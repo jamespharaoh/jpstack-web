@@ -3,12 +3,12 @@
 	package="wbs.clients.apn.chat.supervisor">
 
 	<layer name="console">
-		<bean class="console.ChatMessageStatsProvider"/>
-		<bean class="console.ChatMessageUserStatsProvider"/>
-		<bean class="console.ChatSupervisorConversationPart"/>
-		<bean class="console.ChatSupervisorMessagesPart"/>
-		<bean class="console.ChatSupervisorNotesPart"/>
-		<bean class="console.ChatUserInitiationStatsProvider"/>
+		<component class="console.ChatMessageStatsProvider"/>
+		<component class="console.ChatMessageUserStatsProvider"/>
+		<component class="console.ChatSupervisorConversationPart"/>
+		<component class="console.ChatSupervisorMessagesPart"/>
+		<component class="console.ChatSupervisorNotesPart"/>
+		<component class="console.ChatUserInitiationStatsProvider"/>
 	</layer>
 
 	<console-modules>

@@ -1,7 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.successResult;
 import static wbs.framework.utils.etc.Misc.toEnum;
@@ -9,19 +8,18 @@ import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalMapOptional;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
 
+import com.google.common.base.Optional;
+
+import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
-import fj.data.Either;
-
 import wbs.console.forms.FormField.FormType;
 import wbs.console.helper.EnumConsoleHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -113,7 +111,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			|| isNotPresent (
 				currentValue)
 
-			|| in (
+			|| enumInSafe (
 				formType,
 				FormType.create,
 				FormType.search,
@@ -171,7 +169,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			@NonNull String formName) {
 
 		if (
-			in (
+			enumInSafe (
 				formType,
 				FormType.create,
 				FormType.perform,
@@ -185,7 +183,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 				name);
 
 		} else if (
-			in (
+			enumInSafe (
 				formType,
 				FormType.update)
 		) {
@@ -236,7 +234,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 					name ()));
 
 		if (
-			equal (
+			stringEqual (
 				parameterValue,
 				"none")
 		) {

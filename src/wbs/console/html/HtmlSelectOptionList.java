@@ -1,6 +1,6 @@
 package wbs.console.html;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -8,6 +8,7 @@ import java.util.List;
 
 import wbs.framework.utils.etc.Html;
 
+@Deprecated
 public
 class HtmlSelectOptionList {
 
@@ -67,15 +68,17 @@ class HtmlSelectOptionList {
 			PrintWriter out,
 			String selectedValue) {
 
-		for (HtmlSelectOption htmlSelectOption
-				: htmlSelectOptions) {
+		for (
+			HtmlSelectOption htmlSelectOption
+				: htmlSelectOptions
+		) {
 
 			out.print (
 				"<option value=\"" + Html.encode (htmlSelectOption.value) + "\"");
 
 			if (
 				selectedValue != null
-				&& equal (
+				&& stringEqual (
 					htmlSelectOption.value,
 					selectedValue)
 			) {

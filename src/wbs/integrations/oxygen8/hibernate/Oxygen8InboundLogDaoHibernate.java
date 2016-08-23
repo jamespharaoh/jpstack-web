@@ -2,13 +2,12 @@ package wbs.integrations.oxygen8.hibernate;
 
 import java.util.List;
 
-import lombok.NonNull;
-
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogDao;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogRec;
@@ -23,7 +22,7 @@ class Oxygen8InboundLogDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			@NonNull Oxygen8InboundLogSearch oxygen8InboundLogSearch) {
 
 		Criteria criteria =
@@ -91,7 +90,7 @@ class Oxygen8InboundLogDaoHibernate
 
 		return findMany (
 			"searchIds (oxygen8InboundLogSearch)",
-			Integer.class,
+			Long.class,
 			criteria);
 
 	}

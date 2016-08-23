@@ -17,15 +17,15 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ChatCreditLogicImplementation"/>
+		<component class="logic.ChatCreditLogicImplementation"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.ChatBillDeliveryHandler"/>
-		<bean class="daemon.ChatCheckCreditCommand"/>
-		<bean class="daemon.ChatCreditDaemon"/>
-		<bean class="daemon.ChatPromoCommand"/>
-		<bean class="daemon.ChatSpendWarningDaemon"/>
+		<component class="daemon.ChatBillDeliveryHandler"/>
+		<component class="daemon.ChatCheckCreditCommand"/>
+		<component class="daemon.ChatCreditDaemon"/>
+		<component class="daemon.ChatPromoCommand"/>
+		<component class="daemon.ChatSpendWarningDaemon"/>
 	</layer>
 
 	<console-modules>

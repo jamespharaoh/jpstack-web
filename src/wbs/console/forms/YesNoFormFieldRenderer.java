@@ -1,27 +1,25 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
 import static wbs.framework.utils.etc.Misc.booleanToString;
 import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.stringToBoolean;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
-
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
 
 import fj.data.Either;
-
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("yesNoFormFieldRenderer")
@@ -116,7 +114,7 @@ class YesNoFormFieldRenderer<Container>
 			|| isNotPresent (
 				currentValue)
 
-			|| in (
+			|| enumInSafe (
 				formType,
 				FormType.create,
 				FormType.perform,
@@ -168,7 +166,7 @@ class YesNoFormFieldRenderer<Container>
 			@NonNull String formName) {
 
 		if (
-			in (
+			enumInSafe (
 				formType,
 				FormType.create,
 				FormType.perform,
@@ -182,7 +180,7 @@ class YesNoFormFieldRenderer<Container>
 				name);
 
 		} else if (
-			in (
+			enumInSafe (
 				formType,
 				FormType.update)
 		) {

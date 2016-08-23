@@ -3,7 +3,7 @@
 	package="wbs.integrations.unwiredplaza">
 
 	<layer name="api">
-		<bean class="api.UnwiredPlazaApiServletModule"/>
+		<component class="api.UnwiredPlazaApiServletModule"/>
 	</layer>
 
 </plugin>

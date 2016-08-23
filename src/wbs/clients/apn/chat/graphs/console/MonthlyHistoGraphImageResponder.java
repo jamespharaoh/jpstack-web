@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.graphs.console;
 
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.NumberUtils.integerInSafe;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.awt.Color;
@@ -139,12 +140,13 @@ class MonthlyHistoGraphImageResponder
 					day + 1);
 
 			graphics.setColor (
-				in (
+				ifThenElse (
+					integerInSafe (
 						date.getDayOfWeek (),
 						DateTimeConstants.SATURDAY,
-						DateTimeConstants.SUNDAY)
-					? Color.red
-					: Color.black);
+						DateTimeConstants.SUNDAY),
+					() -> Color.red,
+					() -> Color.black));
 
 			int x1 =
 				+ xBound (day)
@@ -188,7 +190,7 @@ class MonthlyHistoGraphImageResponder
 					day + 1);
 
 			if (
-				in (
+				integerInSafe (
 					date.getDayOfWeek (),
 					DateTimeConstants.SATURDAY,
 					DateTimeConstants.SUNDAY)

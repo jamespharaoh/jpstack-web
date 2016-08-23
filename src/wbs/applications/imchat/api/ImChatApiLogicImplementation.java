@@ -1,14 +1,16 @@
 package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.Misc.doesNotContain;
-import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 import static wbs.framework.utils.etc.StringUtils.underscoreToHyphen;
+import static wbs.framework.utils.etc.TimeUtils.calculateAgeInYears;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +20,6 @@ import javax.inject.Inject;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
-import org.joda.time.Years;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -570,14 +571,14 @@ class ImChatApiLogicImplementation
 
 				}
 
-				Optional<LocalDate> dateOfBirth =
+				Optional <LocalDate> dateOfBirthOptional =
 					DateFinder.find (
 						stringValue,
 						1915);
 
 				if (
 					isNotPresent (
-						dateOfBirth)
+						dateOfBirthOptional)
 				) {
 
 					returnBuilder.put (
@@ -589,13 +590,16 @@ class ImChatApiLogicImplementation
 
 				}
 
-				Integer ageInYears =
-					Years.yearsBetween (
-						dateOfBirth.get ().toDateTimeAtStartOfDay (
-							DateTimeZone.forID (
-								wbsConfig.defaultTimezone ())),
-						transaction.now ()
-					).getYears ();
+				LocalDate dateOfBirth =
+					optionalGetRequired (
+						dateOfBirthOptional);
+
+				Long ageInYears =
+					calculateAgeInYears (
+						dateOfBirth,
+						transaction.now (),
+						DateTimeZone.forID (
+							wbsConfig.defaultTimezone ()));
 
 				if (
 

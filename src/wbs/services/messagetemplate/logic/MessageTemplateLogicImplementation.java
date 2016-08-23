@@ -2,13 +2,12 @@ package wbs.services.messagetemplate.logic;
 
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
+
 import lombok.NonNull;
-
-import com.google.common.collect.ImmutableList;
-
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromXml;
+import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.services.messagetemplate.fixture.MessageTemplateDatabaseSpec;
@@ -56,18 +55,19 @@ class MessageTemplateLogicImplementation
 		// load data
 
 		DataFromXml dataFromXml =
-			new DataFromXml ()
+			new DataFromXmlBuilder ()
 
 			.registerBuilderClasses (
 				MessageTemplateDatabaseSpec.class,
 				MessageTemplateEntryTypeSpec.class,
 				MessageTemplateFieldTypeSpec.class,
-				MessageTemplateParameterSpec.class);
+				MessageTemplateParameterSpec.class)
+
+			.build ();
 
 		MessageTemplateDatabaseSpec databaseSpec =
 			(MessageTemplateDatabaseSpec)
 			dataFromXml.readClasspath (
-				ImmutableList.<Object>of (),
 				resourceName);
 
 		// create database

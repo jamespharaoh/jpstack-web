@@ -4,7 +4,6 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
-
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
 import wbs.platform.queue.console.QueueSubjectSorter.SubjectInfo;
 
@@ -13,13 +12,13 @@ public
 class SortedQueueSubjects {
 
 	@Getter
-	List<SubjectInfo> availableSubjects;
+	List <SubjectInfo> availableSubjects;
 
 	@Getter
-	List<QueueInfo> availableQueues;
+	List <QueueInfo> availableQueues;
 
 	@Getter
-	List<QueueInfo> allQueues;
+	List <QueueInfo> allQueues;
 
 	@Getter
 	long totalItems = 0;

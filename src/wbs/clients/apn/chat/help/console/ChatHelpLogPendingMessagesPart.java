@@ -141,7 +141,7 @@ class ChatHelpLogPendingMessagesPart
 
 				"<td>%h</td>\n",
 				timeFormatter.timestampTimezoneString (
-					chatUserLogic.timezone (
+					chatUserLogic.getTimezone (
 						chatUser),
 					message.getCreatedTime ()),
 

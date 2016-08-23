@@ -10,17 +10,18 @@ import wbs.framework.hibernate.EnumUserType;
 
 public
 class ChatUserCreditModeType
-	extends EnumUserType<Integer,ChatUserCreditMode> {
+	extends EnumUserType <Long, ChatUserCreditMode> {
 
 	{
 
-		sqlType (Types.INTEGER);
+		sqlType (Types.BIGINT);
+
 		enumClass (ChatUserCreditMode.class);
 
-		add (1, ChatUserCreditMode.strict);
-		add (2, ChatUserCreditMode.prePay);
-		add (3, ChatUserCreditMode.barred);
-		add (4, ChatUserCreditMode.free);
+		add (1l, ChatUserCreditMode.strict);
+		add (2l, ChatUserCreditMode.prePay);
+		add (3l, ChatUserCreditMode.barred);
+		add (4l, ChatUserCreditMode.free);
 
 	}
 

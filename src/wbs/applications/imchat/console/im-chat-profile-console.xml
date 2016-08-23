@@ -75,8 +75,7 @@
 		<description-field/>
 
 		<enum-field
-			name="state"
-			helper="imChatProfileStateConsoleHelper"/>
+			name="state"/>
 
 		<text-field
 			name="publicName"
@@ -108,8 +107,7 @@
 		<deleted-field/>
 
 		<enum-field
-			name="state"
-			helper="imChatProfileStateConsoleHelper"/>
+			name="state"/>
 
 		<text-field
 			name="publicName"/>
@@ -134,8 +132,7 @@
 		<deleted-field/>
 
 		<enum-field
-			name="state"
-			helper="imChatProfileStateConsoleHelper"/>
+			name="state"/>
 
 		<text-field
 			name="publicName"

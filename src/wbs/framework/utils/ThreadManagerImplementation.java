@@ -1,6 +1,6 @@
 package wbs.framework.utils;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
@@ -72,7 +72,7 @@ class ThreadManagerImplementation
 				@NonNull GenericExceptionResolution resolution) {
 
 			if (
-				equal (
+				enumEqualSafe (
 					resolution,
 					GenericExceptionResolution.fatalError)
 			) {

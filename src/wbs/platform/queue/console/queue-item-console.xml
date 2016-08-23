@@ -100,8 +100,7 @@
 			label="Created"/>
 
 		<enum-field
-			name="state"
-			helper="queueItemStateConsoleHelper"/>
+			name="state"/>
 
 	</field-set>
 
@@ -135,8 +134,7 @@
 			name="priority"/>
 
 		<enum-field
-			name="state"
-			helper="queueItemStateConsoleHelper"/>
+			name="state"/>
 
 		<object-field
 			name="queueItemClaim"

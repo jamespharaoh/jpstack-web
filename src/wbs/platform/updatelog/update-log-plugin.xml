@@ -7,7 +7,7 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.UpdateManager"/>
+		<component class="logic.UpdateManager"/>
 	</layer>
 
 </plugin>

@@ -1,13 +1,13 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringSplitColon;
 import static wbs.framework.utils.etc.StringUtils.underscoreToCamel;
 
@@ -200,7 +200,7 @@ class GenericConsoleHelperProvider
 		) {
 
 			if (
-				notEqual (
+				stringNotEqualSafe (
 					privKeySpec.name (),
 					viewPrivKey)
 			) {
@@ -491,7 +491,7 @@ class GenericConsoleHelperProvider
 		) {
 
 			if (
-				equal (
+				stringEqual (
 					viewDelegateField,
 					"public")
 			) {

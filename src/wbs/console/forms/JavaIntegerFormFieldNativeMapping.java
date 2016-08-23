@@ -8,10 +8,10 @@ import lombok.NonNull;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.NumberUtils;
 
-@PrototypeComponent ("integerFormFieldNativeMapping")
+@PrototypeComponent ("javaIintegerFormFieldNativeMapping")
 public
-class IntegerFormFieldNativeMapping<Container>
-	implements FormFieldNativeMapping<Container,Long,Integer> {
+class JavaIntegerFormFieldNativeMapping <Container>
+	implements FormFieldNativeMapping <Container, Long, Integer> {
 
 	@Override
 	public

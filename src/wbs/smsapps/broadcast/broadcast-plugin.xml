@@ -15,20 +15,20 @@
 	</models>
 
 	<layer name="console">
-		<bean class="console.BroadcastNumbersAction"/>
-		<bean class="console.BroadcastNumbersPart"/>
-		<bean class="console.BroadcastSendAction"/>
-		<bean class="console.BroadcastSendPart"/>
+		<component class="console.BroadcastNumbersAction"/>
+		<component class="console.BroadcastNumbersPart"/>
+		<component class="console.BroadcastSendAction"/>
+		<component class="console.BroadcastSendPart"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.BroadcastScheduleDaemon"/>
-		<bean class="daemon.BroadcastSendDaemon"/>
+		<component class="daemon.BroadcastScheduleDaemon"/>
+		<component class="daemon.BroadcastSendDaemon"/>
 	</layer>
 
 	<layer name="logic">
-		<bean class="logic.BroadcastLogicImplementation"/>
-		<bean class="logic.BroadcastSendHelper"/>
+		<component class="logic.BroadcastLogicImplementation"/>
+		<component class="logic.BroadcastSendHelper"/>
 	</layer>
 
 	<fixtures>

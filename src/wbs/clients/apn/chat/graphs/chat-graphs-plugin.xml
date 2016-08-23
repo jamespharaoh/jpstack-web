@@ -3,12 +3,12 @@
 	package="wbs.clients.apn.chat.graphs">
 
 	<layer name="console">
-		<bean class="console.ChatGraphsDailyUsersImageResponder"/>
-		<bean class="console.ChatGraphsDailyUsersPart"/>
-		<bean class="console.ChatGraphsJoinersImageResponder"/>
-		<bean class="console.ChatGraphsJoinersPart"/>
-		<bean class="console.ChatGraphsUsersImageResponder"/>
-		<bean class="console.ChatGraphsUsersPart"/>
+		<component class="console.ChatGraphsDailyUsersImageResponder"/>
+		<component class="console.ChatGraphsDailyUsersPart"/>
+		<component class="console.ChatGraphsJoinersImageResponder"/>
+		<component class="console.ChatGraphsJoinersPart"/>
+		<component class="console.ChatGraphsUsersImageResponder"/>
+		<component class="console.ChatGraphsUsersPart"/>
 	</layer>
 
 	<console-modules>

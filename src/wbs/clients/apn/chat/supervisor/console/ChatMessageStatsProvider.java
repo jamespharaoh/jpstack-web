@@ -31,7 +31,7 @@ class ChatMessageStatsProvider
 	public
 	StatsDataSet getStats (
 			@NonNull StatsPeriod period,
-			@NonNull Map<String,Object> conditions) {
+			@NonNull Map <String, Object> conditions) {
 
 		if (period.granularity () != StatsGranularity.hour)
 			throw new IllegalArgumentException ();
@@ -129,7 +129,8 @@ class ChatMessageStatsProvider
 
 				.addIndex (
 					"chatId",
-					conditions.get ("chatId"))
+					conditions.get (
+						"chatId"))
 
 				.addValue (
 					"messagesReceived",

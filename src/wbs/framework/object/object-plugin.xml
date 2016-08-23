@@ -3,16 +3,16 @@
 	package="wbs.framework.object">
 
 	<layer name="object">
-		<bean class="ObjectHelperBuilder"/>
-		<bean class="ObjectHelperChildrenImplementation"/>
-		<bean class="ObjectHelperCodeImplementation"/>
-		<bean class="ObjectHelperFindImplementation"/>
-		<bean class="ObjectHelperIdImplementation"/>
-		<bean class="ObjectHelperIndexImplementation"/>
-		<bean class="ObjectHelperModelImplementation"/>
-		<bean class="ObjectHelperPropertyImplementation"/>
-		<bean class="ObjectHelperUpdateImplementation"/>
-		<bean class="ObjectManagerImplementation"/>
+		<component class="ObjectHelperBuilder"/>
+		<component class="ObjectHelperChildrenImplementation"/>
+		<component class="ObjectHelperCodeImplementation"/>
+		<component class="ObjectHelperFindImplementation"/>
+		<component class="ObjectHelperIdImplementation"/>
+		<component class="ObjectHelperIndexImplementation"/>
+		<component class="ObjectHelperModelImplementation"/>
+		<component class="ObjectHelperPropertyImplementation"/>
+		<component class="ObjectHelperUpdateImplementation"/>
+		<component class="ObjectManagerImplementation"/>
 	</layer>
 
 </plugin>

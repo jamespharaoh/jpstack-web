@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.user.image.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -150,13 +151,14 @@ class ChatUserImageListPart
 
 			printFormat (
 				"<td>%h</td>\n",
-				equal (
+				ifThenElse (
+					referenceEqualSafe (
 						chatUserLogic.getMainChatUserImageByType (
 							chatUser,
 							type),
-						chatUserImage)
-					? "Y"
-					: "");
+						chatUserImage),
+					() -> "Y",
+					() -> ""));
 
 			printFormat (
 				"<td style=\"text-align: center;\">",

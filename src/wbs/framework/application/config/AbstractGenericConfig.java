@@ -1,6 +1,6 @@
 package wbs.framework.application.config;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 
 import java.util.List;
 import java.util.Map;
@@ -50,7 +50,7 @@ class AbstractGenericConfig <Config extends AbstractGenericConfig <Config>>{
 
 			.filter (
 				configItem ->
-					equal (
+					stringEqual (
 						configItem.type (),
 						type))
 

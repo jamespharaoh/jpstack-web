@@ -70,8 +70,7 @@
 			label="Create"/>
 
 		<enum-field
-			name="dataType"
-			helper="imChatCustomerDetailDataTypeConsoleHelper"/>
+			name="dataType"/>
 
 		<integer-field
 			name="minimumAge"/>
@@ -107,8 +106,7 @@
 			name="whenCreatingAccount"/>
 
 		<enum-field
-			name="dataType"
-			helper="imChatCustomerDetailDataTypeConsoleHelper"/>
+			name="dataType"/>
 
 		<integer-field
 			name="minimumAge"
@@ -149,8 +147,7 @@
 			name="whenCreatingAccount"/>
 
 		<enum-field
-			name="dataType"
-			helper="imChatCustomerDetailDataTypeConsoleHelper"/>
+			name="dataType"/>
 
 		<integer-field
 			name="minimumAge"/>
@@ -205,8 +202,7 @@
 			name="whenCreatingAccount"/>
 
 		<enum-field
-			name="dataType"
-			helper="imChatCustomerDetailDataTypeConsoleHelper"/>
+			name="dataType"/>
 
 		<integer-field
 			name="minimumAge"

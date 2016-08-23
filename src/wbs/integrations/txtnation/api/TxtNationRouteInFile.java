@@ -1,7 +1,7 @@
 package wbs.integrations.txtnation.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.PrintWriter;
 import java.util.Collections;
@@ -122,9 +122,11 @@ class TxtNationRouteInFile
 
 		// sanity checks
 
-		if (! equal (
+		if (
+			stringNotEqualSafe (
 				actionParam,
-				"mpush_ir_message")) {
+				"mpush_ir_message")
+		) {
 
 			throw new RuntimeException (
 				stringFormat (
@@ -133,9 +135,11 @@ class TxtNationRouteInFile
 
 		}
 
-		if (! equal (
+		if (
+			stringNotEqualSafe (
 				countryParam,
-				"UK")) {
+				"UK")
+		) {
 
 			throw new RuntimeException (
 				stringFormat (

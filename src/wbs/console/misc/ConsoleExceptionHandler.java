@@ -1,6 +1,6 @@
 package wbs.console.misc;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -15,7 +15,6 @@ import javax.servlet.ServletException;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ErrorResponder;
@@ -150,8 +149,13 @@ class ConsoleExceptionHandler
 					List<String> values =
 						entry.getValue ();
 
-					if (equal (name, "__repost"))
+					if (
+						stringEqual (
+							name,
+							"__repost")
+					) {
 						continue;
+					}
 
 					for (String value : values) {
 

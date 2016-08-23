@@ -5,7 +5,7 @@ import java.util.List;
 public 
 interface ClockworkSmsInboundLogDaoMethods {
 
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			ClockworkSmsInboundLogSearch clockworkSmsInboundLogSearch);
 
 }

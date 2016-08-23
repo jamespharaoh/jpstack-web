@@ -1,7 +1,7 @@
 package wbs.applications.imchat.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.trim;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.framework.utils.etc.Misc.stringTrim;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -70,7 +70,7 @@ class ImChatPendingCustomerNoteUpdateAction
 		// get params
 
 		String valueParam =
-			trim (
+			stringTrim (
 				requestContext.parameterRequired (
 					"value"));
 
@@ -105,7 +105,7 @@ class ImChatPendingCustomerNoteUpdateAction
 					valueParam);
 
 		if (
-			equal (
+			referenceEqualSafe (
 				oldValue,
 				newValue)
 		) {

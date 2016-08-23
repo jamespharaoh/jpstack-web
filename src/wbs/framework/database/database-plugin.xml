@@ -3,11 +3,11 @@
 	package="wbs.framework.database">
 
 	<layer name="hibernate">
-		<bean class="TransactionCacheFactory"/>
+		<component class="TransactionCacheFactory"/>
 	</layer>
 
 	<layer name="utils">
-		<bean class="DbPool"/>
+		<component class="DbPool"/>
 	</layer>
 
 </plugin>

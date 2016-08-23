@@ -1,7 +1,7 @@
 package wbs.integrations.broadcastsystems.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -101,9 +101,11 @@ class BroadcastSystemsSender1
 
 		// pick a handler
 
-		if (equal (
+		if (
+			stringNotEqualSafe (
 				state.message.getMessageType ().getCode (),
-				"sms")) {
+				"sms")
+		) {
 
 			// nothing to do
 

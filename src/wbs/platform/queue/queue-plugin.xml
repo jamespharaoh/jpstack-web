@@ -17,50 +17,50 @@
 	</models>
 
 	<layer name="fixture">
-		<bean class="fixture.QueueTypeBuilder"/>
-		<bean class="fixture.QueueTypesBuilder"/>
+		<component class="fixture.QueueTypeBuilder"/>
+		<component class="fixture.QueueTypesBuilder"/>
 	</layer>
 
 	<layer name="model-meta">
-		<bean class="metamodel.QueueTypeSpec"/>
-		<bean class="metamodel.QueueTypesSpec"/>
+		<component class="metamodel.QueueTypeSpec"/>
+		<component class="metamodel.QueueTypesSpec"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.QueueClaimAction"/>
-		<bean class="console.QueueConsoleLogic"/>
-		<bean class="console.QueueDebugPart"/>
-		<bean class="console.QueueFilterResponder"/>
-		<bean class="console.QueueHomeResponder"/>
-		<bean class="console.QueueItemAction"/>
-		<bean class="console.QueueItemActionsAction"/>
-		<bean class="console.QueueItemActionsPart"/>
-		<bean class="console.QueueItemClaimStatusConsoleHelper"/>
-		<bean class="console.QueueItemConsoleHooks"/>
-		<bean class="console.QueueItemQueueStatsProvider"/>
-		<bean class="console.QueueItemsStatusLinePart"/>
-		<bean class="console.QueueItemStatusLine"/>
-		<bean class="console.QueueItemStateConsoleHelper"/>
-		<bean class="console.QueueItemUserStatsProvider"/>
-		<bean class="console.QueueListActivePart"/>
-		<bean class="console.QueueManager"/>
-		<bean class="console.QueueStatsFilter"/>
-		<bean class="console.QueueStatsGrouper"/>
-		<bean class="console.QueueSubjectActionsAction"/>
-		<bean class="console.QueueSubjectActionsPart"/>
-		<bean class="console.QueueSubjectSorter"/>
-		<bean class="console.QueueSupervisorItemsPart"/>
-		<bean class="console.QueueSupervisorStatsGrouperBuilder"/>
-		<bean class="console.QueueSupervisorStatsGrouperSpec"/>
-		<bean class="console.QueueUnclaimAction"/>
-		<bean class="console.QueueUsersAction"/>
-		<bean class="console.QueueUsersPart"/>
+		<component class="console.QueueClaimAction"/>
+		<component class="console.QueueConsoleLogic"/>
+		<component class="console.QueueDebugPart"/>
+		<component class="console.QueueFilterResponder"/>
+		<component class="console.QueueHomeResponder"/>
+		<component class="console.QueueItemAction"/>
+		<component class="console.QueueItemActionsAction"/>
+		<component class="console.QueueItemActionsPart"/>
+		<component class="console.QueueItemClaimStatusConsoleHelper"/>
+		<component class="console.QueueItemConsoleHooks"/>
+		<component class="console.QueueItemQueueStatsProvider"/>
+		<component class="console.QueueItemsStatusLinePart"/>
+		<component class="console.QueueItemStatusLine"/>
+		<component class="console.QueueItemStateConsoleHelper"/>
+		<component class="console.QueueItemUserStatsProvider"/>
+		<component class="console.QueueListActivePart"/>
+		<component class="console.QueueManager"/>
+		<component class="console.QueueStatsFilter"/>
+		<component class="console.QueueStatsGrouper"/>
+		<component class="console.QueueSubjectActionsAction"/>
+		<component class="console.QueueSubjectActionsPart"/>
+		<component class="console.QueueSubjectSorter"/>
+		<component class="console.QueueSupervisorItemsPart"/>
+		<component class="console.QueueSupervisorStatsGrouperBuilder"/>
+		<component class="console.QueueSupervisorStatsGrouperSpec"/>
+		<component class="console.QueueUnclaimAction"/>
+		<component class="console.QueueUsersAction"/>
+		<component class="console.QueueUsersPart"/>
 	</layer>
 
 	<layer name="logic">
-		<bean class="logic.DummyQueueCache"/>
-		<bean class="logic.MasterQueueCache"/>
-		<bean class="logic.QueueLogicImplementation"/>
+		<component class="logic.DummyQueueCache"/>
+		<component class="logic.MasterQueueCache"/>
+		<component class="logic.QueueLogicImplementation"/>
 	</layer>
 
 	<fixtures>

@@ -1,6 +1,6 @@
 package wbs.platform.php;
 
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -93,7 +93,7 @@ class AbstractPhpEntity
 	public
 	boolean isNumber () {
 
-		return in (
+		return enumInSafe (
 			type,
 			PhpType.pInteger,
 			PhpType.pFloat);
@@ -104,7 +104,7 @@ class AbstractPhpEntity
 	public
 	boolean isScalar () {
 
-		return in (
+		return enumInSafe (
 			type,
 			PhpType.pBoolean,
 			PhpType.pInteger,

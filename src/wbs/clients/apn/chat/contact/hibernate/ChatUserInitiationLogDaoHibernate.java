@@ -6,8 +6,6 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.NonNull;
-
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -15,6 +13,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Interval;
 
+import lombok.NonNull;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogDao;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogSearch;
@@ -65,7 +64,7 @@ class ChatUserInitiationLogDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			@NonNull ChatUserInitiationLogSearch search) {
 
 		Criteria criteria =
@@ -167,7 +166,7 @@ class ChatUserInitiationLogDaoHibernate
 
 		return findMany (
 			"search (search)",
-			Integer.class,
+			Long.class,
 			criteria);
 
 	}

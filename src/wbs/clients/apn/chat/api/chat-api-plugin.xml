@@ -3,7 +3,7 @@
 	package="wbs.clients.apn.chat.api">
 
 	<layer name="api">
-		<bean class="ChatApiServletModule"/>
+		<component class="ChatApiServletModule"/>
 	</layer>
 
 </plugin>

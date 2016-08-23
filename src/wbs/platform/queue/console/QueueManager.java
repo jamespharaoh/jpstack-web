@@ -1,6 +1,6 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
@@ -11,11 +11,10 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import org.joda.time.Duration;
 
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -154,7 +153,7 @@ class QueueManager {
 				queue.getQueueType ());
 
 		if (
-			equal (
+			stringEqual (
 				queueTypeSpec.preferredUserDelay (),
 				"0")
 		) {

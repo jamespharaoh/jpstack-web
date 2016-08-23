@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.user.core.hibernate;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collection;
@@ -688,28 +688,44 @@ class ChatUserDaoHibernate
 						"_chatUser.online",
 						value));
 
-			} else if (equal (key, "gender")) {
+			} else if (
+				stringEqual (
+					key,
+					"gender")
+			) {
 
 				criteria.add (
 					Restrictions.eq (
 						"_chatUser.gender",
 						value));
 
-			} else if (equal (key, "locPlace")) {
+			} else if (
+				stringEqual (
+					key,
+					"locPlace")
+			) {
 
 				criteria.add (
 					Restrictions.eq (
 						"_chatuser.locationPlace",
 						value));
 
-			} else if (equal (key, "orient")) {
+			} else if (
+				stringEqual (
+				key,
+				"orient")
+			) {
 
 				criteria.add (
 					Restrictions.eq (
 						"_chatUser.orient",
 						value));
 
-			} else if (equal (key, "typeIn")) {
+			} else if (
+				stringEqual (
+					key,
+					"typeIn")
+			) {
 
 				if (((Collection <?>) value).size () == 0)
 					return ImmutableList.of ();
@@ -728,7 +744,11 @@ class ChatUserDaoHibernate
 						: Restrictions.isNull (
 							"_chatUser.gender"));
 
-			} else if (equal (key, "genderIn")) {
+			} else if (
+				stringEqual (
+					key,
+					"genderIn")
+			) {
 
 				if (((Collection <?>) value).size () == 0)
 					return ImmutableList.of ();
@@ -751,7 +771,11 @@ class ChatUserDaoHibernate
 
 				);
 
-			} else if (equal (key, "orientIn")) {
+			} else if (
+				stringEqual (
+					key,
+					"orientIn")
+			) {
 
 				if (((Collection<?>) value).size () == 0)
 					return Collections.emptyList ();
@@ -783,42 +807,66 @@ class ChatUserDaoHibernate
 						"_chatUser.barred",
 						value));
 
-			} else if (equal (key, "creditFailedGte")) {
+			} else if (
+				stringEqual (
+					key,
+					"creditFailedGte")
+			) {
 
 				criteria.add (
 					Restrictions.ge (
 						"_chatUser.creditFailed",
 						value));
 
-			} else if (equal (key, "creditFailedLte")) {
+			} else if (
+				stringEqual (
+					key,
+					"creditFailedLte")
+			) {
 
 				criteria.add (
 					Restrictions.le (
 						"_chatUser.creditFailed",
 						value));
 
-			} else if (equal (key, "creditNoReportGte")) {
+			} else if (
+				stringEqual (
+					key,
+					"creditNoReportGte")
+			) {
 
 				criteria.add (
 					Restrictions.ge (
 						"_chatUser.creditSent",
 						value));
 
-			} else if (equal (key, "creditNoReportLte")) {
+			} else if (
+				stringEqual (
+					key,
+					"creditNoReportLte")
+			) {
 
 				criteria.add (
 					Restrictions.le (
 						"_chatUser.creditSent",
 						value));
 
-			} else if (equal (key, "valueSinceEverGte")) {
+			} else if (
+				stringEqual (
+					key,
+					"valueSinceEverGte")
+			) {
 
 				criteria.add (
 					Restrictions.ge (
 						"_chatUser.valueSinceEver",
 						value));
 
-			} else if (equal (key, "valueSinceEverLte")) {
+			} else if (
+				stringEqual (
+					key,
+					"valueSinceEverLte")
+			) {
 
 				criteria.add (
 					Restrictions.le (
@@ -826,7 +874,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				equal (
+				stringEqual (
 					key,
 					"onlineAfter")
 			) {
@@ -860,7 +908,7 @@ class ChatUserDaoHibernate
 						onlineAfterCriteria));
 
 			} else if (
-				equal (
+				stringEqual (
 					key,
 					"deliveryMethodIn")
 			) {
@@ -870,21 +918,33 @@ class ChatUserDaoHibernate
 						"_chatUser.deliveryMethod",
 						(Collection<?>) value));
 
-			} else if (equal (key, "lastMessagePollBefore")) {
+			} else if (
+				stringEqual (
+					key,
+					"lastMessagePollBefore")
+			) {
 
 				criteria.add (
 					Restrictions.lt (
 						"_chatUser.lastMessagePoll",
 						value));
 
-			} else if (equal (key, "lastActionAfter")) {
+			} else if (
+				stringEqual (
+					key,
+					"lastActionAfter")
+			) {
 
 				criteria.add (
 					Restrictions.ge (
 						"_chatUser.lastAction",
 						value));
 
-			} else if (equal (key, "lastActionBefore")) {
+			} else if (
+				stringEqual (
+					key,
+					"lastActionBefore")
+			) {
 
 				criteria.add (
 					Restrictions.lt (
@@ -914,7 +974,11 @@ class ChatUserDaoHibernate
 
 				}
 
-			} else if (equal (key, "limit")) {
+			} else if (
+				stringEqual (
+					key,
+					"limit")
+			) {
 
 				criteria.setMaxResults (
 					toJavaIntegerRequired (

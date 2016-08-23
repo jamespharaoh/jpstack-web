@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.trim;
+import static wbs.framework.utils.etc.Misc.stringTrim;
 import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import javax.inject.Inject;
@@ -79,7 +79,7 @@ class ChatUserNotesAction
 		// check params
 
 		String noteString =
-			trim (
+			stringTrim (
 				requestContext.parameterRequired (
 					"note"));
 

@@ -1,9 +1,11 @@
 package wbs.console.supervisor;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.localTime;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,18 +14,16 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
-import org.joda.time.LocalTime;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.html.ObsoleteDateField;
 import wbs.console.html.ObsoleteDateLinks;
 import wbs.console.misc.ConsoleUserHelper;
@@ -131,8 +131,8 @@ class SupervisorPart
 			supervisorConfigNames =
 				supervisorHelper.getSupervisorConfigNames ();
 
-			ImmutableList.Builder<SupervisorConfig> supervisorConfigsBuilder =
-				ImmutableList.<SupervisorConfig>builder ();
+			ImmutableList.Builder <SupervisorConfig> supervisorConfigsBuilder =
+				ImmutableList.builder ();
 
 			for (
 				String supervisorConfigName
@@ -218,11 +218,10 @@ class SupervisorPart
 			dateField.date
 
 			.toDateTime (
-				new LocalTime (
+				localTime (
 					ifNull (
 						supervisorConfig.spec ().offsetHours (),
-						0),
-					0),
+						0l)),
 				consoleUserHelper.timezone ());
 
 		endTime =
@@ -231,11 +230,10 @@ class SupervisorPart
 			.plusDays (1)
 
 			.toDateTime (
-				new LocalTime (
+				localTime (
 					ifNull (
 						supervisorConfig.spec ().offsetHours (),
-						0),
-					0),
+						0l)),
 				consoleUserHelper.timezone ());
 
 	}
@@ -249,14 +247,14 @@ class SupervisorPart
 				endTime,
 				ifNull (
 					supervisorConfig.spec ().offsetHours (),
-					0));
+					0l));
 
 	}
 
 	void createStatsConditions () {
 
-		ImmutableMap.Builder<String,Object> conditionsBuilder =
-			ImmutableMap.<String,Object>builder ();
+		ImmutableMap.Builder <String, Object> conditionsBuilder =
+			ImmutableMap.builder ();
 
 		for (
 			Object object
@@ -266,7 +264,8 @@ class SupervisorPart
 			if (object instanceof SupervisorConditionSpec) {
 
 				SupervisorConditionSpec supervisorConditionSpec =
-					(SupervisorConditionSpec) object;
+					(SupervisorConditionSpec)
+					object;
 
 				conditionsBuilder.put (
 					supervisorConditionSpec.name (),
@@ -278,12 +277,12 @@ class SupervisorPart
 			if (object instanceof SupervisorIntegerConditionSpec) {
 
 				SupervisorIntegerConditionSpec integerConditionSpec =
-					(SupervisorIntegerConditionSpec) object;
+					(SupervisorIntegerConditionSpec)
+					object;
 
 				conditionsBuilder.put (
 					integerConditionSpec.name (),
-					Integer.parseInt (
-						integerConditionSpec.value ()));
+					integerConditionSpec.value ());
 
 			}
 
@@ -308,8 +307,8 @@ class SupervisorPart
 
 	void createStatsDataSets () {
 
-		ImmutableMap.Builder<String,StatsDataSet> dataSetsBuilder =
-			ImmutableMap.<String,StatsDataSet>builder ();
+		ImmutableMap.Builder <String, StatsDataSet> dataSetsBuilder =
+			ImmutableMap.builder ();
 
 		for (
 			Object object
@@ -320,7 +319,8 @@ class SupervisorPart
 				continue;
 
 			SupervisorDataSetSpec supervisorDataSetSpec =
-				(SupervisorDataSetSpec) object;
+				(SupervisorDataSetSpec)
+				object;
 
 			StatsProvider statsProvider =
 				applicationContext.getComponentRequired (
@@ -345,14 +345,21 @@ class SupervisorPart
 
 	void createPageParts () {
 
-		Map<String,Object> partParameters =
-			ImmutableMap.<String,Object>builder ()
-				.put ("statsPeriod", statsPeriod)
-				.put ("statsDataSetsByName", statsDataSets)
-				.build ();
+		Map <String, Object> partParameters =
+			ImmutableMap.<String, Object> builder ()
 
-		ImmutableList.Builder<PagePart> pagePartsBuilder =
-			ImmutableList.<PagePart>builder ();
+			.put (
+				"statsPeriod",
+				statsPeriod)
+
+			.put (
+				"statsDataSetsByName",
+				statsDataSets)
+
+			.build ();
+
+		ImmutableList.Builder <PagePart> pagePartsBuilder =
+			ImmutableList.builder ();
 
 		for (
 			Provider<PagePart> pagePartFactory
@@ -417,11 +424,12 @@ class SupervisorPart
 				printFormat (
 					"<a",
 					" class=\"%h\"",
-					equal (
+					ifThenElse (
+						stringEqual (
 							oneSupervisorConfig.name (),
-							selectedSupervisorConfigName)
-						? "selected"
-						: "",
+							selectedSupervisorConfigName),
+						() -> "selected",
+						() -> ""),
 					" href=\"%h\"",
 					stringFormat (
 						"%s",
@@ -475,16 +483,16 @@ class SupervisorPart
 
 		// warning if time change
 
-		int hoursInDay =
+		long hoursInDay =
 			new Duration (
 				startTime,
 				endTime)
 			.toStandardHours ().getHours ();
 
 		if (
-			notEqual (
+			integerNotEqualSafe (
 				hoursInDay,
-				24)
+				24l)
 		) {
 
 			printFormat (

@@ -1,5 +1,6 @@
 package wbs.framework.application.tools;
 
+import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringSplitComma;
@@ -10,10 +11,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.application.context.ComponentDefinition;
+import wbs.framework.logging.LoggedErrorsException;
 
 /**
  * Create an application context, instantiate a bean in it and invoke a
@@ -21,6 +25,7 @@ import wbs.framework.application.context.ComponentDefinition;
  * in order to be useful from the command line or in an ant build script.
  */
 @Accessors (fluent = true)
+@Log4j
 public
 class BeanRunner {
 
@@ -82,10 +87,10 @@ class BeanRunner {
 			.configNames (
 				configNames)
 
-			.registerBeanDefinition (
+			.registerComponentDefinition (
 				new ComponentDefinition ()
 
-				.beanClass (
+				.componentClass (
 					runnerClass)
 
 				.name (
@@ -122,17 +127,17 @@ class BeanRunner {
 
 	}
 
-	public
-	static void main (
-			String[] argumentsArray)
-		throws Exception {
+	public static
+	void main (
+			@NonNull String[] argumentsArray) {
 
-		List<String> arguments =
-			Arrays.asList (argumentsArray);
+		List <String> arguments =
+			Arrays.asList (
+				argumentsArray);
 
 		if (arguments.size () < 5) {
 
-			throw new RuntimeException (
+			log.error (
 				stringFormat (
 					"Expects five or more parameters: %s",
 					joinWithCommaAndSpace (
@@ -144,34 +149,54 @@ class BeanRunner {
 						"runner method name",
 						"runner arguments...")));
 
+			System.exit (1);
+
 		}
 
-		new BeanRunner ()
+		try {
 
-			.primaryProjectName (
-				arguments.get (0))
+			new BeanRunner ()
+	
+				.primaryProjectName (
+					arguments.get (0))
+	
+				.primaryProjectPackageName (
+					arguments.get (1))
+	
+				.layerNames (
+					stringSplitComma (
+						arguments.get (2)))
+	
+				.configNames (
+					stringSplitComma (
+						arguments.get (3)))
+	
+				.runnerName (
+					arguments.get (4))
+	
+				.methodName (
+					arguments.get (5))
+	
+				.runnerArgs (
+					arguments.subList (6, arguments.size ()))
+	
+				.run ();
 
-			.primaryProjectPackageName (
-				arguments.get (1))
+		} catch (LoggedErrorsException loggedErrorsException) {
 
-			.layerNames (
-				stringSplitComma (
-					arguments.get (2)))
+			doNothing ();
 
-			.configNames (
-				stringSplitComma (
-					arguments.get (3)))
+			System.exit (1);
 
-			.runnerName (
-				arguments.get (4))
+		} catch (Exception exception) {
 
-			.methodName (
-				arguments.get (5))
+			log.error (
+				"Failed to run component",
+				exception);
 
-			.runnerArgs (
-				arguments.subList (6, arguments.size ()))
+			System.exit (1);
 
-			.run ();
+		}
 
 	}
 

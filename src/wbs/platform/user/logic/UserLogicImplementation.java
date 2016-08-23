@@ -1,10 +1,10 @@
 package wbs.platform.user.logic;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.hashSha1;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import javax.inject.Inject;
 
@@ -207,13 +207,12 @@ class UserLogicImplementation
 
 		if (
 
-			equal (
+			stringEqual (
 				password,
 				"**********")
 
 			&& wbsConfig.testUsers ().contains (
-				stringFormat (
-					"%s.%s",
+				joinWithFullStop (
 					user.getSlice ().getCode (),
 					user.getUsername ()))
 
@@ -234,9 +233,10 @@ class UserLogicImplementation
 		// fail if password hash doesn't match
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				user.getPassword (),
-				hashSha1 (password))
+				hashSha1 (
+					password))
 		) {
 
 			return false;

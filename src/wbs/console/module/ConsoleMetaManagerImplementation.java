@@ -1,12 +1,12 @@
 package wbs.console.module;
 
 import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,13 +20,12 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.commons.io.FileUtils;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.console.context.ConsoleContextExtensionPoint;
 import wbs.console.context.ConsoleContextHint;
 import wbs.console.context.ConsoleContextLink;
@@ -251,7 +250,7 @@ class ConsoleMetaManagerImplementation
 			} else if (extensionPoint.nested ()) {
 
 				if (
-					equal (
+					stringEqual (
 						extensionPoint.name (),
 						extensionPoint.parentExtensionPointName ())
 				) {

@@ -1,9 +1,9 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -182,7 +182,7 @@ class ObjectFormFieldBuilder {
 
 		// field type
 
-		Optional<Class<?>> propertyClass =
+		Optional<Class<?>> propertyClassOptional =
 			objectManager.dereferenceType (
 				Optional.<Class<?>>of (
 					context.containerClass ()),
@@ -213,7 +213,7 @@ class ObjectFormFieldBuilder {
 					name)
 
 				.nativeClass (
-					propertyClass.get ());
+					propertyClassOptional.get ());
 
 		}
 
@@ -222,8 +222,8 @@ class ObjectFormFieldBuilder {
 		FormFieldNativeMapping nativeMapping;
 
 		if (
-			equal (
-				propertyClass,
+			optionalValueEqualSafe (
+				propertyClassOptional,
 				Long.class)
 		) {
 

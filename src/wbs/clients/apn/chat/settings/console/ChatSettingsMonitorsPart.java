@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.settings.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;

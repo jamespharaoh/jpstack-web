@@ -1,8 +1,8 @@
 package wbs.framework.entity.build;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
 
@@ -74,7 +74,7 @@ class ForeignIdModelFieldBuilder {
 				false)
 
 			.valueType (
-				Integer.class)
+				Long.class)
 
 			.nullable (
 				false)
@@ -83,7 +83,7 @@ class ForeignIdModelFieldBuilder {
 				spec.fieldName ())
 
 			.columnNames (
-				ImmutableList.<String>of (
+				ImmutableList.of (
 					ifNull (
 						spec.columnName (),
 						stringFormat (

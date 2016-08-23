@@ -23,7 +23,7 @@ import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("rangeFormFieldRenderer")
@@ -234,13 +234,13 @@ class RangeFormFieldRenderer<
 			Optional.of (
 				Range.between (
 
-			optionalRequired (
+			optionalGetRequired (
 				getValue (
 					minimum.formToInterface (
 						submission,
 						formName))),
 
-			optionalRequired (
+			optionalGetRequired (
 				getValue (
 					maximum.formToInterface (
 						submission,

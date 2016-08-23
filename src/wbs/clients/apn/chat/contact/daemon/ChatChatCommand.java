@@ -327,7 +327,7 @@ class ChatChatCommand
 		Optional<ChatKeywordRec> chatKeywordOptional =
 			chatKeywordHelper.findByCode (
 				chat,
-				GsmUtils.toSimpleAlpha (keyword));
+				GsmUtils.gsmStringSimplify (keyword));
 
 		if (
 			isNotPresent (

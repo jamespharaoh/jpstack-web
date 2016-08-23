@@ -1,10 +1,11 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
+import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -200,15 +201,17 @@ class ManualResponderRequestPendingSummaryPart
 		smsCustomerSession =
 			smsCustomer != null
 			&& smsCustomer.getNumSessions () > 0
-				? smsCustomerSessionHelper.findByIndexOrNull (
-					smsCustomer,
-					smsCustomer.getNumSessions () - 1)
-				: null;
+
+			? smsCustomerSessionHelper.findByIndexRequired (
+				smsCustomer,
+				smsCustomer.getNumSessions () - 1)
+
+			: null;
 
 		// get routes
 
-		Set<RouteRec> routes =
-			new HashSet<RouteRec> ();
+		Set <RouteRec> routes =
+			new HashSet<> ();
 
 		for (
 			ManualResponderTemplateRec manualResponderTemplate
@@ -280,7 +283,7 @@ class ManualResponderRequestPendingSummaryPart
 			) {
 
 				if (
-					in (
+					enumInSafe (
 						message.getStatus (),
 						MessageStatus.undelivered,
 						MessageStatus.cancelled,
@@ -292,7 +295,7 @@ class ManualResponderRequestPendingSummaryPart
 				}
 
 				if (
-					! in (
+					enumNotInSafe (
 						message.getStatus (),
 						MessageStatus.pending,
 						MessageStatus.sent,
@@ -311,7 +314,7 @@ class ManualResponderRequestPendingSummaryPart
 					route.getOutCharge ();
 
 				if (
-					equal (
+					referenceEqualSafe (
 						message.getService (),
 						defaultService)
 				) {

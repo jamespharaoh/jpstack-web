@@ -3,9 +3,9 @@
 	package="wbs.clients.apn.chat.settings">
 
 	<layer name="console">
-		<bean class="console.ChatSettingsMonitorsAction"/>
-		<bean class="console.ChatSettingsMonitorsPart"/>
-		<bean class="console.ChatUserCodeFormFieldSpec"/>
+		<component class="console.ChatSettingsMonitorsAction"/>
+		<component class="console.ChatSettingsMonitorsPart"/>
+		<component class="console.ChatUserCodeFormFieldSpec"/>
 	</layer>
 
 	<console-modules>

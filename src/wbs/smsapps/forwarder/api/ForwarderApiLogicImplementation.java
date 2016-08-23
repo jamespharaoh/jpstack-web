@@ -1,7 +1,8 @@
 package wbs.smsapps.forwarder.api;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -117,7 +118,7 @@ class ForwarderApiLogicImplementation
 		// check the password
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				forwarder.getPassword (),
 				password)
 		) {
@@ -259,7 +260,7 @@ class ForwarderApiLogicImplementation
 
 		// find the message
 
-		Optional<ForwarderMessageInRec> forwarderMessageInOptional =
+		Optional <ForwarderMessageInRec> forwarderMessageInOptional =
 			forwarderMessageInHelper.find (
 				forwarderMessageInId);
 
@@ -268,7 +269,7 @@ class ForwarderApiLogicImplementation
 			isNotPresent (
 				forwarderMessageInOptional)
 
-			|| notEqual (
+			|| referenceNotEqualSafe (
 				forwarderMessageInOptional.get ().getForwarder (),
 				forwarder)
 
@@ -437,7 +438,7 @@ class ForwarderApiLogicImplementation
 		// check password
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				forwarder.getPassword (),
 				password)
 		) {

@@ -1,10 +1,12 @@
 package wbs.console.param;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
+@Deprecated
 public
 class YesNoParamChecker
-	implements ParamChecker<Boolean> {
+	implements ParamChecker <Boolean> {
 
 	private
 	String error;
@@ -30,14 +32,32 @@ class YesNoParamChecker
 		param =
 			param.trim ();
 
-		if (equal (param, "") && ! required)
+		if (
+
+			! required
+
+			&& stringIsEmpty (
+				param)
+
+		) {
 			return null;
+		}
 
-		if (equal (param, "false"))
+		if (
+			stringEqual (
+				param,
+				"false")
+		) {
 			return false;
+		}
 
-		if (equal (param, "true"))
+		if (
+			stringEqual (
+				param,
+				"true")
+		) {
 			return true;
+		}
 
 		throw new ParamFormatException (
 			error);

@@ -6,14 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.joda.time.Instant;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.joda.time.Instant;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)
@@ -91,15 +90,18 @@ class MultiplicationStatsResolver
 		for (Object group : groups) {
 
 			OUTER:
-			for (Instant step : period.steps ()) {
+			for (
+				Instant step
+					: period.steps ()
+			) {
 
-				Pair<Object,Instant> key =
-					Pair.<Object,Instant>of (
+				Pair <Object, Instant> key =
+					Pair.of (
 						group,
 						step);
 
-				int numerator = 1;
-				int denominator = 1;
+				long numerator = 1;
+				long denominator = 1;
 
 				for (
 					int operandIndex = 0;
@@ -110,17 +112,19 @@ class MultiplicationStatsResolver
 					Operand operand =
 						operands.get (operandIndex);
 
-					int value =
+					long value =
 						operand.value;
 
 					if (operand.resolver != null) {
 
 						ResolvedStats operandResolved =
-							operandsResolved.get (operandIndex);
+							operandsResolved.get (
+								operandIndex);
 
-						Integer resolverValue =
-							(Integer)
-							operandResolved.steps ().get (key);
+						Long resolverValue =
+							(Long)
+							operandResolved.steps ().get (
+								key);
 
 						if (resolverValue == null)
 							continue OUTER;
@@ -133,10 +137,10 @@ class MultiplicationStatsResolver
 
 					}
 
-					for (int i = 0; i < operand.power; i++)
+					for (long i = 0; i < operand.power; i++)
 						numerator *= value;
 
-					for (int i = operand.power; i < 0; i ++)
+					for (long i = operand.power; i < 0; i ++)
 						denominator *= value;
 
 				}
@@ -149,8 +153,8 @@ class MultiplicationStatsResolver
 
 			{
 
-				int numerator = 1;
-				int denominator = 1;
+				long numerator = 1;
+				long denominator = 1;
 
 				for (
 					int operandIndex = 0;
@@ -159,24 +163,27 @@ class MultiplicationStatsResolver
 				) {
 
 					Operand operand =
-						operands.get (operandIndex);
+						operands.get (
+							operandIndex);
 
-					int value =
+					long value =
 						operand.value;
 
 					if (operand.resolver != null) {
 
 						ResolvedStats operandResolved =
-							operandsResolved.get (operandIndex);
+							operandsResolved.get (
+								operandIndex);
 
-						Integer resolverValue =
-							(Integer)
-							operandResolved.totals ().get (group);
+						Long resolverValue =
+							(Long)
+							operandResolved.totals ().get (
+								group);
 
 						if (resolverValue == null)
 							break;
 
-						if (resolverValue == 0)
+						if (resolverValue == 0l)
 							break;
 
 						value *=
@@ -184,10 +191,10 @@ class MultiplicationStatsResolver
 
 					}
 
-					for (int i = 0; i < operand.power; i++)
+					for (long i = 0; i < operand.power; i++)
 						numerator *= value;
 
-					for (int i = operand.power; i < 0; i ++)
+					for (long i = operand.power; i < 0; i ++)
 						denominator *= value;
 
 				}
@@ -208,8 +215,8 @@ class MultiplicationStatsResolver
 	@Data
 	public static
 	class Operand {
-		int power = 1;
-		int value = 1;
+		long power = 1l;
+		long value = 1l;
 		StatsResolver resolver;
 	}
 

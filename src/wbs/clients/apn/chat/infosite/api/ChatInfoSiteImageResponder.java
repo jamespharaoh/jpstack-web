@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.infosite.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -48,7 +48,7 @@ class ChatInfoSiteImageResponder
 					"chatInfoSiteId"));
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				infoSite.getToken (),
 				requestContext.requestStringRequired (
 					"chatInfoSiteToken"))
@@ -80,7 +80,7 @@ class ChatInfoSiteImageResponder
 				"chatInfoSiteMode");
 
 		if (
-			equal (
+			stringEqual (
 				mode,
 				"full")
 		) {

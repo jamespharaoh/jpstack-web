@@ -1,9 +1,14 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.toEnum;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNullThenRequired;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.uncapitalise;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +27,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.utils.etc.BeanLogic;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("enumFormFieldBuilder")
@@ -40,43 +46,43 @@ class EnumFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<EnumCsvFormFieldInterfaceMapping>
+	Provider <EnumCsvFormFieldInterfaceMapping>
 	enumCsvFormFieldInterfaceMappingProvider;
 
 	@Inject
-	Provider<EnumFormFieldRenderer>
+	Provider <EnumFormFieldRenderer>
 	enumFormFieldRendererProvider;
 
 	@Inject
-	Provider<HiddenFormField>
+	Provider <HiddenFormField>
 	hiddenFormFieldProvider;
 
 	@Inject
-	Provider<IdentityFormFieldInterfaceMapping>
+	Provider <IdentityFormFieldInterfaceMapping>
 	identityFormFieldInterfaceMappingProvider;
 
 	@Inject
-	Provider<IdentityFormFieldNativeMapping>
+	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
 	@Inject
-	Provider<NullFormFieldConstraintValidator>
+	Provider <NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
 
 	@Inject
-	Provider<ReadOnlyFormField>
+	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
 	@Inject
-	Provider<RequiredFormFieldValueValidator>
+	Provider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
 	@Inject
-	Provider<SimpleFormFieldAccessor>
+	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
 	@Inject
-	Provider<UpdatableFormField>
+	Provider <UpdatableFormField>
 	updatableFormFieldProvider;
 
 	// builder
@@ -122,15 +128,44 @@ class EnumFormFieldBuilder {
 				spec.hidden (),
 				false);
 
+		Class <?> propertyClass =
+			BeanLogic.propertyClassForClass (
+				context.containerClass (),
+				name);
+
+		String enumConsoleHelperName =
+			ifNullThenRequired (
+
+			() -> spec.helperBeanName (),
+
+			() -> ifThenElse (
+				isNotNull (
+					propertyClass.getEnclosingClass ()),
+	
+				() -> stringFormat (
+					"%s%sConsoleHelper",
+					uncapitalise (
+						propertyClass.getEnclosingClass ().getSimpleName ()),
+					propertyClass.getSimpleName ()),
+	
+				() -> stringFormat (
+					"%sConsoleHelper",
+					uncapitalise (
+						propertyClass.getSimpleName ()))
+
+			)
+
+		);
+
 		EnumConsoleHelper enumConsoleHelper =
 			applicationContext.getComponentRequired (
-				spec.helperBeanName (),
+				enumConsoleHelperName,
 				EnumConsoleHelper.class);
-
-		Optional<Optional<Object>> implicitValue =
+	
+		Optional <Optional <Object>> implicitValue =
 			spec.implicitValue () != null
 				? Optional.of (
-					Optional.<Object>of (
+					Optional.of (
 						toEnum (
 							enumConsoleHelper.enumClass (),
 							spec.implicitValue ())))
@@ -154,7 +189,7 @@ class EnumFormFieldBuilder {
 
 		// value validators
 
-		List<FormFieldValueValidator> valueValidators =
+		List <FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
 
 		if (! nullable) {

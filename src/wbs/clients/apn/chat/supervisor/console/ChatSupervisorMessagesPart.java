@@ -101,7 +101,7 @@ class ChatSupervisorMessagesPart
 
 		UserRec senderUser =
 			userHelper.findRequired (
-				requestContext.parameterInteger (
+				requestContext.parameterIntegerRequired (
 					"user_id"));
 
 		chatMessages =

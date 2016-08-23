@@ -21,7 +21,7 @@ import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("rangeFormFieldInterfaceMapping")
@@ -130,10 +130,10 @@ class RangeFormFieldInterfaceMapping<
 		return successResult (
 			Optional.of (
 				Range.between (
-					optionalRequired (
+					optionalGetRequired (
 						getValue (
 							leftResult)),
-					optionalRequired (
+					optionalGetRequired (
 						getValue (
 							rightResult)))));
 
@@ -224,11 +224,11 @@ class RangeFormFieldInterfaceMapping<
 			Optional.of (
 				Range.between (
 
-			optionalRequired (
+			optionalGetRequired (
 				getValue (
 					leftResult)),
 
-			optionalRequired (
+			optionalGetRequired (
 				getValue (
 					rightResult))
 

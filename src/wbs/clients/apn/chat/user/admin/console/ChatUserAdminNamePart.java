@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 
 import javax.inject.Inject;
 
@@ -128,36 +129,47 @@ class ChatUserAdminNamePart
 			"<th>Moderator</th>\n",
 			"</tr>\n");
 
-		for (ChatUserNameRec chatUserName
-				: chatUser.getChatUserNames ()) {
+		for (
+			ChatUserNameRec chatUserName
+				: chatUser.getChatUserNames ()
+		) {
 
 			printFormat (
-				"<tr>\n",
+				"<tr>\n");
 
+			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.timestampTimezoneString (
-					chatUserLogic.timezone (
+					chatUserLogic.getTimezone (
 						chatUser),
-					chatUserName.getCreationTime ()),
+					chatUserName.getCreationTime ()));
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUserName.getOriginalName (),
+				emptyStringIfNull (
+					chatUserName.getOriginalName ()));
 
+			printFormat (
 				"<td>%h</td>\n",
-				chatUserName.getEditedName (),
+				emptyStringIfNull (
+					chatUserName.getEditedName ()));
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatConsoleLogic.textForChatUserInfoStatus (
-					chatUserName.getStatus ()),
+					chatUserName.getStatus ()));
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatConsoleLogic.textForChatUserEditReason (
-					chatUserName.getEditReason ()),
+					chatUserName.getEditReason ()));
 
+			printFormat (
 				"%s\n",
 				objectManager.tdForObjectMiniLink (
-					chatUserName.getModerator ()),
+					chatUserName.getModerator ()));
 
+			printFormat (
 				"</tr>\n");
 
 		}

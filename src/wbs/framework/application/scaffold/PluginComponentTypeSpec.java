@@ -3,22 +3,15 @@ package wbs.framework.application.scaffold;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataParent;
 
 @Accessors (fluent = true)
-@DataClass ("bean")
+@DataClass ("component-type")
 public
-class PluginBeanSpec {
-
-	/*
-	@DataAncestor
-	@Getter @Setter
-	ProjectSpec project;
-	*/
+class PluginComponentTypeSpec {
 
 	@DataAncestor
 	@Getter @Setter
@@ -26,12 +19,10 @@ class PluginBeanSpec {
 
 	@DataParent
 	@Getter @Setter
-	PluginLayerSpec layer;
+	PluginModelsSpec models;
 
-	@DataAttribute (
-		name = "class",
-		required = true)
+	@DataAttribute
 	@Getter @Setter
-	String className;
+	String name;
 
 }

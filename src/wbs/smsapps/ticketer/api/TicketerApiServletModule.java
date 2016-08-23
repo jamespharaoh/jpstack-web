@@ -1,8 +1,8 @@
 package wbs.smsapps.ticketer.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
 import java.util.Map;
@@ -10,13 +10,12 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.StringMapResponderFactory;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -168,10 +167,9 @@ class TicketerApiServletModule
 				requestContext.parameterOrNull ("ticket");
 
 			if (
-				equal (
+				stringIsEmpty (
 					emptyStringIfNull (
-						sliceParam),
-					"")
+						sliceParam))
 			) {
 
 				return makeError (
@@ -182,9 +180,9 @@ class TicketerApiServletModule
 			}
 
 			if (
-				equal (
-					emptyStringIfNull (codeParam),
-					"")
+				stringIsEmpty (
+					emptyStringIfNull (
+						codeParam))
 			) {
 
 				return makeError (
@@ -195,9 +193,9 @@ class TicketerApiServletModule
 			}
 
 			if (
-				equal (
-					emptyStringIfNull (numberParam),
-					"")
+				stringIsEmpty (
+					emptyStringIfNull (
+						numberParam))
 			) {
 
 				return makeError (
@@ -208,9 +206,9 @@ class TicketerApiServletModule
 			}
 
 			if (
-				equal (
-					emptyStringIfNull (ticketParam),
-					"")
+				stringIsEmpty (
+					emptyStringIfNull (
+						ticketParam))
 			) {
 
 				return makeError (

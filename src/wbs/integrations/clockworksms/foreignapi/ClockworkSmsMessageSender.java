@@ -1,8 +1,9 @@
 package wbs.integrations.clockworksms.foreignapi;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
 
 import java.io.ByteArrayInputStream;
@@ -12,10 +13,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -30,6 +27,9 @@ import org.json.simple.JSONObject;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.data.tools.DataFromXml;
@@ -92,7 +92,7 @@ class ClockworkSmsMessageSender {
 		// check state
 
 		if (
-			notEqual (
+			enumNotEqualSafe (
 				state,
 				State.init)
 		) {
@@ -180,7 +180,7 @@ class ClockworkSmsMessageSender {
 		// check state
 
 		if (
-			notEqual (
+			enumNotEqualSafe (
 				state,
 				State.encoded)
 		) {
@@ -230,7 +230,7 @@ class ClockworkSmsMessageSender {
 		// check state
 
 		if (
-			notEqual (
+			enumNotEqualSafe (
 				state,
 				State.sent)
 		) {
@@ -288,9 +288,9 @@ class ClockworkSmsMessageSender {
 			// check response
 
 			if (
-				notEqual (
+				integerNotEqualSafe (
 					httpResponse.getStatusLine ().getStatusCode (),
-					200)
+					200l)
 			) {
 
 				throw new RuntimeException ();
@@ -319,7 +319,7 @@ class ClockworkSmsMessageSender {
 		// check state
 
 		if (
-			notEqual (
+			enumNotEqualSafe (
 				state,
 				State.received)
 		) {
@@ -358,7 +358,7 @@ class ClockworkSmsMessageSender {
 	void close () {
 
 		if (
-			equal (
+			enumEqualSafe (
 				state,
 				State.closed)
 		) {

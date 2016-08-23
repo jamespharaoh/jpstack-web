@@ -5,7 +5,7 @@ import java.util.List;
 public
 interface SmsArenaDlrReportLogDaoMethods {
 
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			SmsArenaDlrReportLogSearch smsArenaDlrReportLogSearch);
 
 }

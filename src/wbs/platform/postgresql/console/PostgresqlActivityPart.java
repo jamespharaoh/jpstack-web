@@ -1,6 +1,6 @@
 package wbs.platform.postgresql.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,12 +37,16 @@ class PostgresqlActivityPart
 		idleStatActivities =
 			new ArrayList<PostgresqlStatActivityRec> ();
 
-		for (PostgresqlStatActivityRec statActivity
-				: allStatActivities) {
+		for (
+			PostgresqlStatActivityRec statActivity
+				: allStatActivities
+		) {
 
-			if (equal (
+			if (
+				stringEqual (
 					statActivity.getCurrentQuery (),
-					"<IDLE>")) {
+					"<IDLE>")
+			) {
 
 				idleStatActivities.add (
 					statActivity);

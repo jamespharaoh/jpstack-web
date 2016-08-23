@@ -62,8 +62,7 @@
 			name="alarmTime"/>
 
 		<enum-field
-			name="reason"
-			helper="chatUserInitiationReasonConsoleHelper"/>
+			name="reason"/>
 
 	</field-set>
 

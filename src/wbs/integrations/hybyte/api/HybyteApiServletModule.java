@@ -1,8 +1,8 @@
 package wbs.integrations.hybyte.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifElse;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -369,7 +369,7 @@ class HybyteApiServletModule
 				reportLogic.deliveryReport (
 					hybyteRouteOut.getRoute (),
 					req.otherId,
-					ifElse (
+					ifThenElse (
 						req.success,
 						() -> MessageStatus.delivered,
 						() -> MessageStatus.undelivered),
@@ -392,7 +392,7 @@ class HybyteApiServletModule
 					reportLogic.deliveryReport (
 						hybyteRouteOut.getFreeRoute ().getRoute (),
 						req.otherId,
-						ifElse (
+						ifThenElse (
 							req.success,
 							() -> MessageStatus.delivered,
 							() -> MessageStatus.undelivered),
@@ -471,9 +471,11 @@ class HybyteApiServletModule
 			Element receiptElem =
 				document.getRootElement ();
 
-			if (! equal (
+			if (
+				stringNotEqualSafe (
 					receiptElem.getName (),
-					"airbytereceipt")) {
+					"airbytereceipt")
+			) {
 
 				throw new RuntimeException (
 					"Don't know what to do with a <" + receiptElem.getName () + ">");

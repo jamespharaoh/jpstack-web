@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.image.daemon;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
@@ -158,7 +158,7 @@ class ChatUserImageUploadCommand
 				"help");
 
 		MessageRec messageOut =
-			optionalRequired (
+			optionalGetRequired (
 				chatSendLogic.sendSystemMagic (
 					chatUser,
 					Optional.of (

@@ -1,25 +1,23 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.NumberUtils.equalToZero;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import java.util.Map;
-
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
 
 import fj.data.Either;
-
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("integerFormFieldInterfaceMapping")
@@ -49,7 +47,7 @@ class IntegerFormFieldInterfaceMapping<Container>
 				interfaceValue)
 
 			|| stringIsEmpty (
-				optionalRequired (
+				optionalGetRequired (
 					interfaceValue))
 
 		) {
@@ -80,10 +78,10 @@ class IntegerFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Either<Optional<String>,String> genericToInterface (
+	Either <Optional <String>, String> genericToInterface (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Long> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Long> genericValue) {
 
 		if (
 
@@ -94,14 +92,15 @@ class IntegerFormFieldInterfaceMapping<Container>
 
 				blankIfZero
 
-				&& equal (
-					genericValue.get (),
-					0))
+				&& equalToZero (
+					genericValue.get ())
+
+			)
 
 		) {
 
 			return successResult (
-				Optional.<String>absent ());
+				Optional.absent ());
 
 		} else {
 

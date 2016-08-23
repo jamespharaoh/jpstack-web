@@ -1,22 +1,21 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.referenceNotEqual;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-import lombok.experimental.Accessors;
-
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+import lombok.experimental.Accessors;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("identityFormFieldAccessor")
 public
-class IdentityFormFieldAccessor<Container>
-	implements FormFieldAccessor<Container,Container> {
+class IdentityFormFieldAccessor <Container>
+	implements FormFieldAccessor <Container, Container> {
 
 	// properties
 
@@ -27,7 +26,7 @@ class IdentityFormFieldAccessor<Container>
 
 	@Override
 	public
-	Optional<Container> read (
+	Optional <Container> read (
 			@NonNull Container container) {
 
 		return Optional.of (
@@ -39,10 +38,10 @@ class IdentityFormFieldAccessor<Container>
 	public
 	void write (
 			@NonNull Container container,
-			@NonNull Optional<Container> nativeValue) {
+			@NonNull Optional <Container> nativeValue) {
 
 		if (
-			referenceNotEqual (
+			referenceNotEqualSafe (
 				container,
 				nativeValue.get ())
 		) {

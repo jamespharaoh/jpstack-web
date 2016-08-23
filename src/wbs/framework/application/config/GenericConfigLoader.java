@@ -5,6 +5,7 @@ import javax.annotation.PostConstruct;
 import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataFromXml;
+import wbs.framework.data.tools.DataFromXmlBuilder;
 
 @SingletonComponent ("genericConfigLoader")
 public
@@ -21,11 +22,13 @@ class GenericConfigLoader {
 	void setup () {
 
 		dataFromXml =
-			new DataFromXml ()
+			new DataFromXmlBuilder ()
 
 			.registerBuilderClasses (
 				GenericConfigSpec.class,
-				GenericConfigItemSpec.class);
+				GenericConfigItemSpec.class)
+
+			.build ();
 
 	}
 

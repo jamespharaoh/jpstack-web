@@ -3,9 +3,9 @@
 	package="wbs.platform.object.browse">
 
 	<layer name="console">
-		<bean class="ObjectBrowsePageBuilder"/>
-		<bean class="ObjectBrowsePageSpec"/>
-		<bean class="ObjectBrowsePart"/>
+		<component class="ObjectBrowsePageBuilder"/>
+		<component class="ObjectBrowsePageSpec"/>
+		<component class="ObjectBrowsePart"/>
 	</layer>
 
 </plugin>

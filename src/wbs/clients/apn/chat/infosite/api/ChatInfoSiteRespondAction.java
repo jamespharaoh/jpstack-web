@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.infosite.api;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import javax.inject.Inject;
 
@@ -20,7 +20,6 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.platform.media.model.MediaRec;
 
 @PrototypeComponent ("chatInfoSiteRespondAction")
 public
@@ -58,7 +57,7 @@ class ChatInfoSiteRespondAction
 					"chatInfoSiteId"));
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				infoSite.getToken (),
 				requestContext.requestStringRequired (
 					"chatInfoSiteToken"))
@@ -71,16 +70,17 @@ class ChatInfoSiteRespondAction
 
 		ChatUserRec otherUser =
 			chatUserHelper.findRequired (
-				requestContext.parameterInteger (
+				requestContext.parameterIntegerRequired (
 					"otherUserId"));
 
 		chatMessageLogic.chatMessageSendFromUser (
 			infoSite.getChatUser (),
 			otherUser,
-			requestContext.parameterOrNull ("text"),
-			Optional.<Long>absent (),
+			requestContext.parameterOrNull (
+				"text"),
+			Optional.absent (),
 			ChatMessageMethod.infoSite,
-			ImmutableList.<MediaRec>of ());
+			ImmutableList.of ());
 
 		transaction.commit ();
 

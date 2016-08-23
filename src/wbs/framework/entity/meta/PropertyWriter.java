@@ -1,7 +1,7 @@
 package wbs.framework.entity.meta;
 
 import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
 

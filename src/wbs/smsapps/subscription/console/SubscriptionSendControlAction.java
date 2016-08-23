@@ -1,6 +1,6 @@
 package wbs.smsapps.subscription.console;
 
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -247,7 +247,7 @@ class SubscriptionSendControlAction
 			}
 
 			if (
-				in (
+				enumInSafe (
 					subscriptionSend.getState (),
 					SubscriptionSendState.notSent,
 					SubscriptionSendState.scheduled)
@@ -273,7 +273,7 @@ class SubscriptionSendControlAction
 			}
 
 			if (
-				in (
+				enumInSafe (
 					subscriptionSend.getState (),
 					SubscriptionSendState.sending)
 			) {

@@ -1,8 +1,9 @@
 package wbs.console.priv;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collection;
@@ -83,9 +84,19 @@ class UserPrivData {
 			sharedData.managePrivIds.get (
 				privId);
 
-		return managePrivId != null
-			&& ! equal (managePrivId, privId)
-			&& canChain (managePrivId);
+		return (
+
+			isNotNull (
+				managePrivId)
+
+			&& integerNotEqualSafe (
+				managePrivId,
+				privId)
+
+			&& canChain (
+				managePrivId)
+
+		);
 
 	}
 
@@ -167,7 +178,7 @@ class UserPrivData {
 			) {
 
 				if (
-					equal (
+					stringEqual (
 						privCode,
 						"manage")
 				) {

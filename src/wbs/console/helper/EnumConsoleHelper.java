@@ -5,33 +5,32 @@ import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.framework.utils.etc.Html;
 
 @Accessors (fluent = true)
 public
-class EnumConsoleHelper<E extends Enum<E>> {
+class EnumConsoleHelper <E extends Enum <E>> {
 
 	@Getter
-	Map<E,String> map =
-		new LinkedHashMap<E,String> ();
+	Map <E, String> map =
+		new LinkedHashMap<> ();
 
 	@Getter
-	Map<String,String> optionsMap =
-		new LinkedHashMap<String,String> ();
+	Map <String, String> optionsMap =
+		new LinkedHashMap<> ();
 
 	@Getter
-	Map<String,String> nullOptionsMap =
-		new LinkedHashMap<String,String> ();
+	Map <String, String> nullOptionsMap =
+		new LinkedHashMap<> ();
 
 	@Getter @Setter
-	Class<E> enumClass;
+	Class <E> enumClass;
 
 	{
 

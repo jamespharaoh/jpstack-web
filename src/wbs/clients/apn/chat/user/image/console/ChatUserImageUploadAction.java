@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.image.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;

@@ -3,15 +3,15 @@
 	package="wbs.console.module">
 
 	<layer name="console">
-		<bean class="ConsoleManagerImplementation"/>
-		<bean class="ConsoleMetaManagerImplementation"/>
-		<bean class="ConsoleMetaModuleBuilder"/>
-		<bean class="ConsoleMetaModuleImplementation"/>
-		<bean class="ConsoleModuleBuilder"/>
-		<bean class="ConsoleModuleImplementation"/>
-		<bean class="ConsoleModuleSpec"/>
-		<bean class="ConsoleModuleSpecReader"/>
-		<bean class="ResolvedConsoleContextLink"/>
+		<component class="ConsoleManagerImplementation"/>
+		<component class="ConsoleMetaManagerImplementation"/>
+		<component class="ConsoleMetaModuleBuilder"/>
+		<component class="ConsoleMetaModuleImplementation"/>
+		<component class="ConsoleModuleBuilder"/>
+		<component class="ConsoleModuleImplementation"/>
+		<component class="ConsoleModuleSpec"/>
+		<component class="ConsoleModuleSpecReader"/>
+		<component class="ResolvedConsoleContextLink"/>
 	</layer>
 
 </plugin>

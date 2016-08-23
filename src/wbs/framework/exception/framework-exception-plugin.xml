@@ -3,8 +3,8 @@
 	package="wbs.framework.exception">
 
 	<layer name="utils">
-		<bean class="ExceptionUtilsImplementation"/>
-		<bean class="SimpleExceptionLogger"/>
+		<component class="ExceptionUtilsImplementation"/>
+		<component class="SimpleExceptionLogger"/>
 	</layer>
 
 </plugin>

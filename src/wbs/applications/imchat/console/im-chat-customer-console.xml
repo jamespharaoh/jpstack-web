@@ -112,8 +112,7 @@
 			nullable="yes"/>
 
 		<enum-field
-			name="order"
-			helper="imChatCustomerSearchOrderConsoleHelper"/>
+			name="order"/>
 
 	</field-set>
 

@@ -3,27 +3,27 @@
 	package="wbs.console.context">
 
 	<layer name="console">
-		<bean class="ConsoleContextExtensionPointBuilder"/>
-		<bean class="ConsoleContextExtensionPointMetaBuilder"/>
-		<bean class="ConsoleContextExtensionPointSpec"/>
-		<bean class="ConsoleContextLink"/>
-		<bean class="ConsoleContextLinkBuilder"/>
-		<bean class="ConsoleContextLinkMetaBuilder"/>
-		<bean class="ConsoleContextLinkSpec"/>
-		<bean class="ConsoleContextNestedExtensionPoint"/>
-		<bean class="ConsoleContextPrivLookup"/>
-		<bean class="ConsoleContextRootExtensionPoint"/>
-		<bean class="ConsoleContextSectionBuilder"/>
-		<bean class="ConsoleContextSectionMetaBuilder"/>
-		<bean class="ConsoleContextSectionSpec"/>
-		<bean class="ConsoleContextStuff"/>
-		<bean class="ConsoleContextStuffBuilder"/>
-		<bean class="ConsoleContextStuffSpec"/>
-		<bean class="ConsoleContextType"/>
-		<bean class="SimpleConsoleContext"/>
-		<bean class="SimpleConsoleContextBuilder"/>
-		<bean class="SimpleConsoleContextMetaBuilder"/>
-		<bean class="SimpleConsoleContextSpec"/>
+		<component class="ConsoleContextExtensionPointBuilder"/>
+		<component class="ConsoleContextExtensionPointMetaBuilder"/>
+		<component class="ConsoleContextExtensionPointSpec"/>
+		<component class="ConsoleContextLink"/>
+		<component class="ConsoleContextLinkBuilder"/>
+		<component class="ConsoleContextLinkMetaBuilder"/>
+		<component class="ConsoleContextLinkSpec"/>
+		<component class="ConsoleContextNestedExtensionPoint"/>
+		<component class="ConsoleContextPrivLookup"/>
+		<component class="ConsoleContextRootExtensionPoint"/>
+		<component class="ConsoleContextSectionBuilder"/>
+		<component class="ConsoleContextSectionMetaBuilder"/>
+		<component class="ConsoleContextSectionSpec"/>
+		<component class="ConsoleContextStuff"/>
+		<component class="ConsoleContextStuffBuilder"/>
+		<component class="ConsoleContextStuffSpec"/>
+		<component class="ConsoleContextType"/>
+		<component class="SimpleConsoleContext"/>
+		<component class="SimpleConsoleContextBuilder"/>
+		<component class="SimpleConsoleContextMetaBuilder"/>
+		<component class="SimpleConsoleContextSpec"/>
 	</layer>
 
 </plugin>

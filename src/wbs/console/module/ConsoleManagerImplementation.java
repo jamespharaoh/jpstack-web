@@ -1,16 +1,16 @@
 package wbs.console.module;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 import static wbs.framework.utils.etc.StringUtils.pluralise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,16 +25,15 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContext.PathSupply;
 import wbs.console.context.ConsoleContextStuff;
@@ -1389,7 +1388,7 @@ class ConsoleManagerImplementation
 				pathParts.next ();
 
 			if (
-				! equal (
+				stringNotEqualSafe (
 					link,
 					"-")
 			) {
@@ -1411,7 +1410,8 @@ class ConsoleManagerImplementation
 				"link:" + nextPathPart;
 
 			consoleContext =
-				consoleContextsByName.get (contextName);
+				consoleContextsByName.get (
+					contextName);
 
 			if (consoleContext == null) {
 
@@ -1427,7 +1427,10 @@ class ConsoleManagerImplementation
 			ConsoleContext searchConsoleContext =
 				consoleContext;
 
-			while (searchConsoleContext.parentContextName () != null) {
+			while (
+				isNotNull (
+					searchConsoleContext.parentContextName ())
+			) {
 
 				searchConsoleContext =
 					consoleContextsByName.get (
@@ -1580,7 +1583,7 @@ class ConsoleManagerImplementation
 			@NonNull ConsoleContext parentContext,
 			@NonNull ConsoleContextType contextType) {
 
-		return optionalRequired (
+		return optionalGetRequired (
 			contextWithParentOfType (
 				parentContext,
 				contextType,
@@ -1644,7 +1647,7 @@ class ConsoleManagerImplementation
 	ConsoleContext contextWithoutParentOfTypeRequired (
 			@NonNull ConsoleContextType contextType) {
 
-		return optionalRequired (
+		return optionalGetRequired (
 			contextWithoutParentOfType (
 				contextType,
 				true));
@@ -1866,7 +1869,7 @@ class ConsoleManagerImplementation
 			@NonNull ConsoleContext sourceContext,
 			@NonNull ConsoleContextType targetContextType) {
 
-		return optionalRequired (
+		return optionalGetRequired (
 			relatedContext (
 				sourceContext,
 				targetContextType,

@@ -1,15 +1,14 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import lombok.Cleanup;
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
@@ -111,7 +110,7 @@ class ImChatChangePasswordAction
 			session.getImChatCustomer ();
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				changePasswordRequest.currentPassword (),
 				imChatcustomer.getPassword ())
 		) {

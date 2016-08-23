@@ -5,13 +5,12 @@ import static wbs.framework.utils.etc.TimeUtils.toInstant;
 
 import java.util.List;
 
-import lombok.NonNull;
-
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import lombok.NonNull;
 import wbs.applications.imchat.model.ImChatCustomerDao;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatCustomerSearch;
@@ -53,7 +52,7 @@ class ImChatCustomerDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			ImChatCustomerSearch imChatCustomerSearch) {
 
 		Criteria criteria =
@@ -187,7 +186,7 @@ class ImChatCustomerDaoHibernate
 
 		return findMany (
 			"searchIds (imCustomerSearch)",
-			Integer.class,
+			Long.class,
 			criteria);
 
 	}

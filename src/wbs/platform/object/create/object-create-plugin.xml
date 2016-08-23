@@ -3,10 +3,10 @@
 	package="wbs.platform.object.create">
 
 	<layer name="console">
-		<bean class="ObjectCreateAction"/>
-		<bean class="ObjectCreatePageBuilder"/>
-		<bean class="ObjectCreatePageSpec"/>
-		<bean class="ObjectCreatePart"/>
+		<component class="ObjectCreateAction"/>
+		<component class="ObjectCreatePageBuilder"/>
+		<component class="ObjectCreatePageSpec"/>
+		<component class="ObjectCreatePart"/>
 	</layer>
 
 </plugin>

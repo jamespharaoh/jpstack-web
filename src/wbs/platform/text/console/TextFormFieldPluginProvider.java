@@ -1,6 +1,6 @@
 package wbs.platform.text.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.TypeUtils.classEqual;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -37,11 +37,11 @@ class TextFormFieldPluginProvider
 
 		if (
 
-			equal (
+			classEqual (
 				genericClass,
 				String.class)
 
-			&& equal (
+			&& classEqual (
 				nativeClass,
 				TextRec.class)
 

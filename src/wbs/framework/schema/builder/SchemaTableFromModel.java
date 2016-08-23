@@ -1,7 +1,8 @@
 package wbs.framework.schema.builder;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionSize;
 import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -11,17 +12,16 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.ImmutableList;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.collect.ImmutableList;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
-import wbs.framework.logging.TaskLog;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.schema.helper.SchemaNamesHelper;
 import wbs.framework.schema.helper.SchemaTypesHelper;
 import wbs.framework.schema.model.SchemaColumn;
@@ -37,6 +37,8 @@ import wbs.framework.sql.SqlLogicImplementation;
 public
 class SchemaTableFromModel {
 
+	// dependencies
+
 	@Inject
 	SchemaNamesHelper schemaNamesHelper;
 
@@ -46,14 +48,18 @@ class SchemaTableFromModel {
 	@Inject
 	SqlLogicImplementation sqlLogic;
 
-	@Getter @Setter
-	TaskLog taskLog;
+	// properties
 
 	@Getter @Setter
-	Map<Class<?>,Model> modelsByClass;
+	TaskLogger taskLog;
+
+	@Getter @Setter
+	Map <Class <?>, Model> modelsByClass;
 
 	@Getter @Setter
 	Model model;
+
+	// state
 
 	SchemaTable schemaTable;
 
@@ -64,11 +70,13 @@ class SchemaTableFromModel {
 	String codeColumn;
 	String indexColumn;
 
-	List<String> parentColumnNames =
-		new ArrayList<String> ();
+	List <String> parentColumnNames =
+		new ArrayList<> ();
 
-	List<String> identityColumnNames =
-		new ArrayList<String> ();
+	List <String> identityColumnNames =
+		new ArrayList<> ();
+
+	// implementation
 
 	public
 	SchemaTable build () {
@@ -129,7 +137,7 @@ class SchemaTableFromModel {
 		if (schemaTable.primaryKey () == null
 				|| schemaTable.primaryKey ().columns ().isEmpty ()) {
 
-			taskLog.error (
+			taskLog.errorFormat (
 				"No primary key for %s",
 				model.objectName ());
 
@@ -315,7 +323,7 @@ class SchemaTableFromModel {
 
 		if (foreignModelField == null) {
 
-			taskLog.error (
+			taskLog.errorFormat (
 				"Foreign model field %s doesn't exist",
 				modelField.fullName ());
 
@@ -329,7 +337,7 @@ class SchemaTableFromModel {
 
 		if (targetModel == null) {
 
-			taskLog.error (
+			taskLog.errorFormat (
 				"Can't find model for type %s specified by %s",
 				modelField.valueType ().getSimpleName (),
 				modelField.fullName ());
@@ -388,7 +396,7 @@ class SchemaTableFromModel {
 
 			if (typeNames == null) {
 
-				taskLog.error (
+				taskLog.errorFormat (
 					"Can't map type %s for %s",
 					modelField.valueType ().getSimpleName (),
 					modelField.fullName ());
@@ -400,12 +408,14 @@ class SchemaTableFromModel {
 		}
 
 		if (
-			notEqual (
-				modelField.columnNames ().size (),
-				typeNames.size ())
+			integerNotEqualSafe (
+				collectionSize (
+					modelField.columnNames ()),
+				collectionSize (
+					typeNames))
 		) {
 
-			taskLog.error (
+			taskLog.errorFormat (
 				"Expected %s columns for %s at %s, not %s",
 				typeNames.size (),
 				modelField.valueType ().getSimpleName (),
@@ -455,7 +465,7 @@ class SchemaTableFromModel {
 
 		if (targetModel == null) {
 
-			taskLog.error (
+			taskLog.errorFormat (
 				"Can't find model for type %s specified by %s",
 				modelField.valueType ().getSimpleName (),
 				modelField.fullName ());
@@ -494,7 +504,7 @@ class SchemaTableFromModel {
 
 		if (schemaTable.primaryKey () != null) {
 
-			taskLog.error (
+			taskLog.errorFormat (
 				"More than one primary key for %s",
 				model.objectName ());
 
@@ -556,7 +566,7 @@ class SchemaTableFromModel {
 
 		if (targetModel == null) {
 
-			taskLog.error (
+			taskLog.errorFormat (
 				"Can't find model for type %s specified by %s",
 				compositeIdModelField.valueType ().getSimpleName (),
 				compositeIdModelField.fullName ());
@@ -712,7 +722,7 @@ class SchemaTableFromModel {
 
 		if (targetModel == null) {
 
-			taskLog.error (
+			taskLog.errorFormat (
 				"Can't find model for type %s specified by %s",
 				componentModelField.valueType ().getSimpleName (),
 				componentModelField.fullName ());

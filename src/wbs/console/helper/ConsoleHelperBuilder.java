@@ -1,9 +1,9 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.classInSafe;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -251,7 +251,7 @@ class ConsoleHelperBuilder {
 				method.getDeclaringClass ();
 
 			if (
-				in (
+				classInSafe (
 					declaringClass,
 					objectHelperInterfaces)
 			) {

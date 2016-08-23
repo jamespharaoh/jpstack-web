@@ -1,12 +1,13 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.toBoolean;
+import static wbs.framework.utils.etc.LogicUtils.parseBooleanTrueFalse;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalMapRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.emptyStringToAbsent;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.TimeUtils.dateToInstantNullSafe;
 
 import java.io.Serializable;
@@ -152,19 +153,22 @@ class ChatUserSearchOldAction
 					"info"));
 
 		Boolean searchPicture =
-			toBoolean (
-				requestContext.parameterRequired (
-					"picture"));
+			optionalOrNull (
+				parseBooleanTrueFalse (
+					requestContext.parameterRequired (
+						"picture")));
 
 		Boolean searchVideo =
-			toBoolean (
-				requestContext.parameterRequired (
-					"video"));
+			optionalOrNull (
+				parseBooleanTrueFalse (
+					requestContext.parameterRequired (
+						"video")));
 
 		Boolean searchAdultVerified =
-			toBoolean (
-				requestContext.parameterRequired (
-					"adultVerified"));
+			optionalOrNull (
+				parseBooleanTrueFalse (
+					requestContext.parameterRequired (
+						"adultVerified")));
 
 		ChatUserCreditMode searchCreditMode =
 			toEnum (
@@ -183,7 +187,7 @@ class ChatUserSearchOldAction
 				emptyStringToAbsent (
 					requestContext.parameterRequired (
 						"online")),
-				NumberUtils::parseLongRequired);
+				NumberUtils::parseIntegerRequired);
 
 		String searchOutput =
 			nullIfEmptyString (
@@ -254,7 +258,7 @@ class ChatUserSearchOldAction
 		// check we are not being stupid
 
 		if (
-			equal (
+			stringEqual (
 				searchOutput,
 				"imageZip")
 		) {

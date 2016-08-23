@@ -10,24 +10,24 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ChatHelpLogicImplementation"/>
-		<bean class="logic.ChatHelpLogLogicImplementation"/>
-		<bean class="logic.ChatHelpTemplateLogicImplementation"/>
+		<component class="logic.ChatHelpLogicImplementation"/>
+		<component class="logic.ChatHelpLogLogicImplementation"/>
+		<component class="logic.ChatHelpTemplateLogicImplementation"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.ChatHelpLogPendingFormAction"/>
-		<bean class="console.ChatHelpLogPendingFormResponder"/>
-		<bean class="console.ChatHelpLogPendingMessagesPart"/>
-		<bean class="console.ChatHelpLogPendingSummaryPart"/>
-		<bean class="console.ChatHelpQueueConsolePlugin"/>
-		<bean class="console.ChatHelpTemplateContextBuilder"/>
-		<bean class="console.ChatHelpTemplateContextMetaBuilder"/>
-		<bean class="console.ChatHelpTemplateContextSpec"/>
+		<component class="console.ChatHelpLogPendingFormAction"/>
+		<component class="console.ChatHelpLogPendingFormResponder"/>
+		<component class="console.ChatHelpLogPendingMessagesPart"/>
+		<component class="console.ChatHelpLogPendingSummaryPart"/>
+		<component class="console.ChatHelpQueueConsolePlugin"/>
+		<component class="console.ChatHelpTemplateContextBuilder"/>
+		<component class="console.ChatHelpTemplateContextMetaBuilder"/>
+		<component class="console.ChatHelpTemplateContextSpec"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.ChatHelpCommand"/>
+		<component class="daemon.ChatHelpCommand"/>
 	</layer>
 
 	<console-modules>

@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -23,7 +23,7 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.object.ObjectManager;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("nameFormFieldBuilder")
@@ -113,7 +113,7 @@ class NameFormFieldBuilder {
 		) {
 
 			Class thatClass =
-				optionalRequired (
+				optionalGetRequired (
 					objectManager.dereferenceType (
 						Optional.<Class<?>>of (
 							thisConsoleHelper.objectClass ()),

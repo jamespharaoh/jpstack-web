@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.infosite.api;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import javax.inject.Inject;
 
@@ -51,7 +51,7 @@ class ChatInfoSiteViewAction
 		// check the token
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				infoSite.getToken (),
 				requestContext.requestStringRequired (
 					"chatInfoSiteToken"))

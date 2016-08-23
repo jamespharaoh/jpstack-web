@@ -1,6 +1,7 @@
 package wbs.smsapps.manualresponder.daemon;
 
-import static wbs.framework.utils.etc.Misc.indexOfRequired;
+import static wbs.framework.utils.etc.CollectionUtils.listIndexOfRequired;
+import static wbs.framework.utils.etc.CollectionUtils.listItemAtIndexRequired;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -86,8 +87,8 @@ class ManualResponderDelivery
 				manualResponderReplyHelper.findRequired (
 					deliveryMessage.getRef ());
 
-			Integer deliveryMessageIndex =
-				indexOfRequired (
+			Long deliveryMessageIndex =
+				listIndexOfRequired (
 					reply.getMessages (),
 					deliveryMessage);
 
@@ -97,7 +98,8 @@ class ManualResponderDelivery
 			) {
 
 				MessageRec nextMessage =
-					reply.getMessages ().get (
+					listItemAtIndexRequired (
+						reply.getMessages (),
 						deliveryMessageIndex + 1);
 
 				if (nextMessage.getStatus () == MessageStatus.held) {
@@ -120,19 +122,20 @@ class ManualResponderDelivery
 				manualResponderReplyHelper.findRequired (
 					deliveryMessage.getRef ());
 
-			Integer deliveryMessageIndex =
-				indexOfRequired (
+			Long deliveryMessageIndex =
+				listIndexOfRequired (
 					reply.getMessages (),
 					deliveryMessage);
 
 			for (
-				int messageIndex = deliveryMessageIndex + 1;
+				long messageIndex = deliveryMessageIndex + 1;
 				messageIndex < reply.getMessages ().size ();
 				messageIndex ++
 			) {
 
 				MessageRec heldMessage =
-					reply.getMessages ().get (
+					listItemAtIndexRequired (
+						reply.getMessages (),
 						messageIndex);
 
 				if (heldMessage.getStatus () == MessageStatus.held) {

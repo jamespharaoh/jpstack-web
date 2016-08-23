@@ -3,13 +3,13 @@
 	package="wbs.console.reporting">
 
 	<layer name="console">
-		<bean class="AdditionStatsResolver"/>
-		<bean class="IntegerStatsFormatter"/>
-		<bean class="MultiplicationStatsResolver"/>
-		<bean class="SimpleStatsResolver"/>
-		<bean class="StatsConsoleLogic"/>
-		<bean class="SumStatsAggregator"/>
-		<bean class="UnaryStatsGrouper"/>
+		<component class="AdditionStatsResolver"/>
+		<component class="IntegerStatsFormatter"/>
+		<component class="MultiplicationStatsResolver"/>
+		<component class="SimpleStatsResolver"/>
+		<component class="StatsConsoleLogic"/>
+		<component class="SumStatsAggregator"/>
+		<component class="UnaryStatsGrouper"/>
 	</layer>
 
 </plugin>

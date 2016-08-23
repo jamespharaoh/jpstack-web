@@ -87,8 +87,7 @@
 			name="numRecipients"/>
 
 		<enum-field
-			name="state"
-			helper="subscriptionSendStateConsoleHelper"/>
+			name="state"/>
 
 	</field-set>
 
@@ -146,8 +145,7 @@
 			name="numRecipients"/>
 
 		<enum-field
-			name="state"
-			helper="subscriptionSendStateConsoleHelper"/>
+			name="state"/>
 
 	</field-set>
 

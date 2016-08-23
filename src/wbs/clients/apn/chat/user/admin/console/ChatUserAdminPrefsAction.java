@@ -1,10 +1,13 @@
 package wbs.clients.apn.chat.user.admin.console;
 
 import static wbs.framework.utils.etc.LogicUtils.anyOf;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.framework.utils.etc.OptionalUtils.optionalValueNotEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
 
 import javax.inject.Inject;
+
+import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -102,15 +105,17 @@ class ChatUserAdminPrefsAction
 
 		// check changes
 
-		Gender oldGender =
-			chatUser.getGender ();
+		Optional <Gender> oldGenderOptional =
+			optionalFromNullable (
+				chatUser.getGender ());
 
 		Gender newGender =
 			Gender.valueOf (
 				genderParam);
 
-		Orient oldOrient =
-			chatUser.getOrient ();
+		Optional <Orient> oldOrientOptional =
+			optionalFromNullable (
+				chatUser.getOrient ());
 
 		Orient newOrient =
 			Orient.valueOf (
@@ -118,12 +123,12 @@ class ChatUserAdminPrefsAction
 
 		if (anyOf (
 		
-			() -> notEqual (
-				oldGender,
+			() -> optionalValueNotEqualSafe (
+				oldGenderOptional,
 				newGender),
 
-			() -> notEqual (
-				oldOrient,
+			() -> optionalValueNotEqualSafe (
+				oldOrientOptional,
 				newOrient)
 
 		)) {

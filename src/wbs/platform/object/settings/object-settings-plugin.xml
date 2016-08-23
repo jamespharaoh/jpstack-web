@@ -3,11 +3,11 @@
 	package="wbs.platform.object.settings">
 
 	<layer name="console">
-		<bean class="ObjectRemoveAction"/>
-		<bean class="ObjectSettingsAction"/>
-		<bean class="ObjectSettingsPageBuilder"/>
-		<bean class="ObjectSettingsPageSpec"/>
-		<bean class="ObjectSettingsPart"/>
+		<component class="ObjectRemoveAction"/>
+		<component class="ObjectSettingsAction"/>
+		<component class="ObjectSettingsPageBuilder"/>
+		<component class="ObjectSettingsPageSpec"/>
+		<component class="ObjectSettingsPart"/>
 	</layer>
 
 </plugin>

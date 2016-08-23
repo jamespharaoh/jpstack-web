@@ -1,8 +1,8 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
 import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.Map;
@@ -330,7 +330,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 			@NonNull String formName) {
 
 		if (
-			in (
+			enumInSafe (
 				formType,
 				FormType.create,
 				FormType.perform,
@@ -344,7 +344,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 				name);
 
 		} else if (
-			in (
+			enumInSafe (
 				formType,
 				FormType.update)
 		) {

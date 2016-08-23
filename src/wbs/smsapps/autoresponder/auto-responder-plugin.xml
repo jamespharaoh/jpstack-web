@@ -16,12 +16,12 @@
 	</models>
 
 	<layer name="console">
-		<bean class="console.AutoResponderVotesPart"/>
+		<component class="console.AutoResponderVotesPart"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.AutoResponderCommand"/>
-		<bean class="daemon.AutoResponderDelivery"/>
+		<component class="daemon.AutoResponderCommand"/>
+		<component class="daemon.AutoResponderDelivery"/>
 	</layer>
 
 	<fixtures>

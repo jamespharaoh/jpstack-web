@@ -9,8 +9,8 @@
 	</models>
 
 	<layer name="daemon">
-		<bean class="daemon.PhotoGrabberCommand"/>
-		<bean class="daemon.PhotoGrabberDelivery"/>
+		<component class="daemon.PhotoGrabberCommand"/>
+		<component class="daemon.PhotoGrabberDelivery"/>
 	</layer>
 
 	<console-modules>

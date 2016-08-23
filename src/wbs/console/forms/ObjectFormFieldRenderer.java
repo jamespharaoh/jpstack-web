@@ -1,10 +1,12 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collection;
@@ -139,7 +141,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		// filter visible options
 
-		List<Record<?>> filteredOptions =
+		List <Record <?>> filteredOptions =
 			allOptions.stream ()
 
 			.filter (
@@ -149,8 +151,22 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 			.filter (
 				item ->
-					objectManager.canView (item)
-					|| equal (item, interfaceValue.orNull ()))
+
+				objectManager.canView (
+					item)
+
+				|| (
+
+					isPresent (
+						interfaceValue)
+
+					&& referenceEqualSafe (
+						item,
+						interfaceValue.get ())
+
+				)
+
+			)
 
 			.collect (
 				Collectors.toList ());
@@ -192,7 +208,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			|| OptionalUtils.isNotPresent (
 				currentValue)
 
-			|| in (
+			|| enumInSafe (
 				formType,
 				FormType.create,
 				FormType.perform,
@@ -270,7 +286,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 			@NonNull String formName) {
 
 		if (
-			in (
+			enumInSafe (
 				formType,
 				FormType.create,
 				FormType.perform,
@@ -284,7 +300,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 				name);
 
 		} else if (
-			in (
+			enumInSafe (
 				formType,
 				FormType.update)
 		) {
@@ -338,7 +354,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 					name ()));
 
 		if (
-			equal (
+			stringEqual (
 				param,
 				"none")
 		) {

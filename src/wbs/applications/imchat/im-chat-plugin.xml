@@ -39,52 +39,52 @@
 	</fixtures>
 
 	<layer name="logic">
-		<bean class="logic.ImChatLogicImplementation"/>
+		<component class="logic.ImChatLogicImplementation"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.ImChatConversationEmailDaemon"/>
+		<component class="daemon.ImChatConversationEmailDaemon"/>
 	</layer>
 
 	<layer name="api">
-		<bean class="api.ImChatApiLogicImplementation"/>
-		<bean class="api.ImChatChangePasswordAction"/>
-		<bean class="api.ImChatConditionsAcceptAction"/>
-		<bean class="api.ImChatConversationEndAction"/>
-		<bean class="api.ImChatConversationStartAction"/>
-		<bean class="api.ImChatCustomerCreateAction"/>
-		<bean class="api.ImChatDetailsUpdateAction"/>
-		<bean class="api.ImChatEventPostAction"/>
-		<bean class="api.ImChatForgotPasswordAction"/>
-		<bean class="api.ImChatMediaConfig"/>
-		<bean class="api.ImChatMediaJpegAction"/>
-		<bean class="api.ImChatMediaResponder"/>
-		<bean class="api.ImChatMessageListAction"/>
-		<bean class="api.ImChatMessageSendAction"/>
-		<bean class="api.ImChatMessageTemplateSetGetAction"/>
-		<bean class="api.ImChatServiceGetAction"/>
-		<bean class="api.ImChatSessionStartAction"/>
-		<bean class="api.ImChatSessionLoadAction"/>
-		<bean class="api.ImChatSessionEndAction"/>
-		<bean class="api.ImChatPricePointListAction"/>
-		<bean class="api.ImChatProfileListAction"/>
-		<bean class="api.ImChatPurchaseStartAction"/>
-		<bean class="api.ImChatPurchaseGetConfirmationAction"/>
-		<bean class="api.ImChatPurchaseConfirmAction"/>
-		<bean class="api.ImChatPurchaseHistoryAction"/>
+		<component class="api.ImChatApiLogicImplementation"/>
+		<component class="api.ImChatChangePasswordAction"/>
+		<component class="api.ImChatConditionsAcceptAction"/>
+		<component class="api.ImChatConversationEndAction"/>
+		<component class="api.ImChatConversationStartAction"/>
+		<component class="api.ImChatCustomerCreateAction"/>
+		<component class="api.ImChatDetailsUpdateAction"/>
+		<component class="api.ImChatEventPostAction"/>
+		<component class="api.ImChatForgotPasswordAction"/>
+		<component class="api.ImChatMediaConfig"/>
+		<component class="api.ImChatMediaJpegAction"/>
+		<component class="api.ImChatMediaResponder"/>
+		<component class="api.ImChatMessageListAction"/>
+		<component class="api.ImChatMessageSendAction"/>
+		<component class="api.ImChatMessageTemplateSetGetAction"/>
+		<component class="api.ImChatServiceGetAction"/>
+		<component class="api.ImChatSessionStartAction"/>
+		<component class="api.ImChatSessionLoadAction"/>
+		<component class="api.ImChatSessionEndAction"/>
+		<component class="api.ImChatPricePointListAction"/>
+		<component class="api.ImChatProfileListAction"/>
+		<component class="api.ImChatPurchaseStartAction"/>
+		<component class="api.ImChatPurchaseGetConfirmationAction"/>
+		<component class="api.ImChatPurchaseConfirmAction"/>
+		<component class="api.ImChatPurchaseHistoryAction"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.ImChatCustomerCreditAction"/>
-		<bean class="console.ImChatCustomerCreditPart"/>
-		<bean class="console.ImChatCustomerSearchOrderConsoleHelper"/>
-		<bean class="console.ImChatCustomerSettingsPasswordAction"/>
-		<bean class="console.ImChatCustomerSettingsPasswordPart"/>
-		<bean class="console.ImChatQueueConsole"/>
-		<bean class="console.ImChatPendingCustomerNoteUpdateAction"/>
-		<bean class="console.ImChatPendingFormAction"/>
-		<bean class="console.ImChatPendingFormResponder"/>
-		<bean class="console.ImChatPendingSummaryPart"/>
+		<component class="console.ImChatCustomerCreditAction"/>
+		<component class="console.ImChatCustomerCreditPart"/>
+		<component class="console.ImChatCustomerSearchOrderConsoleHelper"/>
+		<component class="console.ImChatCustomerSettingsPasswordAction"/>
+		<component class="console.ImChatCustomerSettingsPasswordPart"/>
+		<component class="console.ImChatQueueConsole"/>
+		<component class="console.ImChatPendingCustomerNoteUpdateAction"/>
+		<component class="console.ImChatPendingFormAction"/>
+		<component class="console.ImChatPendingFormResponder"/>
+		<component class="console.ImChatPendingSummaryPart"/>
 	</layer>
 
 	<api-modules>

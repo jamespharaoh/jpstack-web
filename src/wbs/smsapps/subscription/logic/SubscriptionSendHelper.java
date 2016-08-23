@@ -1,6 +1,6 @@
 package wbs.smsapps.subscription.logic;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNull;
 
 import java.util.List;
@@ -187,7 +187,7 @@ class SubscriptionSendHelper
 			SubscriptionRec subscription,
 			SubscriptionSendRec subscriptionSend) {
 
-		return equal (
+		return enumEqualSafe (
 			subscriptionSend.getState (),
 			SubscriptionSendState.scheduled);
 
@@ -199,7 +199,7 @@ class SubscriptionSendHelper
 			SubscriptionRec subscription,
 			SubscriptionSendRec subscriptionSend) {
 
-		return equal (
+		return enumEqualSafe (
 			subscriptionSend.getState (),
 			SubscriptionSendState.sending);
 

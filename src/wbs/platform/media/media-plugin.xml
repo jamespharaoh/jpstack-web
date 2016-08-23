@@ -17,22 +17,22 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.MediaLogicImplementation"/>
+		<component class="logic.MediaLogicImplementation"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.ImageCsvFormFieldInterfaceMapping"/>
-		<bean class="console.ImageFormFieldBuilder"/>
-		<bean class="console.ImageFormFieldRenderer"/>
-		<bean class="console.ImageFormFieldSpec"/>
-		<bean class="console.MediaAudioResponder"/>
-		<bean class="console.MediaConsoleConfig"/>
-		<bean class="console.MediaConsoleLogicImplementation"/>
-		<bean class="console.MediaImageResponder"/>
-		<bean class="console.MediaImageScaleResponder"/>
-		<bean class="console.MediaThumb100Responder"/>
-		<bean class="console.MediaThumb32Responder"/>
-		<bean class="console.MediaVideoResponder"/>
+		<component class="console.ImageCsvFormFieldInterfaceMapping"/>
+		<component class="console.ImageFormFieldBuilder"/>
+		<component class="console.ImageFormFieldRenderer"/>
+		<component class="console.ImageFormFieldSpec"/>
+		<component class="console.MediaAudioResponder"/>
+		<component class="console.MediaConsoleConfig"/>
+		<component class="console.MediaConsoleLogicImplementation"/>
+		<component class="console.MediaImageResponder"/>
+		<component class="console.MediaImageScaleResponder"/>
+		<component class="console.MediaThumb100Responder"/>
+		<component class="console.MediaThumb32Responder"/>
+		<component class="console.MediaVideoResponder"/>
 	</layer>
 
 	<fixtures>

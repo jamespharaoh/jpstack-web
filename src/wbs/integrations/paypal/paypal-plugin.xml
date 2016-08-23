@@ -18,8 +18,8 @@
 	</fixtures>
 
 	<layer name="logic">
-		<bean class="logic.PaypalApiImplementation"/>
-		<bean class="logic.PaypalLogicImplementation"/>
+		<component class="logic.PaypalApiImplementation"/>
+		<component class="logic.PaypalLogicImplementation"/>
 	</layer>
 
 	<console-modules>

@@ -3,12 +3,12 @@
 	package="wbs.framework.web">
 
 	<layer name="web">
-		<bean class="ActionRequestHandler"/>
-		<bean class="JsonResponder"/>
-		<bean class="DelegatingPathHandler"/>
-		<bean class="PathHandlerServlet"/>
-		<bean class="RequestContextImplementation"/>
-		<bean class="ResponseFilter"/>
+		<component class="ActionRequestHandler"/>
+		<component class="JsonResponder"/>
+		<component class="DelegatingPathHandler"/>
+		<component class="PathHandlerServlet"/>
+		<component class="RequestContextImplementation"/>
+		<component class="ResponseFilter"/>
 	</layer>
 
 </plugin>

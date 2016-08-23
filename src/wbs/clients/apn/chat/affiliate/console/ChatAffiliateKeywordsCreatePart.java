@@ -1,13 +1,13 @@
 package wbs.clients.apn.chat.affiliate.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import wbs.clients.apn.chat.core.console.ChatKeywordJoinTypeConsoleHelper;
-import wbs.clients.apn.chat.core.console.GenderConsoleHelper;
-import wbs.clients.apn.chat.core.console.OrientConsoleHelper;
+import wbs.console.helper.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 
@@ -21,11 +21,11 @@ class ChatAffiliateKeywordsCreatePart
 	@Inject
 	ChatKeywordJoinTypeConsoleHelper chatKeywordJoinTypeConsoleHelper;
 
-	@Inject
-	GenderConsoleHelper genderConsoleHelper;
+	@Inject @Named
+	EnumConsoleHelper <?> genderConsoleHelper;
 
-	@Inject
-	OrientConsoleHelper orientConsoleHelper;
+	@Inject @Named
+	EnumConsoleHelper <?> orientConsoleHelper;
 
 	// implementation
 

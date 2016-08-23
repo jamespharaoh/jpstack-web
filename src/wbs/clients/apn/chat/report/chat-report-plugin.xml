@@ -3,7 +3,7 @@
 	package="wbs.clients.apn.chat.report">
 
 	<layer name="console">
-		<bean class="console.ChatReportRevSharePart"/>
+		<component class="console.ChatReportRevSharePart"/>
 	</layer>
 
 	<console-modules>

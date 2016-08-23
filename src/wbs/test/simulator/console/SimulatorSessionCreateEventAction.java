@@ -1,9 +1,9 @@
 package wbs.test.simulator.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifElse;
-import static wbs.framework.utils.etc.Misc.toBoolean;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.LogicUtils.parseBooleanTrueFalseRequired;
 import static wbs.framework.utils.etc.StringUtils.doesNotStartWith;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
@@ -128,11 +128,21 @@ class SimulatorSessionCreateEventAction
 			String type =
 				requestContext.getForm ("type");
 
-			if (equal (type, "sendMessage"))
+			if (
+				stringEqual (
+					type,
+					"sendMessage")
+			) {
 				return sendMessage ();
+			}
 
-			if (equal (type, "deliveryReport"))
+			if (
+				stringEqual (
+					type,
+					"deliveryReport")
+			) {
 				return deliveryReport ();
+			}
 
 			throw new AjaxException (
 				stringFormat (
@@ -358,7 +368,7 @@ class SimulatorSessionCreateEventAction
 					"messageId"));
 
 		Boolean success =
-			toBoolean (
+			parseBooleanTrueFalseRequired (
 				requestContext.getForm (
 					"success"));
 
@@ -366,7 +376,7 @@ class SimulatorSessionCreateEventAction
 
 		reportLogic.deliveryReport (
 			messageId,
-			ifElse (
+			ifThenElse (
 				success,
 				() -> MessageStatus.delivered,
 				() -> MessageStatus.undelivered),

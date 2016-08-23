@@ -9,11 +9,11 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 public
 interface ChatUserInitiationLogDaoMethods {
 
-	List<ChatUserInitiationLogRec> findByTimestamp (
+	List <ChatUserInitiationLogRec> findByTimestamp (
 			ChatRec chat,
 			Interval timestampInterval);
 
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			ChatUserInitiationLogSearch search);
 
 }

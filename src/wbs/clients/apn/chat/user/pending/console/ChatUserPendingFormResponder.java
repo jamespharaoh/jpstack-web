@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.user.pending.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
@@ -415,7 +415,7 @@ class ChatUserPendingFormResponder
 			}
 
 			if (
-				in (
+				enumInSafe (
 					mode,
 					PendingMode.image,
 					PendingMode.video,
@@ -440,10 +440,13 @@ class ChatUserPendingFormResponder
 						requestContext.getForm ("classification")));
 
 				if (
+
 					chatUserImage.getAppend ()
-					|| equal (
+
+					|| stringEqual (
 						chatUser.getChat ().getCode (),
 						"adult")
+
 				) {
 
 					printFormat (

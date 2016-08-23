@@ -22,20 +22,20 @@
 	</fixtures>
 
 	<layer name="api">
-		<bean class="api.Oxygen8ApiServletModule"/>
-		<bean class="api.Oxygen8InboundFile"/>
-		<bean class="api.Oxygen8InboundMmsAction"/>
-		<bean class="api.Oxygen8InboundSmsAction"/>
-		<bean class="api.Oxygen8ReportFile"/>
+		<component class="api.Oxygen8ApiServletModule"/>
+		<component class="api.Oxygen8InboundFile"/>
+		<component class="api.Oxygen8InboundMmsAction"/>
+		<component class="api.Oxygen8InboundSmsAction"/>
+		<component class="api.Oxygen8ReportFile"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.Oxygen8RouteSummaryAdditionalPart"/>
-		<bean class="console.Oxygen8RouteSummaryAdditionalPartFactory"/>
+		<component class="console.Oxygen8RouteSummaryAdditionalPart"/>
+		<component class="console.Oxygen8RouteSummaryAdditionalPartFactory"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.Oxygen8Sender"/>
+		<component class="daemon.Oxygen8Sender"/>
 	</layer>
 
 	<console-modules>

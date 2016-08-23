@@ -1,8 +1,8 @@
 package wbs.framework.entity.generate;
 
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.File;
@@ -12,16 +12,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.commons.io.FileUtils;
+
+import com.google.common.collect.ImmutableList;
+
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import org.apache.commons.io.FileUtils;
-
-import com.google.common.collect.ImmutableList;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.entity.meta.CodeFieldSpec;
@@ -1142,7 +1141,7 @@ class ModelRecordGenerator {
 		// write function body
 
 		if (
-			equal (
+			stringEqual (
 				modelMeta.name (),
 				"text")
 		) {

@@ -1,8 +1,8 @@
 package wbs.smsapps.subscription.logic;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.notIn;
+import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -102,7 +102,7 @@ class SubscriptionLogicImplementation
 		// sanity check
 
 		if (
-			notIn (
+			enumNotInSafe (
 				subscriptionSendNumber.getState (),
 				SubscriptionSendNumberState.queued,
 				SubscriptionSendNumberState.pendingBill)
@@ -194,7 +194,7 @@ class SubscriptionLogicImplementation
 		// sanity check
 
 		if (
-			notEqual (
+			enumNotEqualSafe (
 				subscriptionSendNumber.getState (),
 				SubscriptionSendNumberState.queued)
 		) {

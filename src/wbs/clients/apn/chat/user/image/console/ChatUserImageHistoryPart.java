@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.image.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.toEnum;
 
 import java.util.Iterator;
@@ -64,8 +64,13 @@ class ChatUserImageHistoryPart
 
 		while (iterator.hasNext ()) {
 
-			if (! equal (iterator.next ().getType (), type))
+			if (
+				enumNotEqualSafe (
+					iterator.next ().getType (),
+					type)
+			) {
 				iterator.remove ();
+			}
 
 		}
 

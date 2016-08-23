@@ -1,15 +1,14 @@
 package wbs.platform.event.console;
 
 import static wbs.framework.utils.etc.Misc.doesNotImplement;
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
 import wbs.console.forms.FormFieldBuilderContext;
 import wbs.console.forms.FormFieldPluginProvider;
 import wbs.console.helper.ConsoleHelper;
@@ -60,7 +59,7 @@ class EventFormFieldPluginProvider
 
 			consoleHelper.nameExists ()
 
-			&& equal (
+			&& stringEqual (
 				consoleHelper.nameFieldName (),
 				fieldName)
 

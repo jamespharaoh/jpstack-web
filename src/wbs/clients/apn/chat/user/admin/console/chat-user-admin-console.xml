@@ -105,8 +105,7 @@
 
 		<enum-field
 			name="imageMode"
-			nullable="yes"
-			helper="chatUserImageModeConsoleHelper"/>
+			nullable="yes"/>
 
 		<yes-no-field
 			name="broadcastOptOut"/>

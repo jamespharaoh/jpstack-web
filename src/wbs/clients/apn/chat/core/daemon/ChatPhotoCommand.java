@@ -170,8 +170,9 @@ class ChatPhotoCommand
 
 				chatInfoLogic.sendUserPics (
 					chatUser,
-					3,
-					message.getThreadId ());
+					3l,
+					Optional.of (
+						message.getThreadId ()));
 
 			} else if (
 
@@ -220,7 +221,7 @@ class ChatPhotoCommand
 							chat,
 							"help")),
 					TemplateMissing.error,
-					Collections.<String,String>emptyMap ());
+					Collections.emptyMap ());
 
 			} else {
 
@@ -229,8 +230,9 @@ class ChatPhotoCommand
 				chatInfoLogic.sendRequestedUserPicandOtherUserPics (
 					chatUser,
 					photoUserOptional.get (),
-					2,
-					message.getThreadId ());
+					2l,
+					Optional.of (
+						message.getThreadId ()));
 
 			}
 
@@ -240,8 +242,10 @@ class ChatPhotoCommand
 
 		return smsInboxLogic.inboxProcessed (
 			inbox,
-			Optional.of (defaultService),
-			Optional.of (affiliate),
+			Optional.of (
+				defaultService),
+			Optional.of (
+				affiliate),
 			command);
 
 	}

@@ -1,6 +1,6 @@
 package wbs.integrations.broadcastsystems.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -72,23 +72,23 @@ class BroadcastSystemsReportFile
 		data.statusCode =
 			requestContext.parameterOrNull ("status");
 
-		if (equal (data.statusCode, "delivered")) {
+		if (stringEqual (data.statusCode, "delivered")) {
 			data.status = MessageStatus.delivered;
-		} else if (equal (data.statusCode, "rejected_by_handset")) {
+		} else if (stringEqual (data.statusCode, "rejected_by_handset")) {
 			data.status = MessageStatus.undelivered;
-		} else if (equal (data.statusCode, "pending")) {
+		} else if (stringEqual (data.statusCode, "pending")) {
 			data.status = MessageStatus.submitted;
-		} else if (equal (data.statusCode, "accepted_by_smsc")) {
+		} else if (stringEqual (data.statusCode, "accepted_by_smsc")) {
 			data.status = MessageStatus.submitted;
-		} else if (equal (data.statusCode, "rejected_by_smsc")) {
+		} else if (stringEqual (data.statusCode, "rejected_by_smsc")) {
 			data.status = MessageStatus.undelivered;
-		} else if (equal (data.statusCode, "undeliverable")) {
+		} else if (stringEqual (data.statusCode, "undeliverable")) {
 			data.status = MessageStatus.undelivered;
-		} else if (equal (data.statusCode, "rejected")) {
+		} else if (stringEqual (data.statusCode, "rejected")) {
 			data.status = MessageStatus.undelivered;
-		} else if (equal (data.statusCode, "failed")) {
+		} else if (stringEqual (data.statusCode, "failed")) {
 			data.status = MessageStatus.undelivered;
-		} else if (equal (data.statusCode, "expired")) {
+		} else if (stringEqual (data.statusCode, "expired")) {
 			data.status = MessageStatus.undelivered;
 		} else {
 

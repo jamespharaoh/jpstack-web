@@ -1,10 +1,10 @@
 package wbs.integrations.smsarena.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringToUrl;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -113,7 +113,7 @@ class SmsArenaSender
 		// check message type
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				message.getMessageType ().getCode (),
 				"sms")
 		) {
@@ -243,7 +243,7 @@ class SmsArenaSender
 		// set multipart
 
 		if (
-			! GsmUtils.isValidGsm (
+			! GsmUtils.gsmStringIsValid (
 				params.get("text"))
 		) {
 

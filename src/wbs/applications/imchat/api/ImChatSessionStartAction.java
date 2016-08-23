@@ -1,6 +1,6 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -124,7 +124,7 @@ class ImChatSessionStartAction
 		// verify password
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				customer.getPassword (),
 				startRequest.password ())
 		) {

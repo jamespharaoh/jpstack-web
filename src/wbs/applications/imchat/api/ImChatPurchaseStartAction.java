@@ -1,6 +1,7 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.LogicUtils.booleanEqual;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.hyphenToUnderscore;
@@ -227,11 +228,13 @@ class ImChatPurchaseStartAction
 			isNotPresent (
 				pricePointOptional)
 
-			|| notEqual (
+			|| referenceNotEqualSafe (
 				pricePointOptional.get ().getImChat (),
 				imChat)
 
-			|| pricePointOptional.get ().getDeleted ()
+			|| booleanEqual (
+				pricePointOptional.get ().getDeleted (),
+				true)
 
 		) {
 

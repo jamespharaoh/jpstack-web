@@ -2,7 +2,6 @@ package wbs.console.forms;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
 import wbs.console.module.ConsoleModuleData;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -33,8 +32,7 @@ class EnumFormFieldSpec {
 	Boolean hidden;
 
 	@DataAttribute (
-		name = "helper",
-		required = true)
+		name = "helper")
 	String helperBeanName;
 
 	@DataAttribute (

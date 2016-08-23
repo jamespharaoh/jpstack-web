@@ -1,12 +1,12 @@
 package wbs.framework.entity.build;
 
 import static wbs.framework.utils.etc.Misc.classForNameRequired;
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Set;
 
@@ -64,7 +64,7 @@ class AssociativeCollectionModelFieldBuilder {
 		Class<?> fieldTypeClass;
 
 		if (
-			equal (
+			stringEqual (
 				spec.typeName (),
 				"string")
 		) {

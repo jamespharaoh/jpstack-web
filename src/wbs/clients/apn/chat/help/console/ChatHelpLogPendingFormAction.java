@@ -87,7 +87,7 @@ class ChatHelpLogPendingFormAction
 
 			}
 
-			if (! GsmUtils.isValidGsm (text)) {
+			if (! GsmUtils.gsmStringIsValid (text)) {
 
 				requestContext.addError (
 					"Reply contains invalid characters");

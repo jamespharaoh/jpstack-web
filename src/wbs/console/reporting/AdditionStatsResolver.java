@@ -6,14 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.joda.time.Instant;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.joda.time.Instant;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)
@@ -88,16 +87,22 @@ class AdditionStatsResolver
 		ResolvedStats ret =
 			new ResolvedStats ();
 
-		for (Object group : groups) {
+		for (
+			Object group
+				: groups
+		) {
 
-			for (Instant step : period.steps ()) {
+			for (
+				Instant step
+					: period.steps ()
+			) {
 
-				Pair<Object,Instant> key =
-					Pair.<Object,Instant>of (
+				Pair <Object, Instant> key =
+					Pair.of (
 						group,
 						step);
 
-				int totalValue = 0;
+				long totalValue = 0;
 
 				for (
 					int operandIndex = 0;
@@ -106,19 +111,22 @@ class AdditionStatsResolver
 				) {
 
 					Operand operand =
-						operands.get (operandIndex);
+						operands.get (
+							operandIndex);
 
-					int operandValue =
+					long operandValue =
 						operand.coefficient;
 
 					if (operand.resolver != null) {
 
 						ResolvedStats operandResolved =
-							operandsResolved.get (operandIndex);
+							operandsResolved.get (
+								operandIndex);
 
-						Integer resolverValue =
-							(Integer)
-							operandResolved.steps ().get (key);
+						Long resolverValue =
+							(Long)
+							operandResolved.steps ().get (
+								key);
 
 						if (resolverValue == null)
 							continue;
@@ -141,7 +149,7 @@ class AdditionStatsResolver
 
 			{
 
-				int totalValue = 0;
+				long totalValue = 0;
 
 				for (
 					int operandIndex = 0;
@@ -150,19 +158,22 @@ class AdditionStatsResolver
 				) {
 
 					Operand operand =
-						operands.get (operandIndex);
+						operands.get (
+							operandIndex);
 
-					int operandValue =
+					long operandValue =
 						operand.coefficient;
 
 					if (operand.resolver != null) {
 
 						ResolvedStats operandResolved =
-							operandsResolved.get (operandIndex);
+							operandsResolved.get (
+								operandIndex);
 
-						Integer resolverValue =
-							(Integer)
-							operandResolved.totals ().get (group);
+						Long resolverValue =
+							(Long)
+							operandResolved.totals ().get (
+								group);
 
 						if (resolverValue == null)
 							continue;
@@ -192,7 +203,7 @@ class AdditionStatsResolver
 	@Data
 	public static
 	class Operand {
-		int coefficient;
+		Long coefficient;
 		StatsResolver resolver;
 	}
 

@@ -1,12 +1,16 @@
 package wbs.clients.apn.chat.user.image.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.CollectionUtils.listItemAtIndexRequired;
+import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.toEnum;
-import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringInSafe;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -107,7 +111,8 @@ class ChatUserImageListAction
 		) {
 
 			Matcher matcher =
-				keyPattern.matcher (key);
+				keyPattern.matcher (
+					key);
 
 			if (! matcher.matches ())
 				continue;
@@ -115,21 +120,27 @@ class ChatUserImageListAction
 			String command =
 				matcher.group (1);
 
-			int index =
-				Integer.parseInt (matcher.group (2));
+			long index =
+				parseIntegerRequired (
+					matcher.group (2));
 
 			if (index >= list.size ())
 				throw new RuntimeException ();
 
 			if (
-				equal (
+				stringEqual (
 					command,
 					"remove")
 			) {
 
+				ChatUserImageRec itemToRemove =
+					listItemAtIndexRequired (
+						list,
+						index);
+
 				if (
-					equal (
-						list.get (index),
+					referenceEqualSafe (
+						itemToRemove,
 						chatUserLogic.getMainChatUserImageByType (
 							chatUser,
 							type))
@@ -138,22 +149,27 @@ class ChatUserImageListAction
 					chatUserLogic.setMainChatUserImageByType (
 						chatUser,
 						type,
-						Optional.<ChatUserImageRec>absent ());
+						Optional.absent ());
 
 				}
 
-				list.get (index)
+				itemToRemove
 
 					.setIndex (
 						null);
 
 				for (
-					int otherIndex = index + 1;
+					long otherIndex = index + 1;
 					otherIndex < list.size ();
 					otherIndex ++
 				) {
 
-					list.get (otherIndex)
+					ChatUserImageRec otherItem =
+						listItemAtIndexRequired (
+							list,
+							otherIndex);
+
+					otherItem
 
 						.setIndex (
 							otherIndex - 1l);
@@ -167,11 +183,11 @@ class ChatUserImageListAction
 
 			if (
 
-				notEqual (
+				enumNotEqualSafe (
 					type,
 					ChatUserImageType.video)
 
-				&& in (
+				&& stringInSafe (
 					command,
 					"rotate_cw",
 					"rotate_ccw")
@@ -179,7 +195,9 @@ class ChatUserImageListAction
 			) {
 
 				ChatUserImageRec chatUserImage =
-					list.get (index);
+					listItemAtIndexRequired (
+						list,
+						index);
 
 				BufferedImage smallImage =
 					mediaLogic.getImage (
@@ -190,7 +208,7 @@ class ChatUserImageListAction
 						chatUserImage.getFullMedia ());
 
 				if (
-					equal (
+					stringEqual (
 						command,
 						"rotate_ccw")
 				) {
@@ -204,7 +222,7 @@ class ChatUserImageListAction
 				}
 
 				if (
-					equal (
+					stringEqual (
 						command,
 						"rotate_cw")
 				) {
@@ -238,24 +256,35 @@ class ChatUserImageListAction
 			}
 
 			if (
-				in (
+				stringInSafe (
 					command,
 					"move_up",
 					"move_down")
 			) {
 
-				int diff =
-					equal (command, "move_up") ? -1 : 1;
+				long diff =
+					ifThenElse (
+						stringEqual (
+							command,
+							"move_up"),
+						() -> -1l,
+						() -> 1l);
 
-				int otherIndex = (
-					index + list.size () + diff
+				long otherIndex = (
+					+ index
+					+ list.size ()
+					+ diff
 				) % list.size ();
 
 				ChatUserImageRec thisImage =
-					list.get (index);
+					listItemAtIndexRequired (
+						list,
+						index);
 
 				ChatUserImageRec otherImage =
-					list.get (otherIndex);
+					listItemAtIndexRequired (
+						list,
+						otherIndex);
 
 				thisImage.setIndex (null);
 				otherImage.setIndex (null);
@@ -263,26 +292,29 @@ class ChatUserImageListAction
 				transaction.flush ();
 
 				thisImage.setIndex (
-					fromJavaInteger (
-						otherIndex));
+					otherIndex);
 
 				otherImage.setIndex (
-					fromJavaInteger (
-						index));
+					index);
 
 				notice =
 					"Image/video moved";
 
 			}
 
-			if (in (command, "select")) {
+			if (
+				stringInSafe (
+					command,
+					"select")
+			) {
 
 				ChatUserImageRec chatUserImage =
-					list.get (
+					listItemAtIndexRequired (
+						list,
 						index);
 
 				if (
-					equal (
+					referenceNotEqualSafe (
 						chatUserLogic.getMainChatUserImageByType (
 							chatUser,
 							type),
@@ -292,7 +324,7 @@ class ChatUserImageListAction
 					chatUserLogic.setMainChatUserImageByType (
 						chatUser,
 						type,
-						Optional.<ChatUserImageRec>absent ());
+						Optional.absent ());
 
 					notice =
 						"Image unselected";

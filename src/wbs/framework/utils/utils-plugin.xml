@@ -3,14 +3,14 @@
 	package="wbs.framework.utils">
 
 	<layer name="utils">
-		<bean class="RandomLogicImplementation"/>
-		<bean class="TimeFormatterImplementation"/>
-		<bean class="IntervalFormatterImplementation"/>
-		<bean class="ThreadManagerImplementation"/>
+		<component class="RandomLogicImplementation"/>
+		<component class="TimeFormatterImplementation"/>
+		<component class="IntervalFormatterImplementation"/>
+		<component class="ThreadManagerImplementation"/>
 	</layer>
 
 	<layer name="logic">
-		<bean class="EmailLogicImplementation"/>
+		<component class="EmailLogicImplementation"/>
 	</layer>
 
 </plugin>

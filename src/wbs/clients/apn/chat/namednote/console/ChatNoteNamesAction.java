@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.namednote.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
 
@@ -95,13 +95,18 @@ class ChatNoteNamesAction
 				if (newName == null)
 					continue;
 
-				if (equal (
+				if (
+					stringEqual (
 						newName,
-						noteName.getName ()))
+						noteName.getName ())
+				) {
 					continue;
+				}
 
 				noteName
-					.setName (newName);
+
+					.setName (
+						newName);
 
 				numUpdated ++;
 

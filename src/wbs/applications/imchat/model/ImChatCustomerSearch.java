@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
 import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
@@ -17,7 +16,7 @@ public
 class ImChatCustomerSearch
 	implements Serializable {
 
-	Integer imChatId;
+	Long imChatId;
 
 	String code;
 	String email;

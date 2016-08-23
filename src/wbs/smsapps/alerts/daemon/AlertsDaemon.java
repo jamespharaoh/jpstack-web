@@ -1,8 +1,8 @@
 package wbs.smsapps.alerts.daemon;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
@@ -305,7 +305,7 @@ class AlertsDaemon
 			) {
 
 				if (
-					! in (
+					enumNotInSafe (
 						queueItem.getState (),
 						QueueItemState.pending,
 						QueueItemState.waiting)

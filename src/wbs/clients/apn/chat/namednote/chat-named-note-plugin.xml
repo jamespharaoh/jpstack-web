@@ -13,8 +13,8 @@
 	</models>
 
 	<layer name="console">
-		<bean class="console.ChatNoteNamesAction"/>
-		<bean class="console.ChatNoteNamesPart"/>
+		<component class="console.ChatNoteNamesAction"/>
+		<component class="console.ChatNoteNamesPart"/>
 	</layer>
 
 	<console-modules>

@@ -1,7 +1,7 @@
 package wbs.smsapps.broadcast.console;
 
-import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
+import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -85,7 +85,7 @@ class BroadcastSendAction
 		) {
 
 			if (
-				notEqual (
+				enumNotEqualSafe (
 					broadcast.getState (),
 					BroadcastState.unsent)
 			) {
@@ -275,10 +275,12 @@ class BroadcastSendAction
 
 			}
 
-			if (in (
+			if (
+				enumInSafe (
 					broadcast.getState (),
 					BroadcastState.unsent,
-					BroadcastState.scheduled)) {
+					BroadcastState.scheduled)
+			) {
 
 				broadcast.setState (
 					BroadcastState.cancelled);
@@ -297,9 +299,11 @@ class BroadcastSendAction
 
 			}
 
-			if (in (
+			if (
+				enumInSafe (
 					broadcast.getState (),
-					BroadcastState.sending)) {
+					BroadcastState.sending)
+			) {
 
 				broadcast.setState (
 					BroadcastState.partiallySent);

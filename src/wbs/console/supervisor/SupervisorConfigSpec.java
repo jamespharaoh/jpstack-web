@@ -5,7 +5,6 @@ import java.util.List;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
 import wbs.console.module.ConsoleModuleData;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -29,11 +28,11 @@ class SupervisorConfigSpec {
 	String label;
 
 	@DataAttribute
-	Integer offsetHours;
+	Long offsetHours;
 
 	@DataChildren (
 		direct = true)
-	List<Object> builders =
-		new ArrayList<Object> ();
+	List <Object> builders =
+		new ArrayList<> ();
 
 }

@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.core.daemon;
 
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+
 import java.util.Collections;
 
 import javax.inject.Inject;
@@ -161,13 +163,16 @@ class ChatSetPhotoCommand
 
 		// try set photo
 
-		ChatUserImageRec chatUserImage =
+		Optional <ChatUserImageRec> chatUserImageOptional =
 			chatUserLogic.setPhotoFromMessage (
 				chatUser,
 				message,
 				false);
 
-		if (chatUserImage != null) {
+		if (
+			isPresent (
+				chatUserImageOptional)
+		) {
 
 			// send confirmation
 
@@ -183,7 +188,7 @@ class ChatSetPhotoCommand
 						chat,
 						"help")),
 				TemplateMissing.error,
-				Collections.<String,String>emptyMap ());
+				Collections.emptyMap ());
 
 			// auto join
 

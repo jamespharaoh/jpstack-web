@@ -1,5 +1,6 @@
 package wbs.framework.utils.etc;
 
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TypeUtils.dynamicCast;
 import static wbs.framework.utils.etc.TypeUtils.isInstanceOf;
 
@@ -16,8 +17,8 @@ public
 class OptionalUtils {
 
 	public static <Type>
-	Optional<Type> optionalToGoogle (
-			@NonNull java.util.Optional<Type> javaOptional) {
+	Optional <Type> optionalFromJava (
+			@NonNull java.util.Optional <Type> javaOptional) {
 
 		if (javaOptional.isPresent ()) {
 
@@ -32,67 +33,467 @@ class OptionalUtils {
 
 	}
 
-	public static <Type>
-	boolean optionalEquals (
-			@NonNull Optional<Type> left,
-			@NonNull Type right) {
+	public static
+	boolean optionalEqualAndPresentSafe (
+			@NonNull Optional <?> optional0,
+			@NonNull Optional <?> optional1) {
 
-		if (left.isPresent ()) {
-
-			return left.get ().equals (
-				right);
-
-		} else {
-
+		if (
+			! optional0.isPresent ()
+			|| ! optional1.isPresent ()
+		) {
 			return false;
-
 		}
+
+		if (optional0.getClass () != optional1.getClass ()) {
+			throw new IllegalArgumentException ();
+		}
+
+		return optional0.get ().equals (
+			optional1.get ());
 
 	}
 
-	@SafeVarargs
-	public static <Type>
-	boolean optionalIn (
-			@NonNull Optional<Type> left,
-			@NonNull Type... rights) {
+	public static
+	boolean optionalNotEqualAndPresentSafe (
+			@NonNull Optional <?> optional0,
+			@NonNull Optional <?> optional1) {
 
-		if (left.isPresent ()) {
-
-			return Misc.in (
-				left.get (),
-				rights);
-
-		} else {
-
-			return false;
-
-		}
-
-	}
-
-	@SafeVarargs
-	public static <Type>
-	boolean optionalNotIn (
-			@NonNull Optional<Type> left,
-			@NonNull Type... rights) {
-
-		if (left.isPresent ()) {
-
-			return ! Misc.in (
-				left.get (),
-				rights);
-
-		} else {
-
+		if (
+			! optional0.isPresent ()
+			|| ! optional1.isPresent ()
+		) {
 			return true;
+		}
+
+		if (optional0.getClass () != optional1.getClass ()) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Tried to compare a %s to a %s",
+					optional0.get ().getClass ().getSimpleName (),
+					optional1.get ().getClass ().getSimpleName ()));
 
 		}
+
+		return ! optional0.get ().equals (
+			optional1.get ());
+
+	}
+
+	public static <Type>
+	boolean optionalEqualAndPresentWithClass (
+			@NonNull Class <Type> valueClass,
+			@NonNull Optional <Type> optional0,
+			@NonNull Optional <Type> optional1) {
+
+		if (
+			optional0.isPresent ()
+			&& ! valueClass.isInstance (
+				optional0.get ())
+		) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Generic type violation passing %s as %s",
+					optional0.get ().getClass ().getSimpleName (),
+					valueClass.getSimpleName ()));
+
+		}
+
+		if (
+			optional1.isPresent ()
+			&& ! valueClass.isInstance (
+				optional1.get ())
+		) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Generic type violation passing %s as %s",
+					optional1.get ().getClass ().getSimpleName (),
+					valueClass.getSimpleName ()));
+
+		}
+
+		if (
+			! optional0.isPresent ()
+			|| ! optional1.isPresent ()
+		) {
+			return false;
+		}
+
+		return optional0.get ().equals (
+			optional1.get ());
+
+	}
+
+	public static <Type>
+	boolean optionalNotEqualAndPresentWithClass (
+			@NonNull Class <Type> valueClass,
+			@NonNull Optional <Type> optional0,
+			@NonNull Optional <Type> optional1) {
+
+		if (
+			optional0.isPresent ()
+			&& ! valueClass.isInstance (
+				optional0.get ())
+		) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Generic type violation passing %s as %s",
+					optional0.get ().getClass ().getSimpleName (),
+					valueClass.getSimpleName ()));
+
+		}
+
+		if (
+			optional1.isPresent ()
+			&& ! valueClass.isInstance (
+				optional1.get ())
+		) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Generic type violation passing %s as %s",
+					optional1.get ().getClass ().getSimpleName (),
+					valueClass.getSimpleName ()));
+
+		}
+
+		if (
+			! optional0.isPresent ()
+			|| ! optional1.isPresent ()
+		) {
+			return true;
+		}
+
+		return ! optional0.get ().equals (
+			optional1.get ());
+
+	}
+
+	public static
+	boolean optionalEqualOrNotPresentSafe (
+			@NonNull Optional <?> optional0,
+			@NonNull Optional <?> optional1) {
+
+		if (
+			! optional0.isPresent ()
+			&& ! optional1.isPresent ()
+		) {
+			return true;
+		}
+
+		if (
+			! optional0.isPresent ()
+			|| ! optional1.isPresent ()
+		) {
+			return false;
+		}
+
+		if (optional0.get ().getClass () != optional1.get ().getClass ()) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Tried to compare a %s to a %s",
+					optional0.get ().getClass ().getSimpleName (),
+					optional1.get ().getClass ().getSimpleName ()));
+
+		}
+
+		return optional0.get ().equals (
+			optional1.get ());
+
+	}
+
+	public static
+	boolean optionalNotEqualOrNotPresentSafe (
+			@NonNull Optional <?> optional0,
+			@NonNull Optional <?> optional1) {
+
+		if (
+			! optional0.isPresent ()
+			&& ! optional1.isPresent ()
+		) {
+			return false;
+		}
+
+		if (
+			! optional0.isPresent ()
+			|| ! optional1.isPresent ()
+		) {
+			return true;
+		}
+
+		if (optional0.get ().getClass () != optional1.get ().getClass ()) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Tried to compare a %s to a %s",
+					optional0.get ().getClass ().getSimpleName (),
+					optional1.get ().getClass ().getSimpleName ()));
+
+		}
+
+		return ! optional0.get ().equals (
+			optional1.get ());
+
+	}
+
+	public static <Type>
+	boolean optionalEqualOrNotPresentWithClass (
+			@NonNull Class <Type> valueClass,
+			@NonNull Optional <Type> optional0,
+			@NonNull Optional <Type> optional1) {
+
+		// verify class instances
+
+		if (
+			optional0.isPresent ()
+			&& ! valueClass.isInstance (
+				optional0.get ())
+		) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Generic type violation passing %s as %s",
+					optional0.get ().getClass ().getSimpleName (),
+					valueClass.getSimpleName ()));
+
+		}
+
+		if (
+			optional1.isPresent ()
+			&& ! valueClass.isInstance (
+				optional1.get ())
+		) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Generic type violation passing %s as %s",
+					optional1.get ().getClass ().getSimpleName (),
+					valueClass.getSimpleName ()));
+
+		}
+
+		// handle not present
+
+		if (
+			! optional0.isPresent ()
+			&& ! optional1.isPresent ()
+		) {
+			return true;
+		}
+
+		if (
+			! optional0.isPresent ()
+			|| ! optional1.isPresent ()
+		) {
+			return false;
+		}
+
+		// regular equals
+
+		return optional0.get ().equals (
+			optional1.get ());
+
+	}
+
+	public static <Type>
+	boolean optionalNotEqualOrNotPresentWithClass (
+			@NonNull Class <Type> valueClass,
+			@NonNull Optional <Type> optional0,
+			@NonNull Optional <Type> optional1) {
+
+		// verify class instances
+
+		if (
+			optional0.isPresent ()
+			&& ! valueClass.isInstance (
+				optional0.get ())
+		) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Generic type violation passing %s as %s",
+					optional0.get ().getClass ().getSimpleName (),
+					valueClass.getSimpleName ()));
+
+		}
+
+		if (
+			optional1.isPresent ()
+			&& ! valueClass.isInstance (
+				optional1.get ())
+		) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Generic type violation passing %s as %s",
+					optional1.get ().getClass ().getSimpleName (),
+					valueClass.getSimpleName ()));
+
+		}
+
+		// handle not present
+
+		if (
+			! optional0.isPresent ()
+			&& ! optional1.isPresent ()
+		) {
+			return false;
+		}
+
+		if (
+			! optional0.isPresent ()
+			|| ! optional1.isPresent ()
+		) {
+			return true;
+		}
+
+		// regular equals
+
+		return ! optional0.get ().equals (
+			optional1.get ());
+
+	}
+
+	public static <Type>
+	boolean optionalValueEqualSafe (
+			@NonNull Optional <Type> optional,
+			@NonNull Type value) {
+
+		if (! optional.isPresent ()) {
+			return false;
+		}
+
+		if (optional.get ().getClass () != value.getClass ()) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Tried to compare a %s to a %s",
+					optional.get ().getClass ().getSimpleName (),
+					value.getClass ().getSimpleName ()));
+
+		}
+
+		return optional.get ().equals (
+			value);
+
+	}
+
+	public static <Type>
+	boolean optionalValueNotEqualSafe (
+			@NonNull Optional <Type> optional,
+			@NonNull Type value) {
+
+		if (! optional.isPresent ()) {
+			return true;
+		}
+
+		if (optional.get ().getClass () != value.getClass ()) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Tried to compare a %s to a %s",
+					optional.get ().getClass ().getSimpleName (),
+					value.getClass ().getSimpleName ()));
+
+		}
+
+		return ! optional.get ().equals (
+			value);
+
+	}
+
+	public static <Type>
+	boolean optionalValueEqualWithClass (
+			@NonNull Class <Type> valueClass,
+			@NonNull Optional <Type> optional,
+			@NonNull Type value) {
+
+		// verify class instances
+
+		if (
+			optional.isPresent ()
+			&& ! valueClass.isInstance (
+				optional.get ())
+		) {
+			throw new ClassCastException ();
+		}
+
+		if (
+			! valueClass.isInstance (
+				value)
+		) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Tried to compare a %s to a %s",
+					optional.get ().getClass ().getSimpleName (),
+					value.getClass ().getSimpleName ()));
+
+		}
+
+		// handle not present
+
+		if (! optional.isPresent ()) {
+			return false;
+		}
+
+		// regular equals
+
+		return optional.get ().equals (
+			value);
+
+	}
+
+	public static <Type>
+	boolean optionalValueNotEqualWithClass (
+			@NonNull Class <Type> valueClass,
+			@NonNull Optional <Type> optional,
+			@NonNull Type value) {
+
+		// verify class instances
+
+		if (
+			optional.isPresent ()
+			&& ! valueClass.isInstance (
+				optional.get ())
+		) {
+			throw new ClassCastException ();
+		}
+
+		if (
+			! valueClass.isInstance (
+				value)
+		) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Tried to compare a %s to a %s",
+					optional.get ().getClass ().getSimpleName (),
+					value.getClass ().getSimpleName ()));
+
+		}
+
+		// handle not present
+
+		if (! optional.isPresent ()) {
+			return true;
+		}
+
+		// regular equals
+
+		return ! optional.get ().equals (
+			value);
 
 	}
 
 	public static
 	boolean isPresent (
-			@NonNull Optional<?> optional) {
+			@NonNull Optional <?> optional) {
 
 		return optional.isPresent ();
 
@@ -100,15 +501,15 @@ class OptionalUtils {
 
 	public static
 	boolean isNotPresent (
-			@NonNull Optional<?> optional) {
+			@NonNull Optional <?> optional) {
 
 		return ! optional.isPresent ();
 
 	}
 
 	public static <Type>
-	Type optionalRequired (
-			@NonNull Optional<Type> optional) {
+	Type optionalGetRequired (
+			@NonNull Optional <Type> optional) {
 
 		return optional.get ();
 
@@ -116,7 +517,7 @@ class OptionalUtils {
 
 	public static <Type>
 	Type optionalOrNull (
-			@NonNull Optional<Type> optional) {
+			@NonNull Optional <Type> optional) {
 
 		return optional.orNull ();
 
@@ -124,8 +525,8 @@ class OptionalUtils {
 
 	public static <Type>
 	Type optionalOrElse (
-			@NonNull Optional<Type> optional,
-			@NonNull Supplier<Type> orElse) {
+			@NonNull Optional <Type> optional,
+			@NonNull Supplier <Type> orElse) {
 
 		if (optional.isPresent ()) {
 
@@ -140,8 +541,8 @@ class OptionalUtils {
 	}
 
 	public static <Type>
-	Optional<Type> requiredOptional (
-			@NonNull Optional<Type> optional) {
+	Optional <Type> requiredOptional (
+			@NonNull Optional <Type> optional) {
 
 		if (! optional.isPresent ()) {
 			throw new RuntimeException ();
@@ -152,8 +553,8 @@ class OptionalUtils {
 	}
 
 	public static <Type>
-	Iterable<Type> presentInstances (
-			@NonNull Iterable<Optional<Type>> collection) {
+	Iterable <Type> presentInstances (
+			@NonNull Iterable <Optional <Type>> collection) {
 
 		return Optional.presentInstances (
 			collection);
@@ -161,29 +562,29 @@ class OptionalUtils {
 	}
 
 	public static <Type>
-	Iterable<Type> presentInstances () {
+	Iterable <Type> presentInstances () {
 
-		return ImmutableList.<Type>of ();
+		return ImmutableList.of ();
 
 	}
 
 	public static <Type>
-	Iterable<Type> presentInstances (
-			@NonNull Optional<Type> argument) {
+	Iterable <Type> presentInstances (
+			@NonNull Optional <Type> argument) {
 
 		return presentInstances (
-			ImmutableList.<Optional<Type>>of (
+			ImmutableList.of (
 				argument));
 
 	}
 
 	public static <Type>
-	Iterable<Type> presentInstances (
-			@NonNull Optional<Type> argument0,
-			@NonNull Optional<Type> argument1) {
+	Iterable <Type> presentInstances (
+			@NonNull Optional <Type> argument0,
+			@NonNull Optional <Type> argument1) {
 
 		return presentInstances (
-			ImmutableList.<Optional<Type>>of (
+			ImmutableList.of (
 				argument0,
 				argument1));
 
@@ -191,12 +592,12 @@ class OptionalUtils {
 
 	public static <Type>
 	Iterable<Type> presentInstances (
-			@NonNull Optional<Type> argument0,
-			@NonNull Optional<Type> argument1,
-			@NonNull Optional<Type> argument2) {
+			@NonNull Optional <Type> argument0,
+			@NonNull Optional <Type> argument1,
+			@NonNull Optional <Type> argument2) {
 
 		return presentInstances (
-			ImmutableList.<Optional<Type>>of (
+			ImmutableList.of (
 				argument0,
 				argument1,
 				argument2));
@@ -205,13 +606,13 @@ class OptionalUtils {
 
 	public static <Type>
 	Iterable<Type> presentInstances (
-			@NonNull Optional<Type> argument0,
-			@NonNull Optional<Type> argument1,
-			@NonNull Optional<Type> argument2,
-			@NonNull Optional<Type> argument3) {
+			@NonNull Optional <Type> argument0,
+			@NonNull Optional <Type> argument1,
+			@NonNull Optional <Type> argument2,
+			@NonNull Optional <Type> argument3) {
 
 		return presentInstances (
-			ImmutableList.<Optional<Type>>of (
+			ImmutableList.of (
 				argument0,
 				argument1,
 				argument2,
@@ -221,8 +622,8 @@ class OptionalUtils {
 
 	@SafeVarargs
 	public static <Type>
-	Iterable<Type> presentInstances (
-			@NonNull Optional<Type>... arguments) {
+	Iterable <Type> presentInstances (
+			@NonNull Optional <Type>... arguments) {
 
 		return Optional.presentInstances (
 			Arrays.asList (
@@ -231,20 +632,20 @@ class OptionalUtils {
 	}
 
 	public static <Type>
-	Optional<Type> optionalIf (
+	Optional <Type> optionalIf (
 			@NonNull Boolean present,
-			@NonNull Type value) {
+			@NonNull Supplier <Type> valueSupplier) {
 
 		return present
-			? Optional.<Type>of (
-				value)
-			: Optional.<Type>absent ();
+			? Optional.of (
+				valueSupplier.get ())
+			: Optional.absent ();
 
 	}
 
 	public static <T>
 	T optionalOr (
-			Optional<T> optional,
+			Optional <T> optional,
 			T instead) {
 
 		return optional.or (
@@ -255,10 +656,10 @@ class OptionalUtils {
 	@SafeVarargs
 	public static <Type>
 	Type ifNotPresent (
-			@NonNull Optional<Type>... optionalValues) {
+			@NonNull Optional <Type>... optionalValues) {
 
 		for (
-			Optional<Type> optionalValue
+			Optional <Type> optionalValue
 				: optionalValues
 		) {
 
@@ -296,8 +697,8 @@ class OptionalUtils {
 
 	public static <Type>
 	Type ifNotPresent (
-			@NonNull Optional<? extends Type> optionalValueOne,
-			@NonNull Optional<? extends Type> optionalValueTwo) {
+			@NonNull Optional <? extends Type> optionalValueOne,
+			@NonNull Optional <? extends Type> optionalValueTwo) {
 
 		if (
 			isPresent (
@@ -323,9 +724,9 @@ class OptionalUtils {
 
 	public static <Type>
 	Type ifNotPresent (
-			@NonNull Optional<? extends Type> optionalValueOne,
-			@NonNull Optional<? extends Type> optionalValueTwo,
-			@NonNull Optional<? extends Type> optionalValueThree) {
+			@NonNull Optional <? extends Type> optionalValueOne,
+			@NonNull Optional <? extends Type> optionalValueTwo,
+			@NonNull Optional <? extends Type> optionalValueThree) {
 
 		if (
 			isPresent (

@@ -1,10 +1,10 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.notLessThan;
+import static wbs.framework.utils.etc.NumberUtils.lessThanZero;
+import static wbs.framework.utils.etc.NumberUtils.notLessThan;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -121,7 +121,7 @@ class ImChatConversationEndAction
 
 			|| ! session.getActive ()
 
-			|| notEqual (
+			|| referenceNotEqualSafe (
 				imChat,
 				customer.getImChat ())
 
@@ -148,9 +148,8 @@ class ImChatConversationEndAction
 
 		if (
 
-			lessThan (
-				endRequest.conversationIndex (),
-				0)
+			lessThanZero (
+				endRequest.conversationIndex ())
 
 			|| notLessThan (
 				endRequest.conversationIndex (),
@@ -170,7 +169,7 @@ class ImChatConversationEndAction
 		// end conversation
 
 		if (
-			equal (
+			referenceEqualSafe (
 				conversation,
 				customer.getCurrentConversation ())
 		) {

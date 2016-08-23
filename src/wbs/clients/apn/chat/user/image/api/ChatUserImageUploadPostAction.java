@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.user.image.api;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.FileOutputStream;
 import java.util.List;
@@ -9,14 +9,13 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 import wbs.api.mvc.ApiAction;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
@@ -130,7 +129,7 @@ class ChatUserImageUploadPostAction
 				fileItems.get (0);
 
 			if (
-				notEqual (
+				stringNotEqualSafe (
 					fileItem.getFieldName (),
 					"file")
 			) {

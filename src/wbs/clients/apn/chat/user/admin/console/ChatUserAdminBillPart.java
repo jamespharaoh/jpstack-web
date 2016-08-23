@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
 import java.util.List;
@@ -79,7 +79,7 @@ class ChatUserAdminBillPart
 					"chatUserId"));
 
 		if (
-			equal (
+			enumEqualSafe (
 				chatUser.getType (),
 				ChatUserType.monitor)
 		) {
@@ -87,7 +87,7 @@ class ChatUserAdminBillPart
 		}
 
 		DateTimeZone timezone =
-			chatUserLogic.timezone (
+			chatUserLogic.getTimezone (
 				chatUser);
 
 		LocalDate today =
@@ -132,7 +132,7 @@ class ChatUserAdminBillPart
 	void renderHtmlBodyContent () {
 
 		if (
-			equal (
+			enumEqualSafe (
 				chatUser.getType (),
 				ChatUserType.monitor)
 		) {
@@ -213,13 +213,13 @@ class ChatUserAdminBillPart
 
 				"<td>%h</td>\n",
 				timeFormatter.dateStringShort (
-					chatUserLogic.timezone (
+					chatUserLogic.getTimezone (
 						chatUser),
 					billLog.getTimestamp ()),
 
 				"<td>%h</td>\n",
 				timeFormatter.timeString (
-					chatUserLogic.timezone (
+					chatUserLogic.getTimezone (
 						chatUser),
 					billLog.getTimestamp ()),
 

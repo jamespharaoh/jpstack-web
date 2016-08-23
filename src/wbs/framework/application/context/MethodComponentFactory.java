@@ -13,7 +13,7 @@ class MethodComponentFactory
 	implements ComponentFactory {
 
 	@Getter @Setter
-	Object factoryBean;
+	Object factoryComponent;
 
 	@Getter @Setter
 	String factoryMethodName;
@@ -27,7 +27,7 @@ class MethodComponentFactory
 	Object makeComponent () {
 
 		return MethodUtils.invokeMethod (
-			factoryBean,
+			factoryComponent,
 			factoryMethodName);
 
 	}

@@ -1,6 +1,6 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -83,7 +83,7 @@ class ImChatMediaOriginalJpegAction
 				content.getHash ());
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				hash.toString (),
 				requestContext.requestStringRequired (
 					"mediaContentHash"))

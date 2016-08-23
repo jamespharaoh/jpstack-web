@@ -15,11 +15,11 @@ import wbs.framework.data.annotations.DataParent;
 @Accessors (fluent = true)
 @DataClass ("bean")
 public
-class BeansBeanSpec {
+class ComponentsComponentSpec {
 
 	@DataParent
 	@Getter @Setter
-	BeansSpec beans;
+	ComponentsSpec beans;
 
 	@DataAttribute (
 		required = true)
@@ -49,7 +49,7 @@ class BeansBeanSpec {
 	@DataChildren (
 		direct = true)
 	@Getter @Setter
-	List<BeansBeanPropertySpec> properties =
-		new ArrayList<BeansBeanPropertySpec> ();
+	List<ComponentsComponentPropertySpec> properties =
+		new ArrayList<ComponentsComponentPropertySpec> ();
 
 }

@@ -1,6 +1,6 @@
 package wbs.console.html;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.PrintWriter;
@@ -36,12 +36,12 @@ class ObsoleteDateLinks {
 				url));
 
 		for (
-			Map.Entry<String,String> entry
+			Map.Entry <String, String> entry
 				: formData.entrySet ()
 		) {
 
 			if (
-				equal (
+				stringEqual (
 					entry.getKey (),
 					field)
 			) {

@@ -16,14 +16,14 @@ import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
-@DataClass ("beans")
+@DataClass ("components")
 @Log4j
 public
-class BeansSpec {
+class ComponentsSpec {
 
 	@DataChildren (direct = true)
 	@Getter @Setter
-	List<BeansBeanSpec> beans;
+	List <ComponentsComponentSpec> components;
 
 	@SneakyThrows (Exception.class)
 	public
@@ -32,23 +32,23 @@ class BeansSpec {
 
 		int errors = 0;
 
-		for (BeansBeanSpec bean
-				: beans) {
+		for (ComponentsComponentSpec component
+				: components) {
 
-			Class<?> beanClass = null;
+			Class<?> componentClass = null;
 
 			try {
 
-				beanClass =
-					Class.forName (bean.className ());
+				componentClass =
+					Class.forName (component.className ());
 
 			} catch (ClassNotFoundException exception) {
 
 				log.error (
 					stringFormat (
 						"No such class %s specified as bean class for %s",
-						bean.className (),
-						bean.name ()));
+						component.className (),
+						component.name ()));
 
 				errors ++;
 
@@ -59,8 +59,8 @@ class BeansSpec {
 			try {
 
 				factoryClass =
-					bean.factoryClassName () != null
-						? Class.forName (bean.factoryClassName ())
+					component.factoryClassName () != null
+						? Class.forName (component.factoryClassName ())
 							.asSubclass (ComponentFactory.class)
 						: null;
 
@@ -69,8 +69,8 @@ class BeansSpec {
 				log.error (
 					stringFormat (
 						"No such class %s specified as factory for %s",
-						bean.factoryClassName (),
-						bean.name ()));
+						component.factoryClassName (),
+						component.name ()));
 
 				errors ++;
 
@@ -79,8 +79,8 @@ class BeansSpec {
 				log.error (
 					stringFormat (
 						"Factory class %s for %s is not a BeanFactory",
-						bean.factoryClassName (),
-						bean.name ()));
+						component.factoryClassName (),
+						component.name ()));
 
 				errors ++;
 
@@ -89,35 +89,37 @@ class BeansSpec {
 			if (errors > 0)
 				continue;
 
-			ComponentDefinition beanDefinition =
+			ComponentDefinition componentDefinition =
 				new ComponentDefinition ()
 
 				.name (
-					bean.name ())
+					component.name ())
 
-				.beanClass (
-					beanClass)
+				.componentClass (
+					componentClass)
 
 				.factoryClass (
 					factoryClass)
 
 				.hide (
-					bean.hide ())
+					component.hide ())
 
 				.scope (
-					bean.scope ());
+					component.scope ());
 
-			for (BeansBeanPropertySpec beanProperty
-					: bean.properties ()) {
+			for (
+				ComponentsComponentPropertySpec componentProperty
+					: component.properties ()
+			) {
 
 				errors +=
-					beanProperty.register (
-						beanDefinition);
+					componentProperty.register (
+						componentDefinition);
 
 			}
 
-			applicationContext.registerBeanDefinition (
-				beanDefinition);
+			applicationContext.registerComponentDefinition (
+				componentDefinition);
 
 		}
 

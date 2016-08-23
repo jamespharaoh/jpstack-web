@@ -84,7 +84,7 @@ class ChatMonitorInboxUpdateNoteAction
 
 		ChatContactNoteRec note =
 			chatContactNoteHelper.findRequired (
-				requestContext.parameterInteger (
+				requestContext.parameterIntegerRequired (
 					"id"));
 
 		if (

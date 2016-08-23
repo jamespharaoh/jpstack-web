@@ -1,16 +1,15 @@
 package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.File;
 import java.io.IOException;
 
-import lombok.NonNull;
-
 import org.apache.commons.io.FileUtils;
 
+import lombok.NonNull;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.RuntimeIoException;
 
@@ -121,7 +120,7 @@ class AtomicFileWriter
 				FileUtils.readFileToString (
 					file);
 
-			return notEqual (
+			return stringNotEqualSafe (
 				oldContents,
 				newContents);
 

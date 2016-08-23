@@ -1,10 +1,10 @@
 package wbs.integrations.clockworksms.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifElse;
+import static wbs.framework.utils.etc.LogicUtils.booleanEqual;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.lowercase;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -15,15 +15,14 @@ import java.io.ByteArrayInputStream;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+
 import lombok.Cleanup;
 import lombok.NonNull;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-
 import wbs.api.mvc.ApiLoggingAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromXml;
+import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -128,19 +127,20 @@ class ClockworkSmsRouteReportAction
 		// decode request
 
 		DataFromXml dataFromXml =
-			new DataFromXml ()
+			new DataFromXmlBuilder ()
 
 			.registerBuilderClasses (
 				ClockworkSmsRouteReportRequest.class,
-				ClockworkSmsRouteReportRequest.Item.class);
+				ClockworkSmsRouteReportRequest.Item.class)
+
+			.build ();
 
 		request =
 			(ClockworkSmsRouteReportRequest)
 			dataFromXml.readInputStream (
 				new ByteArrayInputStream (
 					requestBytes),
-				"clockwork-sms-route-report.xml",
-				ImmutableList.of ());
+				"clockwork-sms-route-report.xml");
 
 	}
 
@@ -169,15 +169,15 @@ class ClockworkSmsRouteReportAction
 			isNotPresent (
 				smsRouteOptional)
 
-			|| equal (
+			|| booleanEqual (
 				smsRouteOptional.get ().getDeleted (),
 				true)
 
-			|| equal (
+			|| booleanEqual (
 				smsRouteOptional.get ().getCanSend (),
 				false)
 
-			|| equal (
+			|| booleanEqual (
 				smsRouteOptional.get ().getDeliveryReports (),
 				false)
 
@@ -186,7 +186,7 @@ class ClockworkSmsRouteReportAction
 		}
 
 		RouteRec smsRoute =
-			optionalRequired (
+			optionalGetRequired (
 				smsRouteOptional);
 
 		// lookup clockwork sms route in
@@ -200,7 +200,7 @@ class ClockworkSmsRouteReportAction
 			isNotPresent (
 				clockworkSmsRouteOutOptional)
 
-			|| equal (
+			|| booleanEqual (
 				clockworkSmsRouteOutOptional.get ().getDeleted (),
 				true)
 
@@ -209,7 +209,7 @@ class ClockworkSmsRouteReportAction
 		}
 
 		ClockworkSmsRouteOutRec clockworkSmsRouteOut =
-			optionalRequired (
+			optionalGetRequired (
 				clockworkSmsRouteOutOptional);
 
 		// iterate delivery reports
@@ -264,7 +264,7 @@ class ClockworkSmsRouteReportAction
 		}
 
 		ClockworkSmsDeliveryStatusRec deliveryStatus =
-			optionalRequired (
+			optionalGetRequired (
 				deliveryStatusOptional);
 
 		// lookup the delivery status detail code
@@ -291,7 +291,7 @@ class ClockworkSmsRouteReportAction
 		}
 
 		ClockworkSmsDeliveryStatusDetailCodeRec deliveryStatusDeliveryCode =
-			optionalRequired (
+			optionalGetRequired (
 				deliveryStatusDetailCodeOptional);
 
 		// lookup the message
@@ -316,7 +316,7 @@ class ClockworkSmsRouteReportAction
 		}
 
 		MessageRec smsMessage =
-			optionalRequired (
+			optionalGetRequired (
 				smsMessageOptional);
 
 		// store the delivery report
@@ -329,7 +329,7 @@ class ClockworkSmsRouteReportAction
 				Optional.of (
 					item.status ()),
 				Optional.of (
-					ifElse (
+					ifThenElse (
 						isNotNull (
 							deliveryStatusDeliveryCode),
 						() -> stringFormat (

@@ -1,9 +1,9 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.TypeUtils.classEqual;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -209,7 +209,7 @@ class TextAreaFormFieldBuilder {
 		FormFieldNativeMapping nativeMapping;
 
 		if (
-			equal (
+			classEqual (
 				propertyClass,
 				byte[].class)
 		) {

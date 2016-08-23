@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -250,7 +250,7 @@ class ChatUserSummaryPart
 				"<td>%h</td>\n",
 				chatUser.getFirstJoin () != null
 					? timeFormatter.timestampTimezoneString (
-						chatUserLogic.timezone (
+						chatUserLogic.getTimezone (
 							chatUser),
 						chatUser.getFirstJoin ())
 					: "-",
@@ -262,7 +262,7 @@ class ChatUserSummaryPart
 				"<td>%h</td>\n",
 				chatUser.getLastJoin () != null
 					? timeFormatter.timestampTimezoneString (
-						chatUserLogic.timezone (
+						chatUserLogic.getTimezone (
 							chatUser),
 						chatUser.getLastJoin ())
 					: "-",

@@ -9,11 +9,11 @@
 	</models>
 
 	<layer name="api">
-		<bean class="api.HybyteApiServletModule"/>
+		<component class="api.HybyteApiServletModule"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.HybyteSender"/>
+		<component class="daemon.HybyteSender"/>
 	</layer>
 
 </plugin>

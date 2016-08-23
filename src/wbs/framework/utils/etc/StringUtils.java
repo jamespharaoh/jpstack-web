@@ -1,8 +1,7 @@
 package wbs.framework.utils.etc;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.nullIf;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.NullUtils.nullIf;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
@@ -996,10 +995,381 @@ class StringUtils {
 	Optional <String> emptyStringToAbsent (
 			@NonNull String source) {
 
-		return optionalIf (
-			stringIsEmpty (
-				source),
-			source);
+		if (source.isEmpty ()) {
+
+			return Optional.absent ();
+
+		} else {
+
+			return Optional.of (
+				source);
+
+		}
+
+	}
+
+	public static
+	boolean stringEqual (
+			@NonNull String string0,
+			@NonNull String string1) {
+
+		return string0.equals (
+			string1);
+
+	}
+
+	public static
+	boolean stringEqual (
+			@NonNull CharSequence string0,
+			@NonNull CharSequence string1) {
+
+		return string0.equals (
+			string1);
+
+	}
+
+	public static
+	boolean stringNotEqualSafe (
+			@NonNull String string0,
+			@NonNull String string1) {
+
+		return ! string0.equals (
+			string1);
+
+	}
+
+	public static
+	boolean stringNotEqualSafe (
+			@NonNull CharSequence string0,
+			@NonNull CharSequence string1) {
+
+		return ! string0.equals (
+			string1);
+
+	}
+
+	public static
+	boolean stringLongerThan (
+			@NonNull Long length,
+			@NonNull String string) {
+
+		return string.length () > length;
+
+	}
+
+	public static
+	boolean stringNotLongerThan (
+			@NonNull Long length,
+			@NonNull String string) {
+
+		return string.length () <= length;
+
+	}
+
+	public static
+	boolean stringShorterThan (
+			@NonNull Long length,
+			@NonNull String string) {
+
+		return string.length () < length;
+
+	}
+
+	public static
+	boolean stringNotShorterThan (
+			@NonNull Long length,
+			@NonNull String string) {
+
+		return string.length () >= length;
+
+	}
+
+	public static
+	boolean stringInSafe (
+			@NonNull String value,
+			@NonNull Iterable <String> examples) {
+
+		for (
+			String example
+				: examples
+		) {
+
+			if (
+				value.equals (
+					example)
+			) {
+				return true;
+			}
+
+		}
+
+		return false;
+
+	}
+
+	public static
+	boolean stringInSafe (
+			@NonNull String value,
+			@NonNull String... examples) {
+
+		for (
+			String example
+				: examples
+		) {
+
+			if (
+				value.equals (
+					example)
+			) {
+				return true;
+			}
+
+		}
+
+		return false;
+
+	}
+
+	public static
+	boolean stringInSafe (
+			@NonNull String value,
+			@NonNull String example0) {
+
+		return (
+
+			value.equals (
+				example0)
+
+		);
+
+	}
+
+	public static
+	boolean stringInSafe (
+			@NonNull String value,
+			@NonNull String example0,
+			@NonNull String example1) {
+
+		return (
+
+			value.equals (
+				example0)
+
+			|| value.equals (
+				example1)
+
+		);
+
+	}
+
+	public static
+	boolean stringInSafe (
+			@NonNull String value,
+			@NonNull String example0,
+			@NonNull String example1,
+			@NonNull String example2) {
+
+		return (
+
+			value.equals (
+				example0)
+
+			|| value.equals (
+				example1)
+
+			|| value.equals (
+				example2)
+
+		);
+
+	}
+
+	public static
+	boolean stringInSafe (
+			@NonNull String value,
+			@NonNull String example0,
+			@NonNull String example1,
+			@NonNull String example2,
+			@NonNull String example3) {
+
+		return (
+
+			value.equals (
+				example0)
+
+			|| value.equals (
+				example1)
+
+			|| value.equals (
+				example2)
+
+			|| value.equals (
+				example3)
+
+		);
+
+	}
+
+	public static
+	boolean stringInSafe (
+			@NonNull String value,
+			@NonNull String example0,
+			@NonNull String example1,
+			@NonNull String example2,
+			@NonNull String example3,
+			@NonNull String example4) {
+
+		return (
+
+			value.equals (
+				example0)
+
+			|| value.equals (
+				example1)
+
+			|| value.equals (
+				example2)
+
+			|| value.equals (
+				example3)
+
+			|| value.equals (
+				example4)
+
+		);
+
+	}
+
+	public static
+	boolean stringNotInSafe (
+			@NonNull String value,
+			@NonNull String... examples) {
+
+		for (
+			String example
+				: examples
+		) {
+
+			if (
+				value.equals (
+					example)
+			) {
+				return false;
+			}
+
+		}
+
+		return true;
+
+	}
+
+	public static
+	boolean stringNotInSafe (
+			@NonNull String value,
+			@NonNull String example0) {
+
+		return (
+
+			! value.equals (
+				example0)
+
+		);
+
+	}
+
+	public static
+	boolean stringNotInSafe (
+			@NonNull String value,
+			@NonNull String example0,
+			@NonNull String example1) {
+
+		return (
+
+			! value.equals (
+				example0)
+
+			&& ! value.equals (
+				example1)
+
+		);
+
+	}
+
+	public static
+	boolean stringNotInSafe (
+			@NonNull String value,
+			@NonNull String example0,
+			@NonNull String example1,
+			@NonNull String example2) {
+
+		return (
+
+			! value.equals (
+				example0)
+
+			&& ! value.equals (
+				example1)
+
+			&& ! value.equals (
+				example2)
+
+		);
+
+	}
+
+	public static
+	boolean stringNotInSafe (
+			@NonNull String value,
+			@NonNull String example0,
+			@NonNull String example1,
+			@NonNull String example2,
+			@NonNull String example3) {
+
+		return (
+
+			! value.equals (
+				example0)
+
+			&& ! value.equals (
+				example1)
+
+			&& ! value.equals (
+				example2)
+
+			&& ! value.equals (
+				example3)
+
+		);
+
+	}
+
+	public static
+	boolean stringNotInSafe (
+			@NonNull String value,
+			@NonNull String example0,
+			@NonNull String example1,
+			@NonNull String example2,
+			@NonNull String example3,
+			@NonNull String example4) {
+
+		return (
+
+			! value.equals (
+				example0)
+
+			&& ! value.equals (
+				example1)
+
+			&& ! value.equals (
+				example2)
+
+			&& ! value.equals (
+				example3)
+
+			&& ! value.equals (
+				example4)
+
+		);
 
 	}
 

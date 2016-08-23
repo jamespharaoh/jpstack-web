@@ -1,10 +1,10 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.underscoreToHyphen;
 
 import javax.inject.Inject;
@@ -115,7 +115,7 @@ class ImChatDetailsUpdateAction
 
 			|| ! session.getActive ()
 
-			|| notEqual (
+			|| referenceNotEqualSafe (
 				customer.getImChat (),
 				imChat)
 
@@ -169,7 +169,7 @@ class ImChatDetailsUpdateAction
 			) {
 
 				if (
-					equal (
+					stringEqual (
 						detailValue.getValue (),
 						stringValue)
 				) {

@@ -1,10 +1,11 @@
 package wbs.smsapps.forwarder.logic;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifElse;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -422,11 +423,16 @@ class ForwarderLogicImplementation
 
 			// check route/number
 
-			if (part.forwarderRoute != null
-					&& part.forwarderRoute.getNumber ().length () > 0
-					&& ! equal (
-						part.forwarderRoute.getNumber (),
-						part.numFrom)) {
+			if (
+				part.forwarderRoute != null
+
+				&& part.forwarderRoute.getNumber ().length () > 0
+
+				&& stringNotEqualSafe (
+					part.forwarderRoute.getNumber (),
+					part.numFrom)
+
+			) {
 
 				sendTemplateCheckError (
 					work,
@@ -829,7 +835,7 @@ class ForwarderLogicImplementation
 			forwarderMessaeOut.getMessage ();
 
 		WapPushMessageRec wapPushMessage =
-			ifElse (
+			ifThenElse (
 				isNotNull (
 					url),
 				() -> wapPushMessageHelper.findRequired (
@@ -838,23 +844,23 @@ class ForwarderLogicImplementation
 
 		if (
 
-			notEqual (
+			referenceNotEqualSafe (
 				forwarderMessaeOut.getForwarderMessageIn (),
 				forwarderMessageIn)
 
-			|| notEqual (
+			|| stringNotEqualSafe (
 				message.getNumFrom (),
 				numFrom)
 
-			|| notEqual (
+			|| stringNotEqualSafe (
 				message.getNumTo (),
 				numTo)
 
-			|| notEqual (
+			|| referenceNotEqualSafe (
 				forwarderMessaeOut.getForwarderRoute (),
 				route)
 
-			|| notEqual (
+			|| integerNotEqualSafe (
 				message.getPri (),
 				priority)
 
@@ -863,12 +869,15 @@ class ForwarderLogicImplementation
 				url == null
 
 				&& (
-					notEqual (
+
+					stringNotEqualSafe (
 						message.getMessageType ().getCode (),
 						"sms")
-					|| notEqual (
+
+					|| stringNotEqualSafe (
 						message.getText ().getText (),
 						messageText)
+
 				)
 
 			) || (
@@ -877,15 +886,15 @@ class ForwarderLogicImplementation
 
 				&& (
 
-					notEqual (
+					stringNotEqualSafe (
 						message.getMessageType ().getCode (),
 						"wap_push")
 
-					|| notEqual (
+					|| stringNotEqualSafe (
 						wapPushMessage.getTextText ().getText (),
 						messageText)
 
-					|| notEqual (
+					|| stringNotEqualSafe (
 						wapPushMessage.getUrlText ().getText (),
 						url)
 

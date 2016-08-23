@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.bill.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Arrays;
@@ -177,15 +177,19 @@ class ChatBillDeliveryHandler
 
 		boolean strict;
 
-		if (equal (
+		if (
+			stringEqual (
 				deliveryType.getCode (),
-				"chat_bill")) {
+				"chat_bill")
+		) {
 
 			strict = false;
 
-		} else if (equal (
+		} else if (
+			stringEqual (
 				deliveryType.getCode (),
-				"chat_bill_strict")) {
+				"chat_bill_strict")
+		) {
 
 			strict = true;
 

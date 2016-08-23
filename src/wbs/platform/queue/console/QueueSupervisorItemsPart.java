@@ -60,7 +60,7 @@ class QueueSupervisorItemsPart
 
 		user =
 			userHelper.findRequired (
-				requestContext.parameterInteger (
+				requestContext.parameterIntegerRequired (
 					"userId"));
 
 		queueItems =

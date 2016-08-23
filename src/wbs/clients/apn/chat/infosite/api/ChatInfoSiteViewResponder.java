@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.infosite.api;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
 
@@ -49,7 +49,7 @@ class ChatInfoSiteViewResponder
 					"chatInfoSiteId"));
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				infoSite.getToken (),
 				requestContext.requestStringRequired (
 					"chatInfoSiteToken"))

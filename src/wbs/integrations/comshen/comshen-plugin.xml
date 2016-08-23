@@ -3,7 +3,7 @@
 	package="wbs.integrations.comshen">
 
 	<layer name="api">
-		<bean class="api.ComshenApiServletModule"/>
+		<component class="api.ComshenApiServletModule"/>
 	</layer>
 
 </plugin>

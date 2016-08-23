@@ -13,16 +13,16 @@ public
 class ChatUserInitiationLogSearch
 	implements Serializable {
 
-	Integer chatId;
+	Long chatId;
 
 	TextualInterval timestamp;
 
 	ChatUserInitiationReason reason;
 
-	Integer monitorUserId;
+	Long monitorUserId;
 
 	boolean filter;
 
-	Collection<Long> filterChatIds;
+	Collection <Long> filterChatIds;
 
 }

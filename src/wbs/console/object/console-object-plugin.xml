@@ -3,13 +3,13 @@
 	package="wbs.console.object">
 
 	<layer name="console">
-		<bean class="ExtendContextBuilder"/>
-		<bean class="ExtendContextMetaBuilder"/>
-		<bean class="ExtendContextSpec"/>
-		<bean class="ObjectContext"/>
-		<bean class="ObjectContextBuilder"/>
-		<bean class="ObjectContextMetaBuilder"/>
-		<bean class="ObjectContextSpec"/>
+		<component class="ExtendContextBuilder"/>
+		<component class="ExtendContextMetaBuilder"/>
+		<component class="ExtendContextSpec"/>
+		<component class="ObjectContext"/>
+		<component class="ObjectContextBuilder"/>
+		<component class="ObjectContextMetaBuilder"/>
+		<component class="ObjectContextSpec"/>
 	</layer>
 
 </plugin>

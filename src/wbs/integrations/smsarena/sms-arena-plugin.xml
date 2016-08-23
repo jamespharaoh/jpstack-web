@@ -25,11 +25,11 @@
 	</api-modules>
 
 	<layer name="api">
-		<bean class="api.SmsArenaDlrDispatchAction"/>
+		<component class="api.SmsArenaDlrDispatchAction"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.SmsArenaSender"/>
+		<component class="daemon.SmsArenaSender"/>
 	</layer>
 
 	<console-modules>

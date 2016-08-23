@@ -1,9 +1,8 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,39 +34,35 @@ class SecondsFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<IdentityFormFieldNativeMapping>
+	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
 	@Inject
-	Provider<IntegerFormFieldNativeMapping>
-	integerFormFieldNativeMappingProvider;
-
-	@Inject
-	Provider<NullFormFieldConstraintValidator>
+	Provider <NullFormFieldConstraintValidator>
 	nullFormFieldConstraintValidatorProvider;
 
 	@Inject
-	Provider<ReadOnlyFormField>
+	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
 	@Inject
-	Provider<RequiredFormFieldValueValidator>
+	Provider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
 	@Inject
-	Provider<SecondsFormFieldInterfaceMapping>
+	Provider <SecondsFormFieldInterfaceMapping>
 	secondsFormFieldInterfaceMapping;
 
 	@Inject
-	Provider<SimpleFormFieldAccessor>
+	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
 	@Inject
-	Provider<TextFormFieldRenderer>
+	Provider <TextFormFieldRenderer>
 	textFormFieldRendererProvider;
 
 	@Inject
-	Provider<UpdatableFormField>
+	Provider <UpdatableFormField>
 	updatableFormFieldProvider;
 
 	// builder
@@ -131,32 +126,12 @@ class SecondsFormFieldBuilder {
 
 		// native mapping
 
-		FormFieldNativeMapping nativeMapping;
-
-		if (propertyClass == Integer.class) {
-
-			nativeMapping =
-				integerFormFieldNativeMappingProvider.get ();
-
-		} else if (propertyClass == Long.class) {
-
-			nativeMapping =
-				identityFormFieldNativeMappingProvider.get ();
-
-		} else {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Don't know how to map %s as integer for %s.%s",
-					propertyClass,
-					context.containerClass (),
-					name));
-
-		}
+		FormFieldNativeMapping nativeMapping =
+			identityFormFieldNativeMappingProvider.get ();
 
 		// value validators
 
-		List<FormFieldValueValidator> valueValidators =
+		List <FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
 
 		if (! nullable) {

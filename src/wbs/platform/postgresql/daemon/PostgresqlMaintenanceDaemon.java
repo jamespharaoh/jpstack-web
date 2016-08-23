@@ -1,7 +1,13 @@
 package wbs.platform.postgresql.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.framework.utils.etc.NumberUtils.notLessThan;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.earlierThan;
+import static wbs.framework.utils.etc.TimeUtils.localTime;
+import static wbs.framework.utils.etc.TimeUtils.notEarlierThan;
+import static wbs.framework.utils.etc.TimeUtils.sleepUntil;
+import static wbs.framework.utils.etc.TimeUtils.toInstant;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,20 +17,20 @@ import java.sql.SQLWarning;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
@@ -51,17 +57,17 @@ class PostgresqlMaintenanceDaemon
 	// details
 
 	final static
-	int monthlyDay = 15;
+	long monthlyDay = 15;
 
 	final static
-	int weeklyDayOfWeek =
-		Calendar.WEDNESDAY;
+	long weeklyDayOfWeek =
+		DateTimeConstants.WEDNESDAY;
 
 	final static
-	int dailyHour = 5;
+	long dailyHour = 5;
 
 	final static
-	int hourlyMinute = 30;
+	long hourlyMinute = 30;
 
 	@Override
 	protected
@@ -247,13 +253,13 @@ class PostgresqlMaintenanceDaemon
 
 	}
 
-	List<Command> fetchCommands (
+	List <Command> fetchCommands (
 			Connection connection,
 			String frequency)
 		throws SQLException {
 
-		List<Command> commands =
-			new ArrayList<Command> ();
+		List <Command> commands =
+			new ArrayList<> ();
 
 		@Cleanup
 		PreparedStatement preparedStatement =
@@ -292,10 +298,10 @@ class PostgresqlMaintenanceDaemon
 
 	}
 
-	long nextDaily;
-	long nextHourly;
-	long nextFiveMins;
-	long nextOneMin;
+	Instant nextDaily;
+	Instant nextHourly;
+	Instant nextFiveMinutes;
+	Instant nextOneMinute;
 
 	@Override
 	public
@@ -319,23 +325,28 @@ class PostgresqlMaintenanceDaemon
 
 	void doStuff () {
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		DateTime now =
+			DateTime.now ();
 
-		long now =
-			calendar.getTime ().getTime ();
+		if (
+			notEarlierThan (
+				now,
+				nextDaily)
+		) {
 
-		if (now >= nextDaily) {
-
-			if (equal (
-					calendar.get (Calendar.DATE),
-					monthlyDay)) {
+			if (
+				integerEqualSafe (
+					now.getDayOfMonth (),
+					monthlyDay)
+			) {
 
 				doTasks ("m");
 
-			} else if (equal (
-					calendar.get (Calendar.DAY_OF_WEEK),
-					weeklyDayOfWeek)) {
+			} else if (
+				integerEqualSafe (
+					now.getDayOfWeek (),
+					weeklyDayOfWeek)
+			) {
 
 				doTasks ("w");
 
@@ -345,31 +356,47 @@ class PostgresqlMaintenanceDaemon
 
 			}
 
-			calcDaily (now);
+			calcDaily (
+				now);
 
 		}
 
-		if (now >= nextHourly) {
+		if (
+			notEarlierThan (
+				now,
+				nextHourly)
+		) {
 
 			doTasks ("h");
 
-			calcHourly (now);
+			calcHourly (
+				now);
 
 		}
 
-		if (now >= nextFiveMins) {
+		if (
+			notEarlierThan (
+				now,
+				nextFiveMinutes)
+		) {
 
 			doTasks ("5");
 
-			calcFiveMins (now);
+			calcFiveMins (
+				now);
 
 		}
 
-		if (now >= nextOneMin) {
+		if (
+			notEarlierThan (
+				now,
+				nextOneMinute)
+		) {
 
 			doTasks ("1");
 
-			calcOneMin (now);
+			calcOneMin (
+				now);
 
 		}
 
@@ -378,166 +405,170 @@ class PostgresqlMaintenanceDaemon
 	void waitNext ()
 		throws InterruptedException {
 
-		long nextTime = nextDaily;
+		Instant nextTime =
+			nextDaily;
 
-		if (nextHourly < nextTime)
-			nextTime = nextHourly;
+		if (
+			earlierThan (
+				nextHourly,
+				nextTime)
+		) {
 
-		if (nextFiveMins < nextTime)
-			nextTime = nextFiveMins;
+			nextTime =
+				nextHourly;
 
-		if (nextOneMin < nextTime)
-			nextTime = nextOneMin;
+		}
 
-		long now =
-			System.currentTimeMillis ();
+		if (
+			earlierThan (
+				nextFiveMinutes,
+				nextTime)
+		) {
 
-		if (now < nextTime)
-			Thread.sleep (nextTime - now);
+			nextTime =
+				nextFiveMinutes;
+
+		}
+
+		if (
+			earlierThan (
+				nextOneMinute,
+				nextTime)
+		) {
+
+			nextTime =
+				nextOneMinute;
+
+		}
+
+		Instant now =
+			Instant.now ();
+
+		if (
+			earlierThan (
+				now,
+				nextTime)
+		) {
+
+			sleepUntil (
+				nextTime);
+
+		}
 
 	}
 
 	void calculateTimes () {
 
-		long now =
-			System.currentTimeMillis ();
+		DateTime now =
+			DateTime.now ();
 
-		calcDaily (now);
-		calcHourly (now);
-		calcFiveMins (now);
-		calcOneMin (now);
+		calcDaily (
+			now);
+
+		calcHourly (
+			now);
+
+		calcFiveMins (
+			now);
+
+		calcOneMin (
+			now);
 
 	}
 
 	void calcDaily (
-			long now) {
+			@NonNull DateTime dailyTime) {
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		if (
+			notLessThan (
+				dailyTime.getHourOfDay (),
+				dailyHour)
+		) {
 
-		calendar.setTime (
-			new Date (now));
-
-		if (calendar.get (Calendar.HOUR_OF_DAY) >= dailyHour) {
-
-			calendar.add (
-				Calendar.DATE,
-				1);
+			dailyTime =
+				dailyTime.plusDays (
+					1);
 
 		}
 
-		calendar.set (
-			Calendar.HOUR_OF_DAY,
-			dailyHour);
-
-		calendar.set (
-			Calendar.MINUTE,
-			0);
-
-		calendar.set (
-			Calendar.SECOND,
-			0);
-
-		calendar.set (
-			Calendar.MILLISECOND,
-			0);
-
 		nextDaily =
-			calendar.getTime ().getTime ();
+			toInstant (
+				dailyTime.withTime (
+					localTime (
+						dailyHour,
+						0,
+						0,
+						0)));
 
 	}
 
 	void calcHourly (
-			long now) {
+			@NonNull DateTime hourlyTime) {
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		if (
+			notLessThan (
+				hourlyTime.getMinuteOfHour (),
+				hourlyMinute)
+		) {
 
-		calendar.setTime (
-			new Date (now));
-
-		if (calendar.get (Calendar.MINUTE) >= hourlyMinute) {
-
-			calendar.add (
-				Calendar.HOUR_OF_DAY,
-				1);
+			hourlyTime =
+				hourlyTime.plusHours (
+					1);
 
 		}
 
-		calendar.set (
-			Calendar.MINUTE,
-			hourlyMinute);
-
-		calendar.set (
-			Calendar.SECOND,
-			0);
-
-		calendar.set (
-			Calendar.MILLISECOND,
-			0);
-
 		nextHourly =
-			calendar.getTime ().getTime ();
+			toInstant (
+				hourlyTime.withTime (
+					localTime (
+						hourlyTime.getHourOfDay (),
+						hourlyMinute,
+						0,
+						0)));
 
 	}
 
 	void calcFiveMins (
-			long now) {
+			@NonNull DateTime now) {
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		DateTime nextFiveMinsTemp =
+			now.plusMinutes (
+				5);
 
-		calendar.setTime (
-			new Date (now));
+		nextFiveMinutes =
+			toInstant (
+				nextFiveMinsTemp
 
-		calendar.add (
-			Calendar.MINUTE,
-			+ 5
-			- (
-				+ calendar.get (Calendar.MINUTE)
-				- 3
-			) % 5);
+			.minusMinutes (
+				nextFiveMinsTemp.getMinuteOfHour () % 5)
 
-		calendar.set (
-			Calendar.SECOND,
-			0);
+			.withSecondOfMinute (
+				0)
 
-		calendar.set (
-			Calendar.MILLISECOND,
-			0);
+			.withMillisOfSecond (
+				0)
 
-		nextFiveMins =
-			calendar.getTime ().getTime ();
+		);
 
 	}
 
 	void calcOneMin (
-			long now) {
+			@NonNull DateTime now) {
 
-		Calendar calendar =
-			Calendar.getInstance ();
+		nextOneMinute =
+			toInstant (
+				now
 
-		calendar.setTime (
-			new Date (now));
+			.plusMinutes (
+				1)
 
-		if (calendar.get (Calendar.SECOND) >= 30) {
+			.withSecondOfMinute (
+				0)
 
-			calendar.add (
-				Calendar.MINUTE,
-				1);
+			.withMillisOfSecond (
+				0)
 
-		}
-
-		calendar.set (
-			Calendar.SECOND,
-			30);
-
-		calendar.set (
-			Calendar.MILLISECOND,
-			0);
-
-		nextOneMin =
-			calendar.getTime ().getTime ();
+		);
 
 	}
 

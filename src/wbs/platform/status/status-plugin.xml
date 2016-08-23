@@ -3,9 +3,9 @@
 	package="wbs.platform.status">
 
 	<layer name="console">
-		<bean class="console.StatusLineManager"/>
-		<bean class="console.StatusResponder"/>
-		<bean class="console.StatusUpdateResponder"/>
+		<component class="console.StatusLineManager"/>
+		<component class="console.StatusResponder"/>
+		<component class="console.StatusUpdateResponder"/>
 	</layer>
 
 	<console-modules>

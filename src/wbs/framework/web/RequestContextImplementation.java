@@ -1,12 +1,12 @@
 package wbs.framework.web;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
 
@@ -168,7 +168,7 @@ class RequestContextImplementation
 				valueOptional)
 		) {
 
-			return optionalRequired (
+			return optionalGetRequired (
 				valueOptional);
 
 		} else {
@@ -216,7 +216,7 @@ class RequestContextImplementation
 
 	@Override
 	public
-	Long parameterInteger (
+	Long parameterIntegerRequired (
 			@NonNull String key) {
 
 		return Long.parseLong (
@@ -910,7 +910,7 @@ class RequestContextImplementation
 	public
 	boolean post () {
 
-		return equal (
+		return stringEqual (
 			method (),
 			"POST");
 

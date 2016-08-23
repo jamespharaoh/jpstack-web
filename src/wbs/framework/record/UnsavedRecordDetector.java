@@ -1,18 +1,18 @@
 package wbs.framework.record;
 
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Set;
 
+import com.google.common.collect.Sets;
+
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-
-import com.google.common.collect.Sets;
 
 @Log4j
 public
@@ -23,8 +23,8 @@ class UnsavedRecordDetector {
 		 new UnsavedRecordDetector ();
 
 	private
-	ThreadLocal<Frame> frameThreadLocal =
-		new ThreadLocal<Frame> ();
+	ThreadLocal <Frame> frameThreadLocal =
+		new ThreadLocal<> ();
 
 	public
 	void createFrame (
@@ -52,7 +52,8 @@ class UnsavedRecordDetector {
 			frameThreadLocal.get ();
 
 		if (
-			notEqual (
+			referenceNotEqualWithClass (
+				Object.class,
 				currentFrame.reference,
 				reference)
 		) {
@@ -105,7 +106,8 @@ class UnsavedRecordDetector {
 		}
 
 		if (
-			notEqual (
+			referenceNotEqualWithClass (
+				Object.class,
 				currentFrame.reference,
 				reference)
 		) {
@@ -192,7 +194,7 @@ class UnsavedRecordDetector {
 
 		Object reference;
 
-		Set<Record<?>> unsavedRecords =
+		Set <Record <?>> unsavedRecords =
 			Sets.newIdentityHashSet ();
 
 	}

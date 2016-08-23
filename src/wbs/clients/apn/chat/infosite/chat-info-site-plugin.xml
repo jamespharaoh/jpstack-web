@@ -11,13 +11,13 @@
 	</models>
 
 	<layer name="api">
-		<bean class="api.ChatInfoSiteApiModule"/>
-		<bean class="api.ChatInfoSiteExpiredResponder"/>
-		<bean class="api.ChatInfoSiteImageResponder"/>
-		<bean class="api.ChatInfoSiteMessageSentResponder"/>
-		<bean class="api.ChatInfoSiteRespondAction"/>
-		<bean class="api.ChatInfoSiteViewAction"/>
-		<bean class="api.ChatInfoSiteViewResponder"/>
+		<component class="api.ChatInfoSiteApiModule"/>
+		<component class="api.ChatInfoSiteExpiredResponder"/>
+		<component class="api.ChatInfoSiteImageResponder"/>
+		<component class="api.ChatInfoSiteMessageSentResponder"/>
+		<component class="api.ChatInfoSiteRespondAction"/>
+		<component class="api.ChatInfoSiteViewAction"/>
+		<component class="api.ChatInfoSiteViewResponder"/>
 	</layer>
 
 </plugin>

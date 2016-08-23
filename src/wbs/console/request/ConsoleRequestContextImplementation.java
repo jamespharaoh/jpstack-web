@@ -1,15 +1,15 @@
 package wbs.console.request;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.orNull;
 import static wbs.framework.utils.etc.OptionalUtils.ifNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalEquals;
+import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -265,7 +265,7 @@ class ConsoleRequestContextImplementation
 	Boolean parameterIsOn (
 			@NonNull String key) {
 
-		return optionalEquals (
+		return optionalValueEqualSafe (
 			parameter (
 				key),
 			"on");
@@ -427,17 +427,23 @@ class ConsoleRequestContextImplementation
 			@NonNull String value) {
 
 		formData (
-			ImmutableMap.<String,String>copyOf (
+			ImmutableMap.copyOf (
 				getFormData ().entrySet ().stream ()
-					.map (entry ->
-						new SimpleEntry<> (
-							entry.getKey (),
-							equal (entry.getKey (), name)
-								? value
-								: entry.getValue ()))
-					.collect (Collectors.toMap (
-						Map.Entry::getKey,
-						Map.Entry::getValue))));
+
+			.map (
+				entry ->
+					new SimpleEntry<> (
+						entry.getKey (),
+						stringEqual (entry.getKey (), name)
+							? value
+							: entry.getValue ()))
+
+			.collect (
+				Collectors.toMap (
+					Map.Entry::getKey,
+					Map.Entry::getValue))
+
+		));
 
 	}
 
@@ -1067,10 +1073,10 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	Long parameterInteger (
+	Long parameterIntegerRequired (
 			@NonNull String key) {
 
-		return requestContext.parameterInteger (
+		return requestContext.parameterIntegerRequired (
 			key);
 
 	}

@@ -1,12 +1,12 @@
 package wbs.integrations.mig.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.bytesToString;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,6 @@ import javax.servlet.ServletException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.fileupload.MultipartStream;
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -285,22 +284,26 @@ logger.error ("Got item");
 		subject =
 			subject.trim ();
 
-		List<String> texts =
-			new ArrayList<String> ();
+		List <String> texts =
+			new ArrayList<> ();
 
-		for (MediaRec media : medias) {
+		for (
+			MediaRec media
+				: medias
+		) {
 
-			if (! equal ("text/plain", media.getMediaType ().getMimeType ()))
+			if (
+				stringNotEqualSafe (
+					"text/plain",
+					media.getMediaType ().getMimeType ())
+			) {
 				continue;
+			}
 
-			String text;
-			try {
-				text = new String (
+			String text =
+				bytesToString (
 					media.getContent ().getData (),
 					media.getEncoding ());
-			} catch (UnsupportedEncodingException e) {
-				throw new RuntimeException (e);
-			}
 
 			text = text.trim ();
 
@@ -315,13 +318,28 @@ logger.error ("Got item");
 
 		// add subject, unless it's a prefix of the first text
 
-		if (! subject.isEmpty ()
-				&& (texts.isEmpty ()
-					|| texts.get (0).length () < subject.length ()
-					|| ! equal (subject,
-						texts.get (0).substring (0, subject.length ())))) {
+		if (
 
-			stringBuilder.append (subject);
+			! subject.isEmpty ()
+
+			&& (
+
+				texts.isEmpty ()
+
+				|| texts.get (0).length ()
+					< subject.length ()
+
+				|| stringNotEqualSafe (
+					subject,
+					texts.get (0).substring (
+						0,
+						subject.length ()))
+			)
+
+		) {
+
+			stringBuilder.append (
+				subject);
 
 		}
 
@@ -413,17 +431,22 @@ logger.error ("Got item");
 						"routeId"));
 
 			smsInboxLogic.inboxInsert (
-				Optional.of (guid),
+				Optional.of (
+					guid),
 				textHelper.findOrCreate (
-					getText (subject, medias)),
+					getText (
+						subject,
+						medias)),
 				sender,
 				recipient,
 				route,
-				Optional.of (network),
-				Optional.<Instant>absent (),
+				Optional.of (
+					network),
+				Optional.absent (),
 				medias,
-				Optional.<String>absent (),
-				Optional.of (subject));
+				Optional.absent (),
+				Optional.of (
+					subject));
 
 			transaction.commit ();
 

@@ -3,9 +3,9 @@
 	package="wbs.clients.apn.chat.adult">
 
 	<layer name="daemon">
-		<bean class="daemon.ChatAdultDeliveryHandler"/>
-		<bean class="daemon.ChatAdultExpiryDaemon"/>
-		<bean class="daemon.ChatAdultVerifyCommand"/>
+		<component class="daemon.ChatAdultDeliveryHandler"/>
+		<component class="daemon.ChatAdultExpiryDaemon"/>
+		<component class="daemon.ChatAdultVerifyCommand"/>
 	</layer>
 
 </plugin>

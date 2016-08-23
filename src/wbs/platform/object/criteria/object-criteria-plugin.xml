@@ -3,12 +3,12 @@
 	package="wbs.platform.object.criteria">
 
 	<layer name="console">
-		<bean class="WhereDeletedCriteriaSpec"/>
-		<bean class="WhereNotDeletedCriteriaSpec"/>
-		<bean class="WhereNullCriteriaSpec"/>
-		<bean class="WhereNotNullCriteriaSpec"/>
-		<bean class="WhereICanManageCriteriaSpec"/>
-		<bean class="WhereInCriteriaSpec"/>
+		<component class="WhereDeletedCriteriaSpec"/>
+		<component class="WhereNotDeletedCriteriaSpec"/>
+		<component class="WhereNullCriteriaSpec"/>
+		<component class="WhereNotNullCriteriaSpec"/>
+		<component class="WhereICanManageCriteriaSpec"/>
+		<component class="WhereInCriteriaSpec"/>
 	</layer>
 
 </plugin>

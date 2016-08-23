@@ -60,12 +60,12 @@ class ChatUserHelpFormAction
 			return null;
 		}
 
-		if (!GsmUtils.isValidGsm(text)) {
+		if (!GsmUtils.gsmStringIsValid(text)) {
 			requestContext.addError("Reply contains invalid characters");
 			return null;
 		}
 
-		if (GsmUtils.length(text) > 149) {
+		if (GsmUtils.gsmStringLength(text) > 149) {
 			requestContext.addError("Text is too long!");
 			return null;
 		}

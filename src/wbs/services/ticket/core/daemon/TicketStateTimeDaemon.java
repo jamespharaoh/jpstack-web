@@ -1,7 +1,8 @@
 package wbs.services.ticket.core.daemon;
 
+import static wbs.framework.utils.etc.LogicUtils.booleanEqual;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notLessThanZero;
+import static wbs.framework.utils.etc.NumberUtils.notLessThanZero;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
@@ -192,7 +193,9 @@ class TicketStateTimeDaemon
 			notLessThanZero (
 				timeComparison)
 
-			&& ticket.getTicketState ().getShowInQueue ()
+			&& booleanEqual (
+				ticket.getTicketState ().getShowInQueue (),
+				true)
 
 		) {
 

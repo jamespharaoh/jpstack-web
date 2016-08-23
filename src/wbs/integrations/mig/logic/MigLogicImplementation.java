@@ -1,15 +1,14 @@
 package wbs.integrations.mig.logic;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import lombok.NonNull;
 import wbs.integrations.mig.model.MigNetworkObjectHelper;
 import wbs.integrations.mig.model.MigNetworkRec;
 import wbs.sms.network.model.NetworkRec;
@@ -56,7 +55,7 @@ class MigLogicImplementation
 			numberLogic.objectToNumber (
 				destAddress);
 
-		Optional<MigNetworkRec> currentNetworkOptional =
+		Optional <MigNetworkRec> currentNetworkOptional =
 			migNetworkHelper.find (
 				number.getNetwork ().getId ());
 
@@ -65,7 +64,7 @@ class MigLogicImplementation
 			isPresent (
 				currentNetworkOptional)
 
-			&& equal (
+			&& stringEqual (
 				connectionNetwork.getSuffix (),
 				currentNetworkOptional.get ().getSuffix ())
 

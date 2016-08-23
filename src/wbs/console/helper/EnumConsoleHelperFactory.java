@@ -21,7 +21,7 @@ class EnumConsoleHelperFactory <EnumType extends Enum <EnumType>>
 	public
 	Object makeComponent () {
 
-		return new EnumConsoleHelper<EnumType> ()
+		return new EnumConsoleHelper <EnumType> ()
 
 			.enumClass (
 				enumClass)

@@ -7,8 +7,8 @@
 	</models>
 
 	<layer name="daemon">
-		<bean class="daemon.ChatAdDaemon"/>
-		<bean class="daemon.ChatAdultAdDaemon"/>
+		<component class="daemon.ChatAdDaemon"/>
+		<component class="daemon.ChatAdultAdDaemon"/>
 	</layer>
 
 	<console-modules>

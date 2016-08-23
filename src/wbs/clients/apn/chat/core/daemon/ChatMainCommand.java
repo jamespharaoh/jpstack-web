@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.core.daemon;
 
+import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notIn;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -557,7 +557,7 @@ class ChatMainCommand
 			isNotNull (
 				fromChatUser.getNextJoinType ())
 
-			&& notIn (
+			&& enumNotInSafe (
 				fromChatUser.getNextJoinType (),
 				ChatKeywordJoinType.chatDob,
 				ChatKeywordJoinType.dateDob)

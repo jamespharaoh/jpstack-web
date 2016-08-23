@@ -1,6 +1,6 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import javax.inject.Inject;
@@ -107,7 +107,7 @@ class QueueItemActionsPart
 		) {
 
 			if (
-				equal (
+				referenceEqualSafe (
 					queueItem.getQueueItemClaim ().getUser (),
 					userConsoleLogic.userRequired ())
 			) {

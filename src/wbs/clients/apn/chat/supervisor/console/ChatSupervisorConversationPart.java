@@ -1,10 +1,11 @@
 package wbs.clients.apn.chat.supervisor.console;
 
 import static wbs.framework.utils.etc.LogicUtils.anyOf;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 import static wbs.framework.utils.etc.StringUtils.spacify;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.localDateNotEqual;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,11 +79,11 @@ class ChatSupervisorConversationPart
 					"chatId"));
 
 		long chatUserId1 =
-			requestContext.parameterInteger (
+			requestContext.parameterIntegerRequired (
 				"chatUserId1");
 
 		long chatUserId2 =
-			requestContext.parameterInteger (
+			requestContext.parameterIntegerRequired (
 				"chatUserId2");
 
 		userChatUser =
@@ -95,11 +96,11 @@ class ChatSupervisorConversationPart
 
 		if (anyOf (
 
-			() -> notEqual (
+			() -> referenceNotEqualSafe (
 				userChatUser.getChat (),
 				chat),
 
-			() -> notEqual (
+			() -> referenceNotEqualSafe (
 				monitorChatUser.getChat (),
 				chat))
 
@@ -263,7 +264,7 @@ class ChatSupervisorConversationPart
 				.toLocalDate ();
 
 			if (
-				notEqual (
+				localDateNotEqual (
 					nextDate,
 					previousDate)
 			) {

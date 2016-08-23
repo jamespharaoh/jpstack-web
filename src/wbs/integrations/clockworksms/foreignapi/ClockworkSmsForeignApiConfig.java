@@ -2,6 +2,7 @@ package wbs.integrations.clockworksms.foreignapi;
 
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataFromXml;
+import wbs.framework.data.tools.DataFromXmlBuilder;
 
 @SingletonComponent ("clockworkSmsForeignApiConfig")
 public
@@ -11,11 +12,13 @@ class ClockworkSmsForeignApiConfig {
 	public
 	DataFromXml clockworkSmsForeignApiDataFromXml () {
 
-		return new DataFromXml ()
+		return new DataFromXmlBuilder ()
 
 			.registerBuilderClasses (
 				ClockworkSmsMessageResponse.class,
-				ClockworkSmsMessageResponse.SmsResp.class);
+				ClockworkSmsMessageResponse.SmsResp.class)
+
+			.build ();
 
 	}
 

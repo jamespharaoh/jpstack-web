@@ -1,10 +1,10 @@
 package wbs.integrations.oxygen8.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -141,7 +141,7 @@ class Oxygen8Sender
 		// validate message text
 
 		if (
-			! GsmUtils.isValidGsm (
+			! GsmUtils.gsmStringIsValid (
 				message.getText ().getText ())
 		) {
 
@@ -156,7 +156,7 @@ class Oxygen8Sender
 		}
 
 		long gsmLength =
-			GsmUtils.length (
+			GsmUtils.gsmStringLength (
 				message.getText ().getText ());
 
 		boolean needMultipart =
@@ -195,7 +195,7 @@ class Oxygen8Sender
 		// pick a handler
 
 		if (
-			equal (
+			stringEqual (
 				message.getMessageType ().getCode (),
 				"sms")
 		) {
@@ -515,7 +515,7 @@ class Oxygen8Sender
 								responseTrace));
 
 				} else if (
-					equal (
+					stringEqual (
 						responseLines [0],
 						"101")
 				) {

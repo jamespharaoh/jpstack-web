@@ -1,9 +1,8 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.notEqualSafe;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -170,7 +169,7 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 		if (model.isRooted ()) {
 
 			if (
-				! equal (
+				notEqualSafe (
 					parentGlobalId,
 					GlobalId.root)
 			) {
@@ -356,7 +355,7 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 		if (model.isRooted ()) {
 
 			if (
-				! equal (
+				notEqualSafe (
 					parentGlobalId,
 					GlobalId.root)
 			) {
@@ -544,7 +543,7 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 		if (model.isRooted ()) {
 
 			if (
-				notEqual (
+				notEqualSafe (
 					parentGlobalId,
 					GlobalId.root)
 			) {
@@ -778,7 +777,7 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 		if (model.isRooted ()) {
 
 			if (
-				notEqual (
+				notEqualSafe (
 					parentGlobalId,
 					GlobalId.root)
 			) {
@@ -910,7 +909,7 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 		if (model.isRooted ()) {
 
 			if (
-				notEqual (
+				notEqualSafe (
 					parentGlobalId,
 					GlobalId.root)
 			) {
@@ -1167,7 +1166,7 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 		if (model.isRooted ()) {
 
 			if (
-				notEqual (
+				notEqualSafe (
 					parentGlobalId,
 					GlobalId.root)
 			) {

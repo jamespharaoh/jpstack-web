@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 import static wbs.framework.utils.etc.StringUtils.objectToStringNullSafe;
 
@@ -12,8 +12,7 @@ import javax.inject.Named;
 
 import com.google.common.collect.ImmutableMap;
 
-import wbs.clients.apn.chat.core.console.ChatUserCreditModeConsoleHelper;
-import wbs.clients.apn.chat.core.console.ChatUserDateModeConsoleHelper;
+import wbs.console.helper.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
@@ -26,11 +25,11 @@ class ChatUserSearchOldPart
 
 	// dependencies
 
-	@Inject
-	ChatUserCreditModeConsoleHelper chatUserCreditModeConsoleHelper;
+	@Inject @Named
+	EnumConsoleHelper <?> chatUserCreditModeConsoleHelper;
 
-	@Inject
-	ChatUserDateModeConsoleHelper chatUserDateModeConsoleHelper;
+	@Inject @Named
+	EnumConsoleHelper <?> chatUserDateModeConsoleHelper;
 
 	@Inject
 	@Named ("chatUserSearchItemsPerSubPage")

@@ -10,25 +10,25 @@ import wbs.framework.hibernate.EnumUserType;
 
 public
 class ChatMessageStatusType
-	extends EnumUserType<Integer,ChatMessageStatus> {
+	extends EnumUserType <Long, ChatMessageStatus> {
 
 	{
 
-		sqlType (Types.INTEGER);
+		sqlType (Types.BIGINT);
 		enumClass (ChatMessageStatus.class);
 
-		add (0, ChatMessageStatus.sent);
-		add (1, ChatMessageStatus.blocked);
-		add (2, ChatMessageStatus.autoEdited);
-		add (3, ChatMessageStatus.moderatorPending);
-		add (4, ChatMessageStatus.moderatorApproved);
-		add (5, ChatMessageStatus.moderatorRejected);
-		add (6, ChatMessageStatus.moderatorAutoEdited);
-		add (7, ChatMessageStatus.moderatorEdited);
-		add (8, ChatMessageStatus.signup);
-		add (9, ChatMessageStatus.signupReplaced);
-		add (10, ChatMessageStatus.signupTimeout);
-		add (11, ChatMessageStatus.broadcast);
+		add (0l, ChatMessageStatus.sent);
+		add (1l, ChatMessageStatus.blocked);
+		add (2l, ChatMessageStatus.autoEdited);
+		add (3l, ChatMessageStatus.moderatorPending);
+		add (4l, ChatMessageStatus.moderatorApproved);
+		add (5l, ChatMessageStatus.moderatorRejected);
+		add (6l, ChatMessageStatus.moderatorAutoEdited);
+		add (7l, ChatMessageStatus.moderatorEdited);
+		add (8l, ChatMessageStatus.signup);
+		add (9l, ChatMessageStatus.signupReplaced);
+		add (10l, ChatMessageStatus.signupTimeout);
+		add (11l, ChatMessageStatus.broadcast);
 
 	}
 

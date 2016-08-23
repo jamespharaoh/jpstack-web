@@ -1,6 +1,7 @@
 package wbs.console.html;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.LinkedHashMap;
@@ -9,7 +10,6 @@ import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)
@@ -32,8 +32,8 @@ class SelectBuilder {
 	String selectedValue;
 
 	@Getter @Setter
-	Map<String,String> options =
-		new LinkedHashMap<String,String> ();
+	Map <String, String> options =
+		new LinkedHashMap<> ();
 
 	// implementation
 
@@ -77,8 +77,10 @@ class SelectBuilder {
 			stringFormat (
 				">\n"));
 
-		for (Map.Entry<String,String> optionEntry
-				: options.entrySet ()) {
+		for (
+			Map.Entry <String, String> optionEntry
+				: options.entrySet ()
+		) {
 
 			String optionValue =
 				optionEntry.getKey ();
@@ -93,11 +95,12 @@ class SelectBuilder {
 					" value=\"%h\"",
 					optionValue,
 
-					equal (
+					ifThenElse (
+						stringEqual (
 							optionValue,
-							selectedValue)
-						? " selected"
-						: "",
+							selectedValue),
+						() -> " selected",
+						() -> ""),
 
 					">%h</option>",
 					optionText));

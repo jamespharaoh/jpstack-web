@@ -1,6 +1,7 @@
 package wbs.smsapps.autoresponder.daemon;
 
-import static wbs.framework.utils.etc.Misc.indexOfRequired;
+import static wbs.framework.utils.etc.CollectionUtils.listIndexOfRequired;
+import static wbs.framework.utils.etc.CollectionUtils.listItemAtIndexRequired;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -86,8 +87,8 @@ class AutoResponderDelivery
 				autoResponderRequestHelper.findRequired (
 					deliveryMessage.getRef ());
 
-			int deliveryMessageIndex =
-				indexOfRequired (
+			long deliveryMessageIndex =
+				listIndexOfRequired (
 					request.getSentMessages (),
 					deliveryMessage);
 
@@ -97,7 +98,8 @@ class AutoResponderDelivery
 			) {
 
 				MessageRec nextMessage =
-					request.getSentMessages ().get (
+					listItemAtIndexRequired (
+						request.getSentMessages (),
 						deliveryMessageIndex + 1);
 
 				if (nextMessage.getStatus () == MessageStatus.held) {
@@ -120,19 +122,20 @@ class AutoResponderDelivery
 				autoResponderRequestHelper.findRequired (
 					deliveryMessage.getRef ());
 
-			Integer deliveryMessageIndex =
-				indexOfRequired (
+			Long deliveryMessageIndex =
+				listIndexOfRequired (
 					request.getSentMessages (),
 					deliveryMessage);
 
 			for (
-				int messageIndex = deliveryMessageIndex + 1;
+				long messageIndex = deliveryMessageIndex + 1;
 				messageIndex < request.getSentMessages ().size ();
 				messageIndex ++
 			) {
 
 				MessageRec heldMessage =
-					request.getSentMessages ().get (
+					listItemAtIndexRequired (
+						request.getSentMessages (),
 						messageIndex);
 
 				if (heldMessage.getStatus () == MessageStatus.held) {

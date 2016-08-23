@@ -1,8 +1,9 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionHasOneElement;
+import static wbs.framework.utils.etc.CollectionUtils.collectionHasTwoElements;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.eitherGetLeft;
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.requiredValue;
@@ -114,9 +115,8 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 				viewPriv);
 
 		if (
-			equal (
-				privParts.size (),
-				1)
+			collectionHasOneElement (
+				privParts)
 		) {
 
 			String privCode =
@@ -128,9 +128,8 @@ class ReadOnlyFormField<Container,Generic,Native,Interface>
 				privCode);
 
 		} else if (
-			equal (
-				privParts.size (),
-				2)
+			collectionHasTwoElements (
+				privParts)
 		) {
 
 			String delegatePath =

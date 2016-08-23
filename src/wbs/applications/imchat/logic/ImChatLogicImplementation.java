@@ -1,19 +1,18 @@
 package wbs.applications.imchat.logic;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
-
-import lombok.NonNull;
 
 import org.apache.commons.io.output.StringBuilderWriter;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatMessageRec;
@@ -76,7 +75,7 @@ class ImChatLogicImplementation
 		// check preconditions
 
 		if (
-			notEqual (
+			referenceNotEqualSafe (
 				customer.getCurrentConversation (),
 				conversation)
 		) {

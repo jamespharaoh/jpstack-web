@@ -14,15 +14,15 @@ import wbs.framework.data.annotations.DataParent;
 @DataClass ("value-property")
 public
 class BeansValuePropertySpec
-	implements BeansBeanPropertySpec {
+	implements ComponentsComponentPropertySpec {
 
 	@DataAncestor
 	@Getter @Setter
-	BeansSpec beans;
+	ComponentsSpec beans;
 
 	@DataParent
 	@Getter @Setter
-	BeansBeanSpec bean;
+	ComponentsComponentSpec bean;
 
 	@DataAttribute
 	@Getter @Setter

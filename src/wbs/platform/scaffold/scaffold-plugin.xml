@@ -8,7 +8,7 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.SliceLogicImplementation"/>
+		<component class="logic.SliceLogicImplementation"/>
 	</layer>
 
 	<fixtures>

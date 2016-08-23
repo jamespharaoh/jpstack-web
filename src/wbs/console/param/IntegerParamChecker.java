@@ -3,14 +3,16 @@
  */
 package wbs.console.param;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.not;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Deprecated
 public
 class IntegerParamChecker
-	implements ParamChecker<Long> {
+	implements ParamChecker <Long> {
 
 	String error;
 	boolean required;
@@ -37,8 +39,19 @@ class IntegerParamChecker
 		param =
 			param.trim ();
 
-		if (equal ("", param) && ! required)
+		if (
+
+			not (
+				required)
+
+			&& stringIsEmpty (
+				param)
+
+		) {
+
 			return null;
+
+		}
 
 		Matcher matcher =
 			pattern.matcher (param);

@@ -64,7 +64,7 @@ class QueueUsersAction
 		// get params
 
 		long userId =
-			requestContext.parameterInteger (
+			requestContext.parameterIntegerRequired (
 				"userId");
 
 		boolean reclaim;

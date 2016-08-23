@@ -9,11 +9,11 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 public
 interface ChatUserCreditDaoMethods {
 
-	List<ChatUserCreditRec> findByTimestamp (
+	List <ChatUserCreditRec> findByTimestamp (
 			ChatRec chat,
 			Interval timestampInterval);
 
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			ChatUserCreditSearch search);
 
 }

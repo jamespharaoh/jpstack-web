@@ -1,8 +1,8 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifElse;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 
@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
-
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
@@ -110,8 +109,8 @@ class JsonFormFieldBuilder {
 		// native mapping
 
 		FormFieldNativeMapping nativeMapping =
-			ifElse (
-				equal (
+			ifThenElse (
+				referenceEqualSafe (
 					propertyClass,
 					byte[].class),
 

@@ -1,11 +1,12 @@
 package wbs.smsapps.forwarder.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -1652,12 +1653,17 @@ class ForwarderApiModule
 						|| queryExMessage.clientId == null)
 					continue;
 
-				if (! equal (
+				if (
+
+					integerNotEqualSafe (
 						queryExMessage.serverId,
 						queryExMessage.fmOut.getId ())
-					|| ! equal (
+
+					|| stringNotEqualSafe (
 						queryExMessage.clientId,
-						queryExMessage.fmOut.getOtherId ())) {
+						queryExMessage.fmOut.getOtherId ())
+
+				) {
 
 					errors.add ("Message " + index + " id mismatch");
 

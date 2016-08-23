@@ -39,12 +39,10 @@
 
 		<enum-field
 			name="gender"
-			helper="genderConsoleHelper"
 			nullable="yes"/>
 
 		<enum-field
 			name="orient"
-			helper="orientConsoleHelper"
 			nullable="yes"/>
 
 		<object-field
@@ -141,12 +139,10 @@
 			name="lastAction"/>
 
 		<enum-field
-			name="gender"
-			helper="genderConsoleHelper"/>
+			name="gender"/>
 
 		<enum-field
-			name="orient"
-			helper="orientConsoleHelper"/>
+			name="orient"/>
 
 		<object-field
 			name="category"

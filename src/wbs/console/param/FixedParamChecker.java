@@ -3,11 +3,13 @@
  */
 package wbs.console.param;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.stringTrim;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Deprecated
 public
 class FixedParamChecker
 	implements ParamChecker<Long> {
@@ -66,11 +68,21 @@ class FixedParamChecker
 
 		}
 
-		if (equal ("", param.trim ()) && ! required)
+		if (
+
+			stringIsEmpty (
+				stringTrim (
+					param))
+
+			&& ! required
+
+		) {
 			return null;
+		}
 
 		Matcher matcher =
-			pattern.matcher (param);
+			pattern.matcher (
+				param);
 
 		if (! matcher.matches ()) {
 

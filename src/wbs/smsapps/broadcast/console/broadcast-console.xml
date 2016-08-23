@@ -65,8 +65,7 @@
 		<index-field/>
 
 		<enum-field
-			name="state"
-			helper="broadcastStateConsoleHelper"/>
+			name="state"/>
 
 		<object-field
 			name="createdUser"
@@ -99,8 +98,7 @@
 		<index-field/>
 
 		<enum-field
-			name="state"
-			helper="broadcastStateConsoleHelper"/>
+			name="state"/>
 
 		<timestamp-field
 			name="createdTime"/>

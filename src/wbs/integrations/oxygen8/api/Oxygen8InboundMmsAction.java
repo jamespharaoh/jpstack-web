@@ -1,7 +1,7 @@
 package wbs.integrations.oxygen8.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -168,7 +168,11 @@ class Oxygen8InboundMmsAction
 			errors.add (
 				"Required header missing: X-Mms-Message-Type");
 
-		} else if (! equal (mmsMessageType, "MO_MMS")) {
+		} else if (
+			stringNotEqualSafe (
+				mmsMessageType,
+				"MO_MMS")
+		) {
 
 			errors.add (
 				stringFormat (

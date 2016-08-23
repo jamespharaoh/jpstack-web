@@ -30,6 +30,13 @@ import wbs.framework.record.UnsavedRecordDetector;
 class HibernateTransaction
 	implements Transaction {
 
+	// properties
+
+	@Getter
+	long serverProcessId;
+
+	// state
+
 	private final
 	HibernateDatabase hibernateDatabase;
 
@@ -52,8 +59,17 @@ class HibernateTransaction
 	Instant now =
 		Instant.now ();
 
-	private boolean
-	committed, closed;
+	private
+	boolean begun;
+
+	private
+	boolean committed;
+
+	private
+	boolean closed;
+
+	private
+	boolean unsavedRecordFrameCreated;
 
 	private
 	Session session;
@@ -61,11 +77,10 @@ class HibernateTransaction
 	private
 	org.hibernate.Transaction hibernateTransaction;
 
-	@Getter
-	long serverProcessId;
+	Map <String, Object> meta =
+		new HashMap<> ();
 
-	Map<String,Object> meta =
-		new HashMap<String,Object> ();
+	// constructors
 
 	HibernateTransaction (
 			HibernateDatabase hibernateDatabase,
@@ -82,6 +97,8 @@ class HibernateTransaction
 		this.activeTask = activeTask;
 
 	}
+
+	// implementation
 
 	void begin () {
 
@@ -174,6 +191,12 @@ class HibernateTransaction
 		UnsavedRecordDetector.instance.createFrame (
 			this);
 
+		unsavedRecordFrameCreated = true;
+
+		// update state
+
+		begun = true;
+
 	}
 
 	@Override
@@ -200,6 +223,13 @@ class HibernateTransaction
 
 			throw new RuntimeException (
 				"Tried to commit closed transaction");
+
+		}
+
+		if (! begun) {
+
+			throw new RuntimeException (
+				"Tried to commit unbegun transaction");
 
 		}
 
@@ -269,8 +299,12 @@ class HibernateTransaction
 
 		// remove us from the transaction stack
 
-		if (stack != null)
-			stack.remove (this);
+		if (stack != null) {
+
+			stack.remove (
+				this);
+
+		}
 
 		try {
 
@@ -289,10 +323,6 @@ class HibernateTransaction
 				hibernateTransaction.rollback ();
 
 			}
-
-			// finish the active task
-
-			activeTask.success ();
 
 		} finally {
 
@@ -316,7 +346,12 @@ class HibernateTransaction
 
 			try {
 
-				activeTask.close ();
+				if (
+					isNotNull (
+						activeTask)
+				) {
+					activeTask.close ();
+				}
 
 			} catch (Exception exception) {
 
@@ -328,10 +363,7 @@ class HibernateTransaction
 
 			// always tidy unsaved record detector
 
-			if (
-				isNull (
-					realTransaction)
-			) {
+			if (unsavedRecordFrameCreated) {
 
 				try {
 

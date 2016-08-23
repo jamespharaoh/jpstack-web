@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.localDateNotEqual;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -101,7 +101,7 @@ class ChatUserHelpPart
 		LocalDate previousDate = null;
 
 		DateTimeZone timezone =
-			chatUserLogic.timezone (
+			chatUserLogic.getTimezone (
 				chatUser);
 
 		for (
@@ -118,7 +118,7 @@ class ChatUserHelpPart
 				.toLocalDate ();
 
 			if (
-				notEqual (
+				localDateNotEqual (
 					nextDate,
 					previousDate)
 			) {
@@ -134,7 +134,7 @@ class ChatUserHelpPart
 
 					"<td colspan=\"5\">%h</td>\n",
 					timeFormatter.dateStringLong (
-						chatUserLogic.timezone (
+						chatUserLogic.getTimezone (
 							chatUser),
 						chatHelpLog.getTimestamp ()),
 
@@ -160,7 +160,7 @@ class ChatUserHelpPart
 			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.timeString (
-					chatUserLogic.timezone (
+					chatUserLogic.getTimezone (
 						chatUser),
 					chatHelpLog.getTimestamp ()));
 

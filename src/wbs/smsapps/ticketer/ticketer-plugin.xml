@@ -8,11 +8,11 @@
 	</models>
 
 	<layer name="api">
-		<bean class="api.TicketerApiServletModule"/>
+		<component class="api.TicketerApiServletModule"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.TicketerCommand"/>
+		<component class="daemon.TicketerCommand"/>
 	</layer>
 
 	<console-modules>

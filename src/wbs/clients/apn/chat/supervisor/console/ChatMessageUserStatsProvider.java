@@ -260,11 +260,14 @@ class ChatMessageUserStatsProvider
 			hour ++
 		) {
 
-			for (Object userIdObject
-					: userIds) {
+			for (
+				Object userIdObject
+					: userIds
+			) {
 
-				Integer userId =
-					(Integer) userIdObject;
+				Long userId =
+					(Long)
+					userIdObject;
 
 				statsDataSet.data ().add (
 					new StatsDatum ()

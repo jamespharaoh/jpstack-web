@@ -16,11 +16,11 @@ class BeansPropertyValueSpec {
 
 	@DataAncestor
 	@Getter @Setter
-	BeansSpec beans;
+	ComponentsSpec beans;
 
 	@DataAncestor
 	@Getter @Setter
-	BeansBeanSpec bean;
+	ComponentsComponentSpec bean;
 
 	@DataParent
 	@Getter @Setter

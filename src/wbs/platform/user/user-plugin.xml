@@ -14,20 +14,20 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.UserLogicImplementation"/>
+		<component class="logic.UserLogicImplementation"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.UserConsoleLogicImplementation"/>
-		<bean class="console.UserPasswordAction"/>
-		<bean class="console.UserPasswordPart"/>
-		<bean class="console.UserPrivsEditorAction"/>
-		<bean class="console.UserPrivsEditorPart"/>
-		<bean class="console.UserPrivsSummaryPart"/>
-		<bean class="console.UserStatsGrouper"/>
-		<bean class="console.SupervisorHelperImplementation"/>
-		<bean class="console.SupervisorUserStatsGrouperBuilder"/>
-		<bean class="console.SupervisorUserStatsGrouperSpec"/>
+		<component class="console.UserConsoleLogicImplementation"/>
+		<component class="console.UserPasswordAction"/>
+		<component class="console.UserPasswordPart"/>
+		<component class="console.UserPrivsEditorAction"/>
+		<component class="console.UserPrivsEditorPart"/>
+		<component class="console.UserPrivsSummaryPart"/>
+		<component class="console.UserStatsGrouper"/>
+		<component class="console.SupervisorHelperImplementation"/>
+		<component class="console.SupervisorUserStatsGrouperBuilder"/>
+		<component class="console.SupervisorUserStatsGrouperSpec"/>
 	</layer>
 
 	<fixtures>

@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import javax.inject.Inject;
@@ -24,23 +24,23 @@ class IndexFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<ReadOnlyFormField>
+	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
 	@Inject
-	Provider<IntegerFormFieldNativeMapping>
-	integerFormFieldNativeMappingProvider;
+	Provider <IdentityFormFieldNativeMapping>
+	identityFormFieldNativeMappingProvider;
 
 	@Inject
-	Provider<IntegerFormFieldInterfaceMapping>
+	Provider <IntegerFormFieldInterfaceMapping>
 	integerFormFieldInterfaceMappingProvider;
 
 	@Inject
-	Provider<SimpleFormFieldAccessor>
+	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
 	@Inject
-	Provider<TextFormFieldRenderer>
+	Provider <TextFormFieldRenderer>
 	textFormFieldRendererProvider;
 
 	// builder
@@ -84,12 +84,12 @@ class IndexFormFieldBuilder {
 				name)
 
 			.nativeClass (
-				Integer.class);
+				Long.class);
 
 		// native mapping
 
 		FormFieldNativeMapping nativeMapping =
-			integerFormFieldNativeMappingProvider.get ();
+			identityFormFieldNativeMappingProvider.get ();
 
 		// interface mapping
 

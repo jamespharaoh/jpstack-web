@@ -11,13 +11,13 @@
 	</models>
 
 	<layer name="web">
-		<bean class="web.TextResponder"/>
+		<component class="web.TextResponder"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.TextConsoleConfig"/>
-		<bean class="console.TextFormFieldNativeMapping"/>
-		<bean class="console.TextFormFieldPluginProvider"/>
+		<component class="console.TextConsoleConfig"/>
+		<component class="console.TextFormFieldNativeMapping"/>
+		<component class="console.TextFormFieldPluginProvider"/>
 	</layer>
 
 	<console-modules>

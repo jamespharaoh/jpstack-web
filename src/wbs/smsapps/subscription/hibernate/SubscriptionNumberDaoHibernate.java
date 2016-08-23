@@ -2,13 +2,12 @@ package wbs.smsapps.subscription.hibernate;
 
 import java.util.List;
 
-import lombok.NonNull;
-
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.subscription.model.SubscriptionNumberDao;
@@ -51,7 +50,7 @@ class SubscriptionNumberDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			@NonNull SubscriptionNumberSearch subscriptionNumberSearch) {
 
 		// create criteria
@@ -135,7 +134,7 @@ class SubscriptionNumberDaoHibernate
 
 		return findMany (
 			"searchIds (subscriptionNumberSearch)",
-			Integer.class,
+			Long.class,
 			criteria);
 
 	}

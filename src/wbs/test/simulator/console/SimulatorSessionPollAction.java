@@ -1,6 +1,6 @@
 package wbs.test.simulator.console;
 
-import static wbs.framework.utils.etc.NumberUtils.parseLongRequired;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -65,12 +65,12 @@ class SimulatorSessionPollAction
 	Responder goReal () {
 
 		Long lastId =
-			parseLongRequired (
+			parseIntegerRequired (
 				requestContext.getForm (
 					"last"));
 
 		Long limit =
-			parseLongRequired (
+			parseIntegerRequired (
 				requestContext.getForm (
 					"limit"));
 

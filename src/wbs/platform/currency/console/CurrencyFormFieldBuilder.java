@@ -1,9 +1,9 @@
 package wbs.platform.currency.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,6 @@ import wbs.console.forms.FormFieldUpdateHook;
 import wbs.console.forms.FormFieldValueValidator;
 import wbs.console.forms.IdentityFormFieldNativeMapping;
 import wbs.console.forms.IntegerFormFieldInterfaceMapping;
-import wbs.console.forms.IntegerFormFieldNativeMapping;
 import wbs.console.forms.IntegerFormFieldValueValidator;
 import wbs.console.forms.NullFormFieldConstraintValidator;
 import wbs.console.forms.RangeFormFieldInterfaceMapping;
@@ -59,20 +58,16 @@ class CurrencyFormFieldBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<CurrencyFormFieldInterfaceMapping>
+	Provider <CurrencyFormFieldInterfaceMapping>
 	currencyFormFieldInterfaceMappingProvider;
 
 	@Inject
-	Provider<IdentityFormFieldNativeMapping>
+	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
 	@Inject
-	Provider<IntegerFormFieldInterfaceMapping>
+	Provider <IntegerFormFieldInterfaceMapping>
 	integerFormFieldInterfaceMappingProvider;
-
-	@Inject
-	Provider<IntegerFormFieldNativeMapping>
-	integerFormFieldNativeMappingProvider;
 
 	@Inject
 	Provider<IntegerFormFieldValueValidator>
@@ -187,14 +182,7 @@ class CurrencyFormFieldBuilder {
 
 		boolean range;
 
-		if (propertyClass == Integer.class) {
-
-			nativeMapping =
-				integerFormFieldNativeMappingProvider.get ();
-
-			range = false;
-
-		} else if (propertyClass == Long.class) {
+		if (propertyClass == Long.class) {
 
 			nativeMapping =
 				identityFormFieldNativeMappingProvider.get ();

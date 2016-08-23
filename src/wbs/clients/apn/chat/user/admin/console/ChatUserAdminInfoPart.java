@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 
 import java.util.Set;
 
@@ -180,7 +180,7 @@ class ChatUserAdminInfoPart
 
 				"<td>%h</td>\n",
 				timeFormatter.timestampTimezoneString (
-					chatUserLogic.timezone (
+					chatUserLogic.getTimezone (
 						chatUser),
 					chatUserInfo.getCreationTime ()),
 

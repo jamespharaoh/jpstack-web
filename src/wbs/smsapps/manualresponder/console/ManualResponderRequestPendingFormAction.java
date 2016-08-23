@@ -1,11 +1,11 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.Misc.moreThan;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NumberUtils.moreThan;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
@@ -126,7 +126,7 @@ class ManualResponderRequestPendingFormAction
 				"template-id");
 
 		boolean ignore =
-			equal (
+			stringEqual (
 				templateIdStr,
 				"ignore");
 
@@ -230,7 +230,7 @@ class ManualResponderRequestPendingFormAction
 		// consistency checks
 
 		if (
-			notEqual (
+			referenceNotEqualSafe (
 				template.getManualResponder (),
 				manualResponder)
 		) {
@@ -264,7 +264,7 @@ class ManualResponderRequestPendingFormAction
 				? messageParam
 				: template.getDefaultText ();
 
-		if (! GsmUtils.isValidGsm (messageString)) {
+		if (! GsmUtils.gsmStringIsValid (messageString)) {
 
 			requestContext.addError (
 				"Message contains characters which cannot be sent via SMS");
@@ -327,7 +327,8 @@ class ManualResponderRequestPendingFormAction
 
 		if (
 
-			template.getMaximumMessages () != null
+			isNotNull (
+				template.getMaximumMessages ())
 
 			&& moreThan (
 				effectiveParts,

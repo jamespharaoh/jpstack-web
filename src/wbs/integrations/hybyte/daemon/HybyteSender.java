@@ -1,6 +1,6 @@
 package wbs.integrations.hybyte.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -137,7 +137,7 @@ class HybyteSender
 		// pick a handler
 
 		if (
-			equal (
+			stringEqual (
 				hybyteOutbox.message.getMessageType ().getCode (),
 				"sms")
 		) {
@@ -145,7 +145,7 @@ class HybyteSender
 			// no action required
 
 		} else if (
-			equal (
+			stringEqual (
 				hybyteOutbox.message.getMessageType ().getCode (),
 				"wap_push")
 		) {
@@ -493,9 +493,11 @@ class HybyteSender
 			Element ackElem =
 				(Element) nodes.get (0);
 
-			if (equal (
+			if (
+				stringEqual (
 					ackElem.getAttributeValue ("result"),
-					"OK")) {
+					"OK")
+			) {
 
 				return ackElem.getAttributeValue ("uuid");
 
@@ -516,16 +518,19 @@ class HybyteSender
 			String error =
 				errorElem.getValue ();
 
-			if (equal (
+			if (
+				stringEqual (
 					error,
-					"No content specified")) {
+					"No content specified")
+			) {
 
 				String fullError =
 					"Permanent failure: " + error;
 
 				log.error (fullError);
 
-				throw permFailure(fullError);
+				throw permFailure (
+					fullError);
 
 			}
 

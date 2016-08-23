@@ -1,6 +1,6 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -155,7 +155,7 @@ class QueueUsersPart
 					transaction.now ()));
 
 			if (
-				equal (
+				referenceEqualSafe (
 					userData.user,
 					userConsoleLogic.userRequired ())
 			) {

@@ -89,8 +89,7 @@
 			nullable="yes"/>
 
 		<enum-field
-			name="charset"
-			helper="messageTemplateTypeCharsetConsoleHelper"/>
+			name="charset"/>
 
 	</field-set>
 
@@ -118,8 +117,7 @@
 			name="maxLength"/>
 
 		<enum-field
-			name="charset"
-			helper="messageTemplateTypeCharsetConsoleHelper"/>
+			name="charset"/>
 
 	</field-set>
 
@@ -146,8 +144,7 @@
 			nullable="yes"/>
 
 		<enum-field
-			name="charset"
-			helper="messageTemplateTypeCharsetConsoleHelper"/>
+			name="charset"/>
 
 	</field-set>
 

@@ -4,6 +4,8 @@ import java.util.Collection;
 
 import org.joda.time.Instant;
 
+import com.google.common.base.Optional;
+
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.platform.media.model.MediaRec;
 
@@ -14,35 +16,35 @@ interface ChatInfoLogic {
 	 * Returns the nearest numToFind users who qualify for a pic given
 	 * cutoffTime.
 	 */
-	Collection<ChatUserRec> getNearbyOnlineUsersForInfo (
+	Collection <ChatUserRec> getNearbyOnlineUsersForInfo (
 			ChatUserRec thisUser,
 			Instant cutoffTime,
-			int numToFind);
+			Long numToFind);
 
 	/**
 	 * Returns the nearest numToFind users who qualify for a pic given
 	 * cutoffTime.
 	 */
-	Collection<ChatUserRec> getNearbyOnlineUsersForPic (
+	Collection <ChatUserRec> getNearbyOnlineUsersForPic (
 			ChatUserRec thisUser,
 			Instant cutoffTime,
-			int numToFind);
+			Long numToFind);
 
-	Collection<ChatUserRec> getNearbyOnlineUsersForVideo (
+	Collection <ChatUserRec> getNearbyOnlineUsersForVideo (
 			ChatUserRec thisUser,
 			Instant cutoffTime,
-			int numToFind);
+			Long numToFind);
 
 	void sendUserInfo (
 			ChatUserRec thisUser,
 			ChatUserRec otherUser,
-			Long threadId,
-			boolean asDating);
+			Optional <Long> threadIdOptional,
+			Boolean asDating);
 
-	int sendUserInfos (
-			final ChatUserRec thisUser,
-			final int numToSend,
-			Long threadId);
+	long sendUserInfos (
+			ChatUserRec thisUser,
+			Long numToSend,
+			Optional <Long> threadIdOptional);
 
 	String chatUserBlurb (
 			ChatUserRec thisUser,
@@ -54,36 +56,36 @@ interface ChatInfoLogic {
 
 	void sendUserPics (
 			ChatUserRec thisUser,
-			Collection<ChatUserRec> otherUsers,
-			Long threadId,
-			boolean asDating);
+			Collection <ChatUserRec> otherUsers,
+			Optional <Long> threadId,
+			Boolean asDating);
 
 	void sendUserVideos (
 			ChatUserRec thisUser,
-			Collection<ChatUserRec> otherUsers,
-			Long threadId,
-			boolean asDating);
+			Collection <ChatUserRec> otherUsers,
+			Optional <Long> threadId,
+			Boolean asDating);
 
-	int sendRequestedUserPicandOtherUserPics (
+	long sendRequestedUserPicandOtherUserPics (
 			ChatUserRec thisUser,
 			ChatUserRec requestedUser,
-			int numToSend,
-			Long threadId);
+			Long numToSend,
+			Optional <Long> threadId);
 
-	int sendUserPics (
+	long sendUserPics (
 			ChatUserRec thisUser,
-			int numToSend,
-			Long threadId);
+			Long numToSend,
+			Optional <Long> threadId);
 
-	int sendUserVideos (
+	long sendUserVideos (
 			ChatUserRec thisUser,
-			int numToSend,
-			Long threadId);
+			Long numToSend,
+			Optional <Long> threadId);
 
 	void chatUserSetInfo (
 			ChatUserRec chatUser,
 			String info,
-			Long threadId);
+			Optional <Long> threadId);
 
 	void sendNameHint (
 			ChatUserRec chatUser);

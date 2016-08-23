@@ -1,30 +1,28 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
-import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import java.util.Map;
 
 import javax.inject.Inject;
-
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
 import fj.data.Either;
-
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("timestampFormFieldInterfaceMapping")
@@ -49,13 +47,13 @@ class TimestampFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Either<Optional<Instant>,String> interfaceToGeneric (
+	Either <Optional <Instant>, String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue) {
 
 		if (
-			notEqual (
+			enumNotEqualSafe (
 				format,
 				TimestampFormFieldSpec.Format.timestamp)
 		) {
@@ -68,13 +66,13 @@ class TimestampFormFieldInterfaceMapping<Container>
 				interfaceValue)
 
 			|| stringIsEmpty (
-				optionalRequired (
+				optionalGetRequired (
 					interfaceValue))
 
 		) {
 
 			return successResult (
-				Optional.<Instant>absent ());
+				Optional.absent ());
 
 		} else {
 

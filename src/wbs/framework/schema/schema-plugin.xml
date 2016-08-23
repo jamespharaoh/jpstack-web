@@ -3,15 +3,15 @@
 	package="wbs.framework.schema">
 
 	<layer name="schema">
-		<bean class="helper.SchemaNamesHelperImplementation"/>
-		<bean class="helper.SchemaTypesHelperImplementation"/>
+		<component class="helper.SchemaNamesHelperImplementation"/>
+		<component class="helper.SchemaTypesHelperImplementation"/>
 	</layer>
 
 	<layer name="schema-tool">
-		<bean class="builder.SchemaFromModel"/>
-		<bean class="builder.SchemaTableFromModel"/>
-		<bean class="tool.SchemaToSqlImplementation"/>
-		<bean class="tool.SchemaToolComponents"/>
+		<component class="builder.SchemaFromModel"/>
+		<component class="builder.SchemaTableFromModel"/>
+		<component class="tool.SchemaToSqlImplementation"/>
+		<component class="tool.SchemaToolComponents"/>
 	</layer>
 
 </plugin>

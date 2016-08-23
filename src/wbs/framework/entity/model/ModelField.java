@@ -1,6 +1,6 @@
 package wbs.framework.entity.model;
 
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.lang.reflect.ParameterizedType;
@@ -140,7 +140,7 @@ class ModelField {
 	public
 	boolean id () {
 
-		return in (
+		return enumInSafe (
 			type,
 			ModelFieldType.generatedId,
 			ModelFieldType.assignedId,
@@ -152,7 +152,7 @@ class ModelField {
 	public
 	boolean value () {
 
-		return in (
+		return enumInSafe (
 			type,
 			ModelFieldType.generatedId,
 			ModelFieldType.assignedId,
@@ -172,7 +172,7 @@ class ModelField {
 	public
 	boolean reference () {
 
-		return in (
+		return enumInSafe (
 			type,
 			ModelFieldType.reference,
 			ModelFieldType.parent,
@@ -187,7 +187,7 @@ class ModelField {
 	public
 	boolean composite () {
 
-		return in (
+		return enumInSafe (
 			type,
 			ModelFieldType.compositeId,
 			ModelFieldType.component);
@@ -196,23 +196,35 @@ class ModelField {
 
 	public
 	boolean generatedId () {
-		return type == ModelFieldType.generatedId;
+
+		return enumInSafe (
+			type,
+			ModelFieldType.generatedId);
+
 	}
 
 	public
 	boolean assignedId () {
-		return type == ModelFieldType.assignedId;
+
+		return enumInSafe (
+			type,
+			ModelFieldType.assignedId);
+
 	}
 
 	public
 	boolean foreignId () {
-		return type == ModelFieldType.foreignId;
+
+		return enumInSafe (
+			type,
+			ModelFieldType.foreignId);
+
 	}
 
 	public
 	boolean partner () {
 
-		return in (
+		return enumInSafe (
 			type,
 			ModelFieldType.master,
 			ModelFieldType.slave);
@@ -221,22 +233,38 @@ class ModelField {
 
 	public
 	boolean collection () {
-		return type == ModelFieldType.collection;
+
+		return enumInSafe (
+			type,
+			ModelFieldType.collection);
+
 	}
 
 	public
 	boolean link () {
-		return type == ModelFieldType.associative;
+
+		return enumInSafe (
+			type,
+			ModelFieldType.associative);
+
 	}
 
 	public
 	boolean compositeId () {
-		return type == ModelFieldType.compositeId;
+
+		return enumInSafe (
+			type,
+			ModelFieldType.compositeId);
+
 	}
 
 	public
 	boolean component () {
-		return type == ModelFieldType.component;
+
+		return enumInSafe (
+			type,
+			ModelFieldType.component);
+
 	}
 
 	public

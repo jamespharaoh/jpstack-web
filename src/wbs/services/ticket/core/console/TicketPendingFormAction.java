@@ -94,7 +94,7 @@ class TicketPendingFormAction
 
 		template =
 			ticketTemplateHelper.findRequired (
-				requestContext.parameterInteger (
+				requestContext.parameterIntegerRequired (
 					"template"));
 
 		// remove old queue item

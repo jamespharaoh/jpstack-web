@@ -23,7 +23,7 @@ import fj.data.Either;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TimeFormatter;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("timestampTimezoneFormFieldInterfaceMapping")
@@ -56,7 +56,7 @@ class TimestampTimezoneFormFieldInterfaceMapping<Container>
 				interfaceValue)
 
 			|| stringIsEmpty (
-				optionalRequired (
+				optionalGetRequired (
 					interfaceValue))
 
 		) {
@@ -71,7 +71,7 @@ class TimestampTimezoneFormFieldInterfaceMapping<Container>
 			return successResult (
 				Optional.of (
 					timeFormatter.timestampTimezoneToDateTime (
-						optionalRequired (
+						optionalGetRequired (
 							interfaceValue))));
 
 		} catch (IllegalArgumentException exception) {

@@ -1,6 +1,6 @@
 package wbs.integrations.dialogue.logic;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -279,7 +279,11 @@ class DialogueLocator
 			Element rootElem =
 				document.getRootElement ();
 
-			if (! equal (rootElem.getName (), "LBS")) {
+			if (
+				stringNotEqualSafe (
+					rootElem.getName (),
+					"LBS")
+			) {
 
 				throw new LocatorException (
 					"Returned document was not an <LBS>");
@@ -287,7 +291,8 @@ class DialogueLocator
 			}
 
 			Element responseElem =
-				rootElem.getChild ("Response");
+				rootElem.getChild (
+					"Response");
 
 			if (responseElem == null) {
 

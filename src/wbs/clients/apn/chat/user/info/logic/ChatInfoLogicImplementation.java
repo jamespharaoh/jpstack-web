@@ -1,9 +1,8 @@
 package wbs.clients.apn.chat.user.info.logic;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.moreThan;
 import static wbs.framework.utils.etc.NumberUtils.roundToIntegerRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.laterThan;
 
@@ -139,10 +138,10 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	void sendUserInfo (
-			ChatUserRec thisUser,
-			ChatUserRec otherUser,
-			Long threadId,
-			boolean asDating) {
+			@NonNull ChatUserRec thisUser,
+			@NonNull ChatUserRec otherUser,
+			@NonNull Optional <Long> threadIdOptional,
+			@NonNull Boolean asDating) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -272,8 +271,7 @@ class ChatInfoLogicImplementation
 
 		chatSendLogic.sendMessageMagic (
 			thisUser,
-			Optional.fromNullable (
-				threadId),
+			threadIdOptional,
 			textParts,
 			commandHelper.findByCodeRequired (
 				chat,
@@ -288,10 +286,10 @@ class ChatInfoLogicImplementation
 
 	@Override
 	public
-	int sendUserInfos (
+	long sendUserInfos (
 			@NonNull ChatUserRec thisUser,
-			int numToSend,
-			Long threadId) {
+			@NonNull Long numToSend,
+			@NonNull Optional <Long> threadIdOptional) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -307,7 +305,7 @@ class ChatInfoLogicImplementation
 				.minusWeeks (1)
 				.toInstant ();
 
-		Collection<ChatUserRec> otherUsers =
+		Collection <ChatUserRec> otherUsers =
 			getNearbyOnlineUsersForInfo (
 				thisUser,
 				cutoffTime,
@@ -321,7 +319,7 @@ class ChatInfoLogicImplementation
 			sendUserInfo (
 				thisUser,
 				otherUser,
-				threadId,
+				threadIdOptional,
 				false);
 
 		}
@@ -405,10 +403,10 @@ class ChatInfoLogicImplementation
 
 	public
 	void sendUserPicsViaLink (
-			ChatUserRec thisUser,
-			Collection<ChatUserRec> otherUsers,
-			Long threadId,
-			boolean asDating) {
+			@NonNull ChatUserRec thisUser,
+			@NonNull Collection <ChatUserRec> otherUsers,
+			@NonNull Optional <Long> threadIdOptional,
+			@NonNull Boolean asDating) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -523,7 +521,8 @@ class ChatInfoLogicImplementation
 		messageSender.get ()
 
 			.threadId (
-				threadId)
+				optionalOrNull (
+					threadIdOptional))
 
 			.number (
 				thisUser.getNumber ())
@@ -549,10 +548,10 @@ class ChatInfoLogicImplementation
 
 	public
 	void sendUserPicsViaMms (
-			ChatUserRec thisUser,
-			Collection<ChatUserRec> otherUsers,
-			Long threadId,
-			boolean asDating) {
+			@NonNull ChatUserRec thisUser,
+			@NonNull Collection <ChatUserRec> otherUsers,
+			@NonNull Optional <Long> threadIdOptional,
+			@NonNull Boolean asDating) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -642,7 +641,8 @@ class ChatInfoLogicImplementation
 		messageSender.get ()
 
 			.threadId (
-				threadId)
+				optionalOrNull (
+					threadIdOptional))
 
 			.number (
 				thisUser.getNumber ())
@@ -675,10 +675,10 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	void sendUserPics (
-			ChatUserRec thisUser,
-			Collection<ChatUserRec> otherUsers,
-			Long threadId,
-			boolean asDating) {
+			@NonNull ChatUserRec thisUser,
+			@NonNull Collection <ChatUserRec> otherUsers,
+			@NonNull Optional <Long> threadIdOptional,
+			@NonNull Boolean asDating) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -690,7 +690,7 @@ class ChatInfoLogicImplementation
 			sendUserPicsViaLink (
 				thisUser,
 				otherUsers,
-				threadId,
+				threadIdOptional,
 				asDating);
 
 			break;
@@ -700,7 +700,7 @@ class ChatInfoLogicImplementation
 			sendUserPicsViaMms (
 				thisUser,
 				otherUsers,
-				threadId,
+				threadIdOptional,
 				asDating);
 
 			break;
@@ -735,10 +735,10 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	void sendUserVideos (
-			final ChatUserRec thisUser,
-			Collection<ChatUserRec> otherUsers,
-			Long threadId,
-			boolean asDating) {
+			@NonNull ChatUserRec thisUser,
+			@NonNull Collection <ChatUserRec> otherUsers,
+			@NonNull Optional <Long> threadIdOptional,
+			@NonNull Boolean asDating) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -746,8 +746,8 @@ class ChatInfoLogicImplementation
 		ChatSchemeRec chatScheme =
 			thisUser.getChatScheme ();
 
-		List<MediaRec> medias =
-			new ArrayList<MediaRec> ();
+		List <MediaRec> medias =
+			new ArrayList<> ();
 
 		int i = 0;
 
@@ -838,7 +838,8 @@ class ChatInfoLogicImplementation
 		messageSender.get ()
 
 			.threadId (
-				threadId)
+				optionalOrNull (
+					threadIdOptional))
 
 			.number (
 				thisUser.getNumber ())
@@ -870,11 +871,11 @@ class ChatInfoLogicImplementation
 
 	@Override
 	public
-	int sendRequestedUserPicandOtherUserPics (
-			ChatUserRec thisUser,
-			ChatUserRec requestedUser,
-			int numToSend,
-			Long threadId) {
+	long sendRequestedUserPicandOtherUserPics (
+			@NonNull ChatUserRec thisUser,
+			@NonNull ChatUserRec requestedUser,
+			@NonNull Long numToSend,
+			@NonNull Optional <Long> threadIdOptional) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -901,7 +902,7 @@ class ChatInfoLogicImplementation
 		sendUserPics (
 			thisUser,
 			otherUsers,
-			threadId,
+			threadIdOptional,
 			false);
 
 		return otherUsers.size ();
@@ -910,10 +911,10 @@ class ChatInfoLogicImplementation
 
 	@Override
 	public
-	int sendUserPics (
-			ChatUserRec thisUser,
-			int numToSend,
-			Long threadId) {
+	long sendUserPics (
+			@NonNull ChatUserRec thisUser,
+			@NonNull Long numToSend,
+			@NonNull Optional <Long> threadIdOptional) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -936,7 +937,7 @@ class ChatInfoLogicImplementation
 		sendUserPics (
 			thisUser,
 			otherUsers,
-			threadId,
+			threadIdOptional,
 			false);
 
 		return otherUsers.size ();
@@ -945,10 +946,10 @@ class ChatInfoLogicImplementation
 
 	@Override
 	public
-	int sendUserVideos (
-			ChatUserRec thisUser,
-			int numToSend,
-			Long threadId) {
+	long sendUserVideos (
+			@NonNull ChatUserRec thisUser,
+			@NonNull Long numToSend,
+			@NonNull Optional <Long> threadId) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -984,12 +985,12 @@ class ChatInfoLogicImplementation
 	 */
 	@Override
 	public
-	Collection<ChatUserRec> getNearbyOnlineUsersForInfo (
-			ChatUserRec thisUser,
-			Instant cutoffTime,
-			int numToFind) {
+	Collection <ChatUserRec> getNearbyOnlineUsersForInfo (
+			@NonNull ChatUserRec thisUser,
+			@NonNull Instant cutoffTime,
+			@NonNull Long numToFind) {
 
-		Collection<ChatUserRec> chatUsers =
+		Collection <ChatUserRec> chatUsers =
 			getOnlineUsersForInfo (
 				thisUser,
 				cutoffTime);
@@ -1007,12 +1008,12 @@ class ChatInfoLogicImplementation
 	 */
 	@Override
 	public
-	Collection<ChatUserRec> getNearbyOnlineUsersForPic (
-			ChatUserRec thisUser,
-			Instant cutoffTime,
-			int numToFind) {
+	Collection <ChatUserRec> getNearbyOnlineUsersForPic (
+			@NonNull ChatUserRec thisUser,
+			@NonNull Instant cutoffTime,
+			@NonNull Long numToFind) {
 
-		Collection<ChatUserRec> chatUsers =
+		Collection <ChatUserRec> chatUsers =
 			getOnlineUsersForPic (
 				thisUser,
 				cutoffTime);
@@ -1026,12 +1027,12 @@ class ChatInfoLogicImplementation
 
 	@Override
 	public
-	Collection<ChatUserRec> getNearbyOnlineUsersForVideo (
-			ChatUserRec thisUser,
-			Instant cutoffTime,
-			int numToFind) {
+	Collection <ChatUserRec> getNearbyOnlineUsersForVideo (
+			@NonNull ChatUserRec thisUser,
+			@NonNull Instant cutoffTime,
+			@NonNull Long numToFind) {
 
-		Collection<ChatUserRec> chatUsers =
+		Collection <ChatUserRec> chatUsers =
 			getOnlineUsersForVideo (
 				thisUser,
 				cutoffTime);
@@ -1165,26 +1166,6 @@ class ChatInfoLogicImplementation
 
 			if (chatUser.getInfoText () == null)
 				continue;
-
-			// ignore users according to monitor cap
-
-			if (
-
-				isNotNull (
-					thisUser.getMonitorCap ())
-
-				&& equal (
-					chatUser.getType (),
-					ChatUserType.monitor)
-
-				&& (
-					moreThan (
-						chatUser.getCode ().charAt (2) - '0',
-						thisUser.getMonitorCap ()))
-
-			) {
-				continue;
-			}
 
 			// ignore system user
 
@@ -1419,9 +1400,9 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	void chatUserSetInfo (
-			ChatUserRec chatUser,
-			String info,
-			Long threadId) {
+			@NonNull ChatUserRec chatUser,
+			@NonNull String info,
+			@NonNull Optional <Long> threadId) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -1430,7 +1411,8 @@ class ChatInfoLogicImplementation
 			chatUser.getChat ();
 
 		TextRec newInfoText =
-			textHelper.findOrCreate (info);
+			textHelper.findOrCreate (
+				info);
 
 		// create the chat user info
 
@@ -1451,7 +1433,8 @@ class ChatInfoLogicImplementation
 				ChatUserInfoStatus.moderatorPending)
 
 			.setThreadId (
-				threadId)
+				optionalOrNull (
+					threadId))
 
 		);
 

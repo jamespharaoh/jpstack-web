@@ -48,11 +48,11 @@ class ChatUserInitiationStatsProvider
 
 		// setup data structures
 
-		Map<Long,long[]> alarmsPerUser =
-			new TreeMap<Long,long[]> ();
+		Map <Long, long[]> alarmsPerUser =
+			new TreeMap<> ();
 
-		Set<Object> userIds =
-			new HashSet<Object> ();
+		Set <Object> userIdObjects =
+			new HashSet <> ();
 
 		// retrieve messages
 
@@ -62,14 +62,17 @@ class ChatUserInitiationStatsProvider
 				conditions.get (
 					"chatId"));
 
-		List<ChatUserInitiationLogRec> logs =
+		List <ChatUserInitiationLogRec> logs =
 			chatUserInitiationLogHelper.findByTimestamp (
 				chat,
 				period.toInterval ());
 
 		// aggregate stats
 
-		for (ChatUserInitiationLogRec log : logs) {
+		for (
+			ChatUserInitiationLogRec log
+				: logs
+		) {
 
 			if (log.getReason () != ChatUserInitiationReason.alarmSet)
 				continue;
@@ -83,14 +86,15 @@ class ChatUserInitiationStatsProvider
 				log.getTimestamp ();
 
 			int hour =
-				period.assign (timestamp);
+				period.assign (
+					timestamp);
 
 			// count alarms per user
 
-			if (! userIds.contains (
+			if (! userIdObjects.contains (
 					log.getMonitorUser ().getId ())) {
 
-				userIds.add (
+				userIdObjects.add (
 					log.getMonitorUser ().getId ());
 
 				alarmsPerUser.put (
@@ -113,8 +117,9 @@ class ChatUserInitiationStatsProvider
 		StatsDataSet statsDataSet =
 			new StatsDataSet ();
 
-		statsDataSet.indexValues ()
-			.put ("userId", userIds);
+		statsDataSet.indexValues ().put (
+			"userId",
+			userIdObjects);
 
 		for (
 			int hour = 0;
@@ -122,10 +127,13 @@ class ChatUserInitiationStatsProvider
 			hour ++
 		) {
 
-			for (Object userIdObject : userIds) {
+			for (
+				Object userIdObject
+					: userIdObjects
+			) {
 
-				Integer userId =
-					(Integer) userIdObject;
+				Long userId =
+					(Long) userIdObject;
 
 				statsDataSet.data ().add (
 					new StatsDatum ()

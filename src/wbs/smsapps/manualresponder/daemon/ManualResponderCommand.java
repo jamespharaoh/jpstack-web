@@ -1,14 +1,15 @@
 package wbs.smsapps.manualresponder.daemon;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.calculateAgeInYears;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
 import javax.inject.Inject;
@@ -17,7 +18,6 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
-import org.joda.time.Years;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -254,7 +254,7 @@ class ManualResponderCommand
 		) {
 
 			if (
-				notEqual (
+				referenceNotEqualSafe (
 					manualResponder
 						.getSmsCustomerManager (),
 					manualResponderAffiliate
@@ -515,13 +515,12 @@ class ManualResponderCommand
 					smsCustomer.get ().getDateOfBirth ())
 			) {
 
-				Integer age =
-					Years.yearsBetween (
-						smsCustomer.get ().getDateOfBirth ().toDateTimeAtStartOfDay (
-							DateTimeZone.forID (
-								wbsConfig.defaultTimezone ())),
-						transaction.now ()
-					).getYears ();
+				Long age =
+					calculateAgeInYears (
+						smsCustomer.get ().getDateOfBirth (),
+						transaction.now (),
+						DateTimeZone.forID (
+							wbsConfig.defaultTimezone ()));
 
 				if (
 					lessThan (

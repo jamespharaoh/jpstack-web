@@ -23,25 +23,25 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.SubscriptionLogicImplementation"/>
-		<bean class="logic.SubscriptionSendHelper"/>
+		<component class="logic.SubscriptionLogicImplementation"/>
+		<component class="logic.SubscriptionSendHelper"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.SubscriptionNumberAddRemoveAction"/>
-		<bean class="console.SubscriptionNumberAddRemovePart"/>
-		<bean class="console.SubscriptionNumberAdvice"/>
-		<bean class="console.SubscriptionNumberLinkProvider"/>
-		<bean class="console.SubscriptionNumberOverviewPart"/>
-		<bean class="console.SubscriptionSendControlAction"/>
-		<bean class="console.SubscriptionSendControlPart"/>
+		<component class="console.SubscriptionNumberAddRemoveAction"/>
+		<component class="console.SubscriptionNumberAddRemovePart"/>
+		<component class="console.SubscriptionNumberAdvice"/>
+		<component class="console.SubscriptionNumberLinkProvider"/>
+		<component class="console.SubscriptionNumberOverviewPart"/>
+		<component class="console.SubscriptionSendControlAction"/>
+		<component class="console.SubscriptionSendControlPart"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.SubscriptionDeliveryNoticeHandler"/>
-		<bean class="daemon.SubscriptionScheduleDaemon"/>
-		<bean class="daemon.SubscriptionSendDaemon"/>
-		<bean class="daemon.SubscriptionCommand"/>
+		<component class="daemon.SubscriptionDeliveryNoticeHandler"/>
+		<component class="daemon.SubscriptionScheduleDaemon"/>
+		<component class="daemon.SubscriptionSendDaemon"/>
+		<component class="daemon.SubscriptionCommand"/>
 	</layer>
 
 	<console-modules>

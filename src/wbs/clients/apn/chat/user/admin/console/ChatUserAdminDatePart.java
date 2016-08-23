@@ -1,16 +1,17 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.objectToStringNullSafe;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
-import wbs.clients.apn.chat.core.console.ChatUserDateModeConsoleHelper;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateLogRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TimeFormatter;
@@ -25,8 +26,8 @@ class ChatUserAdminDatePart
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
-	ChatUserDateModeConsoleHelper chatUserDateModeConsoleHelper;
+	@Inject @Named
+	EnumConsoleHelper <?> chatUserDateModeConsoleHelper;
 
 	@Inject
 	ChatUserLogic chatUserLogic;
@@ -189,7 +190,7 @@ class ChatUserAdminDatePart
 				"<td>%h</td>\n",
 				chatUserDateLogRec.getTimestamp () != null
 					? timeFormatter.timestampTimezoneString (
-						chatUserLogic.timezone (
+						chatUserLogic.getTimezone (
 							chatUser),
 						chatUserDateLogRec.getTimestamp ())
 					: "-");

@@ -1,51 +1,53 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Set;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.usertype.UserType;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.framework.utils.ReversableMap;
 
 @Accessors (fluent = true)
 public
-class EnumUserType<DatabaseType,JavaType extends Enum<?>>
+class EnumUserType <DatabaseType, JavaType extends Enum <?>>
 	implements UserType {
 
 	@Getter @Setter
 	int sqlType;
 
 	@Getter @Setter
-	Class<JavaType> enumClass;
+	Class <JavaType> enumClass;
 
 	private
-	ReversableMap<DatabaseType,JavaType> keyToEnumMap =
-		ReversableMap.<DatabaseType,JavaType>makeHashed ();
+	ReversableMap <DatabaseType, JavaType> keyToEnumMap =
+		ReversableMap.makeHashed ();
 
 	public
 	EnumUserType () {
 	}
 
 	public
-	Set<DatabaseType> databaseValues () {
+	Set <DatabaseType> databaseValues () {
 
 		return keyToEnumMap.keySet ();
 
 	}
 
 	public
-	Set<JavaType> javaValues () {
+	Set <JavaType> javaValues () {
 
 		return keyToEnumMap.valueSet ();
 
@@ -105,6 +107,20 @@ class EnumUserType<DatabaseType,JavaType extends Enum<?>>
 		if (resultSet.wasNull ())
 			return null;
 
+		// TODO this is ugly
+
+		if (
+			sqlType == Types.BIGINT
+			&& key instanceof Integer
+		) {
+
+			key =
+				fromJavaInteger (
+					(Integer)
+					key);
+
+		}
+
 		JavaType ret =
 			keyToEnumMap.get (key);
 
@@ -118,9 +134,10 @@ class EnumUserType<DatabaseType,JavaType extends Enum<?>>
 
 				throw new RuntimeException (
 					stringFormat (
-						"Unknown column value '%s' (%s)",
+						"Unknown column value '%s' (%s) for %s",
 						key.toString (),
-						key.getClass ().getName ()));
+						key.getClass ().getName (),
+						enumClass.getSimpleName ()));
 
 			}
 
@@ -151,10 +168,11 @@ class EnumUserType<DatabaseType,JavaType extends Enum<?>>
 
 		Object key =
 			keyToEnumMap.getKey (
-				enumClass.cast (value));
+				enumClass.cast (
+					value));
 
 		if (key == null)
-			throw new RuntimeException();
+			throw new RuntimeException ();
 
 		statement.setObject (
 			index,
@@ -214,20 +232,26 @@ class EnumUserType<DatabaseType,JavaType extends Enum<?>>
 	@Override
 	public
 	int hashCode (
-			Object value) {
+			@NonNull Object value) {
 
 		return keyToEnumMap
-			.getKey (enumClass.cast (value))
+
+			.getKey (
+				enumClass.cast (
+					value))
+
 			.hashCode ();
 
 	}
 
 	public
-	EnumUserType<DatabaseType,JavaType> auto (
-			Class<DatabaseType> databaseClass) {
+	EnumUserType <DatabaseType, JavaType> auto (
+			@NonNull Class <DatabaseType> databaseClass) {
 
-		for (JavaType value
-				: enumClass.getEnumConstants ()) {
+		for (
+			JavaType value
+				: enumClass.getEnumConstants ()
+		) {
 
 			add (
 				databaseClass.cast (

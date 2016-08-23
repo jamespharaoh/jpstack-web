@@ -1,8 +1,9 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NumberUtils.maximumJavaInteger;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.awt.image.BufferedImage;
 
@@ -103,7 +104,7 @@ class ImChatMediaJpegAction
 				content.getHash ());
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				hash.toString (),
 				requestContext.requestStringRequired (
 					"mediaContentHash"))
@@ -143,12 +144,10 @@ class ImChatMediaJpegAction
 					originalImage,
 					ifNull (
 						targetWidth,
-						Long.valueOf (
-							Integer.MAX_VALUE)),
+						maximumJavaInteger),
 					ifNull (
 						targetHeight,
-						Long.valueOf (
-							Integer.MAX_VALUE)));
+						maximumJavaInteger));
 
 		}
 

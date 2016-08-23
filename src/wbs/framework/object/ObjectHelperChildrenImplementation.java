@@ -1,6 +1,6 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.TypeUtils.classNotEqual;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,22 +38,22 @@ class ObjectHelperChildrenImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public <ChildType extends Record<?>>
-	List<ChildType> getChildren (
-			@NonNull Record<?> object,
-			@NonNull Class<ChildType> childClass) {
+	List <ChildType> getChildren (
+			@NonNull Record <?> object,
+			@NonNull Class <ChildType> childClass) {
 
-		ObjectHelper<?> childHelper =
+		ObjectHelper <?> childHelper =
 			objectManager.objectHelperForClassRequired (
 				childClass);
 
-		List<?> childrenTemp =
+		List <?> childrenTemp =
 			childHelper.findByParent (
 				objectHelper.getGlobalId (
 					object));
 
 		@SuppressWarnings ("unchecked")
-		List<ChildType> children =
-			(List<ChildType>)
+		List <ChildType> children =
+			(List <ChildType>)
 			childrenTemp;
 
 		return children;
@@ -63,18 +63,18 @@ class ObjectHelperChildrenImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	List<Record<?>> getMinorChildren (
-			@NonNull Record<?> object) {
+	List <Record <?>> getMinorChildren (
+			@NonNull Record <?> object) {
 
-		List<Record<?>> children =
-			new ArrayList<Record<?>> ();
+		List <Record <?>> children =
+			new ArrayList <Record <?>> ();
 
 		GlobalId globalId =
 			objectHelper.getGlobalId (
 				object);
 
 		for (
-			ObjectHelper<?> childHelper
+			ObjectHelper <?> childHelper
 				: objectManager.objectHelpers ()
 		) {
 
@@ -85,7 +85,7 @@ class ObjectHelperChildrenImplementation<RecordType extends Record<RecordType>>
 
 				childHelper.parentTypeIsFixed ()
 
-				&& notEqual (
+				&& classNotEqual (
 					childHelper.parentClass (),
 					model.objectClass ())
 
@@ -105,18 +105,18 @@ class ObjectHelperChildrenImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	List<Record<?>> getChildren (
-			@NonNull Record<?> object) {
+	List <Record <?>> getChildren (
+			@NonNull Record <?> object) {
 
-		List<Record<?>> children =
-			new ArrayList<Record<?>> ();
+		List <Record <?>> children =
+			new ArrayList <Record <?>> ();
 
 		GlobalId globalId =
 			objectHelper.getGlobalId (
 				object);
 
 		for (
-			ObjectHelper<?> childHelper
+			ObjectHelper <?> childHelper
 				: objectManager.objectHelpers ()
 		) {
 
@@ -128,7 +128,7 @@ class ObjectHelperChildrenImplementation<RecordType extends Record<RecordType>>
 
 				childHelper.parentTypeIsFixed ()
 
-				&& notEqual (
+				&& classNotEqual (
 					childHelper.parentClass (),
 					objectHelper.objectClass ())
 

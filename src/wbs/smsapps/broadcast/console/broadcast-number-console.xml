@@ -44,8 +44,7 @@
 			object-type="number"/>
 
 		<enum-field
-			name="state"
-			helper="broadcastNumberStateConsoleHelper"/>
+			name="state"/>
 
 		<object-field
 			name="addedByUser"

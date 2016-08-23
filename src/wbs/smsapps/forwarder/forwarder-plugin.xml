@@ -19,25 +19,25 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ForwarderLogicImplementation"/>
+		<component class="logic.ForwarderLogicImplementation"/>
 	</layer>
 
 	<layer name="api">
-		<bean class="api.ForwarderApiLogicImplementation"/>
-		<bean class="api.ForwarderApiModule"/>
-		<bean class="api.ForwarderInAction"/>
-		<bean class="api.ForwarderOutAction"/>
-		<bean class="api.ForwarderPeekExRequestDefConfig"/>
-		<bean class="api.ForwarderQueryExRequestDefConfig"/>
-		<bean class="api.ForwarderQueryExMessageChecker"/>
-		<bean class="api.ForwarderUnqueueExRpcHandler"/>
-		<bean class="api.ForwarderUnqueueExRequestDefConfig"/>
+		<component class="api.ForwarderApiLogicImplementation"/>
+		<component class="api.ForwarderApiModule"/>
+		<component class="api.ForwarderInAction"/>
+		<component class="api.ForwarderOutAction"/>
+		<component class="api.ForwarderPeekExRequestDefConfig"/>
+		<component class="api.ForwarderQueryExRequestDefConfig"/>
+		<component class="api.ForwarderQueryExMessageChecker"/>
+		<component class="api.ForwarderUnqueueExRpcHandler"/>
+		<component class="api.ForwarderUnqueueExRequestDefConfig"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.ForwarderCommand"/>
-		<bean class="daemon.ForwarderDaemon"/>
-		<bean class="daemon.ForwarderDelivery"/>
+		<component class="daemon.ForwarderCommand"/>
+		<component class="daemon.ForwarderDaemon"/>
+		<component class="daemon.ForwarderDelivery"/>
 	</layer>
 
 	<console-modules>

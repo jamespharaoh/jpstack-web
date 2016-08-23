@@ -1,17 +1,18 @@
 package wbs.clients.apn.chat.user.pending.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifElse;
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
+import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.isZero;
-import static wbs.framework.utils.etc.Misc.moreThan;
-import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.Misc.trim;
+import static wbs.framework.utils.etc.Misc.stringTrim;
+import static wbs.framework.utils.etc.NumberUtils.equalToZero;
 import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.framework.utils.etc.NumberUtils.moreThan;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.sms.gsm.GsmUtils.gsmStringLength;
 
 import java.util.List;
 
@@ -310,7 +311,7 @@ class ChatUserPendingFormAction
 			chatUser.getNewChatUserName ();
 
 		if (
-			notEqual (
+			enumNotEqualSafe (
 				chatUserName.getStatus (),
 				ChatUserInfoStatus.moderatorPending)
 		) {
@@ -329,8 +330,8 @@ class ChatUserPendingFormAction
 				userConsoleLogic.userRequired ())
 
 			.setStatus (
-				ifElse (
-					equal (
+				ifThenElse (
+					stringEqual (
 						editedName,
 						chatUserName.getOriginalName ()),
 					() -> ChatUserInfoStatus.moderatorApproved,
@@ -407,7 +408,7 @@ class ChatUserPendingFormAction
 			chatUser.getNewChatUserInfo ();
 
 		if (
-			notEqual (
+			enumNotEqualSafe (
 				chatUserInfo.getStatus (),
 				ChatUserInfoStatus.moderatorPending)
 		) {
@@ -430,8 +431,8 @@ class ChatUserPendingFormAction
 				userConsoleLogic.userRequired ())
 
 			.setStatus (
-				ifElse (
-					equal (
+				ifThenElse (
+					stringEqual (
 						editedInfo,
 						chatUserInfo.getOriginalText ().getText ()),
 					() -> ChatUserInfoStatus.moderatorApproved,
@@ -522,7 +523,7 @@ class ChatUserPendingFormAction
 				mode.listProperty ());
 
 		if (
-			notEqual (
+			enumNotEqualSafe (
 				chatUserImage.getStatus (),
 				ChatUserInfoStatus.moderatorPending)
 		) {
@@ -607,11 +608,11 @@ class ChatUserPendingFormAction
 		// get params
 
 		String messageParam =
-			trim (
+			stringTrim (
 				requestContext.parameterRequired (
 					"message"));
 
-		if (GsmUtils.length (messageParam) == 0) {
+		if (GsmUtils.gsmStringLength (messageParam) == 0) {
 
 			requestContext.addError (
 				"Please enter a message to send");
@@ -620,7 +621,7 @@ class ChatUserPendingFormAction
 
 		}
 
-		if (GsmUtils.length (messageParam) > 160) {
+		if (GsmUtils.gsmStringLength (messageParam) > 160) {
 
 			requestContext.addError (
 				"Message is too long");
@@ -706,11 +707,11 @@ class ChatUserPendingFormAction
 		// get params
 
 		String messageParam =
-			trim (
+			stringTrim (
 				requestContext.parameterRequired (
 					"message"));
 
-		if (GsmUtils.length (messageParam) == 0) {
+		if (GsmUtils.gsmStringLength (messageParam) == 0) {
 
 			requestContext.addError (
 				"Please enter a message to send");
@@ -719,7 +720,7 @@ class ChatUserPendingFormAction
 
 		}
 
-		if (GsmUtils.length (messageParam) > 160) {
+		if (GsmUtils.gsmStringLength (messageParam) > 160) {
 
 			requestContext.addError (
 				"Message is too long");
@@ -762,7 +763,7 @@ class ChatUserPendingFormAction
 			chatUser.getNewChatUserInfo ();
 
 		if (
-			notEqual (
+			enumNotEqualSafe (
 				chatUserInfo.getStatus (),
 				ChatUserInfoStatus.moderatorPending)
 		) {
@@ -827,20 +828,23 @@ class ChatUserPendingFormAction
 
 		MessageRec message = null;
 
-		Optional<ChatMessageRec> chatMessage;
+		Optional <ChatMessageRec> chatMessage;
 
 		if (
 
-			in (chatUser.getDeliveryMethod (),
+			enumInSafe (
+				chatUser.getDeliveryMethod (),
 				ChatMessageMethod.iphone,
 				ChatMessageMethod.web)
 
-			&& chat.getSystemChatUser () != null
+			&& isNotNull (
+				chat.getSystemChatUser ())
 
 		) {
 
 			TextRec messageText =
-				textHelper.findOrCreate (messageParam);
+				textHelper.findOrCreate (
+					messageParam);
 
 			chatMessage =
 				Optional.of (
@@ -925,14 +929,17 @@ class ChatUserPendingFormAction
 		// check params
 
 		String messageParam =
-			trim (
+			stringTrim (
 				requestContext.parameterRequired (
 					"message"));
 
+		Long messageParamGsmLength =
+			gsmStringLength (
+				messageParam);
+
 		if (
-			isZero (
-				GsmUtils.length (
-					messageParam))
+			equalToZero (
+				messageParamGsmLength)
 		) {
 
 			requestContext.addError (
@@ -944,9 +951,8 @@ class ChatUserPendingFormAction
 
 		if (
 			moreThan (
-				GsmUtils.length (
-					messageParam),
-				160)
+				messageParamGsmLength,
+				160l)
 		) {
 
 			requestContext.addError (
@@ -1014,7 +1020,8 @@ class ChatUserPendingFormAction
 
 		if (
 
-			in (chatUser.getDeliveryMethod (),
+			enumInSafe (
+				chatUser.getDeliveryMethod (),
 				ChatMessageMethod.iphone,
 				ChatMessageMethod.web)
 

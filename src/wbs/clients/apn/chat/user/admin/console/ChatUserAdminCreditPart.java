@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 
 import javax.inject.Inject;
@@ -52,7 +52,7 @@ class ChatUserAdminCreditPart
 	void renderHtmlBodyContent () {
 
 		if (
-			equal (
+			enumEqualSafe (
 				chatUser.getType (),
 				ChatUserType.monitor)
 		) {

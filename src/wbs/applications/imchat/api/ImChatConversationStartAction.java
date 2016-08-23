@@ -1,7 +1,8 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.LogicUtils.booleanEqual;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.hyphenToUnderscore;
 
@@ -136,7 +137,7 @@ class ImChatConversationStartAction
 
 		// lookup profile
 
-		Optional<ImChatProfileRec> profileOptional =
+		Optional <ImChatProfileRec> profileOptional =
 			imChatProfileHelper.findByCode (
 				imChat,
 				hyphenToUnderscore (
@@ -147,9 +148,11 @@ class ImChatConversationStartAction
 			isNotPresent (
 				profileOptional)
 
-			|| profileOptional.get ().getDeleted ()
+			|| booleanEqual (
+				profileOptional.get ().getDeleted (),
+				true)
 
-			|| notEqual (
+			|| referenceNotEqualSafe (
 				profileOptional.get ().getImChat (),
 				imChat)
 

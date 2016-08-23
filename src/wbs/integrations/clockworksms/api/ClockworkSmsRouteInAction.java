@@ -1,22 +1,22 @@
 package wbs.integrations.clockworksms.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.not;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.Cleanup;
+import lombok.NonNull;
 import wbs.api.mvc.ApiLoggingAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromXml;
+import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -84,10 +84,12 @@ class ClockworkSmsRouteInAction
 		// decode request
 
 		DataFromXml dataFromXml =
-			new DataFromXml ()
+			new DataFromXmlBuilder ()
 
 			.registerBuilderClasses (
-				ClockworkSmsRouteInRequest.class);
+				ClockworkSmsRouteInRequest.class)
+
+			.build ();
 
 		request =
 			(ClockworkSmsRouteInRequest)
@@ -123,25 +125,22 @@ class ClockworkSmsRouteInAction
 			isNotPresent (
 				smsRouteOptional)
 
-			|| equal (
-				smsRouteOptional.get ().getDeleted (),
-				true)
+			|| smsRouteOptional.get ().getDeleted ()
 
-			|| equal (
-				smsRouteOptional.get ().getCanReceive (),
-				false)
+			|| not (
+				smsRouteOptional.get ().getCanReceive ())
 
 		) {
 			throw new PageNotFoundException ();
 		}
 
 		RouteRec smsRoute =
-			optionalRequired (
+			optionalGetRequired (
 				smsRouteOptional);
 
 		// lookup clockwork sms route in
 
-		Optional<ClockworkSmsRouteInRec> clockworkSmsRouteInOptional =
+		Optional <ClockworkSmsRouteInRec> clockworkSmsRouteInOptional =
 			clockworkSmsRouteInHelper.find (
 				smsRoute.getId ());
 
@@ -150,16 +149,15 @@ class ClockworkSmsRouteInAction
 			isNotPresent (
 				clockworkSmsRouteInOptional)
 
-			|| equal (
-				clockworkSmsRouteInOptional.get ().getDeleted (),
-				true)
+			|| clockworkSmsRouteInOptional.get ().getDeleted ()
 
 		) {
 			throw new PageNotFoundException ();
 		}
 
+		@SuppressWarnings ("unused")
 		ClockworkSmsRouteInRec clockworkSmsRouteIn =
-			optionalRequired (
+			optionalGetRequired (
 				clockworkSmsRouteInOptional);
 
 		// lookup network

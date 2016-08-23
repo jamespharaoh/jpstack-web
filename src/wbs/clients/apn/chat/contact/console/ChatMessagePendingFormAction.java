@@ -1,9 +1,9 @@
 package wbs.clients.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.trim;
+import static wbs.framework.utils.etc.Misc.stringTrim;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 
 import javax.inject.Inject;
 
@@ -91,10 +91,9 @@ class ChatMessagePendingFormAction
 
 		// get the message id
 
-		int chatMessageId =
-			Integer.parseInt (
-				requestContext.parameterRequired (
-					"chat_message_id"));
+		Long chatMessageId =
+			requestContext.parameterIntegerRequired (
+				"chat_message_id");
 
 		requestContext.request (
 			"chatMessageId",
@@ -212,7 +211,7 @@ class ChatMessagePendingFormAction
 				transaction.now ());
 
 		if (
-			equal (
+			stringEqual (
 				messageParam,
 				chatMessage.getOriginalText ().getText ())
 		) {
@@ -228,7 +227,7 @@ class ChatMessagePendingFormAction
 					chatMessage.getOriginalText ());
 
 		} else if (
-			equal (
+			stringEqual (
 				messageParam,
 				chatMessage.getEditedText ().getText ())
 		) {
@@ -324,11 +323,11 @@ class ChatMessagePendingFormAction
 		// get params
 
 		String messageParam =
-			trim (
+			stringTrim (
 				requestContext.parameterRequired (
 					"message"));
 
-		if (GsmUtils.length (messageParam) == 0) {
+		if (GsmUtils.gsmStringLength (messageParam) == 0) {
 
 			requestContext.addError (
 				"Please enter a message to send");
@@ -337,7 +336,7 @@ class ChatMessagePendingFormAction
 
 		}
 
-		if (GsmUtils.length (messageParam) > 149) {
+		if (GsmUtils.gsmStringLength (messageParam) > 149) {
 
 			requestContext.addError (
 				"Message is too long");

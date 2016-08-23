@@ -1,14 +1,16 @@
 package wbs.framework.utils.etc;
 
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.StringUtils.bytesToString;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -22,17 +24,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.AbstractMap;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -42,66 +40,13 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import fj.data.Either;
+import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
 // TODO lots to deprecate here
 public
 class Misc {
-
-	@SafeVarargs
-	public static <Type>
-	Type ifNull (
-			@NonNull Type... values) {
-
-		for (Type value : values) {
-
-			if (value != null)
-				return value;
-
-		}
-
-		return null;
-
-	}
-
-	public static <Type>
-	Type ifNull (
-			Type input,
-			Type ifNull) {
-
-		return input == null
-			? ifNull
-			: input;
-
-	}
-
-	public static
-	<Type> Type nullIf (
-			Type input,
-			Type nullIf) {
-
-		if (input == null)
-			return null;
-
-		if (nullIf != null && input.equals (nullIf))
-			return null;
-
-		return input;
-
-	}
-
-	public static
-	<Type> Type ifEq (
-			Type value,
-			Type lookFor,
-			Type replaceWith) {
-
-		return equal (value, lookFor)
-			? replaceWith
-			: value;
-
-	}
 
 	private final static
 	Pattern intPattern =
@@ -121,36 +66,6 @@ class Misc {
 
 	}
 
-	@Deprecated
-	public static
-	Integer toInteger (
-			String string) {
-
-		if (string == null)
-			return null;
-
-		if (isInt (string))
-			return Integer.parseInt (string);
-
-		return null;
-
-	}
-
-	@Deprecated
-	public static
-	Long toLong (
-			String string) {
-
-		if (string == null)
-			return null;
-
-		if (isInt (string))
-			return Long.parseLong (string);
-
-		return null;
-
-	}
-
 	public static <Type extends Enum<Type>>
 	Type toEnum (
 			Class<Type> enumType,
@@ -159,8 +74,13 @@ class Misc {
 		if (name == null || name.length () == 0)
 			return null;
 
-		if (equal (name, "null"))
+		if (
+			stringEqual (
+				name,
+				"null")
+		) {
 			return null;
+		}
 
 		return Enum.valueOf (enumType, name);
 
@@ -176,23 +96,6 @@ class Misc {
 			.filter (value -> ((Enum<?>) value).name ().equals (name))
 			.findFirst ()
 			.orElseThrow (() -> new IllegalArgumentException ());
-
-	}
-
-	public static
-	Boolean toBoolean (
-			String string) {
-
-		if (string == null)
-			return null;
-
-		if (string.equals ("true"))
-			return true;
-
-		if (string.equals ("false"))
-			return false;
-
-		return null;
 
 	}
 
@@ -229,200 +132,6 @@ class Misc {
 
 		throw new RuntimeException (
 			throwable);
-
-	}
-
-	public static
-	boolean equal (
-			Object object1,
-			Object object2) {
-
-		if (object1 == object2)
-			return true;
-
-		if (object1 == null || object2 == null)
-			return false;
-
-		return object1.equals (object2);
-
-	}
-
-	public static
-	boolean notEqual (
-			Object left,
-			Object right) {
-
-		if (left == right)
-			return false;
-
-		if (left == null || right == null)
-			return true;
-
-		return ! left.equals (right);
-
-	}
-
-	public static
-	boolean referenceEqual (
-			@NonNull Object object1,
-			@NonNull Object object2) {
-
-		return object1 == object2;
-
-	}
-
-	public static
-	boolean referenceNotEqual (
-			@NonNull Object object1,
-			@NonNull Object object2) {
-
-		return object1 != object2;
-
-	}
-
-	public static <Type>
-	Type ifElse (
-			@NonNull Boolean condition,
-			@NonNull Supplier<Type> trueValue,
-			@NonNull Supplier<Type> falseValue) {
-
-		if (condition) {
-
-			return trueValue.get ();
-
-		} else {
-
-			return falseValue.get ();
-
-		}
-
-	}
-
-	@SafeVarargs
-	public static <Type>
-	boolean in (
-			@NonNull Type left,
-			@NonNull Type... rights) {
-
-		for (
-			Type right
-				: rights
-		) {
-
-			if (
-				equal (
-					left,
-					right)
-			) {
-				return true;
-			}
-
-		}
-
-		return false;
-
-	}
-
-	public static <Type>
-	boolean in (
-			Type left,
-			Collection<Type> rights) {
-
-		for (
-			Type right
-				: rights
-		) {
-
-			if (
-				equal (
-					left,
-					right)
-			) {
-				return true;
-			}
-
-		}
-
-		return false;
-
-	}
-
-	@SafeVarargs
-	public static <Type>
-	boolean notIn (
-			@NonNull Type left,
-			@NonNull Type... rights) {
-
-		return ! in (
-			left,
-			rights);
-
-	}
-
-	public static
-	Date dateAddMs (
-			Date date,
-			int milliseconds) {
-
-		Calendar calendar =
-			Calendar.getInstance ();
-
-		calendar.setTime (
-			date);
-
-		calendar.add (
-			Calendar.MILLISECOND,
-			milliseconds);
-
-		return calendar.getTime ();
-
-	}
-
-	// TODO use LocalDate instead
-	public static
-	int age (
-			@NonNull TimeZone timeZone,
-			long birth,
-			long when) {
-
-		Calendar calendar =
-			new GregorianCalendar (timeZone);
-
-		calendar.setTime (
-			new Date (birth));
-
-		int birthYear =
-			calendar.get (Calendar.YEAR);
-
-		int birthMonth =
-			calendar.get (Calendar.MONTH);
-
-		int birthDay =
-			calendar.get (Calendar.DAY_OF_MONTH);
-
-		calendar.setTime (
-			new Date (when));
-
-		int whenYear =
-			calendar.get (Calendar.YEAR);
-
-		int whenMonth =
-			calendar.get (Calendar.MONTH);
-
-		int whenDay =
-			calendar.get (Calendar.DAY_OF_MONTH);
-
-		int age =
-			whenYear - birthYear;
-
-		if (whenMonth < birthMonth)
-			age --;
-
-		if (whenMonth == birthMonth
-				&& whenDay < birthDay)
-			age --;
-
-		return age;
 
 	}
 
@@ -522,61 +231,71 @@ class Misc {
 
 	}
 
-	@Deprecated
-	public static
-	void autoClose (
-			Object object) {
+	static
+	public class TempFile
+		implements Closeable {
 
-		try {
+		private final
+		File file;
 
-			if (object == null)
-				return;
+		private
+		TempFile (
+				@NonNull String prefix,
+				@NonNull String extension) {
 
-			if (object instanceof File) {
+			try {
 
-				((File) object).delete ();
+				this.file =
+					File.createTempFile (
+						"wbs-temp-",
+						extension);
 
-			} else if (object instanceof OutputStream) {
+			} catch (IOException ioException) {
 
-				((OutputStream) object).close ();
-
-			} else if (object instanceof InputStream) {
-
-				((InputStream) object).close ();
-
-			} else {
-
-				throw new RuntimeException (
-					"Can't auto close " + object.getClass ());
+				throw new RuntimeIoException (
+					ioException);
 
 			}
 
-		} catch (Exception exception) {
+		}
 
-			throw new RuntimeException (
-				exception);
+		public
+		File file () {
+			return file;
+		}
 
+		public
+		String path () {
+			return file.getPath ();
+		}
+
+		@Override
+		public
+		void close () {
+
+			file.delete ();
+			
 		}
 
 	}
 
 	public static
-	void autoClose  (
-			Object... objects) {
+	TempFile createTempFile (
+			@NonNull String extension) {
 
-		for (Object object : objects)
-			autoClose (object);
+		return new TempFile (
+			"wbs-temp-",
+			extension);
 
 	}
 
 	public static
-	File createTempFile (
-			byte[] data,
-			String extension)
-		throws IOException {
+	TempFile createTempFileWithData (
+			String extension,
+			byte[] data) {
 
-		File file =
-			File.createTempFile (
+		TempFile tempFile =
+			new TempFile (
 				"wbs-temp-",
 				extension);
 
@@ -584,30 +303,35 @@ class Misc {
 
 		try {
 
+			@Cleanup
 			OutputStream outputStream =
-				new FileOutputStream (file);
-
-			outputStream.write (data);
-			outputStream.close ();
-
+				new FileOutputStream (
+					tempFile.file ());
+	
 			success = true;
+	
+			return tempFile;
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
 
 		} finally {
 
-			if (! success)
-				file.delete ();
+			if (! success) {
+				tempFile.close ();
+			}
 
 		}
-
-		return file;
 
 	}
 
 	public static
 	int runCommand (
 			Logger logger,
-			String... command)
-		throws IOException {
+			List <String> command)
+		throws InterruptedException {
 
 		logger.info (
 			stringFormat (
@@ -615,45 +339,49 @@ class Misc {
 				joinWithSpace (
 					command)));
 
-		Process process =
-			Runtime.getRuntime ().exec (
-				command);
-
-		InputStream inputStream = null;
-
 		try {
 
-			// copy the error output to our standard error
+			Process process =
+				Runtime.getRuntime ().exec (
+					command.toArray (
+						new String [] {}));
 
-			inputStream =
-				process.getErrorStream ();
-
+			// debug log any error output
+	
+			@Cleanup
 			BufferedReader bufferedReader =
 				new BufferedReader (
 					new InputStreamReader (
-						inputStream,
+						process.getErrorStream (),
 						"utf-8"));
-
+	
 			String line;
-
-			while ((line = bufferedReader.readLine ()) != null)
-				logger.debug (line);
-
+	
+			while ((line = bufferedReader.readLine ()) != null) {
+	
+				logger.debug (
+					line);
+	
+			}
+	
 			bufferedReader.close ();
 
-			return process.waitFor ();
-
-		} catch (InterruptedException exception) {
-
-			throw new RuntimeException (exception);
-
-		} finally {
-
-			autoClose (inputStream);
-
 			try {
-				process.waitFor ();
-			} catch (Exception exception) { }
+	
+				return process.waitFor ();
+	
+			} catch (InterruptedException exception) {
+	
+				process.destroy ();
+	
+				throw exception;
+	
+			}
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
 
 		}
 
@@ -665,111 +393,96 @@ class Misc {
 			byte[] data,
 			String inExt,
 			String outExt,
-			String... command) {
+			String ... command)
+		throws InterruptedException {
 
 		return runFilterAdvanced (
 			logger,
 			data,
 			inExt,
 			outExt,
-			ImmutableList.<List<String>>of (
-				ImmutableList.<String>copyOf (
+			ImmutableList.of (
+				ImmutableList.copyOf (
 					command)));
+
 	}
 
 	public static
 	byte[] runFilterAdvanced (
 			Logger logger,
 			byte[] data,
-			String inExt,
-			String outExt,
-			List<List<String>> commands) {
+			String inExtension,
+			String outExtension,
+			List <List <String>> commands)
+		throws InterruptedException {
 
-		File inFile = null;
-		File outFile = null;
+		// create the input and output files
+
+		@Cleanup
+		TempFile inFile =
+			createTempFileWithData (
+				inExtension,
+				data);
+
+		@Cleanup
+		TempFile outFile =
+			createTempFile (
+				outExtension);
+
+		// stick the filenames into the command
+
+		for (
+			List <String> command
+				: commands
+		) {
+
+			List <String> newCommand =
+				command.stream ()
+
+				.map (
+					commandItem ->
+						ifThenElse (
+							stringEqual (
+								commandItem,
+								"<in>"),
+							() -> inFile.path (),
+							() -> commandItem))
+
+				.map (
+					commandItem ->
+						ifThenElse (
+							stringEqual (
+								commandItem,
+								"<out>"),
+							() -> outFile.path (),
+							() -> commandItem))
+
+				.collect (
+					Collectors.toList ());
+
+			// run the command
+
+			int status =
+				runCommand (
+					logger,
+					newCommand);
+
+			if (status != 0)
+				throw new RuntimeException ("Command returned " + status);
+
+		}
+
+		// read the output file
 
 		try {
 
-			// create the input and output files
+			return FileUtils.readFileToByteArray (
+				outFile.file ());
 
-			inFile =
-				createTempFile (
-					data,
-					inExt);
+		} catch (IOException ioException) {
 
-			outFile =
-				File.createTempFile (
-					"wbs-",
-					outExt);
-
-			// stick the filenames into the command
-
-			for (
-				List<String> command
-					: commands
-			) {
-
-				String[] newCommand =
-					new String [command.size ()];
-
-				for (
-					int index = 0;
-					index < command.size ();
-					index ++
-				) {
-
-					if (
-						equal (
-							command.get (index),
-							"<in>")
-					) {
-
-						newCommand [index] =
-							inFile.getPath ();
-
-					} else if (
-						equal (
-							command.get (index),
-							"<out>")
-					) {
-
-						newCommand [index] =
-							outFile.getPath ();
-
-					} else {
-
-						newCommand [index] =
-							command.get (index);
-
-					}
-
-				}
-
-				// run the command
-
-				int status =
-					runCommand (
-						logger,
-						newCommand);
-
-				if (status != 0)
-					throw new RuntimeException ("Command returned " + status);
-
-			}
-
-			// read the output file
-
-			return FileUtils.readFileToByteArray (outFile);
-
-		} catch (Exception exception) {
-
-			throw new RuntimeException (exception);
-
-		} finally {
-
-			autoClose (
-				inFile,
-				outFile);
+			throw new RuntimeIoException (
+				ioException);
 
 		}
 
@@ -942,6 +655,7 @@ class Misc {
 
 	}
 
+	@Deprecated
 	public static
 	Boolean stringToBoolean (
 			@NonNull String string,
@@ -949,18 +663,24 @@ class Misc {
 			@NonNull String noString,
 			@NonNull String nullString) {
 
-		if (equal (
+		if (
+			stringEqual (
 				string,
-				yesString))
+				yesString)
+		) {
 			return true;
-
-		if (equal (
-				string,
-				noString))
-			return false;
+		}
 
 		if (
-			equal (
+			stringEqual (
+				string,
+				noString)
+		) {
+			return false;
+		}
+
+		if (
+			stringEqual (
 				string,
 				nullString)
 		) {
@@ -1034,74 +754,6 @@ class Misc {
 			long right) {
 
 		return left < right;
-
-	}
-
-	public static
-	boolean notLessThan (
-			int left,
-			int right) {
-
-		return left >= right;
-
-	}
-
-	public static
-	boolean notLessThan (
-			long left,
-			long right) {
-
-		return left >= right;
-
-	}
-
-	public static
-	boolean moreThan (
-			int left,
-			int right) {
-
-		return left > right;
-
-	}
-
-	public static
-	boolean moreThan (
-			long left,
-			long right) {
-
-		return left > right;
-
-	}
-
-	public static
-	boolean isZero (
-			int value) {
-
-		return value == 0;
-
-	}
-
-	public static
-	boolean isZero (
-			long value) {
-
-		return value == 0l;
-
-	}
-
-	public static
-	boolean moreThanOne (
-			long value) {
-
-		return value > 1l;
-
-	}
-
-	public static
-	boolean notLessThanZero (
-			int value) {
-
-		return value >= 0;
 
 	}
 
@@ -1235,27 +887,6 @@ class Misc {
 
 	}
 
-	public static <Type>
-	int indexOfRequired (
-			@NonNull List<Type> list,
-			@NonNull Type value) {
-
-		int index =
-			list.indexOf (
-				value);
-
-		if (index < 0) {
-
-			throw new IllegalArgumentException ();
-
-		} else {
-
-			return index;
-
-		}
-
-	}
-
 	public static
 	Class<?> classForNameRequired (
 			@NonNull String className) {
@@ -1328,26 +959,10 @@ class Misc {
 	}
 
 	public static
-	String trim (
+	String stringTrim (
 			@NonNull String source) {
 
 		return source.trim ();
-
-	}
-
-	public static
-	boolean moreThanZero (
-			int value) {
-
-		return value > 0;
-
-	}
-
-	public static
-	boolean moreThanZero (
-			long value) {
-
-		return value > 0;
 
 	}
 

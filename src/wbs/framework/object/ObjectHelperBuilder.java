@@ -1,7 +1,7 @@
 package wbs.framework.object;
 
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.Misc.classForNameRequired;
-import static wbs.framework.utils.etc.Misc.ifElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
@@ -165,26 +165,27 @@ class ObjectHelperBuilder {
 			// parent type
 
 			Model parentModel =
-				ifElse (
+				ifThenElse (
 					model.isRooted (),
 
+				() -> entityHelper.modelsByClass ().get (
+					objectTypeRegistry.rootRecordClass ()),
+
+				() -> ifThenElse (
+					model.parentTypeIsFixed ()
+					&& ! model.isRoot (),
+
 					() -> entityHelper.modelsByClass ().get (
-						objectTypeRegistry.rootRecordClass ()),
+						model.parentClass ()),
 
-					() -> ifElse (
-						model.parentTypeIsFixed ()
-						&& ! model.isRoot (),
+					() -> null
 
-						() -> entityHelper.modelsByClass ().get (
-							model.parentClass ()),
+				)
 
-						() -> null
-
-					)
-				);
+			);
 
 			ObjectTypeEntry parentType =
-				ifElse (
+				ifThenElse (
 					model.parentTypeIsFixed ()
 					&& ! model.isRoot (),
 
@@ -193,7 +194,6 @@ class ObjectHelperBuilder {
 						parentModel.objectName ())),
 
 				() -> null
-
 
 			);
 
@@ -213,7 +213,7 @@ class ObjectHelperBuilder {
 			// dao interface
 
 			Class<?> daoInterface =
-				ifElse (
+				ifThenElse (
 					isNotNull (
 						daoImplementation),
 
@@ -257,14 +257,14 @@ class ObjectHelperBuilder {
 					objectType.getCode ())
 
 				.parentTypeId (
-					ifElse (
+					ifThenElse (
 						isNotNull (
 							parentType),
 						() -> parentType.getId (),
 						() -> null))
 
 				.parentClass (
-					ifElse (
+					ifThenElse (
 						isNotNull (
 							parentType),
 						() -> parentModel.objectClass (),

@@ -1,7 +1,10 @@
 package wbs.applications.imchat.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
+import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
+import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -11,13 +14,12 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
+import lombok.NonNull;
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerDetailTypeRec;
 import wbs.applications.imchat.model.ImChatCustomerDetailValueRec;
@@ -39,10 +41,6 @@ import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
-
-import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
-import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
-import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 
 @PrototypeComponent ("imChatPendingSummaryPart")
 public
@@ -366,14 +364,18 @@ class ImChatPendingSummaryPart
 				" class=\"%h\"",
 				joinWithSpace (
 					presentInstances (
-						Optional.of (
-							classForMessage (
-								historyRequest)),
-						optionalIf (
-							equal (
-								message,
-								historyRequest),
-							"selected"))),
+
+					Optional.of (
+						classForMessage (
+							historyRequest)),
+
+					optionalIf (
+						referenceEqualSafe (
+							message,
+							historyRequest),
+						() -> "selected")
+
+				)),
 				">\n");
 
 			formFieldLogic.outputTableCellsList (

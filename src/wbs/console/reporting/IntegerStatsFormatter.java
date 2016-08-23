@@ -2,8 +2,8 @@ package wbs.console.reporting;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.isZero;
 import static wbs.framework.utils.etc.Misc.mapEntry;
+import static wbs.framework.utils.etc.NumberUtils.equalToZero;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.LinkedHashMap;
@@ -11,15 +11,14 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-
 import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.StringSubstituter;
@@ -71,20 +70,26 @@ class IntegerStatsFormatter
 			@NonNull Object group,
 			@NonNull StatsPeriod period,
 			@NonNull Integer step,
-			@NonNull Optional<Object> value) {
+			@NonNull Optional <Object> objectValueOptional) {
 
 		Instant instant =
 			period.step (
 				step);
 
-		Integer intValue =
-			(Integer)
-			value.or (0);
+		Long value =
+			(Long)
+			objectValueOptional.or (
+				0l);
 
 		// empty cell for missing or zero value
 
-		if (intValue == 0) {
+		if (
+			equalToZero (
+				value)
+		) {
+
 			return "<td></td>\n";
+
 		}
 
 		// simple cell if no link
@@ -96,7 +101,7 @@ class IntegerStatsFormatter
 
 			return stringFormat (
 				"<td style=\"text-align: right\">%h</td>\n",
-				intValue);
+				value);
 
 		}
 
@@ -141,13 +146,14 @@ class IntegerStatsFormatter
 			"%s%h</td>\n",
 
 			Html.magicTd (
-				urlParams.toUrl (targetBase),
+				urlParams.toUrl (
+					targetBase),
 				null,
 				1,
 				" text-align: right;",
 				""),
 
-			intValue);
+			value);
 
 	}
 
@@ -155,15 +161,16 @@ class IntegerStatsFormatter
 	public
 	String formatTotal (
 			@NonNull Object group,
-			@NonNull Optional<Object> value) {
+			@NonNull Optional <Object> objectValueOptional) {
 
-		Integer integerValue =
-			(Integer)
-			value.or (0);
+		Long value =
+			(Long)
+			objectValueOptional.or (
+				0l);
 
 		if (
-			isZero (
-				integerValue)
+			equalToZero (
+				value)
 		) {
 			return "<td></td>";
 		}
@@ -172,7 +179,7 @@ class IntegerStatsFormatter
 			"<td",
 			" style=\"text-align: right\"",
 			">%h</td>\n",
-			integerValue);
+			value);
 
 	}
 

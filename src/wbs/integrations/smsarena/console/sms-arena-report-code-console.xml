@@ -67,8 +67,7 @@
 		<description-field/>
 
 		<enum-field
-			name="messageStatus"
-			helper="messageStatusConsoleHelper"/>
+			name="messageStatus"/>
 
 	</field-set>
 
@@ -80,8 +79,7 @@
 		<description-field/>
 
 		<enum-field
-			name="messageStatus"
-			helper="messageStatusConsoleHelper"/>
+			name="messageStatus"/>
 
 		<text-area-field
 			name="additionalInformation"/>
@@ -98,8 +96,7 @@
 		<description-field/>
 
 		<enum-field
-			name="messageStatus"
-			helper="messageStatusConsoleHelper"/>
+			name="messageStatus"/>
 
 		<text-area-field
 			name="additionalInformation"/>
@@ -114,8 +111,7 @@
 		<description-field/>
 
 		<enum-field
-			name="messageStatus"
-			helper="messageStatusConsoleHelper"/>
+			name="messageStatus"/>
 
 		<text-area-field
 			name="additionalInformation"/>

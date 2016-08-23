@@ -1,12 +1,16 @@
 package wbs.clients.apn.chat.date.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.LogicUtils.allOf;
+import static wbs.framework.utils.etc.LogicUtils.equalSafe;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.min;
+import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.framework.utils.etc.NumberUtils.lessThanOne;
 import static wbs.framework.utils.etc.NumberUtils.roundToIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -199,7 +203,7 @@ class ChatDateDaemon
 		}
 
 		ChatData chatData =
-			optionalRequired (
+			optionalGetRequired (
 				chatDataOptional);
 
 		// output some info
@@ -527,17 +531,28 @@ class ChatDateDaemon
 	
 					chatData.numOnline ++;
 	
-					log.info ("Ignoring " + chatUser.getId () + " (online)");
+					log.info (
+						stringFormat (
+							"Ignoring %s (online)",
+							chatUser.getId ()));
 	
 					continue;
 	
 				}
 	
-				if (
-					chatUser.getDateDailyDate () != null
-					&& equal (chatUser.getDateDailyDate (), today)
-					&& chatUser.getDateDailyCount () < 1
-				) {
+				if (allOf (
+
+					() -> isNotNull (
+						chatUser.getDateDailyDate ()),
+
+					() -> equalSafe (
+						chatUser.getDateDailyDate (),
+						today),
+
+					() -> lessThanOne (
+						chatUser.getDateDailyCount ())
+
+				)) {
 	
 					chatData.numSent ++;
 	
@@ -883,8 +898,13 @@ class ChatDateDaemon
 
 		// check its not us
 
-		if (equal (thisUser.getId (), thatUserInfo.id))
+		if (
+			integerEqualSafe (
+				thisUser.getId (),
+				thatUserInfo.id)
+		) {
 			return null;
+		}
 
 		// check they're not blocked
 

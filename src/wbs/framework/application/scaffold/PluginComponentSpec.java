@@ -14,16 +14,24 @@ import wbs.framework.data.annotations.DataParent;
 public
 class PluginComponentSpec {
 
+	/*
+	@DataAncestor
+	@Getter @Setter
+	ProjectSpec project;
+	*/
+
 	@DataAncestor
 	@Getter @Setter
 	PluginSpec plugin;
 
 	@DataParent
 	@Getter @Setter
-	PluginModelsSpec models;
+	PluginLayerSpec layer;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "class",
+		required = true)
 	@Getter @Setter
-	String name;
+	String className;
 
 }

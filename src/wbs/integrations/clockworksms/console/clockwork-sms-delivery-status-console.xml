@@ -63,8 +63,7 @@
 		<description-field/>
 
 		<enum-field
-			name="messageStatus"
-			helper="messageStatusConsoleHelper"/>
+			name="messageStatus"/>
 
 		<text-field
 			name="theirDescription"/>
@@ -80,8 +79,7 @@
 		<description-field/>
 
 		<enum-field
-			name="messageStatus"
-			helper="messageStatusConsoleHelper"/>
+			name="messageStatus"/>
 
 		<text-field
 			name="theirDescription"/>
@@ -103,8 +101,7 @@
 		<deleted-field/>
 
 		<enum-field
-			name="messageStatus"
-			helper="messageStatusConsoleHelper"/>
+			name="messageStatus"/>
 
 		<text-field
 			name="theirDescription"/>
@@ -123,8 +120,7 @@
 		<deleted-field/>
 
 		<enum-field
-			name="messageStatus"
-			helper="messageStatusConsoleHelper"/>
+			name="messageStatus"/>
 
 		<text-field
 			name="theirDescription"/>

@@ -3,7 +3,7 @@
  */
 package wbs.console.param;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 import static wbs.framework.utils.etc.TimeUtils.instantToDateNullSafe;
 
 import java.util.Date;
@@ -47,8 +47,16 @@ class TimestampToParamChecker
 				? param.trim ()
 				: "";
 
-		if (equal ("", param) && ! required)
+		if (
+
+			! required
+
+			&& stringIsEmpty (
+				param)
+
+		) {
 			return null;
+		}
 
 		try {
 

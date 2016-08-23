@@ -5,11 +5,11 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import org.joda.time.Instant;
 import org.joda.time.Interval;
+
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Accessors (fluent = true)
 @Data
@@ -21,10 +21,10 @@ class StatsPeriod {
 	Instant startTime;
 	Instant endTime;
 
-	Integer offset;
+	Long offset;
 
-	List<Instant> steps =
-		new ArrayList<Instant> ();
+	List <Instant> steps =
+		new ArrayList<> ();
 
 	public
 	Interval toInterval () {

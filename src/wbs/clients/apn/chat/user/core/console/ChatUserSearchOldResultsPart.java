@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.sum;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -17,12 +17,12 @@ import javax.inject.Named;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.clients.apn.chat.core.console.ChatConsoleLogic;
-import wbs.clients.apn.chat.core.console.ChatUserCreditModeConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
+import wbs.console.helper.EnumConsoleHelper;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
@@ -46,8 +46,8 @@ class ChatUserSearchOldResultsPart
 	@Inject
 	ChatConsoleLogic chatConsoleLogic;
 
-	@Inject
-	ChatUserCreditModeConsoleHelper chatUserCreditModeConsoleHelper;
+	@Inject @Named
+	EnumConsoleHelper <?> chatUserCreditModeConsoleHelper;
 
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
@@ -396,7 +396,7 @@ class ChatUserSearchOldResultsPart
 				"<td>%h</td>\n",
 				chatUser.getLastAction () != null
 					? timeFormatter.dateStringShort (
-						chatUserLogic.timezone (
+						chatUserLogic.getTimezone (
 							chatUser),
 						chatUser.getLastAction ())
 					: "-");

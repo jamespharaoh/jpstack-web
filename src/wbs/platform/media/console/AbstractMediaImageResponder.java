@@ -1,6 +1,6 @@
 package wbs.platform.media.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 
 import java.io.IOException;
 
@@ -66,7 +66,7 @@ class AbstractMediaImageResponder
 				"rotate");
 
 		if (
-			equal (
+			stringEqual (
 				rotate,
 				"90")
 		) {
@@ -80,7 +80,7 @@ class AbstractMediaImageResponder
 					getMimeType (media));
 
 		} else if (
-			equal (
+			stringEqual (
 				rotate,
 				"180")
 		) {
@@ -94,7 +94,7 @@ class AbstractMediaImageResponder
 					getMimeType (media));
 
 		} else if (
-			equal (
+			stringEqual (
 				rotate,
 				"270")
 		) {

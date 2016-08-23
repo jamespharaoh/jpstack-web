@@ -1,6 +1,6 @@
 package wbs.framework.entity.generate;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import wbs.framework.application.annotations.PrototypeComponent;

@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -48,13 +48,13 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 
 	// state
 
-	AdvancedCache<Pair<Long,String>,RecordType> parentIdAndCodeCache;
+	AdvancedCache <Pair <Long, String>, RecordType> parentIdAndCodeCache;
 
 	// life cycle
 
 	@Override
 	public
-	ObjectHelperCodeImplementation<RecordType> setup () {
+	ObjectHelperCodeImplementation <RecordType> setup () {
 
 		// parent id and code
 
@@ -64,7 +64,11 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 		)) { 
 
 			parentIdAndCodeCache =
-				new AdvancedCache.IdBuilder <Pair<Long,String>,Long,RecordType> ()
+				new AdvancedCache.IdBuilder <
+					Pair <Long, String>,
+					Long,
+					RecordType
+				> ()
 
 				.dummy (! allOf (				
 					() -> model.parentField ().cacheable (),
@@ -179,7 +183,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 
 		}
 
-		return optionalRequired (
+		return optionalGetRequired (
 			recordOptional);
 
 	}

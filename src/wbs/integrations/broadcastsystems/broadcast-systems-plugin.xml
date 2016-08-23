@@ -7,13 +7,13 @@
 	</models>
 
 	<layer name="api">
-		<bean class="api.BroadcastSystemsApiServletModule"/>
-		<bean class="api.BroadcastSystemsReportFile"/>
+		<component class="api.BroadcastSystemsApiServletModule"/>
+		<component class="api.BroadcastSystemsReportFile"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.BroadcastSystemsSender1"/>
-		<bean class="daemon.BroadcastSystemsSender2"/>
+		<component class="daemon.BroadcastSystemsSender1"/>
+		<component class="daemon.BroadcastSystemsSender2"/>
 	</layer>
 
 </plugin>

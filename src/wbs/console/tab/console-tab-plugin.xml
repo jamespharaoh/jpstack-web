@@ -3,9 +3,9 @@
 	package="wbs.console.tab">
 
 	<layer name="console">
-		<bean class="ConsoleContextTab"/>
-		<bean class="TabbedResponder"/>
-		<bean class="TabContextResponder"/>
+		<component class="ConsoleContextTab"/>
+		<component class="TabbedResponder"/>
+		<component class="TabContextResponder"/>
 	</layer>
 
 </plugin>

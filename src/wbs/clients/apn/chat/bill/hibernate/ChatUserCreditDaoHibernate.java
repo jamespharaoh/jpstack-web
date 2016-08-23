@@ -4,14 +4,13 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import java.util.List;
 
-import lombok.NonNull;
-
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Interval;
 
+import lombok.NonNull;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditDao;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditSearch;
@@ -62,7 +61,7 @@ class ChatUserCreditDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			@NonNull ChatUserCreditSearch search) {
 
 		Criteria criteria =
@@ -131,7 +130,7 @@ class ChatUserCreditDaoHibernate
 
 		return findMany (
 			"search (search)",
-			Integer.class,
+			Long.class,
 			criteria);
 
 	}

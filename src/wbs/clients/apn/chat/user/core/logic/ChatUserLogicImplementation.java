@@ -1,14 +1,21 @@
 package wbs.clients.apn.chat.user.core.logic;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.framework.utils.etc.NumberUtils.notLessThan;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromJava;
+import static wbs.framework.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringInSafe;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.framework.utils.etc.TimeUtils.calculateAgeInYears;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 import static wbs.framework.utils.etc.TimeUtils.localDate;
 
@@ -196,7 +203,7 @@ class ChatUserLogicImplementation
 	public
 	void logoff (
 			@NonNull ChatUserRec chatUser,
-			boolean automatic) {
+			@NonNull Boolean automatic) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -269,7 +276,7 @@ class ChatUserLogicImplementation
 			chatUser.getChat ();
 
 		DateTimeZone timezone =
-			timezone (
+			getTimezone (
 				chatUser);
 
 		LocalDate today =
@@ -391,7 +398,7 @@ class ChatUserLogicImplementation
 			@NonNull Optional<Long> thisCategoryId,
 			@NonNull Gender thatGender,
 			@NonNull Orient thatOrient,
-			@NonNull Optional<Long> thatCategoryId) {
+			@NonNull Optional <Long> thatCategoryId) {
 
 		if (
 
@@ -403,7 +410,7 @@ class ChatUserLogicImplementation
 				isNotPresent (
 					thatCategoryId)
 
-				|| notEqual (
+				|| integerNotEqualSafe (
 					thisCategoryId.get (),
 					thatCategoryId.get ())
 
@@ -416,7 +423,7 @@ class ChatUserLogicImplementation
 			return false;
 
 		} else if (
-			equal (
+			enumEqualSafe (
 				thisGender,
 				thatGender)
 		) {
@@ -491,18 +498,18 @@ class ChatUserLogicImplementation
 	 */
 	@Override
 	public
-	Collection<ChatUserRec> getNearestUsers (
+	Collection <ChatUserRec> getNearestUsers (
 			@NonNull ChatUserRec thisUser,
-			@NonNull Collection<ChatUserRec> thoseUsers,
-			int numToFind) {
+			@NonNull Collection <ChatUserRec> thoseUsers,
+			@NonNull Long numToFind) {
 
-		Collection<UserDistance> userDistances =
+		Collection <UserDistance> userDistances =
 			getUserDistances (
 				thisUser,
 				thoseUsers);
 
-		Set<ChatUserRec> ret =
-			new HashSet<ChatUserRec> ();
+		Set <ChatUserRec> ret =
+			new HashSet<> ();
 
 		for (UserDistance userDistance
 				: userDistances) {
@@ -804,10 +811,10 @@ class ChatUserLogicImplementation
 	ChatUserImageRec setPhoto (
 			@NonNull ChatUserRec chatUser,
 			@NonNull byte[] data,
-			@NonNull Optional<String> filenameOptional,
-			@NonNull Optional<String> mimeType,
-			@NonNull Optional<MessageRec> message,
-			boolean append) {
+			@NonNull Optional <String> filenameOptional,
+			@NonNull Optional <String> mimeType,
+			@NonNull Optional <MessageRec> message,
+			@NonNull Boolean append) {
 
 		// create media
 
@@ -834,48 +841,46 @@ class ChatUserLogicImplementation
 
 	@Override
 	public
-	ChatUserImageRec setPhotoFromMessage (
+	Optional <ChatUserImageRec> setPhotoFromMessage (
 			@NonNull ChatUserRec chatUser,
 			@NonNull MessageRec message,
-			boolean append) {
+			@NonNull Boolean append) {
 
-		MediaRec media =
+		return optionalMapRequired (
+
 			findPhoto (
-				message);
-
-		if (media == null)
-			return null;
-
-		return setPhoto (
-			chatUser,
-			media,
-			Optional.of (
 				message),
-			append);
+
+			media ->
+				setPhoto (
+					chatUser,
+					media,
+					Optional.of (
+						message),
+					append)
+
+		);
 
 	}
 
 	@Override
 	public
-	MediaRec findPhoto (
+	Optional <MediaRec> findPhoto (
 			@NonNull MessageRec message) {
 
-		// look for a valid jpeg or gif
+		return optionalFromJava (
+			message.getMedias ().stream ()
 
-		for (MediaRec media
-				: message.getMedias ()) {
+			.filter (
+				media ->
+					stringInSafe (
+						media.getMediaType ().getMimeType (),
+						"image/jpeg",
+						"image/gif"))
 
-			if (! in (
-					media.getMediaType ().getMimeType (),
-					"image/jpeg",
-					"image/gif"))
-				continue;
+			.findFirst ()
 
-			return media;
-
-		}
-
-		return null;
+		);
 
 	}
 
@@ -885,7 +890,7 @@ class ChatUserLogicImplementation
 			@NonNull ChatUserRec chatUser,
 			@NonNull MediaRec fullMedia,
 			@NonNull MessageRec message,
-			boolean append) {
+			@NonNull Boolean append) {
 
 		// resample
 
@@ -915,10 +920,10 @@ class ChatUserLogicImplementation
 	void setVideo (
 			@NonNull ChatUserRec chatUser,
 			@NonNull byte[] data,
-			@NonNull Optional<String> filenameOptional,
-			@NonNull Optional<String> mimeTypeOptional,
+			@NonNull Optional <String> filenameOptional,
+			@NonNull Optional <String> mimeTypeOptional,
 			@NonNull MessageRec message,
-			boolean append) {
+			@NonNull Boolean append) {
 
 		// default mime type
 
@@ -985,7 +990,7 @@ class ChatUserLogicImplementation
 			@NonNull ChatUserRec chatUser,
 			@NonNull byte[] data,
 			@NonNull MessageRec message,
-			boolean append) {
+			@NonNull Boolean append) {
 
 		// resample
 
@@ -1017,7 +1022,7 @@ class ChatUserLogicImplementation
 			@NonNull String filename,
 			@NonNull String mimeType,
 			@NonNull Optional<MessageRec> message,
-			boolean append) {
+			@NonNull Boolean append) {
 
 		switch (type) {
 
@@ -1074,7 +1079,7 @@ class ChatUserLogicImplementation
 	boolean setVideo (
 			@NonNull ChatUserRec chatUser,
 			@NonNull MessageRec message,
-			boolean append) {
+			@NonNull Boolean append) {
 
 		for (MediaRec media
 				: message.getMedias ()) {
@@ -1345,7 +1350,7 @@ class ChatUserLogicImplementation
 			database.currentTransaction ();
 
 		DateTimeZone timezone =
-			timezone (
+			getTimezone (
 				chatUser);
 
 		if (chatUser.getAgeChecked ())
@@ -1354,21 +1359,11 @@ class ChatUserLogicImplementation
 		if (chatUser.getDob () == null)
 			return true;
 
-		Instant eighteenYearsAgo =
-			transaction
-				.now ()
-				.toDateTime (timezone)
-				.minusYears (18)
-				.toInstant ();
-
-		Instant dateOfBirth =
-			chatUser
-				.getDob ()
-				.toDateTimeAtStartOfDay (timezone)
-				.toInstant ();
-
-		return dateOfBirth.isBefore (
-			eighteenYearsAgo);
+		return notLessThan (
+			getAgeInYears (
+				chatUser,
+				transaction.now ()),
+			18l);
 
 	}
 
@@ -1411,10 +1406,13 @@ class ChatUserLogicImplementation
 				String prefix =
 					chatSchemeMap.getPrefix ();
 
-				if (! equal (
+				if (
+					stringNotEqualSafe (
 						prefix,
-						number.subSequence (0, prefix.length ())))
+						number.subSequence (0, prefix.length ()))
+				) {
 					continue;
+				}
 
 				chatScheme =
 					chatSchemeMap.getTargetChatScheme ();
@@ -1468,7 +1466,7 @@ class ChatUserLogicImplementation
 			isNotNull (
 				chatAffiliate.getCategory ())
 
-			&& notEqual (
+			&& referenceNotEqualSafe (
 				chatUser.getCategory (),
 				chatAffiliate.getCategory ())
 
@@ -1577,10 +1575,13 @@ class ChatUserLogicImplementation
 				: chatUser.getChatUserImages ()
 		) {
 
-			if (! equal (
+			if (
+				enumNotEqualSafe (
 					chatUserImage.getType (),
-					type))
+					type)
+			) {
 				continue;
+			}
 
 			if (chatUserImage.getStatus ()
 					!= ChatUserInfoStatus.moderatorPending)
@@ -1659,7 +1660,7 @@ class ChatUserLogicImplementation
 
 	@Override
 	public
-	DateTimeZone timezone (
+	DateTimeZone getTimezone (
 			@NonNull ChatUserRec chatUser) {
 
 		ChatSchemeRec chatScheme =
@@ -1832,6 +1833,20 @@ class ChatUserLogicImplementation
 		}
 
 		return false;
+
+	}
+
+	@Override
+	public 
+	long getAgeInYears (
+			@NonNull ChatUserRec chatUser,
+			@NonNull Instant now) {
+
+		return calculateAgeInYears (
+			chatUser.getDob (),
+			now,
+			getTimezone (
+				chatUser));
 
 	}
 

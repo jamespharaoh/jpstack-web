@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import javax.inject.Inject;
 
@@ -106,7 +106,7 @@ class ChatUserAdminNameAction
 					"chatUserId"));
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				chatUser.getName (),
 				name)
 		) {

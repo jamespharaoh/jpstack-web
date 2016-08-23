@@ -1,6 +1,6 @@
 package wbs.platform.updatelog.logic;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.HashMap;
@@ -111,10 +111,14 @@ class UpdateManager {
 
 		// if the version hasn't changed don't bother
 
-		if (equal (
+		if (
+			integerEqualSafe (
 				masterVersion,
-				newMasterVersion))
+				newMasterVersion)
+		) {
 			return;
+		}
+			
 
 		// remember the new version
 
@@ -168,10 +172,13 @@ class UpdateManager {
 
 		// if the version hasn't changed don't bother
 
-		if (equal (
+		if (
+			integerEqualSafe (
 				stuff1.version,
-				newSecondaryVersion))
+				newSecondaryVersion)
+		) {
 			return;
+		}
 
 		// remember the new version
 
@@ -245,10 +252,13 @@ class UpdateManager {
 
 		// if the version hasn't changed don't bother
 
-		if (equal (
+		if (
+			integerEqualSafe (
 				stuff.version,
-				newTertiaryVersion))
+				newTertiaryVersion)
+		) {
 			return stuff.version;
+		}
 
 		// remember the new version
 

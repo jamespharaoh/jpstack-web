@@ -1,10 +1,12 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.LogicUtils.equalSafe;
 import static wbs.framework.utils.etc.Misc.eitherGetLeft;
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isError;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.requiredValue;
+import static wbs.framework.utils.etc.NumberUtils.equalToOne;
+import static wbs.framework.utils.etc.NumberUtils.equalToTwo;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringSplitColon;
@@ -105,9 +107,8 @@ class HiddenFormField<Container,Generic,Native>
 				viewPriv);
 
 		if (
-			equal (
-				privParts.size (),
-				1)
+			equalToOne (
+				privParts.size ())
 		) {
 
 			String privCode =
@@ -119,9 +120,8 @@ class HiddenFormField<Container,Generic,Native>
 				privCode);
 
 		} else if (
-			equal (
-				privParts.size (),
-				2)
+			equalToTwo (
+				privParts.size ())
 		) {
 
 			String delegatePath =
@@ -299,30 +299,30 @@ class HiddenFormField<Container,Generic,Native>
 
 		// get the current value, if it is the same, do nothing
 
-		Optional<Native> oldNativeValue =
+		Optional <Native> oldNativeValue =
 			requiredValue (
 				accessor.read (
 					container));
 
-		Optional<Generic> oldGenericValue =
+		Optional <Generic> oldGenericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
 					oldNativeValue));
 
 		if (
-			equal (
+			equalSafe (
 				oldGenericValue,
 				newGenericValue)
 		) {
 
-			return new UpdateResult<Generic,Native> ()
+			return new UpdateResult <Generic, Native> ()
 
 				.updated (
 					false)
 
 				.error (
-					Optional.<String>absent ());
+					Optional.absent ());
 
 		}
 

@@ -19,28 +19,28 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ChatMessageLogicImplementation"/>
-		<bean class="logic.ChatSendLogicImplementation"/>
+		<component class="logic.ChatMessageLogicImplementation"/>
+		<component class="logic.ChatSendLogicImplementation"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.ChatMessagePendingFormAction"/>
-		<bean class="console.ChatMessagePendingFormResponder"/>
-		<bean class="console.ChatMessageQueueConsolePlugin"/>
-		<bean class="console.ChatMonitorInboxAddNoteAction"/>
-		<bean class="console.ChatMonitorInboxAlarmAction"/>
-		<bean class="console.ChatMonitorInboxNamedNoteUpdateAction"/>
-		<bean class="console.ChatMonitorInboxFormAction"/>
-		<bean class="console.ChatMonitorInboxFormResponder"/>
-		<bean class="console.ChatMonitorInboxQueueConsolePlugin"/>
-		<bean class="console.ChatMonitorInboxSummaryPart"/>
-		<bean class="console.ChatMonitorInboxUpdateNoteAction"/>
-		<bean class="console.ChatUserInitiationLogConsoleHooks"/>
-		<bean class="console.ChatUserInitiationReasonConsoleHelper"/>
+		<component class="console.ChatMessagePendingFormAction"/>
+		<component class="console.ChatMessagePendingFormResponder"/>
+		<component class="console.ChatMessageQueueConsolePlugin"/>
+		<component class="console.ChatMonitorInboxAddNoteAction"/>
+		<component class="console.ChatMonitorInboxAlarmAction"/>
+		<component class="console.ChatMonitorInboxNamedNoteUpdateAction"/>
+		<component class="console.ChatMonitorInboxFormAction"/>
+		<component class="console.ChatMonitorInboxFormResponder"/>
+		<component class="console.ChatMonitorInboxQueueConsolePlugin"/>
+		<component class="console.ChatMonitorInboxSummaryPart"/>
+		<component class="console.ChatMonitorInboxUpdateNoteAction"/>
+		<component class="console.ChatUserInitiationLogConsoleHooks"/>
+		<component class="console.ChatUserInitiationReasonConsoleHelper"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.ChatChatCommand"/>
+		<component class="daemon.ChatChatCommand"/>
 	</layer>
 
 	<console-modules>

@@ -3,8 +3,8 @@
 	package="wbs.framework.application.config">
 
 	<layer name="config">
-		<bean class="WbsConfigFactory"/>
-		<bean class="GenericConfigLoader"/>
+		<component class="WbsConfigFactory"/>
+		<component class="GenericConfigLoader"/>
 	</layer>
 
 </plugin>

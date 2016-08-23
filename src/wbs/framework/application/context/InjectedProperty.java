@@ -19,11 +19,11 @@ class InjectedProperty {
 
 	@DataParent
 	@Getter @Setter
-	ComponentDefinition beanDefinition;
+	ComponentDefinition componentDefinition;
 
 	@DataAttribute
 	@Getter @Setter
-	Class<?> fieldDeclaringClass;
+	Class <?> fieldDeclaringClass;
 
 	@DataAttribute
 	@Getter @Setter
@@ -56,16 +56,16 @@ class InjectedProperty {
 
 	@DataChildren
 	@Getter @Setter
-	List<String> targetBeanNames =
-		new ArrayList<String> ();
+	List <String> targetComponentNames =
+		new ArrayList<> ();
 
 	public static
 	enum CollectionType {
 
 		single,
 		list,
-		beanNameMap,
-		beanClassMap;
+		componentNameMap,
+		componentClassMap;
 
 	}
 

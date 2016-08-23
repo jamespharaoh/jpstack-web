@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.data.annotations.DataAttribute;
@@ -30,7 +31,7 @@ class ComponentDefinition {
 
 	@DataAttribute
 	@Getter @Setter
-	Class <?> beanClass;
+	Class <?> componentClass;
 
 	@DataAttribute
 	@Getter @Setter
@@ -46,28 +47,28 @@ class ComponentDefinition {
 
 	@DataChildren
 	@Getter @Setter
-	Map<String,Object> valueProperties =
-		new LinkedHashMap<String,Object> ();
+	Map <String, Object> valueProperties =
+		new LinkedHashMap<> ();
 
 	@DataChildren
 	@Getter @Setter
-	Map<String,String> referenceProperties =
-		new LinkedHashMap<String,String> ();
+	Map <String, String> referenceProperties =
+		new LinkedHashMap<> ();
 
 	@DataChildren
 	@Getter @Setter
-	List<InjectedProperty> injectedProperties =
-		new ArrayList<InjectedProperty> ();
+	List <InjectedProperty> injectedProperties =
+		new ArrayList<> ();
 
 	@DataChildren
 	@Getter @Setter
-	Set<String> orderedDependencies =
-		new HashSet<String> ();
+	Set <String> orderedDependencies =
+		new HashSet<> ();
 
 	public
 	ComponentDefinition addValueProperty (
-			String name,
-			Object value) {
+			@NonNull String name,
+			@NonNull Object value) {
 
 		valueProperties.put (
 			name,
@@ -79,12 +80,12 @@ class ComponentDefinition {
 
 	public
 	ComponentDefinition addReferenceProperty (
-			String name,
-			String referencedBeanName) {
+			@NonNull String name,
+			@NonNull String referencedComponentName) {
 
 		referenceProperties.put (
 			name,
-			referencedBeanName);
+			referencedComponentName);
 
 		return this;
 

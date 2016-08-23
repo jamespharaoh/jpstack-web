@@ -12,13 +12,13 @@
 	</models>
 
 	<layer name="console">
-		<bean class="console.ChatAffiliateComparePart"/>
-		<bean class="console.ChatAffiliateCreateOldAction"/>
-		<bean class="console.ChatAffiliateCreateOldPart"/>
-		<bean class="console.ChatAffiliateKeywordsCreateAction"/>
-		<bean class="console.ChatAffiliateKeywordsCreatePart"/>
-		<bean class="console.ChatAffiliateKeywordsListPart"/>
-		<bean class="console.ChatAffiliateUsersPart"/>
+		<component class="console.ChatAffiliateComparePart"/>
+		<component class="console.ChatAffiliateCreateOldAction"/>
+		<component class="console.ChatAffiliateCreateOldPart"/>
+		<component class="console.ChatAffiliateKeywordsCreateAction"/>
+		<component class="console.ChatAffiliateKeywordsCreatePart"/>
+		<component class="console.ChatAffiliateKeywordsListPart"/>
+		<component class="console.ChatAffiliateUsersPart"/>
 	</layer>
 
 	<console-modules>

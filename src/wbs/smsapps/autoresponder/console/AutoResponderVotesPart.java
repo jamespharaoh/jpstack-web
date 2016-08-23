@@ -1,6 +1,6 @@
 package wbs.smsapps.autoresponder.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.simplify;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 

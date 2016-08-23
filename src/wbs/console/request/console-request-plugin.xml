@@ -3,9 +3,9 @@
 	package="wbs.console.request">
 
 	<layer name="console">
-		<bean class="ConsoleRequestContextImplementation"/>
-		<bean class="CryptorFactory"/>
-		<bean class="CryptorImplementation"/>
+		<component class="ConsoleRequestContextImplementation"/>
+		<component class="CryptorFactory"/>
+		<component class="CryptorImplementation"/>
 	</layer>
 
 </plugin>

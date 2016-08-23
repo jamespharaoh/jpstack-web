@@ -11,7 +11,7 @@ interface SubscriptionNumberDaoMethods {
 			SubscriptionRec subscription,
 			NumberRec number);
 
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			SubscriptionNumberSearch search);
 
 }

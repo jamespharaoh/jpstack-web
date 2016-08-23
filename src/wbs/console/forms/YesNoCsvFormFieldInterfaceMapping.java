@@ -1,23 +1,22 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.booleanEqual;
 import static wbs.framework.utils.etc.Misc.errorResult;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 
 import java.util.Map;
-
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import com.google.common.base.Optional;
 
 import fj.data.Either;
-
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("yesNoCsvFormFieldInterfaceMapping")
@@ -34,44 +33,45 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Either<Optional<Boolean>,String> interfaceToGeneric (
+	Either <Optional <Boolean>, String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceOptional) {
+
+		String interfaceValue =
+			optionalGetRequired (
+				interfaceOptional);
 
 		if (
-			equal (
-				optionalRequired (
-					interfaceValue),
+			stringEqual (
+				interfaceValue,
 				"yes")
 		) {
 
 			return successResult (
-				Optional.<Boolean>of (
+				Optional.of (
 					true));
 
 		} else if (
-			equal (
-				optionalRequired (
-					interfaceValue),
+			stringEqual (
+				interfaceValue,
 				"no")
 		) {
 
 			return successResult (
-				Optional.<Boolean>of (
+				Optional.of (
 					false));
 
 		} else if (
-			equal (
-				optionalRequired (
-					interfaceValue),
+			stringEqual (
+				interfaceValue,
 				"")
 		) {
 
 			if (nullable ()) {
 
 				return successResult (
-					Optional.<Boolean>absent ());
+					Optional.absent ());
 
 			} else {
 
@@ -100,10 +100,10 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Either<Optional<String>,String> genericToInterface (
+	Either <Optional <String>, String> genericToInterface (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Boolean> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Boolean> genericValue) {
 
 		if (
 			isNotPresent (
@@ -111,29 +111,29 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 		) {
 
 			return successResult (
-				Optional.<String>of (
+				Optional.of (
 					""));
 
 		} else if (
-			equal (
-				optionalRequired (
+			booleanEqual (
+				optionalGetRequired (
 					genericValue),
 				true)
 		) {
 
 			return successResult (
-				Optional.<String>of (
+				Optional.of (
 					"yes"));
 
 		} else if (
-			equal (
-				optionalRequired (
+			booleanEqual (
+				optionalGetRequired (
 					genericValue),
 				false)
 		) {
 
 			return successResult (
-				Optional.<String>of (
+				Optional.of (
 					"no"));
 
 		} else {

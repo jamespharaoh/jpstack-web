@@ -1,11 +1,11 @@
 package wbs.framework.schema.helper;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.Misc.classForName;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.sql.Types;
 import java.util.Date;
@@ -14,11 +14,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-
-import lombok.Cleanup;
-import lombok.Getter;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.hibernate.type.Type;
 import org.hibernate.usertype.CompositeUserType;
@@ -29,6 +24,10 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
+import lombok.Getter;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -37,7 +36,7 @@ import wbs.framework.application.scaffold.PluginEnumTypeSpec;
 import wbs.framework.application.scaffold.PluginManager;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.hibernate.EnumUserType;
-import wbs.framework.logging.TaskLog;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @Log4j
@@ -60,10 +59,10 @@ class SchemaTypesHelperImplementation
 	// properties
 
 	@Getter
-	Map<Class<?>,List<String>> fieldTypeNames;
+	Map <Class <?>, List <String>> fieldTypeNames;
 
 	@Getter
-	Map<String,List<String>> enumTypes;
+	Map <String, List <String>> enumTypes;
 
 	// implementation
 
@@ -77,24 +76,24 @@ class SchemaTypesHelperImplementation
 
 	void initTypeNames () {
 
-		TaskLog taskLog =
-			new TaskLog ()
-				.log (log);
+		TaskLogger taskLog =
+			new TaskLogger (
+				log);
 
-		ImmutableMap.Builder<Class<?>,List<String>> fieldTypeNamesBuilder =
-			ImmutableMap.<Class<?>,List<String>>builder ();
+		ImmutableMap.Builder <Class <?>, List <String>> fieldTypeNamesBuilder =
+			ImmutableMap.builder ();
 
-		ImmutableMap.Builder<String,List<String>> enumTypesBuilder =
-			ImmutableMap.<String,List<String>>builder ();
+		ImmutableMap.Builder <String, List <String>> enumTypesBuilder =
+			ImmutableMap.builder ();
 
 		for (
-			Map.Entry<Class<?>,String> entry
+			Map.Entry <Class <?>, String> entry
 				: builtinFieldTypeNames.entrySet ()
 		) {
 
 			fieldTypeNamesBuilder.put (
 				entry.getKey (),
-				ImmutableList.<String>of (
+				ImmutableList.of (
 					entry.getValue ()));
 
 		}
@@ -135,12 +134,12 @@ class SchemaTypesHelperImplementation
 
 		}
 
-		if (taskLog.errors () > 0) {
+		if (taskLog.errors ()) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Aborting due to %s errors",
-					taskLog.errors ()));
+					taskLog.errorCount ()));
 
 		}
 
@@ -154,7 +153,7 @@ class SchemaTypesHelperImplementation
 
 	@SuppressWarnings ({ "unchecked", "rawtypes" })
 	void initEnumType (
-			TaskLog taskLog,
+			TaskLogger taskLog,
 			ImmutableMap.Builder<Class<?>,List<String>> fieldTypeNamesBuilder,
 			ImmutableMap.Builder<String,List<String>> enumTypesBuilder,
 			PluginEnumTypeSpec enumType) {
@@ -182,7 +181,7 @@ class SchemaTypesHelperImplementation
 
 		} catch (ClassNotFoundException exception) {
 
-			taskLog.error (
+			taskLog.errorFormat (
 				"No such class %s",
 				enumClassName);
 
@@ -235,7 +234,7 @@ class SchemaTypesHelperImplementation
 	}
 
 	void initCustomType (
-			TaskLog taskLog,
+			TaskLogger taskLog,
 			ImmutableMap.Builder<Class<?>,List<String>> fieldTypeNamesBuilder,
 			ImmutableMap.Builder<String,List<String>> enumTypesBuilder,
 			PluginCustomTypeSpec customType) {
@@ -272,7 +271,7 @@ class SchemaTypesHelperImplementation
 				objectClassOptional)
 		) {
 
-			taskLog.error (
+			taskLog.errorFormat (
 				"No such class %s",
 				objectClassName);
 
@@ -294,7 +293,7 @@ class SchemaTypesHelperImplementation
 				helperClassOptional)
 		) {
 
-			taskLog.error (
+			taskLog.errorFormat (
 				"No such class %s",
 				helperClassName);
 
@@ -327,7 +326,7 @@ class SchemaTypesHelperImplementation
 
 		} catch (Exception exception) {
 
-			taskLog.error (
+			taskLog.errorFormatException (
 				exception,
 				"Error instantiating %s",
 				helperClass.getName ());
@@ -353,7 +352,7 @@ class SchemaTypesHelperImplementation
 
 			if (typeName == null) {
 
-				taskLog.error (
+				taskLog.errorFormat (
 					"Don't know how to handle sql type %s for %s",
 					enumHelper.sqlType (),
 					helper.getClass ().getName ());
@@ -411,7 +410,7 @@ class SchemaTypesHelperImplementation
 
 				if (typeName == null) {
 
-					taskLog.error (
+					taskLog.errorFormat (
 						"Don't know how to handle sql type %s for %s",
 						propertyType.getReturnedClass (),
 						helper.getClass ().getName ());
@@ -433,7 +432,7 @@ class SchemaTypesHelperImplementation
 
 		}
 
-		taskLog.error (
+		taskLog.errorFormat (
 			"Don't know how to handle %s",
 			helper.getClass ());
 
@@ -441,8 +440,8 @@ class SchemaTypesHelperImplementation
 
 	}
 
-	Map<Class<?>,String> builtinFieldTypeNames =
-		ImmutableMap.<Class<?>,String>builder ()
+	Map <Class <?>, String> builtinFieldTypeNames =
+		ImmutableMap.<Class <?>, String> builder ()
 
 		.put (
 			Boolean.class,
@@ -486,8 +485,8 @@ class SchemaTypesHelperImplementation
 
 		.build ();
 
-	Map<Integer,String> builtinSqlTypeNames =
-		ImmutableMap.<Integer,String>builder ()
+	Map <Integer, String> builtinSqlTypeNames =
+		ImmutableMap.<Integer, String> builder ()
 
 		.put (
 			Types.VARCHAR,
@@ -500,6 +499,10 @@ class SchemaTypesHelperImplementation
 		.put (
 			Types.INTEGER,
 			"int")
+
+		.put (
+			Types.BIGINT,
+			"bigint")
 
 		.build ();
 

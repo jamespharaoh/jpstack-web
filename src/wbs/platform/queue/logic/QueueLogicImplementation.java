@@ -1,9 +1,9 @@
 package wbs.platform.queue.logic;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -106,8 +106,9 @@ class QueueLogicImplementation
 		// sanity check
 
 		if (
-			notEqual (
-				objectManager.getObjectTypeId (refObject),
+			integerNotEqualSafe (
+				objectManager.getObjectTypeId (
+					refObject),
 				queueType.getRefType ().getId ())
 		) {
 
@@ -236,7 +237,7 @@ class QueueLogicImplementation
 		// sanity check
 
 		if (
-			notEqual (
+			integerNotEqualSafe (
 				objectManager.getObjectTypeId (
 					object),
 				queueType.getSubjectType ().getId ())
@@ -298,10 +299,17 @@ class QueueLogicImplementation
 			+ queueSubject.getTotalItems ()
 			- queueSubject.getActiveItems ();
 
-		if (queueItem.getIndex () != currentItemIndex)
+		if (
+			integerNotEqualSafe (
+				queueItem.getIndex (),
+				currentItemIndex)
+		) {
 			throw new IllegalStateException ();
+		}
 
-		if (! in (queueItem.getState (),
+		if (
+			enumNotInSafe (
+				queueItem.getState (),
 				QueueItemState.pending,
 				QueueItemState.claimed)) {
 

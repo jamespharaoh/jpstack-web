@@ -12,7 +12,7 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ChatInfoLogicImplementation"/>
+		<component class="logic.ChatInfoLogicImplementation"/>
 	</layer>
 
 </plugin>

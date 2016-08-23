@@ -1,14 +1,15 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
-import wbs.clients.apn.chat.core.console.ChatUserCreditModeConsoleHelper;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
+import wbs.console.helper.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
 
@@ -17,8 +18,8 @@ public
 class ChatUserAdminCreditModePart
 	extends AbstractPagePart {
 
-	@Inject
-	ChatUserCreditModeConsoleHelper chatUserCreditModeConsoleHelper;
+	@Inject @Named
+	EnumConsoleHelper <?> chatUserCreditModeConsoleHelper;
 
 	@Inject
 	ChatUserConsoleHelper chatUserHelper;
@@ -41,7 +42,7 @@ class ChatUserAdminCreditModePart
 	void renderHtmlBodyContent () {
 
 		if (
-			equal (
+			enumEqualSafe (
 				chatUser.getType (),
 				ChatUserType.monitor)
 		) {

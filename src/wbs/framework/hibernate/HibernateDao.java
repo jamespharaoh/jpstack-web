@@ -1,10 +1,10 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.CollectionUtils.collectionDoesNotHaveOneElement;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
 
@@ -246,9 +246,8 @@ class HibernateDao {
 		// handle multiple results error
 
 		if (
-			notEqual (
-				objectList.size (),
-				1)
+			collectionDoesNotHaveOneElement (
+				objectList)
 		) {
 
 			throw new RuntimeException (

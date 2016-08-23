@@ -1,23 +1,21 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.google.common.base.Optional;
+
+import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
-import fj.data.Either;
-
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
@@ -183,7 +181,7 @@ class TextFormFieldRenderer<Container>
 			@NonNull String formName) {
 
 		if (
-			in (
+			enumInSafe (
 				formType,
 				FormType.create,
 				FormType.perform,
@@ -197,7 +195,7 @@ class TextFormFieldRenderer<Container>
 				name);
 
 		} else if (
-			in (
+			enumInSafe (
 				formType,
 				FormType.update)
 		) {
@@ -245,7 +243,7 @@ class TextFormFieldRenderer<Container>
 
 	@Override
 	public
-	Either<Optional<String>,String> formToInterface (
+	Either <Optional <String>, String> formToInterface (
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
@@ -258,19 +256,18 @@ class TextFormFieldRenderer<Container>
 
 			nullable ()
 
-			&& equal (
-				formValue,
-				"")
+			&& stringIsEmpty (
+				formValue)
 
 		) {
 
 			return successResult (
-				Optional.<String>absent ());
+				Optional.absent ());
 
 		}
 
 		return successResult (
-			Optional.fromNullable (
+			Optional.of (
 				formValue));
 
 	}

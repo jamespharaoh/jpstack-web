@@ -3,7 +3,7 @@
 	package="wbs.integrations.urbanairship">
 
 	<layer name="logic">
-		<bean class="logic.UrbanAirshipApi"/>
+		<component class="logic.UrbanAirshipApi"/>
 	</layer>
 
 </plugin>

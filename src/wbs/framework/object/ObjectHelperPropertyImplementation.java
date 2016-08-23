@@ -2,7 +2,7 @@ package wbs.framework.object;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TypeUtils.dynamicCast;
 import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
@@ -338,7 +338,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 
 			}
 
-			return optionalRequired (
+			return optionalGetRequired (
 				parentOptional);
 
 		}

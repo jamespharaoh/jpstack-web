@@ -3,8 +3,8 @@
 	package="wbs.console.part">
 
 	<layer name="console">
-		<bean class="NotFoundPart"/>
-		<bean class="TextPart"/>
+		<component class="NotFoundPart"/>
+		<component class="TextPart"/>
 	</layer>
 
 </plugin>

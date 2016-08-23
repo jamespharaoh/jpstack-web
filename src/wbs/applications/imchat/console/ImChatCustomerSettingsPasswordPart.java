@@ -1,7 +1,7 @@
 package wbs.applications.imchat.console;
 
-import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.StringUtils.stringInSafe;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,11 +67,12 @@ class ImChatCustomerSettingsPasswordPart
 			.map (
 				EventLinkRec::getEvent)
 
-			.filter (event ->
-				in (
-					event.getEventType ().getCode (),
-					"im_chat_customer_forgotten_password",
-					"im_chat_customer_generated_password_from_console"))
+			.filter (
+				event ->
+					stringInSafe (
+						event.getEventType ().getCode (),
+						"im_chat_customer_forgotten_password",
+						"im_chat_customer_generated_password_from_console"))
 
 			.distinct ()
 

@@ -5,7 +5,6 @@ import java.util.Collection;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
 import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
@@ -14,11 +13,12 @@ public
 class ChatUserCreditSearch
 	implements Serializable {
 
-	Integer chatId;
+	Long chatId;
 
 	TextualInterval timestamp;
 
 	boolean filter;
-	Collection<Integer> filterChatIds;
+
+	Collection <Long> filterChatIds;
 
 }

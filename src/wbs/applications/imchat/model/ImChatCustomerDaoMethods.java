@@ -9,7 +9,7 @@ interface ImChatCustomerDaoMethods {
 			ImChatRec imChat,
 			String email);
 
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			ImChatCustomerSearch imChatCustomerSearch);
 
 }

@@ -25,33 +25,33 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ChatUserLogicImplementation"/>
+		<component class="logic.ChatUserLogicImplementation"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.ChatUserConsoleConfig"/>
-		<bean class="console.ChatUserConsoleHooks"/>
-		<bean class="console.ChatUserHelpFormAction"/>
-		<bean class="console.ChatUserHelpFormResponder"/>
-		<bean class="console.ChatUserHelpPart"/>
-		<bean class="console.ChatUserHistoryPart"/>
-		<bean class="console.ChatUserNotesAction"/>
-		<bean class="console.ChatUserNotesPart"/>
-		<bean class="console.ChatUserNumberLinkProvider"/>
-		<bean class="console.ChatUserOnlinePart"/>
-		<bean class="console.ChatUserSearchOldAction"/>
-		<bean class="console.ChatUserSearchOldPart"/>
-		<bean class="console.ChatUserSearchOldResultsPart"/>
-		<bean class="console.ChatUserSummaryPart"/>
-		<bean class="console.ChatUserTypeConsoleHelper"/>
+		<component class="console.ChatUserConsoleConfig"/>
+		<component class="console.ChatUserConsoleHooks"/>
+		<component class="console.ChatUserHelpFormAction"/>
+		<component class="console.ChatUserHelpFormResponder"/>
+		<component class="console.ChatUserHelpPart"/>
+		<component class="console.ChatUserHistoryPart"/>
+		<component class="console.ChatUserNotesAction"/>
+		<component class="console.ChatUserNotesPart"/>
+		<component class="console.ChatUserNumberLinkProvider"/>
+		<component class="console.ChatUserOnlinePart"/>
+		<component class="console.ChatUserSearchOldAction"/>
+		<component class="console.ChatUserSearchOldPart"/>
+		<component class="console.ChatUserSearchOldResultsPart"/>
+		<component class="console.ChatUserSummaryPart"/>
+		<component class="console.ChatUserTypeConsoleHelper"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.ChatMonitorSwapDaemon"/>
-		<bean class="daemon.ChatUserAlarmDaemon"/>
-		<bean class="daemon.ChatUserJoinOutboundDaemon"/>
-		<bean class="daemon.ChatUserOnlineDaemon"/>
-		<bean class="daemon.ChatUserQuietDaemon"/>
+		<component class="daemon.ChatMonitorSwapDaemon"/>
+		<component class="daemon.ChatUserAlarmDaemon"/>
+		<component class="daemon.ChatUserJoinOutboundDaemon"/>
+		<component class="daemon.ChatUserOnlineDaemon"/>
+		<component class="daemon.ChatUserQuietDaemon"/>
 	</layer>
 
 	<console-modules>

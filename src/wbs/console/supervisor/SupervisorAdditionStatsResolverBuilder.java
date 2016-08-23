@@ -78,8 +78,12 @@ class SupervisorAdditionStatsResolverBuilder {
 
 			additionStatsResolver.operands ().add (
 				new AdditionStatsResolver.Operand ()
-					.coefficient (operandSpec.coefficient ())
-					.resolver (resolver));
+
+				.coefficient (
+					operandSpec.coefficient ())
+
+				.resolver (
+					resolver));
 
 		}
 

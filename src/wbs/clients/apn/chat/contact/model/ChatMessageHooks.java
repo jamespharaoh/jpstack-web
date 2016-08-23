@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.contact.model;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
@@ -45,7 +45,7 @@ class ChatMessageHooks
 		// sanity check
 
 		if (
-			notEqual (
+			referenceNotEqualSafe (
 				fromChatUser.getChat (),
 				toChatUser.getChat ())
 		) {

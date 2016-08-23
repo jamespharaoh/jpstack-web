@@ -119,7 +119,7 @@ class ChatCreditDaemon
 				"Chat billing after %s",
 				threeMonthsAgo));
 
-		List<Long> chatUserIds =
+		List <Long> chatUserIds =
 			chatUserHelper.findWantingBill (
 				threeMonthsAgo)
 

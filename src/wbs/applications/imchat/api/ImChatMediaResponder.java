@@ -1,5 +1,8 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.CollectionUtils.arrayLength;
+import static wbs.framework.utils.etc.NumberUtils.integerToDecimalString;
+
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -7,7 +10,6 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.web.AbstractResponder;
 import wbs.framework.web.RequestContext;
@@ -43,8 +45,9 @@ class ImChatMediaResponder
 
 		requestContext.setHeader (
 			"Content-Length",
-			Integer.toString (
-				data.length));
+			integerToDecimalString (
+				arrayLength (
+					data)));
 
 	}
 

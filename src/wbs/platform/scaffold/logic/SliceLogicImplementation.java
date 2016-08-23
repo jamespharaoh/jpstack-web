@@ -1,9 +1,9 @@
 package wbs.platform.scaffold.logic;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.orNull;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.TimeUtils.laterThan;
 
 import java.util.HashMap;
@@ -146,7 +146,7 @@ class SliceLogicImplementation
 								sliceId))))
 
 				.setCurrentQueueInactivityUpdateTime (
-					optionalRequired (
+					optionalGetRequired (
 						nextUpdateTimestampBySlice.get (
 							sliceId)));
 

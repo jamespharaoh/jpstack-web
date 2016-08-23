@@ -1,18 +1,25 @@
 
 package wbs.clients.apn.chat.api;
 
+import static wbs.framework.utils.etc.CollectionUtils.arrayLength;
+import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.framework.utils.etc.LogicUtils.allOf;
-import static wbs.framework.utils.etc.Misc.age;
+import static wbs.framework.utils.etc.LogicUtils.anyOf;
+import static wbs.framework.utils.etc.LogicUtils.equalSafe;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
 import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifElse;
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.framework.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,7 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
@@ -271,8 +277,16 @@ class ChatApiServletModule
 			String mimeType =
 				media.getMediaType ().getMimeType ();
 
-			if (format != null
-					&& ! equal (format, "orig")) {
+			if (allOf (
+
+				() ->isNotNull (
+					format),
+
+				() -> stringNotEqualSafe (
+					format,
+					"orig")
+
+			)) {
 
 				if (mediaLogic.isVideo (mimeType)) {
 
@@ -323,7 +337,9 @@ class ChatApiServletModule
 
 			requestContext.setHeader (
 				"Content-Length",
-				Integer.toString (data.length));
+				integerToDecimalString (
+					arrayLength (
+						data)));
 
 			OutputStream out =
 				requestContext.outputStream ();
@@ -345,7 +361,7 @@ class ChatApiServletModule
 
 			requestContext.request (
 				"mediaId",
-				Integer.parseInt (
+				parseIntegerRequired (
 					matcher.group (1)));
 
 			requestContext.request (
@@ -730,7 +746,16 @@ class ChatApiServletModule
 						chat,
 						numberRec);
 
-				if (myUser == null || ! equal (myUser.getChat ().getId (), chatId)) {
+				if (anyOf (
+
+					() -> isNull (
+						myUser),
+
+					() -> integerNotEqualSafe (
+						myUser.getChat ().getId (),
+						chatId)
+
+				)) {
 
 					return Rpc.rpcError (
 						"chat-profiles-response",
@@ -774,16 +799,20 @@ class ChatApiServletModule
 					codes)
 
 				.lastAction (
-					ifElse (
+					ifThenElse (
 						isNotNull (
 							lastAction),
-						() ->
-							TextualInterval.after (
-								DateTimeZone.UTC,
-								transaction.now ().minus (
-									Duration.standardSeconds (
-										lastAction))),
-						() -> null))
+
+					() ->
+						TextualInterval.after (
+							DateTimeZone.UTC,
+							transaction.now ().minus (
+								Duration.standardSeconds (
+									lastAction))),
+
+					() -> null)
+
+				)
 
 				.typeIn (
 					types)
@@ -851,7 +880,7 @@ class ChatApiServletModule
 					isNotNull (
 						myUser)
 
-					&& equal (
+					&& referenceEqualSafe (
 						user,
 						myUser.getChat ().getSystemChatUser ())
 
@@ -1008,10 +1037,9 @@ class ChatApiServletModule
 					profile.add (
 						Rpc.rpcElem (
 							"age",
-							age (
-								TimeZone.getDefault (),
-								user.getDob ().toDate ().getTime (),
-								System.currentTimeMillis ())));
+							chatUserLogic.getAgeInYears (
+								user,
+								transaction.now ())));
 
 				}
 
@@ -1703,7 +1731,15 @@ class ChatApiServletModule
 						field.getValues ()
 							.get (profileFieldEntry.getValue ());
 
-					if (! equal (profileFieldEntry.getValue (), "") && value == null) {
+					if (
+
+						stringIsNotEmpty (
+							profileFieldEntry.getValue ())
+
+						&& isNull (
+							value)
+
+					) {
 
 						throw new RpcException (
 							"chat-profile-response",
@@ -3106,7 +3142,11 @@ class ChatApiServletModule
 
 				}
 
-				if (! equal (userImageIds, requestImageIds)) {
+				if (
+					equalSafe (
+						userImageIds,
+						requestImageIds)
+				) {
 
 					throw new RpcException (
 						Rpc.rpcError (
@@ -3182,22 +3222,22 @@ class ChatApiServletModule
 				ChatUserImageRec selectedChatUserImage = null;
 
 				for (
-					ChatUserImageRec cui
+					ChatUserImageRec chatUserImage
 						: chatUserLogic.getChatUserImageListByType (
 							chatUser,
 							type)
 				) {
 
 					if (
-						notEqual (
-							cui.getId (),
+						integerNotEqualSafe (
+							chatUserImage.getId (),
 							selectedImageId)
 					) {
 						continue;
 					}
 
 					selectedChatUserImage =
-						cui;
+						chatUserImage;
 
 				}
 
@@ -3297,10 +3337,14 @@ class ChatApiServletModule
 
 				if (chatUserImage.getType () != type) continue;
 
-				if (! in (chatUserImage.getStatus (),
+				if (
+					enumNotInSafe (
+						chatUserImage.getStatus (),
 						ChatUserInfoStatus.moderatorPending,
-						ChatUserInfoStatus.moderatorRejected))
+						ChatUserInfoStatus.moderatorRejected)
+				) {
 					continue;
+				}
 
 				RpcStructure respImage =
 
@@ -3515,7 +3559,7 @@ class ChatApiServletModule
 				() -> isNotNull (
 					sendAmount),
 
-				() -> notEqual (
+				() -> integerNotEqualSafe (
 					sendCount * routeCharge,
 					sendAmount)
 

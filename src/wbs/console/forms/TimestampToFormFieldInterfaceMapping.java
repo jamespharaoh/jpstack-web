@@ -24,7 +24,7 @@ import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TextualInterval;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("timestampToFormFieldInterfaceMapping")
@@ -57,7 +57,7 @@ class TimestampToFormFieldInterfaceMapping<Container>
 				interfaceValue)
 
 			|| stringIsEmpty (
-				optionalRequired (
+				optionalGetRequired (
 					interfaceValue))
 
 		) {

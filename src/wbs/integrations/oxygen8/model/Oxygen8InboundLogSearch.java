@@ -2,12 +2,12 @@ package wbs.integrations.oxygen8.model;
 
 import java.io.Serializable;
 
+import org.joda.time.Instant;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
-
-import org.joda.time.Instant;
 
 @Accessors (chain = true)
 @Data
@@ -17,7 +17,7 @@ public
 class Oxygen8InboundLogSearch
 	implements Serializable {
 
-	Integer routeId;
+	Long routeId;
 
 	Instant timestampAfter;
 	Instant timestampBefore;

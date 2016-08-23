@@ -1,17 +1,20 @@
 package wbs.platform.object.search;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.CollectionUtils.listSlice;
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.methodInvoke;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.requiredValue;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.localDateNotEqual;
+import static wbs.framework.utils.etc.TypeUtils.classEqual;
 import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
 
 import java.lang.reflect.Method;
@@ -92,7 +95,7 @@ class ObjectSearchResultsPart
 	String sessionKey;
 
 	@Getter @Setter
-	Integer itemsPerPage;
+	Long itemsPerPage;
 
 	@Getter @Setter
 	String targetContextTypeName;
@@ -100,14 +103,14 @@ class ObjectSearchResultsPart
 	// state
 
 	IdObject currentObject;
-	List<IdObject> objects;
+	List <IdObject> objects;
 	Integer totalObjects;
 
 	Boolean singlePage;
-	Integer pageNumber;
-	Integer pageCount;
+	Long pageNumber;
+	Long pageCount;
 
-	Optional<ConsoleContext> targetContext;
+	Optional <ConsoleContext> targetContext;
 
 	// details
 
@@ -139,7 +142,7 @@ class ObjectSearchResultsPart
 		// current object
 
 		if (
-			equal (
+			classEqual (
 				consoleHelper.objectClass (),
 				resultsClass)
 		) {
@@ -179,7 +182,7 @@ class ObjectSearchResultsPart
 			allObjectIds.size ();
 
 		if (
-			equal (
+			stringEqual (
 				requestContext.parameterOrDefault (
 					"page",
 					"0"),
@@ -193,21 +196,24 @@ class ObjectSearchResultsPart
 			singlePage = false;
 
 			pageNumber =
-				Integer.parseInt (
+				parseIntegerRequired (
 					requestContext.parameterOrDefault (
 						"page",
 						"0"));
 
 		}
 
-		List<Long> pageObjectIds =
+		List <Long> pageObjectIds =
 			singlePage
-				? allObjectIds
-				: allObjectIds.subList (
-					pageNumber * itemsPerPage,
-					Math.min (
-						(pageNumber + 1) * itemsPerPage,
-						allObjectIds.size ()));
+
+			? allObjectIds
+
+			: listSlice (
+				allObjectIds,
+				pageNumber * itemsPerPage,
+				Math.min (
+					(pageNumber + 1) * itemsPerPage,
+					allObjectIds.size ()));
 
 		pageCount =
 			(allObjectIds.size () - 1) / itemsPerPage + 1;
@@ -438,7 +444,7 @@ class ObjectSearchResultsPart
 
 			if (
 
-				equal (
+				classEqual (
 					consoleHelper.objectClass (),
 					resultsClass)
 
@@ -456,7 +462,7 @@ class ObjectSearchResultsPart
 					rowTimestamp.toDateTime ().toLocalDate ();
 
 				if (
-					notEqual (
+					localDateNotEqual (
 						currentDate,
 						rowDate)
 				) {
@@ -501,17 +507,23 @@ class ObjectSearchResultsPart
 					" class=\"%h\"",
 					joinWithSpace (
 						presentInstances (
-							Optional.of (
-								"magic-table-row"),
-							Optional.of (
-								stringFormat (
-									"search-result-%s",
-									object.getId ())),
-							optionalIf (
-								object == currentObject,
-								"selected"),
-							getListClass (
-								object))),
+
+						Optional.of (
+							"magic-table-row"),
+
+						Optional.of (
+							stringFormat (
+								"search-result-%s",
+								object.getId ())),
+
+						optionalIf (
+							object == currentObject,
+							() -> "selected"),
+
+						getListClass (
+							object)
+
+					)),
 
 					" data-rows-class=\"%h\"",
 					stringFormat (
@@ -564,7 +576,7 @@ class ObjectSearchResultsPart
 
 						optionalIf (
 							object == currentObject,
-							"selected"),
+							() -> "selected"),
 
 						getListClass (
 							object))),

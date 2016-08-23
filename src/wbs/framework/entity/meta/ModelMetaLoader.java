@@ -1,8 +1,9 @@
 package wbs.framework.entity.meta;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -11,19 +12,19 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.Getter;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.scaffold.PluginComponentSpec;
 import wbs.framework.application.scaffold.PluginManager;
-import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataFromXml;
+import wbs.framework.data.tools.DataFromXmlBuilder;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @Log4j
@@ -70,8 +71,8 @@ class ModelMetaLoader {
 	private
 	void createDataFromXml () {
 
-		dataFromXml =
-			new DataFromXml ();
+		DataFromXmlBuilder dataFromXmlBuilder =
+			new DataFromXmlBuilder ();
 
 		for (
 			Map.Entry<Class<?>,Provider<Object>> modelMetaDataEntry
@@ -84,67 +85,64 @@ class ModelMetaLoader {
 			Provider<?> modelMetaDataProvider =
 				modelMetaDataEntry.getValue ();
 
-			dataFromXml.registerBuilder (
+			dataFromXmlBuilder.registerBuilder (
 				modelMetaDataClass,
 				modelMetaDataProvider);
 
 		}
+
+		dataFromXml =
+			dataFromXmlBuilder.build ();
 
 	}
 
 	private
 	void loadSpecs () {
 
-		ImmutableMap.Builder<String,ModelMetaSpec> modelBuilder =
-			ImmutableMap.<String,ModelMetaSpec>builder ();
+		ImmutableMap.Builder <String, ModelMetaSpec> modelBuilder =
+			ImmutableMap.builder ();
 
-		ImmutableMap.Builder<String,ModelMetaSpec> componentBuilder =
-			ImmutableMap.<String,ModelMetaSpec>builder ();
+		ImmutableMap.Builder <String, ModelMetaSpec> componentBuilder =
+			ImmutableMap.builder ();
 
-		int errorCount = 0;
+		TaskLogger taskLog =
+			new TaskLogger (
+				log);
 
-		for (
-			PluginSpec plugin
-				: pluginManager.plugins ()
-		) {
+		pluginManager.plugins ().forEach (
+			pluginSpec -> {
 
-			if (plugin.models () == null)
-				continue;
-
-			for (
-				PluginModelSpec model
-					: plugin.models ().models ()
+			if (
+				isNull (
+					pluginSpec.models ())
 			) {
+				return;
+			}
 
-				errorCount +=
+			pluginSpec.models ().models ().forEach (
+				pluginModelSpec ->
 					loadModelMeta (
+						taskLog,
 						modelBuilder,
-						plugin,
-						model.name ());
+						pluginSpec,
+						pluginModelSpec.name ()));
 
-			}
-
-			for (
-				PluginComponentSpec component
-					: plugin.models ().components ()
-			) {
-
-				errorCount +=
+			pluginSpec.models ().componentTypes ().forEach (
+				pluginComponentTypeSpec ->
 					loadModelMeta (
+						taskLog,
 						componentBuilder,
-						plugin,
-						component.name ());
+						pluginSpec,
+						pluginComponentTypeSpec.name ()));
 
-			}
+		});
 
-		}
-
-		if (errorCount > 0) {
+		if (taskLog.errors ()) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Aborting due to %s errors",
-					errorCount));
+					taskLog.errorCount ()));
 
 		}
 
@@ -157,10 +155,11 @@ class ModelMetaLoader {
 	}
 
 	private
-	int loadModelMeta (
-			ImmutableMap.Builder<String,ModelMetaSpec> builder,
-			PluginSpec plugin,
-			String modelName) {
+	void loadModelMeta (
+			@NonNull TaskLogger taskLog,
+			@NonNull ImmutableMap.Builder <String, ModelMetaSpec> builder,
+			@NonNull PluginSpec plugin,
+			@NonNull String modelName) {
 
 		String resourceName =
 			stringFormat (
@@ -175,14 +174,13 @@ class ModelMetaLoader {
 
 		if (inputStream == null) {
 
-			log.error (
-				stringFormat (
-					"Model meta not found for %s.%s: %s",
-					plugin.name (),
-					modelName,
-					resourceName));
+			taskLog.errorFormat (
+				"Model meta not found for %s.%s: %s",
+				plugin.name (),
+				modelName,
+				resourceName);
 
-			return 1;
+			return;
 
 		}
 
@@ -200,40 +198,36 @@ class ModelMetaLoader {
 
 		} catch (Exception exception) {
 
-			log.error (
-				stringFormat (
-					"Error reading model meta for %s.%s: %s",
-					plugin.name (),
-					modelName,
-					resourceName),
-				exception);
+			taskLog.errorFormatException (
+				exception,
+				"Error reading model meta for %s.%s: %s",
+				plugin.name (),
+				modelName,
+				resourceName);
 
-			return 1;
+			return;
 
 		}
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				spec.name (),
 				modelName)
 		) {
 
-			log.error (
-				stringFormat (
-					"Model meta name %s should be %s in %s",
-					spec.name (),
-					modelName,
-					resourceName));
+			taskLog.errorFormat (
+				"Model meta name %s should be %s in %s",
+				spec.name (),
+				modelName,
+				resourceName);
 
-			return 1;
+			return;
 
 		}
 
 		builder.put (
 			modelName,
 			spec);
-
-		return 0;
 
 	}
 

@@ -1,6 +1,6 @@
 package wbs.smsapps.manualresponder.logic;
 
-import static wbs.framework.utils.etc.Misc.ifElse;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 
@@ -148,7 +148,7 @@ class ManualResponderLogicImplementation
 			}
 
 			long singleMessageLength =
-				GsmUtils.length (
+				GsmUtils.gsmStringLength (
 					singleMessage);
 
 			messageParts =
@@ -333,15 +333,19 @@ class ManualResponderLogicImplementation
 
 	@Override
 	public
-	Optional<AffiliateRec> customerAffiliate (
+	Optional <AffiliateRec> customerAffiliate (
 			@NonNull ManualResponderNumberRec number) {
 
-		return ifElse (
+		return ifThenElse (
 			isNotNull (
 				number.getSmsCustomer ()),
+
 			() -> smsCustomerLogic.customerAffiliate (
 				number.getSmsCustomer ()),
-			() -> Optional.<AffiliateRec>absent ());
+
+			() -> Optional.absent ()
+
+		);
 
 	}
 

@@ -1,7 +1,7 @@
 package wbs.integrations.mig.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -114,15 +114,19 @@ class MigSender
 
 		// pick a handler
 
-		if (equal (
+		if (
+			stringEqual (
 				migOutbox.message.getMessageType ().getCode (),
-				"sms")) {
+				"sms")
+		) {
 
 			// nothing to do
 
-		} else if (equal (
+		} else if (
+			stringEqual (
 				migOutbox.message.getMessageType ().getCode (),
-				"wap_push")) {
+				"wap_push")
+		) {
 
 			migOutbox.wapPushMessage =
 				wapPushMessageHelper.findOrThrow (
@@ -158,7 +162,7 @@ class MigSender
 
 	@Override
 	protected
-	Optional<List<String>> sendMessage (
+	Optional <List <String>> sendMessage (
 			@NonNull MIGOutbox migOutbox)
 		throws SendFailureException {
 
@@ -221,17 +225,17 @@ class MigSender
 	 * Opens the connection, setting all appropriate parameters.
 	 */
 	HttpURLConnection openConnection (
-			MIGOutbox migOutbox,
-			String params)
+			@NonNull MIGOutbox migOutbox,
+			@NonNull String params)
 		throws IOException {
 
 		boolean isPost =
-			equal (
+			stringEqual (
 				migOutbox.migRouteOut.getMethod (),
 				"post");
 
 		boolean isGet =
-			equal (
+			stringEqual (
 				migOutbox.migRouteOut.getMethod (),
 				"get");
 

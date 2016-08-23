@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
@@ -37,7 +38,7 @@ interface ChatUserLogic {
 
 	void logoff (
 			ChatUserRec chatUser,
-			boolean automatic);
+			Boolean automatic);
 
 	boolean deleted (
 			ChatUserRec chatUser);
@@ -48,19 +49,19 @@ interface ChatUserLogic {
 	boolean compatible (
 			Gender thisGender,
 			Orient thisOrient,
-			Optional<Long> thisCategoryId,
+			Optional <Long> thisCategoryId,
 			Gender thatGender,
 			Orient thatOrient,
-			Optional<Long> thatCategoryId);
+			Optional <Long> thatCategoryId);
 
 	boolean compatible (
 			ChatUserRec thisUser,
 			ChatUserRec thatUser);
 
-	Collection<ChatUserRec> getNearestUsers (
+	Collection <ChatUserRec> getNearestUsers (
 			ChatUserRec thisUser,
-			Collection<ChatUserRec> thoseUsers,
-			int numToFind);
+			Collection <ChatUserRec> thoseUsers,
+			Long numToFind);
 
 	List<UserDistance> getUserDistances (
 			ChatUserRec thisUser,
@@ -124,21 +125,21 @@ interface ChatUserLogic {
 	ChatUserImageRec setPhoto (
 			ChatUserRec chatUser,
 			byte[] data,
-			Optional<String> filename,
-			Optional<String> mimeType,
-			Optional<MessageRec> message,
-			boolean append);
+			Optional <String> filename,
+			Optional <String> mimeType,
+			Optional <MessageRec> message,
+			Boolean append);
 
-	ChatUserImageRec setPhotoFromMessage (
+	Optional <ChatUserImageRec> setPhotoFromMessage (
 			ChatUserRec chatUser,
 			MessageRec message,
-			boolean append);
+			Boolean append);
 
 	void setVideo (
 			ChatUserRec chatUser,
 			MediaRec fullMedia,
 			MessageRec message,
-			boolean append);
+			Boolean append);
 
 	void setVideo (
 			ChatUserRec chatUser,
@@ -146,13 +147,13 @@ interface ChatUserLogic {
 			Optional<String> filename,
 			Optional<String> mimeType,
 			MessageRec message,
-			boolean append);
+			Boolean append);
 
 	void setAudio (
 			ChatUserRec chatUser,
 			byte[] data,
 			MessageRec message,
-			boolean append);
+			Boolean append);
 
 	void setImage (
 			ChatUserRec chatUser,
@@ -161,12 +162,12 @@ interface ChatUserLogic {
 			String filename,
 			String mimeType,
 			Optional<MessageRec> message,
-			boolean append);
+			Boolean append);
 
 	boolean setVideo (
 			ChatUserRec chatUser,
 			MessageRec message,
-			boolean append);
+			Boolean append);
 
 	boolean setPlace (
 			ChatUserRec chatUser,
@@ -187,9 +188,9 @@ interface ChatUserLogic {
 	void setAffiliate (
 			ChatUserRec chatUser,
 			ChatAffiliateRec chatAffiliate,
-			Optional<MessageRec> message);
+			Optional <MessageRec> message);
 
-	MediaRec findPhoto (
+	Optional <MediaRec> findPhoto (
 			MessageRec message);
 
 	boolean valid (
@@ -252,7 +253,7 @@ interface ChatUserLogic {
 	String getBrandName (
 			ChatUserRec chatUser);
 
-	DateTimeZone timezone (
+	DateTimeZone getTimezone (
 			ChatUserRec chatUser);
 
 	List<ChatUserImageRec> getChatUserImageListByType (
@@ -274,5 +275,9 @@ interface ChatUserLogic {
 	boolean likes (
 			ChatUserRec chatUser,
 			Gender otherGender);
+
+	long getAgeInYears (
+			ChatUserRec chatUser,
+			Instant now);
 
 }

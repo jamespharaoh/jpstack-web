@@ -1,9 +1,10 @@
 package wbs.console.param;
 
+@Deprecated
 public
-interface ParamChecker<T> {
+interface ParamChecker <Type> {
 
-	T get (
+	Type get (
 		String param);
 
 }

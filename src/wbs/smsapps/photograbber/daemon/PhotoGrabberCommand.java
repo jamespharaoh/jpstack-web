@@ -1,8 +1,8 @@
 package wbs.smsapps.photograbber.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,19 +17,18 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.SneakyThrows;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.google.common.base.Optional;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -362,7 +361,7 @@ class PhotoGrabberCommand
 			case start:
 
 				if (
-					equal (
+					stringEqual (
 						qualifiedName,
 						"photo-grabber-response")
 				) {
@@ -382,7 +381,7 @@ class PhotoGrabberCommand
 			case inResponse:
 
 				if (
-					equal (
+					stringEqual (
 						qualifiedName,
 						"found")
 				) {
@@ -606,7 +605,7 @@ class PhotoGrabberCommand
 		}
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				handler.found.toLowerCase (),
 				"true")
 		) {

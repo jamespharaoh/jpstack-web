@@ -1,12 +1,12 @@
 package wbs.framework.utils;
 
-import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.lowercase;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringInSafe;
 import static wbs.framework.utils.etc.StringUtils.stringSplitSimple;
 import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
@@ -47,7 +47,7 @@ class TextualInterval {
 			@NonNull String string) {
 
 		if (
-			in (
+			stringInSafe (
 				lowercase (
 					string),
 				"today",
@@ -513,7 +513,7 @@ class TextualInterval {
 			@NonNull String string,
 			@NonNull Long hourOffset) {
 
-		return optionalRequired (
+		return optionalGetRequired (
 			parse (
 				timeZone,
 				string,

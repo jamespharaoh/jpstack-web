@@ -3,8 +3,8 @@
 	package="wbs.console.priv">
 
 	<layer name="console">
-		<bean class="UserPrivCheckerBuilder"/>
-		<bean class="UserPrivCheckerImplementation"/>
+		<component class="UserPrivCheckerBuilder"/>
+		<component class="UserPrivCheckerImplementation"/>
 	</layer>
 
 </plugin>

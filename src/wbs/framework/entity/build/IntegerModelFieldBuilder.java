@@ -1,6 +1,6 @@
 package wbs.framework.entity.build;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 
@@ -70,7 +70,7 @@ class IntegerModelFieldBuilder {
 				false)
 
 			.valueType (
-				Integer.class)
+				Long.class)
 
 			.nullable (
 				ifNull (
@@ -78,7 +78,7 @@ class IntegerModelFieldBuilder {
 					false))
 
 			.columnNames (
-				ImmutableList.<String>of (
+				ImmutableList.of (
 					ifNull (
 						spec.columnName (),
 						camelToUnderscore (

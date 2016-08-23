@@ -53,7 +53,7 @@ interface RequestContext {
 			String key,
 			String defaultValue);
 
-	Long parameterInteger (
+	Long parameterIntegerRequired (
 			String key);
 
 	Map <String, List <String>> parameterMap ();

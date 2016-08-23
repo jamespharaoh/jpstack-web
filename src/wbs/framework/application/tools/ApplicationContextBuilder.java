@@ -1,15 +1,16 @@
 package wbs.framework.application.tools;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.Misc.classForNameRequired;
+import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +49,8 @@ import wbs.framework.application.context.MethodComponentFactory;
 import wbs.framework.application.scaffold.BuildPluginSpec;
 import wbs.framework.application.scaffold.BuildSpec;
 import wbs.framework.application.scaffold.PluginApiModuleSpec;
-import wbs.framework.application.scaffold.PluginBeanSpec;
 import wbs.framework.application.scaffold.PluginComponentSpec;
+import wbs.framework.application.scaffold.PluginComponentTypeSpec;
 import wbs.framework.application.scaffold.PluginConsoleModuleSpec;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
 import wbs.framework.application.scaffold.PluginDependencySpec;
@@ -61,6 +62,8 @@ import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginModelsSpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataFromXml;
+import wbs.framework.data.tools.DataFromXmlBuilder;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelperFactory;
 import wbs.framework.object.ObjectHooks;
 
@@ -95,10 +98,10 @@ class ApplicationContextBuilder {
 	List<PluginSpec> plugins;
 	PluginManager pluginManager;
 
-	Map <String, Object> singletonBeans =
+	Map <String, Object> singletonComponents =
 		new LinkedHashMap<> ();
 
-	List <ComponentDefinition> beanDefinitionsToRegister =
+	List <ComponentDefinition> componentDefinitionsToRegister =
 		new ArrayList<> ();
 
 	ApplicationContext applicationContext;
@@ -106,13 +109,13 @@ class ApplicationContextBuilder {
 	// implementation
 
 	public
-	ApplicationContextBuilder addSingletonBean (
+	ApplicationContextBuilder addSingletonComponent (
 			@NonNull String singletonName,
-			@NonNull Object singletonBean) {
+			@NonNull Object singletonComponent) {
 
-		singletonBeans.put (
+		singletonComponents.put (
 			singletonName,
-			singletonBean);
+			singletonComponent);
 
 		return this;
 
@@ -142,28 +145,29 @@ class ApplicationContextBuilder {
 			"/wbs-build.xml";
 
 		DataFromXml buildDataFromXml =
-			new DataFromXml ()
+			new DataFromXmlBuilder ()
 
 			.registerBuilderClasses (
 				BuildSpec.class,
-				BuildPluginSpec.class);
+				BuildPluginSpec.class)
+
+			.build ();
 
 		BuildSpec build =
 			(BuildSpec)
 			buildDataFromXml.readClasspath (
-				Collections.emptyList (),
 				buildPath);
 
-		ImmutableList.Builder<PluginSpec> pluginsBuilder =
-			ImmutableList.<PluginSpec>builder ();
+		ImmutableList.Builder <PluginSpec> pluginsBuilder =
+			ImmutableList.builder ();
 
 		DataFromXml pluginDataFromXml =
-			new DataFromXml ()
+			new DataFromXmlBuilder ()
 
 			.registerBuilderClasses (
 				PluginApiModuleSpec.class,
-				PluginBeanSpec.class,
 				PluginComponentSpec.class,
+				PluginComponentTypeSpec.class,
 				PluginConsoleModuleSpec.class,
 				PluginCustomTypeSpec.class,
 				PluginEnumTypeSpec.class,
@@ -172,7 +176,9 @@ class ApplicationContextBuilder {
 				PluginModelSpec.class,
 				PluginModelsSpec.class,
 				PluginDependencySpec.class,
-				PluginSpec.class);
+				PluginSpec.class)
+
+			.build ();
 
 		for (
 			BuildPluginSpec buildPlugin
@@ -189,9 +195,9 @@ class ApplicationContextBuilder {
 			PluginSpec plugin =
 				(PluginSpec)
 				pluginDataFromXml.readClasspath (
-					ImmutableList.<Object>of (
-						build),
-					pluginPath);
+					pluginPath,
+					ImmutableList.of (
+						build));
 
 			pluginsBuilder.add (
 				plugin);
@@ -211,7 +217,7 @@ class ApplicationContextBuilder {
 				.plugins (plugins)
 				.build ();
 
-		addSingletonBean (
+		addSingletonComponent (
 			"pluginManager",
 			pluginManager);
 
@@ -221,35 +227,37 @@ class ApplicationContextBuilder {
 	void initContext ()
 		throws Exception {
 
-		int errors = 0;
+		TaskLogger taskLog =
+			new TaskLogger (
+				log);
 
 		createApplicationContext ();
 
-		errors +=
-			registerLayerBeans ();
+		registerLayerComponents (
+			taskLog);
 
-		errors +=
-			registerConfigBeans ();
+		registerConfigComponents (
+			taskLog);
 
-		errors +=
-			registerSingletonBeans ();
+		registerSingletonComponents (
+			taskLog);
 
-		if (errors > 0) {
+		if (taskLog.errors ()) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Aborting due to %s errors",
-					errors));
+					taskLog.errorCount ()));
 
 		}
 
 		for (
-			ComponentDefinition beanDefinition
-				: beanDefinitionsToRegister
+			ComponentDefinition componentDefinition
+				: componentDefinitionsToRegister
 		) {
 
-			applicationContext.registerBeanDefinition (
-				beanDefinition);
+			applicationContext.registerComponentDefinition (
+				componentDefinition);
 
 		}
 
@@ -266,10 +274,8 @@ class ApplicationContextBuilder {
 	}
 
 	private
-	int registerLayerBeans ()
-		throws Exception {
-
-		int errors = 0;
+	void registerLayerComponents (
+			@NonNull TaskLogger taskLog) {
 
 		for (
 			String layerName
@@ -278,7 +284,7 @@ class ApplicationContextBuilder {
 
 			log.info (
 				stringFormat (
-					"Loading beans for layer %s",
+					"Loading components for layer %s",
 					layerName));
 
 			for (
@@ -286,127 +292,117 @@ class ApplicationContextBuilder {
 					: plugins
 			) {
 
-				errors +=
-					registerLayerBeans (
-						plugin,
-						layerName);
+				registerLayerComponents (
+					taskLog,
+					plugin,
+					layerName);
 
 			}
 
 		}
 
-		return errors;
-
 	}
 
-	int registerLayerBeans (
+	void registerLayerComponents (
+			@NonNull TaskLogger taskLog,
 			@NonNull PluginSpec plugin,
-			@NonNull String layerName)
-		throws Exception {
-
-		int errors = 0;
+			@NonNull String layerName) {
 
 		PluginLayerSpec layer =
-			plugin.layersByName ().get (layerName);
+			plugin.layersByName ().get (
+				layerName);
 
 		if (layer != null) {
 
 			for (
-				PluginBeanSpec bean
-					: layer.beans ()
+				PluginComponentSpec component
+					: layer.components ()
 			) {
 
-				errors +=
-					registerLayerBean (
-						bean);
-
-			}
-
-		}
-
-		if (equal (layerName, "api")) {
-
-			errors +=
-				registerApiLayerBeans (
-					plugin);
-
-			for (
-				PluginApiModuleSpec apiModule
-					: plugin.apiModules ()
-			) {
-
-				errors +=
-					registerApiModule (
-						apiModule);
+				registerLayerComponent (
+					taskLog,
+					component);
 
 			}
 
 		}
 
 		if (
-			equal (
+			stringEqual (
+				layerName,
+				"api")
+		) {
+
+			registerApiLayerComponents (
+				taskLog,
+				plugin);
+
+			plugin.apiModules ().forEach (
+				apiModule ->
+					registerApiModule (
+						taskLog,
+						apiModule));
+
+		}
+
+		if (
+			stringEqual (
 				layerName,
 				"console")
 		) {
 
-			errors +=
-				registerConsoleLayerBeans (
-					plugin);
+			registerConsoleLayerComponents (
+				taskLog,
+				plugin);
 
-			for (
-				PluginConsoleModuleSpec consoleModule
-					: plugin.consoleModules ()
-			) {
-
-				errors +=
+			plugin.consoleModules ().forEach (
+				consoleModule ->
 					registerConsoleModule (
-						consoleModule);
-
-			}
+						taskLog,
+						consoleModule));
 
 		}
 
 		if (
-			equal (
+			stringEqual (
 				layerName,
 				"hibernate")
 		) {
 
-			errors +=
-				registerHibernateLayerBeans (
-					plugin);
+			registerHibernateLayerComponents (
+				taskLog,
+				plugin);
 
 		}
 
 		if (
-			equal (
+			stringEqual (
 				layerName,
 				"object")
 		) {
 
-			errors +=
-				registerObjectLayerBeans (
-					plugin);
+			registerObjectLayerComponents (
+				taskLog,
+				plugin);
 
 		}
 
 		if (
-			equal (
+			stringEqual (
 				layerName,
 				"fixture")
 		) {
 
-			errors +=
-				registerFixtureLayerBeans (
-					plugin);
+			registerFixtureLayerComponents (
+				taskLog,
+				plugin);
 
 		}
 
-		return errors;
-
 	}
 
-	int registerApiModule (
+	long registerApiModule (
+			@NonNull TaskLogger taskLog,
 			@NonNull PluginApiModuleSpec pluginApiModuleSpec) {
 
 		String xmlResourceName =
@@ -419,25 +415,25 @@ class ApplicationContextBuilder {
 				pluginApiModuleSpec
 					.name ());
 
-		String apiModuleSpecBeanName =
+		String apiModuleSpecComponentName =
 			stringFormat (
 				"%sApiModuleSpec",
 				hyphenToCamel (
 					pluginApiModuleSpec.name ()));
 
-		String apiModuleBeanName =
+		String apiModuleComponentName =
 			stringFormat (
 				"%sApiModule",
 				hyphenToCamel (
 					pluginApiModuleSpec.name ()));
 
-		applicationContext.registerBeanDefinition (
+		applicationContext.registerComponentDefinition (
 			new ComponentDefinition ()
 
 			.name (
-				apiModuleSpecBeanName)
+				apiModuleSpecComponentName)
 
-			.beanClass (
+			.componentClass (
 				ApiModuleSpec.class)
 
 			.scope (
@@ -452,13 +448,13 @@ class ApplicationContextBuilder {
 
 		);
 
-		applicationContext.registerBeanDefinition (
+		applicationContext.registerComponentDefinition (
 			new ComponentDefinition ()
 
 			.name (
-				apiModuleBeanName)
+				apiModuleComponentName)
 
-			.beanClass (
+			.componentClass (
 				ApiModule.class)
 
 			.scope (
@@ -469,7 +465,7 @@ class ApplicationContextBuilder {
 
 			.addReferenceProperty (
 				"apiModuleSpec",
-				apiModuleSpecBeanName)
+				apiModuleSpecComponentName)
 
 		);
 
@@ -477,7 +473,8 @@ class ApplicationContextBuilder {
 
 	}
 
-	int registerConsoleModule (
+	void registerConsoleModule (
+			@NonNull TaskLogger taskLog,
 			@NonNull PluginConsoleModuleSpec pluginConsoleModuleSpec) {
 
 		String xmlResourceName =
@@ -490,31 +487,31 @@ class ApplicationContextBuilder {
 				pluginConsoleModuleSpec
 					.name ());
 
-		String consoleSpecBeanName =
+		String consoleSpecComponentName =
 			stringFormat (
 				"%sConsoleModuleSpec",
 				hyphenToCamel (
 					pluginConsoleModuleSpec.name ()));
 
-		String consoleModuleBeanName =
+		String consoleModuleComponentName =
 			stringFormat (
 				"%sConsoleModule",
 				hyphenToCamel (
 					pluginConsoleModuleSpec.name ()));
 
-		String consoleMetaModuleBeanName =
+		String consoleMetaModuleComponentName =
 			stringFormat (
 				"%sConsoleMetaModule",
 				hyphenToCamel (
 					pluginConsoleModuleSpec.name ()));
 
-		applicationContext.registerBeanDefinition (
+		applicationContext.registerComponentDefinition (
 			new ComponentDefinition ()
 
 			.name (
-				consoleSpecBeanName)
+				consoleSpecComponentName)
 
-			.beanClass (
+			.componentClass (
 				ConsoleModuleSpec.class)
 
 			.scope (
@@ -529,13 +526,13 @@ class ApplicationContextBuilder {
 
 		);
 
-		applicationContext.registerBeanDefinition (
+		applicationContext.registerComponentDefinition (
 			new ComponentDefinition ()
 
 			.name (
-				consoleModuleBeanName)
+				consoleModuleComponentName)
 
-			.beanClass (
+			.componentClass (
 				ConsoleModule.class)
 
 			.scope (
@@ -546,17 +543,17 @@ class ApplicationContextBuilder {
 
 			.addReferenceProperty (
 				"consoleSpec",
-				consoleSpecBeanName)
+				consoleSpecComponentName)
 
 		);
 
-		applicationContext.registerBeanDefinition (
+		applicationContext.registerComponentDefinition (
 			new ComponentDefinition ()
 
 			.name (
-				consoleMetaModuleBeanName)
+				consoleMetaModuleComponentName)
 
-			.beanClass (
+			.componentClass (
 				ConsoleMetaModule.class)
 
 			.scope (
@@ -567,26 +564,22 @@ class ApplicationContextBuilder {
 
 			.addReferenceProperty (
 				"consoleSpec",
-				consoleSpecBeanName)
+				consoleSpecComponentName)
 
 		);
 
-		return 0;
-
 	}
 
-	int registerFixtureLayerBeans (
-			@NonNull PluginSpec plugin)
-		throws Exception {
-
-		int errors = 0;
+	void registerFixtureLayerComponents (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginSpec plugin) {
 
 		for (
 			PluginFixtureSpec fixture
 				: plugin.fixtures ()
 		) {
 
-			String fixtureProviderBeanName =
+			String fixtureProviderComponentName =
 				stringFormat (
 					"%sFixtureProvider",
 					fixture.name ());
@@ -608,28 +601,25 @@ class ApplicationContextBuilder {
 
 			} catch (ClassNotFoundException exception) {
 
-				log.error (
-					stringFormat (
-						"Can't find fixture provider of type %s ",
-						fixtureProviderClassName,
-						"for fixture %s ",
-						fixture.name (),
-						"from %s",
-						plugin.name ()));
-
-				errors ++;
+				taskLog.errorFormat (
+					"Can't find fixture provider of type %s ",
+					fixtureProviderClassName,
+					"for fixture %s ",
+					fixture.name (),
+					"from %s",
+					plugin.name ());
 
 				continue;
 
 			}
 
-			applicationContext.registerBeanDefinition (
+			applicationContext.registerComponentDefinition (
 				new ComponentDefinition ()
 
 				.name (
-					fixtureProviderBeanName)
+					fixtureProviderComponentName)
 
-				.beanClass (
+				.componentClass (
 					fixtureProviderClass)
 
 				.scope (
@@ -637,228 +627,125 @@ class ApplicationContextBuilder {
 
 		}
 
-		return errors;
-
 	}
 
-	/*
-	int registerMissingConsoleHelperProviders (
-			ProjectPluginSpec plugin,
-			Set<String> consoleHelperProviderObjectNames) {
+	void registerHibernateLayerComponents (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginSpec plugin) {
 
-		int errorCount = 0;
-
-		for (ProjectModelSpec model
-				: plugin.models ().models ()) {
-
-			if (consoleHelperProviderObjectNames.contains (
-					model.name ()))
-				continue;
-
-			String objectHelperBeanName =
-				sf ("%sObjectHelper",
-					model.name ());
-
-			String consoleHelperProviderBeanName =
-				sf ("%sConsoleHelperProvider",
-					model.name ());
-
-			String consoleHelperClassName =
-				sf ("%s.%s.console.%sConsoleHelper",
-					plugin.project ().packageName (),
-					plugin.packageName (),
-					capitalise (model.name ()));
-
-			Class<?> consoleHelperClass;
-
-			try {
-
-				consoleHelperClass =
-					Class.forName (
-						consoleHelperClassName);
-
-			} catch (ClassNotFoundException exception) {
-
-				log.error (sf (
-					"Console helper class %s not found",
-					consoleHelperClassName));
-
-				return 1;
-
-			}
-
-			applicationContext.registerBeanDefinition (
-				new BeanDefinition ()
-					.name (consoleHelperProviderBeanName)
-					.beanClass (GenericConsoleHelperProvider.class)
-					.scope ("singleton")
-
-					.addValueProperty (
-						"consoleHelperProviderSpec",
-						new ConsoleHelperProviderSpec ())
-
-					.addReferenceProperty (
-						"objectHelper",
-						objectHelperBeanName)
-
-					.addValueProperty (
-						"consoleHelperClass",
-						consoleHelperClass));
-
-		}
-
-		return errorCount;
-
-	}
-	*/
-
-	int registerHibernateLayerBeans (
-			@NonNull PluginSpec plugin)
-		throws Exception {
-
-		int errorCount = 0;
-
-		for (
-			PluginModelSpec projectModelSpec
-				: plugin.models ().models ()
-		) {
-
-			errorCount +=
+		plugin.models ().models ().forEach (
+			projectModelSpec ->
 				registerDaoHibernate (
-					projectModelSpec);
-
-		}
-
-		return errorCount;
+					taskLog,
+					projectModelSpec));
 
 	}
 
-	int registerObjectLayerBeans (
-			@NonNull PluginSpec plugin)
-		throws Exception {
+	void registerObjectLayerComponents (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginSpec plugin) {
 
-		int errorCount = 0;
+		plugin.models ().models ().forEach (
+			projectModelSpec -> {
 
-		for (
-			PluginModelSpec projectModelSpec
-				: plugin.models ().models ()
-		) {
+			registerObjectHooks (
+				taskLog,
+				projectModelSpec);
 
-			errorCount +=
-				registerObjectHooks (
-					projectModelSpec);
+			registerObjectHelper (
+				taskLog,
+				projectModelSpec);
 
-			errorCount +=
-				registerObjectHelper (
-					projectModelSpec);
+			registerObjectHelperImplementation (
+				taskLog,
+				projectModelSpec);
 
-			errorCount +=
-				registerObjectHelperImplementation (
-					projectModelSpec);
-
-		}
-
-		return errorCount;
+		});
 
 	}
 
-	int registerApiLayerBeans (
-			@NonNull PluginSpec plugin)
-		throws Exception {
+	void registerApiLayerComponents (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginSpec plugin) {
 
-		int errors = 0;
-
-		return errors;
+		doNothing ();
 
 	}
 
-	int registerConsoleLayerBeans (
-			@NonNull PluginSpec plugin)
-		throws Exception {
+	void registerConsoleLayerComponents (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginSpec plugin) {
 
-		int errors = 0;
-
-		for (PluginModelSpec model
-				: plugin.models ().models ()) {
-
-			errors +=
+		plugin.models ().models ().forEach (
+			pluginModelSpec ->
 				registerConsoleHelper (
-					model);
+					taskLog,
+					pluginModelSpec));
 
-		}
-
-		for (
-			PluginEnumTypeSpec enumType
-				: plugin.models ().enumTypes ()
-		) {
-
-			errors +=
+		plugin.models ().enumTypes ().forEach (
+			pluginEnumTypeSpec ->
 				registerEnumConsoleHelper (
-					enumType);
-
-		}
-
-		return errors;
+					taskLog,
+					pluginEnumTypeSpec));
 
 	}
 
-	int registerLayerBean (
-			@NonNull PluginBeanSpec beanSpec)
-		throws Exception {
+	void registerLayerComponent (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginComponentSpec componentSpec) {
 
 		log.debug (
 			stringFormat (
 				"Loading %s from %s",
-				beanSpec.className (),
-				beanSpec.plugin ().name ()));
+				componentSpec.className (),
+				componentSpec.plugin ().name ()));
 
-		String beanClassName =
+		String componentClassName =
 			stringFormat (
 				"%s.%s",
-				beanSpec.plugin ().packageName (),
-				beanSpec.className ());
+				componentSpec.plugin ().packageName (),
+				componentSpec.className ());
 
-		Class<?> beanClass;
+		Class <?> componentClass;
 
 		try {
 
-			beanClass =
+			componentClass =
 				Class.forName (
-					beanClassName);
+					componentClassName);
 
 		} catch (ClassNotFoundException exception) {
 
-			log.error (
-				stringFormat (
-					"No such class %s in %s.%s.%s",
-					beanClassName,
-					beanSpec.plugin ().name (),
-					beanSpec.layer ().name (),
-					beanSpec.className ()));
+			taskLog.errorFormat (
+				"No such class %s in %s.%s.%s",
+				componentClassName,
+				componentSpec.plugin ().name (),
+				componentSpec.layer ().name (),
+				componentSpec.className ());
 
-			return 1;
+			return;
 
 		}
 
-		String beanName = null;
+		String componentName = null;
 
 		SingletonComponent singletonComponent =
-			beanClass.getAnnotation (
+			componentClass.getAnnotation (
 				SingletonComponent.class);
 
 		if (singletonComponent != null) {
 
-			beanName =
+			componentName =
 				singletonComponent.value ();
 
-			applicationContext.registerBeanDefinition (
+			applicationContext.registerComponentDefinition (
 				new ComponentDefinition ()
 
 				.name (
-					beanName)
+					componentName)
 
-				.beanClass (
-					beanClass)
+				.componentClass (
+					componentClass)
 
 				.scope (
 					"singleton")
@@ -868,22 +755,22 @@ class ApplicationContextBuilder {
 		}
 
 		PrototypeComponent prototypeComponent =
-			beanClass.getAnnotation (
+			componentClass.getAnnotation (
 				PrototypeComponent.class);
 
 		if (prototypeComponent != null) {
 
-			beanName =
+			componentName =
 				prototypeComponent.value ();
 
-			applicationContext.registerBeanDefinition (
+			applicationContext.registerComponentDefinition (
 				new ComponentDefinition ()
 
 				.name (
-					beanName)
+					componentName)
 
-				.beanClass (
-					beanClass)
+				.componentClass (
+					componentClass)
 
 				.scope (
 					"prototype")
@@ -893,27 +780,27 @@ class ApplicationContextBuilder {
 		}
 
 		ProxiedRequestComponent proxiedRequestComponent =
-			beanClass.getAnnotation (
+			componentClass.getAnnotation (
 				ProxiedRequestComponent.class);
 
 		if (proxiedRequestComponent != null) {
 
-			beanName =
+			componentName =
 				proxiedRequestComponent.value ();
 
-			String targetBeanName =
+			String targetComponentName =
 				stringFormat (
 					"%sTarget",
-					beanName);
+					componentName);
 
-			applicationContext.registerBeanDefinition (
+			applicationContext.registerComponentDefinition (
 				new ComponentDefinition ()
 
 				.name (
-					targetBeanName)
+					targetComponentName)
 
-				.beanClass (
-					beanClass)
+				.componentClass (
+					componentClass)
 
 				.scope (
 					"prototype")
@@ -923,50 +810,49 @@ class ApplicationContextBuilder {
 
 			);
 
-			applicationContext.registerBeanDefinition (
+			applicationContext.registerComponentDefinition (
 				new ComponentDefinition ()
 
 				.name (
-					beanName)
+					componentName)
 
-				.beanClass (
+				.componentClass (
 					proxiedRequestComponent.proxyInterface ())
 
 				.factoryClass (
-					ThreadLocalProxyBeanFactory.class)
+					ThreadLocalProxyComponentFactory.class)
 
 				.scope (
 					"singleton")
 
 				.addValueProperty (
-					"beanName",
-					beanName)
+					"componentName",
+					componentName)
 
 				.addValueProperty (
-					"beanClass",
+					"componentClass",
 					proxiedRequestComponent.proxyInterface ())
 
 			);
 
 			applicationContext.requestComponentNames ().add (
-				beanName);
+				componentName);
 
 		}
 
-		if (beanName == null) {
+		if (componentName == null) {
 
-			log.error (
-				stringFormat (
-					"Could not find component annotation on %s",
-					beanClass.getName ()));
+			taskLog.errorFormat (
+				"Could not find component annotation on %s",
+				componentClass.getName ());
 
-			return 1;
+			return;
 
 		}
 
 		for (
 			Method method
-				: beanClass.getDeclaredMethods ()
+				: componentClass.getDeclaredMethods ()
 		) {
 
 			Named namedAnnotation =
@@ -977,10 +863,13 @@ class ApplicationContextBuilder {
 				method.getAnnotation (
 					SingletonComponent.class);
 
-			if (singletonComponentAnnotation != null) {
+			if (
+				isNotNull (
+					singletonComponentAnnotation)
+			) {
 
 				if (
-					notEqual (
+					stringNotEqualSafe (
 						method.getName (),
 						singletonComponentAnnotation.value ())
 				) {
@@ -994,13 +883,13 @@ class ApplicationContextBuilder {
 
 				}
 
-				applicationContext.registerBeanDefinition (
+				applicationContext.registerComponentDefinition (
 					new ComponentDefinition ()
 
 					.name (
 						singletonComponentAnnotation.value ())
 
-					.beanClass (
+					.componentClass (
 						method.getReturnType ())
 
 					.scope (
@@ -1010,8 +899,8 @@ class ApplicationContextBuilder {
 						MethodComponentFactory.class)
 
 					.addReferenceProperty (
-						"factoryBean",
-						beanName)
+						"factoryComponent",
+						componentName)
 
 					.addValueProperty (
 						"factoryMethodName",
@@ -1036,7 +925,7 @@ class ApplicationContextBuilder {
 			if (prototypeComponentAnnotation != null) {
 
 				if (
-					notEqual (
+					stringNotEqualSafe (
 						method.getName (),
 						prototypeComponentAnnotation.value ())
 				) {
@@ -1050,13 +939,13 @@ class ApplicationContextBuilder {
 
 				}
 
-				applicationContext.registerBeanDefinition (
+				applicationContext.registerComponentDefinition (
 					new ComponentDefinition ()
 
 					.name (
 						prototypeComponentAnnotation.value ())
 
-					.beanClass (
+					.componentClass (
 						method.getReturnType ())
 
 					.scope (
@@ -1066,8 +955,8 @@ class ApplicationContextBuilder {
 						MethodComponentFactory.class)
 
 					.addReferenceProperty (
-						"factoryBean",
-						beanName)
+						"factoryComponent",
+						componentName)
 
 					.addValueProperty (
 						"factoryMethodName",
@@ -1087,15 +976,13 @@ class ApplicationContextBuilder {
 
 		}
 
-		return 0;
-
 	}
 
-	int registerObjectHooks (
-			@NonNull PluginModelSpec model)
-		throws Exception {
+	void registerObjectHooks (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginModelSpec model) {
 
-		String objectHooksBeanName =
+		String objectHooksComponentName =
 			stringFormat (
 				"%sHooks",
 				model.name ());
@@ -1106,7 +993,7 @@ class ApplicationContextBuilder {
 				model.plugin ().packageName (),
 				capitalise (model.name ()));
 
-		Class<?> objectHooksClass;
+		Class <?> objectHooksClass;
 
 		try {
 
@@ -1114,13 +1001,13 @@ class ApplicationContextBuilder {
 				Class.forName (
 					objectHooksClassName);
 
-			applicationContext.registerBeanDefinition (
+			applicationContext.registerComponentDefinition (
 				new ComponentDefinition ()
 
 				.name (
-					objectHooksBeanName)
+					objectHooksComponentName)
 
-				.beanClass (
+				.componentClass (
 					objectHooksClass)
 
 				.scope (
@@ -1128,17 +1015,15 @@ class ApplicationContextBuilder {
 
 			);
 
-			return 0;
-
 		} catch (ClassNotFoundException exception) {
 
-			applicationContext.registerBeanDefinition (
+			applicationContext.registerComponentDefinition (
 				new ComponentDefinition ()
 
 				.name (
-					objectHooksBeanName)
+					objectHooksComponentName)
 
-				.beanClass (
+				.componentClass (
 					ObjectHooks.DefaultImplementation.class)
 
 				.scope (
@@ -1146,17 +1031,15 @@ class ApplicationContextBuilder {
 
 			);
 
-			return 0;
-
 		}
 
 	}
 
-	int registerObjectHelper (
-			@NonNull PluginModelSpec model)
-		throws Exception {
+	void registerObjectHelper (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginModelSpec model) {
 
-		String objectHelperBeanName =
+		String objectHelperComponentName =
 			stringFormat (
 				"%sObjectHelper",
 				model.name ());
@@ -1165,18 +1048,20 @@ class ApplicationContextBuilder {
 			stringFormat (
 				"%s.model.%sObjectHelper",
 				model.plugin ().packageName (),
-				capitalise (model.name ()));
+				capitalise (
+					model.name ()));
 
-		Class<?> objectHelperClass =
-			Class.forName (objectHelperClassName);
+		Class <?> objectHelperClass =
+			classForNameRequired (
+				objectHelperClassName);
 
-		applicationContext.registerBeanDefinition (
+		applicationContext.registerComponentDefinition (
 			new ComponentDefinition ()
 
 			.name (
-				objectHelperBeanName)
+				objectHelperComponentName)
 
-			.beanClass (
+			.componentClass (
 				objectHelperClass)
 
 			.scope (
@@ -1195,15 +1080,13 @@ class ApplicationContextBuilder {
 
 		);
 
-		return 0;
-
 	}
 
-	int registerObjectHelperImplementation (
-			@NonNull PluginModelSpec model)
-		throws Exception {
+	void registerObjectHelperImplementation (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginModelSpec model) {
 
-		String objectHelperImplementationBeanName =
+		String objectHelperImplementationComponentName =
 			stringFormat (
 				"%sObjectHelperImplementation",
 				model.name ());
@@ -1212,9 +1095,10 @@ class ApplicationContextBuilder {
 			stringFormat (
 				"%s.model.%sObjectHelperImplementation",
 				model.plugin ().packageName (),
-				capitalise (model.name ()));
+				capitalise (
+					model.name ()));
 
-		Class<?> objectHelperImplementationClass;
+		Class <?> objectHelperImplementationClass;
 
 		try {
 
@@ -1232,17 +1116,17 @@ class ApplicationContextBuilder {
 				model.name ()));
 			*/
 
-			return 0;
+			return;
 
 		}
 
-		applicationContext.registerBeanDefinition (
+		applicationContext.registerComponentDefinition (
 			new ComponentDefinition ()
 
 			.name (
-				objectHelperImplementationBeanName)
+				objectHelperImplementationComponentName)
 
-			.beanClass (
+			.componentClass (
 				objectHelperImplementationClass)
 
 			.scope (
@@ -1250,15 +1134,15 @@ class ApplicationContextBuilder {
 
 		);
 
-		return 0;
+		return;
 
 	}
 
-	int registerDaoHibernate (
-			@NonNull PluginModelSpec pluginModelSpec)
-		throws Exception {
+	void registerDaoHibernate (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginModelSpec pluginModelSpec) {
 
-		String daoBeanName =
+		String daoComponentName =
 			stringFormat (
 				"%sDao",
 				pluginModelSpec.name ());
@@ -1313,7 +1197,7 @@ class ApplicationContextBuilder {
 			! gotDaoClass
 			&& ! gotDaoHibernateClass
 		) {
-			return 0;
+			return;
 		}
 
 		if (
@@ -1321,21 +1205,22 @@ class ApplicationContextBuilder {
 			|| ! gotDaoHibernateClass
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"DAO methods or implementation missing for %s in %s",
-					pluginModelSpec.name (),
-					pluginModelSpec.plugin ().name ()));
+			taskLog.errorFormat (
+				"DAO methods or implementation missing for %s in %s",
+				pluginModelSpec.name (),
+				pluginModelSpec.plugin ().name ());
+
+			return;
 
 		}
 
-		applicationContext.registerBeanDefinition (
+		applicationContext.registerComponentDefinition (
 			new ComponentDefinition ()
 
 			.name (
-				daoBeanName)
+				daoComponentName)
 
-			.beanClass (
+			.componentClass (
 				daoHibernateClass)
 
 			.scope (
@@ -1343,20 +1228,20 @@ class ApplicationContextBuilder {
 
 		);
 
-		return 0;
+		return;
 
 	}
 
-	int registerConsoleHelper (
-			@NonNull PluginModelSpec model)
-		throws Exception {
+	void registerConsoleHelper (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginModelSpec model) {
 
-		String objectHelperBeanName =
+		String objectHelperComponentName =
 			stringFormat (
 				"%sObjectHelper",
 				model.name ());
 
-		String consoleHelperBeanName =
+		String consoleHelperComponentName =
 			stringFormat (
 				"%sConsoleHelper",
 				model.name ());
@@ -1377,22 +1262,21 @@ class ApplicationContextBuilder {
 
 		} catch (ClassNotFoundException exception) {
 
-			log.error (
-				stringFormat (
-					"No such class %s",
-					consoleHelperClassName));
+			taskLog.errorFormat (
+				"No such class %s",
+				consoleHelperClassName);
 
-			return 1;
+			return;
 
 		}
 
-		applicationContext.registerBeanDefinition (
+		applicationContext.registerComponentDefinition (
 			new ComponentDefinition ()
 
 			.name (
-				consoleHelperBeanName)
+				consoleHelperComponentName)
 
-			.beanClass (
+			.componentClass (
 				consoleHelperClass)
 
 			.factoryClass (
@@ -1403,7 +1287,7 @@ class ApplicationContextBuilder {
 
 			.addReferenceProperty (
 				"objectHelper",
-				objectHelperBeanName)
+				objectHelperComponentName)
 
 			.addValueProperty (
 				"consoleHelperClass",
@@ -1411,21 +1295,20 @@ class ApplicationContextBuilder {
 
 		);
 
-		return 0;
-
 	}
 
-	int registerEnumConsoleHelper (
-			@NonNull PluginEnumTypeSpec enumType)
-		throws Exception {
+	void registerEnumConsoleHelper (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginEnumTypeSpec enumType) {
 
 		String enumClassName =
 			stringFormat (
 				"%s.model.%s",
 				enumType.plugin ().packageName (),
-				capitalise (enumType.name ()));
+				capitalise (
+					enumType.name ()));
 
-		Class<?> enumClass;
+		Class <?> enumClass;
 
 		try {
 
@@ -1435,27 +1318,26 @@ class ApplicationContextBuilder {
 
 		} catch (ClassNotFoundException exception) {
 
-			log.error (
-				stringFormat (
-					"No such class %s",
-					enumClassName));
+			taskLog.errorFormat (
+				"No such class %s",
+				enumClassName);
 
-			return 1;
+			return;
 
 		}
 
-		String enumConsoleHelperBeanName =
+		String enumConsoleHelperComponentName =
 			stringFormat (
 				"%sConsoleHelper",
 				enumType.name ());
 
-		applicationContext.registerBeanDefinition (
+		applicationContext.registerComponentDefinition (
 			new ComponentDefinition ()
 
 			.name (
-				enumConsoleHelperBeanName)
+				enumConsoleHelperComponentName)
 
-			.beanClass (
+			.componentClass (
 				EnumConsoleHelper.class)
 
 			.factoryClass (
@@ -1470,11 +1352,10 @@ class ApplicationContextBuilder {
 
 		);
 
-		return 0;
-
 	}
 
-	int registerConfigBeans () {
+	void registerConfigComponents (
+			@NonNull TaskLogger taskLog) {
 
 		for (
 			String configName
@@ -1488,7 +1369,7 @@ class ApplicationContextBuilder {
 
 			String configPath =
 				stringFormat (
-					"conf/%s-config-beans.xml",
+					"conf/%s-config-components.xml",
 					configName);
 
 			applicationContext.registerXmlFilename (
@@ -1496,15 +1377,14 @@ class ApplicationContextBuilder {
 
 		}
 
-		return 0;
-
 	}
 
-	int registerSingletonBeans () {
+	void registerSingletonComponents (
+			@NonNull TaskLogger taskLog) {
 
 		for (
 			Map.Entry <String,Object> entry
-				: singletonBeans.entrySet ()
+				: singletonComponents.entrySet ()
 		) {
 
 			applicationContext.registerUnmanagedSingleton (
@@ -1512,8 +1392,6 @@ class ApplicationContextBuilder {
 				entry.getValue ());
 
 		}
-
-		return 0;
 
 	}
 
@@ -1531,11 +1409,11 @@ class ApplicationContextBuilder {
 	}
 
 	public
-	ApplicationContextBuilder registerBeanDefinition (
-			@NonNull ComponentDefinition beanDefinition) {
+	ApplicationContextBuilder registerComponentDefinition (
+			@NonNull ComponentDefinition componentDefinition) {
 
-		beanDefinitionsToRegister.add (
-			beanDefinition);
+		componentDefinitionsToRegister.add (
+			componentDefinition);
 
 		return this;
 

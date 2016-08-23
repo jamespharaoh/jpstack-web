@@ -1,6 +1,6 @@
 package wbs.framework.entity.build;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 
 import com.google.common.collect.ImmutableList;
 
@@ -64,7 +64,7 @@ class AssignedIdModelFieldBuilder {
 				false)
 
 			.valueType (
-				Integer.class)
+				Long.class)
 
 			.nullable (
 				false)

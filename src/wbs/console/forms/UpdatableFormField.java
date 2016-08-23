@@ -1,7 +1,8 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionHasOneElement;
+import static wbs.framework.utils.etc.CollectionUtils.collectionHasTwoElements;
 import static wbs.framework.utils.etc.Misc.eitherGetLeft;
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.getError;
 import static wbs.framework.utils.etc.Misc.getValue;
 import static wbs.framework.utils.etc.Misc.isError;
@@ -9,6 +10,7 @@ import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.isRight;
 import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOr;
 import static wbs.framework.utils.etc.StringUtils.stringSplitColon;
 
@@ -130,9 +132,8 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 				viewPriv);
 
 		if (
-			equal (
-				privParts.size (),
-				1)
+			collectionHasOneElement (
+				privParts)
 		) {
 
 			String privCode =
@@ -144,9 +145,8 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 				privCode);
 
 		} else if (
-			equal (
-				privParts.size (),
-				2)
+			collectionHasTwoElements (
+				privParts)
 		) {
 
 			String delegatePath =
@@ -570,30 +570,30 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 
 		// get the current value, if it is the same, do nothing
 
-		Optional<Native> oldNativeValue =
+		Optional <Native> oldNativeValue =
 			requiredValue (
 				accessor.read (
 					container));
 
-		Optional<Generic> oldGenericValue =
+		Optional <Generic> oldGenericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
 					oldNativeValue));
 
 		if (
-			equal (
+			optionalEqualOrNotPresentSafe (
 				oldGenericValue,
 				newGenericValue)
 		) {
 
-			return new UpdateResult<Generic,Native> ()
+			return new UpdateResult <Generic, Native> ()
 
 				.updated (
 					false)
 
 				.error (
-					Optional.<String>absent ());
+					Optional.absent ());
 
 		}
 
@@ -603,7 +603,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			container,
 			newNativeValue);
 
-		return new UpdateResult<Generic,Native> ()
+		return new UpdateResult <Generic, Native> ()
 
 			.updated (
 				true)

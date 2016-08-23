@@ -1,9 +1,10 @@
 package wbs.integrations.dialogue.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 import static wbs.framework.utils.etc.TimeUtils.dateToInstantNullSafe;
 
 import java.io.IOException;
@@ -172,8 +173,11 @@ class DialogueMmsApiServletModule
 							charset)));
 
 				if (
-					text == null
-					&& equal (
+
+					isNull (
+						text)
+
+					&& stringEqual (
 						type,
 						"text/plain")
 				) {
@@ -320,7 +324,7 @@ class DialogueMmsApiServletModule
 					messageId);
 
 			if (
-				notEqual (
+				stringNotEqualSafe (
 					message.getMessageType ().getCode (),
 					"mms")
 			) {
@@ -331,11 +335,14 @@ class DialogueMmsApiServletModule
 			}
 
 			String deliveryReportParam =
-				requestContext.parameterOrNull ("X-Mms-Delivery-Report");
+				requestContext.parameterOrNull (
+					"X-Mms-Delivery-Report");
 
 			if (deliveryReportParam == null) {
-				throw new ServletException("Unrecognised MMS report for "
-						+ messageId);
+
+				throw new ServletException (
+					"Unrecognised MMS report for " + messageId);
+
 			}
 
 			MessageStatus newMessageStatus = null;

@@ -2,6 +2,7 @@ package wbs.console.reporting;
 
 import java.util.List;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("sumStatsAggregator")
@@ -12,15 +13,18 @@ class SumStatsAggregator
 	@Override
 	public
 	Object aggregate (
-			List<Object> values) {
+			@NonNull List <Object> valueObjects) {
 
-		int sum = 0;
+		long sum = 0;
 
-		for (Object value
-				: values) {
+		for (
+			Object valueObject
+				: valueObjects
+		) {
 
 			sum +=
-				(Integer) value;
+				(Long)
+				valueObject;
 
 		}
 

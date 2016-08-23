@@ -12,9 +12,9 @@
 	</models>
 
 	<layer name="api">
-		<bean class="api.TxtNationApiServletModule"/>
-		<bean class="api.TxtNationRouteInFile"/>
-		<bean class="api.TxtNationRoutePathHandlerEntry"/>
+		<component class="api.TxtNationApiServletModule"/>
+		<component class="api.TxtNationRouteInFile"/>
+		<component class="api.TxtNationRoutePathHandlerEntry"/>
 	</layer>
 
 	<console-modules>

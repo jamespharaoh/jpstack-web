@@ -3,7 +3,7 @@
 	package="wbs.platform.hooks">
 
 	<layer name="logic">
-		<bean class="logic.HooksManager"/>
+		<component class="logic.HooksManager"/>
 	</layer>
 
 </plugin>

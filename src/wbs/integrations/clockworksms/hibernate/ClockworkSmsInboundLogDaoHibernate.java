@@ -4,13 +4,12 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import java.util.List;
 
-import lombok.NonNull;
-
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogDao;
 import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogRec;
@@ -25,7 +24,7 @@ class ClockworkSmsInboundLogDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			@NonNull ClockworkSmsInboundLogSearch search) {
 
 		Criteria criteria =
@@ -98,7 +97,7 @@ class ClockworkSmsInboundLogDaoHibernate
 
 		return findMany (
 			"searchIds (search)",
-			Integer.class,
+			Long.class,
 			criteria);
 
 	}

@@ -1,21 +1,23 @@
 package wbs.console.param;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.not;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
+
 import lombok.NonNull;
 
 public
-class EnumParamChecker<E extends Enum<E>>
-	implements ParamChecker<E> {
+class EnumParamChecker <EnumType extends Enum <EnumType>>
+	implements ParamChecker <EnumType> {
 
 	String error;
-	Class<E> enumClass;
+	Class<EnumType> enumClass;
 	boolean required;
 
 	public
 	EnumParamChecker (
 			String newError,
 			boolean required,
-			Class<E> enumClass) {
+			Class<EnumType> enumClass) {
 
 		error = newError;
 		this.required = required;
@@ -25,17 +27,20 @@ class EnumParamChecker<E extends Enum<E>>
 
 	@Override
 	public
-	E get (
+	EnumType get (
 			@NonNull String param) {
 
 		param =
 			param.trim ();
 
 		if (
-			equal (
-				"",
+
+			stringIsEmpty (
 				param)
-			&& ! required
+
+			&& not (
+				required)
+
 		) {
 
 			return null;

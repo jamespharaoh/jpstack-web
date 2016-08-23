@@ -134,7 +134,7 @@ class ChatUserNotesPart
 			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.timestampTimezoneString (
-					chatUserLogic.timezone (
+					chatUserLogic.getTimezone (
 						chatUser),
 					chatUserNote.getTimestamp ()));
 

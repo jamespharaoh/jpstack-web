@@ -1,10 +1,10 @@
 package wbs.smsapps.subscription.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalToGoogle;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromJava;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
@@ -172,7 +172,7 @@ class SubscriptionCommand
 				number);
 
 		if (
-			equal (
+			stringEqual (
 				command.getCode (),
 				"subscribe")
 		) {
@@ -180,7 +180,7 @@ class SubscriptionCommand
 			return doSubscribe ();
 
 		} else if (
-			equal (
+			stringEqual (
 				command.getCode (),
 				"unsubscribe")
 		) {
@@ -201,7 +201,7 @@ class SubscriptionCommand
 	void matchKeyword () {
 
 		Optional<SubscriptionKeywordRec> subscriptionKeywordOptional =
-			optionalToGoogle (
+			optionalFromJava (
 
 			keywordFinder.find (
 				rest)
@@ -278,7 +278,7 @@ class SubscriptionCommand
 
 			activeSubscriptionSub == null
 
-			|| notEqual (
+			|| referenceNotEqualSafe (
 				activeSubscriptionSub.getSubscriptionList (),
 				subscriptionList)
 

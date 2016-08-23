@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import lombok.NonNull;
-import lombok.SneakyThrows;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
@@ -18,6 +15,8 @@ import org.joda.time.ReadableInstant;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+import lombok.SneakyThrows;
 import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("statsConsoleLogic")
@@ -108,10 +107,10 @@ class StatsConsoleLogic {
 
 	public
 	StatsPeriod createStatsPeriod (
-			StatsGranularity granularity,
-			ReadableInstant startTime,
-			ReadableInstant endTime,
-			Integer offset) {
+			@NonNull StatsGranularity granularity,
+			@NonNull ReadableInstant startTime,
+			@NonNull ReadableInstant endTime,
+			@NonNull Long offset) {
 
 		StatsPeriod ret =
 			new StatsPeriod ()

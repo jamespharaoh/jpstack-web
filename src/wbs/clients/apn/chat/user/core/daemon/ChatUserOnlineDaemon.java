@@ -1,11 +1,11 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.moreThan;
+import static wbs.framework.utils.etc.NumberUtils.moreThanZero;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
@@ -15,6 +15,8 @@ import javax.inject.Inject;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
+
+import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
@@ -151,7 +153,7 @@ class ChatUserOnlineDaemon
 
 		if (
 
-			equal (
+			enumEqualSafe (
 				chatUser.getDeliveryMethod (),
 				ChatMessageMethod.sms)
 
@@ -318,9 +320,10 @@ class ChatUserOnlineDaemon
 				isNull (
 					chatUser.getSessionInfoRemain ())
 
-				|| moreThan (
-					chatUser.getSessionInfoRemain (),
-					1))
+				|| moreThanZero (
+					chatUser.getSessionInfoRemain ())
+
+			)
 
 		) {
 
@@ -330,11 +333,11 @@ class ChatUserOnlineDaemon
 					objectManager.objectPathMini (
 						chatUser)));
 
-			int numSent =
+			long numSent =
 				chatInfoLogic.sendUserInfos (
 					chatUser,
-					1,
-					null);
+					1l,
+					Optional.absent ());
 
 			if (chatUser.getSessionInfoRemain () != null) {
 

@@ -3,7 +3,7 @@
 	package="wbs.framework.fixtures">
 
 	<layer name="fixture">
-		<bean class="FixturesComponents"/>
+		<component class="FixturesComponents"/>
 	</layer>
 
 </plugin>

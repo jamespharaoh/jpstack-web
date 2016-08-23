@@ -88,18 +88,15 @@
 
 		<enum-field
 			name="joinGender"
-			nullable="yes"
-			helper="genderConsoleHelper"/>
+			nullable="yes"/>
 
 		<enum-field
 			name="joinOrient"
-			nullable="yes"
-			helper="orientConsoleHelper"/>
+			nullable="yes"/>
 
 		<enum-field
 			name="joinType"
-			nullable="yes"
-			helper="chatKeywordJoinTypeConsoleHelper"/>
+			nullable="yes"/>
 
 		<object-field
 			name="joinChatAffiliate"

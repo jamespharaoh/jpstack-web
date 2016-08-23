@@ -1,6 +1,6 @@
 package wbs.console.context;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -12,7 +12,6 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import wbs.console.helper.PrivKeySpec;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.tab.ConsoleContextTab;
@@ -126,13 +125,18 @@ class SimpleConsoleContext
 
 		// set privs
 
-		for (PrivKeySpec privKeySpec
-				: privKeySpecs) {
+		for (
+			PrivKeySpec privKeySpec
+				: privKeySpecs
+		) {
 
-			if (! equal (
+			if (
+				stringNotEqualSafe (
 					privKeySpec.delegateName (),
-					"root"))
+					"root")
+			) {
 				throw new RuntimeException ();
+			}
 
 			if (privChecker.canRecursive (
 					GlobalId.root,

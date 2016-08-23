@@ -1,15 +1,14 @@
 package wbs.clients.apn.chat.date.daemon;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import javax.inject.Inject;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.date.logic.ChatDateLogic;
 import wbs.clients.apn.chat.help.logic.ChatHelpLogLogic;
@@ -108,7 +107,7 @@ class ChatDateStopCommand
 			command.getCommandType ();
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				commandType.getCode (),
 				"date_stop")
 		) {
@@ -116,7 +115,7 @@ class ChatDateStopCommand
 		}
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				commandType.getParentType ().getCode (),
 				"chat_scheme")
 		) {

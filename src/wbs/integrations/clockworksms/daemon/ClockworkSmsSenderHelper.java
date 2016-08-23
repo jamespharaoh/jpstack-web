@@ -1,11 +1,11 @@
 package wbs.integrations.clockworksms.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.sms.gsm.GsmUtils.isNotValidGsm;
+import static wbs.sms.gsm.GsmUtils.gsmStringIsNotValid;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -110,7 +110,7 @@ class ClockworkSmsSenderHelper
 		// validate message text
 
 		if (
-			isNotValidGsm (
+			gsmStringIsNotValid (
 				smsMessage.getText ().getText ())
 		) {
 
@@ -125,11 +125,11 @@ class ClockworkSmsSenderHelper
 		}
 
 		long gsmLength =
-			GsmUtils.length (
+			GsmUtils.gsmStringLength (
 				smsMessage.getText ().getText ());
 
 		long gsmParts =
-			GsmUtils.parts (
+			GsmUtils.gsmCountMessageParts (
 				gsmLength);
 
 		if (
@@ -157,7 +157,7 @@ class ClockworkSmsSenderHelper
 		// pick a handler
 
 		if (
-			equal (
+			stringEqual (
 				smsMessage.getMessageType ().getCode (),
 				"sms")
 		) {

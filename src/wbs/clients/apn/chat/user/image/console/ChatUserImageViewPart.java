@@ -42,7 +42,7 @@ class ChatUserImageViewPart
 
 		image =
 			chatUserImageHelper.findRequired (
-				requestContext.parameterInteger (
+				requestContext.parameterIntegerRequired (
 					"chatUserImageId"));
 
 		if (image.getChatUser () != chatUser)

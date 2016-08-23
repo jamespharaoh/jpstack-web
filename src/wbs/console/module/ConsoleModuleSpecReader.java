@@ -6,12 +6,11 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import com.google.common.collect.ImmutableList;
-
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataFromXml;
+import wbs.framework.data.tools.DataFromXmlBuilder;
 
 @Accessors (fluent = true)
 @SingletonComponent ("consoleModuleSpecReader")
@@ -28,19 +27,22 @@ class ConsoleModuleSpecReader {
 	public
 	void init () {
 
-		dataFromXml =
-			new DataFromXml ();
+		DataFromXmlBuilder builder =
+			new DataFromXmlBuilder ();
 
 		for (
 			Map.Entry <Class <?>, Provider <ConsoleModuleSpec>> entry
 				: consoleModuleSpecProviders.entrySet ()
 		) {
 
-			dataFromXml.registerBuilder (
+			builder.registerBuilder (
 				entry.getKey (),
 				entry.getValue ());
 
 		}
+
+		dataFromXml =
+			builder.build ();
 
 	}
 
@@ -51,7 +53,6 @@ class ConsoleModuleSpecReader {
 		ConsoleModuleSpec consoleSpec =
 			(ConsoleModuleSpec)
 			dataFromXml.readClasspath (
-				ImmutableList.of (),
 				xmlResourceName);
 
 		return consoleSpec;

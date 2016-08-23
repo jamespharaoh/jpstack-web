@@ -1,17 +1,22 @@
 package wbs.framework.utils.etc;
 
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+
 import java.sql.Timestamp;
 import java.util.Date;
-
-import lombok.NonNull;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+import org.joda.time.ReadableDuration;
 import org.joda.time.ReadableInstant;
+import org.joda.time.Years;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+
+import lombok.NonNull;
 
 public
 class TimeUtils {
@@ -27,8 +32,8 @@ class TimeUtils {
 
 	public static
 	boolean earlierThan (
-			@NonNull Instant left,
-			@NonNull Instant right) {
+			@NonNull ReadableInstant left,
+			@NonNull ReadableInstant right) {
 
 		return left.isBefore (
 			right);
@@ -36,11 +41,31 @@ class TimeUtils {
 	}
 
 	public static
+	boolean notEarlierThan (
+			@NonNull ReadableInstant left,
+			@NonNull ReadableInstant right) {
+
+		return ! left.isBefore (
+			right);
+
+	}
+
+	public static
 	boolean laterThan (
-			@NonNull Instant left,
-			@NonNull Instant right) {
+			@NonNull ReadableInstant left,
+			@NonNull ReadableInstant right) {
 
 		return left.isAfter (
+			right);
+
+	}
+
+	public static
+	boolean notLaterThan (
+			@NonNull ReadableInstant left,
+			@NonNull ReadableInstant right) {
+
+		return ! left.isAfter (
 			right);
 
 	}
@@ -177,6 +202,155 @@ class TimeUtils {
 		}
 
 		return earliest;
+
+	}
+
+	public static
+	boolean localDateEqual (
+			@NonNull LocalDate date0,
+			@NonNull LocalDate date1) {
+
+		return date0.equals (
+			date1);
+
+	}
+
+	public static
+	boolean localDateNotEqual (
+			@NonNull LocalDate date0,
+			@NonNull LocalDate date1) {
+
+		return ! date0.equals (
+			date1);
+
+	}
+
+	public static
+	void sleepDuration (
+			@NonNull ReadableDuration duration)
+		throws InterruptedException {
+
+		Thread.sleep (
+			duration.getMillis ());
+
+	}
+
+	public static
+	void sleepUntil (
+			@NonNull ReadableInstant endTime)
+		throws InterruptedException {
+
+		long millisToSleep = (
+			+ endTime.getMillis ()
+			- System.currentTimeMillis ());
+
+		if (millisToSleep > 0) {
+
+			Thread.sleep (
+				millisToSleep);
+
+		}
+
+	}
+
+	public static
+	LocalTime localTime (
+			long hour,
+			long minute,
+			long second,
+			long millisecond) {
+
+		return new LocalTime (
+
+			toJavaIntegerRequired (
+				hour),
+
+			toJavaIntegerRequired (
+				minute),
+
+			toJavaIntegerRequired (
+				second),
+
+			toJavaIntegerRequired (
+				millisecond)
+
+		);
+
+	}
+
+	public static
+	LocalTime localTime (
+			long hour,
+			long minute,
+			long second) {
+
+		return new LocalTime (
+
+			toJavaIntegerRequired (
+				hour),
+
+			toJavaIntegerRequired (
+				minute),
+
+			toJavaIntegerRequired (
+				second),
+
+			0
+
+		);
+
+	}
+
+	public static
+	LocalTime localTime (
+			long hour,
+			long minute) {
+
+		return new LocalTime (
+
+			toJavaIntegerRequired (
+				hour),
+
+			toJavaIntegerRequired (
+				minute),
+
+			0,
+			0
+
+		);
+
+	}
+
+	public static
+	LocalTime localTime (
+			long hour) {
+
+		return new LocalTime (
+
+			toJavaIntegerRequired (
+				hour),
+
+			0,
+			0,
+			0
+
+		);
+
+	}
+
+	public static
+	long calculateAgeInYears (
+			@NonNull LocalDate birthDate,
+			@NonNull Instant now,
+			@NonNull DateTimeZone timezone) {
+
+		Years years =
+			Years.yearsBetween (
+				birthDate.toDateTimeAtStartOfDay (
+					timezone),
+				now);
+
+		return years.getYears ();
 
 	}
 

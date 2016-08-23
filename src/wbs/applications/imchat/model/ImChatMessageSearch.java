@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
 import wbs.framework.utils.TextualInterval;
 
 @Accessors (fluent = true)
@@ -13,7 +12,7 @@ public
 class ImChatMessageSearch
 	implements Serializable {
 
-	Integer imChatId;
+	Long imChatId;
 
 	TextualInterval timestamp;
 

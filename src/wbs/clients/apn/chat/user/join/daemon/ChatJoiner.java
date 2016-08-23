@@ -1,9 +1,14 @@
 package wbs.clients.apn.chat.user.join.daemon;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
+import static wbs.framework.utils.etc.LogicUtils.allOf;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.NumberUtils.equalToZero;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringLongerThan;
 
 import java.util.Collections;
 
@@ -398,13 +403,16 @@ class ChatJoiner {
 	private
 	boolean updateUserPhoto () {
 
-		ChatUserImageRec chatUserImage =
+		Optional <ChatUserImageRec> chatUserImageOptional =
 			chatUserLogic.setPhotoFromMessage (
 				chatUser,
 				message,
 				false);
 
-		if (chatUserImage == null) {
+		if (
+			isPresent (
+				chatUserImageOptional)
+		) {
 
 			chatSendLogic.sendSystemMmsFree (
 				chatUser,
@@ -459,19 +467,33 @@ class ChatJoiner {
 	private
 	boolean updateUser () {
 
-		if (gender != null)
-			chatUser.setGender (gender);
+		chatUser
 
-		if (orient != null)
-			chatUser.setOrient (orient);
+			.setGender (
+				ifNull (
+					chatUser.getGender (),
+					gender))
 
-		if (deliveryId != null) {
-			chatUserLogic.adultVerify (chatUser);
+			.setOrient (
+				ifNull (
+					chatUser.getOrient (),
+					orient));
+
+		if (
+			isNotNull (
+				deliveryId)
+		) {
+
+			chatUserLogic.adultVerify (
+				chatUser);
+
 			return true;
+
 		}
 
 		if (
-			in (joinType,
+			enumInSafe (
+				joinType,
 				JoinType.chatPrefs)
 		) {
 
@@ -482,7 +504,8 @@ class ChatJoiner {
 		// set gender
 
 		if (
-			in (joinType,
+			enumInSafe (
+				joinType,
 				JoinType.chatGender,
 				JoinType.dateGender)
 		) {
@@ -492,7 +515,8 @@ class ChatJoiner {
 		}
 
 		if (
-			in (joinType,
+			enumInSafe (
+				joinType,
 				JoinType.chatGenderOther,
 				JoinType.dateGenderOther)
 		) {
@@ -503,17 +527,24 @@ class ChatJoiner {
 
 		// set info
 
-		if (
-			in (joinType,
+		if (allOf (
+
+			() -> enumInSafe (
+				joinType,
 				JoinType.chatSetInfo,
-				JoinType.dateSetInfo)
-			&& rest.length () > 10
-		) {
+				JoinType.dateSetInfo),
+
+			() -> stringLongerThan (
+				10l,
+				rest)
+
+		)) {
 
 			chatInfoLogic.chatUserSetInfo (
 				chatUser,
 				rest,
-				message.getThreadId ());
+				Optional.of (
+					message.getThreadId ()));
 
 		}
 
@@ -521,7 +552,7 @@ class ChatJoiner {
 
 		if (
 
-			in (
+			enumInSafe (
 				joinType,
 				JoinType.chatAge)
 
@@ -540,7 +571,7 @@ class ChatJoiner {
 
 		if (
 
-			in (
+			enumInSafe (
 				joinType,
 				JoinType.chatCharges,
 				JoinType.dateCharges)
@@ -568,7 +599,8 @@ class ChatJoiner {
 		// set date of birth
 
 		if (
-			in (joinType,
+			enumInSafe (
+				joinType,
 				JoinType.chatDob,
 				JoinType.dateDob)
 		) {
@@ -580,7 +612,8 @@ class ChatJoiner {
 		// set location
 
 		if (
-			in (joinType,
+			enumInSafe (
+				joinType,
 				JoinType.chatLocation,
 				JoinType.dateLocation)
 		) {
@@ -597,7 +630,8 @@ class ChatJoiner {
 		// set photo, if appropriate
 
 		if (
-			in (joinType,
+			enumInSafe (
+				joinType,
 				JoinType.dateSetPhoto)
 		) {
 
@@ -827,10 +861,16 @@ class ChatJoiner {
 
 		// check we got a decent location
 
-		if (in (joinType,
+		if (
+
+			enumInSafe (
+				joinType,
 				JoinType.chatLocation,
 				JoinType.dateLocation)
-			&& ! gotPlace) {
+
+			&& ! gotPlace
+
+		) {
 
 			chatSendLogic.sendSystemMagic (
 				chatUser,
@@ -839,9 +879,11 @@ class ChatJoiner {
 				"location_error",
 				commandHelper.findByCodeRequired (
 					chatUser.getChatScheme (),
-					joinTypeIsChat (joinType)
-						? "chat_location"
-						: "date_location"),
+					ifThenElse (
+						joinTypeIsChat (
+							joinType),
+						() -> "chat_location",
+						() -> "date_location")),
 				0l,
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
@@ -1235,10 +1277,12 @@ class ChatJoiner {
 		case chatPics:
 
 			if (
-				0 == chatInfoLogic.sendUserPics (
-					chatUser,
-					3,
-					message.getThreadId ())
+				equalToZero (
+					chatInfoLogic.sendUserPics (
+						chatUser,
+						3l,
+						Optional.of (
+							message.getThreadId ())))
 			) {
 
 				chatSendLogic.sendSystemMagic (
@@ -1251,7 +1295,7 @@ class ChatJoiner {
 						"help"),
 					0l,
 					TemplateMissing.error,
-					Collections.<String,String>emptyMap ());
+					Collections.emptyMap ());
 
 			}
 
@@ -1260,10 +1304,12 @@ class ChatJoiner {
 		case chatVideos:
 
 			if (
-				0 == chatInfoLogic.sendUserVideos (
-					chatUser,
-					3,
-					message.getThreadId ())
+				equalToZero (
+					chatInfoLogic.sendUserVideos (
+						chatUser,
+						3l,
+						Optional.of (
+							message.getThreadId ())))
 			) {
 
 				chatSendLogic.sendSystemMagic (
@@ -1276,7 +1322,7 @@ class ChatJoiner {
 						"help"),
 					0l,
 					TemplateMissing.error,
-					Collections.<String,String>emptyMap ());
+					Collections.emptyMap ());
 
 			}
 
@@ -1284,11 +1330,12 @@ class ChatJoiner {
 
 		case chatNext:
 
-			int numSent =
+			long numSent =
 				chatInfoLogic.sendUserInfos (
 					chatUser,
-					2,
-					message.getThreadId ());
+					2l,
+					Optional.of (
+						message.getThreadId ()));
 
 			if (numSent > 1) {
 
@@ -1313,7 +1360,7 @@ class ChatJoiner {
 						"help"),
 					0l,
 					TemplateMissing.error,
-					Collections.<String,String>emptyMap ());
+					Collections.emptyMap ());
 
 			}
 

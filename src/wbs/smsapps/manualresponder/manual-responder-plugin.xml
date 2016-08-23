@@ -22,24 +22,24 @@
 	</models>
 
 	<layer name="logic">
-		<bean class="logic.ManualResponderLogicImplementation"/>
+		<component class="logic.ManualResponderLogicImplementation"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.ManualResponderNumberConsoleHooks"/>
-		<bean class="console.ManualResponderQueueConsolePlugin"/>
-		<bean class="console.ManualResponderRequestConsoleHooks"/>
-		<bean class="console.ManualResponderRequestPendingFormAction"/>
-		<bean class="console.ManualResponderRequestPendingFormResponder"/>
-		<bean class="console.ManualResponderRequestPendingNumberNoteUpdateAction"/>
-		<bean class="console.ManualResponderRequestPendingSummaryPart"/>
-		<bean class="console.ManualResponderStatusLine"/>
-		<bean class="console.ManualResponderStatusLinePart"/>
+		<component class="console.ManualResponderNumberConsoleHooks"/>
+		<component class="console.ManualResponderQueueConsolePlugin"/>
+		<component class="console.ManualResponderRequestConsoleHooks"/>
+		<component class="console.ManualResponderRequestPendingFormAction"/>
+		<component class="console.ManualResponderRequestPendingFormResponder"/>
+		<component class="console.ManualResponderRequestPendingNumberNoteUpdateAction"/>
+		<component class="console.ManualResponderRequestPendingSummaryPart"/>
+		<component class="console.ManualResponderStatusLine"/>
+		<component class="console.ManualResponderStatusLinePart"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.ManualResponderCommand"/>
-		<bean class="daemon.ManualResponderDelivery"/>
+		<component class="daemon.ManualResponderCommand"/>
+		<component class="daemon.ManualResponderDelivery"/>
 	</layer>
 
 	<fixtures>

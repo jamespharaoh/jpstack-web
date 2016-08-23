@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.queue.model.QueueItemRec;
@@ -36,20 +37,20 @@ class QueueStatsFilter {
 
 	// state
 
-	Optional<SliceRec> slice;
-	Optional<Set<QueueRec>> queues;
+	Optional <SliceRec> slice;
+	Optional <Set <QueueRec>> queues;
 
-	Set<QueueRec> includeQueues =
+	Set <QueueRec> includeQueues =
 		new HashSet<QueueRec> ();
 
-	Set<QueueRec> excludeQueues =
-		new HashSet<QueueRec> ();
+	Set <QueueRec> excludeQueues =
+		new HashSet <QueueRec> ();
 
 	// implementation
 
 	public
 	void conditions (
-			Map<String,Object> conditions) {
+			Map <String, Object> conditions) {
 
 		if (conditions.containsKey ("sliceId")) {
 
@@ -63,18 +64,19 @@ class QueueStatsFilter {
 		} else {
 
 			slice =
-				Optional.<SliceRec>absent ();
+				Optional.absent ();
 
 		}
 
 		if (conditions.containsKey ("queueId")) {
 
-			ImmutableSet.Builder<QueueRec> queuesBuilder =
-				ImmutableSet.<QueueRec>builder ();
+			ImmutableSet.Builder <QueueRec> queuesBuilder =
+				ImmutableSet.builder ();
 
-			Set<?> queueIds =
-				(Set<?>)
-				conditions.get ("queueId");
+			Set <?> queueIds =
+				(Set <?>)
+				conditions.get (
+					"queueId");
 
 			for (
 				Object queueId
@@ -89,13 +91,13 @@ class QueueStatsFilter {
 			}
 
 			queues =
-				Optional.<Set<QueueRec>>of (
+				Optional.of (
 					queuesBuilder.build ());
 
 		} else {
 
 			queues =
-				Optional.<Set<QueueRec>>absent ();
+				Optional.absent ();
 
 		}
 
@@ -163,11 +165,11 @@ class QueueStatsFilter {
 	}
 
 	public
-	List<QueueItemRec> filterQueueItems (
-			List<QueueItemRec> allQueueItems) {
+	List <QueueItemRec> filterQueueItems (
+			@NonNull List <QueueItemRec> allQueueItems) {
 
-		List<QueueItemRec> filteredQueueItems =
-			new ArrayList<QueueItemRec> ();
+		List <QueueItemRec> filteredQueueItems =
+			new ArrayList<> ();
 
 		for (
 			QueueItemRec queueItem

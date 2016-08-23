@@ -1,9 +1,10 @@
 package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.Misc.moreThan;
+import static wbs.framework.utils.etc.NumberUtils.moreThan;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.sms.gsm.GsmUtils.gsmStringLength;
 
 import javax.inject.Inject;
 
@@ -143,7 +144,7 @@ class ChatMonitorInboxFormAction
 
 			}
 
-			if (! GsmUtils.isValidGsm (text)) {
+			if (! GsmUtils.gsmStringIsValid (text)) {
 
 				requestContext.addError (
 					"Message text is invalid");
@@ -154,7 +155,8 @@ class ChatMonitorInboxFormAction
 
 			if (
 				moreThan (
-					GsmUtils.length (text),
+					gsmStringLength (
+						text),
 					ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
 						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES)
 			) {
@@ -206,7 +208,7 @@ class ChatMonitorInboxFormAction
 
 			if (
 				lessThan (
-					GsmUtils.length (text),
+					GsmUtils.gsmStringLength (text),
 					chat.getMinMonitorMessageLength ())
 			) {
 

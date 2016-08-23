@@ -1,7 +1,9 @@
 package wbs.framework.utils.etc;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.equalSafe;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.StringUtils.replaceAll;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.PrintWriter;
@@ -108,11 +110,10 @@ class Html {
 						"&#");
 
 					dest.append (
-						Character.getNumericValue (
-							character));
+						(int) character);
 
 					dest.append (
-						";");
+						';');
 
 				}
 
@@ -408,7 +409,15 @@ class Html {
 		boolean value;
 
 		if (
-			equal (
+			isNull (
+				formValue)
+		) {
+
+			value =
+				defaultValue;
+
+		} else if (
+			stringEqual (
 				formValue,
 				"true")
 		) {
@@ -417,22 +426,13 @@ class Html {
 				true;
 
 		} else if (
-			equal (
+			stringEqual (
 				formValue,
 				"false")
 		) {
 
 			value =
 				false;
-
-		} else if (
-			equal (
-				formValue,
-				null)
-		) {
-
-			value =
-				defaultValue;
 
 		} else {
 
@@ -568,6 +568,7 @@ class Html {
 
 	}
 
+	@Deprecated
 	public static <Key>
 	String option (
 			Key value,
@@ -575,7 +576,7 @@ class Html {
 			Key defaultValue) {
 
 		boolean selected =
-			equal (
+			equalSafe (
 				value,
 				defaultValue);
 

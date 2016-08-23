@@ -1,6 +1,6 @@
 package wbs.smsapps.subscription.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import java.util.Arrays;
@@ -109,7 +109,7 @@ class SubscriptionDeliveryNoticeHandler
 					SubscriptionBillState.failed);
 
 			if (
-				equal (
+				referenceNotEqualSafe (
 					subscriptionNumber.getPendingSubscriptionBill (),
 					subscriptionBill)
 			) {
@@ -143,7 +143,7 @@ class SubscriptionDeliveryNoticeHandler
 					+ subscription.getCreditsPerBill ());
 
 			if (
-				equal (
+				referenceNotEqualSafe (
 					subscriptionNumber.getPendingSubscriptionBill (),
 					subscriptionBill)
 			) {

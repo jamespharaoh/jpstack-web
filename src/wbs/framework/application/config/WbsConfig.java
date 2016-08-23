@@ -14,6 +14,7 @@ import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.tools.DataFromXml;
+import wbs.framework.data.tools.DataFromXmlBuilder;
 
 @Accessors (fluent = true)
 @Data
@@ -83,13 +84,15 @@ class WbsConfig {
 			@NonNull String filename) {
 
 		DataFromXml dataFromXml =
-			new DataFromXml ()
+			new DataFromXmlBuilder ()
 
 			.registerBuilderClasses (
 				ImmutableList.of (
 					WbsConfig.class,
 					WbsConfigDatabase.class,
-					WbsConfigEmail.class));
+					WbsConfigEmail.class))
+
+			.build ();
 
 		WbsConfig wbsConfig =
 			(WbsConfig)

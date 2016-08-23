@@ -3,8 +3,8 @@
 	package="wbs.console.misc">
 
 	<layer name="console">
-		<bean class="ConsoleExceptionHandler"/>
-		<bean class="ConsoleMiscComponents"/>
+		<component class="ConsoleExceptionHandler"/>
+		<component class="ConsoleMiscComponents"/>
 	</layer>
 
 </plugin>

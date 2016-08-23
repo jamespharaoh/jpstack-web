@@ -2,8 +2,9 @@ package wbs.smsapps.manualresponder.console;
 
 import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.LogicUtils.not;
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -158,12 +159,12 @@ class ManualResponderRequestPendingFormResponder
 
 				if (networkIsRulesMatcher.matches ()) {
 
-					int networkId =
-						Integer.parseInt (
+					long networkId =
+						parseIntegerRequired (
 							networkIsRulesMatcher.group (1));
 
 					if (
-						notEqual (
+						integerNotEqualSafe (
 							manualResponderNumber
 								.getNumber ()
 								.getNetwork ()
@@ -185,12 +186,12 @@ class ManualResponderRequestPendingFormResponder
 
 				if (networkIsNotRulesMatcher.matches ()) {
 
-					int networkId =
-						Integer.parseInt (
+					long networkId =
+						parseIntegerRequired (
 							networkIsNotRulesMatcher.group (1));
 
 					if (
-						equal (
+						integerEqualSafe (
 							manualResponderNumber
 								.getNumber ()
 								.getNetwork ()

@@ -1,6 +1,6 @@
 package wbs.integrations.oxygen8.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 
 import java.io.IOException;
 
@@ -44,7 +44,7 @@ class Oxygen8InboundFile
 		Action action;
 
 		if (
-			equal (
+			stringEqual (
 				requestContext.header (
 					"X-Mms-Message-Type"),
 				"MO_MMS")

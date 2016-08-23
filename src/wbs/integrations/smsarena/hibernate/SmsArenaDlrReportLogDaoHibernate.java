@@ -2,13 +2,12 @@ package wbs.integrations.smsarena.hibernate;
 
 import java.util.List;
 
-import lombok.NonNull;
-
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.integrations.smsarena.model.SmsArenaDlrReportLogDao;
 import wbs.integrations.smsarena.model.SmsArenaDlrReportLogRec;
@@ -23,7 +22,7 @@ class SmsArenaDlrReportLogDaoHibernate
 
 	@Override
 	public
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			@NonNull SmsArenaDlrReportLogSearch search) {
 
 		Criteria criteria =
@@ -80,7 +79,7 @@ class SmsArenaDlrReportLogDaoHibernate
 
 		return findMany (
 			"searchIds (search)",
-			Integer.class,
+			Long.class,
 			criteria);
 
 	}

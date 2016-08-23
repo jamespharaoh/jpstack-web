@@ -1,7 +1,13 @@
 package wbs.platform.core.console;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionDoesNotHaveTwoElements;
+import static wbs.framework.utils.etc.CollectionUtils.listItemAtIndexRequired;
 import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -17,10 +23,6 @@ import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.record.GlobalId;
-
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
-
 import wbs.platform.scaffold.console.SliceConsoleHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleHelper;
@@ -47,21 +49,23 @@ class CoreLogonResponder
 
 	// state
 
-	Optional<SliceRec> slice;
+	Optional <SliceRec> slice;
 
 	// details
 
 	@Override
 	public
 	String getTitle () {
+
 		return wbsConfig.consoleTitle ();
+
 	}
 
 	@Override
 	protected
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())
@@ -83,7 +87,7 @@ class CoreLogonResponder
 	protected
 	void prepare () {
 
-		Optional<String> sliceCode =
+		Optional <String> sliceCode =
 			requestContext.header (
 				"x-wbs-slice");
 
@@ -101,7 +105,7 @@ class CoreLogonResponder
 		} else {
 
 			slice =
-				Optional.<SliceRec>absent ();
+				Optional.absent ();
 
 		}
 
@@ -144,19 +148,28 @@ class CoreLogonResponder
 				: wbsConfig.testUsers ()
 		) {
 
-			String[] usernameParts =
-				username.split ("\\.");
+			List <String> usernameParts =
+				stringSplitFullStop (
+					username);
 
-			if (usernameParts.length != 2)
+			if (
+				collectionDoesNotHaveTwoElements (
+					usernameParts)
+			) {
 				continue;
+			}
 
 			String sliceCode =
-				usernameParts [0];
+				listItemAtIndexRequired (
+					usernameParts,
+					0l);
 
 			String userCode =
-				usernameParts [1];
+				listItemAtIndexRequired (
+					usernameParts,
+					1l);
 
-			Optional<UserRec> userOptional =
+			Optional <UserRec> userOptional =
 				userHelper.findByCode (
 					GlobalId.root,
 					sliceCode,

@@ -16,16 +16,16 @@
 	</models>
 
 	<layer name="console">
-		<bean class="console.SimulatorRouteSummaryAdditionalPart"/>
-		<bean class="console.SimulatorRouteSummaryAdditionalPartFactory"/>
-		<bean class="console.SimulatorSessionConsolePart"/>
-		<bean class="console.SimulatorSessionCreateEventAction"/>
-		<bean class="console.SimulatorSessionPollAction"/>
+		<component class="console.SimulatorRouteSummaryAdditionalPart"/>
+		<component class="console.SimulatorRouteSummaryAdditionalPartFactory"/>
+		<component class="console.SimulatorSessionConsolePart"/>
+		<component class="console.SimulatorSessionCreateEventAction"/>
+		<component class="console.SimulatorSessionPollAction"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.SimulatorSenderHelper"/>
-		<bean class="daemon.SimulatorSenderService"/>
+		<component class="daemon.SimulatorSenderHelper"/>
+		<component class="daemon.SimulatorSenderService"/>
 	</layer>
 
 	<fixtures>

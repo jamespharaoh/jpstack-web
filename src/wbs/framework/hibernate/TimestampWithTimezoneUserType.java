@@ -1,6 +1,7 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.framework.utils.etc.TimeUtils.toInstant;
 
 import java.io.Serializable;
@@ -35,9 +36,11 @@ class TimestampWithTimezoneUserType
 			Object left,
 			Object right) {
 
-		return equal (
-			left,
-			right);
+		return optionalEqualOrNotPresentSafe (
+			optionalFromNullable (
+				left),
+			optionalFromNullable (
+				right));
 
 	}
 

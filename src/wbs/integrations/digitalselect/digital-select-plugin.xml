@@ -7,18 +7,18 @@
 	</models>
 
 	<layer name="console">
-		<bean class="console.DigitalSelectRouteSummaryAdditionalPart"/>
-		<bean class="console.DigitalSelectRouteSummaryAdditionalPartFactory"/>
+		<component class="console.DigitalSelectRouteSummaryAdditionalPart"/>
+		<component class="console.DigitalSelectRouteSummaryAdditionalPartFactory"/>
 	</layer>
 
 	<layer name="api">
-		<bean class="api.DigitalSelectApiServletModule"/>
-		<bean class="api.DigitalSelectRoutePathHandlerEntry"/>
-		<bean class="api.DigitalSelectRouteReportFile"/>
+		<component class="api.DigitalSelectApiServletModule"/>
+		<component class="api.DigitalSelectRoutePathHandlerEntry"/>
+		<component class="api.DigitalSelectRouteReportFile"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.DigitalSelectSender"/>
+		<component class="daemon.DigitalSelectSender"/>
 	</layer>
 
 </plugin>

@@ -3,13 +3,13 @@
 	package="wbs.platform.object.search">
 
 	<layer name="console">
-		<bean class="ObjectSearchCsvResponder"/>
-		<bean class="ObjectSearchGetAction"/>
-		<bean class="ObjectSearchPageBuilder"/>
-		<bean class="ObjectSearchPageSpec"/>
-		<bean class="ObjectSearchPart"/>
-		<bean class="ObjectSearchPostAction"/>
-		<bean class="ObjectSearchResultsPart"/>
+		<component class="ObjectSearchCsvResponder"/>
+		<component class="ObjectSearchGetAction"/>
+		<component class="ObjectSearchPageBuilder"/>
+		<component class="ObjectSearchPageSpec"/>
+		<component class="ObjectSearchPart"/>
+		<component class="ObjectSearchPostAction"/>
+		<component class="ObjectSearchResultsPart"/>
 	</layer>
 
 </plugin>

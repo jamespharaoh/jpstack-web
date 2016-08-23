@@ -3,7 +3,7 @@
 	package="wbs.console.html">
 
 	<layer name="console">
-		<bean class="SelectBuilder"/>
+		<component class="SelectBuilder"/>
 	</layer>
 
 </plugin>

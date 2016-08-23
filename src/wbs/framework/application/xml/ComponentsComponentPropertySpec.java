@@ -3,7 +3,7 @@ package wbs.framework.application.xml;
 import wbs.framework.application.context.ComponentDefinition;
 
 public
-interface BeansBeanPropertySpec {
+interface ComponentsComponentPropertySpec {
 
 	int register (
 			ComponentDefinition beanDefinition);

@@ -1,23 +1,20 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.NumberUtils.equalToOne;
+import static wbs.framework.utils.etc.NumberUtils.equalToThree;
+import static wbs.framework.utils.etc.NumberUtils.equalToTwo;
 import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
-
-import lombok.Data;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,6 +23,10 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
+import lombok.Data;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.request.ConsoleRequestContext;
@@ -166,7 +167,7 @@ class FormFieldLogic {
 		) {
 
 			if (
-				notEqual (
+				stringNotEqualSafe (
 					updateResultEntry.getKey ().getLeft (),
 					formName)
 			) {
@@ -199,9 +200,8 @@ class FormFieldLogic {
 			doNothing ();
 
 		} else if (
-			equal (
-				errorFieldNames.size (),
-				1)
+			equalToOne (
+				errorFieldNames.size ())
 		) {
 
 			requestContext.addError (
@@ -210,9 +210,8 @@ class FormFieldLogic {
 					errorFieldNames.get (0)));
 
 		} else if (
-			equal (
-				errorFieldNames.size (),
-				2)
+			equalToTwo (
+				errorFieldNames.size ())
 		) {
 
 			requestContext.addError (
@@ -222,9 +221,8 @@ class FormFieldLogic {
 					errorFieldNames.get (1)));
 
 		} else if (
-			equal (
-				errorFieldNames.size (),
-				3)
+			equalToThree (
+				errorFieldNames.size ())
 		) {
 
 			requestContext.addError (
@@ -250,18 +248,19 @@ class FormFieldLogic {
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull UpdateResultSet updateResultSet,
 			@NonNull Object container,
-			@NonNull PermanentRecord<?> linkObject,
-			@NonNull Optional<Object> objectRef,
-			@NonNull Optional<String> objectType,
+			@NonNull PermanentRecord <?> linkObject,
+			@NonNull Optional <Object> objectRef,
+			@NonNull Optional <String> objectType,
 			@NonNull String formName) {
 
 		for (
-			Map.Entry<Pair<String,String>,UpdateResult<?,?>> updateResultEntry
+			Map.Entry <Pair <String, String>, UpdateResult <?, ?>>
+			updateResultEntry
 				: updateResultSet.updateResults ().entrySet ()
 		) {
 
 			if (
-				notEqual (
+				stringNotEqualSafe (
 					updateResultEntry.getKey ().getLeft (),
 					formName)
 			) {

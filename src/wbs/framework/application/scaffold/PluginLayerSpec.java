@@ -6,7 +6,6 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
@@ -24,7 +23,7 @@ class PluginLayerSpec {
 	@DataChildren (
 		direct = true)
 	@Getter @Setter
-	List<PluginBeanSpec> beans =
-		new ArrayList<PluginBeanSpec> ();
+	List <PluginComponentSpec> components =
+		new ArrayList<> ();
 
 }

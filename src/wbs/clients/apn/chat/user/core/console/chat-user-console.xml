@@ -101,7 +101,6 @@
 
 		<enum-field
 			name="type"
-			helper="chatUserTypeConsoleHelper"
 			nullable="yes"/>
 
 		<text-field
@@ -117,12 +116,10 @@
 
 		<enum-field
 			name="gender"
-			helper="genderConsoleHelper"
 			nullable="yes"/>
 
 		<enum-field
 			name="orient"
-			helper="orientConsoleHelper"
 			nullable="yes"/>
 
 		<object-field
@@ -157,7 +154,6 @@
 
 		<enum-field
 			name="creditMode"
-			helper="chatUserCreditModeConsoleHelper"
 			nullable="yes"/>
 
 		<currency-field
@@ -182,7 +178,6 @@
 
 		<enum-field
 			name="datingMode"
-			helper="chatUserDateModeConsoleHelper"
 			nullable="yes"/>
 
 		<yes-no-field
@@ -198,16 +193,13 @@
 		<code-field/>
 
 		<enum-field
-			name="type"
-			helper="chatUserTypeConsoleHelper"/>
+			name="type"/>
 
 		<enum-field
-			name="gender"
-			helper="genderConsoleHelper"/>
+			name="gender"/>
 
 		<enum-field
-			name="orient"
-			helper="orientConsoleHelper"/>
+			name="orient"/>
 
 		<text-field
 			name="name"/>
@@ -230,12 +222,10 @@
 			maximum-length="16"/>
 
 		<enum-field
-			name="gender"
-			helper="genderConsoleHelper"/>
+			name="gender"/>
 
 		<enum-field
-			name="orient"
-			helper="orientConsoleHelper"/>
+			name="orient"/>
 
 		<gazetteer-field
 			name="postcode"

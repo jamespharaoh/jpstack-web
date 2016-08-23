@@ -1,7 +1,8 @@
 package wbs.applications.imchat.api;
 
+import static wbs.framework.utils.etc.LogicUtils.not;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -103,9 +104,10 @@ class ImChatConditionsAcceptAction
 			isNull (
 				session)
 
-			|| ! session.getActive ()
+			|| not (
+				session.getActive ())
 
-			|| notEqual (
+			|| referenceNotEqualSafe (
 				customer.getImChat (),
 				imChat)
 

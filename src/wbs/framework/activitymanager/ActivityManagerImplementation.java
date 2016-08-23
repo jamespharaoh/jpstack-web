@@ -1,10 +1,10 @@
 package wbs.framework.activitymanager;
 
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.max;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.NumberUtils.roundToIntegerRequired;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -222,7 +222,7 @@ class ActivityManagerImplementation
 			Instant.now ());
 
 		if (
-			notEqual (
+			referenceNotEqualSafe (
 				task,
 				currentTask.get ())
 		) {

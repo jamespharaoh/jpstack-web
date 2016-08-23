@@ -1,7 +1,7 @@
 package wbs.framework.utils;
 
-import static wbs.framework.utils.etc.NumberUtils.parseLongRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalRequired;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.regex.Matcher;
@@ -48,7 +48,7 @@ class IntervalFormatterImplementation
 	Long parseIntervalStringSecondsRequired (
 			@NonNull String input) {
 
-		return optionalRequired (
+		return optionalGetRequired (
 			parseIntervalStringSeconds (
 				input));
 
@@ -180,7 +180,7 @@ class IntervalFormatterImplementation
 					input);
 
 			return matcher.matches ()
-				? scale * parseLongRequired (
+				? scale * parseIntegerRequired (
 					matcher.group (1))
 				: null;
 

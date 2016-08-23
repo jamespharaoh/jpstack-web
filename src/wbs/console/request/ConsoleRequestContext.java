@@ -231,7 +231,7 @@ interface ConsoleRequestContext {
 			String key,
 			Supplier<String> orElse);
 
-	Long parameterInteger (
+	Long parameterIntegerRequired (
 			String key);
 
 	String sessionId ();

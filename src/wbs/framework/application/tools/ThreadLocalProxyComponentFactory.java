@@ -1,6 +1,6 @@
 package wbs.framework.application.tools;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.lang.reflect.InvocationHandler;
@@ -14,27 +14,30 @@ import wbs.framework.application.context.ComponentFactory;
 
 @Accessors (fluent = true)
 public
-class ThreadLocalProxyBeanFactory
+class ThreadLocalProxyComponentFactory
 	implements
 		ComponentFactory,
 		InvocationHandler {
 
 	@Getter @Setter
-	String beanName;
+	String componentName;
 
 	@Getter @Setter
-	Class<?> beanClass;
+	Class <?> componentClass;
 
-	ThreadLocal<Object> targets =
-		new ThreadLocal<Object> ();
+	ThreadLocal <Object> targets =
+		new ThreadLocal<> ();
 
 	@Override
 	public
 	Object makeComponent () {
 
 		return Proxy.newProxyInstance (
-			beanClass.getClassLoader (),
-			new Class<?> [] { beanClass, Control.class },
+			componentClass.getClassLoader (),
+			new Class <?> [] {
+				componentClass,
+				Control.class,
+			},
 			this);
 
 	}
@@ -47,7 +50,7 @@ class ThreadLocalProxyBeanFactory
 			Object[] args)
 		throws Throwable {
 
-		if (method.getDeclaringClass ().isAssignableFrom (beanClass)) {
+		if (method.getDeclaringClass ().isAssignableFrom (componentClass)) {
 
 			Object target =
 				targets.get ();
@@ -61,7 +64,7 @@ class ThreadLocalProxyBeanFactory
 		if (method.getDeclaringClass () == Control.class) {
 
 			if (
-				equal (
+				stringEqual (
 					method.getName (),
 					"threadLocalProxySet")
 			) {
@@ -71,7 +74,7 @@ class ThreadLocalProxyBeanFactory
 					throw new RuntimeException (
 						stringFormat (
 							"Tried to set target for %s twice without reset",
-							beanName));
+							componentName));
 
 				}
 
@@ -82,7 +85,7 @@ class ThreadLocalProxyBeanFactory
 			}
 
 			if (
-				equal (
+				stringEqual (
 					method.getName (),
 					"threadLocalProxyReset")
 			) {

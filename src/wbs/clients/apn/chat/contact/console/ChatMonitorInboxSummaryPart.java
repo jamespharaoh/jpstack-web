@@ -1,19 +1,23 @@
 package wbs.clients.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.in;
+import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
+import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.localDateNotEqual;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -21,9 +25,10 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
-import org.joda.time.Years;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 import lombok.NonNull;
 import wbs.clients.apn.chat.contact.model.ChatContactNoteObjectHelper;
@@ -40,6 +45,7 @@ import wbs.clients.apn.chat.namednote.model.ChatNamedNoteRec;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameObjectHelper;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -85,6 +91,9 @@ class ChatMonitorInboxSummaryPart
 
 	@Inject
 	ChatUserAlarmObjectHelper chatUserAlarmHelper;
+
+	@Inject
+	ChatUserLogic chatUserLogic;
 
 	@Inject
 	Database database;
@@ -188,33 +197,37 @@ class ChatMonitorInboxSummaryPart
 		chat =
 			userChatUser.getChat ();
 
-		// 7 days limit
-
-		List <ChatMessageRec> history1 =
-			chatMessageHelper.findLimit (
-				userChatUser,
-				monitorChatUser,
-				50l);
-
-		List <ChatMessageRec> history2 =
-			chatMessageHelper.findLimit (
-				monitorChatUser,
-				userChatUser,
-				50l);
-
 		chatMessageHistory =
-			new ArrayList<ChatMessageRec> (
-				history1.size () + history2.size ());
+			Lists.newArrayList (
+				Iterables.concat (
 
-		chatMessageHistory.addAll (history1);
-		chatMessageHistory.addAll (history2);
+			chatMessageHelper.findLimit (
+				userChatUser,
+				monitorChatUser,
+				50l),
 
-		Collections.sort (
-			chatMessageHistory,
-			ChatMessageComparator.descending);
+			chatMessageHelper.findLimit (
+				monitorChatUser,
+				userChatUser,
+				50l)
 
-		if (chatMessageHistory.size () > 50)
-			chatMessageHistory = chatMessageHistory.subList (0, 50);
+		)).stream ()
+
+			.filter (
+				chatMessage ->
+					enumNotInSafe (
+						chatMessage.getStatus (),
+						ChatMessageStatus.moderatorPending,
+						ChatMessageStatus.moderatorRejected))
+
+			.sorted (
+				ChatMessageComparator.descending)
+
+			.limit (
+				50l)
+
+			.collect (
+				Collectors.toList ());
 
 		alarm =
 			chatUserAlarmHelper.find (
@@ -549,12 +562,9 @@ class ChatMonitorInboxSummaryPart
 				"<td>%h (%h)</td>\n",
 				timeFormatter.dateString (
 					monitorChatUser.getDob ()),
-				Years.yearsBetween (
-					monitorChatUser.getDob ().toDateTimeAtStartOfDay (
-						DateTimeZone.forID (
-							chat.getTimezone ())),
-					now
-				).getYears ());
+				chatUserLogic.getAgeInYears (
+					monitorChatUser,
+					now));
 
 		} else {
 
@@ -572,12 +582,9 @@ class ChatMonitorInboxSummaryPart
 				"<td>%h (%h)</td>\n",
 				timeFormatter.dateString (
 					userChatUser.getDob ()),
-				Years.yearsBetween (
-					userChatUser.getDob ().toDateTimeAtStartOfDay (
-						DateTimeZone.forID (
-							chat.getTimezone ())),
-					now
-				).getYears ());
+				chatUserLogic.getAgeInYears (
+					userChatUser,
+					now));
 
 		} else {
 
@@ -723,27 +730,30 @@ class ChatMonitorInboxSummaryPart
 
 	void goGeneralNotes () {
 
-		for (ChatContactNoteRec note
-				: notes) {
+		for (
+			ChatContactNoteRec note
+				: notes
+		) {
 
-			StringBuilder noteInfo =
-				new StringBuilder ();
+			String noteInfo =
+				joinWithCommaAndSpace (
+					presentInstances (
 
-			if (note.getConsoleUser () != null) {
-				noteInfo.append (note.getConsoleUser ().getUsername ());
-			}
+				optionalIf (
+					isNotNull (
+						note.getConsoleUser ()),
+					() ->
+						note.getConsoleUser ().getUsername ()),
 
-			if (note.getTimestamp () != null) {
+				optionalIf (
+					isNotNull (
+						note.getTimestamp ()),
+					() ->
+						timeFormatter.timestampTimezoneString (
+							chatTimezone,
+							note.getTimestamp ()))
 
-				if (noteInfo.length () > 0)
-					noteInfo.append (", ");
-
-				noteInfo.append (
-					timeFormatter.timestampTimezoneString (
-						chatTimezone,
-						note.getTimestamp ()));
-
-			}
+			));
 
 			printFormat (
 				"<tr",
@@ -959,20 +969,12 @@ class ChatMonitorInboxSummaryPart
 
 		LocalDate previousDate = null;
 
-		for (ChatMessageRec chatMessage
-				: chatMessageHistory) {
+		for (
+			ChatMessageRec chatMessage
+				: chatMessageHistory
+		) {
 
 			// ignore unapproved messages
-
-			if (
-				chatMessage.getQueueItem () != null
-				&& in (
-					chatMessage.getQueueItem ().getState (),
-					ChatMessageStatus.moderatorPending,
-					ChatMessageStatus.moderatorRejected)
-			) {
-				continue;
-			}
 
 			LocalDate newDate =
 				chatMessage.getTimestamp ()
@@ -983,10 +985,14 @@ class ChatMonitorInboxSummaryPart
 				.toLocalDate ();
 
 			if (
-				previousDate == null
-				|| notEqual (
+
+				isNull (
+					previousDate)
+
+				|| localDateNotEqual (
 					previousDate,
 					newDate)
+
 			) {
 
 				previousDate =

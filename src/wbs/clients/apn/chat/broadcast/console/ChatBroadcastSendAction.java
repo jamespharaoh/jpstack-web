@@ -1,11 +1,11 @@
 package wbs.clients.apn.chat.broadcast.console;
 
 import static wbs.framework.utils.etc.LogicUtils.allOf;
-import static wbs.framework.utils.etc.Misc.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.moreThanZero;
 import static wbs.framework.utils.etc.Misc.orNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.framework.utils.etc.NumberUtils.moreThanZero;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -666,7 +666,7 @@ class ChatBroadcastSendAction
 						form.message ());
 
 				long messageLength =
-					GsmUtils.length (
+					GsmUtils.gsmStringLength (
 						messageString);
 
 				if (messageLength > 160) {

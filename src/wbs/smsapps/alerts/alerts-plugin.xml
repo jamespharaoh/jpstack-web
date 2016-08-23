@@ -11,13 +11,13 @@
 	</models>
 
 	<layer name="console">
-		<bean class="console.AlertsSettingsNumbersAction"/>
-		<bean class="console.AlertsSettingsNumbersPart"/>
-		<bean class="console.AlertsSubjectsPart"/>
+		<component class="console.AlertsSettingsNumbersAction"/>
+		<component class="console.AlertsSettingsNumbersPart"/>
+		<component class="console.AlertsSubjectsPart"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.AlertsDaemon"/>
+		<component class="daemon.AlertsDaemon"/>
 	</layer>
 
 	<console-modules>

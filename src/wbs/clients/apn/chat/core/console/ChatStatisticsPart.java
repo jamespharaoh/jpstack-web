@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.core.console;
 
-import static wbs.framework.utils.etc.Misc.isZero;
+import static wbs.framework.utils.etc.NumberUtils.equalToZero;
+import static wbs.framework.utils.etc.NumberUtils.moreThanZero;
 
 import java.util.List;
 
@@ -126,7 +127,7 @@ class ChatStatisticsPart
 
 		if (
 
-			isZero (
+			equalToZero (
 				numAffiliates)
 
 			&& ! privChecker.canRecursive (
@@ -137,7 +138,10 @@ class ChatStatisticsPart
 			return;
 		}
 
-		if (numAffiliates > 0) {
+		if (
+			moreThanZero (
+				numAffiliates)
+		) {
 
 			printFormat (
 				"<p>Number of affiliates: %h</p>\n",
@@ -145,7 +149,11 @@ class ChatStatisticsPart
 
 		}
 
-		if (! privChecker.canRecursive (chat, "monitor")) {
+		if (
+			! privChecker.canRecursive (
+				chat,
+				"monitor")
+		) {
 
 			printFormat (
 				"<h2>Users</h2>\n");

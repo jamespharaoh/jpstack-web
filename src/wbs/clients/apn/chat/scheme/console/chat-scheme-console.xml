@@ -215,8 +215,7 @@
 			name="timezone"/>
 
 		<enum-field
-			name="operatorLabel"
-			helper="chatUserOperatorLabelConsoleHelper"/>
+			name="operatorLabel"/>
 
 	</field-set>
 

@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.user.admin.console;
 
 import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
-import static wbs.framework.utils.etc.Misc.trim;
+import static wbs.framework.utils.etc.Misc.stringTrim;
 import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import javax.inject.Inject;
@@ -94,7 +94,7 @@ class ChatUserAdminBarringAction
 				"bar_off");
 
 		String reason =
-			trim (
+			stringTrim (
 				requestContext.parameterRequired (
 					"reason"));
 

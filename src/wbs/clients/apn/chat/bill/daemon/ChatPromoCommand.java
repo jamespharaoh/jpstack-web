@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.bill.daemon;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
@@ -439,15 +440,15 @@ class ChatPromoCommand
 
 		}
 
-		if (
+		if (allOf (
 
-			chatPromo.getJoinDating ()
+			() -> chatPromo.getJoinDating (),
 
-			&& equal (
+			() -> enumEqualSafe (
 				chatUser.getDateMode (),
 				ChatUserDateMode.none)
 
-		) {
+		)) {
 
 			chatDateLogic.userDateStuff (
 				chatUser,

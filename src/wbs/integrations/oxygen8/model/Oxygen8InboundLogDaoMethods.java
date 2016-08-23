@@ -5,7 +5,7 @@ import java.util.List;
 public
 interface Oxygen8InboundLogDaoMethods {
 
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			Oxygen8InboundLogSearch oxygen8InboundLogSearch);
 
 }

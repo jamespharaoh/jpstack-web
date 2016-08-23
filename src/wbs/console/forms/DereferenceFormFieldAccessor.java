@@ -1,18 +1,17 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.in;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringInSafe;
 
 import javax.inject.Inject;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.BeanLogic;
@@ -59,14 +58,14 @@ class DereferenceFormFieldAccessor<Container,Native>
 	public
 	void write (
 			@NonNull Container container,
-			@NonNull Optional<Native> nativeValue) {
+			@NonNull Optional <Native> nativeValue) {
 
 		if (
 
 			path.indexOf ('.') >= 0
 
-			|| in (
-				nativeValue,
+			|| stringInSafe (
+				path,
 				"this",
 				"parent",
 				"grandparent",

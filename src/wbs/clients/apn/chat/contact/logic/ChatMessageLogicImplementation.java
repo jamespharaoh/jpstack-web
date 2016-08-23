@@ -1,10 +1,13 @@
 package wbs.clients.apn.chat.contact.logic;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionSize;
+import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
+import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.LogicUtils.not;
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.Misc.in;
-import static wbs.framework.utils.etc.Misc.notEqual;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
@@ -192,9 +195,9 @@ class ChatMessageLogicImplementation
 			@NonNull ChatUserRec fromUser,
 			@NonNull ChatUserRec toUser,
 			@NonNull String text,
-			@NonNull Optional<Long> threadId,
+			@NonNull Optional <Long> threadId,
 			@NonNull ChatMessageMethod source,
-			@NonNull List<MediaRec> medias) {
+			@NonNull List <MediaRec> medias) {
 
 		log.debug (
 			stringFormat (
@@ -213,8 +216,9 @@ class ChatMessageLogicImplementation
 						? threadId.get ().toString ()
 						: "null",
 					source.toString (),
-					Integer.toString (
-						medias.size ()))));
+					integerToDecimalString (
+						collectionSize (
+							medias)))));
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -252,7 +256,7 @@ class ChatMessageLogicImplementation
 
 		if (allOf (
 
-			() -> notEqual (
+			() -> enumNotEqualSafe (
 				source,
 				ChatMessageMethod.iphone),
 
@@ -558,7 +562,7 @@ class ChatMessageLogicImplementation
 
 			fromUser.getAdultVerified ()
 
-			|| in (
+			|| enumInSafe (
 				chatMessage.getSource (),
 				ChatMessageMethod.iphone,
 				ChatMessageMethod.web,
@@ -568,10 +572,11 @@ class ChatMessageLogicImplementation
 
 			toUser.getAdultVerified ()
 
-			|| toUser.getType ()
-				== ChatUserType.monitor
+			|| enumEqualSafe (
+				toUser.getType (),
+				ChatUserType.monitor)
 
-			|| in (
+			|| enumInSafe (
 				toUser.getDeliveryMethod (),
 				ChatMessageMethod.iphone,
 				ChatMessageMethod.web);

@@ -1,6 +1,7 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.CollectionUtils.collectionHasOneElement;
+import static wbs.framework.utils.etc.CollectionUtils.collectionSize;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
@@ -162,9 +163,8 @@ class ObjectHelperIdImplementation<RecordType extends Record<RecordType>>
 			return objects;
 
 		} else if (
-			equal (
-				missingIds.size (),
-				1)
+			collectionHasOneElement (
+				missingIds)
 		) {
 
 			throw new RuntimeException (
@@ -176,7 +176,8 @@ class ObjectHelperIdImplementation<RecordType extends Record<RecordType>>
 
 		} else if (
 			lessThan (
-				missingIds.size (),
+				collectionSize (
+					missingIds),
 				6)
 		) {
 

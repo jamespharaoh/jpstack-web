@@ -1,7 +1,8 @@
 package wbs.applications.imchat.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.NumberUtils.maximumJavaInteger;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
@@ -113,7 +114,7 @@ class ImChatPendingFormAction
 		String messageText;
 
 		if (
-			equal (
+			stringEqual (
 				templateString,
 				"bill")
 		) {
@@ -133,7 +134,7 @@ class ImChatPendingFormAction
 				imChat.getBillMessageMaxChars ();
 
 		} else if (
-			equal (
+			stringEqual (
 				templateString,
 				"free")
 		) {
@@ -153,7 +154,7 @@ class ImChatPendingFormAction
 				imChat.getFreeMessageMaxChars ();
 
 		} else if (
-			equal (
+			stringEqual (
 				templateString,
 				"ignore")
 		) {
@@ -184,7 +185,7 @@ class ImChatPendingFormAction
 				template.getText ();
 
 			minLength = 0;
-			maxLength = Integer.MAX_VALUE;
+			maxLength = maximumJavaInteger;
 
 		}
 

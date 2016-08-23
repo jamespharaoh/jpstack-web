@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.LogicUtils.equalSafe;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -33,7 +33,7 @@ class IdentityFormFieldPluginProvider
 			Class nativeClass) {
 
 		if (
-			equal (
+			equalSafe (
 				genericClass,
 				nativeClass)
 		) {

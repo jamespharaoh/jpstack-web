@@ -1,9 +1,9 @@
 package wbs.integrations.broadcastsystems.daemon;
 
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.Misc.stringToUrl;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
 
 import java.net.HttpURLConnection;
@@ -114,7 +114,7 @@ class BroadcastSystemsSender2
 		// check message type
 
 		if (
-			notEqual (
+			stringNotEqualSafe (
 				message.getMessageType ().getCode (),
 				"sms")
 		) {

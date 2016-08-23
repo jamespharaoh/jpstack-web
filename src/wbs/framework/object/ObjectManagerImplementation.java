@@ -1,10 +1,10 @@
 package wbs.framework.object;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.equal;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.startsWith;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
 
@@ -558,17 +558,17 @@ class ObjectManagerImplementation
 	Object dereference (
 			@NonNull Object object,
 			@NonNull String path,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map <String, Object> hints) {
 
 		// check hints
 
 		for (
-			Map.Entry<String,Object> hintEntry
+			Map.Entry <String, Object> hintEntry
 				: hints.entrySet ()
 		) {
 
 			if (
-				equal (
+				stringEqual (
 					hintEntry.getKey (),
 					path)
 			) {
@@ -606,7 +606,7 @@ class ObjectManagerImplementation
 		) {
 
 			if (
-				equal (
+				stringEqual (
 					pathPart,
 					"root")
 			) {
@@ -616,7 +616,7 @@ class ObjectManagerImplementation
 						0l);
 
 			} else if (
-				equal (
+				stringEqual (
 					pathPart,
 					"this")
 			) {
@@ -631,7 +631,7 @@ class ObjectManagerImplementation
 				doNothing ();
 
 			} else if (
-				equal (
+				stringEqual (
 					pathPart,
 					"parent")
 			) {
@@ -641,7 +641,7 @@ class ObjectManagerImplementation
 						(Record<?>) object);
 
 			} else if (
-				equal (
+				stringEqual (
 					pathPart,
 					"grandparent")
 			) {
@@ -653,7 +653,7 @@ class ObjectManagerImplementation
 						object));
 
 			} else if (
-				equal (
+				stringEqual (
 					pathPart,
 					"greatgrandparent")
 			) {
@@ -720,7 +720,7 @@ class ObjectManagerImplementation
 				return Optional.absent ();
 
 			if (
-				equal (
+				stringEqual (
 					pathPart,
 					"this")
 			) {
@@ -728,7 +728,7 @@ class ObjectManagerImplementation
 				doNothing ();
 
 			} else if (
-				equal (
+				stringEqual (
 					pathPart,
 					"parent")
 			) {
@@ -738,7 +738,7 @@ class ObjectManagerImplementation
 						objectClass);
 
 			} else if (
-				equal (
+				stringEqual (
 					pathPart,
 					"grandparent")
 			) {
@@ -749,7 +749,7 @@ class ObjectManagerImplementation
 						objectClass));
 
 			} else if (
-				equal (
+				stringEqual (
 					pathPart,
 					"greatgrandparent")
 			) {
@@ -761,19 +761,19 @@ class ObjectManagerImplementation
 						objectClass)));
 
 			} else if (
-				equal (
+				stringEqual (
 					pathPart,
 					"root")
 			) {
 
 				objectClass =
-					Optional.<Class<?>>of (
+					Optional.of (
 						rootHelper.objectClass ());
 
 			} else {
 
 				objectClass =
-					Optional.<Class<?>>of (
+					Optional.of (
 						BeanLogic.propertyClassForClass (
 							objectClass.get (),
 							pathPart));

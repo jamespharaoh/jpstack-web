@@ -7,6 +7,6 @@ interface StatsProvider {
 
 	StatsDataSet getStats (
 			StatsPeriod period,
-			Map<String,Object> conditions);
+			Map <String, Object> conditions);
 
 }

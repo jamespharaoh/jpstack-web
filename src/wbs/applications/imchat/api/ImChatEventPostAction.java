@@ -1,11 +1,11 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.notEqual;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.objectToString;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
@@ -136,7 +136,7 @@ class ImChatEventPostAction
 
 						! session.getActive ()
 
-						|| notEqual (
+						|| referenceNotEqualSafe (
 							session.getImChatCustomer ().getImChat (),
 							imChat)
 
@@ -197,7 +197,7 @@ class ImChatEventPostAction
 			// write exceptions
 
 			if (
-				equal (
+				stringEqual (
 					eventItemRequest.type (),
 					"unhandled-error")
 			) {
@@ -263,7 +263,7 @@ class ImChatEventPostAction
 					GenericExceptionResolution.ignoreWithThirdPartyWarning);
 
 			} else if (
-				equal (
+				stringEqual (
 					eventItemRequest.type (),
 					"api-error")
 			) {

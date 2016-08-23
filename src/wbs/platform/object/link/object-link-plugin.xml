@@ -3,10 +3,10 @@
 	package="wbs.platform.object.link">
 
 	<layer name="console">
-		<bean class="ObjectLinksAction"/>
-		<bean class="ObjectLinksPart"/>
-		<bean class="ObjectLinksPageBuilder"/>
-		<bean class="ObjectLinksPageSpec"/>
+		<component class="ObjectLinksAction"/>
+		<component class="ObjectLinksPart"/>
+		<component class="ObjectLinksPageBuilder"/>
+		<component class="ObjectLinksPageSpec"/>
 	</layer>
 
 </plugin>

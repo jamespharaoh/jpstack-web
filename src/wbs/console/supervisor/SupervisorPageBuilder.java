@@ -1,7 +1,7 @@
 package wbs.console.supervisor;
 
 import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.Misc.ifNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 
@@ -36,7 +36,7 @@ import wbs.framework.record.Record;
 @ConsoleModuleBuilderHandler
 public
 class SupervisorPageBuilder<
-	ObjectType extends Record<ObjectType>
+	ObjectType extends Record <ObjectType>
 > {
 
 	// dependencies
@@ -50,26 +50,26 @@ class SupervisorPageBuilder<
 	// indirect dependencies
 
 	@Inject
-	Provider<ConsoleManager> consoleManagerProvider;
+	Provider <ConsoleManager> consoleManagerProvider;
 
 	// prototype dependencies
 
 	@Inject
-	Provider<ConsoleFile> consoleFile;
+	Provider <ConsoleFile> consoleFile;
 
 	@Inject
-	Provider<ConsoleContextTab> contextTab;
+	Provider <ConsoleContextTab> contextTab;
 
 	@Inject
-	Provider<SupervisorPart> supervisorPart;
+	Provider <SupervisorPart> supervisorPart;
 
 	@Inject
-	Provider<TabContextResponder> tabContextResponder;
+	Provider <TabContextResponder> tabContextResponder;
 
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer<ObjectType> container;
+	ConsoleContextBuilderContainer <ObjectType> container;
 
 	@BuilderSource
 	SupervisorPageSpec spec;
@@ -79,7 +79,7 @@ class SupervisorPageBuilder<
 
 	// state
 
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	String name;
 	String tabName;
@@ -89,7 +89,7 @@ class SupervisorPageBuilder<
 	String responderName;
 	String title;
 
-	Provider<PagePart> pagePartFactory;
+	Provider <PagePart> pagePartFactory;
 
 	// build
 

@@ -9,7 +9,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import lombok.NonNull;
-
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.schema.model.Schema;
 import wbs.framework.schema.model.SchemaColumn;
@@ -43,7 +42,7 @@ class SchemaToSqlImplementation
 	@Override
 	public
 	void forSchema (
-			@NonNull List<String> sqlStatements,
+			@NonNull List <String> sqlStatements,
 			@NonNull Schema schema) {
 
 		forEnumTypes (
@@ -52,7 +51,7 @@ class SchemaToSqlImplementation
 
 		forSchemaTables (
 			sqlStatements,
-			new ArrayList<SchemaTable> (
+			new ArrayList<> (
 				schema.tables ().values ()));
 
 	}
@@ -60,11 +59,11 @@ class SchemaToSqlImplementation
 	@Override
 	public
 	void forEnumTypes (
-			@NonNull List<String> sqlStatements,
-			@NonNull Map<String,List<String>> enumTypes) {
+			@NonNull List <String> sqlStatements,
+			@NonNull Map <String, List <String>> enumTypes) {
 
 		for (
-			Map.Entry<String,List<String>> entry
+			Map.Entry <String, List <String>> entry
 				: enumTypes.entrySet ()
 		) {
 

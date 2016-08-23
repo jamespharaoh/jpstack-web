@@ -10,15 +10,15 @@ public
 interface SchemaToSql {
 
 	void forSchema (
-			List<String> sqlStatements,
+			List <String> sqlStatements,
 			Schema schema);
 
 	void forSchemaTables (
-			List<String> sqlStatements,
-			List<SchemaTable> schemaTables);
+			List <String> sqlStatements,
+			List <SchemaTable> schemaTables);
 
 	void forEnumTypes (
-			List<String> sqlStatements,
-			Map<String,List<String>> enumTypes);
+			List <String> sqlStatements,
+			Map <String, List <String>> enumTypes);
 
 }

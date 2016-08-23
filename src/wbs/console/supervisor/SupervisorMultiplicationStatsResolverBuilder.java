@@ -80,9 +80,17 @@ class SupervisorMultiplicationStatsResolverBuilder {
 
 			multiplicationStatsResolver.operands ().add (
 				new MultiplicationStatsResolver.Operand ()
-					.power (operandSpec.power ())
-					.value (operandSpec.value ())
-					.resolver (resolver));
+
+				.power (
+					operandSpec.power ())
+
+				.value (
+					operandSpec.value ())
+
+				.resolver (
+					resolver)
+
+			);
 
 		}
 

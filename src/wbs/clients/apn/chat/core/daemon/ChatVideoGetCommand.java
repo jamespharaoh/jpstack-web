@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.core.daemon;
 
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -7,12 +9,11 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
@@ -29,7 +30,6 @@ import wbs.clients.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -196,11 +196,12 @@ class ChatVideoGetCommand
 
 			// just send three random videos
 
-			int numSent =
+			long numSent =
 				chatInfoLogic.sendUserVideos (
 					chatUser,
-					3,
-					message.getThreadId ());
+					3l,
+					Optional.of (
+						message.getThreadId ()));
 
 			// send a message if no videos were found
 

@@ -1,10 +1,10 @@
 package wbs.framework.entity.generate;
 
-import static wbs.framework.utils.etc.Misc.equal;
-import static wbs.framework.utils.etc.Misc.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
+import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
 
@@ -52,7 +52,7 @@ class AssociativeCollectionWriter {
 		String fullFieldTypeName;
 
 		if (
-			equal (
+			stringEqual (
 				spec.typeName (),
 				"string")
 		) {

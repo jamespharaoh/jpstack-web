@@ -23,18 +23,18 @@
 	</sql-scripts>
 
 	<layer name="api">
-		<bean class="api.ClockworkSmsRouteInAction"/>
-		<bean class="api.ClockworkSmsRouteReportAction"/>
+		<component class="api.ClockworkSmsRouteInAction"/>
+		<component class="api.ClockworkSmsRouteReportAction"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.ClockworkSmsSenderHelper"/>
-		<bean class="daemon.ClockworkSmsSenderService"/>
+		<component class="daemon.ClockworkSmsSenderHelper"/>
+		<component class="daemon.ClockworkSmsSenderService"/>
 	</layer>
 
 	<layer name="logic">
-		<bean class="foreignapi.ClockworkSmsForeignApiConfig"/>
-		<bean class="foreignapi.ClockworkSmsMessageSender"/>
+		<component class="foreignapi.ClockworkSmsForeignApiConfig"/>
+		<component class="foreignapi.ClockworkSmsMessageSender"/>
 	</layer>
 
 	<fixtures>

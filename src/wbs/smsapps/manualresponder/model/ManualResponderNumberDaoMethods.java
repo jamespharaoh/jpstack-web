@@ -11,7 +11,7 @@ interface ManualResponderNumberDaoMethods {
 			ManualResponderRec manualResponder,
 			NumberRec number);
 
-	List<Integer> searchIds (
+	List <Long> searchIds (
 			ManualResponderNumberSearch search);
 
 }

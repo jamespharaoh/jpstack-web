@@ -14,20 +14,20 @@
 	</models>
 
 	<layer name="daemon">
-		<bean class="daemon.ChatBroadcastScheduleDaemon"/>
-		<bean class="daemon.ChatBroadcastSendDaemon"/>
+		<component class="daemon.ChatBroadcastScheduleDaemon"/>
+		<component class="daemon.ChatBroadcastSendDaemon"/>
 	</layer>
 
 	<layer name="console">
-		<bean class="console.ChatBroadcastListPart"/>
-		<bean class="console.ChatBroadcastSendAction"/>
-		<bean class="console.ChatBroadcastSendPart"/>
-		<bean class="console.ChatBroadcastVerifyPart"/>
+		<component class="console.ChatBroadcastListPart"/>
+		<component class="console.ChatBroadcastSendAction"/>
+		<component class="console.ChatBroadcastSendPart"/>
+		<component class="console.ChatBroadcastVerifyPart"/>
 	</layer>
 
 	<layer name="logic">
-		<bean class="logic.ChatBroadcastLogicImplementation"/>
-		<bean class="logic.ChatBroadcastSendHelper"/>
+		<component class="logic.ChatBroadcastLogicImplementation"/>
+		<component class="logic.ChatBroadcastSendHelper"/>
 	</layer>
 
 	<console-modules>

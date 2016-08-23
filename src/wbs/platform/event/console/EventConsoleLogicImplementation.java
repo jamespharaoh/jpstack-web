@@ -1,6 +1,6 @@
 package wbs.platform.event.console;
 
-import static wbs.framework.utils.etc.Misc.equal;
+import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.instantToDateNullSafe;
 import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
@@ -152,7 +152,7 @@ class EventConsoleLogicImplementation
 		) {
 
 			if (
-				equal (
+				integerEqualSafe (
 					eventLink.getTypeId (),
 					EventLogic.integerEventLinkType)
 			) {
@@ -166,7 +166,7 @@ class EventConsoleLogicImplementation
 							eventLink.getRefId ().toString ()));
 
 			} else if (
-				equal (
+				integerEqualSafe (
 					eventLink.getTypeId (),
 					EventLogic.booleanEventLinkType)
 			) {
@@ -179,7 +179,7 @@ class EventConsoleLogicImplementation
 						eventLink.getRefId () != 0 ? "yes" : "no");
 
 			} else if (
-				equal (
+				integerEqualSafe (
 					eventLink.getTypeId (),
 					EventLogic.instantEventLinkType)
 			) {
