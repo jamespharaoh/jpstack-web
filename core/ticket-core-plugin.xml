@@ -23,16 +23,16 @@
 	</fixtures>
 
 	<layer name="console">
-		<bean class="console.TicketFieldsProvider"/>
-		<bean class="console.TicketFieldsProvider$Config"/>
-		<bean class="console.TicketManagerQueueConsole"/>
-		<bean class="console.TicketPendingFormAction"/>
-		<bean class="console.TicketPendingFormResponder"/>
-		<bean class="console.TicketPendingHistoryPart"/>
+		<component class="console.TicketFieldsProvider"/>
+		<component class="console.TicketFieldsProvider$Config"/>
+		<component class="console.TicketManagerQueueConsole"/>
+		<component class="console.TicketPendingFormAction"/>
+		<component class="console.TicketPendingFormResponder"/>
+		<component class="console.TicketPendingHistoryPart"/>
 	</layer>
 
 	<layer name="daemon">
-		<bean class="daemon.TicketStateTimeDaemon"/>
+		<component class="daemon.TicketStateTimeDaemon"/>
 	</layer>
 
 	<console-modules>

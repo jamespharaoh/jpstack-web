@@ -3,12 +3,12 @@
 	package="wbs.services.ticket.create">
 
 	<layer name="console">
-		<bean class="ObjectTicketCreatePageSpec"/>
-		<bean class="ObjectTicketCreatePageBuilder"/>
-		<bean class="ObjectTicketCreateAction"/>
-		<bean class="ObjectTicketCreatePart"/>
-		<bean class="ObjectTicketCreateSetFieldSpec"/>
-		<bean class="ObjectTicketCreateSetFieldBuilder"/>
+		<component class="ObjectTicketCreatePageSpec"/>
+		<component class="ObjectTicketCreatePageBuilder"/>
+		<component class="ObjectTicketCreateAction"/>
+		<component class="ObjectTicketCreatePart"/>
+		<component class="ObjectTicketCreateSetFieldSpec"/>
+		<component class="ObjectTicketCreateSetFieldBuilder"/>
 	</layer>
 
 </plugin>
