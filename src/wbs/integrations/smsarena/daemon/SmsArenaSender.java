@@ -2,7 +2,7 @@ package wbs.integrations.smsarena.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.stringToUrl;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
@@ -89,7 +89,7 @@ class SmsArenaSender
 				route.getId ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				smsArenaRouteOutOptional)
 		) {
 

@@ -1,6 +1,6 @@
 package wbs.framework.schema.helper;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
@@ -267,7 +267,7 @@ class SchemaTypesHelperImplementation
 				objectClassName);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				objectClassOptional)
 		) {
 
@@ -289,7 +289,7 @@ class SchemaTypesHelperImplementation
 				helperClassName);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				helperClassOptional)
 		) {
 
@@ -301,10 +301,10 @@ class SchemaTypesHelperImplementation
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				objectClassOptional)
 
-			|| isNotPresent (
+			|| optionalIsNotPresent (
 				helperClassOptional)
 
 		) {

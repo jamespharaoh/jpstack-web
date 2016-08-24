@@ -2,7 +2,7 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.errorResult;
 import static wbs.framework.utils.etc.Misc.successResult;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
@@ -51,7 +51,7 @@ class SecondsFormFieldInterfaceMapping<Container>
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				interfaceValue)
 
 			|| stringIsEmpty (
@@ -70,7 +70,7 @@ class SecondsFormFieldInterfaceMapping<Container>
 					interfaceValue.get ());
 
 			if (
-				isNotPresent (
+				optionalIsNotPresent (
 					genericValue)
 			) {
 
@@ -97,7 +97,7 @@ class SecondsFormFieldInterfaceMapping<Container>
 			@NonNull Optional <Long> genericValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 

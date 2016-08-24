@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.PrototypeComponent;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("nameFormFieldValueValidator")
@@ -38,7 +38,7 @@ class NameFormFieldValueValidator
 				genericValue.get ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				code)
 		) {
 

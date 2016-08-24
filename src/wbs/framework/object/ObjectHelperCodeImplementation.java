@@ -2,7 +2,7 @@ package wbs.framework.object;
 
 import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
@@ -167,7 +167,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 				codes);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				recordOptional)
 		) {
 

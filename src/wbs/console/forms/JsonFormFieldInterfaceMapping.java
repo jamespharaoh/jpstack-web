@@ -16,7 +16,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.FormatWriterWriter;
 import wbs.framework.utils.etc.JsonToHtml;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 @PrototypeComponent ("jsonFormFieldInterfaceMapping")
 public
@@ -46,7 +46,7 @@ class JsonFormFieldInterfaceMapping<Container>
 			@NonNull Optional<String> genericValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 

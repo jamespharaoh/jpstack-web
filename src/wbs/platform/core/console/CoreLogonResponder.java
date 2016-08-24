@@ -3,7 +3,7 @@ package wbs.platform.core.console;
 import static wbs.framework.utils.etc.CollectionUtils.collectionDoesNotHaveTwoElements;
 import static wbs.framework.utils.etc.CollectionUtils.listItemAtIndexRequired;
 import static wbs.framework.utils.etc.Misc.isEmpty;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
 
@@ -176,7 +176,7 @@ class CoreLogonResponder
 					userCode);
 
 			if (
-				isNotPresent (
+				optionalIsNotPresent (
 					userOptional)
 			) {
 				continue;
@@ -234,7 +234,7 @@ class CoreLogonResponder
 			"<table class=\"details\">\n");
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				slice)
 		) {
 

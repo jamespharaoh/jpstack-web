@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Set;
@@ -78,7 +78,7 @@ class ChatMonitorInboxFormResponder
 					"chatMonitorInboxId"));
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				chatMonitorInboxOptional)
 		) {
 

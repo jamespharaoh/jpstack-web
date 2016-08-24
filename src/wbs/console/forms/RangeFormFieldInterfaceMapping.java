@@ -20,7 +20,7 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 @Accessors (fluent = true)
@@ -54,7 +54,7 @@ class RangeFormFieldInterfaceMapping<
 			@NonNull Optional<Range<Generic>> genericValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 
@@ -84,7 +84,7 @@ class RangeFormFieldInterfaceMapping<
 		}
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				getValue (
 					leftResult))
 		) {
@@ -115,7 +115,7 @@ class RangeFormFieldInterfaceMapping<
 		}
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				getValue (
 					rightResult))
 		) {
@@ -147,7 +147,7 @@ class RangeFormFieldInterfaceMapping<
 			@NonNull Optional<Range<Interface>> interfaceValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				interfaceValue)
 		) {
 
@@ -177,7 +177,7 @@ class RangeFormFieldInterfaceMapping<
 		}
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				getValue (
 					leftResult))
 		) {
@@ -208,7 +208,7 @@ class RangeFormFieldInterfaceMapping<
 		}
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				getValue (
 					rightResult))
 		) {

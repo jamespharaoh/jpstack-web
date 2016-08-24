@@ -2,7 +2,7 @@ package wbs.integrations.oxygen8.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -98,7 +98,7 @@ class Oxygen8Sender
 				route.getId ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				oxygen8RouteOutOptional)
 		) {
 

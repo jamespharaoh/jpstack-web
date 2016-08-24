@@ -13,7 +13,7 @@ import wbs.framework.data.annotations.DataParent;
 @Accessors (fluent = true)
 @DataClass ("value-property")
 public
-class BeansValuePropertySpec
+class ComponentsValuePropertySpec
 	implements ComponentsComponentPropertySpec {
 
 	@DataAncestor

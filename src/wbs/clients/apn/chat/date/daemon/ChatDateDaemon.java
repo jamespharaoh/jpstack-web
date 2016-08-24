@@ -9,7 +9,7 @@ import static wbs.framework.utils.etc.Misc.min;
 import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.framework.utils.etc.NumberUtils.lessThanOne;
 import static wbs.framework.utils.etc.NumberUtils.roundToIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -196,7 +196,7 @@ class ChatDateDaemon
 				chatId);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				chatDataOptional)
 		) {
 			return;

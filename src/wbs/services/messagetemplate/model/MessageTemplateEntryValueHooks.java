@@ -2,7 +2,7 @@ package wbs.services.messagetemplate.model;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
@@ -294,7 +294,7 @@ class MessageTemplateEntryValueHooks
 			isNotNull (
 				fieldValue)
 
-			&& isNotPresent (
+			&& optionalIsNotPresent (
 				valueOptional)
 
 		) {

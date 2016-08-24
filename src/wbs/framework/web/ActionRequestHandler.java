@@ -55,7 +55,7 @@ class ActionRequestHandler
 			String actionName) {
 
 		return actionProvider (
-			applicationContext.getComponentProvider (
+			applicationContext.getComponentProviderRequired (
 				actionName,
 				Action.class));
 

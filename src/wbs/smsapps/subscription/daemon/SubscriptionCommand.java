@@ -2,7 +2,7 @@ package wbs.smsapps.subscription.daemon;
 
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalFromJava;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -224,7 +224,7 @@ class SubscriptionCommand
 		);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				subscriptionKeywordOptional)
 		) {
 			return;

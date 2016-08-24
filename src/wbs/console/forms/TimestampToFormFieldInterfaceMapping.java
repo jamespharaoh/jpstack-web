@@ -23,7 +23,7 @@ import fj.data.Either;
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TextualInterval;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 @Accessors (fluent = true)
@@ -53,7 +53,7 @@ class TimestampToFormFieldInterfaceMapping<Container>
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				interfaceValue)
 
 			|| stringIsEmpty (
@@ -98,7 +98,7 @@ class TimestampToFormFieldInterfaceMapping<Container>
 			@NonNull Optional<Instant> genericValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 

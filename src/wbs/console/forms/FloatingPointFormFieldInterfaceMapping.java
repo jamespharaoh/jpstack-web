@@ -12,7 +12,7 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 @PrototypeComponent ("doubleFormFieldInterfaceMapping")
 public
@@ -28,7 +28,7 @@ class FloatingPointFormFieldInterfaceMapping<Container>
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				interfaceValue)
 
 			|| stringIsEmpty (
@@ -58,7 +58,7 @@ class FloatingPointFormFieldInterfaceMapping<Container>
 			@NonNull Optional<Double> genericValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 

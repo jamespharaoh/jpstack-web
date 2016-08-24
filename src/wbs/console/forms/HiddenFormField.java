@@ -7,7 +7,7 @@ import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.NumberUtils.equalToOne;
 import static wbs.framework.utils.etc.NumberUtils.equalToTwo;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringSplitColon;
 
@@ -210,7 +210,7 @@ class HiddenFormField<Container,Generic,Native>
 			@NonNull Container container) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				implicitValue)
 		) {
 			return;

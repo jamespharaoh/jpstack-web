@@ -20,7 +20,7 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.entity.record.Record;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCsvFormFieldInterfaceMapping")
@@ -59,7 +59,7 @@ class ObjectCsvFormFieldInterfaceMapping<Container,Generic extends Record<Generi
 			@NonNull Optional<Generic> genericValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 

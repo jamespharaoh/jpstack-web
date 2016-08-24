@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 
 @Accessors (fluent = true)
 public
-class SingletonBeanFactory
+class SingletonComponentFactory
 	implements ComponentFactory {
 
 	@Getter @Setter

@@ -2,7 +2,7 @@ package wbs.integrations.clockworksms.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.sms.gsm.GsmUtils.gsmStringIsNotValid;
@@ -88,7 +88,7 @@ class ClockworkSmsSenderHelper
 				smsRoute.getId ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				clockworkSmsRouteOutOptional)
 		) {
 

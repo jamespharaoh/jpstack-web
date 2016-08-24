@@ -500,7 +500,7 @@ class OptionalUtils {
 	}
 
 	public static
-	boolean isNotPresent (
+	boolean optionalIsNotPresent (
 			@NonNull Optional <?> optional) {
 
 		return ! optional.isPresent ();

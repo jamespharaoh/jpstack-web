@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.successResult;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 
 import java.util.Map;
@@ -38,7 +38,7 @@ class EnumCsvFormFieldInterfaceMapping<Container,Generic extends Enum<Generic>>
 			@NonNull Optional<Generic> genericValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 

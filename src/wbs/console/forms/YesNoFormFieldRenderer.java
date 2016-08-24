@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.Misc.booleanToString;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.stringToBoolean;
 import static wbs.framework.utils.etc.Misc.successResult;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
@@ -111,7 +111,7 @@ class YesNoFormFieldRenderer<Container>
 
 			nullable ()
 
-			|| isNotPresent (
+			|| optionalIsNotPresent (
 				currentValue)
 
 			|| enumInSafe (

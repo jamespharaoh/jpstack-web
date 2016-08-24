@@ -3,7 +3,7 @@ package wbs.applications.imchat.api;
 import static wbs.framework.utils.etc.LogicUtils.booleanEqual;
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.hyphenToUnderscore;
 
 import javax.inject.Inject;
@@ -145,7 +145,7 @@ class ImChatConversationStartAction
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				profileOptional)
 
 			|| booleanEqual (

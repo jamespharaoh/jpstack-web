@@ -16,7 +16,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.TimeUtils.laterThan;
 
 import wbs.sms.number.core.model.ChatUserNumberReportObjectHelper;
@@ -57,7 +57,7 @@ class ChatNumberReportLogicImplementation
 				number.getId ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				numberReportOptional)
 		) {
 
@@ -120,7 +120,7 @@ class ChatNumberReportLogicImplementation
 				number.getId ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				numberReportOptional)
 		) {
 

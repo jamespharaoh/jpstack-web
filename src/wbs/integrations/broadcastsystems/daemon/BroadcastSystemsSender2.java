@@ -1,7 +1,7 @@
 package wbs.integrations.broadcastsystems.daemon;
 
 import static wbs.framework.utils.etc.Misc.stringToUrl;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
@@ -90,7 +90,7 @@ class BroadcastSystemsSender2
 				route.getId ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				broadcastSystemsRouteOutOptional)
 		) {
 

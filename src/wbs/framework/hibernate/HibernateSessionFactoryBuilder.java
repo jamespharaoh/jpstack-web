@@ -4,7 +4,7 @@ import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -184,7 +184,7 @@ class HibernateSessionFactoryBuilder {
 				objectClassName);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				objectClassOptional)
 		) {
 
@@ -207,7 +207,7 @@ class HibernateSessionFactoryBuilder {
 				helperClassName);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				helperClassOptional)
 		) {
 
@@ -220,10 +220,10 @@ class HibernateSessionFactoryBuilder {
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				objectClassOptional)
 
-			|| isNotPresent (
+			|| optionalIsNotPresent (
 				helperClassOptional)
 
 		) {
@@ -255,7 +255,7 @@ class HibernateSessionFactoryBuilder {
 				enumClassName);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				enumClassOptional)
 		) {
 

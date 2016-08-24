@@ -8,7 +8,7 @@ import org.json.simple.JSONValue;
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.PrototypeComponent;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("jsonFormFieldNativeMapping")
@@ -23,7 +23,7 @@ class JsonFormFieldNativeMapping<Container>
 			@NonNull Optional<String> nativeValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				nativeValue)
 		) {
 			return Optional.absent ();
@@ -42,7 +42,7 @@ class JsonFormFieldNativeMapping<Container>
 			@NonNull Optional<Object> genericValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 			return Optional.absent ();

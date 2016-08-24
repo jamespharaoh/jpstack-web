@@ -1,6 +1,6 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
 import static wbs.framework.utils.etc.StringUtils.underscoreToHyphen;
 
@@ -101,7 +101,7 @@ class ImChatMessageTemplateSetGetAction
 				request.code ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				messageTemplateSetOptional)
 		) {
 

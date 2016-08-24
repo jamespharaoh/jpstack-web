@@ -1,7 +1,7 @@
 package wbs.framework.object;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TypeUtils.dynamicCast;
@@ -326,7 +326,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 					parentObjectId);
 
 			if (
-				isNotPresent (
+				optionalIsNotPresent (
 					parentOptional)
 			) {
 

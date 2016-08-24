@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.stringTrim;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 
@@ -155,7 +155,7 @@ class ChatMessagePendingFormAction
 		// check message is ok
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				requestContext.parameter (
 					"sendWithoutApproval"))
 		) {

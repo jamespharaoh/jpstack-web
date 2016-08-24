@@ -4,7 +4,7 @@ import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.util.ArrayList;
@@ -337,7 +337,7 @@ class ForwarderLogicImplementation
 					work.template.fmInId);
 
 			if (
-				isNotPresent (
+				optionalIsNotPresent (
 					messageInOptional)
 			) {
 
@@ -387,7 +387,7 @@ class ForwarderLogicImplementation
 						part.routeCode);
 
 				if (
-					isNotPresent (
+					optionalIsNotPresent (
 						forwarderRouteOptional)
 				) {
 
@@ -497,7 +497,7 @@ class ForwarderLogicImplementation
 						part.networkId);
 
 				if (
-					isNotPresent (
+					optionalIsNotPresent (
 						networkOptional)
 				) {
 

@@ -2,7 +2,7 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
@@ -159,7 +159,7 @@ class ObjectFormFieldBuilder {
 						spec.objectTypeName ()));
 
 			if (
-				isNotPresent (
+				optionalIsNotPresent (
 					consoleHelper)
 			) {
 

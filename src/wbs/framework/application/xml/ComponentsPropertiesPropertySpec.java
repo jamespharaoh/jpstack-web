@@ -18,7 +18,7 @@ import wbs.framework.data.annotations.DataParent;
 @Accessors (fluent = true)
 @DataClass ("properties-property")
 public
-class BeansPropertiesPropertySpec
+class ComponentsPropertiesPropertySpec
 	implements ComponentsComponentPropertySpec {
 
 	@DataAncestor
@@ -35,8 +35,8 @@ class BeansPropertiesPropertySpec
 
 	@DataChildren (direct = true)
 	@Getter @Setter
-	List<BeansPropertyValueSpec> properties =
-		new ArrayList<BeansPropertyValueSpec> ();
+	List<ComponentPropertyValueSpec> properties =
+		new ArrayList<ComponentPropertyValueSpec> ();
 
 	@Override
 	public
@@ -46,7 +46,7 @@ class BeansPropertiesPropertySpec
 		Properties properties =
 			new Properties ();
 
-		for (BeansPropertyValueSpec propertyValue
+		for (ComponentPropertyValueSpec propertyValue
 				: this.properties) {
 
 			properties.setProperty (

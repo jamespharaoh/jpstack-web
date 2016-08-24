@@ -2,7 +2,7 @@ package wbs.platform.object.search;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -439,7 +439,7 @@ class ObjectSearchPageBuilder<
 				searchClassName);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				searchClassOptional)
 		) {
 

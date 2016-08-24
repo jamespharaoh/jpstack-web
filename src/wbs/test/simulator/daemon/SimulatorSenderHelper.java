@@ -1,6 +1,6 @@
 package wbs.test.simulator.daemon;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 import java.util.List;
 
@@ -143,7 +143,7 @@ class SimulatorSenderHelper
 				message.getNumber ().getId ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				simulatorSessionNumberOptional)
 		) {
 

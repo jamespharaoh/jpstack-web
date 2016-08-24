@@ -2,7 +2,7 @@ package wbs.console.module;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
@@ -1750,7 +1750,7 @@ class ConsoleManagerImplementation
 			}
 
 			if (
-				isNotPresent (
+				optionalIsNotPresent (
 					targetContext)
 			) {
 

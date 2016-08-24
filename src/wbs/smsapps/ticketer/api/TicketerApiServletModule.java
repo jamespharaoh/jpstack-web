@@ -1,6 +1,6 @@
 package wbs.smsapps.ticketer.api;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
@@ -230,7 +230,7 @@ class TicketerApiServletModule
 					sliceParam);
 
 			if (
-				isNotPresent (
+				optionalIsNotPresent (
 					sliceOptional)
 			) {
 
@@ -250,7 +250,7 @@ class TicketerApiServletModule
 					codeParam);
 
 			if (
-				isNotPresent (
+				optionalIsNotPresent (
 					ticketerOptional)
 			) {
 
@@ -270,7 +270,7 @@ class TicketerApiServletModule
 					numberParam);
 
 			if (
-				isNotPresent (
+				optionalIsNotPresent (
 					numberOptional)
 			) {
 

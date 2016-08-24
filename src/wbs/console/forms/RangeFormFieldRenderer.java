@@ -22,7 +22,7 @@ import fj.data.Either;
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.FormatWriter;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 @Accessors (fluent = true)
@@ -216,11 +216,11 @@ class RangeFormFieldRenderer<
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				getValue (
 					leftResult))
 
-			|| isNotPresent (
+			|| optionalIsNotPresent (
 				getValue (
 					rightResult))
 		) {

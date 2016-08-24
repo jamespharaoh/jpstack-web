@@ -17,7 +17,7 @@ import fj.data.Either;
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TextualInterval;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 @PrototypeComponent ("intervalFormFieldInterfaceMapping")
 public
@@ -41,7 +41,7 @@ class IntervalFormFieldInterfaceMapping<Container>
 		// allow null
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 
@@ -68,7 +68,7 @@ class IntervalFormFieldInterfaceMapping<Container>
 		// allow null
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				interfaceValue)
 		) {
 
@@ -86,7 +86,7 @@ class IntervalFormFieldInterfaceMapping<Container>
 				formFieldPreferences.hourOffset ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				optionalInterval)
 		) {
 

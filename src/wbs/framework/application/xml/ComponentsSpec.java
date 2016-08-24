@@ -5,11 +5,12 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.application.context.ApplicationContextImplementation;
 import wbs.framework.application.context.ComponentDefinition;
 import wbs.framework.application.context.ComponentFactory;
 import wbs.framework.data.annotations.DataChildren;
@@ -28,7 +29,7 @@ class ComponentsSpec {
 	@SneakyThrows (Exception.class)
 	public
 	int register (
-			ApplicationContext applicationContext) {
+			@NonNull ApplicationContextImplementation applicationContext) {
 
 		int errors = 0;
 

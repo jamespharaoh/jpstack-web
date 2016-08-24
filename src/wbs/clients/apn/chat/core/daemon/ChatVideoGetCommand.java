@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.core.daemon;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -227,7 +227,7 @@ class ChatVideoGetCommand
 
 			if (
 
-				isNotPresent (
+				optionalIsNotPresent (
 					otherUserOptional)
 
 				|| otherUserOptional.get ().getChatUserVideoList ().isEmpty ()

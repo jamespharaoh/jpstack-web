@@ -19,7 +19,7 @@ import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TimeFormatter;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 @PrototypeComponent ("dateFormFieldInterfaceMapping")
 public
@@ -43,7 +43,7 @@ class DateFormFieldInterfaceMapping<Container>
 		// handle not present
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 
@@ -72,7 +72,7 @@ class DateFormFieldInterfaceMapping<Container>
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				interfaceValue)
 
 			|| stringIsEmpty (
@@ -92,7 +92,7 @@ class DateFormFieldInterfaceMapping<Container>
 				interfaceValue.get ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 

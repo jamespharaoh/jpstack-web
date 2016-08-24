@@ -3,7 +3,7 @@ package wbs.smsapps.forwarder.api;
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.isInt;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
@@ -243,7 +243,7 @@ class ForwarderOutAction
 
 				if (
 
-					isNotPresent (
+					optionalIsNotPresent (
 						forwarderMessageInOptional)
 
 					|| referenceNotEqualSafe (

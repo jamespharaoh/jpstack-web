@@ -3,7 +3,7 @@ package wbs.integrations.clockworksms.api;
 import static wbs.framework.utils.etc.LogicUtils.booleanEqual;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.lowercase;
@@ -166,7 +166,7 @@ class ClockworkSmsRouteReportAction
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				smsRouteOptional)
 
 			|| booleanEqual (
@@ -197,7 +197,7 @@ class ClockworkSmsRouteReportAction
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				clockworkSmsRouteOutOptional)
 
 			|| booleanEqual (
@@ -249,7 +249,7 @@ class ClockworkSmsRouteReportAction
 					item.status ()));
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				deliveryStatusOptional)
 		) {
 
@@ -276,7 +276,7 @@ class ClockworkSmsRouteReportAction
 				item.errCode ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				deliveryStatusDetailCodeOptional)
 		) {
 
@@ -301,7 +301,7 @@ class ClockworkSmsRouteReportAction
 				item.clientId ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				smsMessageOptional)
 		) {
 

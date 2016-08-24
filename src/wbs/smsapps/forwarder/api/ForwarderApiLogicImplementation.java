@@ -1,7 +1,7 @@
 package wbs.smsapps.forwarder.api;
 
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.UnsupportedEncodingException;
@@ -85,7 +85,7 @@ class ForwarderApiLogicImplementation
 				sliceCode);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				sliceOptional)
 		) {
 
@@ -104,7 +104,7 @@ class ForwarderApiLogicImplementation
 				code);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				forwarderOptional)
 		) {
 
@@ -266,7 +266,7 @@ class ForwarderApiLogicImplementation
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				forwarderMessageInOptional)
 
 			|| referenceNotEqualSafe (
@@ -395,7 +395,7 @@ class ForwarderApiLogicImplementation
 				sliceCode);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				sliceOptional)
 		) {
 
@@ -419,7 +419,7 @@ class ForwarderApiLogicImplementation
 				forwarderCode);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				forwarderOptional)
 		) {
 

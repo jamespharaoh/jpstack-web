@@ -124,7 +124,7 @@ class ConsoleModuleImplementation
 	Provider<Responder> beanResponder (
 			@NonNull String name) {
 
-		return applicationContext.getComponentProvider (
+		return applicationContext.getComponentProviderRequired (
 			name,
 			Responder.class);
 

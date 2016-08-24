@@ -2,7 +2,7 @@ package wbs.framework.object;
 
 import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -185,7 +185,7 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 				index);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				recordOptional)
 		) {
 

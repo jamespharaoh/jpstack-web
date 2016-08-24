@@ -1,13 +1,18 @@
 package wbs.framework.application.tools;
 
+import static wbs.framework.utils.etc.DebugUtils.debugFormat;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.framework.utils.etc.TypeUtils.classForName;
 import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
+import static wbs.framework.utils.etc.TypeUtils.isNotSubclassOf;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -17,6 +22,7 @@ import java.util.Map;
 
 import javax.inject.Named;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
@@ -44,6 +50,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.annotations.ProxiedRequestComponent;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.application.context.ApplicationContextImplementation;
 import wbs.framework.application.context.ComponentDefinition;
 import wbs.framework.application.context.MethodComponentFactory;
 import wbs.framework.application.scaffold.BuildPluginSpec;
@@ -104,7 +111,7 @@ class ApplicationContextBuilder {
 	List <ComponentDefinition> componentDefinitionsToRegister =
 		new ArrayList<> ();
 
-	ApplicationContext applicationContext;
+	ApplicationContextImplementation applicationContext;
 
 	// implementation
 
@@ -292,7 +299,27 @@ class ApplicationContextBuilder {
 					: plugins
 			) {
 
-				registerLayerComponents (
+				PluginLayerSpec layer =
+					plugin.layersByName ().get (
+						layerName);
+		
+				if (layer != null) {
+
+					registerLayerComponents (
+						taskLog,
+						plugin,
+						layer);
+
+				}
+
+			}
+
+			for (
+				PluginSpec plugin
+					: plugins
+			) {
+
+				registerLayerAutomaticComponents (
 					taskLog,
 					plugin,
 					layerName);
@@ -306,26 +333,25 @@ class ApplicationContextBuilder {
 	void registerLayerComponents (
 			@NonNull TaskLogger taskLog,
 			@NonNull PluginSpec plugin,
-			@NonNull String layerName) {
+			@NonNull PluginLayerSpec layer) {
 
-		PluginLayerSpec layer =
-			plugin.layersByName ().get (
-				layerName);
+		for (
+			PluginComponentSpec component
+				: layer.components ()
+		) {
 
-		if (layer != null) {
-
-			for (
-				PluginComponentSpec component
-					: layer.components ()
-			) {
-
-				registerLayerComponent (
-					taskLog,
-					component);
-
-			}
+			registerLayerComponent (
+				taskLog,
+				component);
 
 		}
+
+	}
+
+	void registerLayerAutomaticComponents (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginSpec plugin,
+			@NonNull String layerName) {
 
 		if (
 			stringEqual (
@@ -687,6 +713,12 @@ class ApplicationContextBuilder {
 				registerEnumConsoleHelper (
 					taskLog,
 					pluginEnumTypeSpec));
+
+		plugin.models ().customTypes ().forEach (
+			pluginCustomTypeSpec ->
+				registerCustomConsoleHelper (
+					taskLog,
+					pluginCustomTypeSpec));
 
 	}
 
@@ -1301,6 +1333,10 @@ class ApplicationContextBuilder {
 			@NonNull TaskLogger taskLog,
 			@NonNull PluginEnumTypeSpec enumType) {
 
+debugFormat (
+	"Will register enum %s",
+	enumType.name ());
+
 		String enumClassName =
 			stringFormat (
 				"%s.model.%s",
@@ -1352,6 +1388,94 @@ class ApplicationContextBuilder {
 
 		);
 
+debugFormat (
+	"Registered %s",
+	enumConsoleHelperComponentName);
+
+	}
+
+	void registerCustomConsoleHelper (
+			@NonNull TaskLogger taskLog,
+			@NonNull PluginCustomTypeSpec customType) {
+
+		String customClassName =
+			stringFormat (
+				"%s.model.%s",
+				customType.plugin ().packageName (),
+				capitalise (
+					customType.name ()));
+
+		Optional <Class <?>> customClassOptional =
+			classForName (
+				customClassName);
+
+		if (
+			optionalIsNotPresent (
+				customClassOptional)
+
+		) {
+
+			taskLog.errorFormat (
+				"No such class %s",
+				customClassName);
+
+			return;
+
+		}
+
+		if (
+			isNotSubclassOf (
+				Enum.class,
+				customClassOptional.get ())
+		) {
+			return;
+		}
+
+		Class <?> enumClass =
+			customClassOptional.get ();
+
+		String enumConsoleHelperComponentName =
+			stringFormat (
+				"%sConsoleHelper",
+				customType.name ());
+
+		if (
+			optionalIsPresent (
+				applicationContext.getComponentDefinition (
+					enumConsoleHelperComponentName))
+		) {
+			return;
+		}
+
+debugFormat (
+	"Will register custom enum %s",
+	customType.name ());
+
+		applicationContext.registerComponentDefinition (
+			new ComponentDefinition ()
+
+			.name (
+				enumConsoleHelperComponentName)
+
+			.componentClass (
+				EnumConsoleHelper.class)
+
+			.factoryClass (
+				EnumConsoleHelperFactory.class)
+
+			.scope (
+				"singleton")
+
+			.addValueProperty (
+				"enumClass",
+				enumClass)
+
+		);
+
+debugFormat (
+	"Registered %s",
+	enumConsoleHelperComponentName);
+
 	}
 
 	void registerConfigComponents (
@@ -1395,10 +1519,11 @@ class ApplicationContextBuilder {
 
 	}
 
+	@SuppressWarnings ("resource")
 	void createApplicationContext () {
 
 		applicationContext =
-			new ApplicationContext ()
+			new ApplicationContextImplementation ()
 
 			.activityManager (
 				activityManager)

@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.core.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 import java.util.Collections;
 
@@ -176,7 +176,7 @@ class ChatPhotoCommand
 
 			} else if (
 
-				isNotPresent (
+				optionalIsNotPresent (
 					photoUserOptional)
 
 				|| ! chatUserLogic.valid (

@@ -2,7 +2,7 @@ package wbs.integrations.clockworksms.api;
 
 import static wbs.framework.utils.etc.LogicUtils.not;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 import javax.inject.Inject;
@@ -122,7 +122,7 @@ class ClockworkSmsRouteInAction
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				smsRouteOptional)
 
 			|| smsRouteOptional.get ().getDeleted ()
@@ -146,7 +146,7 @@ class ClockworkSmsRouteInAction
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				clockworkSmsRouteInOptional)
 
 			|| clockworkSmsRouteInOptional.get ().getDeleted ()

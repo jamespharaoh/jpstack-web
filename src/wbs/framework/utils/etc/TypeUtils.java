@@ -9,6 +9,8 @@ import lombok.NonNull;
 public
 class TypeUtils {
 
+	// ---------- class instances
+
 	public static
 	boolean isInstanceOf (
 			@NonNull Class <?> theClass,
@@ -38,6 +40,48 @@ class TypeUtils {
 			value);
 
 	}
+
+	public static
+	boolean isSubclassOf (
+			@NonNull Class <?> superclass,
+			@NonNull Class <?> subclass) {
+
+		return superclass.isAssignableFrom (
+			subclass);
+
+	}
+
+	public static
+	boolean isNotSubclassOf (
+			@NonNull Class <?> superclass,
+			@NonNull Class <?> subclass) {
+
+		return ! superclass.isAssignableFrom (
+			subclass);
+
+	}
+
+	public static
+	boolean isSuperclassOf (
+			@NonNull Class <?> subclass,
+			@NonNull Class <?> superclass) {
+
+		return superclass.isAssignableFrom (
+			subclass);
+
+	}
+
+	public static
+	boolean isNotSuperclassOf (
+			@NonNull Class <?> subclass,
+			@NonNull Class <?> superclass) {
+
+		return ! superclass.isAssignableFrom (
+			subclass);
+
+	}
+
+	// ---------- class equality
 
 	public static
 	boolean classEqual (

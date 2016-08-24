@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
 import static wbs.framework.utils.etc.StringUtils.utf8ToString;
 import lombok.NonNull;
@@ -21,7 +21,7 @@ class Utf8StringFormFieldNativeMapping<Container>
 			@NonNull Optional<byte[]> nativeValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				nativeValue)
 		) {
 			return Optional.absent ();
@@ -40,7 +40,7 @@ class Utf8StringFormFieldNativeMapping<Container>
 			@NonNull Optional<String> genericValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 			return Optional.absent ();

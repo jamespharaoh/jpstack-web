@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.contact.daemon;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
@@ -330,7 +330,7 @@ class ChatChatCommand
 				GsmUtils.gsmStringSimplify (keyword));
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				chatKeywordOptional)
 		) {
 			return Optional.<InboxAttemptRec>absent ();

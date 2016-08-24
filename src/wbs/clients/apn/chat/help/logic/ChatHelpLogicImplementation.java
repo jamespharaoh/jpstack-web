@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.help.logic;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 import java.util.List;
 
@@ -126,7 +126,7 @@ class ChatHelpLogicImplementation
 					helpCommand.getId ());
 
 			if (
-				isNotPresent (
+				optionalIsNotPresent (
 					threadId)
 			) {
 

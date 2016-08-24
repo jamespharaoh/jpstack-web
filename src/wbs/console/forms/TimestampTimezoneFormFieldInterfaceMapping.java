@@ -22,7 +22,7 @@ import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.utils.TimeFormatter;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 @Accessors (fluent = true)
@@ -52,7 +52,7 @@ class TimestampTimezoneFormFieldInterfaceMapping<Container>
 
 		if (
 
-			isNotPresent (
+			optionalIsNotPresent (
 				interfaceValue)
 
 			|| stringIsEmpty (

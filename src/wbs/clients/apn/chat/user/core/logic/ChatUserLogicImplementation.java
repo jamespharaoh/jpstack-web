@@ -8,7 +8,7 @@ import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.NumberUtils.notLessThan;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalFromJava;
 import static wbs.framework.utils.etc.OptionalUtils.optionalMapRequired;
@@ -407,7 +407,7 @@ class ChatUserLogicImplementation
 
 			&& (
 
-				isNotPresent (
+				optionalIsNotPresent (
 					thatCategoryId)
 
 				|| integerNotEqualSafe (
@@ -1151,7 +1151,7 @@ class ChatUserLogicImplementation
 		}
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				gazetteerEntryOptional)
 		) {
 

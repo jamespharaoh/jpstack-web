@@ -2,7 +2,7 @@ package wbs.clients.apn.chat.core.daemon;
 
 import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
@@ -180,7 +180,7 @@ class ChatMainCommand
 			fromChatUser.getChatScheme ();
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				toUserOptional)
 		) {
 
@@ -282,7 +282,7 @@ class ChatMainCommand
 				keyword);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				chatSchemeKeywordOptional)
 		) {
 
@@ -413,7 +413,7 @@ class ChatMainCommand
 				keyword);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				chatKeywordOptional)
 		) {
 
@@ -572,7 +572,7 @@ class ChatMainCommand
 				1915);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				dateOfBirth)
 		) {
 			return Optional.absent ();

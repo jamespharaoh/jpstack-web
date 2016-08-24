@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.report.console;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -632,7 +632,7 @@ class ChatReportRevSharePart
 				form.month ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				chatMonthCostOptional)
 		) {
 			return;

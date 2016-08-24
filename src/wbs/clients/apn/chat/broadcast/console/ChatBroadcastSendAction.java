@@ -6,7 +6,7 @@ import static wbs.framework.utils.etc.Misc.orNull;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.NumberUtils.moreThanZero;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -373,7 +373,7 @@ class ChatBroadcastSendAction
 						form.fromUser ());
 
 				if (
-					isNotPresent (
+					optionalIsNotPresent (
 						fromChatUserOptional)
 				) {
 
@@ -514,7 +514,7 @@ class ChatBroadcastSendAction
 									number);
 
 							if (
-								isNotPresent (
+								optionalIsNotPresent (
 									numberOptional)
 							) {
 								continue;
