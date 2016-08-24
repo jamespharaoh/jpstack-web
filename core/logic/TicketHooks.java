@@ -1,38 +1,49 @@
-package wbs.services.ticket.core.model;
+package wbs.services.ticket.core.logic;
+
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.hibernate.TransientObjectException;
 
+import com.google.common.base.Optional;
+
+import lombok.NonNull;
 import wbs.framework.database.Database;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHooks;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.Record;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
+import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
+import wbs.services.ticket.core.model.TicketFieldTypeRec;
+import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
+import wbs.services.ticket.core.model.TicketFieldValueRec;
+import wbs.services.ticket.core.model.TicketObjectHelper;
+import wbs.services.ticket.core.model.TicketRec;
 
 public
 class TicketHooks
-	implements ObjectHooks<TicketRec> {
+	implements ObjectHooks <TicketRec> {
 
 	@Inject
-	Provider<TicketObjectHelper> ticketHelper;
+	Provider <TicketObjectHelper> ticketHelper;
 
 	@Inject
-	Provider<TicketFieldTypeObjectHelper> ticketFieldTypeHelper;
+	Provider <TicketFieldTypeObjectHelper> ticketFieldTypeHelper;
 
 	@Inject
-	Provider<TicketFieldValueObjectHelper> ticketFieldValueHelper;
+	Provider <TicketFieldValueObjectHelper> ticketFieldValueHelper;
 
 	@Inject
-	Provider<ObjectManager> objectManager;
+	Provider <ObjectManager> objectManager;
 
 	@Inject
-	Provider<QueueLogic> queueLogic;
+	Provider <QueueLogic> queueLogic;
 
 	@Inject
 	Database database;
@@ -148,9 +159,9 @@ class TicketHooks
 	@Override
 	public
 	void setDynamic (
-			TicketRec ticket,
-			String name,
-			Object value) {
+			@NonNull TicketRec ticket,
+			@NonNull String name,
+			@NonNull Optional <?> valueOptional) {
 
 		// find the ticket field type
 
@@ -197,7 +208,8 @@ class TicketHooks
 
 				.setStringValue (
 					(String)
-					value);
+					optionalOrNull (
+						valueOptional));
 
 			break;
 
@@ -207,7 +219,8 @@ class TicketHooks
 
 				.setIntegerValue (
 					(Long)
-					value);
+					optionalOrNull (
+						valueOptional));
 
 			break;
 
@@ -217,14 +230,17 @@ class TicketHooks
 
 				.setBooleanValue (
 					(Boolean)
-					value);
+					optionalOrNull (
+						valueOptional));
 
 			break;
 
 		case object:
 
 			Record<?> record =
-				(Record<?>) value;
+				(Record<?>)
+				optionalOrNull (
+					valueOptional);
 
 			ticketFieldValue.setIntegerValue (
 				record.getId ());
