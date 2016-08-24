@@ -133,7 +133,7 @@ class AbstractPhpEntity
 
 	@Override
 	public
-	Integer asInteger () {
+	Long asInteger () {
 
 		throw new PhpTypeException (
 			type,

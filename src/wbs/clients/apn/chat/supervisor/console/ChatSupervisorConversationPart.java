@@ -1,7 +1,8 @@
 package wbs.clients.apn.chat.supervisor.console;
 
 import static wbs.framework.utils.etc.LogicUtils.anyOf;
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 import static wbs.framework.utils.etc.StringUtils.spacify;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -96,13 +97,17 @@ class ChatSupervisorConversationPart
 
 		if (anyOf (
 
-			() -> referenceNotEqualSafe (
-				userChatUser.getChat (),
-				chat),
+			() ->
+				referenceNotEqualWithClass (
+					ChatRec.class,
+					userChatUser.getChat (),
+					chat),
 
-			() -> referenceNotEqualSafe (
-				monitorChatUser.getChat (),
-				chat))
+			() ->
+				referenceNotEqualWithClass (
+					ChatRec.class,
+					monitorChatUser.getChat (),
+					chat))
 
 		) {
 
@@ -264,9 +269,14 @@ class ChatSupervisorConversationPart
 				.toLocalDate ();
 
 			if (
-				localDateNotEqual (
+
+				isNull (
+					previousDate)
+
+				|| localDateNotEqual (
 					nextDate,
 					previousDate)
+
 			) {
 
 				printFormat (

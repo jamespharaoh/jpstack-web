@@ -1,18 +1,18 @@
 package wbs.applications.imchat.api;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import lombok.Cleanup;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import lombok.Cleanup;
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
 import wbs.applications.imchat.model.ImChatSessionRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -28,25 +28,25 @@ class ImChatSessionLoadAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ImChatApiLogic imChatApiLogic;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerObjectHelper imChatCustomerHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatSessionObjectHelper imChatSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<JsonResponder> jsonResponderProvider;
+	@PrototypeDependency
+	Provider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 

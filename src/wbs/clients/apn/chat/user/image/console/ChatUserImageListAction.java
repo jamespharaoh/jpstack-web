@@ -3,8 +3,8 @@ package wbs.clients.apn.chat.user.image.console;
 import static wbs.framework.utils.etc.CollectionUtils.listItemAtIndexRequired;
 import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
@@ -139,7 +139,8 @@ class ChatUserImageListAction
 						index);
 
 				if (
-					referenceEqualSafe (
+					referenceEqualWithClass (
+						ChatUserImageRec.class,
 						itemToRemove,
 						chatUserLogic.getMainChatUserImageByType (
 							chatUser,
@@ -314,7 +315,8 @@ class ChatUserImageListAction
 						index);
 
 				if (
-					referenceNotEqualSafe (
+					referenceNotEqualWithClass (
+						ChatUserImageRec.class,
 						chatUserLogic.getMainChatUserImageByType (
 							chatUser,
 							type),

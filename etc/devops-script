@@ -93,7 +93,7 @@ class DevopsScript
 				"-t",
 				[
 					"cd #{@deployment_project_path}",
-					"ant console-live",
+					"ant console-deploy",
 					"sudo restart #{@config_services["console"]}",
 				].join(" && ")
 
@@ -105,7 +105,7 @@ class DevopsScript
 				"-t",
 				[
 					"cd #{@deployment_project_path}",
-					"ant api-live",
+					"ant api-deploy",
 					"sudo restart #{@config_services["api"]}",
 				].join(" && ")
 
@@ -117,7 +117,7 @@ class DevopsScript
 				"-t",
 				[
 					"cd #{@deployment_project_path}",
-					"ant build",
+					"ant daemon-deploy",
 					"sudo restart #{@config_services["daemon"]}",
 				].join(" && ")
 

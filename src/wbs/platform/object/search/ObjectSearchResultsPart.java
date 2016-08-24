@@ -14,7 +14,7 @@ import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.localDateNotEqual;
-import static wbs.framework.utils.etc.TypeUtils.classEqual;
+import static wbs.framework.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
 
 import java.lang.reflect.Method;
@@ -142,7 +142,7 @@ class ObjectSearchResultsPart
 		// current object
 
 		if (
-			classEqual (
+			classEqualSafe (
 				consoleHelper.objectClass (),
 				resultsClass)
 		) {
@@ -444,7 +444,7 @@ class ObjectSearchResultsPart
 
 			if (
 
-				classEqual (
+				classEqualSafe (
 					consoleHelper.objectClass (),
 					resultsClass)
 

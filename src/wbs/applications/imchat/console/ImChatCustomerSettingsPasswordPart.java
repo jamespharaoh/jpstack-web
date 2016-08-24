@@ -6,11 +6,10 @@ import static wbs.framework.utils.etc.StringUtils.stringInSafe;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.platform.event.console.EventConsoleLogic;
 import wbs.platform.event.console.EventLinkConsoleHelper;
@@ -24,13 +23,13 @@ class ImChatCustomerSettingsPasswordPart
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	EventConsoleLogic eventConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	EventLinkConsoleHelper eventLinkHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerConsoleHelper imChatCustomerHelper;
 
 	// state

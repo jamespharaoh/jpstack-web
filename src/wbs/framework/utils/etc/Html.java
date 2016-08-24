@@ -1,7 +1,8 @@
 package wbs.framework.utils.etc;
 
-import static wbs.framework.utils.etc.LogicUtils.equalSafe;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.framework.utils.etc.StringUtils.replaceAll;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -529,6 +530,7 @@ class Html {
 		}
 	}
 
+	@Deprecated
 	public static <Key>
 	String select (
 			String name,
@@ -576,9 +578,11 @@ class Html {
 			Key defaultValue) {
 
 		boolean selected =
-			equalSafe (
-				value,
-				defaultValue);
+			optionalEqualOrNotPresentSafe (
+				optionalFromNullable (
+					value),
+				optionalFromNullable (
+					defaultValue));
 
 		boolean gotValue =
 			value != null

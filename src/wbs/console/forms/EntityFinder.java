@@ -5,11 +5,13 @@ import java.util.List;
 import wbs.framework.entity.record.Record;
 
 public
-interface EntityFinder<Entity extends Record<Entity>> {
+interface EntityFinder <Entity extends Record <Entity>> {
+
+	Class <Entity> entityClass ();
 
 	Entity findEntity (
 			Long id);
 
-	List<Entity> findEntities ();
+	List <Entity> findAllEntities ();
 
 }

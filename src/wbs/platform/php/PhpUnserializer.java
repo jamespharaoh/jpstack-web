@@ -85,11 +85,17 @@ class PhpUnserializer {
 		return i == 1 ? PhpBoolean.pTrue : PhpBoolean.pFalse;
 	}
 
-	private static PhpEntity unserializeI(CountingInputStream in)
-			throws IOException {
-		expect(in, ':');
-		int i = readInt(in, ';');
-		return new PhpInteger(i);
+	private static 
+	PhpEntity unserializeI (
+			CountingInputStream in)
+		throws IOException {
+
+		expect (in, ':');
+
+		long i = readInt (in, ';');
+
+		return new PhpInteger (i);
+
 	}
 
 	private static

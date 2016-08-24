@@ -4,16 +4,14 @@ import static wbs.framework.utils.etc.Misc.isNull;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import lombok.Cleanup;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import com.google.common.collect.Lists;
 
+import lombok.Cleanup;
 import wbs.applications.imchat.model.ImChatCustomerObjectHelper;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatPurchaseObjectHelper;
@@ -21,6 +19,8 @@ import wbs.applications.imchat.model.ImChatPurchaseRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
 import wbs.applications.imchat.model.ImChatSessionRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -37,31 +37,31 @@ class ImChatPurchaseHistoryAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ImChatApiLogic imChatApiLogic;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerObjectHelper imChatCustomerHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatPurchaseObjectHelper imChatPurchaseHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatSessionObjectHelper imChatSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<JsonResponder> jsonResponderProvider;
+	@PrototypeDependency
+	Provider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 

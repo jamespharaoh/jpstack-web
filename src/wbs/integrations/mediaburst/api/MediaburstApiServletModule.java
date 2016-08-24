@@ -2,6 +2,7 @@ package wbs.integrations.mediaburst.api;
 
 import static wbs.framework.utils.etc.Misc.fromHex;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.lowercase;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -475,7 +476,8 @@ class MediaburstApiServletModule
 
 			requestContext.request (
 				"routeId",
-				Integer.parseInt (matcher.group (1)));
+				parseIntegerRequired (
+					matcher.group (1)));
 
 			return defaultFiles.get (
 				matcher.group (2));

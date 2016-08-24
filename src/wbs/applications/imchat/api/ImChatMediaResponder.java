@@ -5,12 +5,11 @@ import static wbs.framework.utils.etc.NumberUtils.integerToDecimalString;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.web.AbstractResponder;
 import wbs.framework.web.RequestContext;
 
@@ -22,7 +21,7 @@ class ImChatMediaResponder
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// properties

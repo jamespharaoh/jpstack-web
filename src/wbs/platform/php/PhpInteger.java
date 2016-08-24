@@ -1,6 +1,6 @@
 package wbs.platform.php;
 
-import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -13,11 +13,11 @@ class PhpInteger
 	extends AbstractPhpEntity {
 
 	private
-	int value;
+	Long value;
 
 	public
 	PhpInteger (
-			int newValue) {
+			Long newValue) {
 
 		super (
 			PhpType.pInteger);
@@ -37,7 +37,7 @@ class PhpInteger
 
 	@Override
 	public
-	Integer asInteger () {
+	Long asInteger () {
 
 		return value;
 
@@ -47,8 +47,7 @@ class PhpInteger
 	public
 	Long asLong () {
 
-		return fromJavaInteger (
-			value);
+		return value;
 
 	}
 
@@ -140,7 +139,8 @@ class PhpInteger
 	public
 	int hashCode () {
 
-		return value;
+		return toJavaIntegerRequired (
+			value);
 
 	}
 
@@ -162,10 +162,12 @@ class PhpInteger
 
 	public final static
 	PhpInteger zero =
-		new PhpInteger (0);
+		new PhpInteger (
+			0l);
 
 	public final static
 	PhpInteger one =
-		new PhpInteger (1);
+		new PhpInteger (
+			1l);
 
 }

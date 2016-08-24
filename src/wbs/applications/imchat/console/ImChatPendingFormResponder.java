@@ -6,8 +6,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
@@ -24,6 +22,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.currency.logic.CurrencyLogic;
 
@@ -34,13 +33,13 @@ class ImChatPendingFormResponder
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	ImChatMessageObjectHelper imChatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// state
@@ -49,7 +48,7 @@ class ImChatPendingFormResponder
 	ImChatConversationRec conversation;
 	ImChatCustomerRec customer;
 	ImChatRec imChat;
-	List<ImChatTemplateRec> templates;
+	List <ImChatTemplateRec> templates;
 
 	String summaryUrl;
 

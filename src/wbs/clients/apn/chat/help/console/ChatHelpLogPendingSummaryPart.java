@@ -1,5 +1,6 @@
 package wbs.clients.apn.chat.help.console;
 
+import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 import static wbs.framework.utils.etc.TimeUtils.localDateNotEqual;
 
@@ -237,9 +238,14 @@ class ChatHelpLogPendingSummaryPart
 					.toLocalDate ();
 
 			if (
-				localDateNotEqual (
+
+				isNull (
+					previousDate)
+
+				|| localDateNotEqual (
 					nextDate,
 					previousDate)
+
 			) {
 
 				previousDate =

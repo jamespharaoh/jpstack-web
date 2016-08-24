@@ -1,7 +1,6 @@
 package wbs.platform.php;
 
 import static wbs.framework.utils.etc.NumberUtils.roundToIntegerRequired;
-import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.stringToBytes;
 
 import java.util.ArrayList;
@@ -38,11 +37,10 @@ class PhpDouble
 
 	@Override
 	public
-	Integer asInteger () {
+	Long asInteger () {
 
-		return toJavaIntegerRequired (
-			roundToIntegerRequired (
-				value));
+		return roundToIntegerRequired (
+			value);
 
 	}
 

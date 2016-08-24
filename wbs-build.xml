@@ -140,40 +140,20 @@
 		<!-- platform -->
 
 		<plugin
-			name="object-core"
-			package="wbs.platform.object.core"/>
-
-		<plugin
-			name="currency"
-			package="wbs.platform.currency"/>
-
-		<plugin
 			name="affiliate"
 			package="wbs.platform.affiliate"/>
-
-		<plugin
-			name="status"
-			package="wbs.platform.status"/>
 
 		<plugin
 			name="core"
 			package="wbs.platform.core"/>
 
 		<plugin
-			name="hooks"
-			package="wbs.platform.hooks"/>
+			name="currency"
+			package="wbs.platform.currency"/>
 
 		<plugin
-			name="object-criteria"
-			package="wbs.platform.object.criteria"/>
-
-		<plugin
-			name="object-link"
-			package="wbs.platform.object.link"/>
-
-		<plugin
-			name="object-summary"
-			package="wbs.platform.object.summary"/>
+			name="daemon"
+			package="wbs.platform.daemon"/>
 
 		<plugin
 			name="event"
@@ -186,6 +166,10 @@
 		<plugin
 			name="group"
 			package="wbs.platform.group"/>
+
+		<plugin
+			name="hooks"
+			package="wbs.platform.hooks"/>
 
 		<plugin
 			name="lock"
@@ -204,17 +188,24 @@
 			package="wbs.platform.object.browse"/>
 
 		<plugin
+			name="object-core"
+			package="wbs.platform.object.core"/>
+
+		<plugin
 			name="object-create"
 			package="wbs.platform.object.create"/>
 
 		<plugin
+			name="object-criteria"
+			package="wbs.platform.object.criteria"/>
+
+		<plugin
+			name="object-link"
+			package="wbs.platform.object.link"/>
+
+		<plugin
 			name="object-list"
 			package="wbs.platform.object.list"/>
-
-		<!-- TODO this does not belong here -->
-		<plugin
-			name="object-ticket-create"
-			package="wbs.services.ticket.create"/>
 
 		<plugin
 			name="object-search"
@@ -225,12 +216,33 @@
 			package="wbs.platform.object.settings"/>
 
 		<plugin
+			name="object-summary"
+			package="wbs.platform.object.summary"/>
+
+		<!-- TODO this does not belong here -->
+		<plugin
+			name="object-ticket-create"
+			package="wbs.services.ticket.create"/>
+
+		<plugin
+			name="platform-common"
+			package="wbs.platform.common"/>
+
+		<plugin
+			name="postgresql"
+			package="wbs.platform.postgresql"/>
+
+		<plugin
 			name="priv"
 			package="wbs.platform.priv"/>
 
 		<plugin
 			name="queue"
 			package="wbs.platform.queue"/>
+
+		<plugin
+			name="rpc"
+			package="wbs.platform.rpc"/>
 
 		<plugin
 			name="scaffold"
@@ -241,28 +253,20 @@
 			package="wbs.platform.service"/>
 
 		<plugin
-			name="text"
-			package="wbs.platform.text"/>
+			name="status"
+			package="wbs.platform.status"/>
 
 		<plugin
-			name="user"
-			package="wbs.platform.user"/>
+			name="text"
+			package="wbs.platform.text"/>
 
 		<plugin
 			name="update-log"
 			package="wbs.platform.updatelog"/>
 
 		<plugin
-			name="postgresql"
-			package="wbs.platform.postgresql"/>
-
-		<plugin
-			name="rpc"
-			package="wbs.platform.rpc"/>
-
-		<plugin
-			name="platform-common"
-			package="wbs.platform.common"/>
+			name="user"
+			package="wbs.platform.user"/>
 
 		<!-- sms -->
 

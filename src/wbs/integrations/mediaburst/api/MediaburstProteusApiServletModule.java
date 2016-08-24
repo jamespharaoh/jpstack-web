@@ -1,6 +1,7 @@
 package wbs.integrations.mediaburst.api;
 
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -187,9 +188,10 @@ class MediaburstProteusApiServletModule
 			// save stuff
 
 			reportRequestResult.messageId =
-				Integer.parseInt(xomContent (
-					document,
-					"/DeliveryReceipt/ClientID"));
+				Integer.parseInt (
+					xomContent (
+						document,
+						"/DeliveryReceipt/ClientID"));
 
 			reportRequestResult.otherId =
 				xomContent (
@@ -248,7 +250,7 @@ class MediaburstProteusApiServletModule
 
 			requestContext.request (
 				"routeId",
-				Integer.parseInt (
+				parseIntegerRequired (
 					matcher.group (1)));
 
 			return defaultFiles.get (

@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -163,7 +164,7 @@ class DelegatingPathHandler
 	@Override
 	public
 	WebFile processPath (
-			String path)
+			@NonNull String path)
 		throws ServletException {
 
 		log.debug (

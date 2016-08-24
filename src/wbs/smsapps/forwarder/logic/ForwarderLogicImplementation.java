@@ -2,6 +2,7 @@ package wbs.smsapps.forwarder.logic;
 
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -844,7 +845,8 @@ class ForwarderLogicImplementation
 
 		if (
 
-			referenceNotEqualSafe (
+			referenceNotEqualWithClass (
+				ForwarderMessageInRec.class,
 				forwarderMessaeOut.getForwarderMessageIn (),
 				forwarderMessageIn)
 
@@ -856,7 +858,8 @@ class ForwarderLogicImplementation
 				message.getNumTo (),
 				numTo)
 
-			|| referenceNotEqualSafe (
+			|| referenceNotEqualWithClass (
+				ForwarderRouteRec.class,
 				forwarderMessaeOut.getForwarderRoute (),
 				route)
 

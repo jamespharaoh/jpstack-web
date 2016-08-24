@@ -1,9 +1,11 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringTrim;
+import static wbs.framework.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -187,9 +189,12 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 					valueParam);
 
 		if (
-			referenceEqualSafe (
-				oldValue,
-				newValue)
+			optionalEqualOrNotPresentWithClass (
+				TextRec.class,
+				optionalFromNullable (
+					oldValue),
+				optionalFromNullable (
+					newValue))
 		) {
 
 			return textResponder.get ()
@@ -259,7 +264,8 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 					valueParam);
 
 		if (
-			referenceEqualSafe (
+			referenceEqualWithClass (
+				TextRec.class,
 				oldValue,
 				newValue)
 		) {

@@ -1,10 +1,10 @@
 package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.LogicUtils.not;
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.json.simple.JSONObject;
@@ -17,6 +17,8 @@ import wbs.applications.imchat.model.ImChatRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
 import wbs.applications.imchat.model.ImChatSessionRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -31,30 +33,30 @@ public
 class ImChatConditionsAcceptAction
 	implements Action {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	ImChatApiLogic imChatApiLogic;
 
-	@Inject
+	@SingletonDependency
 	ImChatObjectHelper imChatHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatSessionObjectHelper imChatSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<JsonResponder> jsonResponderProvider;
+	@PrototypeDependency
+	Provider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 
@@ -87,8 +89,9 @@ class ImChatConditionsAcceptAction
 
 		ImChatRec imChat =
 			imChatHelper.findRequired (
-				requestContext.requestIntegerRequired (
-					"imChatId"));
+				parseIntegerRequired (
+					requestContext.requestStringRequired (
+						"imChatId")));
 
 		// lookup session
 
@@ -107,7 +110,8 @@ class ImChatConditionsAcceptAction
 			|| not (
 				session.getActive ())
 
-			|| referenceNotEqualSafe (
+			|| referenceNotEqualWithClass (
+				ImChatRec.class,
 				customer.getImChat (),
 				imChat)
 

@@ -1,9 +1,8 @@
 package wbs.applications.imchat.console;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.framework.utils.etc.Misc.stringTrim;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
@@ -13,6 +12,8 @@ import wbs.applications.imchat.model.ImChatMessageRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.etc.Html;
@@ -29,31 +30,33 @@ public
 class ImChatPendingCustomerNoteUpdateAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ImChatMessageConsoleHelper imChatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	TextConsoleHelper textHelper;
 
-	@Inject
-	Provider<TextResponder> textResponderProvider;
-
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleHelper userHelper;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider<TextResponder> textResponderProvider;
 
 	// details
 
@@ -105,7 +108,8 @@ class ImChatPendingCustomerNoteUpdateAction
 					valueParam);
 
 		if (
-			referenceEqualSafe (
+			referenceEqualWithClass (
+				TextRec.class,
 				oldValue,
 				newValue)
 		) {

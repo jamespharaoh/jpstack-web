@@ -234,27 +234,39 @@ class LogicUtils {
 
 	public static <Type>
 	boolean referenceEqualSafe (
-			@NonNull Object object1,
-			@NonNull Object object2) {
+			@NonNull Object object0,
+			@NonNull Object object1) {
 
-		if (object1.getClass () != object2.getClass ()) {
-			throw new RuntimeException ();
+		if (object0.getClass () != object1.getClass ()) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Tried to compare a %s to a %s",
+					object0.getClass ().getSimpleName (),
+					object1.getClass ().getSimpleName ()));
+
 		}
 
-		return object1 == object2;
+		return object0 == object1;
 
 	}
 
 	public static
 	boolean referenceNotEqualSafe (
-			@NonNull Object object1,
-			@NonNull Object object2) {
+			@NonNull Object object0,
+			@NonNull Object object1) {
 
-		if (object1.getClass () != object2.getClass ()) {
-			throw new RuntimeException ();
+		if (object0.getClass () != object1.getClass ()) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Tried to compare a %s to a %s",
+					object0.getClass ().getSimpleName (),
+					object1.getClass ().getSimpleName ()));
+
 		}
 
-		return object1 != object2;
+		return object0 != object1;
 
 	}
 

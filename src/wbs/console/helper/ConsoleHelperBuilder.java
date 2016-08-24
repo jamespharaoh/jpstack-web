@@ -1,8 +1,11 @@
 package wbs.console.helper;
 
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.classForName;
 import static wbs.framework.utils.etc.TypeUtils.classInSafe;
 
 import java.lang.reflect.Constructor;
@@ -124,53 +127,33 @@ class ConsoleHelperBuilder {
 
 		// extra methods
 
+		String extraInterfaceName =
+			stringFormat (
+				"%s.%sObjectHelperMethods",
+				modelPackageName,
+				capitalise (
+					consoleHelperProvider.objectName ()));
+
+		extraInterface =
+			optionalOrNull (
+				classForName (
+					extraInterfaceName));
+
 		String extraImplementationBeanName =
 			stringFormat (
-				"%sObjectHelperImplementation",
+				"%sObjectHelperMethodsImplementation",
 				consoleHelperProvider.objectName ());
 
-		try {
-
-			extraImplementation =
-				applicationContext.getComponentRequired (
+		extraImplementation =
+			ifThenElse (
+				isNotNull (
+					extraInterface),
+				() -> applicationContext.getComponentRequired (
 					extraImplementationBeanName,
-					Object.class);
-
-		} catch (NoSuchComponentException exception) {
-		}
-
-		try {
-
-			String extraInterfaceName =
-				stringFormat (
-					"%s.%sObjectHelperMethods",
-					modelPackageName,
-					capitalise (
-						consoleHelperProvider.objectName ()));
-
-			extraInterface =
-				Class.forName (
-					extraInterfaceName);
-
-		} catch (ClassNotFoundException exception) {
-		}
+					Object.class),
+				() -> null);
 
 		// dao methods
-
-		String daoImplementationBeanName =
-			stringFormat (
-				"%sDao",
-				consoleHelperProvider.objectName ());
-
-		try {
-
-			daoImplementation =
-				applicationContext.getComponentRequired (
-					daoImplementationBeanName,
-					Object.class);
-
-		} catch (NoSuchComponentException exception) {
-		}
 
 		String daoMethodsInterfaceName =
 			stringFormat (
@@ -179,25 +162,24 @@ class ConsoleHelperBuilder {
 				capitalise (
 					consoleHelperProvider.objectName ()));
 
-		try {
+		daoMethodsInterface =
+			optionalOrNull (
+				classForName (
+					daoMethodsInterfaceName));
 
-			daoMethodsInterface =
-				Class.forName (
-					daoMethodsInterfaceName);
+		String daoImplementationBeanName =
+			stringFormat (
+				"%sDao",
+				consoleHelperProvider.objectName ());
 
-		} catch (ClassNotFoundException exception) {
-		}
-
-		if (daoMethodsInterface != null
-				&& daoImplementation == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Found dao methods interface %s but no implementation bean %s",
-					daoMethodsInterfaceName,
-					daoImplementationBeanName));
-
-		}
+		daoImplementation =
+			ifThenElse (
+				isNotNull (
+					daoMethodsInterface),
+				() -> applicationContext.getComponentRequired (
+					daoImplementationBeanName,
+					Object.class),
+				() -> null);
 
 		// console hooks
 
@@ -344,7 +326,15 @@ class ConsoleHelperBuilder {
 
 		@Override
 		public
-		Record<?> findEntity (
+		Class entityClass () {
+
+			return objectHelper.objectClass ();
+
+		}
+
+		@Override
+		public
+		Record <?> findEntity (
 				@NonNull Long id) {
 
 			return optionalOrNull (
@@ -355,9 +345,9 @@ class ConsoleHelperBuilder {
 
 		@Override
 		public
-		List<Record<?>> findEntities () {
+		List <Record <?>> findAllEntities () {
 
-			return (List<Record<?>>)
+			return (List <Record <?>>)
 				objectHelper.findAll ();
 
 		}

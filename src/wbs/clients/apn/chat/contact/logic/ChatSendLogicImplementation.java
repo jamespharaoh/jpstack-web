@@ -2,6 +2,7 @@ package wbs.clients.apn.chat.contact.logic;
 
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collection;
@@ -648,7 +649,8 @@ class ChatSendLogicImplementation
 			finalText,
 			Optional.of (
 				ifThenElse (
-					referenceEqualSafe (
+					referenceEqualWithClass (
+						CommandRec.class,
 						magicCommand,
 						commandHelper.findByCodeRequired (
 							chat,

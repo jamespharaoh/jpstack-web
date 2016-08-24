@@ -1,14 +1,14 @@
 package wbs.applications.imchat.api;
 
 import static wbs.framework.utils.etc.LogicUtils.booleanEqual;
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.hyphenToUnderscore;
 
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.json.simple.JSONObject;
@@ -29,6 +29,8 @@ import wbs.applications.imchat.model.ImChatRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
 import wbs.applications.imchat.model.ImChatSessionRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -52,49 +54,49 @@ class ImChatPurchaseStartAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ImChatApiLogic imChatApiLogic;
 
-	@Inject
+	@SingletonDependency
 	ImChatObjectHelper imChatHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerObjectHelper imChatCustomerHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatPricePointObjectHelper imChatPricePointHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatPurchaseObjectHelper imChatPurchaseHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatSessionObjectHelper imChatSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	PaypalApi paypalApi;
 
-	@Inject
+	@SingletonDependency
 	PaypalLogic paypalLogic;
 
-	@Inject
+	@SingletonDependency
 	PaypalPaymentObjectHelper paypalPaymentHelper;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<JsonResponder> jsonResponderProvider;
+	@PrototypeDependency
+	Provider <JsonResponder> jsonResponderProvider;
 
 	// state
 
@@ -170,8 +172,9 @@ class ImChatPurchaseStartAction
 
 		ImChatRec imChat =
 			imChatHelper.findRequired (
-				requestContext.requestIntegerRequired (
-					"imChatId"));
+				parseIntegerRequired (
+					requestContext.requestStringRequired (
+						"imChatId")));
 
 		imChatDevelopmentMode =
 			imChat.getDevelopmentMode ();
@@ -228,7 +231,8 @@ class ImChatPurchaseStartAction
 			optionalIsNotPresent (
 				pricePointOptional)
 
-			|| referenceNotEqualSafe (
+			|| referenceNotEqualWithClass (
+				ImChatRec.class,
 				pricePointOptional.get ().getImChat (),
 				imChat)
 

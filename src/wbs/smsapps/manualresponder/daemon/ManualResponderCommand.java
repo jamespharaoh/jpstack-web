@@ -1,6 +1,6 @@
 package wbs.smsapps.manualresponder.daemon;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
@@ -41,6 +41,7 @@ import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.core.logic.DateFinder;
 import wbs.sms.customer.logic.SmsCustomerLogic;
+import wbs.sms.customer.model.SmsCustomerManagerRec;
 import wbs.sms.customer.model.SmsCustomerObjectHelper;
 import wbs.sms.customer.model.SmsCustomerRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
@@ -254,7 +255,8 @@ class ManualResponderCommand
 		) {
 
 			if (
-				referenceNotEqualSafe (
+				referenceNotEqualWithClass (
+					SmsCustomerManagerRec.class,
 					manualResponder
 						.getSmsCustomerManager (),
 					manualResponderAffiliate

@@ -29,11 +29,11 @@ class PhpBoolean
 
 	@Override
 	public
-	Integer asInteger () {
+	Long asInteger () {
 
 		return value
-			? 1
-			: 0;
+			? 1l
+			: 0l;
 
 	}
 

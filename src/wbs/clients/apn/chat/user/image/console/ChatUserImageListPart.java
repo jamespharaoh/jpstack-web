@@ -1,8 +1,9 @@
 package wbs.clients.apn.chat.user.image.console;
 
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
 import static wbs.framework.utils.etc.Misc.toEnum;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualWithClass;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
@@ -152,10 +153,12 @@ class ChatUserImageListPart
 			printFormat (
 				"<td>%h</td>\n",
 				ifThenElse (
-					referenceEqualSafe (
-						chatUserLogic.getMainChatUserImageByType (
-							chatUser,
-							type),
+					optionalValueEqualWithClass (
+						ChatUserImageRec.class,
+						optionalFromNullable (
+							chatUserLogic.getMainChatUserImageByType (
+								chatUser,
+								type)),
 						chatUserImage),
 					() -> "Y",
 					() -> ""));
@@ -190,50 +193,57 @@ class ChatUserImageListPart
 				chatUserImage.getClassification ());
 
 			printFormat (
-				"<td>\n",
+				"<td>\n");
 
+			printFormat (
 				"<input",
 				" type=\"submit\"",
 				" name=\"remove_%h\"",
 				index,
 				" value=\"X\"",
-				">\n",
+				">\n");
 
+			printFormat (
 				"<input",
 				" type=\"submit\"",
 				" name=\"rotate_ccw_%h\"",
 				index,
 				" value=\"&#x21b6;\"",
-				">\n",
+				">\n");
 
+			printFormat (
 				"<input",
 				" type=\"submit\"",
 				" name=\"rotate_cw_%h\"",
 				index,
 				" value=\"&#x21b7;\"",
-				">\n",
+				">\n");
 
+			printFormat (
 				"<input",
 				" type=\"submit\"",
 				" name=\"move_up_%h\"",
 				index,
 				" value=\"&#x2191;\"",
-				">\n",
+				">\n");
 
+			printFormat (
 				"<input",
 				" type=\"submit\"",
 				" name=\"move_down_%h\"",
 				index,
 				" value=\"&#x2193;\"",
-				">\n",
+				">\n");
 
+			printFormat (
 				"<input",
 				" type=\"submit\"",
 				" name=\"select_%h\"",
 				index,
 				" value=\"S\"",
-				">\n",
+				">\n");
 
+			printFormat (
 				"</td>\n");
 
 			printFormat (

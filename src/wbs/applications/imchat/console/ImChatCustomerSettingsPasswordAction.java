@@ -2,7 +2,6 @@ package wbs.applications.imchat.console;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
@@ -13,6 +12,7 @@ import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -26,22 +26,22 @@ class ImChatCustomerSettingsPasswordAction
 
 	// implementation
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerConsoleHelper imChatCustomerHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatLogic imChatLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleHelper userHelper;
 
 	// details

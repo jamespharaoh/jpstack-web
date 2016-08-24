@@ -31,7 +31,7 @@ interface PhpEntity {
 
 	Boolean asBoolean ();
 
-	Integer asInteger ();
+	Long asInteger ();
 
 	Long asLong ();
 

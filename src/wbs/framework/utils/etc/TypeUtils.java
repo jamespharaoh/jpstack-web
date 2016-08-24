@@ -84,7 +84,7 @@ class TypeUtils {
 	// ---------- class equality
 
 	public static
-	boolean classEqual (
+	boolean classEqualSafe (
 			@NonNull Class <?> class0,
 			@NonNull Class <?> class1) {
 

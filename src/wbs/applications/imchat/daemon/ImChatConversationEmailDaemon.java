@@ -4,8 +4,6 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.joda.time.Duration;
 
 import lombok.Cleanup;
@@ -15,6 +13,7 @@ import wbs.applications.imchat.logic.ImChatLogic;
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.daemon.SleepingDaemonService;
@@ -27,13 +26,13 @@ class ImChatConversationEmailDaemon
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ImChatConversationObjectHelper imChatConversationHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatLogic imChatLogic;
 
 	// details

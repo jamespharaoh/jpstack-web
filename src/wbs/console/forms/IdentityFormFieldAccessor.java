@@ -1,12 +1,14 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 
 import javax.inject.Inject;
 
 import com.google.common.base.Optional;
 
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
@@ -17,10 +19,15 @@ public
 class IdentityFormFieldAccessor <Container>
 	implements FormFieldAccessor <Container, Container> {
 
-	// properties
+	// dependencies
 
 	@Inject
 	ConsoleObjectManager consoleObjectManager;
+
+	// properties
+
+	@Getter @Setter
+	Class <Container> containerClass;
 
 	// implementation
 
@@ -41,7 +48,8 @@ class IdentityFormFieldAccessor <Container>
 			@NonNull Optional <Container> nativeValue) {
 
 		if (
-			referenceNotEqualSafe (
+			referenceNotEqualWithClass (
+				containerClass,
 				container,
 				nativeValue.get ())
 		) {

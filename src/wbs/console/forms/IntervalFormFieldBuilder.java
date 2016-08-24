@@ -1,9 +1,9 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.TypeUtils.classEqualSafe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,7 +173,7 @@ class IntervalFormFieldBuilder {
 		FormFieldNativeMapping nativeMapping;
 
 		if (
-			referenceEqualSafe (
+			classEqualSafe (
 				propertyClass.get (),
 				Interval.class)
 		) {
@@ -182,7 +182,7 @@ class IntervalFormFieldBuilder {
 				intervalFormFieldNativeMappingProvider.get ();
 
 		} else if (
-			referenceEqualSafe (
+			classEqualSafe (
 				propertyClass.get (),
 				TextualInterval.class)
 		) {

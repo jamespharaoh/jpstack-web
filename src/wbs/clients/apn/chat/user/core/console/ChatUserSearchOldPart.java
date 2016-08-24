@@ -76,8 +76,8 @@ class ChatUserSearchOldPart
 	void renderHtmlBodyContent () {
 
 		@SuppressWarnings ("unchecked")
-		Map<String,String> params =
-			(Map<String,String>)
+		Map <String, String> params =
+			(Map <String, String>)
 			requestContext.session (
 				"chatUserSearchParams");
 
@@ -121,7 +121,8 @@ class ChatUserSearchOldPart
 				"type",
 				searchTypeOptions,
 				objectToStringNullSafe (
-					params.get ("type"))),
+					params.get (
+						"type"))),
 
 			"</tr>\n");
 

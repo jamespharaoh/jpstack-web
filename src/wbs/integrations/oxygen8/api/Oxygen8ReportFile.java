@@ -77,10 +77,12 @@ class Oxygen8ReportFile
 				"routeId");
 
 		state.reference =
-			requestContext.parameterOrNull ("Reference");
+			requestContext.parameterOrNull (
+				"Reference");
 
 		state.status =
-			requestContext.parameterOrNull ("Status");
+			requestContext.parameterOrNull (
+				"Status");
 
 	}
 

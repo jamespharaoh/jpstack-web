@@ -4,8 +4,8 @@ import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
@@ -15,8 +15,6 @@ import static wbs.framework.utils.etc.TimeUtils.calculateAgeInYears;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
@@ -37,6 +35,7 @@ import wbs.applications.imchat.model.ImChatProfileRec;
 import wbs.applications.imchat.model.ImChatPurchaseRec;
 import wbs.applications.imchat.model.ImChatRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -52,24 +51,24 @@ public
 class ImChatApiLogicImplementation
 	implements ImChatApiLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency 
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerDetailValueObjectHelper imChatCustomerDetailValueHelper;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// implementation

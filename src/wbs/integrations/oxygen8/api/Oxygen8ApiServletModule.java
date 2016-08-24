@@ -1,5 +1,7 @@
 package wbs.integrations.oxygen8.api;
 
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
+
 import java.util.Map;
 import java.util.regex.Matcher;
 
@@ -44,7 +46,7 @@ class Oxygen8ApiServletModule
 
 				requestContext.request (
 					"routeId",
-					Integer.parseInt (
+					parseIntegerRequired (
 						matcher.group (1)));
 
 				return defaultFiles.get (

@@ -1,0 +1,9 @@
+<plugin
+	name="daemon"
+	package="wbs.platform.daemon">
+
+	<layer name="daemon">
+		<component class="DaemonMiscComponents"/>
+	</layer>
+
+</plugin>

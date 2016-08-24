@@ -1,6 +1,6 @@
 package wbs.platform.user.console;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -83,7 +83,8 @@ class UserPasswordAction
 
 		if (
 
-			referenceNotEqualSafe (
+			referenceNotEqualWithClass (
+				UserRec.class,
 				user,
 				userConsoleLogic.userRequired ())
 

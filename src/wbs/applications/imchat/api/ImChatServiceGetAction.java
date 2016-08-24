@@ -1,12 +1,15 @@
 package wbs.applications.imchat.api;
 
-import javax.inject.Inject;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
+
 import javax.inject.Provider;
 
 import lombok.Cleanup;
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Action;
@@ -22,25 +25,25 @@ class ImChatServiceGetAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ImChatApiLogic imChatApiLogic;
 
-	@Inject
+	@SingletonDependency
 	ImChatObjectHelper imChatHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<JsonResponder> jsonResponderProvider;
+	@PrototypeDependency
+	Provider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 
@@ -58,8 +61,9 @@ class ImChatServiceGetAction
 
 		ImChatRec imChat =
 			imChatHelper.findRequired (
-				requestContext.requestIntegerRequired (
-					"imChatId"));
+				parseIntegerRequired (
+					requestContext.requestStringRequired (
+						"imChatId")));
 
 		// create response
 

@@ -2,15 +2,15 @@ package wbs.clients.apn.chat.user.core.logic;
 
 import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.NumberUtils.notLessThan;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromJava;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalFromJava;
 import static wbs.framework.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringInSafe;
@@ -41,6 +41,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
+import wbs.clients.apn.chat.category.model.ChatCategoryRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.logic.ChatNumberReportLogic;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -1466,7 +1467,8 @@ class ChatUserLogicImplementation
 			isNotNull (
 				chatAffiliate.getCategory ())
 
-			&& referenceNotEqualSafe (
+			&& referenceNotEqualWithClass (
+				ChatCategoryRec.class,
 				chatUser.getCategory (),
 				chatAffiliate.getCategory ())
 

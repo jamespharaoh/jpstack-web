@@ -4,13 +4,14 @@ import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalEqualAndPresentWithClass;
 import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualWithClass;
+import static wbs.framework.utils.etc.OptionalUtils.optionalNotEqualAndPresentWithClass;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
@@ -369,29 +370,21 @@ class QueueSubjectSorter {
 			isNotNull (
 				subjectInfo.preferredUser);
 
-		subjectInfo.preferredByUs = (
-
-			subjectInfo.preferred
-
-			&& optionalValueEqualWithClass (
+		subjectInfo.preferredByUs =
+			optionalEqualAndPresentWithClass (
 				UserRec.class,
 				optionalFromNullable (
 					subjectInfo.preferredUser),
-				effectiveUser)
+				optionalFromNullable (
+					effectiveUser));
 
-		);
-
-		subjectInfo.preferredByOther = (
-
-			subjectInfo.preferred
-
-			&& optionalValueEqualWithClass (
+		subjectInfo.preferredByOther =
+			optionalNotEqualAndPresentWithClass (
 				UserRec.class,
 				optionalFromNullable (
 					subjectInfo.preferredUser),
-				effectiveUser)
-
-		);
+				optionalFromNullable (
+					effectiveUser));
 
 		if (subjectInfo.preferred) {
 

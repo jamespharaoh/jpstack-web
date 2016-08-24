@@ -1,5 +1,6 @@
 package wbs.platform.php;
 
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.bytesToString;
 import static wbs.framework.utils.etc.StringUtils.stringToBytes;
 
@@ -51,9 +52,9 @@ class PhpString
 	/** This implementation is inconsistent with PHP's behaviour. */
 	@Override
 	public
-	Integer asInteger () {
+	Long asInteger () {
 
-		return Integer.parseInt (
+		return parseIntegerRequired (
 			bytesToString (
 				data,
 				"iso-8859-1"));

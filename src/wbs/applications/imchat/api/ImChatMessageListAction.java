@@ -5,7 +5,6 @@ import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.json.simple.JSONObject;
@@ -22,6 +21,8 @@ import wbs.applications.imchat.model.ImChatMessageRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
 import wbs.applications.imchat.model.ImChatSessionRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -37,28 +38,28 @@ class ImChatMessageListAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ImChatApiLogic imChatApiLogic;
 
-	@Inject
+	@SingletonDependency
 	ImChatConversationObjectHelper imChatConversationHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatSessionObjectHelper imChatSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatMessageObjectHelper imChatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<JsonResponder> jsonResponderProvider;
+	@PrototypeDependency
+	Provider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 
@@ -123,7 +124,7 @@ class ImChatMessageListAction
 		// find conversation
 
 		ImChatConversationRec conversation =
-			imChatConversationHelper.findByIndexOrNull (
+			imChatConversationHelper.findByIndexRequired (
 				customer,
 				request.conversationIndex ());
 

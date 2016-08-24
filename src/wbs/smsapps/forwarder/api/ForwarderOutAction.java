@@ -1,6 +1,6 @@
 package wbs.smsapps.forwarder.api;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isInt;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -246,7 +246,8 @@ class ForwarderOutAction
 					optionalIsNotPresent (
 						forwarderMessageInOptional)
 
-					|| referenceNotEqualSafe (
+					|| referenceNotEqualWithClass (
+						ForwarderRec.class,
 						forwarderMessageInOptional.get ().getForwarder (),
 						forwarder)
 

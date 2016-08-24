@@ -2,12 +2,12 @@ package wbs.applications.imchat.api;
 
 
 import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.json.simple.JSONObject;
@@ -21,6 +21,8 @@ import wbs.applications.imchat.model.ImChatRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
 import wbs.applications.imchat.model.ImChatSessionRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -38,34 +40,34 @@ class ImChatCustomerCreateAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ImChatApiLogic imChatApiLogic;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerObjectHelper imChatCustomerHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatObjectHelper imChatHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatSessionObjectHelper imChatSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<JsonResponder> jsonResponderProvider;
+	@PrototypeDependency
+	Provider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 
@@ -98,8 +100,9 @@ class ImChatCustomerCreateAction
 
 		ImChatRec imChat =
 			imChatHelper.findRequired (
-				requestContext.requestIntegerRequired (
-					"imChatId"));
+				parseIntegerRequired (
+					requestContext.requestStringRequired (
+						"imChatId")));
 
 		// check for existing
 

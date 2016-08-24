@@ -1,9 +1,9 @@
 package wbs.smsapps.subscription.daemon;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalFromJava;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -278,7 +278,8 @@ class SubscriptionCommand
 
 			activeSubscriptionSub == null
 
-			|| referenceNotEqualSafe (
+			|| referenceNotEqualWithClass (
+				SubscriptionListRec.class,
 				activeSubscriptionSub.getSubscriptionList (),
 				subscriptionList)
 

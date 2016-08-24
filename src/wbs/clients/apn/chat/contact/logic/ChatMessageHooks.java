@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.contact.logic;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -48,7 +48,8 @@ class ChatMessageHooks
 		// sanity check
 
 		if (
-			referenceNotEqualSafe (
+			referenceNotEqualWithClass (
+				ChatRec.class,
 				fromChatUser.getChat (),
 				toChatUser.getChat ())
 		) {

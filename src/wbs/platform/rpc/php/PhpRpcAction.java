@@ -252,7 +252,7 @@ class PhpRpcAction
 		public
 		Object obtain (
 				RpcDefinition def,
-				List<String> errors,
+				List <String> errors,
 				boolean checkRequires) {
 
 			return phpToObject (
@@ -429,7 +429,7 @@ class PhpRpcAction
 
 		}
 
-		return entity.asInteger();
+		return entity.asInteger ();
 
 	}
 

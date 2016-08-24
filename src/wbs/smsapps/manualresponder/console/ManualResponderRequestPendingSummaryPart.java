@@ -2,7 +2,7 @@ package wbs.smsapps.manualresponder.console;
 
 import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
 import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
@@ -314,7 +314,8 @@ class ManualResponderRequestPendingSummaryPart
 					route.getOutCharge ();
 
 				if (
-					referenceEqualSafe (
+					referenceEqualWithClass (
+						ServiceRec.class,
 						message.getService (),
 						defaultService)
 				) {

@@ -1,6 +1,7 @@
 package wbs.smsapps.forwarder.api;
 
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 
@@ -252,7 +253,8 @@ class ForwarderUnqueueExRpcHandler
 				// it doesn't exist
 
 				if (
-					referenceNotEqualSafe (
+					referenceNotEqualWithClass (
+						ForwarderRec.class,
 						unqueueExReport.fmOutReport.getForwarderMessageOut ().getForwarder (),
 						forwarder)
 				) {

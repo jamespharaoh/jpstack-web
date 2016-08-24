@@ -1,15 +1,15 @@
 package wbs.applications.imchat.api;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.objectToString;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.json.simple.JSONObject;
@@ -25,6 +25,8 @@ import wbs.applications.imchat.model.ImChatRec;
 import wbs.applications.imchat.model.ImChatSessionObjectHelper;
 import wbs.applications.imchat.model.ImChatSessionRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -42,28 +44,28 @@ class ImChatEventPostAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	ImChatEventObjectHelper imChatEventHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatObjectHelper imChatHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatSessionObjectHelper imChatSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<JsonResponder> jsonResponderProvider;
+	@PrototypeDependency
+	Provider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 
@@ -96,8 +98,9 @@ class ImChatEventPostAction
 
 		ImChatRec imChat =
 			imChatHelper.findRequired (
-				requestContext.requestIntegerRequired (
-					"imChatId"));
+				parseIntegerRequired (
+					requestContext.requestStringRequired (
+						"imChatId")));
 
 		// write events
 
@@ -136,7 +139,8 @@ class ImChatEventPostAction
 
 						! session.getActive ()
 
-						|| referenceNotEqualSafe (
+						|| referenceNotEqualWithClass (
+							ImChatRec.class,
 							session.getImChatCustomer ().getImChat (),
 							imChat)
 

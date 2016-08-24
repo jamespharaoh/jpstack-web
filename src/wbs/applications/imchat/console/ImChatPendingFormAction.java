@@ -5,8 +5,6 @@ import static wbs.framework.utils.etc.NumberUtils.maximumJavaInteger;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
-
 import lombok.Cleanup;
 import wbs.applications.imchat.model.ImChatConversationRec;
 import wbs.applications.imchat.model.ImChatCustomerRec;
@@ -16,6 +14,7 @@ import wbs.applications.imchat.model.ImChatTemplateRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -30,25 +29,25 @@ class ImChatPendingFormAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ImChatMessageConsoleHelper imChatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatTemplateConsoleHelper imChatTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// details

@@ -6,7 +6,6 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
@@ -22,24 +21,26 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("imChatCustomerCreditPart")
 public
 class ImChatCustomerCreditPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	ConsoleModule imChatCustomerConsoleModule;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerConsoleHelper imChatCustomerHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerCreditConsoleHelper imChatCustomerCreditHelper;
 
 	// state

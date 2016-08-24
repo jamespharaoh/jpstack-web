@@ -3,7 +3,6 @@ package wbs.applications.imchat.console;
 import static wbs.framework.utils.etc.OptionalUtils.ifNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletException;
 
@@ -18,6 +17,7 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -31,28 +31,29 @@ class ImChatCustomerCreditAction
 
 	// implementation
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	ConsoleModule imChatCustomerConsoleModule;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerCreditConsoleHelper imChatCustomerCreditHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerConsoleHelper imChatCustomerHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleHelper userHelper;
 
 	// details

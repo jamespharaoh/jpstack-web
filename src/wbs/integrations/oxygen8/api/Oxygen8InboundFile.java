@@ -1,6 +1,7 @@
 package wbs.integrations.oxygen8.api;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualSafe;
 
 import java.io.IOException;
 
@@ -22,10 +23,10 @@ class Oxygen8InboundFile
 	// dependencies
 
 	@Inject
-	Provider<Oxygen8InboundMmsAction> oxygen8InboundMmsAction;
+	Provider <Oxygen8InboundMmsAction> oxygen8InboundMmsAction;
 
 	@Inject
-	Provider<Oxygen8InboundSmsAction> oxygen8InboundSmsAction;
+	Provider <Oxygen8InboundSmsAction> oxygen8InboundSmsAction;
 
 	@Inject
 	RequestContext requestContext;
@@ -44,9 +45,10 @@ class Oxygen8InboundFile
 		Action action;
 
 		if (
-			stringEqual (
-				requestContext.header (
-					"X-Mms-Message-Type"),
+			optionalValueEqualSafe (
+				optionalFromNullable (
+					requestContext.header (
+						"X-Mms-Message-Type")),
 				"MO_MMS")
 		) {
 

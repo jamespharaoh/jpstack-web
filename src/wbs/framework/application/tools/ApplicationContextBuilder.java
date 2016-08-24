@@ -1,6 +1,5 @@
 package wbs.framework.application.tools;
 
-import static wbs.framework.utils.etc.DebugUtils.debugFormat;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -1333,10 +1332,6 @@ class ApplicationContextBuilder {
 			@NonNull TaskLogger taskLog,
 			@NonNull PluginEnumTypeSpec enumType) {
 
-debugFormat (
-	"Will register enum %s",
-	enumType.name ());
-
 		String enumClassName =
 			stringFormat (
 				"%s.model.%s",
@@ -1387,10 +1382,6 @@ debugFormat (
 				enumClass)
 
 		);
-
-debugFormat (
-	"Registered %s",
-	enumConsoleHelperComponentName);
 
 	}
 
@@ -1447,10 +1438,6 @@ debugFormat (
 			return;
 		}
 
-debugFormat (
-	"Will register custom enum %s",
-	customType.name ());
-
 		applicationContext.registerComponentDefinition (
 			new ComponentDefinition ()
 
@@ -1471,10 +1458,6 @@ debugFormat (
 				enumClass)
 
 		);
-
-debugFormat (
-	"Registered %s",
-	enumConsoleHelperComponentName);
 
 	}
 

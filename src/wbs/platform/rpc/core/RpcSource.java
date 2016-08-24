@@ -7,7 +7,7 @@ interface RpcSource {
 
 	Object obtain (
 			RpcDefinition def,
-			List<String> errors,
+			List <String> errors,
 			boolean checkRequires);
 
 }

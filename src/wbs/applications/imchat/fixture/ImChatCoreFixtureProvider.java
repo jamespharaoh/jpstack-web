@@ -7,8 +7,6 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.apache.commons.io.IOUtils;
 
 import lombok.SneakyThrows;
@@ -32,6 +30,7 @@ import wbs.applications.imchat.model.ImChatSessionObjectHelper;
 import wbs.applications.imchat.model.ImChatSessionRec;
 import wbs.applications.imchat.model.ImChatTemplateObjectHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -56,67 +55,67 @@ class ImChatCoreFixtureProvider
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	CurrencyObjectHelper currencyHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerDetailTypeObjectHelper imChatCustomerDetailTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerObjectHelper imChatCustomerHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatConversationObjectHelper imChatConversationHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatObjectHelper imChatHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatMessageObjectHelper imChatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatPricePointObjectHelper imChatPricePointHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatProfileObjectHelper imChatProfileHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatPurchaseObjectHelper imChatPurchaseHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatSessionObjectHelper imChatSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatTemplateObjectHelper imChatTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaLogic;
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuItemObjectHelper menuItemHelper;
 
-	@Inject
+	@SingletonDependency
 	MessageTemplateLogic messageTemplateLogic;
 
-	@Inject
+	@SingletonDependency
 	MessageTemplateSetObjectHelper messageTemplateSetHelper;
 
-	@Inject
+	@SingletonDependency
 	PaypalAccountObjectHelper paypalAccountHelper;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// implementation

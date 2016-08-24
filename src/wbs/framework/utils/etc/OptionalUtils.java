@@ -45,8 +45,14 @@ class OptionalUtils {
 			return false;
 		}
 
-		if (optional0.getClass () != optional1.getClass ()) {
-			throw new IllegalArgumentException ();
+		if (optional0.get ().getClass () != optional1.get ().getClass ()) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Tried to compare a %s to a %s",
+					optional0.get ().getClass ().getSimpleName (),
+					optional1.get ().getClass ().getSimpleName ()));
+
 		}
 
 		return optional0.get ().equals (
@@ -66,7 +72,7 @@ class OptionalUtils {
 			return true;
 		}
 
-		if (optional0.getClass () != optional1.getClass ()) {
+		if (optional0.get ().getClass () != optional1.get ().getClass ()) {
 
 			throw new ClassCastException (
 				stringFormat (

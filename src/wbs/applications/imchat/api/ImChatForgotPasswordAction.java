@@ -1,6 +1,7 @@
 package wbs.applications.imchat.api;
 
-import javax.inject.Inject;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
+
 import javax.inject.Provider;
 
 import org.json.simple.JSONObject;
@@ -15,6 +16,8 @@ import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
@@ -31,31 +34,31 @@ class ImChatForgotPasswordAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ImChatApiLogic imChatApiLogic;
 
-	@Inject
+	@SingletonDependency
 	ImChatLogic imChatLogic;
 
-	@Inject
+	@SingletonDependency
 	ImChatCustomerObjectHelper imChatCustomerHelper;
 
-	@Inject
+	@SingletonDependency
 	ImChatObjectHelper imChatHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<JsonResponder> jsonResponderProvider;
+	@PrototypeDependency
+	Provider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 
@@ -88,8 +91,9 @@ class ImChatForgotPasswordAction
 
 		ImChatRec imChat =
 			imChatHelper.findRequired (
-				requestContext.requestIntegerRequired (
-					"imChatId"));
+				parseIntegerRequired (
+					requestContext.requestStringRequired (
+						"imChatId")));
 
 		// check for existing
 

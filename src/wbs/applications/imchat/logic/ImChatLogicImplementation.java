@@ -1,11 +1,9 @@
 package wbs.applications.imchat.logic;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
-
-import javax.inject.Inject;
 
 import org.apache.commons.io.output.StringBuilderWriter;
 
@@ -19,6 +17,7 @@ import wbs.applications.imchat.model.ImChatMessageRec;
 import wbs.applications.imchat.model.ImChatProfileRec;
 import wbs.applications.imchat.model.ImChatRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -38,25 +37,25 @@ class ImChatLogicImplementation
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EmailLogic emailLogic;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// implementation
@@ -75,7 +74,8 @@ class ImChatLogicImplementation
 		// check preconditions
 
 		if (
-			referenceNotEqualSafe (
+			referenceNotEqualWithClass (
+				ImChatConversationRec.class,
 				customer.getCurrentConversation (),
 				conversation)
 		) {

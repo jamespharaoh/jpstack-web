@@ -1,10 +1,10 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.TypeUtils.classEqualSafe;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -110,7 +110,7 @@ class JsonFormFieldBuilder {
 
 		FormFieldNativeMapping nativeMapping =
 			ifThenElse (
-				referenceEqualSafe (
+				classEqualSafe (
 					propertyClass,
 					byte[].class),
 

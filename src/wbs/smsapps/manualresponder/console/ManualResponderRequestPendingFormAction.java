@@ -1,6 +1,7 @@
 package wbs.smsapps.manualresponder.console;
 
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.NumberUtils.moreThan;
@@ -230,7 +231,8 @@ class ManualResponderRequestPendingFormAction
 		// consistency checks
 
 		if (
-			referenceNotEqualSafe (
+			referenceNotEqualWithClass (
+				ManualResponderRec.class,
 				template.getManualResponder (),
 				manualResponder)
 		) {

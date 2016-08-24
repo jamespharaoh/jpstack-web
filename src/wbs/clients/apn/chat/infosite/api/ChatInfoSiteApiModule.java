@@ -1,5 +1,7 @@
 package wbs.clients.apn.chat.infosite.api;
 
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -68,7 +70,8 @@ class ChatInfoSiteApiModule
 
 				requestContext.request (
 					"chatInfoSiteId",
-					Integer.parseInt (matcher.group (1)));
+					parseIntegerRequired (
+						matcher.group (1)));
 
 				requestContext.request (
 					"chatInfoSiteToken",
@@ -79,7 +82,8 @@ class ChatInfoSiteApiModule
 
 				requestContext.request (
 					"chatInfoSiteIndex",
-					Integer.parseInt (matcher.group (3)));
+					parseIntegerRequired (
+						matcher.group (3)));
 
 				requestContext.request (
 					"chatInfoSiteMode",

@@ -1,6 +1,6 @@
 package wbs.applications.imchat.console;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
 import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
@@ -40,6 +39,7 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.etc.Html;
 
 @PrototypeComponent ("imChatPendingSummaryPart")
@@ -49,19 +49,20 @@ class ImChatPendingSummaryPart
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	ConsoleModule imChatPendingConsoleModule;
 
-	@Inject
+	@SingletonDependency
 	ImChatMessageObjectHelper imChatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// state
@@ -370,7 +371,8 @@ class ImChatPendingSummaryPart
 							historyRequest)),
 
 					optionalIf (
-						referenceEqualSafe (
+						referenceEqualWithClass (
+							ImChatMessageRec.class,
 							message,
 							historyRequest),
 						() -> "selected")

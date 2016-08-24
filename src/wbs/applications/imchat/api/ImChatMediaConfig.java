@@ -1,20 +1,20 @@
 package wbs.applications.imchat.api;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.UninitializedDependency;
 import wbs.framework.web.Action;
 
 @SingletonComponent ("imChatMediaConfig")
 public
 class ImChatMediaConfig {
 
-	// prototype dependencies
+	// unitialized dependencies
 
-	@Inject
-	Provider<ImChatMediaJpegAction> imChatMediaJpegActionProvider;
+	@UninitializedDependency
+	Provider <ImChatMediaJpegAction> imChatMediaJpegActionProvider;
 
 	// implementation
 

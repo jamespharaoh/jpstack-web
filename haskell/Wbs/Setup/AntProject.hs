@@ -50,137 +50,187 @@ writeBuildFile world = do
 		[
 
 			makeComboTarget "clean" [
-				"clean" ],
+
+				"clean"
+
+			],
 
 			makeComboTarget "build" [
+
 				"build-framework",
 				"build-meta",
 				"generate-records",
 				"build-entity",
 				"generate-helpers",
-				"build-rest" ],
+				"build-rest"
+
+			],
 
 			makeComboTarget "framework-jar" [
-				"build-framework",
-				"framework-jar" ],
 
-			makeComboTarget "console-live" [
+				"build-framework",
+				"framework-jar"
+
+			],
+
+			makeComboTarget "api-deploy" [
+
 				"build-framework",
 				"build-meta",
 				"generate-records",
 				"build-entity",
 				"generate-helpers",
 				"build-rest",
-				"console-live" ],
 
-			makeComboTarget "console-test" [
-				"build-framework",
-				"build-meta",
-				"generate-records",
-				"build-entity",
-				"generate-helpers",
-				"build-rest",
-				"console-test" ],
+				"api-deploy"
 
-			makeComboTarget "console-auto" [
-				"build-framework",
-				"build-meta",
-				"generate-records",
-				"build-entity",
-				"generate-helpers",
-				"build-rest",
-				"console-live",
-				"console-restart" ],
-
-			makeComboTarget "api-live" [
-				"build-framework",
-				"build-meta",
-				"generate-records",
-				"build-entity",
-				"generate-helpers",
-				"build-rest",
-				"api-live" ],
-
-			makeComboTarget "api-test" [
-				"build-framework",
-				"build-meta",
-				"generate-records",
-				"build-entity",
-				"generate-helpers",
-				"build-rest",
-				"api-test" ],
+			],
 
 			makeComboTarget "api-auto" [
+
 				"build-framework",
 				"build-meta",
 				"generate-records",
 				"build-entity",
 				"generate-helpers",
 				"build-rest",
-				"api-live",
-				"api-restart" ],
+
+				"api-deploy",
+				"api-restart"
+
+			],
+
+			makeComboTarget "console-deploy" [
+
+				"build-framework",
+				"build-meta",
+				"generate-records",
+				"build-entity",
+				"generate-helpers",
+				"build-rest",
+
+				"console-deploy"
+
+			],
+
+			makeComboTarget "console-auto" [
+
+				"build-framework",
+				"build-meta",
+				"generate-records",
+				"build-entity",
+				"generate-helpers",
+				"build-rest",
+
+				"console-deploy",
+				"console-restart"
+
+			],
+
+			makeComboTarget "daemon-deploy" [
+
+				"build-framework",
+				"build-meta",
+				"generate-records",
+				"build-entity",
+				"generate-helpers",
+				"build-rest",
+
+				"daemon-deploy"
+
+			],
 
 			makeComboTarget "daemon-auto" [
+
 				"build-framework",
 				"build-meta",
 				"generate-records",
 				"build-entity",
 				"generate-helpers",
 				"build-rest",
-				"daemon-restart" ],
+
+				"daemon-deploy",
+				"daemon-restart"
+
+			],
 
 			makeComboTarget "all-auto" [
+
 				"build-framework",
 				"build-meta",
 				"generate-records",
 				"build-entity",
 				"generate-helpers",
 				"build-rest",
-				"api-live",
+
+				"api-deploy",
+				"console-deploy",
+				"daemon-deploy",
+
 				"api-restart",
-				"console-live",
 				"console-restart",
-				"daemon-restart" ],
+				"daemon-restart"
+
+			],
 
 			makeComboTarget "javadoc" [
-				"javadoc" ],
+
+				"javadoc"
+
+			],
 
 			makeComboTarget "fixtures" [
+
 				"build-framework",
 				"build-meta",
 				"generate-records",
 				"build-entity",
 				"generate-helpers",
 				"build-rest",
+
 				"db-drop",
 				"db-create",
 				"schema-create",
 				"sql-schema",
 				"sql-data",
-				"fixtures" ],
+				"fixtures"
+
+			],
 
 			makeComboTarget "tomcat-test" [
+
 				"build-framework",
 				"build-meta",
 				"generate-records",
 				"build-entity",
 				"generate-helpers",
 				"build-rest",
-				"console-test",
-				"api-test",
-				"tomcat-test" ],
+
+				"api-deploy",
+				"console-deploy",
+				"daemon-deploy",
+
+				"tomcat-test"
+
+			],
 
 			makeComboTarget "generate-records" [
+
 				"build-framework",
 				"build-meta",
-				"generate-records" ],
+				"generate-records"
+
+			],
 
 			makeComboTarget "generate-helpers" [
+
 				"build-framework",
 				"build-meta",
 				"generate-records",
 				"build-entity",
-				"generate-helpers" ]
+				"generate-helpers"
+
+			]
 
 		]
 
@@ -422,12 +472,17 @@ writeBuildFile world = do
 
 			makeSimpleTarget "build-rest" [
 				makeJavacTask [] [
+
 					mkelem "src" [
 						sattr "path" "src"
 					] [],
 					mkelem "src" [
-						sattr "path" "work/generated"
+						sattr "path" "work/bin"
 					] [],
+					mkelem "src" [
+						sattr "path" "work/generated"
+					] []
+
 				],
 				makeCopyToDir "work/bin" [
 					makeFilesetDir "src" [
@@ -445,10 +500,25 @@ writeBuildFile world = do
 		"src/" ++
 		(replace "." "/" $ plgPackage pluginConfig)
 
-	let makeWebTarget name env = let
+	let makeDaemonDeployTarget = let
 
 		workDir =
-			"work/" ++ env ++ "/" ++ name
+			"work/daemon"
+
+		in makeSimpleTarget "daemon-deploy" [
+
+			makeMkdir workDir,
+
+			makeCopyToDir workDir [
+				makeFilesetDir "work/bin" []
+			]
+
+		]
+
+	let makeWebDeployTarget name = let
+
+		workDir =
+			"work/" ++ name ++ "/root"
 
 		pluginDir pluginConfig =
 			"src/" ++
@@ -472,7 +542,7 @@ writeBuildFile world = do
 				)
 			) []
 
-		in makeSimpleTarget (name ++ "-" ++ env) [
+		in makeSimpleTarget (name ++ "-deploy") [
 
 			makeMkdir workDir,
 			makeMkdir $ workDir ++ "/WEB-INF",
@@ -493,7 +563,7 @@ writeBuildFile world = do
 			],
 
 			makeCopyFileToFile
-				(name ++ "/web-" ++ env ++ ".xml")
+				(name ++ "/web-live.xml")
 				(workDir ++ "/WEB-INF/web.xml")
 
 		]
@@ -527,15 +597,12 @@ writeBuildFile world = do
 			sattr "executable" exec
 		] elems
 
-	let makeTomcatTarget env = let
-
-		workDir =
-			"work/" ++ env
+	let makeTomcatTestTarget = let
 
 		tomcatDir =
-			 workDir ++ "/tomcat"
+			 "work/tomcat-test"
 
-		in makeSimpleTarget ("tomcat-" ++ env) [
+		in makeSimpleTarget ("tomcat-test") [
 
 			-- deploy tomcat
 
@@ -552,7 +619,7 @@ writeBuildFile world = do
 			-- configure tomcat
 
 			makeCopyFileToFileOverwrite
-				("console/server-" ++ env ++ ".xml")
+				("console/server-test.xml")
 				(tomcatDir ++ "/conf/server.xml"),
 
 			makeCopyFileToFile
@@ -564,7 +631,7 @@ writeBuildFile world = do
 			makeDeleteDir $ tomcatDir ++ "/apps/console/ROOT",
 
 			makeCopyDirToDir
-				(workDir ++ "/console")
+				("work/console/root")
 				(tomcatDir ++ "/apps/console/ROOT"),
 
 			makeCopyDirToDir
@@ -580,7 +647,7 @@ writeBuildFile world = do
 			makeDeleteDir $ tomcatDir ++ "/apps/api/ROOT",
 
 			makeCopyDirToDir
-				(workDir ++ "/api")
+				("work/api/root")
 				(tomcatDir ++ "/apps/api/ROOT"),
 
 			makeCopyDirToDir
@@ -597,11 +664,12 @@ writeBuildFile world = do
 
 		]
 
-	let makeWebTargets env =
+	let makeDeployTargets =
 		[
-			makeWebTarget "console" env,
-			makeWebTarget "api" env,
-			makeTomcatTarget env
+			makeDaemonDeployTarget,
+			makeWebDeployTarget "api",
+			makeWebDeployTarget "console",
+			makeTomcatTestTarget
 		]
 
 	let makeServiceTarget name service action =
@@ -840,8 +908,7 @@ writeBuildFile world = do
 				makeComboTargets ++
 				makeCleanTargets ++
 				makeBuildTargets ++
-				makeWebTargets "live" ++
-				makeWebTargets "test" ++
+				makeDeployTargets ++
 				makeServiceTargets ++
 				makeJavadocTargets ++
 				makeDatabaseTargets ++

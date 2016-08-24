@@ -7,7 +7,7 @@ import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.LogicUtils.anyOf;
 import static wbs.framework.utils.etc.LogicUtils.equalSafe;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
@@ -880,7 +880,8 @@ class ChatApiServletModule
 					isNotNull (
 						myUser)
 
-					&& referenceEqualSafe (
+					&& referenceEqualWithClass (
+						UserRec.class,
 						user,
 						myUser.getChat ().getSystemChatUser ())
 

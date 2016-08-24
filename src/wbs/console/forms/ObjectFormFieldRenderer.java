@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.successResult;
@@ -136,8 +136,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		// get a list of options
 
-		Collection<? extends Record<?>> allOptions =
-			entityFinder.findEntities ();
+		Collection <? extends Record <?>> allOptions =
+			entityFinder.findAllEntities ();
 
 		// filter visible options
 
@@ -160,7 +160,8 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 					optionalIsPresent (
 						interfaceValue)
 
-					&& referenceEqualSafe (
+					&& referenceEqualWithClass (
+						entityFinder.entityClass (),
 						item,
 						interfaceValue.get ())
 
