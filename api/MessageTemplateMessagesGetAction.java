@@ -15,7 +15,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.hyphenToUnderscore;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
 import static wbs.framework.utils.etc.StringUtils.underscoreToHyphen;
@@ -94,7 +94,7 @@ class MessageTemplateMessagesGetAction
 				messageTemplateDatabaseCode);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				messageTemplateDatabaseOptional)
 		) {
 
