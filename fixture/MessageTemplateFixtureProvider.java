@@ -2,9 +2,9 @@ package wbs.services.messagetemplate.fixture;
 
 import javax.inject.Inject;
 
+import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.GlobalId;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
