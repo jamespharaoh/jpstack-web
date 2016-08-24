@@ -82,7 +82,10 @@ class EventDetailsFormFieldBuilder {
 		// accessor
 
 		FormFieldAccessor accessor =
-			identityFormFieldAccessorProvider.get ();
+			identityFormFieldAccessorProvider.get ()
+
+			.containerClass (
+				context.containerClass ());
 
 		// native mapping
 

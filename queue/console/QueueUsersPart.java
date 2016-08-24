@@ -1,6 +1,6 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,7 +52,7 @@ class QueueUsersPart
 
 	// state
 
-	List<UserData> userDatas;
+	List <UserData> userDatas;
 
 	// implementation
 
@@ -60,10 +60,10 @@ class QueueUsersPart
 	public
 	void prepare () {
 
-		Map<Long,UserData> temp =
+		Map <Long,UserData> temp =
 			new HashMap<> ();
 
-		List<QueueItemClaimRec> queueItemClaims =
+		List <QueueItemClaimRec> queueItemClaims =
 			queueItemClaimHelper.findClaimed ();
 
 		for (
@@ -155,7 +155,8 @@ class QueueUsersPart
 					transaction.now ()));
 
 			if (
-				referenceEqualSafe (
+				referenceEqualWithClass (
+					UserRec.class,
 					userData.user,
 					userConsoleLogic.userRequired ())
 			) {

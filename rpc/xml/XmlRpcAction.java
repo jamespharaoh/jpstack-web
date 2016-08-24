@@ -1,6 +1,7 @@
 package wbs.platform.rpc.xml;
 
 import static wbs.framework.utils.etc.Misc.fromHex;
+import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
@@ -244,7 +245,7 @@ class XmlRpcAction
 		public
 		Object obtain (
 				RpcDefinition def,
-				List<String> errors,
+				List <String> errors,
 				boolean checkRequires) {
 
 			return xmlToObject (
@@ -442,7 +443,7 @@ class XmlRpcAction
 	Object xmlToInteger (
 			RpcDefinition rpcDefinition,
 			Element element,
-			List<String> errors) {
+			List <String> errors) {
 
 		if (element.getChildElements ().size () > 0) {
 
@@ -469,7 +470,7 @@ class XmlRpcAction
 
 		}
 
-		return Integer.parseInt (
+		return parseIntegerRequired (
 			text);
 
 	}

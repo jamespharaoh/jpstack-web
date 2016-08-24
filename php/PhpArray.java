@@ -6,9 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.extern.log4j.Log4j;
-
 import com.google.common.collect.ImmutableMap;
+
+import lombok.extern.log4j.Log4j;
 
 @Log4j
 public
@@ -125,11 +125,11 @@ class PhpArray
 
 	@Override
 	public
-	Integer asInteger () {
+	Long asInteger () {
 
 		return map.size () > 0
-			? 1
-			: 0;
+			? 1l
+			: 0l;
 
 	}
 

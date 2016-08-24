@@ -30,9 +30,9 @@ class PhpNull
 
 	@Override
 	public
-	Integer asInteger () {
+	Long asInteger () {
 
-		return 0;
+		return 0l;
 
 	}
 

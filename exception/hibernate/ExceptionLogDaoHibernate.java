@@ -9,6 +9,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.joda.time.Instant;
 
 import lombok.NonNull;
@@ -82,7 +83,13 @@ class ExceptionLogDaoHibernate
 
 		Criteria criteria =
 			createCriteria (
-				ExceptionLogRec.class);
+				ExceptionLogRec.class,
+				"_exceptionLog")
+
+			.createAlias (
+				"_exceptionLog.user",
+				"_user",
+				JoinType.LEFT_OUTER_JOIN);
 
 		if (
 			isNotNull (
@@ -91,12 +98,12 @@ class ExceptionLogDaoHibernate
 
 			criteria.add (
 				Restrictions.ge (
-					"timestamp",
+					"_exceptionLog.timestamp",
 					search.timestamp ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
-					"timestamp",
+					"_exceptionLog.timestamp",
 					search.timestamp ().end ()));
 
 		}
@@ -108,7 +115,7 @@ class ExceptionLogDaoHibernate
 
 			criteria.add (
 				Restrictions.eq (
-					"type.id",
+					"_exceptionLog.type.id",
 					search.typeId ()));
 
 		}
@@ -120,7 +127,7 @@ class ExceptionLogDaoHibernate
 
 			criteria.add (
 				Restrictions.eq (
-					"user.slice.id",
+					"_user.slice.id",
 					search.userSliceId ()));
 
 		}
@@ -132,7 +139,7 @@ class ExceptionLogDaoHibernate
 
 			criteria.add (
 				Restrictions.eq (
-					"user.id",
+					"_user.id",
 					search.userId ()));
 
 		}
@@ -144,7 +151,7 @@ class ExceptionLogDaoHibernate
 
 			criteria.add (
 				Restrictions.ilike (
-					"source",
+					"_exceptionLog.source",
 					"%" + search.sourceContains () + "%"));
 
 		}
@@ -156,7 +163,7 @@ class ExceptionLogDaoHibernate
 
 			criteria.add (
 				Restrictions.ilike (
-					"summary",
+					"_exceptionLog.summary",
 					"%" + search.summaryContains () + "%"));
 
 		}
@@ -168,7 +175,7 @@ class ExceptionLogDaoHibernate
 
 			criteria.add (
 				Restrictions.ilike (
-					"dump.text",
+					"_exceptionLog.dump",
 					"%" + search.dumpContains () + "%"));
 
 		}
@@ -180,7 +187,7 @@ class ExceptionLogDaoHibernate
 
 			criteria.add (
 				Restrictions.eq (
-					"alert",
+					"_exceptionLog.alert",
 					search.alert ()));
 
 		}
@@ -192,7 +199,7 @@ class ExceptionLogDaoHibernate
 
 			criteria.add (
 				Restrictions.eq (
-					"fatal",
+					"_exceptionLog.fatal",
 					search.fatal ()));
 
 		}
@@ -204,7 +211,7 @@ class ExceptionLogDaoHibernate
 
 			criteria.add (
 				Restrictions.eq (
-					"resolution",
+					"_exceptionLog.resolution",
 					search.resolution ()));
 
 		}
@@ -217,7 +224,7 @@ class ExceptionLogDaoHibernate
 
 				criteria.addOrder (
 					Order.desc (
-						"timestamp"));
+						"_exceptionLog.timestamp"));
 
 				break;
 

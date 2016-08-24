@@ -1,6 +1,6 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 
 import javax.inject.Inject;
 
@@ -13,6 +13,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("queueUnclaimAction")
 public
@@ -65,7 +66,8 @@ class QueueUnclaimAction
 				queueItemId);
 
 		if (
-			referenceNotEqualSafe (
+			referenceNotEqualWithClass (
+				UserRec.class,
 				queueItem.getQueueItemClaim ().getUser (),
 				userConsoleLogic.userRequired ())
 		) {

@@ -1,6 +1,6 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import javax.inject.Inject;
@@ -14,6 +14,7 @@ import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.queue.metamodel.QueueTypeSpec;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("queueItemActionsPart")
 public
@@ -107,7 +108,8 @@ class QueueItemActionsPart
 		) {
 
 			if (
-				referenceEqualSafe (
+				referenceEqualWithClass (
+					UserRec.class,
 					queueItem.getQueueItemClaim ().getUser (),
 					userConsoleLogic.userRequired ())
 			) {

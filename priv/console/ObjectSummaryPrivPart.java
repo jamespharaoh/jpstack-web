@@ -12,7 +12,6 @@ import javax.inject.Inject;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.AbstractPagePart;
