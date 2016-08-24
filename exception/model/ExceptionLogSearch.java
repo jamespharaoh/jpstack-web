@@ -19,6 +19,8 @@ class ExceptionLogSearch
 	TextualInterval timestamp;
 
 	Long typeId;
+
+	Long userSliceId;
 	Long userId;
 
 	String sourceContains;

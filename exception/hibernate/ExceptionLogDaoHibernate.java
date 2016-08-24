@@ -115,6 +115,18 @@ class ExceptionLogDaoHibernate
 
 		if (
 			isNotNull (
+				search.userSliceId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"user.slice.id",
+					search.userSliceId ()));
+
+		}
+
+		if (
+			isNotNull (
 				search.userId ())
 		) {
 

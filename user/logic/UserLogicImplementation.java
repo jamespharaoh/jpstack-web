@@ -1,7 +1,7 @@
 package wbs.platform.user.logic;
 
 import static wbs.framework.utils.etc.Misc.hashSha1;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
@@ -119,7 +119,7 @@ class UserLogicImplementation
 				user.getId ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				userOnlineOptional)
 		) {
 			return;
@@ -165,7 +165,7 @@ class UserLogicImplementation
 				username);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				userOptional)
 		) {
 			return null;

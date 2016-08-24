@@ -12,7 +12,7 @@ import fj.data.Either;
 
 import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.framework.application.annotations.PrototypeComponent;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import wbs.platform.media.model.MediaRec;
 
 @PrototypeComponent ("imageCsvFormFieldInterfaceMapping")
@@ -39,7 +39,7 @@ class ImageCsvFormFieldInterfaceMapping<Container>
 			@NonNull Optional<MediaRec> genericValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 

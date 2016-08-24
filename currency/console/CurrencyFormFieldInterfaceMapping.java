@@ -21,7 +21,7 @@ import fj.data.Either;
 import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.currency.model.CurrencyRec;
 
@@ -104,7 +104,7 @@ class CurrencyFormFieldInterfaceMapping<Container>
 				interfaceValue.get ());
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				parseResult)
 		) {
 
@@ -131,7 +131,7 @@ class CurrencyFormFieldInterfaceMapping<Container>
 			@NonNull Optional<Long> genericValue) {
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				genericValue)
 		) {
 

@@ -59,6 +59,11 @@
 			nullable="yes"/>
 
 		<object-field
+			name="userSliceId"
+			object-type="slice"
+			nullable="yes"/>
+
+		<object-field
 			name="userId"
 			object-type="user"
 			nullable="yes"/>

@@ -10,7 +10,7 @@ import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.framework.utils.etc.NumberUtils.moreThan;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -667,7 +667,7 @@ class MediaLogicImplementation
 				data);
 
 		if (
-			isNotPresent (
+			optionalIsNotPresent (
 				videoFrameImageOptional)
 		) {
 			return Optional.<MediaRec>absent ();
