@@ -1,4 +1,4 @@
-package wbs.platform.text.model;
+package wbs.platform.text.logic;
 
 import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.isNull;
@@ -15,11 +15,13 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
-
 import wbs.framework.database.Database;
+import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.text.model.TextObjectHelperMethods;
+import wbs.platform.text.model.TextRec;
 
 public
-class TextObjectHelperImplementation
+class TextObjectHelperMethodsImplementation
 	implements TextObjectHelperMethods {
 
 	int maxExistingTexts = 65536;

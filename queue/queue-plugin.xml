@@ -35,12 +35,10 @@
 		<component class="console.QueueItemAction"/>
 		<component class="console.QueueItemActionsAction"/>
 		<component class="console.QueueItemActionsPart"/>
-		<component class="console.QueueItemClaimStatusConsoleHelper"/>
 		<component class="console.QueueItemConsoleHooks"/>
 		<component class="console.QueueItemQueueStatsProvider"/>
 		<component class="console.QueueItemsStatusLinePart"/>
 		<component class="console.QueueItemStatusLine"/>
-		<component class="console.QueueItemStateConsoleHelper"/>
 		<component class="console.QueueItemUserStatsProvider"/>
 		<component class="console.QueueListActivePart"/>
 		<component class="console.QueueManager"/>

@@ -28,7 +28,7 @@ import wbs.console.responder.ConsoleResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.record.IdObject;
+import wbs.framework.entity.record.IdObject;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.FormatWriterWriter;
 

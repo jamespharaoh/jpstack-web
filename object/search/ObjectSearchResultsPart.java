@@ -6,7 +6,7 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.methodInvoke;
 import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
@@ -49,8 +49,8 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.IdObject;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.IdObject;
+import wbs.framework.entity.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.platform.user.console.UserConsoleLogic;
 
@@ -623,7 +623,7 @@ class ObjectSearchResultsPart
 			@NonNull Record<?> object) {
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				targetContext)
 		) {
 

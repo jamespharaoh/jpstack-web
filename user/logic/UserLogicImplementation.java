@@ -15,7 +15,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.record.GlobalId;
+import wbs.framework.entity.record.GlobalId;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.model.UserObjectHelper;

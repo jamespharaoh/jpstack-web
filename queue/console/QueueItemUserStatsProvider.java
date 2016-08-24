@@ -18,7 +18,7 @@ import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;

@@ -11,7 +11,7 @@ import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.framework.utils.etc.NumberUtils.moreThan;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringToBytes;
@@ -43,7 +43,7 @@ import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.record.GlobalId;
+import wbs.framework.entity.record.GlobalId;
 import wbs.platform.media.model.ContentObjectHelper;
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaObjectHelper;
@@ -158,7 +158,7 @@ class MediaLogicImplementation
 			// video
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					videoCodec)
 			) {
 
@@ -174,7 +174,7 @@ class MediaLogicImplementation
 			}
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					videoResolution)
 			) {
 
@@ -191,7 +191,7 @@ class MediaLogicImplementation
 			}
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					videoBitrate)
 			) {
 
@@ -235,7 +235,7 @@ class MediaLogicImplementation
 			// duration
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					videoDuration)
 			) {
 
@@ -518,7 +518,7 @@ class MediaLogicImplementation
 				mimeType);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				imageOptional)
 		) {
 
@@ -1482,7 +1482,7 @@ class MediaLogicImplementation
 				data);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				videoFrameBytesOptional)
 		) {
 

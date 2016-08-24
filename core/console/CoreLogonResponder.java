@@ -4,7 +4,7 @@ import static wbs.framework.utils.etc.CollectionUtils.collectionDoesNotHaveTwoEl
 import static wbs.framework.utils.etc.CollectionUtils.listItemAtIndexRequired;
 import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
 
 import java.util.List;
@@ -22,7 +22,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
-import wbs.framework.record.GlobalId;
+import wbs.framework.entity.record.GlobalId;
 import wbs.platform.scaffold.console.SliceConsoleHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleHelper;
@@ -92,7 +92,7 @@ class CoreLogonResponder
 				"x-wbs-slice");
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				sliceCode)
 		) {
 
@@ -216,7 +216,7 @@ class CoreLogonResponder
 			">\n");
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				slice)
 		) {
 

@@ -1,4 +1,4 @@
-package wbs.platform.service.model;
+package wbs.platform.queue.logic;
 
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 
@@ -17,17 +17,20 @@ import lombok.Cleanup;
 import lombok.NonNull;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHooks;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.Record;
 import wbs.platform.object.core.model.ObjectTypeDao;
 import wbs.platform.object.core.model.ObjectTypeRec;
+import wbs.platform.queue.model.QueueRec;
+import wbs.platform.queue.model.QueueTypeDao;
+import wbs.platform.queue.model.QueueTypeRec;
 import wbs.platform.scaffold.model.SliceRec;
 
 public
-class ServiceHooks
-	implements ObjectHooks<ServiceRec> {
+class QueueHooks
+	implements ObjectHooks<QueueRec> {
 
 	// dependencies
 
@@ -38,7 +41,7 @@ class ServiceHooks
 	ObjectTypeDao objectTypeDao;
 
 	@Inject
-	ServiceTypeDao serviceTypeDao;
+	QueueTypeDao queueTypeDao;
 
 	// indirect dependencies
 
@@ -47,7 +50,7 @@ class ServiceHooks
 
 	// state
 
-	Map<Long,List<Long>> serviceTypeIdsByParentTypeId =
+	Map<Long,List<Long>> queueTypeIdsByParentTypeId =
 		new HashMap<> ();
 
 	// lifecycle
@@ -59,27 +62,27 @@ class ServiceHooks
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
-				"serviceHooks.init ()",
+				"queueTypeHooks.init ()",
 				this);
 
 		// preload object types
 
 		objectTypeDao.findAll ();
 
-		// load service types and construct index
+		// load queue types and construct index
 
-		serviceTypeIdsByParentTypeId =
-			serviceTypeDao.findAll ().stream ()
+		queueTypeIdsByParentTypeId =
+			queueTypeDao.findAll ().stream ()
 
 			.collect (
 				Collectors.groupingBy (
 
-				serviceType ->
-					serviceType.getParentType ().getId (),
+				queueType ->
+					queueType.getParentType ().getId (),
 
 				Collectors.mapping (
-					serviceType ->
-						serviceType.getId (),
+					queueType ->
+						queueType.getId (),
 					Collectors.toList ()))
 
 			);
@@ -91,22 +94,22 @@ class ServiceHooks
 	@Override
 	public
 	void createSingletons (
-			@NonNull ObjectHelper <ServiceRec> serviceHelper,
-			@NonNull ObjectHelper <?> parentHelper,
-			@NonNull Record <?> parent) {
+			@NonNull ObjectHelper<QueueRec> queueHelper,
+			@NonNull ObjectHelper<?> parentHelper,
+			@NonNull Record<?> parent) {
 
 		if (
 			doesNotContain (
-				serviceTypeIdsByParentTypeId.keySet (),
+				queueTypeIdsByParentTypeId.keySet (),
 				parentHelper.objectTypeId ())
 		) {
 			return;
 		}
 
 		ObjectManager objectManager =
-		   objectManagerProvider.get ();
+			objectManagerProvider.get ();
 
-		Optional <SliceRec> slice =
+		Optional<SliceRec> slice =
 			objectManager.getAncestor (
 				SliceRec.class,
 				parent);
@@ -116,23 +119,23 @@ class ServiceHooks
 				parentHelper.objectTypeId ());
 
 		for (
-			Long serviceTypeId
-				: serviceTypeIdsByParentTypeId.get (
+			Long queueTypeId
+				: queueTypeIdsByParentTypeId.get (
 					parentHelper.objectTypeId ())
 		) {
 
-			ServiceTypeRec serviceType =
-				serviceTypeDao.findRequired (
-					serviceTypeId);
+			QueueTypeRec queueType =
+				queueTypeDao.findRequired (
+					queueTypeId);
 
-			serviceHelper.insert (
-				serviceHelper.createInstance ()
+			queueHelper.insert (
+				queueHelper.createInstance ()
 
-				.setServiceType (
-					serviceType)
+				.setQueueType (
+					queueType)
 
 				.setCode (
-					serviceType.getCode ())
+					queueType.getCode ())
 
 				.setParentType (
 					parentType)
@@ -143,7 +146,11 @@ class ServiceHooks
 				.setSlice (
 					slice.orNull ())
 
+				.setDefaultPriority (
+					queueType.getDefaultPriority ())
+
 			);
+
 
 		}
 

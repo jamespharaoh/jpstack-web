@@ -2,7 +2,7 @@ package wbs.platform.scaffold.logic;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.orNull;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.TimeUtils.laterThan;
 
@@ -177,7 +177,7 @@ class SliceLogicImplementation
 
 		if (
 
-			isPresent (
+			optionalIsPresent (
 				nextUpdateTimestamp)
 
 			&& laterThan (

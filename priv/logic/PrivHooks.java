@@ -1,4 +1,4 @@
-package wbs.platform.queue.model;
+package wbs.platform.priv.logic;
 
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 
@@ -9,25 +9,23 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
-import javax.inject.Provider;
-
-import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHooks;
-import wbs.framework.object.ObjectManager;
-import wbs.framework.record.Record;
 import wbs.platform.object.core.model.ObjectTypeDao;
 import wbs.platform.object.core.model.ObjectTypeRec;
-import wbs.platform.scaffold.model.SliceRec;
+import wbs.platform.priv.model.PrivRec;
+import wbs.platform.priv.model.PrivTypeDao;
+import wbs.platform.priv.model.PrivTypeRec;
 
 public
-class QueueHooks
-	implements ObjectHooks<QueueRec> {
+class PrivHooks
+	implements ObjectHooks<PrivRec> {
 
 	// dependencies
 
@@ -38,16 +36,11 @@ class QueueHooks
 	ObjectTypeDao objectTypeDao;
 
 	@Inject
-	QueueTypeDao queueTypeDao;
-
-	// indirect dependencies
-
-	@Inject
-	Provider<ObjectManager> objectManagerProvider;
+	PrivTypeDao privTypeDao;
 
 	// state
 
-	Map<Long,List<Long>> queueTypeIdsByParentTypeId =
+	Map <Long, List <Long>> privTypeIdsByParentTypeId =
 		new HashMap<> ();
 
 	// lifecycle
@@ -59,27 +52,27 @@ class QueueHooks
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
-				"queueTypeHooks.init ()",
+				"privHooks.init ()",
 				this);
 
 		// preload object types
 
 		objectTypeDao.findAll ();
 
-		// load queue types and construct index
+		// load priv types and construct index
 
-		queueTypeIdsByParentTypeId =
-			queueTypeDao.findAll ().stream ()
+		privTypeIdsByParentTypeId =
+			privTypeDao.findAll ().stream ()
 
 			.collect (
 				Collectors.groupingBy (
 
-				queueType ->
-					queueType.getParentType ().getId (),
+				privType ->
+					privType.getParentObjectType ().getId (),
 
 				Collectors.mapping (
-					queueType ->
-						queueType.getId (),
+					privType ->
+						privType.getId (),
 					Collectors.toList ()))
 
 			);
@@ -91,48 +84,40 @@ class QueueHooks
 	@Override
 	public
 	void createSingletons (
-			@NonNull ObjectHelper<QueueRec> queueHelper,
+			@NonNull ObjectHelper<PrivRec> privHelper,
 			@NonNull ObjectHelper<?> parentHelper,
 			@NonNull Record<?> parent) {
 
 		if (
 			doesNotContain (
-				queueTypeIdsByParentTypeId.keySet (),
+				privTypeIdsByParentTypeId.keySet (),
 				parentHelper.objectTypeId ())
 		) {
 			return;
 		}
-
-		ObjectManager objectManager =
-			objectManagerProvider.get ();
-
-		Optional<SliceRec> slice =
-			objectManager.getAncestor (
-				SliceRec.class,
-				parent);
 
 		ObjectTypeRec parentType =
 			objectTypeDao.findById (
 				parentHelper.objectTypeId ());
 
 		for (
-			Long queueTypeId
-				: queueTypeIdsByParentTypeId.get (
+			Long privTypeId
+				: privTypeIdsByParentTypeId.get (
 					parentHelper.objectTypeId ())
 		) {
 
-			QueueTypeRec queueType =
-				queueTypeDao.findRequired (
-					queueTypeId);
+			PrivTypeRec privType =
+				privTypeDao.findRequired (
+					privTypeId);
 
-			queueHelper.insert (
-				queueHelper.createInstance ()
+			privHelper.insert (
+				privHelper.createInstance ()
 
-				.setQueueType (
-					queueType)
+				.setPrivType (
+					privType)
 
 				.setCode (
-					queueType.getCode ())
+					privType.getCode ())
 
 				.setParentType (
 					parentType)
@@ -140,14 +125,7 @@ class QueueHooks
 				.setParentId (
 					parent.getId ())
 
-				.setSlice (
-					slice.orNull ())
-
-				.setDefaultPriority (
-					queueType.getDefaultPriority ())
-
 			);
-
 
 		}
 

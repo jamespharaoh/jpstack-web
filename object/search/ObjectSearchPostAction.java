@@ -4,7 +4,7 @@ import static wbs.framework.utils.etc.Misc.getMethodRequired;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.methodInvoke;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.Serializable;
@@ -37,7 +37,7 @@ import wbs.console.responder.RedirectResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
 
@@ -126,7 +126,7 @@ class ObjectSearchPostAction
 		// handle new/repeat search buttons
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"new-search"))
 		) {
@@ -144,7 +144,7 @@ class ObjectSearchPostAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"repeat-search"))
 		) {
@@ -156,7 +156,7 @@ class ObjectSearchPostAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"download-csv"))
 		) {
@@ -329,7 +329,7 @@ class ObjectSearchPostAction
 					targetContextType);
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					targetContext)
 			) {
 

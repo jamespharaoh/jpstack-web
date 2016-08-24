@@ -25,7 +25,7 @@ import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.ModelMetaBuilderHandler;
 import wbs.framework.entity.meta.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
-import wbs.framework.record.GlobalId;
+import wbs.framework.entity.record.GlobalId;
 import wbs.platform.affiliate.metamodel.AffiliateTypeSpec;
 import wbs.platform.affiliate.model.AffiliateTypeObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;

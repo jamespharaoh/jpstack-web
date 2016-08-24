@@ -1,4 +1,4 @@
-package wbs.platform.priv.model;
+package wbs.platform.affiliate.logic;
 
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 
@@ -14,17 +14,23 @@ import lombok.Cleanup;
 import lombok.NonNull;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHooks;
-import wbs.framework.record.Record;
+import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.affiliate.model.AffiliateTypeDao;
+import wbs.platform.affiliate.model.AffiliateTypeRec;
 import wbs.platform.object.core.model.ObjectTypeDao;
 import wbs.platform.object.core.model.ObjectTypeRec;
 
 public
-class PrivHooks
-	implements ObjectHooks<PrivRec> {
+class AffiliateHooks
+	implements ObjectHooks<AffiliateRec> {
 
 	// dependencies
+
+	@Inject
+	AffiliateTypeDao affiliateTypeDao;
 
 	@Inject
 	Database database;
@@ -32,12 +38,9 @@ class PrivHooks
 	@Inject
 	ObjectTypeDao objectTypeDao;
 
-	@Inject
-	PrivTypeDao privTypeDao;
-
 	// state
 
-	Map<Long,List<Long>> privTypeIdsByParentTypeId =
+	Map<Long,List<Long>> affiliateTypeIdsByParentTypeId =
 		new HashMap<> ();
 
 	// lifecycle
@@ -49,27 +52,21 @@ class PrivHooks
 		@Cleanup
 		Transaction transaction =
 			database.beginReadOnly (
-				"privHooks.init ()",
+				"AffiliateHooks.init ()",
 				this);
 
-		// preload object types
-
-		objectTypeDao.findAll ();
-
-		// load priv types and construct index
-
-		privTypeIdsByParentTypeId =
-			privTypeDao.findAll ().stream ()
+		affiliateTypeIdsByParentTypeId =
+			affiliateTypeDao.findAll ().stream ()
 
 			.collect (
 				Collectors.groupingBy (
 
-				privType ->
-					privType.getParentObjectType ().getId (),
+				affiliateType ->
+					affiliateType.getParentType ().getId (),
 
 				Collectors.mapping (
-					privType ->
-						privType.getId (),
+					affiliateType ->
+						affiliateType.getId (),
 					Collectors.toList ()))
 
 			);
@@ -81,13 +78,13 @@ class PrivHooks
 	@Override
 	public
 	void createSingletons (
-			@NonNull ObjectHelper<PrivRec> privHelper,
+			@NonNull ObjectHelper<AffiliateRec> affiliateHelper,
 			@NonNull ObjectHelper<?> parentHelper,
 			@NonNull Record<?> parent) {
 
 		if (
 			doesNotContain (
-				privTypeIdsByParentTypeId.keySet (),
+				affiliateTypeIdsByParentTypeId.keySet (),
 				parentHelper.objectTypeId ())
 		) {
 			return;
@@ -98,23 +95,26 @@ class PrivHooks
 				parentHelper.objectTypeId ());
 
 		for (
-			Long privTypeId
-				: privTypeIdsByParentTypeId.get (
+			Long affiliateTypeId
+				: affiliateTypeIdsByParentTypeId.get (
 					parentHelper.objectTypeId ())
 		) {
 
-			PrivTypeRec privType =
-				privTypeDao.findRequired (
-					privTypeId);
+			AffiliateTypeRec affiliateType =
+				affiliateTypeDao.findRequired (
+					affiliateTypeId);
 
-			privHelper.insert (
-				privHelper.createInstance ()
+			affiliateHelper.insert (
+				affiliateHelper.createInstance ()
 
-				.setPrivType (
-					privType)
+				.setAffiliateType (
+					affiliateType)
 
 				.setCode (
-					privType.getCode ())
+					affiliateType.getCode ())
+
+				.setDescription (
+					affiliateType.getDescription ())
 
 				.setParentType (
 					parentType)

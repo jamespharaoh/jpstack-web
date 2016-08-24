@@ -10,7 +10,7 @@ import org.joda.time.Interval;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.framework.utils.TimeFormatter;
 import wbs.platform.queue.model.QueueItemProcessedTimeComparator;
 import wbs.platform.queue.model.QueueItemRec;
