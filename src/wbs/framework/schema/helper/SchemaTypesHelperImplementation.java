@@ -1,11 +1,11 @@
 package wbs.framework.schema.helper;
 
-import static wbs.framework.utils.etc.Misc.classForName;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.classForName;
 
 import java.sql.Types;
 import java.util.Date;
@@ -262,7 +262,7 @@ class SchemaTypesHelperImplementation
 				capitalise (
 					customType.name ()));
 
-		Optional<Class<?>> objectClassOptional =
+		Optional <Class <?>> objectClassOptional =
 			classForName (
 				objectClassName);
 

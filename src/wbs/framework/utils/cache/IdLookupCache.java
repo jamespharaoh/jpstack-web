@@ -1,7 +1,7 @@
 package wbs.framework.utils.cache;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalMapOptional;
 
 import java.util.concurrent.TimeUnit;
@@ -87,7 +87,7 @@ class IdLookupCache<Key,Id,Value>
 		) {
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					cachedId)
 			) {
 
@@ -120,7 +120,7 @@ class IdLookupCache<Key,Id,Value>
 								value))));
 
 		} else if (
-			isPresent (
+			optionalIsPresent (
 				valueOptional)
 		) {
 

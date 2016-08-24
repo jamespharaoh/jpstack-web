@@ -1,6 +1,6 @@
 package wbs.console.helper;
 
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 public
 interface ConsoleObjectManagerMethods {

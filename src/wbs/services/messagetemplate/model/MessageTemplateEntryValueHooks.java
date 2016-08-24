@@ -2,14 +2,18 @@ package wbs.services.messagetemplate.model;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-
 import org.hibernate.TransientObjectException;
 
+import com.google.common.base.Optional;
+
+import lombok.NonNull;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectHooks;
 import wbs.framework.object.ObjectManager;
@@ -98,7 +102,7 @@ class MessageTemplateEntryValueHooks
 	void setDynamic (
 			@NonNull MessageTemplateEntryValueRec entryValue,
 			@NonNull String name,
-			Object value) {
+			@NonNull Optional <?> valueOptional) {
 
 		MessageTemplateFieldTypeObjectHelper messageTemplateFieldTypeHelper =
 			messageTemplateFieldTypeHelperProvider.get ();
@@ -247,8 +251,8 @@ class MessageTemplateEntryValueHooks
 			isNull (
 				fieldValue)
 
-			&& isNotNull (
-				value)
+			&& optionalIsPresent (
+				valueOptional)
 
 		) {
 
@@ -264,7 +268,8 @@ class MessageTemplateEntryValueHooks
 
 				.setStringValue (
 					(String)
-					value)
+					optionalGetRequired (
+						valueOptional))
 
 			);
 
@@ -273,23 +278,24 @@ class MessageTemplateEntryValueHooks
 				fieldValue);
 
 		} else if (
-			isNotNull (
-				value)
+			optionalIsPresent (
+				valueOptional)
 		) {
 
 			fieldValue
 
 				.setStringValue (
 					(String)
-					value);
+					optionalGetRequired (
+						valueOptional));
 
 		} else if (
 
 			isNotNull (
 				fieldValue)
 
-			&& isNull (
-				value)
+			&& isNotPresent (
+				valueOptional)
 
 		) {
 

@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.core.daemon;
 
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 
 import java.util.Collections;
 
@@ -22,8 +22,8 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
+import wbs.framework.entity.record.IdObject;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.IdObject;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -170,7 +170,7 @@ class ChatSetPhotoCommand
 				false);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				chatUserImageOptional)
 		) {
 

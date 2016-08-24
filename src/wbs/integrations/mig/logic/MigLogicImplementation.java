@@ -1,6 +1,6 @@
 package wbs.integrations.mig.logic;
 
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -61,7 +61,7 @@ class MigLogicImplementation
 
 		if (
 
-			isPresent (
+			optionalIsPresent (
 				currentNetworkOptional)
 
 			&& stringEqual (

@@ -6,7 +6,7 @@ import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NumberUtils.equalToOne;
 import static wbs.framework.utils.etc.NumberUtils.equalToThree;
 import static wbs.framework.utils.etc.NumberUtils.equalToTwo;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
@@ -31,7 +31,7 @@ import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.record.PermanentRecord;
+import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.utils.etc.FormatWriter;
 
 @Log4j
@@ -128,7 +128,7 @@ class FormFieldLogic {
 					formName);
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					updateResult.error ())
 			) {
 
@@ -181,7 +181,7 @@ class FormFieldLogic {
 				updateResultEntry.getValue ();
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					updateResult.error ())
 			) {
 
@@ -444,7 +444,7 @@ class FormFieldLogic {
 			}
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					updateResultSet)
 			) {
 
@@ -558,7 +558,7 @@ class FormFieldLogic {
 			Optional<String> error;
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					updateResultSet)
 			) {
 

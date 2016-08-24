@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.orNull;
 import static wbs.framework.utils.etc.OptionalUtils.ifNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
@@ -52,7 +52,7 @@ import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;
 import wbs.console.tab.TabList;
 import wbs.framework.application.annotations.ProxiedRequestComponent;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.framework.utils.etc.Html;
 import wbs.framework.utils.etc.OptionalUtils;
 import wbs.framework.web.RequestContext;
@@ -780,7 +780,7 @@ class ConsoleRequestContextImplementation
 				"formData");
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				formData)
 		) {
 			return formData.get ();

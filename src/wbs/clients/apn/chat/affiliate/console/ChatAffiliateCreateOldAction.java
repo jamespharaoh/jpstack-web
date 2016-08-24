@@ -2,7 +2,7 @@ package wbs.clients.apn.chat.affiliate.console;
 
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import static wbs.framework.utils.etc.Misc.toEnum;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
@@ -187,7 +187,7 @@ class ChatAffiliateCreateOldAction
 				code);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				existingChatAffiliateOptional)
 		) {
 
@@ -220,7 +220,7 @@ class ChatAffiliateCreateOldAction
 					keyword);
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					existingChatKeywordOptional)
 			) {
 
@@ -238,7 +238,7 @@ class ChatAffiliateCreateOldAction
 					keyword);
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					existingChatSchemeKeywordOptional)
 			) {
 

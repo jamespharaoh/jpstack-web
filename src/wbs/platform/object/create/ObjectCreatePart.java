@@ -27,8 +27,8 @@ import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.GlobalId;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.entity.record.Record;
 import wbs.platform.scaffold.model.RootObjectHelper;
 
 @Accessors (fluent = true)

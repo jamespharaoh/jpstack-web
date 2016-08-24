@@ -9,13 +9,13 @@ import javax.inject.Inject;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.CommonRecord;
-import wbs.framework.record.EphemeralRecord;
-import wbs.framework.record.EventRecord;
-import wbs.framework.record.MajorRecord;
-import wbs.framework.record.MinorRecord;
-import wbs.framework.record.Record;
-import wbs.framework.record.TypeRecord;
+import wbs.framework.entity.record.CommonRecord;
+import wbs.framework.entity.record.EphemeralRecord;
+import wbs.framework.entity.record.EventRecord;
+import wbs.framework.entity.record.MajorRecord;
+import wbs.framework.entity.record.MinorRecord;
+import wbs.framework.entity.record.Record;
+import wbs.framework.entity.record.TypeRecord;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperModelImplementation")

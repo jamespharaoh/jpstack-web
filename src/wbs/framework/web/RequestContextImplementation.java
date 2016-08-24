@@ -2,7 +2,7 @@ package wbs.framework.web;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
@@ -164,7 +164,7 @@ class RequestContextImplementation
 				key);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				valueOptional)
 		) {
 

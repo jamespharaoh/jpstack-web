@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 
 import javax.inject.Inject;
 
@@ -81,7 +81,7 @@ class ChatUserAdminDeleteAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"deleteUser"))
 		) {
@@ -110,7 +110,7 @@ class ChatUserAdminDeleteAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"undeleteUser"))
 		) {

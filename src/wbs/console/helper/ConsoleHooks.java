@@ -2,10 +2,9 @@ package wbs.console.helper;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
 import lombok.NonNull;
+import wbs.framework.entity.record.Record;
 
 import com.google.common.base.Optional;
-
-import wbs.framework.record.Record;
 
 public
 interface ConsoleHooks<RecordType extends Record<RecordType>> {

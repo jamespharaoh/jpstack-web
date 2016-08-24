@@ -4,7 +4,7 @@ import com.google.common.base.Optional;
 
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 @PrototypeComponent ("nullFormFieldUpdateHook")
 public

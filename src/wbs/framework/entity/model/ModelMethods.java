@@ -3,8 +3,8 @@ package wbs.framework.entity.model;
 import java.util.List;
 import java.util.Map;
 
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
-import wbs.framework.record.Record;
 
 public
 interface ModelMethods {

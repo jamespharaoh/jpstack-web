@@ -2,7 +2,7 @@ package wbs.smsapps.broadcast.console;
 
 import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
 import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
@@ -79,7 +79,7 @@ class BroadcastSendAction
 			broadcast.getBroadcastConfig ();
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"send"))
 		) {
@@ -138,7 +138,7 @@ class BroadcastSendAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"schedule"))
 		) {
@@ -208,7 +208,7 @@ class BroadcastSendAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"unschedule"))
 		) {
@@ -250,7 +250,7 @@ class BroadcastSendAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"cancel"))
 		) {

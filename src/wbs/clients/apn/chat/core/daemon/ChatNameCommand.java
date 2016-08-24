@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.core.daemon;
 
-import static wbs.framework.record.IdObject.objectId;
+import static wbs.framework.entity.record.IdObject.objectId;
 
 import java.util.Collections;
 

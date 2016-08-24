@@ -47,17 +47,22 @@ class ActivityManagerImplementation
 		Duration.millis (
 			1000);
 
+	@Getter @Setter
+	Duration showTaskDuration =
+		Duration.millis (
+			2);
+
 	// state
 
 	String hostname;
 	int processId;
 	long nextTaskId;
 
-	ThreadLocal<Task> currentTask =
-		new ThreadLocal<Task> ();
+	ThreadLocal <Task> currentTask =
+		new ThreadLocal<> ();
 
-	Map<Long,Task> activeTasks =
-		new LinkedHashMap<Long,Task> ();
+	Map <Long, Task> activeTasks =
+		new LinkedHashMap<> ();
 
 	// implementation
 
@@ -247,7 +252,8 @@ class ActivityManagerImplementation
 			isNull (
 				task.parent ())
 
-			&& taskDuration.isLongerThan (
+			&& notShorterThan (
+				taskDuration,
 				slowTaskDuration)
 
 		) {
@@ -268,7 +274,7 @@ class ActivityManagerImplementation
 			writeTaskRecursive (
 				formatWriter,
 				"  ",
-				Duration.millis (1),
+				showTaskDuration,
 				task);
 
 			log.warn (

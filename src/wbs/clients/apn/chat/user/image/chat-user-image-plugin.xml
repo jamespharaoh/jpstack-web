@@ -27,7 +27,6 @@
 		<component class="console.ChatUserImageHistoryPart"/>
 		<component class="console.ChatUserImageListAction"/>
 		<component class="console.ChatUserImageListPart"/>
-		<component class="console.ChatUserImageModeConsoleHelper"/>
 		<component class="console.ChatUserImageRemovePart"/>
 		<component class="console.ChatUserImageRevertPart"/>
 		<component class="console.ChatUserImageRotatePart"/>

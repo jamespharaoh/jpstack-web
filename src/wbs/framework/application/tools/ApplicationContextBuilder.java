@@ -1,6 +1,5 @@
 package wbs.framework.application.tools;
 
-import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
@@ -8,6 +7,7 @@ import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -656,7 +656,7 @@ class ApplicationContextBuilder {
 				taskLog,
 				projectModelSpec);
 
-			registerObjectHelperImplementation (
+			registerObjectHelperMethodsImplementation (
 				taskLog,
 				projectModelSpec);
 
@@ -989,7 +989,7 @@ class ApplicationContextBuilder {
 
 		String objectHooksClassName =
 			stringFormat (
-				"%s.model.%sHooks",
+				"%s.logic.%sHooks",
 				model.plugin ().packageName (),
 				capitalise (model.name ()));
 
@@ -1082,29 +1082,29 @@ class ApplicationContextBuilder {
 
 	}
 
-	void registerObjectHelperImplementation (
+	void registerObjectHelperMethodsImplementation (
 			@NonNull TaskLogger taskLog,
 			@NonNull PluginModelSpec model) {
 
-		String objectHelperImplementationComponentName =
+		String objectHelperMethodsImplementationComponentName =
 			stringFormat (
-				"%sObjectHelperImplementation",
+				"%sObjectHelperMethodsImplementation",
 				model.name ());
 
-		String objectHelperImplementationClassName =
+		String objectHelperMethodsImplementationClassName =
 			stringFormat (
-				"%s.model.%sObjectHelperImplementation",
+				"%s.logic.%sObjectHelperMethodsImplementation",
 				model.plugin ().packageName (),
 				capitalise (
 					model.name ()));
 
-		Class <?> objectHelperImplementationClass;
+		Class <?> objectHelperMethodsImplementationClass;
 
 		try {
 
-			objectHelperImplementationClass =
+			objectHelperMethodsImplementationClass =
 				Class.forName (
-					objectHelperImplementationClassName);
+					objectHelperMethodsImplementationClassName);
 
 		} catch (ClassNotFoundException exception) {
 
@@ -1124,10 +1124,10 @@ class ApplicationContextBuilder {
 			new ComponentDefinition ()
 
 			.name (
-				objectHelperImplementationComponentName)
+				objectHelperMethodsImplementationComponentName)
 
 			.componentClass (
-				objectHelperImplementationClass)
+				objectHelperMethodsImplementationClass)
 
 			.scope (
 				"singleton")

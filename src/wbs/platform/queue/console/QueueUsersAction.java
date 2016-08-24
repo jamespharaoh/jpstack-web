@@ -13,7 +13,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimRec;
@@ -70,7 +70,7 @@ class QueueUsersAction
 		boolean reclaim;
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"reclaim"))
 		) {
@@ -78,7 +78,7 @@ class QueueUsersAction
 			reclaim = true;
 
 		} else if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"unclaim"))
 		) {

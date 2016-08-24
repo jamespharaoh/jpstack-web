@@ -2,9 +2,9 @@ package wbs.framework.object;
 
 import java.util.List;
 
-import wbs.framework.record.EphemeralRecord;
-import wbs.framework.record.GlobalId;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.EphemeralRecord;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.entity.record.Record;
 
 public
 interface ObjectDatabaseHelper<RecordType extends Record<RecordType>> {

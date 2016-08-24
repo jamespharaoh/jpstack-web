@@ -1,14 +1,14 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.Misc.classForName;
 import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.classForName;
 
 import java.io.File;
 import java.io.FileOutputStream;

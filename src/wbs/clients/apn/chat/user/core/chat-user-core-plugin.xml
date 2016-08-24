@@ -1,5 +1,5 @@
 <plugin
-	name="chat-user"
+	name="chat-user-core"
 	package="wbs.clients.apn.chat.user.core">
 
 	<sql-scripts>
@@ -43,7 +43,6 @@
 		<component class="console.ChatUserSearchOldPart"/>
 		<component class="console.ChatUserSearchOldResultsPart"/>
 		<component class="console.ChatUserSummaryPart"/>
-		<component class="console.ChatUserTypeConsoleHelper"/>
 	</layer>
 
 	<layer name="daemon">

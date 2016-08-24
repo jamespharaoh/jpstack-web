@@ -22,7 +22,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperIdImplementation")

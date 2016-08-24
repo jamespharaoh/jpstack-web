@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.LogicUtils.referenceEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.successResult;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -27,8 +27,8 @@ import lombok.experimental.Accessors;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
-import wbs.framework.record.Record;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.OptionalUtils;
 
@@ -157,7 +157,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 				|| (
 
-					isPresent (
+					optionalIsPresent (
 						interfaceValue)
 
 					&& referenceEqualSafe (
@@ -412,7 +412,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 		// render object path
 
 		if (
-			OptionalUtils.isPresent (
+			OptionalUtils.optionalIsPresent (
 				interfaceValue)
 		) {
 
@@ -449,7 +449,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 
 		if (
 
-			OptionalUtils.isPresent (
+			OptionalUtils.optionalIsPresent (
 				interfaceValue)
 
 			&& isNotNull (

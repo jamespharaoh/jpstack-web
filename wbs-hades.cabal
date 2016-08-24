@@ -25,6 +25,12 @@ executable wbs-setup
     transformers
   hs-source-dirs: haskell
   default-language: Haskell2010
+  other-modules:
+    Wbs.Config,
+    Wbs.Setup.AntProject,
+    Wbs.Setup.EclipseClasspath,
+    Wbs.Setup.EclipseFactorypath,
+    Wbs.Setup.EclipseProject
 
 executable wbs-git-tool
   main-is: Wbs/GitTool.hs
@@ -43,6 +49,8 @@ executable wbs-git-tool
   other-extensions: FlexibleContexts, Arrows, NoMonomorphismRestriction
   hs-source-dirs: haskell
   default-language: Haskell2010
+  other-modules:
+    Wbs.Config
 
 executable wbs-analyse
   main-is: Wbs/Analyse.hs
@@ -55,6 +63,8 @@ executable wbs-analyse
   other-extensions: FlexibleContexts, Arrows, NoMonomorphismRestriction
   hs-source-dirs: haskell
   default-language: Haskell2010
+  other-modules:
+    Wbs.Config
 
 executable wbs-documentation
   main-is: Wbs/Docs/Main.hs
@@ -76,3 +86,9 @@ executable wbs-documentation
     OverloadedStrings
   hs-source-dirs: haskell
   default-language: Haskell2010
+  other-modules:
+    Wbs.Docs.Data,
+    Wbs.Docs.Render,
+    Wbs.TagLang
+
+-- ex: et ts=2

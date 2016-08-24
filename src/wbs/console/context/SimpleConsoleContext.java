@@ -19,7 +19,7 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
-import wbs.framework.record.GlobalId;
+import wbs.framework.entity.record.GlobalId;
 import wbs.framework.web.WebFile;
 
 @Accessors (fluent = true)

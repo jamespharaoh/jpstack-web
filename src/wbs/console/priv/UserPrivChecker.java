@@ -3,8 +3,8 @@ package wbs.console.priv;
 import java.util.Collection;
 import java.util.Map;
 
-import wbs.framework.record.GlobalId;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.entity.record.Record;
 
 public
 interface UserPrivChecker {

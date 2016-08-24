@@ -1,11 +1,13 @@
 package wbs.framework.object;
 
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.classForNameFormat;
+import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -35,13 +37,12 @@ import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.context.ApplicationContext;
-import wbs.framework.application.context.NoSuchComponentException;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelMethods;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
 @SingletonComponent ("objectHelperBuilder")
@@ -69,60 +70,60 @@ class ObjectHelperBuilder {
 	// prototype dependencies
 
 	@Inject
-	Provider<ObjectDatabaseHelper<?>> objectDatabaseHelperProvider;
+	Provider <ObjectDatabaseHelper <?>> objectDatabaseHelperProvider;
 
 	// component prototype dependencies
 
 	@Inject
-	Provider<ObjectHelperChildrenImplementation<?>>
+	Provider <ObjectHelperChildrenImplementation <?>>
 	objectHelperChildrenImplementationProvider;
 
 	@Inject
-	Provider<ObjectHelperCodeImplementation<?>>
+	Provider <ObjectHelperCodeImplementation <?>>
 	objectHelperCodeImplementationProvider;
 
 	@Inject
-	Provider<ObjectHelperFindImplementation<?>>
+	Provider <ObjectHelperFindImplementation <?>>
 	objectHelperFindImplementationProvider;
 
 	@Inject
-	Provider<ObjectHelperIdImplementation<?>>
+	Provider <ObjectHelperIdImplementation <?>>
 	objectHelperIdImplementationProvider;
 
 	@Inject
-	Provider<ObjectHelperIndexImplementation<?>>
+	Provider <ObjectHelperIndexImplementation <?>>
 	objectHelperIndexImplementationProvider;
 
 	@Inject
-	Provider<ObjectHelperModelImplementation<?>>
+	Provider <ObjectHelperModelImplementation <?>>
 	objectHelperModelImplementationProvider;
 
 	@Inject
-	Provider<ObjectHelperPropertyImplementation<?>>
+	Provider <ObjectHelperPropertyImplementation <?>>
 	objectHelperPropertyImplementationProvider;
 
 	@Inject
-	Provider<ObjectHelperUpdateImplementation<?>>
+	Provider <ObjectHelperUpdateImplementation <?>>
 	objectHelperUpdateImplementationProvider;
 
 	// state
 
-	List<ObjectHelper<?>> list =
-		new ArrayList<ObjectHelper<?>> ();
+	List <ObjectHelper <?>> list =
+		new ArrayList<> ();
 
-	ObjectHelper<?> rootObjectHelper;
+	ObjectHelper <?> rootObjectHelper;
 
-	Map<String,ObjectHelper<?>> byObjectName =
-		new HashMap<String,ObjectHelper<?>> ();
+	Map <String, ObjectHelper <?>> byObjectName =
+		new HashMap <> ();
 
-	Map<Class<?>,ObjectHelper<?>> byObjectClass =
-		new HashMap<Class<?>,ObjectHelper<?>> ();
-
-	Map<Long,ObjectHelper<?>> byObjectTypeId =
+	Map <Class <?>, ObjectHelper <?>> byObjectClass =
 		new HashMap<> ();
 
-	Map<String,ObjectHelper<?>> byObjectTypeCode =
-		new HashMap<String,ObjectHelper<?>> ();
+	Map <Long, ObjectHelper <?>> byObjectTypeId =
+		new HashMap<> ();
+
+	Map <String, ObjectHelper <?>> byObjectTypeCode =
+		new HashMap<> ();
 
 	@Getter
 	boolean ready = false;
@@ -212,7 +213,7 @@ class ObjectHelperBuilder {
 
 			// dao interface
 
-			Class<?> daoInterface =
+			Class <?> daoInterface =
 				ifThenElse (
 					isNotNull (
 						daoImplementation),
@@ -467,25 +468,25 @@ class ObjectHelperBuilder {
 		ObjectModel model;
 
 		@Getter @Setter
-		Map<String,ObjectTypeEntry> objectTypesByCode;
+		Map <String, ObjectTypeEntry> objectTypesByCode;
 
 		@Getter @Setter
-		ObjectDatabaseHelper<?> objectDatabaseHelper;
+		ObjectDatabaseHelper <?> objectDatabaseHelper;
 
-		ObjectHelperChildrenImplementation<?> childrenImplementation;
-		ObjectHelperCodeImplementation<?> codeImplementation;
-		ObjectHelperFindImplementation<?> findImplementation;
-		ObjectHelperIdImplementation<?> idImplementation;
-		ObjectHelperIndexImplementation<?> indexImplementation;
-		ObjectHelperModelImplementation<?> modelImplementation;
-		ObjectHelperPropertyImplementation<?> propertyImplementation;
-		ObjectHelperUpdateImplementation<?> updateImplementation;
+		ObjectHelperChildrenImplementation <?> childrenImplementation;
+		ObjectHelperCodeImplementation <?> codeImplementation;
+		ObjectHelperFindImplementation <?> findImplementation;
+		ObjectHelperIdImplementation <?> idImplementation;
+		ObjectHelperIndexImplementation <?> indexImplementation;
+		ObjectHelperModelImplementation <?> modelImplementation;
+		ObjectHelperPropertyImplementation <?> propertyImplementation;
+		ObjectHelperUpdateImplementation <?> updateImplementation;
 
-		List<ObjectHelperComponent> components;
+		List <ObjectHelperComponent> components;
 
-		ObjectHelper<?> objectHelper;
+		ObjectHelper <?> objectHelper;
 
-		Class<?> extraInterface;
+		Class <?> extraInterface;
 		Object extraImplementation;
 
 		@SuppressWarnings ("unchecked")
@@ -499,7 +500,7 @@ class ObjectHelperBuilder {
 		ObjectHelper<?> build () {
 
 			@Cleanup
-			ActiveTask activeTask =
+			ActiveTask functionTask =
 				activityManager.start (
 					"function",
 					stringFormat (
@@ -507,112 +508,138 @@ class ObjectHelperBuilder {
 						objectDatabaseHelper.model ().objectName ()),
 					this);
 
-			// extra methods
+			// extra methods and implementation
 
-			String extraImplementationBeanName =
-				stringFormat (
-					"%sObjectHelperImplementation",
-					model.objectName ());
+			{
 
-			try {
+				@Cleanup
+				ActiveTask stepTask =
+					activityManager.start (
+						"step",
+						stringFormat (
+							"extra methods and implementation",
+							model.objectName ()),
+						this);
 
 				extraImplementation =
-					applicationContext.getComponentRequired (
-						extraImplementationBeanName,
-						Object.class);
-
-			} catch (NoSuchComponentException exception) {
-			}
-
-			try {
-
-				String extraInterfaceName =
-					stringFormat (
-						"%s.%sObjectHelperMethods",
-						model.objectClass ().getPackage ().getName (),
-						capitalise (
-							model.objectName ()));
+					optionalOrNull (
+						applicationContext.getComponent (
+							stringFormat (
+								"%sObjectHelperMethodsImplementation",
+								model.objectName ()),
+							Object.class));
 
 				extraInterface =
-					Class.forName (
-						extraInterfaceName);
+					optionalOrNull (
+						classForNameFormat (
+							"%s.%sObjectHelperMethods",
+							model.objectClass ().getPackage ().getName (),
+							capitalise (
+								model.objectName ())));
 
-			} catch (ClassNotFoundException exception) {
 			}
 
 			// proxy class
 
-			Class<?> proxyClass =
-				Proxy.getProxyClass (
-					model.helperClass ().getClassLoader (),
-					model.helperClass (),
-					ObjectHelperBuilderMethods.class);
+			{
 
-			Constructor<?> constructor =
-				proxyClass.getConstructor (
-					InvocationHandler.class);
+				@Cleanup
+				ActiveTask stepTask =
+					activityManager.start (
+						"step",
+						stringFormat (
+							"proxy class",
+							model.objectName ()),
+						this);
 
-			components =
-				ImmutableList.<ObjectHelperComponent>builder ()
+				Class <?> proxyClass =
+					Proxy.getProxyClass (
+						model.helperClass ().getClassLoader (),
+						model.helperClass (),
+						ObjectHelperBuilderMethods.class);
+	
+				Constructor <?> proxyConstructor =
+					proxyClass.getConstructor (
+						InvocationHandler.class);
 
-				.add (
-					childrenImplementation =
-						objectHelperChildrenImplementationProvider.get ())
+				InvocationHandler invocationHandler =
+					new InvocationHandlerImplementation ();
+	
+				objectHelper =
+					model.helperClass ().cast (
+						proxyConstructor.newInstance (
+							invocationHandler));
 
-				.add (
-					codeImplementation =
-						objectHelperCodeImplementationProvider.get ())
+			}
 
-				.add (
-					findImplementation =
-						objectHelperFindImplementationProvider.get ())
+			// components
 
-				.add (
-					idImplementation =
-						objectHelperIdImplementationProvider.get ())
+			{
 
-				.add (
-					indexImplementation =
-						objectHelperIndexImplementationProvider.get ())
+				@Cleanup
+				ActiveTask stepTask =
+					activityManager.start (
+						"step",
+						stringFormat (
+							"components",
+							model.objectName ()),
+						this);
 
-				.add (
-					modelImplementation =
-						objectHelperModelImplementationProvider.get ())
+				components =
+					ImmutableList.<ObjectHelperComponent> builder ()
+	
+					.add (
+						childrenImplementation =
+							objectHelperChildrenImplementationProvider.get ())
+	
+					.add (
+						codeImplementation =
+							objectHelperCodeImplementationProvider.get ())
+	
+					.add (
+						findImplementation =
+							objectHelperFindImplementationProvider.get ())
+	
+					.add (
+						idImplementation =
+							objectHelperIdImplementationProvider.get ())
+	
+					.add (
+						indexImplementation =
+							objectHelperIndexImplementationProvider.get ())
+	
+					.add (
+						modelImplementation =
+							objectHelperModelImplementationProvider.get ())
+	
+					.add (
+						propertyImplementation =
+							objectHelperPropertyImplementationProvider.get ())
+	
+					.add (
+						updateImplementation =
+							objectHelperUpdateImplementationProvider.get ())
+	
+					.build ();
 
-				.add (
-					propertyImplementation =
-						objectHelperPropertyImplementationProvider.get ())
+				components.forEach (
+					component ->
+						component
+	
+					.objectHelper (
+						objectHelper)
+	
+					.objectDatabaseHelper (
+						objectDatabaseHelper)
+	
+					.model (
+						model)
+	
+					.setup ()
+	
+				);
 
-				.add (
-					updateImplementation =
-						objectHelperUpdateImplementationProvider.get ())
-
-				.build ();
-
-			InvocationHandler invocationHandler =
-				new InvocationHandlerImplementation ();
-
-			objectHelper =
-				model.helperClass ().cast (
-					constructor.newInstance (
-						invocationHandler));
-
-			components.forEach (
-				component ->
-					component
-
-				.objectHelper (
-					objectHelper)
-
-				.objectDatabaseHelper (
-					objectDatabaseHelper)
-
-				.model (
-					model)
-
-				.setup ()
-
-			);
+			}
 
 			// return
 

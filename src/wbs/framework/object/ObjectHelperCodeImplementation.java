@@ -3,7 +3,7 @@ package wbs.framework.object;
 import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
@@ -20,8 +20,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.GlobalId;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.entity.record.Record;
 import wbs.framework.utils.cache.AdvancedCache;
 
 @Accessors (fluent = true)
@@ -214,7 +214,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 				code);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				recordOptional)
 		) {
 
@@ -242,7 +242,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 				code);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				recordOptional)
 		) {
 
@@ -271,7 +271,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 				code1);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				recordOptional)
 		) {
 
@@ -300,7 +300,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 				code1);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				recordOptional)
 		) {
 

@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.help.console;
 
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 
 import javax.inject.Inject;
 
@@ -70,7 +70,7 @@ class ChatHelpLogPendingFormAction
 				"text");
 
 		boolean ignore =
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"ignore"));
 

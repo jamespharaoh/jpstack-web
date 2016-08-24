@@ -27,7 +27,7 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;

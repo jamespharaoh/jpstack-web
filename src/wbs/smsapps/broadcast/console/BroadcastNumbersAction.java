@@ -1,7 +1,7 @@
 package wbs.smsapps.broadcast.console;
 
 import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
@@ -154,7 +154,7 @@ class BroadcastNumbersAction
 		BroadcastLogic.AddResult addResult;
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"add"))
 		) {
@@ -178,7 +178,7 @@ class BroadcastNumbersAction
 		int numRemoved = 0;
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"remove"))
 		) {

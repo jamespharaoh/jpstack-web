@@ -9,7 +9,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
 public 

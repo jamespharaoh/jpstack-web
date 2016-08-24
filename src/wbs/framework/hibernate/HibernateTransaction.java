@@ -23,7 +23,7 @@ import lombok.extern.log4j.Log4j;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.database.Transaction;
 import wbs.framework.database.WbsConnection;
-import wbs.framework.record.UnsavedRecordDetector;
+import wbs.framework.entity.record.UnsavedRecordDetector;
 
 @Accessors (fluent = true)
 @Log4j

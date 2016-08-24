@@ -9,7 +9,7 @@ import static wbs.framework.utils.etc.Misc.isError;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.isRight;
 import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOr;
 import static wbs.framework.utils.etc.StringUtils.stringSplitColon;
@@ -34,8 +34,8 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
-import wbs.framework.record.PermanentRecord;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.PermanentRecord;
+import wbs.framework.entity.record.Record;
 import wbs.framework.utils.etc.FormatWriter;
 
 @Accessors (fluent = true)
@@ -341,7 +341,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			formName);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				error)
 		) {
 
@@ -521,7 +521,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 					newGenericValue);
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					valueError)
 			) {
 
@@ -554,7 +554,7 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 				newNativeValue);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				constraintError)
 		) {
 

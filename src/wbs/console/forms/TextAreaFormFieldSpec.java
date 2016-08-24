@@ -9,7 +9,7 @@ import wbs.console.module.ConsoleModuleData;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
 @Data

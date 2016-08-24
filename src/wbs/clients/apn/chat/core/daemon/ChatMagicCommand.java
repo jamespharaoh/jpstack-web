@@ -18,7 +18,7 @@ import wbs.clients.apn.chat.keyword.model.ChatKeywordRec;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.core.logic.KeywordFinder;
@@ -112,7 +112,7 @@ class ChatMagicCommand
 
 			if (
 
-				isPresent (
+				optionalIsPresent (
 					chatKeywordOptional)
 
 				&& chatKeywordOptional.get ().getGlobal ()

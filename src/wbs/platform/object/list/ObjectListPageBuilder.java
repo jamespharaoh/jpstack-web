@@ -40,7 +40,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.platform.object.criteria.WhereDeletedCriteriaSpec;
 import wbs.platform.object.criteria.WhereICanManageCriteriaSpec;
 import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;

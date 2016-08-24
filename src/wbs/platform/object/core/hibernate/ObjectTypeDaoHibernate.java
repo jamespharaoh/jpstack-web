@@ -6,9 +6,9 @@ import org.hibernate.criterion.Restrictions;
 
 import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.entity.record.Record;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.framework.object.ObjectTypeRegistry;
-import wbs.framework.record.Record;
 import wbs.platform.object.core.model.ObjectTypeDao;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.scaffold.model.RootRec;

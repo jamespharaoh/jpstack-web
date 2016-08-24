@@ -11,6 +11,7 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
 import wbs.framework.utils.etc.FormatWriter;
 
 @SingletonComponent ("modelWriterManager")
@@ -20,13 +21,13 @@ class ModelWriterManager {
 	// prototype dependencies
 
 	@Inject
-	Provider<BuilderFactory> builderFactoryProvider;
+	Provider <BuilderFactory> builderFactoryProvider;
 
 	// collection dependencies
 
 	@Inject
 	@ModelWriter
-	Map<Class<?>,Provider<Object>> modelWriterProviders;
+	Map <Class <?>, Provider <Object>> modelWriterProviders;
 
 	// state
 

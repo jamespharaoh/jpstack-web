@@ -48,7 +48,7 @@ class CodeUtils {
 				string);
 
 		if (
-			OptionalUtils.isPresent (
+			OptionalUtils.optionalIsPresent (
 				optionalCode)
 		) {
 

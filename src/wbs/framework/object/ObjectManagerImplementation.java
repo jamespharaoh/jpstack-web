@@ -26,10 +26,10 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
+import wbs.framework.entity.record.EphemeralRecord;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelperBuilder.ObjectHelperBuilderMethods;
-import wbs.framework.record.EphemeralRecord;
-import wbs.framework.record.GlobalId;
-import wbs.framework.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 
 @Accessors (fluent = true)

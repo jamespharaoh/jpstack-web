@@ -1,7 +1,7 @@
 package wbs.console.helper;
 
 import wbs.console.context.ConsoleContextStuff;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 public
 interface ConsoleHelperProvider<ConcreteType extends Record<ConcreteType>> {

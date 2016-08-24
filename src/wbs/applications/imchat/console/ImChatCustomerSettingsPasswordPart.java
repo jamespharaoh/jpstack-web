@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.GlobalId;
+import wbs.framework.entity.record.GlobalId;
 import wbs.platform.event.console.EventConsoleLogic;
 import wbs.platform.event.console.EventLinkConsoleHelper;
 import wbs.platform.event.model.EventLinkRec;

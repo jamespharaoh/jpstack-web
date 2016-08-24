@@ -24,8 +24,8 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.record.PermanentRecord;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.PermanentRecord;
+import wbs.framework.entity.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
 

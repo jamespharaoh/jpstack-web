@@ -21,7 +21,7 @@ import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.record.GlobalId;
+import wbs.framework.entity.record.GlobalId;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.rpc.core.Rpc;

@@ -14,7 +14,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.sms.number.core.console.NumberPlugin;
 import wbs.sms.number.core.model.NumberRec;
 

@@ -17,7 +17,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.platform.daemon.SleepingDaemonService;
 
 @Accessors (fluent = true)

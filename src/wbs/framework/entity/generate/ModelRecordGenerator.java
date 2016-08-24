@@ -23,6 +23,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginSpec;
+import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
 import wbs.framework.entity.meta.CodeFieldSpec;
 import wbs.framework.entity.meta.DateFieldSpec;
 import wbs.framework.entity.meta.IdentityIntegerFieldSpec;
@@ -41,6 +42,7 @@ import wbs.framework.entity.meta.ParentTypeFieldSpec;
 import wbs.framework.entity.meta.ReferenceFieldSpec;
 import wbs.framework.entity.meta.TimestampFieldSpec;
 import wbs.framework.entity.meta.TypeCodeFieldSpec;
+import wbs.framework.utils.AtomicFileWriter;
 import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.RuntimeIoException;
 
@@ -146,16 +148,16 @@ class ModelRecordGenerator {
 			java.util.Map.class,
 			java.util.Set.class,
 
-			wbs.framework.record.UnsavedRecordDetector.class,
-			wbs.framework.record.CommonRecord.class,
-			wbs.framework.record.EphemeralRecord.class,
-			wbs.framework.record.EventRecord.class,
-			wbs.framework.record.MajorRecord.class,
-			wbs.framework.record.MinorRecord.class,
-			wbs.framework.record.Record.class,
-			wbs.framework.record.RecordComponent.class,
-			wbs.framework.record.RootRecord.class,
-			wbs.framework.record.TypeRecord.class,
+			wbs.framework.entity.record.UnsavedRecordDetector.class,
+			wbs.framework.entity.record.CommonRecord.class,
+			wbs.framework.entity.record.EphemeralRecord.class,
+			wbs.framework.entity.record.EventRecord.class,
+			wbs.framework.entity.record.MajorRecord.class,
+			wbs.framework.entity.record.MinorRecord.class,
+			wbs.framework.entity.record.Record.class,
+			wbs.framework.entity.record.RecordComponent.class,
+			wbs.framework.entity.record.RootRecord.class,
+			wbs.framework.entity.record.TypeRecord.class,
 
 			org.apache.commons.lang3.builder.CompareToBuilder.class,
 

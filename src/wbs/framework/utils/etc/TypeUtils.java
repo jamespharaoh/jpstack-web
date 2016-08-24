@@ -1,5 +1,9 @@
 package wbs.framework.utils.etc;
 
+import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
+
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 
 public
@@ -110,6 +114,152 @@ class TypeUtils {
 		}
 
 		return true;
+
+	}
+
+	// ---------- class lookup
+
+	public static
+	Optional <Class <?>> classForName (
+			@NonNull String className) {
+
+		try {
+
+			return Optional.<Class<?>>of (
+				Class.forName (
+					className));
+
+		} catch (ClassNotFoundException exception) {
+
+			return Optional.absent ();
+
+		}
+
+	}
+
+	public static
+	Optional <Class <?>> classForName (
+			@NonNull String packageName,
+			@NonNull String className) {
+
+		try {
+
+			return Optional.<Class<?>>of (
+				Class.forName (
+					packageName + "." + className));
+
+		} catch (ClassNotFoundException exception) {
+
+			return Optional.absent ();
+
+		}
+
+	}
+
+	public static
+	Class<?> classForNameRequired (
+			@NonNull String className) {
+
+		try {
+
+			return Class.forName (
+				className);
+
+		} catch (ClassNotFoundException exception) {
+
+			throw new RuntimeException (
+				exception);
+
+		}
+
+	}
+
+	public static
+	Class<?> classForNameRequired (
+			@NonNull String packageName,
+			@NonNull String className) {
+
+		try {
+
+			return Class.forName (
+				packageName + "." + className);
+
+		} catch (ClassNotFoundException exception) {
+
+			throw new RuntimeException (
+				exception);
+
+		}
+
+	}
+
+	public static
+	Optional <Class <?>> classForNameFormat (
+			@NonNull Object ... arguments) {
+
+		return classForName (
+			stringFormatArray (
+				arguments));
+
+	}
+
+	public static
+	Class <?> classForNameFormatRequired (
+			@NonNull Object ... arguments) {
+
+		return classForNameRequired (
+			stringFormatArray (
+				arguments));
+
+	}
+
+	// ---------- class names
+
+	public static
+	String classNameSimple (
+			@NonNull Class <?> theClass) {
+
+		return theClass.getSimpleName ();
+
+	}
+
+	public static
+	String objectClassNameSimple (
+			@NonNull Object object) {
+
+		return object.getClass ().getSimpleName ();
+
+	}
+
+	public static
+	String classNameFull (
+			@NonNull Class <?> theClass) {
+
+		return theClass.getName ();
+
+	}
+
+	public static
+	String objectClassNameFull (
+			@NonNull Object object) {
+
+		return object.getClass ().getName ();
+
+	}
+
+	public static
+	String classPackageName (
+			@NonNull Class <?> theClass) {
+
+		return theClass.getPackage ().getName ();
+
+	}
+
+	public static
+	String objectPackageName (
+			@NonNull Object object) {
+
+		return object.getClass ().getPackage ().getName ();
 
 	}
 

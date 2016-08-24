@@ -1,11 +1,11 @@
 package wbs.framework.entity.model;
 
-import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.uncapitalise;
+import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -22,8 +22,8 @@ import wbs.framework.entity.build.ModelBuilderManager;
 import wbs.framework.entity.build.ModelFieldBuilderContext;
 import wbs.framework.entity.build.ModelFieldBuilderTarget;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
-import wbs.framework.record.Record;
 import wbs.framework.schema.helper.SchemaNamesHelper;
 import wbs.framework.schema.helper.SchemaTypesHelper;
 
@@ -105,8 +105,8 @@ class ModelBuilder {
 				recordClassName);
 
 		@SuppressWarnings ("unchecked")
-		Class<? extends Record<?>> recordClassTemp =
-			(Class<? extends Record<?>>)
+		Class <? extends Record <?>> recordClassTemp =
+			(Class <? extends Record <?>>)
 			classForNameRequired (
 				recordClassNameFull);
 

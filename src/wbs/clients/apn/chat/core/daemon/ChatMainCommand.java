@@ -42,7 +42,7 @@ import wbs.clients.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.clients.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
-import wbs.framework.record.IdObject;
+import wbs.framework.entity.record.IdObject;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.sms.command.logic.CommandLogic;

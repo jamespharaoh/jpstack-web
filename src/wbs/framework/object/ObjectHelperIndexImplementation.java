@@ -16,8 +16,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.GlobalId;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.entity.record.Record;
 import wbs.framework.utils.cache.AdvancedCache;
 
 @Accessors (fluent = true)

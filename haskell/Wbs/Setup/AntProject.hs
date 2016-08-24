@@ -56,6 +56,8 @@ writeBuildFile world = do
 				"build-framework",
 				"build-meta",
 				"generate-records",
+				"build-entity",
+				"generate-helpers",
 				"build-rest" ],
 
 			makeComboTarget "framework-jar" [
@@ -66,6 +68,8 @@ writeBuildFile world = do
 				"build-framework",
 				"build-meta",
 				"generate-records",
+				"build-entity",
+				"generate-helpers",
 				"build-rest",
 				"console-live" ],
 
@@ -73,6 +77,8 @@ writeBuildFile world = do
 				"build-framework",
 				"build-meta",
 				"generate-records",
+				"build-entity",
+				"generate-helpers",
 				"build-rest",
 				"console-test" ],
 
@@ -80,6 +86,8 @@ writeBuildFile world = do
 				"build-framework",
 				"build-meta",
 				"generate-records",
+				"build-entity",
+				"generate-helpers",
 				"build-rest",
 				"console-live",
 				"console-restart" ],
@@ -88,6 +96,8 @@ writeBuildFile world = do
 				"build-framework",
 				"build-meta",
 				"generate-records",
+				"build-entity",
+				"generate-helpers",
 				"build-rest",
 				"api-live" ],
 
@@ -95,6 +105,8 @@ writeBuildFile world = do
 				"build-framework",
 				"build-meta",
 				"generate-records",
+				"build-entity",
+				"generate-helpers",
 				"build-rest",
 				"api-test" ],
 
@@ -102,6 +114,8 @@ writeBuildFile world = do
 				"build-framework",
 				"build-meta",
 				"generate-records",
+				"build-entity",
+				"generate-helpers",
 				"build-rest",
 				"api-live",
 				"api-restart" ],
@@ -110,6 +124,8 @@ writeBuildFile world = do
 				"build-framework",
 				"build-meta",
 				"generate-records",
+				"build-entity",
+				"generate-helpers",
 				"build-rest",
 				"daemon-restart" ],
 
@@ -117,6 +133,8 @@ writeBuildFile world = do
 				"build-framework",
 				"build-meta",
 				"generate-records",
+				"build-entity",
+				"generate-helpers",
 				"build-rest",
 				"api-live",
 				"api-restart",
@@ -131,6 +149,8 @@ writeBuildFile world = do
 				"build-framework",
 				"build-meta",
 				"generate-records",
+				"build-entity",
+				"generate-helpers",
 				"build-rest",
 				"db-drop",
 				"db-create",
@@ -143,6 +163,8 @@ writeBuildFile world = do
 				"build-framework",
 				"build-meta",
 				"generate-records",
+				"build-entity",
+				"generate-helpers",
 				"build-rest",
 				"console-test",
 				"api-test",
@@ -151,7 +173,14 @@ writeBuildFile world = do
 			makeComboTarget "generate-records" [
 				"build-framework",
 				"build-meta",
-				"generate-records" ]
+				"generate-records" ],
+
+			makeComboTarget "generate-helpers" [
+				"build-framework",
+				"build-meta",
+				"generate-records",
+				"build-entity",
+				"generate-helpers" ]
 
 		]
 
@@ -286,10 +315,10 @@ writeBuildFile world = do
 				] [
 
 					mkelem "include" [
-						sattr "name" "wbs/framework/**"
+						sattr "name" "wbs/api/**"
 					] [],
 					mkelem "include" [
-						sattr "name" "wbs/api/**"
+						sattr "name" "wbs/framework/**"
 					] [],
 					mkelem "include" [
 						sattr "name" "wbs/console/**"
@@ -315,8 +344,45 @@ writeBuildFile world = do
 					] [],
 
 					mkelem "include" [
+						sattr "name" "wbs/api/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/console/**"
+					] [],
+					mkelem "include" [
 						sattr "name" "wbs/framework/**"
 					] [],
+
+					mkelem "include" [
+						sattr "name" "wbs/**/generate/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/**/metamodel/**"
+					] []
+
+				],
+				makeCopyToDir "work/bin" [
+					makeFilesetDir "src" [
+						makeIncludeName "**/*.xml",
+						makeIncludeName "log4j.properties"
+					]
+				],
+				makeCopyFileToDir "wbs-build.xml" "work/bin" []
+			],
+
+			makeSimpleTarget "build-entity" [
+				makeJavacTask [] [
+
+					mkelem "src" [
+						sattr "path" "src"
+					] [],
+					mkelem "src" [
+						sattr "path" "work/bin"
+					] [],
+					mkelem "src" [
+						sattr "path" "work/generated"
+					] [],
+
 					mkelem "include" [
 						sattr "name" "wbs/api/**"
 					] [],
@@ -324,10 +390,24 @@ writeBuildFile world = do
 						sattr "name" "wbs/console/**"
 					] [],
 					mkelem "include" [
+						sattr "name" "wbs/framework/**"
+					] [],
+
+					mkelem "include" [
 						sattr "name" "wbs/**/generate/**"
 					] [],
 					mkelem "include" [
+						sattr "name" "wbs/**/hibernate/**"
+					] [],
+					mkelem "include" [
 						sattr "name" "wbs/**/metamodel/**"
+					] [],
+
+					mkelem "include" [
+						sattr "name" "wbs/**/build/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/**/model/**"
 					] []
 
 				],
@@ -348,9 +428,6 @@ writeBuildFile world = do
 					mkelem "src" [
 						sattr "path" "work/generated"
 					] [],
-					mkelem "src" [
-						sattr "path" "work/bin"
-					] []
 				],
 				makeCopyToDir "work/bin" [
 					makeFilesetDir "src" [
@@ -641,8 +718,33 @@ writeBuildFile world = do
 					makeArgValue "wbs.test",
 					makeArgValue "model-meta,model-generate,utils",
 					makeArgValue "",
-					makeArgValue "wbs.framework.entity.generate.ModelGeneratorTool",
+					makeArgValue (
+						"wbs.framework.entity.generate.ModelGeneratorTool"
+					),
 					makeArgValue "generateModels"
+				]
+
+			],
+
+			makeSimpleTarget "generate-helpers" [
+
+				mkelem "java" [
+					sattr "classname"
+						"wbs.framework.application.tools.BeanRunner",
+					sattr "classpathref" "classpath",
+					sattr "failonerror" "true"
+				] [
+					makeArgValue "wbs-test",
+					makeArgValue "wbs.test",
+					makeArgValue (
+						"entity,model,model-meta,model-generate,schema,utils"
+					),
+					makeArgValue "",
+					makeArgValue (
+						"wbs.framework.entity.generate" ++
+						".ObjectHelperGeneratorTool"
+					),
+					makeArgValue "generateObjectHelpers"
 				]
 
 			]

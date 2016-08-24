@@ -1,7 +1,7 @@
 package wbs.framework.entity.build;
 
-import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
 
 import com.google.common.collect.ImmutableList;
 
@@ -74,7 +74,7 @@ class ParentTypeModelFieldBuilder {
 				false)
 
 			.columnNames (
-				ImmutableList.<String>of (
+				ImmutableList.of (
 					ifNull (
 						spec.columnName (),
 						"parent_type_id")));

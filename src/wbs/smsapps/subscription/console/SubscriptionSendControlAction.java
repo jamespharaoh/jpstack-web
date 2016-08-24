@@ -1,7 +1,7 @@
 package wbs.smsapps.subscription.console;
 
 import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
@@ -83,7 +83,7 @@ class SubscriptionSendControlAction
 					"subscriptionSendId"));
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"send"))
 		) {
@@ -117,7 +117,7 @@ class SubscriptionSendControlAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"schedule"))
 		) {
@@ -169,7 +169,7 @@ class SubscriptionSendControlAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"unschedule"))
 		) {
@@ -217,7 +217,7 @@ class SubscriptionSendControlAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"cancel"))
 		) {

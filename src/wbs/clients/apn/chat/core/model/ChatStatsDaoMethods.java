@@ -7,7 +7,7 @@ import org.joda.time.Interval;
 public
 interface ChatStatsDaoMethods {
 
-	List<ChatStatsRec> findByTimestamp (
+	List <ChatStatsRec> findByTimestamp (
 			ChatRec chat,
 			Interval timestampInterval);
 

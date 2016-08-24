@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.record.IdObject.objectId;
+import static wbs.framework.entity.record.IdObject.objectId;
 import static wbs.framework.utils.etc.Misc.toEnum;
 
 import javax.inject.Inject;

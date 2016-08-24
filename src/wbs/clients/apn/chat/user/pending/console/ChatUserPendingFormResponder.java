@@ -27,7 +27,7 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.GlobalId;
+import wbs.framework.entity.record.GlobalId;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.media.console.MediaConsoleLogic;
 

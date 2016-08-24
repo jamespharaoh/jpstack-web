@@ -21,6 +21,8 @@ import lombok.NonNull;
 public
 class TimeUtils {
 
+	// ---------- instant construction
+
 	public static
 	String isoDate (
 			@NonNull Instant instant) {
@@ -29,6 +31,78 @@ class TimeUtils {
 			isoDateFormat);
 
 	}
+
+	public static
+	Instant toInstant (
+			@NonNull ReadableInstant readableInstant) {
+
+		return readableInstant.toInstant ();
+
+	}
+
+	public static
+	Instant toInstantNullSafe (
+			ReadableInstant readableInstant) {
+
+		return readableInstant != null
+			? readableInstant.toInstant ()
+			: null;
+
+	}
+
+	public static
+	Instant dateToInstantNullSafe (
+			Date date) {
+
+		if (date == null)
+			return null;
+
+		return new Instant (
+			date);
+
+	}
+
+	public static
+	Instant millisToInstant (
+			long millis) {
+
+		return new Instant (
+			millis);
+
+	}
+
+	public static
+	Instant secondsToInstant (
+			long seconds) {
+
+		return new Instant (
+			seconds * 1000);
+
+	}
+
+	public static
+	Instant toInstant (
+			@NonNull Timestamp timestamp) {
+
+		return millisToInstant (
+			timestamp.getTime ());
+
+	}
+
+	// ---------- instant conversion
+
+	public static
+	Date instantToDateNullSafe (
+			ReadableInstant instant) {
+
+		if (instant == null)
+			return null;
+
+		return instant.toInstant ().toDate ();
+
+	}
+
+	// ---------- instant comparison
 
 	public static
 	boolean earlierThan (
@@ -70,8 +144,10 @@ class TimeUtils {
 
 	}
 
+	// ---------- duration comparison
+
 	public static
-	boolean notShorterThan (
+	boolean longerThan (
 			@NonNull Duration left,
 			@NonNull Duration right) {
 
@@ -79,6 +155,38 @@ class TimeUtils {
 			right);
 
 	}
+
+	public static
+	boolean notLongerThan (
+			@NonNull Duration left,
+			@NonNull Duration right) {
+
+		return ! left.isLongerThan (
+			right);
+
+	}
+
+	public static
+	boolean shorterThan (
+			@NonNull Duration left,
+			@NonNull Duration right) {
+
+		return left.isShorterThan (
+			right);
+
+	}
+
+	public static
+	boolean notShorterThan (
+			@NonNull Duration left,
+			@NonNull Duration right) {
+
+		return ! left.isShorterThan (
+			right);
+
+	}
+
+	// ---------- local date construction
 
 	public static
 	LocalDate localDate (
@@ -93,83 +201,6 @@ class TimeUtils {
 				timezone)
 
 			.toLocalDate ();
-
-	}
-
-	public static
-	Instant toInstant (
-			@NonNull ReadableInstant readableInstant) {
-
-		return readableInstant.toInstant ();
-
-	}
-
-	public static
-	Instant toInstantNullSafe (
-			ReadableInstant readableInstant) {
-
-		return readableInstant != null
-			? readableInstant.toInstant ()
-			: null;
-
-	}
-
-	public static
-	Instant dateToInstantNullSafe (
-			Date date) {
-
-		if (date == null)
-			return null;
-
-		return new Instant (
-			date);
-
-	}
-
-	public static
-	Date instantToDateNullSafe (
-			ReadableInstant instant) {
-
-		if (instant == null)
-			return null;
-
-		return instant.toInstant ().toDate ();
-
-	}
-
-	public static
-	Instant millisToInstant (
-			long millis) {
-
-		return new Instant (
-			millis);
-
-	}
-
-	public static
-	Instant secondsToInstant (
-			long seconds) {
-
-		return new Instant (
-			seconds * 1000);
-
-	}
-
-	public static
-	Timestamp toSqlTimestamp (
-			@NonNull ReadableInstant instant) {
-
-		return new Timestamp (
-			instant.getMillis ());
-
-	}
-
-	public static
-	Instant toInstant (
-			@NonNull Timestamp timestamp) {
-
-		return millisToInstant (
-			timestamp.getTime ());
 
 	}
 

@@ -4,7 +4,7 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.NumberUtils.moreThanZero;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -162,7 +162,7 @@ class SubscriptionNumberAddRemoveAction
 		// add numbers
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"add"))
 		) {
@@ -299,7 +299,7 @@ class SubscriptionNumberAddRemoveAction
 		// remove numbers
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"remove"))
 		) {

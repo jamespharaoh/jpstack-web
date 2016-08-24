@@ -2,7 +2,7 @@ package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.stringTrim;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 
 import javax.inject.Inject;
@@ -103,11 +103,11 @@ class ChatMessagePendingFormAction
 
 		if (
 
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"send"))
 
-			|| isPresent (
+			|| optionalIsPresent (
 				requestContext.parameter (
 					"sendWithoutApproval"))
 		) {
@@ -115,7 +115,7 @@ class ChatMessagePendingFormAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"reject"))
 		) {

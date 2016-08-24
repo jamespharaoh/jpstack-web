@@ -15,7 +15,7 @@ import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.entity.model.ModelField;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 
 @Accessors (fluent = true)

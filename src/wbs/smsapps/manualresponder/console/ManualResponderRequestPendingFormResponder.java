@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.LogicUtils.not;
 import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Set;
@@ -362,7 +362,7 @@ class ManualResponderRequestPendingFormResponder
 				"template-id");
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				templateIdStringOptional)
 		) {
 

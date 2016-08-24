@@ -6,7 +6,7 @@ import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.NumberUtils.equalToZero;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringLongerThan;
 
@@ -329,7 +329,7 @@ class ChatJoiner {
 				1915);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				dateOfBirth)
 		) {
 
@@ -410,7 +410,7 @@ class ChatJoiner {
 				false);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				chatUserImageOptional)
 		) {
 

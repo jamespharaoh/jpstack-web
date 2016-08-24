@@ -16,7 +16,7 @@ import wbs.console.lookup.StringLookup;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.request.Cryptor;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.framework.web.PageNotFoundException;
 
 @Log4j

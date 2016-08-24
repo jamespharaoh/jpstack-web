@@ -29,10 +29,6 @@
 		<component class="console.ChatConsoleLogicImplementation"/>
 		<component class="console.ChatKeywordJoinTypeConsoleHelper"/>
 		<component class="console.ChatStatisticsPart"/>
-		<component class="console.ChatUserCreditModeConsoleHelper"/>
-		<component class="console.ChatUserDateModeConsoleHelper"/>
-		<component class="console.GenderConsoleHelper"/>
-		<component class="console.OrientConsoleHelper"/>
 	</layer>
 
 	<layer name="daemon">

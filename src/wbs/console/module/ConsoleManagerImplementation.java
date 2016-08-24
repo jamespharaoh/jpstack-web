@@ -3,7 +3,7 @@ package wbs.console.module;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
@@ -1713,7 +1713,7 @@ class ConsoleManagerImplementation
 					consoleContext);
 
 			while (
-				isPresent (
+				optionalIsPresent (
 					searchContext)
 			) {
 
@@ -1723,7 +1723,7 @@ class ConsoleManagerImplementation
 						targetContextType);
 
 				if (
-					isPresent (
+					optionalIsPresent (
 						targetContext)
 				) {
 					break;
@@ -1834,7 +1834,7 @@ class ConsoleManagerImplementation
 					false);
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					targetOptional)
 			) {
 				return targetOptional;

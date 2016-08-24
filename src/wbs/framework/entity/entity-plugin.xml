@@ -46,44 +46,49 @@
 	</layer>
 
 	<layer name="model-generate">
-		<component class="generate.AssignedIdFieldWriter"/>
-		<component class="generate.AssociativeCollectionWriter"/>
-		<component class="generate.AssociativeListWriter"/>
-		<component class="generate.BinaryFieldWriter"/>
-		<component class="generate.CodeFieldWriter"/>
-		<component class="generate.ChildrenCollectionWriter"/>
-		<component class="generate.ChildrenListWriter"/>
-		<component class="generate.ChildrenMappingWriter"/>
-		<component class="generate.ComponentFieldWriter"/>
-		<component class="generate.DateFieldWriter"/>
-		<component class="generate.DeletedFieldWriter"/>
-		<component class="generate.DescriptionFieldWriter"/>
-		<component class="generate.EnumFieldWriter"/>
-		<component class="generate.FloatingPointFieldWriter"/>
-		<component class="generate.ForeignIdFieldWriter"/>
-		<component class="generate.GeneratedIdFieldWriter"/>
-		<component class="generate.IdentityDateFieldWriter"/>
-		<component class="generate.IdentityIntegerFieldWriter"/>
-		<component class="generate.IdentityReferenceFieldWriter"/>
-		<component class="generate.IdentityStringFieldWriter"/>
-		<component class="generate.IndexFieldWriter"/>
-		<component class="generate.IntegerFieldWriter"/>
-		<component class="generate.MasterFieldWriter"/>
+
 		<component class="generate.ModelGenerateComponents"/>
 		<component class="generate.ModelInterfacesGenerator"/>
 		<component class="generate.ModelRecordGenerator"/>
 		<component class="generate.ModelWriterManager"/>
-		<component class="generate.NameFieldWriter"/>
-		<component class="generate.ParentFieldWriter"/>
-		<component class="generate.ParentIdFieldWriter"/>
-		<component class="generate.ParentTypeFieldWriter"/>
-		<component class="generate.ReferenceFieldWriter"/>
-		<component class="generate.SlaveFieldWriter"/>
-		<component class="generate.StringFieldWriter"/>
-		<component class="generate.TimestampFieldWriter"/>
-		<component class="generate.TypeCodeFieldWriter"/>
-		<component class="generate.TypeFieldWriter"/>
-		<component class="generate.YesNoFieldWriter"/>
+		<component class="generate.ObjectHelperGenerator"/>
+
+		<component class="generate.collections.AssociativeCollectionWriter"/>
+		<component class="generate.collections.AssociativeListWriter"/>
+		<component class="generate.collections.ChildrenCollectionWriter"/>
+		<component class="generate.collections.ChildrenListWriter"/>
+		<component class="generate.collections.ChildrenMappingWriter"/>
+
+		<component class="generate.fields.AssignedIdFieldWriter"/>
+		<component class="generate.fields.BinaryFieldWriter"/>
+		<component class="generate.fields.ComponentFieldWriter"/>
+		<component class="generate.fields.DateFieldWriter"/>
+		<component class="generate.fields.DeletedFieldWriter"/>
+		<component class="generate.fields.DescriptionFieldWriter"/>
+		<component class="generate.fields.EnumFieldWriter"/>
+		<component class="generate.fields.FloatingPointFieldWriter"/>
+		<component class="generate.fields.ForeignIdFieldWriter"/>
+		<component class="generate.fields.GeneratedIdFieldWriter"/>
+		<component class="generate.fields.IdentityDateFieldWriter"/>
+		<component class="generate.fields.IdentityIntegerFieldWriter"/>
+		<component class="generate.fields.IdentityReferenceFieldWriter"/>
+		<component class="generate.fields.IdentityStringFieldWriter"/>
+		<component class="generate.fields.IndexFieldWriter"/>
+		<component class="generate.fields.IntegerFieldWriter"/>
+		<component class="generate.fields.MasterFieldWriter"/>
+		<component class="generate.fields.CodeFieldWriter"/>
+		<component class="generate.fields.NameFieldWriter"/>
+		<component class="generate.fields.ParentFieldWriter"/>
+		<component class="generate.fields.ParentIdFieldWriter"/>
+		<component class="generate.fields.ParentTypeFieldWriter"/>
+		<component class="generate.fields.ReferenceFieldWriter"/>
+		<component class="generate.fields.SlaveFieldWriter"/>
+		<component class="generate.fields.StringFieldWriter"/>
+		<component class="generate.fields.TimestampFieldWriter"/>
+		<component class="generate.fields.TypeCodeFieldWriter"/>
+		<component class="generate.fields.TypeFieldWriter"/>
+		<component class="generate.fields.YesNoFieldWriter"/>
+
 	</layer>
 
 	<layer name="entity">

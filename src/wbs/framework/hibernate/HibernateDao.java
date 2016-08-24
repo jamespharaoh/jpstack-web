@@ -24,7 +24,7 @@ import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
-import wbs.framework.record.IdObject;
+import wbs.framework.entity.record.IdObject;
 
 @Log4j
 public abstract

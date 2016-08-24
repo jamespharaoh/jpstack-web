@@ -10,7 +10,7 @@ import org.joda.time.Instant;
 
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.sms.number.core.console.NumberPlugin;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.subscription.model.SubscriptionSubRec;

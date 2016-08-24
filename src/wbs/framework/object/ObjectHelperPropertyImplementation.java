@@ -15,8 +15,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.GlobalId;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.entity.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 
 @Accessors (fluent = true)
@@ -463,9 +463,9 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	void setDynamic (
-			@NonNull Record<?> objectUncast,
+			@NonNull Record <?> objectUncast,
 			@NonNull String name,
-			@NonNull Object value) {
+			@NonNull Optional <?> valueOptional) {
 
 		@SuppressWarnings ("unchecked")
 		RecordType object =
@@ -477,7 +477,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 		model.hooks ().setDynamic (
 			object,
 			name,
-			value);
+			valueOptional);
 
 	}
 

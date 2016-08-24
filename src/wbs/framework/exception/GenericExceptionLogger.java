@@ -2,7 +2,7 @@ package wbs.framework.exception;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 public
 interface GenericExceptionLogger<Resolution> {

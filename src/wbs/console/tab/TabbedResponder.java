@@ -29,10 +29,10 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
-import wbs.framework.record.GlobalId;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("tabbedResponder")

@@ -27,7 +27,7 @@ class ChatAffiliateCreateOldPart
 
 	// dependencies
 
-	@Inject
+	@Inject @Named
 	ChatKeywordJoinTypeConsoleHelper chatKeywordJoinTypeConsoleHelper;
 
 	@Inject

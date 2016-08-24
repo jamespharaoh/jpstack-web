@@ -16,7 +16,7 @@ import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
@@ -1317,11 +1317,11 @@ class ChatApiServletModule
 
 						Rpc.rpcElem (
 							"found",
-							isPresent (
+							optionalIsPresent (
 								mediaRecOptional)));
 
 				if (
-					isPresent (
+					optionalIsPresent (
 						mediaRecOptional)
 				) {
 

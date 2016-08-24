@@ -3,7 +3,7 @@ package wbs.applications.imchat.api;
 import static wbs.framework.utils.etc.LogicUtils.booleanEqual;
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.hyphenToUnderscore;
 
 import java.util.Map;
@@ -127,7 +127,7 @@ class ImChatPurchaseStartAction
 			createPurchase ();
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				createPurchaseResult)
 		) {
 			return createPurchaseResult.get ();
@@ -455,7 +455,7 @@ class ImChatPurchaseStartAction
 	Responder createResponse () {
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				redirectUrl)
 		) {
 

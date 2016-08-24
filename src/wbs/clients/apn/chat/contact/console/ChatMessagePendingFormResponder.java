@@ -2,7 +2,7 @@ package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
@@ -277,7 +277,7 @@ class ChatMessagePendingFormResponder
 			"</table>\n");
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"reject"))
 		) {

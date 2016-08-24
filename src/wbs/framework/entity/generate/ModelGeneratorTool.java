@@ -7,10 +7,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.extern.log4j.Log4j;
-
 import com.google.common.collect.Iterables;
 
+import lombok.extern.log4j.Log4j;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.entity.meta.ModelMetaLoader;
 import wbs.framework.entity.meta.ModelMetaSpec;
@@ -27,10 +26,10 @@ class ModelGeneratorTool {
 	// prototype dependencies
 
 	@Inject
-	Provider<ModelRecordGenerator> modelRecordGeneratorProvider;
+	Provider <ModelRecordGenerator> modelRecordGeneratorProvider;
 
 	@Inject
-	Provider<ModelInterfacesGenerator> modelInterfacesGeneratorProvider;
+	Provider <ModelInterfacesGenerator> modelInterfacesGeneratorProvider;
 
 	// implementation
 

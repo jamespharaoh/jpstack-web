@@ -11,9 +11,9 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.EphemeralRecord;
-import wbs.framework.record.Record;
-import wbs.framework.record.UnsavedRecordDetector;
+import wbs.framework.entity.record.EphemeralRecord;
+import wbs.framework.entity.record.Record;
+import wbs.framework.entity.record.UnsavedRecordDetector;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperUpdateImplementation")

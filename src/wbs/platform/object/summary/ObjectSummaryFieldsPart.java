@@ -16,7 +16,7 @@ import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.platform.scaffold.model.RootObjectHelper;
 
 @Accessors (fluent = true)

@@ -51,6 +51,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
@@ -157,6 +158,38 @@ class ApplicationContext {
 
 	EasyReadWriteLock lock =
 		EasyReadWriteLock.instantiate ();
+
+	public <ComponentType>
+	Optional <ComponentType> getComponent (
+			@NonNull String componentName,
+			@NonNull Class <ComponentType> componentClass) {
+
+		@Cleanup
+		HeldLock heldLock =
+			lock.read ();
+
+		ComponentDefinition componentDefinition =
+			componentDefinitionsByName.get (
+				componentName);
+
+		if (
+			isNotNull (
+				componentDefinition)
+		) {
+
+			return Optional.of (
+				componentClass.cast (
+					getComponent (
+						componentDefinition,
+						true)));
+
+		} else {
+
+			return Optional.absent ();
+
+		}
+
+	}
 
 	public <ComponentType>
 	ComponentType getComponentRequired (

@@ -2,7 +2,7 @@ package wbs.console.helper;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 public
 interface ConsoleHelperMethods<ObjectType extends Record<ObjectType>> {

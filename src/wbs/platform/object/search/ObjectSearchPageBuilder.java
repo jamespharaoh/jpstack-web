@@ -1,13 +1,13 @@
 package wbs.platform.object.search;
 
-import static wbs.framework.utils.etc.Misc.classForName;
-import static wbs.framework.utils.etc.Misc.classForNameRequired;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.classForName;
+import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
 
 import java.util.Collections;
 
@@ -37,7 +37,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 
@@ -434,7 +434,7 @@ class ObjectSearchPageBuilder<
 					capitalise (
 						consoleHelper.objectName ())));
 
-		Optional<Class<?>> searchClassOptional =
+		Optional <Class <?>> searchClassOptional =
 			classForName (
 				searchClassName);
 

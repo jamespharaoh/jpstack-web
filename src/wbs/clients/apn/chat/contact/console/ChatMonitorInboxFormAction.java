@@ -2,7 +2,7 @@ package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.NumberUtils.moreThan;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.sms.gsm.GsmUtils.gsmStringLength;
 
@@ -122,12 +122,12 @@ class ChatMonitorInboxFormAction
 				"text");
 
 		boolean ignore =
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"ignore"));
 
 		boolean note =
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"sendAndNote"));
 

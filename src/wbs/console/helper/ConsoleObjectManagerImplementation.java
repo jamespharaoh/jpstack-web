@@ -17,11 +17,11 @@ import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.entity.record.EphemeralRecord;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.EphemeralRecord;
-import wbs.framework.record.GlobalId;
-import wbs.framework.record.Record;
 import wbs.framework.utils.etc.Html;
 
 /**

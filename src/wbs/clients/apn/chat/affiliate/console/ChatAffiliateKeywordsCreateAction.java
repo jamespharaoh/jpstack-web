@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.affiliate.console;
 
 import static wbs.framework.utils.etc.Misc.toEnum;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 
 import javax.inject.Inject;
 
@@ -132,7 +132,7 @@ class ChatAffiliateKeywordsCreateAction
 				keyword);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				chatKeywordOptional)
 		) {
 
@@ -149,7 +149,7 @@ class ChatAffiliateKeywordsCreateAction
 				keyword);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				chatSchemeKeywordOptional)
 		) {
 

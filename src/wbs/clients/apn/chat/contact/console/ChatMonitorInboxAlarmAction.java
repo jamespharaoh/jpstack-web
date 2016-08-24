@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
@@ -123,12 +123,12 @@ class ChatMonitorInboxAlarmAction
 		// pull in parameters
 
 		boolean save =
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"alarmSet"));
 
 		boolean clear =
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"alarmCancel"));
 

@@ -2,7 +2,7 @@ package wbs.framework.object;
 
 import java.util.List;
 
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 public
 interface ObjectTypeRegistry {

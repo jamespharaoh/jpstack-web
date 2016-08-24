@@ -12,8 +12,8 @@ import java.util.Map;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.record.GlobalId;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.entity.record.Record;
 
 @Log4j
 public

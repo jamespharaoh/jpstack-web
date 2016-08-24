@@ -2,7 +2,7 @@ package wbs.framework.utils;
 
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.lowercase;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -402,7 +402,7 @@ class TextualInterval {
 				hourOffset);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				symbolicResult)
 		) {
 			return symbolicResult;
@@ -415,7 +415,7 @@ class TextualInterval {
 				hourOffset);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				numericResult)
 		) {
 			return numericResult;
@@ -590,7 +590,7 @@ class TextualInterval {
 			@NonNull Optional<Interval> interval) {
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				interval)
 		) {
 

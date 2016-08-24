@@ -1,7 +1,9 @@
 package wbs.framework.object;
 
-import wbs.framework.record.GlobalId;
-import wbs.framework.record.Record;
+import com.google.common.base.Optional;
+
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.entity.record.Record;
 
 public
 interface ObjectHelperPropertyMethods<RecordType extends Record<RecordType>> {
@@ -43,16 +45,16 @@ interface ObjectHelperPropertyMethods<RecordType extends Record<RecordType>> {
 	// hooks
 
 	void setParent (
-			Record<?> object,
-			Record<?> parent);
+			Record <?> object,
+			Record <?> parent);
 
 	Object getDynamic (
-			Record<?> object,
+			Record <?> object,
 			String name);
 
 	void setDynamic (
-			Record<?> object,
+			Record <?> object,
 			String name,
-			Object value);
+			Optional <?> value);
 
 }

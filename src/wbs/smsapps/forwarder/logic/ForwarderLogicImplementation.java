@@ -22,7 +22,7 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.record.GlobalId;
+import wbs.framework.entity.record.GlobalId;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;

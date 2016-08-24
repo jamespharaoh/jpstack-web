@@ -16,9 +16,9 @@ import wbs.framework.data.annotations.DataChildrenIndex;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataName;
 import wbs.framework.data.annotations.DataReference;
+import wbs.framework.entity.record.Record;
+import wbs.framework.entity.record.RootRecord;
 import wbs.framework.object.ObjectHelper;
-import wbs.framework.record.Record;
-import wbs.framework.record.RootRecord;
 import wbs.framework.utils.etc.BeanLogic;
 
 @Accessors (fluent = true)

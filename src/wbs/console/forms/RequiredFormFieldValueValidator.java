@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.PrototypeComponent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 
 @PrototypeComponent ("requiredFormFieldValueValidator")
 public
@@ -18,7 +18,7 @@ class RequiredFormFieldValueValidator<Generic>
 			Optional<Generic> genericValue) {
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				genericValue)
 		) {
 

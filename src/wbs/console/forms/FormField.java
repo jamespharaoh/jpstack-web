@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 import com.google.common.base.Optional;
 
 import wbs.console.html.ScriptRef;
-import wbs.framework.record.PermanentRecord;
+import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.utils.etc.FormatWriter;
 
 public

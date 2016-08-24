@@ -24,7 +24,7 @@ import wbs.console.context.ConsoleContextStuff;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;
 import wbs.console.tab.TabList;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 public
 interface ConsoleRequestContext {

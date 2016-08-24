@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -77,7 +77,7 @@ class ChatUserAdminOnlineAction
 				chatUser.getType ().name ());
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"online"))
 		) {
@@ -160,7 +160,7 @@ class ChatUserAdminOnlineAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"offline"))
 		) {

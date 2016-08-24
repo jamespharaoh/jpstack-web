@@ -1,6 +1,6 @@
 package wbs.framework.object;
 
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 public 
 interface ObjectHelperComponent <RecordType extends Record <RecordType>> {

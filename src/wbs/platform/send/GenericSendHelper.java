@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.joda.time.Instant;
 
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
-import wbs.framework.record.Record;
 
 public
 interface GenericSendHelper<

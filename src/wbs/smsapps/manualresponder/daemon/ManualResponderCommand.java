@@ -7,7 +7,7 @@ import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.calculateAgeInYears;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
@@ -29,8 +29,8 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.Record;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.TimeFormatter;
 import wbs.platform.queue.logic.QueueLogic;
@@ -543,7 +543,7 @@ class ManualResponderCommand
 		// start session
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				smsCustomer)
 		) {
 

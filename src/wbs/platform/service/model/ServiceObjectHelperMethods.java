@@ -1,6 +1,6 @@
 package wbs.platform.service.model;
 
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 public
 interface ServiceObjectHelperMethods {

@@ -32,12 +32,12 @@ import lombok.experimental.Accessors;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.entity.record.EphemeralRecord;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectDatabaseHelper;
 import wbs.framework.object.ObjectModel;
 import wbs.framework.object.ObjectTypeRegistry;
-import wbs.framework.record.EphemeralRecord;
-import wbs.framework.record.GlobalId;
-import wbs.framework.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("hibernateObjectDatabaseHelper")

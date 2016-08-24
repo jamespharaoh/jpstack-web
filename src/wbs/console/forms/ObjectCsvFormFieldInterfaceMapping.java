@@ -18,7 +18,8 @@ import fj.data.Either;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
+
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
 
 @Accessors (fluent = true)

@@ -9,7 +9,7 @@ import static wbs.framework.utils.etc.Misc.stringTrim;
 import static wbs.framework.utils.etc.NumberUtils.equalToZero;
 import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.NumberUtils.moreThan;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringEqual;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.sms.gsm.GsmUtils.gsmStringLength;
@@ -142,7 +142,7 @@ class ChatUserPendingFormAction
 		// delegate appropriately
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"chatUserDismiss"))
 		) {
@@ -150,7 +150,7 @@ class ChatUserPendingFormAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"chatUserNameApprove"))
 		) {
@@ -158,7 +158,7 @@ class ChatUserPendingFormAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"chatUserInfoApprove"))
 		) {
@@ -166,7 +166,7 @@ class ChatUserPendingFormAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"chatUserImageApprove"))
 		) {
@@ -177,7 +177,7 @@ class ChatUserPendingFormAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"chatUserVideoApprove"))
 		) {
@@ -188,7 +188,7 @@ class ChatUserPendingFormAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"chatUserAudioApprove"))
 		) {
@@ -199,7 +199,7 @@ class ChatUserPendingFormAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"chatUserNameReject"))
 		) {
@@ -207,7 +207,7 @@ class ChatUserPendingFormAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"chatUserInfoReject"))
 		) {
@@ -215,7 +215,7 @@ class ChatUserPendingFormAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"chatUserImageReject"))
 		) {
@@ -226,7 +226,7 @@ class ChatUserPendingFormAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"chatUserVideoReject"))
 		) {
@@ -237,7 +237,7 @@ class ChatUserPendingFormAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"chatUserAudioReject"))
 		) {

@@ -19,10 +19,10 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ErrorResponder;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
-import wbs.framework.record.GlobalId;
 import wbs.framework.utils.etc.StringFormatter;
 import wbs.framework.web.WebExceptionHandler;
 

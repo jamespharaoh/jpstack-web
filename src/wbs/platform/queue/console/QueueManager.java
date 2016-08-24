@@ -18,7 +18,7 @@ import lombok.extern.log4j.Log4j;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.metamodel.QueueTypeSpec;
 import wbs.platform.queue.model.QueueItemRec;

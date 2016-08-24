@@ -30,9 +30,9 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.request.Cryptor;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.Record;
 import wbs.framework.utils.StringSubstituter;
 import wbs.framework.utils.etc.BeanLogic;
 

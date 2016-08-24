@@ -492,7 +492,7 @@ class OptionalUtils {
 	}
 
 	public static
-	boolean isPresent (
+	boolean optionalIsPresent (
 			@NonNull Optional <?> optional) {
 
 		return optional.isPresent ();
@@ -664,7 +664,7 @@ class OptionalUtils {
 		) {
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					optionalValue)
 			) {
 
@@ -683,7 +683,7 @@ class OptionalUtils {
 			@NonNull Optional<? extends Type> optionalValueOne) {
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				optionalValueOne)
 		) {
 
@@ -701,7 +701,7 @@ class OptionalUtils {
 			@NonNull Optional <? extends Type> optionalValueTwo) {
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				optionalValueOne)
 		) {
 
@@ -710,7 +710,7 @@ class OptionalUtils {
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				optionalValueTwo)
 		) {
 
@@ -729,7 +729,7 @@ class OptionalUtils {
 			@NonNull Optional <? extends Type> optionalValueThree) {
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				optionalValueOne)
 		) {
 
@@ -738,7 +738,7 @@ class OptionalUtils {
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				optionalValueTwo)
 		) {
 
@@ -747,7 +747,7 @@ class OptionalUtils {
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				optionalValueThree)
 		) {
 
@@ -765,7 +765,7 @@ class OptionalUtils {
 			@NonNull Optional <?> optionalValue) {
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				optionalValue)
 		) {
 
@@ -800,7 +800,7 @@ class OptionalUtils {
 			@NonNull Function<? super From,To> mappingFunction) {
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				optionalValue)
 		) {
 
@@ -822,7 +822,7 @@ class OptionalUtils {
 			@NonNull Function<? super From,Optional<To>> mappingFunction) {
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				optionalValue)
 		) {
 

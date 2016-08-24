@@ -1,20 +1,20 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.objectClassNameSimple;
 
 import javax.inject.Inject;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("dynamicFormFieldAccessor")
@@ -89,16 +89,16 @@ class DynamicFormFieldAccessor<
 	public
 	void write (
 			@NonNull Container container,
-			@NonNull Optional<Native> nativeValue) {
+			@NonNull Optional<Native> nativeValueOptional) {
 
 		// sanity check native type
 
 		if (
 
-			nativeValue.isPresent ()
+			nativeValueOptional.isPresent ()
 
 			&& ! nativeClass.isInstance (
-				nativeValue.get ())
+				nativeValueOptional.get ())
 
 		) {
 
@@ -107,7 +107,8 @@ class DynamicFormFieldAccessor<
 					"Field %s is %s, not %s",
 					name,
 					nativeClass.getSimpleName (),
-					nativeValue.getClass ().getSimpleName ()));
+					objectClassNameSimple (
+						nativeValueOptional.get ())));
 
 		}
 
@@ -120,7 +121,7 @@ class DynamicFormFieldAccessor<
 		consoleHelper.setDynamic (
 			container,
 			name,
-			nativeValue.orNull ());
+			nativeValueOptional);
 
 	}
 

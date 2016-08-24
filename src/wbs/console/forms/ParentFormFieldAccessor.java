@@ -8,8 +8,8 @@ import lombok.experimental.Accessors;
 import com.google.common.base.Optional;
 
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("parentFormFieldAccessor")

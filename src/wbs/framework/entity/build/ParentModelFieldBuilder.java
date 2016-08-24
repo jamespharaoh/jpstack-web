@@ -1,11 +1,11 @@
 package wbs.framework.entity.build;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.Misc.classForNameRequired;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
 
 import javax.inject.Inject;
 
@@ -111,7 +111,7 @@ class ParentModelFieldBuilder {
 					false))
 
 			.columnNames (
-				ImmutableList.<String>of (
+				ImmutableList.of (
 					ifNull (
 						spec.columnName (),
 						stringFormat (

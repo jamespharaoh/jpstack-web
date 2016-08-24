@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 
 import java.util.List;
 
@@ -80,7 +80,7 @@ class FormFieldPluginManagerImplementation
 				nativeClass);
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				result)
 		) {
 

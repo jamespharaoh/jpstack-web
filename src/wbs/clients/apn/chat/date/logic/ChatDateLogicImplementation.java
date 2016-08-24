@@ -20,7 +20,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.record.IdObject;
+import wbs.framework.entity.record.IdObject;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.message.core.model.MessageRec;

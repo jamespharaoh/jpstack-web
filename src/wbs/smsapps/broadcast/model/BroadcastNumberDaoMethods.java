@@ -11,7 +11,7 @@ interface BroadcastNumberDaoMethods {
 			BroadcastRec broadcast,
 			NumberRec number);
 
-	List<BroadcastNumberRec> findAcceptedLimit (
+	List <BroadcastNumberRec> findAcceptedLimit (
 			BroadcastRec broadcast,
 			int limit);
 

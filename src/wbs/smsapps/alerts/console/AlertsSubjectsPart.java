@@ -9,8 +9,8 @@ import javax.inject.Inject;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.GlobalId;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.entity.record.Record;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
 import wbs.smsapps.alerts.model.AlertsSubjectRec;
 

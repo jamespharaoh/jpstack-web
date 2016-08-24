@@ -3,16 +3,19 @@ package wbs.framework.object;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import wbs.framework.record.Record;
+import com.google.common.base.Optional;
+
+import lombok.NonNull;
+import wbs.framework.entity.record.Record;
 
 public
-interface ObjectHooks<RecordType extends Record<RecordType>> {
+interface ObjectHooks <RecordType extends Record <RecordType>> {
 
 	default
 	void createSingletons (
-			ObjectHelper<RecordType> objectHelper,
-			ObjectHelper<?> parentHelper,
-			Record<?> parentObject) {
+			@NonNull ObjectHelper <RecordType> objectHelper,
+			@NonNull ObjectHelper <?> parentHelper,
+			@NonNull Record <?> parentObject) {
 
 		doNothing ();
 
@@ -20,7 +23,7 @@ interface ObjectHooks<RecordType extends Record<RecordType>> {
 
 	default
 	void beforeInsert (
-			RecordType object) {
+			@NonNull RecordType object) {
 
 		doNothing ();
 
@@ -28,7 +31,7 @@ interface ObjectHooks<RecordType extends Record<RecordType>> {
 
 	default
 	void afterInsert (
-			RecordType object) {
+			@NonNull RecordType object) {
 
 		doNothing ();
 
@@ -36,7 +39,7 @@ interface ObjectHooks<RecordType extends Record<RecordType>> {
 
 	default
 	void beforeUpdate (
-			RecordType object) {
+			@NonNull RecordType object) {
 
 		doNothing ();
 
@@ -44,8 +47,8 @@ interface ObjectHooks<RecordType extends Record<RecordType>> {
 
 	default
 	Object getDynamic (
-			RecordType object,
-			String name) {
+			@NonNull RecordType object,
+			@NonNull String name) {
 
 		throw new UnsupportedOperationException (
 			stringFormat (
@@ -56,9 +59,9 @@ interface ObjectHooks<RecordType extends Record<RecordType>> {
 
 	default
 	void setDynamic (
-			RecordType object,
-			String name,
-			Object value) {
+			@NonNull RecordType object,
+			@NonNull String name,
+			@NonNull Optional <?> value) {
 
 		throw new UnsupportedOperationException (
 			stringFormat (

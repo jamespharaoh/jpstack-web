@@ -22,7 +22,7 @@ import wbs.api.mvc.ApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.record.GlobalId;
+import wbs.framework.entity.record.GlobalId;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;

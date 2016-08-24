@@ -9,7 +9,7 @@ import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.NumberUtils.notLessThan;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.isNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalFromJava;
 import static wbs.framework.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -60,10 +60,10 @@ import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.record.GlobalId;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.RandomLogic;
 import wbs.framework.utils.TimeFormatter;
@@ -402,7 +402,7 @@ class ChatUserLogicImplementation
 
 		if (
 
-			isPresent (
+			optionalIsPresent (
 				thisCategoryId)
 
 			&& (
@@ -1142,7 +1142,7 @@ class ChatUserLogicImplementation
 					match.simpleKeyword ());
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					gazetteerEntryOptional)
 			) {
 				break;
@@ -1478,7 +1478,7 @@ class ChatUserLogicImplementation
 					chatAffiliate.getCategory ());
 
 			if (
-				isPresent (
+				optionalIsPresent (
 					message)
 			) {
 

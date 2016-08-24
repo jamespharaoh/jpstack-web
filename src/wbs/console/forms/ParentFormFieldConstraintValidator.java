@@ -14,7 +14,7 @@ import com.google.common.base.Optional;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("parentFormFieldConstraintValidator")

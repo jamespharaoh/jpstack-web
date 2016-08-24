@@ -2,7 +2,7 @@ package wbs.clients.apn.chat.user.core.console;
 
 import static wbs.framework.utils.etc.LogicUtils.parseBooleanTrueFalse;
 import static wbs.framework.utils.etc.Misc.toEnum;
-import static wbs.framework.utils.etc.OptionalUtils.isPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.emptyStringToAbsent;
@@ -125,7 +125,7 @@ class ChatUserSearchOldAction
 					"number"));
 
 		boolean searchIncludeDeleted =
-			isPresent (
+			optionalIsPresent (
 				requestContext.parameter (
 					"includeDeleted"));
 
@@ -391,7 +391,7 @@ class ChatUserSearchOldAction
 		}
 
 		if (
-			isPresent (
+			optionalIsPresent (
 				searchOnline)
 		) {
 

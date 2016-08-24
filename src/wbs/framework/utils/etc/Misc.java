@@ -887,42 +887,6 @@ class Misc {
 
 	}
 
-	public static
-	Class<?> classForNameRequired (
-			@NonNull String className) {
-
-		try {
-
-			return Class.forName (
-				className);
-
-		} catch (ClassNotFoundException exception) {
-
-			throw new RuntimeException (
-				exception);
-
-		}
-
-	}
-
-	public static
-	Optional<Class<?>> classForName (
-			@NonNull String className) {
-
-		try {
-
-			return Optional.<Class<?>>of (
-				Class.forName (
-					className));
-
-		} catch (ClassNotFoundException exception) {
-
-			return Optional.<Class<?>>absent ();
-
-		}
-
-	}
-
 	public static <Type>
 	Type orNull (
 			@NonNull Optional<Type> optional) {

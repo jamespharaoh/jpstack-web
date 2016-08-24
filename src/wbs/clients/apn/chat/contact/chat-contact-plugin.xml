@@ -36,7 +36,6 @@
 		<component class="console.ChatMonitorInboxSummaryPart"/>
 		<component class="console.ChatMonitorInboxUpdateNoteAction"/>
 		<component class="console.ChatUserInitiationLogConsoleHooks"/>
-		<component class="console.ChatUserInitiationReasonConsoleHelper"/>
 	</layer>
 
 	<layer name="daemon">

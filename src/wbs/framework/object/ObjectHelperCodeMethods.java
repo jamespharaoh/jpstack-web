@@ -4,8 +4,8 @@ import java.util.function.Supplier;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.record.GlobalId;
-import wbs.framework.record.Record;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.entity.record.Record;
 
 public 
 interface ObjectHelperCodeMethods<RecordType extends Record<RecordType>> {
