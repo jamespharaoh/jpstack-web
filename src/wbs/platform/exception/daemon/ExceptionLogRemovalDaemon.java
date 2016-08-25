@@ -1,6 +1,6 @@
 package wbs.platform.exception.daemon;
 
-import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
@@ -94,7 +94,7 @@ class ExceptionLogRemovalDaemon
 					1000l);
 
 			if (
-				isEmpty (
+				collectionIsEmpty (
 					oldExceptionLogs)
 			) {
 				return;

@@ -3,7 +3,7 @@ package wbs.platform.core.console;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.framework.utils.etc.OptionalUtils.optionalValueNotEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringInSafe;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
@@ -178,7 +178,7 @@ class CoreAuthFilter
 					reloadTime),
 				now)
 
-			|| stringEqual (
+			|| stringEqualSafe (
 				requestContext.servletPath (),
 				"/")
 

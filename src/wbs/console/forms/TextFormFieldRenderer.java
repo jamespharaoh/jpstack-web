@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.MapUtils.mapIsNotEmpty;
 import static wbs.framework.utils.etc.Misc.successResult;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
@@ -133,7 +133,7 @@ class TextFormFieldRenderer<Container>
 			">");
 
 		if (
-			isNotEmpty (
+			mapIsNotEmpty (
 				presets ())
 		) {
 

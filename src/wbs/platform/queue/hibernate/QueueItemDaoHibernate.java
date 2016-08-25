@@ -1,6 +1,6 @@
 package wbs.platform.queue.hibernate;
 
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -113,11 +113,11 @@ class QueueItemDaoHibernate
 
 		if (search.filter ()) {
 
-			List<Criterion> filterCriteria =
-				new ArrayList<Criterion> ();
+			List <Criterion> filterCriteria =
+				new ArrayList<> ();
 
 			if (
-				isNotEmpty (
+				collectionIsNotEmpty (
 					search.filterQueueIds ())
 			) {
 

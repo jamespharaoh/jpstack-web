@@ -20,10 +20,10 @@ import wbs.framework.entity.record.TypeRecord;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperModelImplementation")
 public 
-class ObjectHelperModelImplementation<RecordType extends Record<RecordType>>
+class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 	implements
-		ObjectHelperComponent<RecordType>,
-		ObjectHelperModelMethods<RecordType> {
+		ObjectHelperComponent <RecordType>,
+		ObjectHelperModelMethods <RecordType> {
 
 	// dependencies
 
@@ -33,13 +33,13 @@ class ObjectHelperModelImplementation<RecordType extends Record<RecordType>>
 	// properties
 
 	@Setter
-	ObjectModel<RecordType> model;
+	ObjectModel <RecordType> model;
 
 	@Setter
-	ObjectHelper<RecordType> objectHelper;
+	ObjectHelper <RecordType> objectHelper;
 
 	@Setter
-	ObjectDatabaseHelper<RecordType> objectDatabaseHelper;
+	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
 
 	@Setter
 	ObjectManager objectManager;
@@ -81,7 +81,7 @@ class ObjectHelperModelImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	Class<?> parentClass () {
+	Class <? extends Record <?>> parentClass () {
 
 		if (model.isRooted ()) {
 

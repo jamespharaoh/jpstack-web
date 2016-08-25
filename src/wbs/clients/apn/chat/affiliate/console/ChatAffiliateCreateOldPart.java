@@ -2,7 +2,7 @@ package wbs.clients.apn.chat.affiliate.console;
 
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -128,7 +128,7 @@ class ChatAffiliateCreateOldPart
 				schemeEntry.getValue (),
 
 				ifThenElse (
-					stringEqual (
+					stringEqualSafe (
 						schemeEntry.getValue ().toString (),
 						requestContext.getForm ("chatScheme")),
 					() -> " selected",

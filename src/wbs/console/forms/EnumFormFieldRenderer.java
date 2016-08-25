@@ -8,7 +8,7 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalMapOptional;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
@@ -234,7 +234,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 					name ()));
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				parameterValue,
 				"none")
 		) {

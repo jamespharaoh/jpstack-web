@@ -29,7 +29,7 @@ class ObjectHelperChildrenImplementation<RecordType extends Record<RecordType>>
 	ObjectHelper<RecordType> objectHelper;
 
 	@Setter
-	ObjectDatabaseHelper<RecordType> objectDatabaseHelper;
+	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
 
 	@Setter
 	ObjectManager objectManager;
@@ -37,7 +37,7 @@ class ObjectHelperChildrenImplementation<RecordType extends Record<RecordType>>
 	// implementation
 
 	@Override
-	public <ChildType extends Record<?>>
+	public <ChildType extends Record <?>>
 	List <ChildType> getChildren (
 			@NonNull Record <?> object,
 			@NonNull Class <ChildType> childClass) {

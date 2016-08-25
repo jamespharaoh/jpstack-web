@@ -7,7 +7,7 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.emptyStringToAbsent;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.TimeUtils.dateToInstantNullSafe;
 
 import java.io.Serializable;
@@ -258,7 +258,7 @@ class ChatUserSearchOldAction
 		// check we are not being stupid
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				searchOutput,
 				"imageZip")
 		) {

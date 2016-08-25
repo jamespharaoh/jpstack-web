@@ -12,7 +12,7 @@ interface ModelMethods {
 	// identity
 
 	String objectName ();
-	Class<? extends Record<?>> objectClass ();
+	Class <? extends Record <?>> objectClass ();
 	String objectTypeCode ();
 
 	String tableName ();
@@ -47,8 +47,8 @@ interface ModelMethods {
 	Boolean create ();
 	Boolean mutable ();
 
-	Class<? extends Record<?>> parentClass ();
-	Class<? extends ObjectHelper<?>> helperClass ();
+	Class <? extends Record<?>> parentClass ();
+	Class <? extends ObjectHelper<?>> helperClass ();
 
 	// property accessors
 

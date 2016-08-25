@@ -4,7 +4,7 @@ import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalFromJava;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
@@ -172,7 +172,7 @@ class SubscriptionCommand
 				number);
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				command.getCode (),
 				"subscribe")
 		) {
@@ -180,7 +180,7 @@ class SubscriptionCommand
 			return doSubscribe ();
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				command.getCode (),
 				"unsubscribe")
 		) {

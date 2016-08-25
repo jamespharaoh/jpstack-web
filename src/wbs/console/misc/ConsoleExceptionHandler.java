@@ -1,6 +1,6 @@
 package wbs.console.misc;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -150,7 +150,7 @@ class ConsoleExceptionHandler
 						entry.getValue ();
 
 					if (
-						stringEqual (
+						stringEqualSafe (
 							name,
 							"__repost")
 					) {

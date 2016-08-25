@@ -1,7 +1,6 @@
 package wbs.applications.imchat.api;
 
-
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.MapUtils.mapIsNotEmpty;
 import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 
 import java.util.Map;
@@ -201,7 +200,7 @@ class ImChatCustomerCreateAction
 				createRequest.details ());
 
 		if (
-			isNotEmpty (
+			mapIsNotEmpty (
 				detailErrors)
 		) {
 

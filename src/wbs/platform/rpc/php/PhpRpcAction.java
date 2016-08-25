@@ -1,6 +1,6 @@
 package wbs.platform.rpc.php;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -575,7 +575,7 @@ class PhpRpcAction
 			// ignore encoding, this is handled separately
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"encoding")
 			) {

@@ -1,9 +1,9 @@
 package wbs.framework.entity.record;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -63,7 +63,7 @@ class UnsavedRecordDetector {
 		}
 
 		if (
-			isNotEmpty (
+			collectionIsNotEmpty (
 				currentFrame.unsavedRecords)
 		) {
 

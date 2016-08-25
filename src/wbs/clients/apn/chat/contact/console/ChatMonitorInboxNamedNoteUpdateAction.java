@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.Misc.stringTrim;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -144,7 +144,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 		ChatUserRec otherChatUser;
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				typeString,
 				"user")
 		) {
@@ -156,7 +156,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 				monitorInbox.getMonitorChatUser ();
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				typeString,
 				"monitor")
 		) {
@@ -187,7 +187,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 				: "";
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				newValue,
 				oldValue)
 		) {

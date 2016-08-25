@@ -8,7 +8,7 @@ import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringInSafe;
 
@@ -128,7 +128,7 @@ class ChatUserImageListAction
 				throw new RuntimeException ();
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					command,
 					"remove")
 			) {
@@ -209,7 +209,7 @@ class ChatUserImageListAction
 						chatUserImage.getFullMedia ());
 
 				if (
-					stringEqual (
+					stringEqualSafe (
 						command,
 						"rotate_ccw")
 				) {
@@ -223,7 +223,7 @@ class ChatUserImageListAction
 				}
 
 				if (
-					stringEqual (
+					stringEqualSafe (
 						command,
 						"rotate_cw")
 				) {
@@ -265,7 +265,7 @@ class ChatUserImageListAction
 
 				long diff =
 					ifThenElse (
-						stringEqual (
+						stringEqualSafe (
 							command,
 							"move_up"),
 						() -> -1l,

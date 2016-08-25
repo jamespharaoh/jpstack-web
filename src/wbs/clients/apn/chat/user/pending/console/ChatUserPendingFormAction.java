@@ -10,7 +10,7 @@ import static wbs.framework.utils.etc.NumberUtils.equalToZero;
 import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.NumberUtils.moreThan;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.sms.gsm.GsmUtils.gsmStringLength;
 
@@ -331,7 +331,7 @@ class ChatUserPendingFormAction
 
 			.setStatus (
 				ifThenElse (
-					stringEqual (
+					stringEqualSafe (
 						editedName,
 						chatUserName.getOriginalName ()),
 					() -> ChatUserInfoStatus.moderatorApproved,
@@ -432,7 +432,7 @@ class ChatUserPendingFormAction
 
 			.setStatus (
 				ifThenElse (
-					stringEqual (
+					stringEqualSafe (
 						editedInfo,
 						chatUserInfo.getOriginalText ().getText ()),
 					() -> ChatUserInfoStatus.moderatorApproved,

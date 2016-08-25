@@ -1,6 +1,6 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
@@ -153,7 +153,7 @@ class QueueManager {
 				queue.getQueueType ());
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				queueTypeSpec.preferredUserDelay (),
 				"0")
 		) {

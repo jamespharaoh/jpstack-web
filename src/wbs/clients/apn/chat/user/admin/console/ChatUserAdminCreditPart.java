@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.user.admin.console;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
 import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
-import static wbs.framework.utils.etc.Misc.isEmpty;
 
 import javax.inject.Inject;
 
@@ -174,7 +174,7 @@ class ChatUserAdminCreditPart
 			"</tr>\n");
 
 		if (
-			isEmpty (
+			collectionIsEmpty (
 				chatUser.getChatUserCredits ())
 		) {
 

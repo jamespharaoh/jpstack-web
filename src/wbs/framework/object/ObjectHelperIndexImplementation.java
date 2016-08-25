@@ -51,7 +51,7 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	ObjectHelperIndexImplementation<RecordType> setup () {
+	ObjectHelperIndexImplementation <RecordType> setup () {
 
 		// parent id and index
 
@@ -145,7 +145,7 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	Optional<RecordType> findByIndex (
+	Optional <RecordType> findByIndex (
 			@NonNull Record <?> parent,
 			@NonNull Long index) {
 
@@ -237,7 +237,7 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 			@NonNull Long indexEnd) {
 
 		ObjectHelper <?> parentHelper =
-			objectManager.objectHelperForObject (
+			objectManager.objectHelperForObjectRequired (
 				parent);
 
 		GlobalId parentGlobalId =

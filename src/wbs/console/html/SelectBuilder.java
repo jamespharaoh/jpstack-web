@@ -1,7 +1,7 @@
 package wbs.console.html;
 
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.LinkedHashMap;
@@ -96,7 +96,7 @@ class SelectBuilder {
 					optionValue,
 
 					ifThenElse (
-						stringEqual (
+						stringEqualSafe (
 							optionValue,
 							selectedValue),
 						() -> " selected",

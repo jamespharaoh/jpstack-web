@@ -1,13 +1,13 @@
 package wbs.console.object;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.maybeList;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
-import static wbs.framework.utils.etc.StringUtils.startsWith;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringStartsWithSimple;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,11 +15,10 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
+import lombok.NonNull;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ConsoleContextBuilderContainerImplementation;
@@ -386,9 +385,9 @@ class ObjectContextBuilder<
 					resolvedContextLink.localName ());
 
 			boolean link =
-				startsWith (
-					resolvedContextName,
-					"link:");
+				stringStartsWithSimple (
+					"link:",
+					resolvedContextName);
 
 			String resolvedPathPrefix =
 				joinWithoutSeparator (

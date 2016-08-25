@@ -3,7 +3,7 @@ package wbs.clients.apn.chat.contact.console;
 import static wbs.framework.utils.etc.Misc.stringTrim;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
 import javax.inject.Inject;
 
@@ -211,7 +211,7 @@ class ChatMessagePendingFormAction
 				transaction.now ());
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				messageParam,
 				chatMessage.getOriginalText ().getText ())
 		) {
@@ -227,7 +227,7 @@ class ChatMessagePendingFormAction
 					chatMessage.getOriginalText ());
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				messageParam,
 				chatMessage.getEditedText ().getText ())
 		) {

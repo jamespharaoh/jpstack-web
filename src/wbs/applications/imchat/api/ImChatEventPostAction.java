@@ -6,7 +6,7 @@ import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.objectToString;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
@@ -201,7 +201,7 @@ class ImChatEventPostAction
 			// write exceptions
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					eventItemRequest.type (),
 					"unhandled-error")
 			) {
@@ -267,7 +267,7 @@ class ImChatEventPostAction
 					GenericExceptionResolution.ignoreWithThirdPartyWarning);
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					eventItemRequest.type (),
 					"api-error")
 			) {

@@ -1,6 +1,5 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.stringTrim;
@@ -264,10 +263,12 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 					valueParam);
 
 		if (
-			referenceEqualWithClass (
+			optionalEqualOrNotPresentWithClass (
 				TextRec.class,
-				oldValue,
-				newValue)
+				optionalFromNullable (
+					oldValue),
+				optionalFromNullable (
+					newValue))
 		) {
 
 			return textResponder.get ()

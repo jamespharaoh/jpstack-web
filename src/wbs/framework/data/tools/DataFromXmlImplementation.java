@@ -1,8 +1,8 @@
 package wbs.framework.data.tools;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.LogicUtils.parseBooleanYesNo;
 import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.toEnumGeneric;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
@@ -784,10 +784,10 @@ class DataFromXmlImplementation
 
 			if (
 
-				isNotEmpty (
+				collectionIsNotEmpty (
 					childElement.attributes ())
 
-				|| isNotEmpty (
+				|| collectionIsNotEmpty (
 					childElement.elements ())
 
 				|| ! tryToSetScalarField (

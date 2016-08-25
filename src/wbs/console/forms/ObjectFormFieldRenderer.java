@@ -6,7 +6,7 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.requiredSuccess;
 import static wbs.framework.utils.etc.Misc.successResult;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collection;
@@ -241,7 +241,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 				optionEntry.getValue ();
 
 			ObjectHelper<?> objectHelper =
-				objectManager.objectHelperForObject (
+				objectManager.objectHelperForObjectRequired (
 					optionValue);
 
 			boolean selected =
@@ -355,7 +355,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 					name ()));
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				param,
 				"none")
 		) {

@@ -1,7 +1,7 @@
 package wbs.integrations.mediaburst.daemon;
 
 import static wbs.framework.utils.etc.NumberUtils.integerInSafe;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -149,7 +149,7 @@ class MediaburstProteusSender
 		// pick a handler
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				proteusOutbox.message.getMessageType ().getCode (),
 				"sms")
 		) {
@@ -157,7 +157,7 @@ class MediaburstProteusSender
 			// nothing to do
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				proteusOutbox.message.getMessageType ().getCode (),
 				"wap_push")
 		) {
@@ -405,7 +405,7 @@ class MediaburstProteusSender
 		// add normal sms stuff where appropriate
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				state.message.getMessageType ().getCode (),
 				"sms")
 		) {
@@ -426,7 +426,7 @@ class MediaburstProteusSender
 		// add wap push stuff where appropriate
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				state.message.getMessageType ().getCode (),
 				"wap_push")
 		) {

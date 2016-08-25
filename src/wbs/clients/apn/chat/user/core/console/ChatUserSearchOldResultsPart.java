@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.Misc.sum;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
@@ -232,7 +232,7 @@ class ChatUserSearchOldResultsPart
 				ifNull (chatUser.getName (), "-"));
 
 			if (
-				isNotEmpty (
+				collectionIsNotEmpty (
 					chatUser.getChatUserImageList ())
 			) {
 

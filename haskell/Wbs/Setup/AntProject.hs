@@ -266,7 +266,8 @@ writeBuildFile world = do
 			sattr "debug" "on",
 			sattr "includeantruntime" "false",
 			sattr "classpathref" "classpath",
-			sattr "encoding" "utf8"
+			sattr "encoding" "utf8",
+			sattr "target" "1.8"
 		] ++ attrs) elems
 
 	let makeCleanTargets =
@@ -784,7 +785,7 @@ writeBuildFile world = do
 				] [
 					makeArgValue "wbs-test",
 					makeArgValue "wbs.test",
-					makeArgValue "model-meta,model-generate,utils",
+					makeArgValue "generate,model-meta,model-generate,utils",
 					makeArgValue "",
 					makeArgValue (
 						"wbs.framework.entity.generate.ModelGeneratorTool"
@@ -805,7 +806,7 @@ writeBuildFile world = do
 					makeArgValue "wbs-test",
 					makeArgValue "wbs.test",
 					makeArgValue (
-						"entity,model,model-meta,model-generate,schema,utils"
+						"entity,generate,model,model-meta,object-generate,schema,utils"
 					),
 					makeArgValue "",
 					makeArgValue (

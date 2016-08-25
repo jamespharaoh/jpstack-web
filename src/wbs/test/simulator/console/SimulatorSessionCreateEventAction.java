@@ -2,8 +2,8 @@ package wbs.test.simulator.console;
 
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.LogicUtils.parseBooleanTrueFalseRequired;
-import static wbs.framework.utils.etc.StringUtils.doesNotStartWith;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.doesNotStartWithSimple;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
@@ -129,7 +129,7 @@ class SimulatorSessionCreateEventAction
 				requestContext.getForm ("type");
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					type,
 					"sendMessage")
 			) {
@@ -137,7 +137,7 @@ class SimulatorSessionCreateEventAction
 			}
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					type,
 					"deliveryReport")
 			) {
@@ -454,7 +454,7 @@ class SimulatorSessionCreateEventAction
 		) {
 
 			if (
-				doesNotStartWith (
+				doesNotStartWithSimple (
 					number,
 					simulatorRoute.getPrefix ())
 			) {

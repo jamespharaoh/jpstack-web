@@ -3,9 +3,9 @@ package wbs.framework.object;
 import wbs.framework.entity.record.Record;
 
 public
-interface ObjectHelperModelMethods<RecordType extends Record<RecordType>> {
+interface ObjectHelperModelMethods <RecordType extends Record <RecordType>> {
 
-	Class<RecordType> objectClass ();
+	Class <RecordType> objectClass ();
 	String objectName ();
 	String objectTypeCode ();
 	Long objectTypeId ();
@@ -16,7 +16,7 @@ interface ObjectHelperModelMethods<RecordType extends Record<RecordType>> {
 	String shortName ();
 	String shortNamePlural ();
 
-	Class<?> parentClass ();
+	Class <? extends Record <?>> parentClass ();
 	String parentFieldName ();
 	String parentLabel ();
 	Boolean parentExists ();

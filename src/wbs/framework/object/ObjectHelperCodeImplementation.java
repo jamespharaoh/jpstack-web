@@ -363,7 +363,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 			@NonNull String... codes) {
 
 		ObjectHelper<?> parentHelper =
-			objectManager.objectHelperForObject (
+			objectManager.objectHelperForObjectRequired (
 				parent);
 
 		GlobalId parentGlobalId =
@@ -385,7 +385,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 			@NonNull String... codes) {
 
 		ObjectHelper<?> parentHelper =
-			objectManager.objectHelperForObject (
+			objectManager.objectHelperForObjectRequired (
 				parent);
 
 		GlobalId parentGlobalId =

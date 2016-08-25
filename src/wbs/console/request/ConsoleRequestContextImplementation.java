@@ -9,7 +9,7 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -434,7 +434,7 @@ class ConsoleRequestContextImplementation
 				entry ->
 					new SimpleEntry<> (
 						entry.getKey (),
-						stringEqual (entry.getKey (), name)
+						stringEqualSafe (entry.getKey (), name)
 							? value
 							: entry.getValue ()))
 

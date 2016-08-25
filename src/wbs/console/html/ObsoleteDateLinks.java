@@ -1,6 +1,6 @@
 package wbs.console.html;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.PrintWriter;
@@ -41,7 +41,7 @@ class ObsoleteDateLinks {
 		) {
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					entry.getKey (),
 					field)
 			) {

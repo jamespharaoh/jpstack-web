@@ -1,7 +1,7 @@
 package wbs.integrations.mig.logic;
 
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
@@ -64,7 +64,7 @@ class MigLogicImplementation
 			optionalIsPresent (
 				currentNetworkOptional)
 
-			&& stringEqual (
+			&& stringEqualSafe (
 				connectionNetwork.getSuffix (),
 				currentNetworkOptional.get ().getSuffix ())
 

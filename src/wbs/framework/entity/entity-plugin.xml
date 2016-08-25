@@ -45,13 +45,15 @@
 		<component class="meta.YesNoFieldSpec"/>
 	</layer>
 
+	<layer name="generate">
+		<component class="generate.ModelGenerateComponents"/>
+	</layer>
+
 	<layer name="model-generate">
 
-		<component class="generate.ModelGenerateComponents"/>
 		<component class="generate.ModelInterfacesGenerator"/>
 		<component class="generate.ModelRecordGenerator"/>
 		<component class="generate.ModelWriterManager"/>
-		<component class="generate.ObjectHelperGenerator"/>
 
 		<component class="generate.collections.AssociativeCollectionWriter"/>
 		<component class="generate.collections.AssociativeListWriter"/>
@@ -89,6 +91,10 @@
 		<component class="generate.fields.TypeFieldWriter"/>
 		<component class="generate.fields.YesNoFieldWriter"/>
 
+	</layer>
+
+	<layer name="object-generate">
+		<component class="generate.ObjectHelperGenerator"/>
 	</layer>
 
 	<layer name="entity">

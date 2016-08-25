@@ -34,7 +34,7 @@
   </target>
   <target name="just-build-framework">
     <mkdir dir="work/bin"/>
-    <javac destdir="work/bin" debug="on" includeantruntime="false" classpathref="classpath" encoding="utf8">
+    <javac destdir="work/bin" debug="on" includeantruntime="false" classpathref="classpath" encoding="utf8" target="1.8">
       <include name="wbs/api/**"/>
       <include name="wbs/console/**"/>
       <include name="wbs/framework/**"/>
@@ -50,7 +50,7 @@
     </jar>
   </target>
   <target name="just-build-meta">
-    <javac destdir="work/bin" debug="on" includeantruntime="false" classpathref="classpath" encoding="utf8">
+    <javac destdir="work/bin" debug="on" includeantruntime="false" classpathref="classpath" encoding="utf8" target="1.8">
       <src path="src"/>
       <src path="work/bin"/>
       <include name="wbs/api/**"/>
@@ -68,7 +68,7 @@
     <copy file="wbs-build.xml" todir="work/bin"/>
   </target>
   <target name="just-build-entity">
-    <javac destdir="work/bin" debug="on" includeantruntime="false" classpathref="classpath" encoding="utf8">
+    <javac destdir="work/bin" debug="on" includeantruntime="false" classpathref="classpath" encoding="utf8" target="1.8">
       <src path="src"/>
       <src path="work/bin"/>
       <src path="work/generated"/>
@@ -90,7 +90,7 @@
     <copy file="wbs-build.xml" todir="work/bin"/>
   </target>
   <target name="just-build-rest">
-    <javac destdir="work/bin" debug="on" includeantruntime="false" classpathref="classpath" encoding="utf8">
+    <javac destdir="work/bin" debug="on" includeantruntime="false" classpathref="classpath" encoding="utf8" target="1.8">
       <src path="src"/>
       <src path="work/bin"/>
       <src path="work/generated"/>
@@ -590,7 +590,7 @@
     <java classname="wbs.framework.application.tools.BeanRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
-      <arg value="model-meta,model-generate,utils"/>
+      <arg value="generate,model-meta,model-generate,utils"/>
       <arg value=""/>
       <arg value="wbs.framework.entity.generate.ModelGeneratorTool"/>
       <arg value="generateModels"/>
@@ -600,7 +600,7 @@
     <java classname="wbs.framework.application.tools.BeanRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
-      <arg value="entity,model,model-meta,model-generate,schema,utils"/>
+      <arg value="entity,generate,model,model-meta,object-generate,schema,utils"/>
       <arg value=""/>
       <arg value="wbs.framework.entity.generate.ObjectHelperGeneratorTool"/>
       <arg value="generateObjectHelpers"/>

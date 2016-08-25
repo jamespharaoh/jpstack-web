@@ -1,6 +1,6 @@
 package wbs.framework.schema.tool;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.sql.Connection;
@@ -266,7 +266,7 @@ class SchemaTool {
 				int objectTypeId;
 	
 				if (
-					stringEqual (
+					stringEqualSafe (
 						model.objectTypeCode (),
 						"root")
 				) {

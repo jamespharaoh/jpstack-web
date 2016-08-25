@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.infosite.api;
 
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
@@ -80,7 +80,7 @@ class ChatInfoSiteImageResponder
 				"chatInfoSiteMode");
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				mode,
 				"full")
 		) {

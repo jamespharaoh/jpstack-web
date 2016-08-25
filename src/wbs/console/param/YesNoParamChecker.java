@@ -1,6 +1,6 @@
 package wbs.console.param;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 @Deprecated
@@ -44,7 +44,7 @@ class YesNoParamChecker
 		}
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				param,
 				"false")
 		) {
@@ -52,7 +52,7 @@ class YesNoParamChecker
 		}
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				param,
 				"true")
 		) {

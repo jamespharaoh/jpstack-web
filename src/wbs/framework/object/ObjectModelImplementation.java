@@ -126,13 +126,13 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	List<ModelField> fields () {
+	List <ModelField> fields () {
 		return model.fields ();
 	}
 
 	@Override
 	public
-	Map<String,ModelField> fieldsByName () {
+	Map <String, ModelField> fieldsByName () {
 		return model.fieldsByName ();
 	}
 
@@ -178,7 +178,7 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	Record<?> getParent (
+	Record <?> getParent (
 			@NonNull Record<?> object) {
 
 		return model.getParent (

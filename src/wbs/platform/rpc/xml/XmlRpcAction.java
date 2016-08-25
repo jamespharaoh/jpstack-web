@@ -2,7 +2,7 @@ package wbs.platform.rpc.xml;
 
 import static wbs.framework.utils.etc.Misc.fromHex;
 import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
@@ -410,7 +410,7 @@ class XmlRpcAction
 			element.getValue ();
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				text,
 				"true")
 		) {
@@ -418,7 +418,7 @@ class XmlRpcAction
 		}
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				text,
 				"false")
 		) {

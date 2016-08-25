@@ -1,8 +1,8 @@
 package wbs.framework.application.context;
 
-import static wbs.framework.utils.etc.CollectionUtils.iterableCount;
 import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.framework.utils.etc.IterableUtils.iterableCount;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
@@ -13,7 +13,7 @@ import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.joinWithSeparator;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringNotInSafe;
@@ -323,7 +323,7 @@ class ApplicationContextImplementation
 
 			.filter (
 				componentDefinition ->
-					stringEqual (
+					stringEqualSafe (
 						componentDefinition.scope (),
 						"singleton"))
 
@@ -380,7 +380,7 @@ class ApplicationContextImplementation
 			lock.read ();
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				componentDefinition.scope (),
 				"prototype")
 		) {
@@ -390,7 +390,7 @@ class ApplicationContextImplementation
 				initialize);
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				componentDefinition.scope (),
 				"singleton")
 		) {
@@ -1083,7 +1083,7 @@ class ApplicationContextImplementation
 				componentDefinition);
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					componentDefinition.scope (),
 					"singleton")
 			) {
@@ -1096,7 +1096,7 @@ class ApplicationContextImplementation
 			}
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					componentDefinition.scope (),
 					"prototype")
 			) {
@@ -1133,7 +1133,7 @@ class ApplicationContextImplementation
 					componentDefinition);
 
 				if (
-					stringEqual (
+					stringEqualSafe (
 						componentDefinition.scope (),
 						"singleton")
 				) {
@@ -1146,7 +1146,7 @@ class ApplicationContextImplementation
 				}
 
 				if (
-					stringEqual (
+					stringEqualSafe (
 						componentDefinition.scope (),
 						"prototype")
 				) {

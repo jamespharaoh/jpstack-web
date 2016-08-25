@@ -66,10 +66,10 @@ interface ObjectManagerMethods {
 
 	// utilities
 
-	Class <?> objectTypeCodeToClass (
+	Class <?> objectClassForTypeCodeRequired (
 			String typeCode);
 
-	ObjectHelper <?> objectHelperForTypeCode (
+	ObjectHelper <?> objectHelperForTypeCodeRequired (
 			String typeCode);
 
 	ObjectHelper <?> objectHelperForTypeId (
@@ -206,9 +206,9 @@ interface ObjectManagerMethods {
 			Record<?> dataObject);
 
 	<ObjectType extends Record<?>>
-	SortedMap<String,ObjectType> pathMap (
-			Collection<ObjectType> objects,
-			Record<?> root,
+	SortedMap <String, ObjectType> pathMap (
+			Collection <ObjectType> objects,
+			Record <?> root,
 			boolean mini);
 
 	// structured dereferncing
@@ -230,21 +230,21 @@ interface ObjectManagerMethods {
 
 	}
 
-	Optional<Class<?>> dereferenceType (
-			Optional<Class<?>> objectClass,
-			Optional<String> path);
+	Optional <Class <?>> dereferenceType (
+			Optional <Class <?>> objectClass,
+			Optional <String> path);
 
 	// object helpers
 
 	List<ObjectHelper<?>> objectHelpers ();
 
-	ObjectHelper<?> objectHelperForObjectName (
+	ObjectHelper <?> objectHelperForObjectNameRequired (
 			String objectName);
 
-	ObjectHelper<?> objectHelperForObject (
-			Record<?> object);
+	ObjectHelper <?> objectHelperForObjectRequired (
+			Record <?> object);
 
-	ObjectHelper<?> objectHelperForClassRequired (
-			Class<?> objectClass);
+	ObjectHelper <?> objectHelperForClassRequired (
+			Class <?> objectClass);
 
 }

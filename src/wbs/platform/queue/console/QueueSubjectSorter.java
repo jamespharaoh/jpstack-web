@@ -1,10 +1,10 @@
 package wbs.platform.queue.console;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
@@ -218,7 +218,7 @@ class QueueSubjectSorter {
 
 			.filter (
 				queueInfo ->
-					isNotEmpty (
+					collectionIsNotEmpty (
 						queueInfo.subjectInfos))
 
 			.collect (

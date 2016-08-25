@@ -1,35 +1,43 @@
 package wbs.framework.object;
 
+import static wbs.framework.utils.etc.MapUtils.mapItemForKey;
+import static wbs.framework.utils.etc.MapUtils.mapItemForKeyOrThrow;
+import static wbs.framework.utils.etc.MapUtils.mapWithDerivedKey;
 import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.startsWith;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
+import static wbs.framework.utils.etc.StringUtils.stringStartsWithSimple;
+import static wbs.framework.utils.etc.TypeUtils.isSubclassOf;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
+import javax.inject.Named;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
-import wbs.framework.object.ObjectHelperBuilder.ObjectHelperBuilderMethods;
 import wbs.framework.utils.etc.BeanLogic;
 
 @Accessors (fluent = true)
@@ -38,20 +46,30 @@ public
 class ObjectManagerImplementation
 	implements ObjectManager {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
-	ObjectHelperBuilder objectHelperBuilder;
-
-	@Inject
+	@SingletonDependency
 	ObjectTypeRegistry objectTypeRegistry;
+
+	@SingletonDependency
+	@Named
+	ObjectHelper <?> rootObjectHelper;
+
+	// collection dependencies
+
+	@SingletonDependency
+	Map <String, ObjectHelper <?>> objectHelpersByComponentName;
 
 	// state
 
-	ObjectHelper<?> rootHelper;
+	List <ObjectHelper <?>> objectHelpers;
+	Map <String, ObjectHelper <?>> objectHelpersByName;
+	Map <Long, ObjectHelper <?>> objectHelpersByTypeId;
+	Map <String, ObjectHelper <?>> objectHelpersByTypeCode;
+	Map <Class <?>, ObjectHelper <?>> objectHelpersByClass;
 
 	// init
 
@@ -59,22 +77,42 @@ class ObjectManagerImplementation
 	public
 	void init () {
 
-		// lookup root object helper, which we use a lot
+		// index object helpers
 
-		rootHelper =
-			objectHelperBuilder.forObjectName (
-				"root");
+		objectHelpers =
+			ImmutableList.copyOf (
+				objectHelpersByComponentName.values ());
+
+		objectHelpersByName =
+			mapWithDerivedKey (
+				objectHelpers,
+				ObjectHelper::objectName);
+
+		objectHelpersByTypeId =
+			mapWithDerivedKey (
+				objectHelpers,
+				ObjectHelper::objectTypeId);
+
+		objectHelpersByTypeCode =
+			mapWithDerivedKey (
+				objectHelpers,
+				ObjectHelper::objectTypeCode);
+
+		objectHelpersByClass =
+			mapWithDerivedKey (
+				objectHelpers,
+				ObjectHelper::objectClass);
 
 		// inject us back into the object helpers
 
-		objectHelperBuilder.asList ().forEach (
+		objectHelpers.forEach (
 			objectHelper -> {
 
-			ObjectHelperBuilderMethods objectHelperBuilder =
-				(ObjectHelperBuilderMethods)
+			ObjectHelperImplementation objectHelperImplementation =
+				(ObjectHelperImplementation)
 				objectHelper;
 
-			objectHelperBuilder.objectManager (
+			objectHelperImplementation.objectManager (
 				this);
 
 		});
@@ -85,21 +123,31 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForTypeCode (
+	ObjectHelper<?> objectHelperForTypeCodeRequired (
 			@NonNull String typeCode) {
 
-		return objectHelperBuilder.forObjectTypeCode (
-			typeCode);
+		return mapItemForKeyOrThrow (
+			objectHelpersByTypeCode,
+			typeCode,
+			() -> new NoSuchElementException (
+				stringFormat (
+					"No object helper for type code '%s'",
+					typeCode)));
 
 	}
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForObjectName (
+	ObjectHelper<?> objectHelperForObjectNameRequired (
 			@NonNull String objectName) {
 
-		return objectHelperBuilder
-			.forObjectName (objectName);
+		return mapItemForKeyOrThrow (
+			objectHelpersByName,
+			objectName,
+			() -> new NoSuchElementException (
+				stringFormat (
+					"No object helper for object name '%s'",
+					objectName)));
 
 	}
 
@@ -110,7 +158,7 @@ class ObjectManagerImplementation
 			@NonNull Class<ChildType> childClass) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForObject (object);
+			objectHelperForObjectRequired (object);
 
 		return objectHelper.getChildren (
 			object,
@@ -134,11 +182,12 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	Class<?> objectTypeCodeToClass (
+	Class <?> objectClassForTypeCodeRequired (
 			@NonNull String typeCode) {
 
-		ObjectHelper<?> objectHelper =
-			objectHelperForTypeCode (typeCode);
+		ObjectHelper <?> objectHelper =
+			objectHelperForTypeCodeRequired (
+				typeCode);
 
 		return objectHelper.objectClass ();
 
@@ -146,8 +195,8 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForObject (
-			@NonNull Record<?> object) {
+	ObjectHelper <?> objectHelperForObjectRequired (
+			@NonNull Record <?> object) {
 
 		return objectHelperForClassRequired (
 			object.getClass ());
@@ -156,11 +205,42 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForClassRequired (
-			@NonNull Class<?> objectClass) {
+	ObjectHelper <?> objectHelperForClassRequired (
+			@NonNull Class <?> objectClass) {
 
-		return objectHelperBuilder.forObjectClassRequired (
-			objectClass);
+		Class <?> currentObjectClass =
+			objectClass;
+
+		while (
+			isSubclassOf (
+				Record.class,
+				currentObjectClass)
+		) {
+
+			Optional <ObjectHelper <?>> objectHelperOptional =
+				mapItemForKey (
+					objectHelpersByClass,
+					currentObjectClass);
+
+			if (
+				optionalIsPresent (
+					objectHelperOptional)
+			) {
+
+				return optionalGetRequired (
+					objectHelperOptional);
+
+			}
+
+			currentObjectClass =
+				currentObjectClass.getSuperclass ();
+
+		}
+
+		throw new NoSuchElementException (
+			stringFormat (
+				"No object helper for object class %s",
+				objectClass.getSimpleName ()));
 
 	}
 
@@ -176,7 +256,7 @@ class ObjectManagerImplementation
 			return "-";
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForObject (object);
+			objectHelperForObjectRequired (object);
 
 		if (objectHelper.isRoot ())
 			return "root";
@@ -194,7 +274,7 @@ class ObjectManagerImplementation
 				objectHelper.getParent (object);
 
 			ObjectHelper<?> parentHelper =
-				objectHelperForObject (parent);
+				objectHelperForObjectRequired (parent);
 
 			// work out this part
 
@@ -314,7 +394,7 @@ class ObjectManagerImplementation
 			Record<?> object) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForObject (object);
+			objectHelperForObjectRequired (object);
 
 		return stringFormat (
 			"%s#%s",
@@ -329,7 +409,7 @@ class ObjectManagerImplementation
 			@NonNull Record<?> object) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForObject (object);
+			objectHelperForObjectRequired (object);
 
 		return objectHelper.getGlobalId (
 			object);
@@ -342,7 +422,7 @@ class ObjectManagerImplementation
 			@NonNull Record<?> object) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForObject (object);
+			objectHelperForObjectRequired (object);
 
 		return objectHelper
 			.getParentGlobalId (object);
@@ -350,10 +430,10 @@ class ObjectManagerImplementation
 	}
 
 	@Override
-	public <RecordType extends Record<?>>
-	SortedMap<String,RecordType> pathMap (
-			@NonNull Collection<RecordType> objects,
-			Record<?> root,
+	public <RecordType extends Record <?>>
+	SortedMap <String, RecordType> pathMap (
+			@NonNull Collection <RecordType> objects,
+			Record <?> root,
 			boolean mini) {
 
 		SortedMap<String,RecordType> ret =
@@ -397,10 +477,12 @@ class ObjectManagerImplementation
 	String getCode (
 			@NonNull Record<?> object) {
 
-		ObjectHelper<?> objectHelper =
-			objectHelperForClassRequired (object.getClass ());
+		ObjectHelper <?> objectHelper =
+			objectHelperForClassRequired (
+				object.getClass ());
 
-		return objectHelper.getCode (object);
+		return objectHelper.getCode (
+			object);
 
 	}
 
@@ -409,8 +491,8 @@ class ObjectManagerImplementation
 	Record<?> findObject (
 			@NonNull GlobalId objectGlobalId) {
 
-		ObjectHelper<?> objectHelper =
-			objectHelperBuilder.forObjectTypeId (
+		ObjectHelper <?> objectHelper =
+			objectHelpersByTypeId.get (
 				objectGlobalId.typeId ());
 
 		return optionalOrNull (
@@ -425,7 +507,7 @@ class ObjectManagerImplementation
 			@NonNull Record<?> parent) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForObject (parent);
+			objectHelperForObjectRequired (parent);
 
 		return objectHelper.getMinorChildren (
 			parent);
@@ -438,7 +520,7 @@ class ObjectManagerImplementation
 			@NonNull ItemType object) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForObject (object);
+			objectHelperForObjectRequired (object);
 
 		return objectHelper.remove (
 			object);
@@ -451,7 +533,7 @@ class ObjectManagerImplementation
 			@NonNull Record<?> object) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForObject (object);
+			objectHelperForObjectRequired (object);
 
 		return objectHelper.objectTypeCode ();
 
@@ -463,7 +545,7 @@ class ObjectManagerImplementation
 			@NonNull Record<?> object) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForObject (object);
+			objectHelperForObjectRequired (object);
 
 		return objectHelper.objectTypeId ();
 
@@ -484,20 +566,19 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForTypeId (
+	ObjectHelper <?> objectHelperForTypeId (
 			@NonNull Long typeId) {
 
-		return objectHelperBuilder.forObjectTypeId (
+		return objectHelpersByTypeId.get (
 			typeId);
 
 	}
 
 	@Override
 	public
-	List<ObjectHelper<?>> objectHelpers () {
+	List <ObjectHelper <?>> objectHelpers () {
 
-		return objectHelperBuilder
-			.asList ();
+		return objectHelpers;
 
 	}
 
@@ -526,7 +607,7 @@ class ObjectManagerImplementation
 			object;
 
 		ObjectHelper<?> currentHelper =
-			objectHelperForObject (current);
+			objectHelperForObjectRequired (current);
 
 		for (;;) {
 
@@ -547,7 +628,7 @@ class ObjectManagerImplementation
 				currentHelper.getParent (current);
 
 			currentHelper =
-				objectHelperForObject (current);
+				objectHelperForObjectRequired (current);
 
 		}
 
@@ -568,7 +649,7 @@ class ObjectManagerImplementation
 		) {
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					hintEntry.getKey (),
 					path)
 			) {
@@ -576,9 +657,9 @@ class ObjectManagerImplementation
 				return hintEntry.getValue ();
 
 			} else if (
-				startsWith (
-					path,
-					hintEntry.getKey () + ".")
+				stringStartsWithSimple (
+					hintEntry.getKey () + ".",
+					path)
 			) {
 
 				path =
@@ -606,17 +687,17 @@ class ObjectManagerImplementation
 		) {
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					pathPart,
 					"root")
 			) {
 
 				object =
-					rootHelper.findRequired (
+					rootObjectHelper.findRequired (
 						0l);
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					pathPart,
 					"this")
 			) {
@@ -631,7 +712,7 @@ class ObjectManagerImplementation
 				doNothing ();
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					pathPart,
 					"parent")
 			) {
@@ -641,7 +722,7 @@ class ObjectManagerImplementation
 						(Record<?>) object);
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					pathPart,
 					"grandparent")
 			) {
@@ -653,7 +734,7 @@ class ObjectManagerImplementation
 						object));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					pathPart,
 					"greatgrandparent")
 			) {
@@ -720,7 +801,7 @@ class ObjectManagerImplementation
 				return Optional.absent ();
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					pathPart,
 					"this")
 			) {
@@ -728,7 +809,7 @@ class ObjectManagerImplementation
 				doNothing ();
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					pathPart,
 					"parent")
 			) {
@@ -738,7 +819,7 @@ class ObjectManagerImplementation
 						objectClass);
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					pathPart,
 					"grandparent")
 			) {
@@ -749,7 +830,7 @@ class ObjectManagerImplementation
 						objectClass));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					pathPart,
 					"greatgrandparent")
 			) {
@@ -761,14 +842,14 @@ class ObjectManagerImplementation
 						objectClass)));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					pathPart,
 					"root")
 			) {
 
 				objectClass =
 					Optional.of (
-						rootHelper.objectClass ());
+						rootObjectHelper.objectClass ());
 
 			} else {
 
@@ -788,10 +869,10 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	<ObjectType extends Record<ObjectType>>
-	Optional<ObjectType> getAncestor (
-			Class<ObjectType> ancestorClass,
-			Record<?> object) {
+	<ObjectType extends Record <ObjectType>>
+	Optional <ObjectType> getAncestor (
+			Class <ObjectType> ancestorClass,
+			Record <?> object) {
 
 		for (;;) {
 
@@ -811,7 +892,7 @@ class ObjectManagerImplementation
 			// stop at root
 
 			if (
-				rootHelper.objectClass ().isInstance (
+				rootObjectHelper.objectClass ().isInstance (
 					object)
 			) {
 

@@ -2,7 +2,7 @@ package wbs.clients.apn.chat.user.core.hibernate;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collection;
@@ -689,7 +689,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"gender")
 			) {
@@ -700,7 +700,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"locPlace")
 			) {
@@ -711,7 +711,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 				key,
 				"orient")
 			) {
@@ -722,7 +722,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"typeIn")
 			) {
@@ -745,7 +745,7 @@ class ChatUserDaoHibernate
 							"_chatUser.gender"));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"genderIn")
 			) {
@@ -772,7 +772,7 @@ class ChatUserDaoHibernate
 				);
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"orientIn")
 			) {
@@ -808,7 +808,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"creditFailedGte")
 			) {
@@ -819,7 +819,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"creditFailedLte")
 			) {
@@ -830,7 +830,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"creditNoReportGte")
 			) {
@@ -841,7 +841,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"creditNoReportLte")
 			) {
@@ -852,7 +852,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"valueSinceEverGte")
 			) {
@@ -863,7 +863,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"valueSinceEverLte")
 			) {
@@ -874,7 +874,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"onlineAfter")
 			) {
@@ -908,7 +908,7 @@ class ChatUserDaoHibernate
 						onlineAfterCriteria));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"deliveryMethodIn")
 			) {
@@ -919,7 +919,7 @@ class ChatUserDaoHibernate
 						(Collection<?>) value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"lastMessagePollBefore")
 			) {
@@ -930,7 +930,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"lastActionAfter")
 			) {
@@ -941,7 +941,7 @@ class ChatUserDaoHibernate
 						value));
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"lastActionBefore")
 			) {
@@ -975,7 +975,7 @@ class ChatUserDaoHibernate
 				}
 
 			} else if (
-				stringEqual (
+				stringEqualSafe (
 					key,
 					"limit")
 			) {

@@ -1,6 +1,6 @@
 package wbs.console.param;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
 public
 class CheckboxParamChecker
@@ -28,7 +28,7 @@ class CheckboxParamChecker
 			param.trim ();
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				param,
 				"on")
 		) {

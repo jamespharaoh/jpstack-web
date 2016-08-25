@@ -1,7 +1,7 @@
 package wbs.framework.hibernate;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
 import static wbs.framework.utils.etc.LogicUtils.notEqualSafe;
-import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
@@ -84,11 +84,11 @@ class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	List<RecordType> findMany (
-			@NonNull List<Long> ids) {
+	List <RecordType> findMany (
+			@NonNull List <Long> ids) {
 
 		if (
-			isEmpty (
+			collectionIsEmpty (
 				ids)
 		) {
 			return ImmutableList.of ();

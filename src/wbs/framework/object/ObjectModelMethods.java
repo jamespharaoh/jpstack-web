@@ -3,17 +3,17 @@ package wbs.framework.object;
 import wbs.framework.entity.record.Record;
 
 public
-interface ObjectModelMethods<RecordType extends Record<RecordType>> {
+interface ObjectModelMethods <RecordType extends Record <RecordType>> {
 
 	Long objectTypeId ();
 	String objectTypeCode ();
 
 	Long parentTypeId ();
-	Class<?> parentClass ();
+	Class <? extends Record <?>> parentClass ();
 
 	Object daoImplementation ();
-	Class<?> daoInterface ();
+	Class <?> daoInterface ();
 
-	ObjectHooks<RecordType> hooks ();
+	ObjectHooks <RecordType> hooks ();
 
 }

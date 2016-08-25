@@ -3,7 +3,7 @@ package wbs.console.supervisor;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.localTime;
 
@@ -425,7 +425,7 @@ class SupervisorPart
 					"<a",
 					" class=\"%h\"",
 					ifThenElse (
-						stringEqual (
+						stringEqualSafe (
 							oneSupervisorConfig.name (),
 							selectedSupervisorConfigName),
 						() -> "selected",

@@ -1,7 +1,7 @@
 package wbs.integrations.mig.daemon;
 
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -115,7 +115,7 @@ class MigSender
 		// pick a handler
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				migOutbox.message.getMessageType ().getCode (),
 				"sms")
 		) {
@@ -123,7 +123,7 @@ class MigSender
 			// nothing to do
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				migOutbox.message.getMessageType ().getCode (),
 				"wap_push")
 		) {
@@ -230,12 +230,12 @@ class MigSender
 		throws IOException {
 
 		boolean isPost =
-			stringEqual (
+			stringEqualSafe (
 				migOutbox.migRouteOut.getMethod (),
 				"post");
 
 		boolean isGet =
-			stringEqual (
+			stringEqualSafe (
 				migOutbox.migRouteOut.getMethod (),
 				"get");
 

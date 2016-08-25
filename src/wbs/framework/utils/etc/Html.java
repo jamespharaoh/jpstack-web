@@ -4,7 +4,7 @@ import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
 import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.framework.utils.etc.StringUtils.replaceAll;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.PrintWriter;
@@ -418,7 +418,7 @@ class Html {
 				defaultValue;
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				formValue,
 				"true")
 		) {
@@ -427,7 +427,7 @@ class Html {
 				true;
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				formValue,
 				"false")
 		) {

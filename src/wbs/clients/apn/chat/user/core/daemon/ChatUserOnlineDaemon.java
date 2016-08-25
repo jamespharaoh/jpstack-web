@@ -1,8 +1,8 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
-import static wbs.framework.utils.etc.Misc.isEmpty;
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NumberUtils.moreThanZero;
@@ -408,7 +408,7 @@ class ChatUserOnlineDaemon
 
 		if (
 
-			isEmpty (
+			collectionIsEmpty (
 				chatUser.getChatUserImageList ())
 
 			&& (
@@ -445,7 +445,7 @@ class ChatUserOnlineDaemon
 
 		if (
 
-			isNotEmpty (
+			collectionIsNotEmpty (
 				chatUser.getChatUserImageList ())
 
 			&& (

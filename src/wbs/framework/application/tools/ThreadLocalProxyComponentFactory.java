@@ -1,6 +1,6 @@
 package wbs.framework.application.tools;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.lang.reflect.InvocationHandler;
@@ -64,7 +64,7 @@ class ThreadLocalProxyComponentFactory
 		if (method.getDeclaringClass () == Control.class) {
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					method.getName (),
 					"threadLocalProxySet")
 			) {
@@ -85,7 +85,7 @@ class ThreadLocalProxyComponentFactory
 			}
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					method.getName (),
 					"threadLocalProxyReset")
 			) {

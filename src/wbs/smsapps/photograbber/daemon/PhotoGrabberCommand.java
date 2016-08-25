@@ -1,6 +1,6 @@
 package wbs.smsapps.photograbber.daemon;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
@@ -361,7 +361,7 @@ class PhotoGrabberCommand
 			case start:
 
 				if (
-					stringEqual (
+					stringEqualSafe (
 						qualifiedName,
 						"photo-grabber-response")
 				) {
@@ -381,7 +381,7 @@ class PhotoGrabberCommand
 			case inResponse:
 
 				if (
-					stringEqual (
+					stringEqualSafe (
 						qualifiedName,
 						"found")
 				) {

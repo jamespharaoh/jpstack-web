@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.adult.daemon;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -89,7 +89,7 @@ class ChatAdultDeliveryHandler
 		boolean join;
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				deliveryType.getCode (),
 				"chat_adult")
 		) {
@@ -97,7 +97,7 @@ class ChatAdultDeliveryHandler
 			join = false;
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				deliveryType.getCode (),
 				"chat_adult_join")
 		) {

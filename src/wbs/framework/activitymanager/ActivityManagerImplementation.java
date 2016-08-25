@@ -1,7 +1,7 @@
 package wbs.framework.activitymanager;
 
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
-import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.MapUtils.mapIsEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.max;
@@ -301,7 +301,7 @@ class ActivityManagerImplementation
 				stringWriter);
 
 		if (
-			isEmpty (
+			mapIsEmpty (
 				activeTasks)
 		) {
 

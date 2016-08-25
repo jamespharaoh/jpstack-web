@@ -54,7 +54,7 @@ class ConsoleHelperProviderMetaBuilder {
 			Builder builder) {
 
 		ObjectHelper <?> objectHelper =
-			objectManager.objectHelperForObjectName (
+			objectManager.objectHelperForObjectNameRequired (
 				consoleHelperProviderSpec.objectName ());
 
 		List <String> packageNameParts =

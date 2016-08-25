@@ -4,7 +4,7 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -195,7 +195,7 @@ class Oxygen8Sender
 		// pick a handler
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				message.getMessageType ().getCode (),
 				"sms")
 		) {
@@ -515,7 +515,7 @@ class Oxygen8Sender
 								responseTrace));
 
 				} else if (
-					stringEqual (
+					stringEqualSafe (
 						responseLines [0],
 						"101")
 				) {

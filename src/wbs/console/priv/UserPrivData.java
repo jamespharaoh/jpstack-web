@@ -3,7 +3,7 @@ package wbs.console.priv;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collection;
@@ -178,7 +178,7 @@ class UserPrivData {
 			) {
 
 				if (
-					stringEqual (
+					stringEqualSafe (
 						privCode,
 						"manage")
 				) {

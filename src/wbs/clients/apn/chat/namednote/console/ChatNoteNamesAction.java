@@ -2,7 +2,7 @@ package wbs.clients.apn.chat.namednote.console;
 
 import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
 
@@ -96,7 +96,7 @@ class ChatNoteNamesAction
 					continue;
 
 				if (
-					stringEqual (
+					stringEqualSafe (
 						newName,
 						noteName.getName ())
 				) {

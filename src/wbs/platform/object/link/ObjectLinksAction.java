@@ -1,8 +1,8 @@
 package wbs.platform.object.link;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 
@@ -269,7 +269,7 @@ class ObjectLinksAction
 		}
 
 		if (
-			isNotEmpty (
+			collectionIsNotEmpty (
 				updatedTargetObjects)
 		) {
 
@@ -307,7 +307,7 @@ class ObjectLinksAction
 		transaction.commit ();
 
 		if (
-			isNotEmpty (
+			collectionIsNotEmpty (
 				updatedTargetObjects)
 		) {
 

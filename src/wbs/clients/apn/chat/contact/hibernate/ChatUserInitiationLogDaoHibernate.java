@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.contact.hibernate;
 
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 
 import java.util.ArrayList;
@@ -135,11 +135,11 @@ class ChatUserInitiationLogDaoHibernate
 
 		if (search.filter ()) {
 
-			List<Criterion> filterCriteria =
-				new ArrayList<Criterion> ();
+			List <Criterion> filterCriteria =
+				new ArrayList<> ();
 
 			if (
-				isNotEmpty (
+				collectionIsNotEmpty (
 					search.filterChatIds ())
 			) {
 

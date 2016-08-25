@@ -8,7 +8,7 @@ import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
 import static wbs.framework.utils.etc.StringUtils.joinWithPipe;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
 
@@ -311,7 +311,7 @@ class CurrencyLogicImplementation
 		// return the result
 
 		boolean positive =
-			stringEqual (
+			stringEqualSafe (
 				ifNull (
 					matcher.group (1),
 					"+"),

@@ -11,7 +11,7 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.localDateNotEqual;
 import static wbs.framework.utils.etc.TypeUtils.classEqualSafe;
@@ -182,7 +182,7 @@ class ObjectSearchResultsPart
 			allObjectIds.size ();
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				requestContext.parameterOrDefault (
 					"page",
 					"0"),

@@ -2,7 +2,7 @@ package wbs.framework.entity.generate;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.File;
@@ -1143,7 +1143,7 @@ class ModelRecordGenerator {
 		// write function body
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				modelMeta.name (),
 				"text")
 		) {

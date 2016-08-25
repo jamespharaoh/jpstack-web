@@ -6,7 +6,7 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 import static wbs.framework.utils.etc.TypeUtils.classForName;
@@ -70,7 +70,6 @@ import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.object.ObjectHelperFactory;
 import wbs.framework.object.ObjectHooks;
 
 @Accessors (fluent = true)
@@ -353,7 +352,7 @@ class ApplicationContextBuilder {
 			@NonNull String layerName) {
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				layerName,
 				"api")
 		) {
@@ -371,7 +370,7 @@ class ApplicationContextBuilder {
 		}
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				layerName,
 				"console")
 		) {
@@ -389,7 +388,7 @@ class ApplicationContextBuilder {
 		}
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				layerName,
 				"hibernate")
 		) {
@@ -401,7 +400,7 @@ class ApplicationContextBuilder {
 		}
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				layerName,
 				"object")
 		) {
@@ -413,7 +412,7 @@ class ApplicationContextBuilder {
 		}
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				layerName,
 				"fixture")
 		) {
@@ -1075,16 +1074,27 @@ class ApplicationContextBuilder {
 				"%sObjectHelper",
 				model.name ());
 
-		String objectHelperClassName =
+		String objectHelperInterfaceName =
 			stringFormat (
 				"%s.model.%sObjectHelper",
 				model.plugin ().packageName (),
 				capitalise (
 					model.name ()));
 
-		Class <?> objectHelperClass =
+		Class <?> objectHelperInterface =
 			classForNameRequired (
-				objectHelperClassName);
+				objectHelperInterfaceName);
+
+		String objectHelperImplementationClassName =
+			stringFormat (
+				"%s.logic.%sObjectHelperImplementation",
+				model.plugin ().packageName (),
+				capitalise (
+					model.name ()));
+
+		Class <?> objectHelperImplementationClass =
+			classForNameRequired (
+				objectHelperImplementationClassName);
 
 		applicationContext.registerComponentDefinition (
 			new ComponentDefinition ()
@@ -1093,21 +1103,10 @@ class ApplicationContextBuilder {
 				objectHelperComponentName)
 
 			.componentClass (
-				objectHelperClass)
+				objectHelperImplementationClass)
 
 			.scope (
 				"singleton")
-
-			.factoryClass (
-				ObjectHelperFactory.class)
-
-			.addValueProperty (
-				"objectName",
-				model.name ())
-
-			.addValueProperty (
-				"objectHelperClass",
-				objectHelperClass)
 
 		);
 

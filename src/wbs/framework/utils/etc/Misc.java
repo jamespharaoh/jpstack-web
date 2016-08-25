@@ -3,7 +3,7 @@ package wbs.framework.utils.etc;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.StringUtils.bytesToString;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.BufferedReader;
@@ -75,7 +75,7 @@ class Misc {
 			return null;
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				name,
 				"null")
 		) {
@@ -442,7 +442,7 @@ class Misc {
 				.map (
 					commandItem ->
 						ifThenElse (
-							stringEqual (
+							stringEqualSafe (
 								commandItem,
 								"<in>"),
 							() -> inFile.path (),
@@ -451,7 +451,7 @@ class Misc {
 				.map (
 					commandItem ->
 						ifThenElse (
-							stringEqual (
+							stringEqualSafe (
 								commandItem,
 								"<out>"),
 							() -> outFile.path (),
@@ -664,7 +664,7 @@ class Misc {
 			@NonNull String nullString) {
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				string,
 				yesString)
 		) {
@@ -672,7 +672,7 @@ class Misc {
 		}
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				string,
 				noString)
 		) {
@@ -680,7 +680,7 @@ class Misc {
 		}
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				string,
 				nullString)
 		) {
@@ -772,38 +772,6 @@ class Misc {
 			long value1) {
 
 		return value0 + value1;
-
-	}
-
-	public static
-	boolean isEmpty (
-			@NonNull Collection<?> collection) {
-
-		return collection.isEmpty ();
-
-	}
-
-	public static
-	boolean isEmpty (
-			@NonNull Map<?,?> map) {
-
-		return map.isEmpty ();
-
-	}
-
-	public static
-	boolean isNotEmpty (
-			Collection<?> collection) {
-
-		return ! collection.isEmpty ();
-
-	}
-
-	public static
-	boolean isNotEmpty (
-			Map<?,?> collection) {
-
-		return ! collection.isEmpty ();
 
 	}
 

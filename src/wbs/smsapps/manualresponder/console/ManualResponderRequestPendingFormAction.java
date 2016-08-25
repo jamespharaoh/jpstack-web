@@ -6,7 +6,7 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
 import static wbs.framework.utils.etc.NumberUtils.moreThan;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
@@ -127,7 +127,7 @@ class ManualResponderRequestPendingFormAction
 				"template-id");
 
 		boolean ignore =
-			stringEqual (
+			stringEqualSafe (
 				templateIdStr,
 				"ignore");
 

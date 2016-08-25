@@ -718,7 +718,7 @@ class StringUtils {
 	}
 
 	public static
-	boolean doesNotStartWith (
+	boolean doesNotStartWithSimple (
 			@NonNull String string,
 			@NonNull String prefix) {
 
@@ -850,7 +850,7 @@ class StringUtils {
 			@NonNull String singular) {
 
 		if (
-			endsWith (
+			stringEndsWith (
 				singular,
 				"s")
 		) {
@@ -866,9 +866,9 @@ class StringUtils {
 	}
 
 	public static
-	boolean startsWith (
-			@NonNull String subject,
-			@NonNull String suffix) {
+	boolean stringStartsWithSimple (
+			@NonNull String suffix,
+			@NonNull String subject) {
 
 		return subject.startsWith (
 			suffix);
@@ -876,9 +876,9 @@ class StringUtils {
 	}
 
 	public static
-	boolean endsWith (
-			@NonNull String subject,
-			@NonNull String suffix) {
+	boolean stringEndsWith (
+			@NonNull String suffix,
+			@NonNull String subject) {
 
 		return subject.endsWith (
 			suffix);
@@ -1009,7 +1009,7 @@ class StringUtils {
 	}
 
 	public static
-	boolean stringEqual (
+	boolean stringEqualSafe (
 			@NonNull String string0,
 			@NonNull String string1) {
 
@@ -1019,7 +1019,7 @@ class StringUtils {
 	}
 
 	public static
-	boolean stringEqual (
+	boolean stringEqualSafe (
 			@NonNull CharSequence string0,
 			@NonNull CharSequence string1) {
 
@@ -1370,6 +1370,31 @@ class StringUtils {
 				example4)
 
 		);
+
+	}
+
+	public static
+	String stringReplaceAllSimple (
+			@NonNull String from,
+			@NonNull String to,
+			@NonNull String subject) {
+
+		return subject.replaceAll (
+			Pattern.quote (
+				from),
+			to);
+
+	}
+
+	public static
+	String stringReplaceAllRegex (
+			@NonNull String fromPattern,
+			@NonNull String to,
+			@NonNull String subject) {
+
+		return subject.replaceAll (
+			fromPattern,
+			to);
 
 	}
 

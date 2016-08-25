@@ -5,8 +5,6 @@ import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import lombok.NonNull;
 
@@ -14,16 +12,18 @@ public
 class CollectionUtils {
 
 	public static
-	Properties toProperties (
-			@NonNull Map <String, String> propertiesMap) {
+	boolean collectionIsEmpty (
+			@NonNull Collection<?> collection) {
 
-		Properties properties =
-			new Properties ();
+		return collection.isEmpty ();
 
-		properties.putAll (
-			propertiesMap);
+	}
 
-		return properties;
+	public static
+	boolean collectionIsNotEmpty (
+			Collection <?> collection) {
+
+		return ! collection.isEmpty ();
 
 	}
 
@@ -80,24 +80,6 @@ class CollectionUtils {
 			@NonNull Long size) {
 
 		return collection.size () >= size;
-
-	}
-
-	public static
-	long iterableCount (
-			@NonNull Iterable <?> iterable) {
-
-		long size = 0;
-
-		for (
-			@SuppressWarnings ("unused")
-			Object _item
-				: iterable
-		) {
-			size ++;
-		}
-
-		return size;
 
 	}
 
@@ -190,6 +172,42 @@ class CollectionUtils {
 			@NonNull List <Type> list) {
 
 		return list.get (4);
+
+	}
+
+	public static <Type>
+	Type listLastElementRequired (
+			@NonNull List <Type> list) {
+
+		return list.get (
+			list.size () - 1);
+
+	}
+
+	public static <Type>
+	Type listSecondLastElementRequired (
+			@NonNull List <Type> list) {
+
+		return list.get (
+			list.size () - 2);
+
+	}
+
+	public static <Type>
+	Type listThirdLastElementRequired (
+			@NonNull List <Type> list) {
+
+		return list.get (
+			list.size () - 3);
+
+	}
+
+	public static <Type>
+	Type listFourthLastElementRequired (
+			@NonNull List <Type> list) {
+
+		return list.get (
+			list.size () - 4);
 
 	}
 

@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.File;
@@ -250,7 +250,7 @@ class ConsoleMetaManagerImplementation
 			} else if (extensionPoint.nested ()) {
 
 				if (
-					stringEqual (
+					stringEqualSafe (
 						extensionPoint.name (),
 						extensionPoint.parentExtensionPointName ())
 				) {

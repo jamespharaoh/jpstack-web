@@ -3,7 +3,6 @@
 	package="wbs.framework.object">
 
 	<layer name="object">
-		<component class="ObjectHelperBuilder"/>
 		<component class="ObjectHelperChildrenImplementation"/>
 		<component class="ObjectHelperCodeImplementation"/>
 		<component class="ObjectHelperFindImplementation"/>

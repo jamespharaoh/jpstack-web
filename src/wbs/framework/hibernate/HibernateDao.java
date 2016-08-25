@@ -1,10 +1,10 @@
 package wbs.framework.hibernate;
 
 import static wbs.framework.utils.etc.CollectionUtils.collectionDoesNotHaveOneElement;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.Misc.isEmpty;
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
 
@@ -237,7 +237,7 @@ class HibernateDao {
 		// handle empty list
 
 		if (
-			isEmpty (
+			collectionIsEmpty (
 				objectList)
 		) {
 			return null;
@@ -284,12 +284,12 @@ class HibernateDao {
 			@NonNull List<?> list) {
 
 		@SuppressWarnings ("unchecked")
-		List<Record> ret =
-			(List<Record>) list;
+		List <Record> ret =
+			(List <Record>) list;
 
 		if (
 
-			isNotEmpty (
+			collectionIsNotEmpty (
 				list)
 
 			&& isNotInstanceOf (
@@ -331,7 +331,7 @@ class HibernateDao {
 
 		if (
 
-			isNotEmpty (
+			collectionIsNotEmpty (
 				objectList)
 
 			&& isNotInstanceOf (

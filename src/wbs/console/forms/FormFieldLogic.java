@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
 import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NumberUtils.equalToOne;
 import static wbs.framework.utils.etc.NumberUtils.equalToThree;
@@ -193,7 +193,7 @@ class FormFieldLogic {
 		}
 
 		if (
-			isEmpty (
+			collectionIsEmpty (
 				errorFieldNames)
 		) {
 
@@ -777,7 +777,7 @@ class FormFieldLogic {
 			"</tr>");
 
 		if (
-			isEmpty (
+			collectionIsEmpty (
 				objects)
 		) {
 

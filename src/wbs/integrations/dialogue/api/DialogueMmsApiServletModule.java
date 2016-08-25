@@ -2,7 +2,7 @@ package wbs.integrations.dialogue.api;
 
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 import static wbs.framework.utils.etc.TimeUtils.dateToInstantNullSafe;
@@ -177,7 +177,7 @@ class DialogueMmsApiServletModule
 					isNull (
 						text)
 
-					&& stringEqual (
+					&& stringEqualSafe (
 						type,
 						"text/plain")
 				) {

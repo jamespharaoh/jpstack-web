@@ -1,6 +1,6 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.CollectionUtils.toProperties;
+import static wbs.framework.utils.etc.MapUtils.mapToProperties;
 import static wbs.framework.utils.etc.Misc.booleanToYesNo;
 
 import java.util.Properties;
@@ -35,7 +35,7 @@ class HibernateComponents {
 	SessionFactory hibernateSessionFactory () {
 
 		Properties configProperties =
-			toProperties (
+			mapToProperties (
 				ImmutableMap.<String, String> builder ()
 
 			.put (

@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.Misc.errorResult;
 import static wbs.framework.utils.etc.Misc.successResult;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
 import java.util.Map;
 
@@ -43,7 +43,7 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 				interfaceOptional);
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				interfaceValue,
 				"yes")
 		) {
@@ -53,7 +53,7 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 					true));
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				interfaceValue,
 				"no")
 		) {
@@ -63,7 +63,7 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 					false));
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				interfaceValue,
 				"")
 		) {

@@ -6,7 +6,7 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
 
@@ -910,7 +910,7 @@ class RequestContextImplementation
 	public
 	boolean post () {
 
-		return stringEqual (
+		return stringEqualSafe (
 			method (),
 			"POST");
 

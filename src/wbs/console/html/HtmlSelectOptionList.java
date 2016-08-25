@@ -1,6 +1,6 @@
 package wbs.console.html;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -78,7 +78,7 @@ class HtmlSelectOptionList {
 
 			if (
 				selectedValue != null
-				&& stringEqual (
+				&& stringEqualSafe (
 					htmlSelectOption.value,
 					selectedValue)
 			) {

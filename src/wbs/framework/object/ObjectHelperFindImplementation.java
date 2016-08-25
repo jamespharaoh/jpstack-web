@@ -1,6 +1,8 @@
 package wbs.framework.object;
 
+import static wbs.framework.utils.etc.DebugUtils.debugFormat;
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.lang.reflect.InvocationTargetException;
@@ -28,22 +30,22 @@ class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
 	// properties
 
 	@Setter
-	ObjectModel<RecordType> model;
+	ObjectModel <RecordType> model;
 
 	@Setter
-	ObjectHelper<RecordType> objectHelper;
+	ObjectHelper <RecordType> objectHelper;
 
 	@Setter
 	ObjectManager objectManager;
 
 	@Setter
-	ObjectDatabaseHelper<RecordType> objectDatabaseHelper;
+	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
 
 	// public implementation
 
 	@Override
 	public
-	List<RecordType> findAll () {
+	List <RecordType> findAll () {
 
 		return objectDatabaseHelper.findAll ();
 
@@ -51,7 +53,7 @@ class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	List<RecordType> findByParent (
+	List <RecordType> findByParent (
 			@NonNull GlobalId parentGlobalId) {
 
 		return objectDatabaseHelper.findAllByParent (
@@ -174,21 +176,31 @@ class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	List<RecordType> findByParent (
+	List <RecordType> findByParent (
 			@NonNull Record<?> parent) {
 
-		ObjectHelper<?> parentHelper =
+		ObjectHelper <?> parentHelper =
 			objectManager.objectHelperForClassRequired (
 				parent.getClass ());
 
-		List<?> objectsUncast =
+debugFormat (
+	"parentHelper: %s",
+	optionalFromNullable (
+		parentHelper));
+
+debugFormat (
+	"model: %s",
+	optionalFromNullable (
+		model));
+
+		List <?> objectsUncast =
 			parentHelper.getChildren (
 				parent,
 				model.objectClass ());
 
 		@SuppressWarnings ("unchecked")
-		List<RecordType> objects =
-			(List<RecordType>)
+		List <RecordType> objects =
+			(List <RecordType>)
 			objectsUncast;
 
 		return objects;
@@ -197,7 +209,7 @@ class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	List<RecordType> findByParentAndType (
+	List <RecordType> findByParentAndType (
 			@NonNull GlobalId parentGlobalId,
 			@NonNull String typeCode) {
 

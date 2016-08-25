@@ -1,11 +1,11 @@
 package wbs.smsapps.alerts.console;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.LogicUtils.booleanEqual;
 import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.StringUtils.pluralise;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -167,7 +167,7 @@ class AlertsSettingsNumbersAction
 				continue;
 
 			if (
-				! stringEqual (
+				! stringEqualSafe (
 					alertsNumber.getName (),
 					newName)
 			) {
@@ -196,7 +196,7 @@ class AlertsSettingsNumbersAction
 						alertsNumber.getId ()));
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					alertsNumber.getNumber ().getNumber (),
 					newNumber)
 			) {
@@ -393,7 +393,7 @@ class AlertsSettingsNumbersAction
 		transaction.commit ();
 
 		if (
-			isNotEmpty (
+			collectionIsNotEmpty (
 				notices)
 		) {
 

@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.underscoreToHyphen;
 
 import javax.inject.Provider;
@@ -173,7 +173,7 @@ class ImChatDetailsUpdateAction
 			) {
 
 				if (
-					stringEqual (
+					stringEqualSafe (
 						detailValue.getValue (),
 						stringValue)
 				) {

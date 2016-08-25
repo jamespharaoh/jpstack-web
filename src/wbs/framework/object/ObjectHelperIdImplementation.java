@@ -1,8 +1,8 @@
 package wbs.framework.object;
 
 import static wbs.framework.utils.etc.CollectionUtils.collectionHasOneElement;
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
 import static wbs.framework.utils.etc.CollectionUtils.collectionSize;
-import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
@@ -156,7 +156,7 @@ class ObjectHelperIdImplementation<RecordType extends Record<RecordType>>
 		}
 
 		if (
-			isEmpty (
+			collectionIsEmpty (
 				missingIds)
 		) {
 

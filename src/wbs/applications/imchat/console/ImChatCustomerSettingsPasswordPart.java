@@ -1,6 +1,6 @@
 package wbs.applications.imchat.console;
 
-import static wbs.framework.utils.etc.Misc.isEmpty;
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
 import static wbs.framework.utils.etc.StringUtils.stringInSafe;
 
 import java.util.List;
@@ -117,7 +117,7 @@ class ImChatCustomerSettingsPasswordPart
 			"<h2>Recent forgotten password events</h2>");
 
 		if (
-			isEmpty (
+			collectionIsEmpty (
 				events)
 		) {
 

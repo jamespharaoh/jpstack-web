@@ -436,21 +436,21 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForTypeCode (
+	ObjectHelper<?> objectHelperForTypeCodeRequired (
 			String typeCode) {
 
 		return objectManager
-			.objectHelperForTypeCode (typeCode);
+			.objectHelperForTypeCodeRequired (typeCode);
 
 	}
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForClassRequired (
-			Class<?> objectClass) {
+	ObjectHelper <?> objectHelperForClassRequired (
+			Class <?> objectClass) {
 
-		return objectManager
-			.objectHelperForClassRequired (objectClass);
+		return objectManager.objectHelperForClassRequired (
+			objectClass);
 
 	}
 
@@ -479,10 +479,10 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	Class<?> objectTypeCodeToClass (
+	Class<?> objectClassForTypeCodeRequired (
 			String typeCode) {
 
-		return objectManager.objectTypeCodeToClass (
+		return objectManager.objectClassForTypeCodeRequired (
 			typeCode);
 
 	}
@@ -583,10 +583,10 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForObject (
+	ObjectHelper<?> objectHelperForObjectRequired (
 			Record<?> object) {
 
-		return objectManager.objectHelperForObject (
+		return objectManager.objectHelperForObjectRequired (
 			object);
 
 	}
@@ -718,10 +718,10 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForObjectName (
+	ObjectHelper<?> objectHelperForObjectNameRequired (
 			String objectName) {
 
-		return objectManager.objectHelperForObjectName (
+		return objectManager.objectHelperForObjectNameRequired (
 			objectName);
 
 	}

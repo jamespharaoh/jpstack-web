@@ -1,6 +1,6 @@
 package wbs.integrations.hybyte.daemon;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -137,7 +137,7 @@ class HybyteSender
 		// pick a handler
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				hybyteOutbox.message.getMessageType ().getCode (),
 				"sms")
 		) {
@@ -145,7 +145,7 @@ class HybyteSender
 			// no action required
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				hybyteOutbox.message.getMessageType ().getCode (),
 				"wap_push")
 		) {
@@ -494,7 +494,7 @@ class HybyteSender
 				(Element) nodes.get (0);
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					ackElem.getAttributeValue ("result"),
 					"OK")
 			) {
@@ -519,7 +519,7 @@ class HybyteSender
 				errorElem.getValue ();
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					error,
 					"No content specified")
 			) {

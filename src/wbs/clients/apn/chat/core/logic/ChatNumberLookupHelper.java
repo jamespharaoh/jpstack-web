@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.core.logic;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
 import javax.inject.Inject;
 
@@ -48,7 +48,7 @@ class ChatNumberLookupHelper
 				numberLookup);
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				numberLookup.getCode (),
 				"block_all")
 		) {

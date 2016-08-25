@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import lombok.NonNull;
-
 import com.google.common.collect.ImmutableMap;
+
+import lombok.NonNull;
 
 public
 class StringFormatter {
@@ -31,11 +31,11 @@ class StringFormatter {
 	 * them, returning the resulting strings in a list.
 	 */
 	public
-	List<String> formatSpecial (
-			@NonNull List<Object> arguments) {
+	List <String> formatSpecial (
+			@NonNull List <Object> arguments) {
 
-		List<String> stringsToReturn =
-			new ArrayList<String> ();
+		List <String> stringsToReturn =
+			new ArrayList<> ();
 
 		for (
 			int argumentIndex = 0;
@@ -45,7 +45,24 @@ class StringFormatter {
 
 			String format =
 				(String)
-				arguments.get (argumentIndex);
+				arguments.get (
+					argumentIndex);
+
+			/*
+			if (
+				referenceNotEqualSafe (
+					format,
+					format.intern ())
+			) {
+
+				throw new IllegalArgumentException (
+					stringFormat (
+						"Format string at position %s ",
+						argumentIndex,
+						"is not interned, so probably a bug"));
+
+			}
+			*/
 
 			int numPercents =
 				numPercents (format);

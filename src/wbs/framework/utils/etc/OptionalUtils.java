@@ -844,7 +844,23 @@ class OptionalUtils {
 	}
 
 	public static <Type>
-	Optional<Type> optionalFromNullable (
+	Optional <Type> optionalAbsent () {
+
+		return Optional.absent ();
+
+	}
+
+	public static <Type>
+	Optional <Type> optionalOf (
+			@NonNull Type value) {
+
+		return Optional.of (
+			value);
+
+	}
+
+	public static <Type>
+	Optional <Type> optionalFromNullable (
 			Type value) {
 
 		return Optional.fromNullable (

@@ -1,7 +1,7 @@
 package wbs.smsapps.manualresponder.console;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
 import static wbs.framework.utils.etc.ConcurrentUtils.futureValue;
-import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.HashMap;
@@ -167,7 +167,7 @@ class ManualResponderStatusLine
 				}
 
 				if (
-					isEmpty (
+					collectionIsEmpty (
 						reports)
 				) {
 
@@ -232,7 +232,7 @@ class ManualResponderStatusLine
 				}
 
 				if (
-					isEmpty (
+					collectionIsEmpty (
 						reports)
 				) {
 

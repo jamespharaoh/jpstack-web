@@ -2,7 +2,7 @@ package wbs.clients.apn.chat.user.pending.console;
 
 import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
@@ -443,7 +443,7 @@ class ChatUserPendingFormResponder
 
 					chatUserImage.getAppend ()
 
-					|| stringEqual (
+					|| stringEqualSafe (
 						chatUser.getChat ().getCode (),
 						"adult")
 

@@ -6,7 +6,7 @@ import static wbs.framework.utils.etc.LogicUtils.notEqualSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.sum;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringInSafe;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
@@ -1061,7 +1061,7 @@ class ChatCreditLogicImplementation
 			ChatUserRec chatUser) {
 
 		boolean onAdultService =
-			stringEqual (
+			stringEqualSafe (
 				chatUser.getChat ().getCode (),
 				"adult");
 

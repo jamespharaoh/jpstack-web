@@ -413,7 +413,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 						currentObject);
 
 				currentHelper =
-					objectManager.objectHelperForObject (
+					objectManager.objectHelperForObjectRequired (
 						currentObject);
 
 			} else {

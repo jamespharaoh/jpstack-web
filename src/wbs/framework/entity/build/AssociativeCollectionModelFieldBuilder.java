@@ -4,7 +4,7 @@ import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
 
@@ -64,7 +64,7 @@ class AssociativeCollectionModelFieldBuilder {
 		Class<?> fieldTypeClass;
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				spec.typeName (),
 				"string")
 		) {

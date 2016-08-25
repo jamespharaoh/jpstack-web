@@ -2,7 +2,7 @@ package wbs.applications.imchat.console;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.NumberUtils.maximumJavaInteger;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import lombok.Cleanup;
@@ -113,7 +113,7 @@ class ImChatPendingFormAction
 		String messageText;
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				templateString,
 				"bill")
 		) {
@@ -133,7 +133,7 @@ class ImChatPendingFormAction
 				imChat.getBillMessageMaxChars ();
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				templateString,
 				"free")
 		) {
@@ -153,7 +153,7 @@ class ImChatPendingFormAction
 				imChat.getFreeMessageMaxChars ();
 
 		} else if (
-			stringEqual (
+			stringEqualSafe (
 				templateString,
 				"ignore")
 		) {
