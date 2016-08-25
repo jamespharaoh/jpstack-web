@@ -294,13 +294,13 @@ class CurrencyFormFieldBuilder {
 					spec.nullable (),
 					false))
 
-			.align (
-				TextFormFieldRenderer.Align.right)
-
 			.size (
 				range
 					? FormField.defaultSize / 2 - 2
-					: FormField.defaultSize);
+					: FormField.defaultSize)
+
+			.listAlign (
+				FormField.Align.right);
 
 		FormFieldRenderer renderer =
 			range

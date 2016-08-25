@@ -5,18 +5,17 @@ import static wbs.framework.utils.etc.Misc.doNothing;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Optional;
+
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.console.html.ScriptRef;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.utils.etc.FormatWriter;
 
 public
-interface FormField<Container,Generic,Native,Interface> {
+interface FormField <Container, Generic, Native, Interface> {
 
 	final static
 	int defaultSize = 48;
@@ -186,18 +185,27 @@ interface FormField<Container,Generic,Native,Interface> {
 	@Accessors (fluent = true)
 	@Data
 	public static
-	class UpdateResult<Generic,Native> {
+	class UpdateResult <Generic, Native> {
 
 		Boolean updated;
 
-		Optional<Generic> oldGenericValue;
-		Optional<Generic> newGenericValue;
+		Optional <Generic> oldGenericValue;
+		Optional <Generic> newGenericValue;
 
-		Optional<Native> oldNativeValue;
-		Optional<Native> newNativeValue;
+		Optional <Native> oldNativeValue;
+		Optional <Native> newNativeValue;
 
-		Optional<String> error;
+		Optional <String> error;
 
+	}
+
+	// data
+
+	public static
+	enum Align {
+		left,
+		center,
+		right;
 	}
 
 }

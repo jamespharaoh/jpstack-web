@@ -38,8 +38,8 @@ import wbs.framework.utils.etc.FormatWriter;
 @PrototypeComponent ("readOnlyFormField")
 @DataClass ("read-only-form-field")
 public
-class ReadOnlyFormField<Container,Generic,Native,Interface>
-	implements FormField<Container,Generic,Native,Interface> {
+class ReadOnlyFormField <Container, Generic, Native, Interface>
+	implements FormField <Container, Generic, Native, Interface> {
 
 	// dependencies
 

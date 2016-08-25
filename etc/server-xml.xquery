@@ -66,6 +66,7 @@
 
 	</Service>
 
+	<!--
 	<Service name="api">
 
 		<Executor
@@ -104,5 +105,6 @@
 		</Engine>
 
 	</Service>
+	-->
 
 </Server>

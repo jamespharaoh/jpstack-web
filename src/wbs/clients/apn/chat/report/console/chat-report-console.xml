@@ -65,70 +65,58 @@
 
 		<integer-field
 			name="joiners"
-			label="Joiners"
-			blank-if-zero="yes"/>
+			label="Joiners"/>
 
 		<integer-field
 			name="outRevNum"
-			label="Out rev #"
-			blank-if-zero="yes"/>
+			label="Out rev #"/>
 
 		<integer-field
 			name="inRevNum"
-			label="In rev #"
-			blank-if-zero="yes"/>
+			label="In rev #"/>
 
 		<integer-field
 			name="smsCostNum"
-			label="SMS cost #"
-			blank-if-zero="yes"/>
+			label="SMS cost #"/>
 
 		<integer-field
 			name="mmsCostNum"
-			label="MMS cost #"
-			blank-if-zero="yes"/>
+			label="MMS cost #"/>
 
 		<currency-field
 			name="outRev_p"
 			label="Out rev"
-			currency="currency"
-			blank-if-zero="yes"/>
+			currency="currency"/>
 
 		<currency-field
 			name="inRev_p"
 			label="In rev"
-			currency="currency"
-			blank-if-zero="yes"/>
+			currency="currency"/>
 
 		<currency-field
 			name="smsCost_p"
 			label="SMS cost"
-			currency="currency"
-			blank-if-zero="yes"/>
+			currency="currency"/>
 
 		<currency-field
 			name="mmsCost_p"
 			label="MMS cost"
-			currency="currency"
-			blank-if-zero="yes"/>
+			currency="currency"/>
 
 		<currency-field
 			name="creditRev_p"
 			label="Card rev"
-			currency="currency"
-			blank-if-zero="yes"/>
+			currency="currency"/>
 
 		<currency-field
 			name="staffCost_p"
 			label="Staff"
-			currency="currency"
-			blank-if-zero="yes"/>
+			currency="currency"/>
 
 		<currency-field
 			name="total_p"
 			label="Total"
-			currency="currency"
-			blank-if-zero="yes"/>
+			currency="currency"/>
 
 	</field-set>
 

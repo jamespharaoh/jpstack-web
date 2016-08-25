@@ -1,22 +1,32 @@
 package wbs.console.forms;
 
-import java.util.Map;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import lombok.NonNull;
+import java.util.Map;
 
 import com.google.common.base.Optional;
 
 import fj.data.Either;
-
+import lombok.NonNull;
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.utils.etc.FormatWriter;
 
 public
-interface FormFieldRenderer<Container,Interface> {
+interface FormFieldRenderer <Container, Interface> {
 
 	default
 	boolean fileUpload () {
 		return false;
+	}
+
+	default
+	FormField.Align listAlign () {
+		return FormField.Align.left;
+	}
+
+	default
+	FormField.Align propertiesAlign () {
+		return FormField.Align.left;
 	}
 
 	void renderFormTemporarilyHidden (
@@ -49,13 +59,17 @@ interface FormFieldRenderer<Container,Interface> {
 	void renderHtmlTableCell (
 			FormatWriter htmlWriter,
 			Container container,
-			Map<String,Object> hints,
-			Optional<Interface> interfaceValue,
+			Map <String, Object> hints,
+			Optional <Interface> interfaceValue,
 			boolean link,
 			int colspan) {
 
 		htmlWriter.writeFormat (
-			"<td");
+			"<td",
+			" style=\"%h\"",
+			stringFormat (
+				"text-align: %s",
+				propertiesAlign ().name ()));
 
 		if (colspan != 1) {
 

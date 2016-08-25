@@ -38,11 +38,16 @@ class TextFormFieldRenderer<Container>
 	Boolean nullable;
 
 	@Getter @Setter
-	Align align;
-
-	@Getter @Setter
 	Integer size =
 		FormField.defaultSize;
+
+	@Getter @Setter
+	FormField.Align listAlign =
+		FormField.Align.left;
+
+	@Getter @Setter
+	FormField.Align propertiesAlign =
+		FormField.Align.right;
 
 	@Getter @Setter
 	Map<String,String> presets =
@@ -285,15 +290,6 @@ class TextFormFieldRenderer<Container>
 			"%h",
 			interfaceValue.or (""));
 
-	}
-
-	// data
-
-	public static
-	enum Align {
-		left,
-		center,
-		right;
 	}
 
 }

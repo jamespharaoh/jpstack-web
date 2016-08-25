@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.forms.TextFormFieldRenderer.Align;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -171,10 +170,8 @@ class SecondsFormFieldBuilder {
 			.nullable (
 				nullable)
 
-			.align (
-				format == SecondsFormFieldSpec.Format.numeric
-					? Align.right
-					: Align.left);
+			.listAlign (
+				FormField.Align.right);
 
 		// update hook
 

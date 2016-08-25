@@ -234,10 +234,7 @@ class IntegerFormFieldBuilder {
 			.nullable (
 				ifNull (
 					spec.nullable (),
-					false))
-
-			.align (
-				TextFormFieldRenderer.Align.right);
+					false));
 
 		// update hook
 

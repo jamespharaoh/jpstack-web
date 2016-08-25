@@ -9,9 +9,10 @@ import static wbs.framework.utils.etc.Misc.isError;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.isRight;
 import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOr;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringSplitColon;
 
 import java.util.LinkedHashSet;
@@ -75,36 +76,36 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 	String viewPriv;
 
 	@Getter @Setter
-	Set<ScriptRef> scriptRefs =
-		new LinkedHashSet<ScriptRef> ();
+	Set <ScriptRef> scriptRefs =
+		new LinkedHashSet<> ();
 
 	@Getter @Setter
-	FormFieldAccessor<Container,Native> accessor;
+	FormFieldAccessor <Container, Native> accessor;
 
 	@Getter @Setter
-	FormFieldNativeMapping<Container,Generic,Native> nativeMapping;
+	FormFieldNativeMapping <Container, Generic, Native> nativeMapping;
 
 	@Getter @Setter
-	List<FormFieldValueValidator<Generic>> valueValidators;
+	List<FormFieldValueValidator <Generic>> valueValidators;
 
 	@Getter @Setter
-	FormFieldConstraintValidator<Container,Native> constraintValidator;
+	FormFieldConstraintValidator <Container, Native> constraintValidator;
 
 	@Getter @Setter
-	FormFieldInterfaceMapping<Container,Generic,Interface> interfaceMapping;
+	FormFieldInterfaceMapping <Container, Generic, Interface> interfaceMapping;
 
 	@Getter @Setter
-	Map<String,FormFieldInterfaceMapping<Container,Generic,String>>
+	Map <String, FormFieldInterfaceMapping <Container, Generic, String>>
 	shortcutInterfaceMappings;
 
 	@Getter @Setter
-	FormFieldInterfaceMapping<Container,Generic,String> csvMapping;
+	FormFieldInterfaceMapping <Container, Generic, String> csvMapping;
 
 	@Getter @Setter
-	FormFieldRenderer<Container,Interface> renderer;
+	FormFieldRenderer <Container, Interface> renderer;
 
 	@Getter @Setter
-	FormFieldUpdateHook<Container,Generic,Native> updateHook;
+	FormFieldUpdateHook <Container, Generic, Native> updateHook;
 
 	// implementation
 
@@ -329,7 +330,12 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 			"<tr>\n",
 			"<th>%h</th>\n",
 			label (),
-			"<td>");
+			"<td",
+			" style=\"%s\"",
+			stringFormat (
+				"text-align: %s",
+				renderer.propertiesAlign ().name ()),
+			">");
 
 		renderer.renderFormInput (
 			submission,
