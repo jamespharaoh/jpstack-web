@@ -1,7 +1,7 @@
 package wbs.platform.event.console;
 
 import static wbs.framework.utils.etc.Misc.doesNotImplement;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -59,7 +59,7 @@ class EventFormFieldPluginProvider
 
 			consoleHelper.nameExists ()
 
-			&& stringEqual (
+			&& stringEqualSafe (
 				consoleHelper.nameFieldName (),
 				fieldName)
 

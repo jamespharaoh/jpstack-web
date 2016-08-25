@@ -1,6 +1,6 @@
 package wbs.platform.postgresql.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ class PostgresqlActivityPart
 		) {
 
 			if (
-				stringEqual (
+				stringEqualSafe (
 					statActivity.getCurrentQuery (),
 					"<IDLE>")
 			) {

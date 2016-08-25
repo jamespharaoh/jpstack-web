@@ -3,7 +3,7 @@ package wbs.platform.user.logic;
 import static wbs.framework.utils.etc.Misc.hashSha1;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import javax.inject.Inject;
@@ -207,7 +207,7 @@ class UserLogicImplementation
 
 		if (
 
-			stringEqual (
+			stringEqualSafe (
 				password,
 				"**********")
 

@@ -2,7 +2,7 @@ package wbs.platform.media.console;
 
 import static wbs.framework.utils.etc.StringUtils.bytesToString;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
@@ -400,7 +400,7 @@ class MediaConsoleLogicImplementation
 			MediaRec media) {
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				media.getMediaType ().getMimeType (),
 				"text/plain")
 		) {
@@ -503,7 +503,7 @@ class MediaConsoleLogicImplementation
 			MediaRec media) {
 
 		if (
-			stringEqual (
+			stringEqualSafe (
 				media.getMediaType ().getMimeType (),
 				"text/plain")
 		) {

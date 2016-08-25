@@ -1,6 +1,6 @@
 package wbs.platform.priv.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqual;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -286,7 +286,7 @@ class PrivDataLoaderImplementation
 				try {
 
 					newData.objectTypeIdsByClassName.put (
-						objectManager.objectTypeCodeToClass (
+						objectManager.objectClassForTypeCodeRequired (
 							objectType.getCode ()
 						).getName (),
 						objectType.getId ());
@@ -346,7 +346,7 @@ class PrivDataLoaderImplementation
 						newData.objectDatasByObjectId.get (objectId);
 
 					if (
-						stringEqual (
+						stringEqualSafe (
 							priv.getCode (),
 							"manage")
 					) {

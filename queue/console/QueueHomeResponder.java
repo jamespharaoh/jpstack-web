@@ -1,6 +1,6 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.Misc.isNotEmpty;
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
@@ -232,7 +232,7 @@ class QueueHomeResponder
 		// output styles
 
 		if (
-			isNotEmpty (
+			collectionIsNotEmpty (
 				queues)
 		) {
 

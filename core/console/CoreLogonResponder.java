@@ -1,8 +1,8 @@
 package wbs.platform.core.console;
 
 import static wbs.framework.utils.etc.CollectionUtils.collectionDoesNotHaveTwoElements;
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
 import static wbs.framework.utils.etc.CollectionUtils.listItemAtIndexRequired;
-import static wbs.framework.utils.etc.Misc.isEmpty;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
@@ -128,7 +128,7 @@ class CoreLogonResponder
 	void goTestUsers () {
 
 		if (
-			isEmpty (
+			collectionIsEmpty (
 				wbsConfig.testUsers ())
 		) {
 			return;
