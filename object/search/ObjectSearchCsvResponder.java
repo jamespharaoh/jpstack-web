@@ -29,8 +29,8 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
-import wbs.framework.utils.etc.FormatWriter;
-import wbs.framework.utils.etc.FormatWriterWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.framework.utils.formatwriter.WriterFormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchCsvResponder")
@@ -77,7 +77,7 @@ class ObjectSearchCsvResponder
 	void setup () {
 
 		formatWriter =
-			new FormatWriterWriter (
+			new WriterFormatWriter (
 				requestContext.writer ());
 
 	}
