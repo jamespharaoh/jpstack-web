@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

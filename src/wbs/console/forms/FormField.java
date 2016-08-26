@@ -12,7 +12,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import wbs.console.html.ScriptRef;
 import wbs.framework.entity.record.PermanentRecord;
-import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 public
 interface FormField <Container, Generic, Native, Interface> {

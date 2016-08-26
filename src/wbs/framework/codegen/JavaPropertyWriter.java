@@ -1,4 +1,4 @@
-package wbs.framework.entity.meta;
+package wbs.framework.codegen;
 
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
@@ -8,11 +8,10 @@ import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
 import java.lang.reflect.Method;
 
 import lombok.NonNull;
-
-import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 public
-class PropertyWriter {
+class JavaPropertyWriter {
 
 	// properties
 
@@ -24,7 +23,7 @@ class PropertyWriter {
 	String defaultValue;
 
 	public
-	PropertyWriter thisClassNameFormat (
+	JavaPropertyWriter thisClassNameFormat (
 			Object... arguments) {
 
 		if (thisClassName != null) {
@@ -40,7 +39,7 @@ class PropertyWriter {
 	}
 
 	public
-	PropertyWriter typeNameFormat (
+	JavaPropertyWriter typeNameFormat (
 			Object... arguments) {
 
 		if (typeName != null) {
@@ -56,7 +55,7 @@ class PropertyWriter {
 	}
 
 	public
-	PropertyWriter setterTypeNameFormat (
+	JavaPropertyWriter setterTypeNameFormat (
 			@NonNull Object... arguments) {
 
 		if (setterTypeName != null) {
@@ -72,7 +71,7 @@ class PropertyWriter {
 	}
 
 	public
-	PropertyWriter setterConversionFormat (
+	JavaPropertyWriter setterConversionFormat (
 			@NonNull Object... arguments) {
 
 		if (setterConversion != null) {
@@ -88,7 +87,7 @@ class PropertyWriter {
 	}
 
 	public
-	PropertyWriter setterConversion (
+	JavaPropertyWriter setterConversion (
 			@NonNull Method method) {
 
 		return setterConversionFormat (
@@ -99,7 +98,7 @@ class PropertyWriter {
 	}
 
 	public
-	PropertyWriter propertyNameFormat (
+	JavaPropertyWriter propertyNameFormat (
 			Object... arguments) {
 
 		if (propertyName != null) {
@@ -115,7 +114,7 @@ class PropertyWriter {
 	}
 
 	public
-	PropertyWriter defaultValueFormat (
+	JavaPropertyWriter defaultValueFormat (
 			Object... arguments) {
 
 		if (defaultValue != null) {

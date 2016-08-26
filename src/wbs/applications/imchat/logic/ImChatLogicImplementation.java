@@ -24,8 +24,8 @@ import wbs.framework.database.Transaction;
 import wbs.framework.utils.EmailLogic;
 import wbs.framework.utils.RandomLogic;
 import wbs.framework.utils.TimeFormatter;
-import wbs.framework.utils.etc.FormatWriter;
-import wbs.framework.utils.etc.FormatWriterWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.framework.utils.formatwriter.WriterFormatWriter;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.model.UserRec;
@@ -120,7 +120,7 @@ class ImChatLogicImplementation
 			new StringBuilder ();
 
 		FormatWriter formatWriter =
-			new FormatWriterWriter (
+			new WriterFormatWriter (
 				new StringBuilderWriter (
 					stringBuilder));
 

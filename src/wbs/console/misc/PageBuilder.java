@@ -5,9 +5,9 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import wbs.framework.utils.etc.FormatWriter;
-import wbs.framework.utils.etc.FormatWriterWriter;
 import wbs.framework.utils.etc.Html;
+import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.framework.utils.formatwriter.WriterFormatWriter;
 
 public
 class PageBuilder {
@@ -29,11 +29,11 @@ class PageBuilder {
 		new StringWriter ();
 
 	FormatWriter headFormatWriter =
-		new FormatWriterWriter (
+		new WriterFormatWriter (
 			headStringWriter);
 
 	FormatWriter footFormatWriter =
-		new FormatWriterWriter (
+		new WriterFormatWriter (
 			footStringWriter);
 
 	public
@@ -103,7 +103,7 @@ class PageBuilder {
 				new StringWriter ();
 
 			formatWriter =
-				new FormatWriterWriter (
+				new WriterFormatWriter (
 					stringWriter);
 
 			inPage =

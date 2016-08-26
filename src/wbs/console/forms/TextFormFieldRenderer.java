@@ -18,13 +18,13 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("textFormFieldRenderer")
 @Accessors (fluent = true)
 public
-class TextFormFieldRenderer<Container>
-	implements FormFieldRenderer<Container,String> {
+class TextFormFieldRenderer <Container>
+	implements FormFieldRenderer <Container, String> {
 
 	// properties
 
@@ -47,10 +47,10 @@ class TextFormFieldRenderer<Container>
 
 	@Getter @Setter
 	FormField.Align propertiesAlign =
-		FormField.Align.right;
+		FormField.Align.left;
 
 	@Getter @Setter
-	Map<String,String> presets =
+	Map <String, String> presets =
 		new LinkedHashMap<> ();
 
 	// utilities

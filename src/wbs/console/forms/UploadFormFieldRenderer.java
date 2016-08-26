@@ -21,8 +21,8 @@ import fj.data.Either;
 
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.RuntimeIoException;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("uploadFormFieldRenderer")
 @Accessors (fluent = true)

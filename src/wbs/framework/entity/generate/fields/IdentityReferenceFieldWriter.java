@@ -15,10 +15,10 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.IdentityReferenceFieldSpec;
-import wbs.framework.entity.meta.PropertyWriter;
-import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("identityReferenceFieldWriter")
 @ModelWriter
@@ -64,7 +64,7 @@ class IdentityReferenceFieldWriter {
 
 		// write field
 
-		new PropertyWriter ()
+		new JavaPropertyWriter ()
 
 			.thisClassNameFormat (
 				"%s",

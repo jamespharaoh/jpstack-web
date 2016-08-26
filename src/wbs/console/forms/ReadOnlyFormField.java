@@ -32,7 +32,7 @@ import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("readOnlyFormField")

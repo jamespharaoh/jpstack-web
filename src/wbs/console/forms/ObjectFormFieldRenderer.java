@@ -29,8 +29,8 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
-import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.OptionalUtils;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectFormFieldRenderer")

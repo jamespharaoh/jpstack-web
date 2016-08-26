@@ -32,7 +32,7 @@ import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.entity.record.PermanentRecord;
-import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 @Log4j
 @SingletonComponent ("fieldsLogic")

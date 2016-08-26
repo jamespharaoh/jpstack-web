@@ -13,9 +13,10 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.FormatWriter;
-import wbs.framework.utils.etc.FormatWriterWriter;
 import wbs.framework.utils.etc.JsonToHtml;
+import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.framework.utils.formatwriter.WriterFormatWriter;
+
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 @PrototypeComponent ("jsonFormFieldInterfaceMapping")
@@ -59,7 +60,7 @@ class JsonFormFieldInterfaceMapping<Container>
 			new StringWriter ();
 
 		FormatWriter formatWriter =
-			new FormatWriterWriter (
+			new WriterFormatWriter (
 				stringWriter);
 
 		formatWriter.writeFormat (

@@ -5,7 +5,7 @@ import javax.inject.Provider;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.PagePart;
 import wbs.framework.entity.record.PermanentRecord;
-import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 import wbs.platform.event.model.EventRec;
 
 public

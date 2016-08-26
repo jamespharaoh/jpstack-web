@@ -20,7 +20,7 @@ import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 import wbs.framework.web.PageNotFoundException;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;

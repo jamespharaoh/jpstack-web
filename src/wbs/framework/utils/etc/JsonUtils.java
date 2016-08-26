@@ -11,6 +11,8 @@ import lombok.experimental.Accessors;
 import org.json.simple.JSONValue;
 
 import wbs.framework.utils.etc.JsonUtils.EscapeOptions.EscapeOptionsBuilder;
+import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.framework.utils.formatwriter.WriterFormatWriter;
 
 public
 class JsonUtils {
@@ -34,7 +36,7 @@ class JsonUtils {
 			new StringWriter ();
 
 		FormatWriter formatWriter =
-			new FormatWriterWriter (
+			new WriterFormatWriter (
 				stringWriter);
 
 		writeEscapedJsonString (

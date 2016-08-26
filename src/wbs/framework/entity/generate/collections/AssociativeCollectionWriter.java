@@ -17,11 +17,11 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
 import wbs.framework.entity.meta.AssociativeCollectionSpec;
-import wbs.framework.entity.meta.PropertyWriter;
-import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("associativeCollectionWriter")
 @ModelWriter
@@ -88,7 +88,7 @@ class AssociativeCollectionWriter {
 
 		// write field
 
-		new PropertyWriter ()
+		new JavaPropertyWriter ()
 
 			.thisClassNameFormat (
 				"%s",

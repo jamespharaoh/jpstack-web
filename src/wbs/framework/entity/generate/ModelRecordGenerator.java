@@ -42,9 +42,9 @@ import wbs.framework.entity.meta.ParentTypeFieldSpec;
 import wbs.framework.entity.meta.ReferenceFieldSpec;
 import wbs.framework.entity.meta.TimestampFieldSpec;
 import wbs.framework.entity.meta.TypeCodeFieldSpec;
-import wbs.framework.utils.AtomicFileWriter;
-import wbs.framework.utils.etc.FormatWriter;
 import wbs.framework.utils.etc.RuntimeIoException;
+import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.framework.utils.formatwriter.AtomicFileWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("modelRecordGenerator")

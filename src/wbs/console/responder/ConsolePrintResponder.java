@@ -6,8 +6,8 @@ import java.io.PrintWriter;
 import javax.inject.Inject;
 
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.utils.etc.FormatWriter;
-import wbs.framework.utils.etc.FormatWriterWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.framework.utils.formatwriter.WriterFormatWriter;
 
 public abstract
 class ConsolePrintResponder
@@ -38,7 +38,7 @@ class ConsolePrintResponder
 			requestContext.writer ();
 
 		formatWriter =
-			new FormatWriterWriter (
+			new WriterFormatWriter (
 				printWriter);
 
 	}

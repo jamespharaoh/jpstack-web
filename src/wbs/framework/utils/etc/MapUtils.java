@@ -4,6 +4,7 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOf;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -57,6 +58,31 @@ class MapUtils {
 		} else {
 
 			return optionalAbsent ();
+
+		}
+
+	}
+
+	public static <KeyType, ValueType>
+	ValueType mapItemForKeyRequired (
+			@NonNull Map <KeyType, ValueType> map,
+			@NonNull KeyType key) {
+
+		ValueType value =
+			map.get (
+				key);
+
+		if (value != null) {
+
+			return value;
+
+		} else if (map.containsKey (key)) {
+
+			throw new NullPointerException ();
+
+		} else {
+
+			throw new NoSuchElementException ();
 
 		}
 

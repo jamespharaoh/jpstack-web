@@ -9,7 +9,7 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 import lombok.NonNull;
 import wbs.console.forms.FormField.FormType;
-import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 public
 interface FormFieldRenderer <Container, Interface> {

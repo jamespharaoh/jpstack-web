@@ -3,8 +3,12 @@ package wbs.framework.utils.etc;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
@@ -211,6 +215,8 @@ class CollectionUtils {
 
 	}
 
+	// one element
+
 	public static
 	boolean collectionHasOneElement (
 			@NonNull Collection <?> collection) {
@@ -228,6 +234,40 @@ class CollectionUtils {
 	}
 
 	public static
+	boolean collectionHasMoreThanOneElement (
+			@NonNull Collection <?> collection) {
+
+		return collection.size () > 1;
+
+	}
+
+	public static
+	boolean collectionDoesNotHaveMoreThanOneElement (
+			@NonNull Collection <?> collection) {
+
+		return collection.size () <= 1;
+
+	}
+
+	public static
+	boolean collectionHasLessThanOneElement (
+			@NonNull Collection <?> collection) {
+
+		return collection.size () < 1;
+
+	}
+
+	public static
+	boolean collectionDoesNotHaveLessThanOneElement (
+			@NonNull Collection <?> collection) {
+
+		return collection.size () >= 1;
+
+	}
+
+	// two elements
+
+	public static
 	boolean collectionHasTwoElements (
 			@NonNull Collection <?> collection) {
 
@@ -242,6 +282,8 @@ class CollectionUtils {
 		return collection.size () != 2;
 
 	}
+
+	// three elements
 
 	public static
 	boolean collectionHasThreeElements (
@@ -259,6 +301,8 @@ class CollectionUtils {
 
 	}
 
+	// four elements
+
 	public static
 	boolean collectionHasFourElements (
 			@NonNull Collection <?> collection) {
@@ -266,6 +310,8 @@ class CollectionUtils {
 		return collection.size () == 4;
 
 	}
+
+	// lists
 
 	public static <Type>
 	List <Type> listSlice (
@@ -282,10 +328,71 @@ class CollectionUtils {
 	}
 
 	public static <Type>
-	Type collectionFirstElementRequired (
-			@NonNull Collection <Type> collection) {
+	List <Type> listSliceAllButFirstItemRequired (
+			@NonNull List <Type> list) {
 
-		return collection.iterator ().next ();
+		return list.subList (
+			1,
+			list.size ());
+
+	}
+	public static <Type>
+	List <Type> listSliceAllButFirstTwoItemsRequired (
+			@NonNull List <Type> list) {
+
+		return list.subList (
+			2,
+			list.size ());
+
+	}
+
+	public static <Type>
+	List <Type> listSliceAllButLastItemRequired (
+			@NonNull List <Type> list) {
+
+		return list.subList (
+			0,
+			list.size () - 1);
+
+	}
+	public static <Type>
+	List <Type> listSliceAllButLastTwoItemsRequired (
+			@NonNull List <Type> list) {
+
+		return list.subList (
+			0,
+			list.size () - 2);
+
+	}
+
+	public static <Type>
+	Type iterableFirstElementRequired (
+			@NonNull Iterable <Type> iterable) {
+
+		return iterable.iterator ().next ();
+
+	}
+
+	public static <Type extends Comparable <Type>>
+	List <Type> listSorted (
+			@NonNull Iterable <Type> iterable) {
+
+		List <Type> sortedList =
+			new ArrayList <Type> ();
+
+		for (
+			Type item
+				: iterable
+		) {
+			sortedList.add (
+				item);
+		}
+
+		Collections.sort (
+			sortedList);
+
+		return ImmutableList.copyOf (
+			sortedList);
 
 	}
 

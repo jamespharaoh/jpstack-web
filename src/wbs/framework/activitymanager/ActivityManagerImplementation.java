@@ -32,8 +32,8 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.utils.etc.FormatWriter;
-import wbs.framework.utils.etc.FormatWriterWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.framework.utils.formatwriter.WriterFormatWriter;
 
 @Log4j
 public
@@ -262,7 +262,7 @@ class ActivityManagerImplementation
 				new StringWriter ();
 
 			FormatWriter formatWriter =
-				new FormatWriterWriter (
+				new WriterFormatWriter (
 					stringWriter);
 
 			formatWriter.writeFormat (
@@ -297,7 +297,7 @@ class ActivityManagerImplementation
 			new StringWriter ();
 
 		FormatWriter formatWriter =
-			new FormatWriterWriter (
+			new WriterFormatWriter (
 				stringWriter);
 
 		if (

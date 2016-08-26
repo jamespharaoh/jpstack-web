@@ -12,7 +12,7 @@ import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.BuilderFactory;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
-import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 @SingletonComponent ("modelWriterManager")
 public

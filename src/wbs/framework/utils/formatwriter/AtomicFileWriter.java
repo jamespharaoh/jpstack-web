@@ -1,6 +1,5 @@
-package wbs.framework.utils;
+package wbs.framework.utils.formatwriter;
 
-import static wbs.framework.utils.etc.Misc.doNothing;
 import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
@@ -9,13 +8,24 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 
+import lombok.Getter;
 import lombok.NonNull;
-import wbs.framework.utils.etc.FormatWriter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import wbs.framework.utils.etc.RuntimeIoException;
 
+@Accessors (fluent = true)
 public
 class AtomicFileWriter
 	implements FormatWriter {
+
+	// properties
+
+	@Getter @Setter
+	String indentString = "\t";
+
+	@Getter @Setter
+	long indentSize = 0;
 
 	// state
 
@@ -130,22 +140,6 @@ class AtomicFileWriter
 				exception);
 
 		}
-
-	}
-
-	@Override
-	public
-	void indent () {
-
-		doNothing ();
-
-	}
-
-	@Override
-	public
-	void unindent () {
-
-		doNothing ();
 
 	}
 

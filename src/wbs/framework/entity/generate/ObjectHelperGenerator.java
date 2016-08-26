@@ -4,9 +4,9 @@ import static wbs.framework.utils.etc.ArrayUtils.arrayIsEmpty;
 import static wbs.framework.utils.etc.ArrayUtils.arrayIsNotEmpty;
 import static wbs.framework.utils.etc.ArrayUtils.arrayMap;
 import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
-import static wbs.framework.utils.etc.CollectionUtils.collectionSize;
 import static wbs.framework.utils.etc.CollectionUtils.listLastElementRequired;
 import static wbs.framework.utils.etc.CollectionUtils.listSlice;
+import static wbs.framework.utils.etc.CollectionUtils.listSliceAllButLastItemRequired;
 import static wbs.framework.utils.etc.IterableUtils.iterableMap;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualUnsafe;
@@ -21,12 +21,9 @@ import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringReplaceAllRegex;
 import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
-import static wbs.framework.utils.etc.StringUtils.stringStartsWithSimple;
 import static wbs.framework.utils.etc.StringUtils.uncapitalise;
-import static wbs.framework.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.framework.utils.etc.TypeUtils.classForName;
 import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
-import static wbs.framework.utils.etc.TypeUtils.classNameFull;
 import static wbs.framework.utils.etc.TypeUtils.classPackageName;
 import static wbs.framework.utils.etc.TypeUtils.isInstanceOf;
 
@@ -45,13 +42,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Named;
+import javax.inject.Provider;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 import lombok.Cleanup;
 import lombok.Getter;
@@ -59,14 +59,31 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.codegen.JavaAnnotationWriter;
+import wbs.framework.codegen.JavaClassUnitWriter;
+import wbs.framework.codegen.JavaClassWriter;
+import wbs.framework.codegen.JavaImportRegistry;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelMethods;
+import wbs.framework.object.ObjectDatabaseHelper;
+import wbs.framework.object.ObjectHelperImplementation;
+import wbs.framework.object.ObjectHooks;
+import wbs.framework.object.ObjectManager;
+import wbs.framework.object.ObjectModel;
+import wbs.framework.object.ObjectModelImplementation;
 import wbs.framework.object.ObjectModelMethods;
-import wbs.framework.utils.AtomicFileWriter;
-import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.object.ObjectTypeEntry;
+import wbs.framework.object.ObjectTypeRegistry;
+import wbs.framework.utils.etc.OptionalUtils;
 import wbs.framework.utils.etc.RuntimeIoException;
+import wbs.framework.utils.formatwriter.AtomicFileWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperGenerator")
@@ -106,11 +123,6 @@ class ObjectHelperGenerator {
 
 	Class <?> objectHelperInterface;
 
-	FormatWriter javaWriter;
-
-	Set <Pair <String, List <Class <?>>>> delegatedMethods =
-		new HashSet<> ();
-
 	// implementation
 
 	public
@@ -140,18 +152,12 @@ class ObjectHelperGenerator {
 
 		}
 
-		List <String> modelPackageNameParts =
-			stringSplitFullStop (
-				classPackageName (
-					model.objectClass ()));
-
 		packageName =
 			joinWithFullStop (
-				listSlice (
-					modelPackageNameParts,
-					0l,
-					collectionSize (
-						modelPackageNameParts) - 1));
+				listSliceAllButLastItemRequired (
+					stringSplitFullStop (
+						classPackageName (
+							model.objectClass ()))));
 
 		recordClassName =
 			stringFormat (
@@ -288,688 +294,711 @@ class ObjectHelperGenerator {
 				objectHelperImplementationName);
 
 		@Cleanup
-		FormatWriter javaWriterTemp =
+		FormatWriter formatWriter =
 			new AtomicFileWriter (
 				filename);
 
-		setJavaWriter (
-			javaWriterTemp);
+		JavaClassUnitWriter classUnitWriter =
+			new JavaClassUnitWriter ()
 
-		javaWriter.writeFormat (
-			"package %s.logic;\n",
-			packageName);
+			.formatWriter (
+				formatWriter)
 
-		javaWriter.writeFormat (
-			"\n");
+			.packageNameFormat (
+				"%s.logic",
+				packageName);
 
-		writeImports ();
-		writeClass ();
+		JavaClassWriter classWriter =
+			new JavaClassWriter ()
 
-	}
+			.className (
+				objectHelperImplementationName)
 
-	private
-	void setJavaWriter (
-			@NonNull FormatWriter javaWriter) {
+			.addClassAnnotation (
+				new JavaAnnotationWriter ()
 
-		this.javaWriter =
-			javaWriter;
+				.name (
+					"java.lang.SuppressWarnings")
 
-	}
+				.addAttributeFormat (
+					"value",
+					"{ \"rawtypes\", \"unchecked\" }"))
 
-	private
-	void writeImports () {
+			.addClassModifier (
+				"public")
 
-		for (
-			Class<?> standardImportClass
-				: standardImportClasses
-		) {
+			.addImplements (
+				ObjectHelperImplementation.class)
 
-			javaWriter.writeFormat (
-				"import %s;\n",
-				standardImportClass.getName ());
+			.addImplements (
+				packageName + ".model",
+				objectHelperInterfaceName);
 
-		}
-
-		javaWriter.writeFormat (
-			"\n");
-
-		javaWriter.writeFormat (
-			"import %s;\n",
-			model.objectClass ().getName ());
-
-		for (
-			String componentName
-				: componentNames
-		) {
-
-			javaWriter.writeFormat (
-				"import %s;\n",
-				stringFormat (
-					"wbs.framework.object.ObjectHelper%sImplementation",
-					capitalise (
-						componentName)));
-
-		}
-
-		if (hasDao) {
-
-			javaWriter.writeFormat (
-				"import %s;\n",
-				daoMethodsInterface.getName ());
-
-		}
-
-		if (hasExtra) {
-
-			javaWriter.writeFormat (
-				"import %s;\n",
-				extraMethodsInterface.getName ());
-
-		}
-
-		javaWriter.writeFormat (
-			"\n");
-
-	}
-
-	void writeClass () {
-
-		javaWriter.writeFormat (
-			"@SuppressWarnings ({ \"rawtypes\", \"unchecked\" })\n");
-
-		javaWriter.writeFormat (
-			"public\n");
-
-		javaWriter.writeFormat (
-			"class %s\n",
-			objectHelperImplementationName);
-
-		javaWriter.writeFormat (
-			"\timplements\n");
-
-		javaWriter.writeFormat (
-			"\t\tObjectHelperImplementation,\n");
-
-		javaWriter.writeFormat (
-			"\t\t%s.model.%s {\n",
-			packageName,
-			objectHelperInterfaceName);
-
-		javaWriter.writeFormat (
-			"\n");
-
-		writeDependencies ();
-		writePrototypeDependencies ();
-		writeState ();
-
-		writeLifecycle ();
-		writeImplementation ();
-		writeDelegations ();
-
-		javaWriter.writeFormat (
-			"}\n");
-
-	}
-
-	void writeDependencies () {
-
-		javaWriter.writeFormat (
-			"\t// dependencies\n");
-
-		javaWriter.writeFormat (
-			"\n");
-
-		javaWriter.writeFormat (
-			"\t@SingletonDependency\n");
-
-		javaWriter.writeFormat (
-			"\tApplicationContext applicationContext;\n");
-
-		javaWriter.writeFormat (
-			"\n");
-
-		javaWriter.writeFormat (
-			"\t@SingletonDependency\n");
-
-		javaWriter.writeFormat (
-			"\tDatabase database;\n");
-
-		javaWriter.writeFormat (
-			"\n");
-
-		javaWriter.writeFormat (
-			"\t@SingletonDependency\n");
-
-		javaWriter.writeFormat (
-			"\tEntityHelper entityHelper;\n");
-
-		javaWriter.writeFormat (
-			"\n");
-
-		javaWriter.writeFormat (
-			"\t@SingletonDependency\n");
-
-		javaWriter.writeFormat (
-			"\tObjectTypeRegistry objectTypeRegistry;\n");
-
-		javaWriter.writeFormat (
-			"\n");
-
-		if (hasDao) {
-
-			javaWriter.writeFormat (
-				"\t@SingletonDependency\n");
-
-			javaWriter.writeFormat (
-				"\t@Named\n");
+		classUnitWriter.addBlock (
+			classWriter);
 	
-			javaWriter.writeFormat (
-				"\t%s %s;\n",
-				daoMethodsInterfaceName,
+		classWriter.addBlock (
+			this::writeDependencies);
+		
+		classWriter.addBlock (
+			this::writePrototypeDependencies);
+		
+		classWriter.addBlock (
+			this::writeState);
+		
+		classWriter.addBlock (
+			this::writeLifecycle);
+		
+		classWriter.addBlock (
+			this::writeImplementation);
+		
+		classWriter.addBlock (
+			this::writeDelegations);
+		
+		classUnitWriter.write ();
+
+	}
+
+	void writeDependencies (
+			@NonNull JavaImportRegistry imports,
+			@NonNull FormatWriter formatWriter) {
+
+		formatWriter.writeLineFormat (
+			"// dependencies");
+
+		formatWriter.writeNewline ();
+
+		// application context
+
+		formatWriter.writeLineFormat (
+			"@%s",
+			imports.register (
+				SingletonDependency.class));
+
+		formatWriter.writeLineFormat (
+			"%s applicationContext;",
+			imports.register (
+				ApplicationContext.class));
+
+		formatWriter.writeNewline ();
+
+		// database
+
+		formatWriter.writeLineFormat (
+			"@%s",
+			imports.register (
+				SingletonDependency.class));
+
+		formatWriter.writeLineFormat (
+			"%s database;",
+			imports.register (
+				Database.class));
+
+		formatWriter.writeNewline ();
+
+		// entity helper
+
+		formatWriter.writeLineFormat (
+			"@%s",
+			imports.register (
+				SingletonDependency.class));
+
+		formatWriter.writeLineFormat (
+			"%s entityHelper;",
+			imports.register (
+				EntityHelper.class));
+
+		formatWriter.writeNewline ();
+
+		// object type registry
+
+		formatWriter.writeLineFormat (
+			"@%s",
+			imports.register (
+				SingletonDependency.class));
+
+		formatWriter.writeLineFormat (
+			"%s objectTypeRegistry;",
+			imports.register (
+				ObjectTypeRegistry.class));
+
+		formatWriter.writeNewline ();
+
+		// dao
+
+		if (hasDao) {
+
+			formatWriter.writeLineFormat (
+				"@%s",
+				imports.register (
+					SingletonDependency.class));
+	
+			formatWriter.writeLineFormat (
+				"@%s",
+				imports.register (
+					Named.class));
+	
+			formatWriter.writeLineFormat (
+				"%s %s;",
+				imports.register (
+					daoMethodsInterface),
 				daoComponentName);
 	
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
 		}
 
 		if (hasExtra) {
 
-			javaWriter.writeFormat (
-				"\t@SingletonDependency\n");
-
-			javaWriter.writeFormat (
-				"\t@Named\n");
+			formatWriter.writeLineFormat (
+				"@%s",
+				imports.register (
+					SingletonDependency.class));
 	
-			javaWriter.writeFormat (
-				"\t%s %s;\n",
-				extraMethodsInterfaceName,
+			formatWriter.writeLineFormat (
+				"@%s",
+				imports.register (
+					Named.class));
+	
+			formatWriter.writeLineFormat (
+				"%s %s;",
+				imports.register (
+					extraMethodsInterface),
 				extraComponentName);
 	
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
 		}
 
 	}	
 
-	void writePrototypeDependencies () {
+	void writePrototypeDependencies (
+			@NonNull JavaImportRegistry imports,
+			@NonNull FormatWriter formatWriter) {
 
-		javaWriter.writeFormat (
-			"\t// prototype dependencies\n");
+		formatWriter.writeLineFormat (
+			"// prototype dependencies");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"\t@PrototypeDependency\n");
+		// object database helper
 
-		javaWriter.writeFormat (
-			"\tProvider <ObjectDatabaseHelper>\n");
+		formatWriter.writeLineFormat (
+			"@%s",
+			imports.register (
+				PrototypeDependency.class));
 
-		javaWriter.writeFormat (
-			"\tobjectDatabaseHelperProvider;\n");
+		formatWriter.writeLineFormat (
+			"%s <%s>",
+			imports.register (
+				Provider.class),
+			imports.register (
+				ObjectDatabaseHelper.class));
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeLineFormat (
+			"objectDatabaseHelperProvider;");
+
+		formatWriter.writeNewline ();
+
+		// components
 
 		for (
 			String componentName
 				: componentNames
 		) {
 
-			javaWriter.writeFormat (
-				"\t@PrototypeDependency\n");
+			formatWriter.writeLineFormat (
+				"@%s",
+				imports.register (
+					PrototypeDependency.class));
 
-			javaWriter.writeFormat (
-				"\tProvider <%s>\n",
+			formatWriter.writeLineFormat (
+				"%s <%s>",
+				imports.register (
+					Provider.class),
 				stringFormat (
-					"ObjectHelper%sImplementation <%s>",
-					capitalise (
-						componentName),
-					model.objectClass ().getSimpleName ()));
+					"%s <%s>",
+					imports.registerFormat (
+						"wbs.framework.object.ObjectHelper%sImplementation",
+						capitalise (
+							componentName)),
+					imports.register (
+						model.objectClass ())));
 
-			javaWriter.writeFormat (
-				"\t%s;\n",
+			formatWriter.writeLineFormat (
+				"%s;",
 				stringFormat (
 					"objectHelper%sImplementationProvider",
 					capitalise (
 						componentName)));
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
 		}
 
 	}
 
-	void writeState () {
+	void writeState (
+			@NonNull JavaImportRegistry imports,
+			@NonNull FormatWriter formatWriter) {
 
-		javaWriter.writeFormat (
-			"\t// state\n");
+		formatWriter.writeLineFormat (
+			"// state");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"\tModel parentModel;\n");
+		formatWriter.writeLineFormat (
+			"%s model;",
+			imports.register (
+				Model.class));
 
-		javaWriter.writeFormat (
-			"\tModel model;\n");
+		formatWriter.writeLineFormat (
+			"%s parentModel;",
+			imports.register (
+				Model.class));
 
-		javaWriter.writeFormat (
-			"\tObjectModel objectModel;\n");
+		formatWriter.writeLineFormat (
+			"%s objectModel;",
+			imports.register (
+				ObjectModel.class));
 
-		javaWriter.writeFormat (
-			"\tObjectDatabaseHelper databaseHelper;\n");
+		formatWriter.writeLineFormat (
+			"%s databaseHelper;",
+			imports.register (
+				ObjectDatabaseHelper.class));
 
-		javaWriter.writeFormat (
-			"\tObjectHooks hooksImplementation;\n");
+		formatWriter.writeLineFormat (
+			"%s hooksImplementation;",
+			imports.register (
+				ObjectHooks.class));
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
 		for (
 			String componentName
 				: componentNames
 		) {
 
-			javaWriter.writeFormat (
-				"\t%s %s;\n",
-				stringFormat (
-					"ObjectHelper%sImplementation <%s>",
+			formatWriter.writeLineFormat (
+				"%s <%s> %s;",
+				imports.registerFormat (
+					"wbs.framework.object.ObjectHelper%sImplementation",
 					capitalise (
-						componentName),
-					model.objectClass ().getSimpleName ()),
+						componentName)),
+				imports.register (
+					model.objectClass ()),
 				stringFormat (
 					"%sImplementation",
 					componentName));
 
 		}
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
 	}
 
-	void writeLifecycle () {
+	void writeLifecycle (
+			@NonNull JavaImportRegistry imports,
+			@NonNull FormatWriter formatWriter) {
 
-		javaWriter.writeFormat (
-			"\t// lifecycle\n");
+		formatWriter.writeLineFormat (
+			"// lifecycle");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"\t@PostConstruct\n");
+		// open method
 
-		javaWriter.writeFormat (
-			"\tpublic\n");
+		formatWriter.writeLineFormat (
+			"@%s",
+			imports.register (
+				PostConstruct.class));
 
-		javaWriter.writeFormat (
-			"\tvoid setup () {\n");
+		formatWriter.writeLineFormat (
+			"public");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeLineFormat (
+			"void setup () {");
 
-		// start transaction
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"\t\ttry (\n");
+		formatWriter.increaseIndent ();
 
-		javaWriter.writeFormat (
-			"\t\t\tTransaction transaction =\n");
+		// open transaction
 
-		javaWriter.writeFormat (
-			"\t\t\t\tdatabase.beginReadOnly (\n");
+		formatWriter.writeLineFormat (
+			"try (");
 
-		javaWriter.writeFormat (
-			"\t\t\t\t\t\"setup\",\n");
+		formatWriter.writeLineFormat (
+			"\t%s transaction =",
+			imports.register (
+				Transaction.class));
 
-		javaWriter.writeFormat (
-			"\t\t\t\t\tthis)\n");
+		formatWriter.writeLineFormat (
+			"\t\tdatabase.beginReadOnly (");
 
-		javaWriter.writeFormat (
-			"\t\t) {\n");
+		formatWriter.writeLineFormat (
+			"\t\t\t\"setup\",");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeLineFormat (
+			"\t\t\tthis);");
+
+		formatWriter.writeLineFormat (
+			") {");
+
+		formatWriter.writeNewline ();
+
+		formatWriter.increaseIndent ();
 
 		// model
 
-		javaWriter.writeFormat (
-			"\t\t\tmodel =\n");
+		formatWriter.writeLineFormat (
+			"model =");
 
-		javaWriter.writeFormat (
-			"\t\t\t\tentityHelper.modelsByName ().get (\n");
+		formatWriter.writeLineFormat (
+			"\tentityHelper.modelsByName ().get (");
 
-		javaWriter.writeFormat (
-			"\t\t\t\t\t\"%s\");\n",
+		formatWriter.writeLineFormat (
+			"\t\t\"%s\");",
 			model.objectName ());
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
 		// object type
 
-		javaWriter.writeFormat (
-			"\t\t\tObjectTypeEntry objectType =\n");
+		formatWriter.writeLineFormat (
+			"%s objectType =",
+			imports.register (
+				ObjectTypeEntry.class));
 
-		javaWriter.writeFormat (
-			"\t\t\t\tobjectTypeRegistry.findByCode (\n");
+		formatWriter.writeLineFormat (
+			"\tobjectTypeRegistry.findByCode (");
 
-		javaWriter.writeFormat (
-			"\t\t\t\t\t\"%s\");\n",
+		formatWriter.writeLineFormat (
+			"\t\t\"%s\");",
 			model.objectTypeCode ());
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
 		if (
 			isNotNull (
 				parentModel)
 		) {
 
-			javaWriter.writeFormat (
-				"\t\t\tparentModel =\n");
+			// parent model
 
-			javaWriter.writeFormat (
-				"\t\t\t\tentityHelper.modelsByName ().get (\n");
+			formatWriter.writeLineFormat (
+				"parentModel =");
 
-			javaWriter.writeFormat (
-				"\t\t\t\t\t\"%s\");\n",
+			formatWriter.writeLineFormat (
+				"\tentityHelper.modelsByName ().get (");
+
+			formatWriter.writeLineFormat (
+				"\t\t\"%s\");",
 				parentModel.objectName ());
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
-			javaWriter.writeFormat (
-				"\t\t\tObjectTypeEntry parentType =\n");
+			// parent type
+
+			formatWriter.writeLineFormat (
+				"ObjectTypeEntry parentType =");
 	
-			javaWriter.writeFormat (
-				"\t\t\t\tobjectTypeRegistry.findByCode (\n");
+			formatWriter.writeLineFormat (
+				"\tobjectTypeRegistry.findByCode (");
 	
-			javaWriter.writeFormat (
-				"\t\t\t\t\t\"%s\");\n",
+			formatWriter.writeLineFormat (
+				"\t\t\"%s\");",
 				parentModel.objectTypeCode ());
 	
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
 		}
 
 		// hooks
 
-		javaWriter.writeFormat (
-			"\t\t\t\thooksImplementation =\n");
+		formatWriter.writeLineFormat (
+			"hooksImplementation =");
 
-		javaWriter.writeFormat (
-			"\t\t\t\t\tOptionalUtils.optionalOrNull (\n");
+		formatWriter.writeLineFormat (
+			"\t%s.optionalOrNull (",
+			imports.register (
+				OptionalUtils.class));
 
-		javaWriter.writeFormat (
-			"\t\t\t\t\t\tapplicationContext.getComponent (\n");
+		formatWriter.writeLineFormat (
+			"\t\tapplicationContext.getComponent (");
 
-		javaWriter.writeFormat (
-			"\t\t\t\t\t\t\t\"%s\",\n",
+		formatWriter.writeLineFormat (
+			"\t\t\t\"%s\",",
 			hooksComponentName);
 
-		javaWriter.writeFormat (
-			"\t\t\t\t\t\t\tObjectHooks.class));\n");
+		formatWriter.writeLineFormat (
+			"\t\t\t%s.class));",
+			imports.register (
+				ObjectHooks.class));
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
 		// object model
 
-		javaWriter.writeFormat (
-			"\t\t\tObjectModel objectModel =\n");
+		formatWriter.writeLineFormat (
+			"%s objectModel =",
+			imports.register (
+				ObjectModel.class));
 
-		javaWriter.writeFormat (
-			"\t\t\t\tnew ObjectModelImplementation ()\n");
+		formatWriter.writeLineFormat (
+			"\tnew %s ()",
+			imports.register (
+				ObjectModelImplementation.class));
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"\t\t\t\t.model (\n");
+		formatWriter.writeLineFormat (
+			"\t.model (");
 
-		javaWriter.writeFormat (
-			"\t\t\t\t\tmodel)\n");
+		formatWriter.writeLineFormat (
+			"\t\tmodel)\n");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"\t\t\t\t.objectTypeId (\n");
+		formatWriter.writeLineFormat (
+			"\t.objectTypeId (");
 
-		javaWriter.writeFormat (
-			"\t\t\t\t\tobjectType.getId ())\n");
+		formatWriter.writeLineFormat (
+			"\t\tobjectType.getId ())");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"\t\t\t\t.objectTypeCode (\n");
+		formatWriter.writeLineFormat (
+			"\t.objectTypeCode (");
 
-		javaWriter.writeFormat (
-			"\t\t\t\t\tobjectType.getCode ())\n");
+		formatWriter.writeLineFormat (
+			"\t\tobjectType.getCode ())");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
 		if (
 			isNotNull (
 				parentModel)
 		) {
 
-			javaWriter.writeFormat (
-				"\t\t\t\t.parentTypeId (\n");
+			formatWriter.writeLineFormat (
+				"\t.parentTypeId (");
 
-			javaWriter.writeFormat (
-				"\t\t\t\t\tparentType.getId ())\n");
+			formatWriter.writeLineFormat (
+				"\t\tparentType.getId ())");
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 	
-			javaWriter.writeFormat (
-				"\t\t\t\t.parentClass (\n");
+			formatWriter.writeLineFormat (
+				"\t.parentClass (");
 	
-			javaWriter.writeFormat (
-				"\t\t\t\t\tparentModel.objectClass ())\n");
+			formatWriter.writeLineFormat (
+				"\t\tparentModel.objectClass ())");
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
 		}
 
 		if (hasDao) {
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 	
-			javaWriter.writeFormat (
-				"\t\t\t\t.daoImplementation (\n");
+			formatWriter.writeLineFormat (
+				"\t.daoImplementation (");
 
-			javaWriter.writeFormat (
-				"\t\t\t\t\t%s)\n",
+			formatWriter.writeLineFormat (
+				"\t\t%s)",
 				daoComponentName);
 	
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
-			javaWriter.writeFormat (
-				"\t\t\t\t.daoInterface (\n");
+			formatWriter.writeLineFormat (
+				"\t.daoInterface (");
 	
-			javaWriter.writeFormat (
-				"\t\t\t\t\t%s.class)\n",
+			formatWriter.writeLineFormat (
+				"\t\t%s.class)",
 				daoMethodsInterfaceName);
 	
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
 		}
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeLineFormat (
+			"\t.hooks (");
 
-		javaWriter.writeFormat (
-			"\t\t\t\t.hooks (\n");
+		formatWriter.writeLineFormat (
+			"\t\thooksImplementation)");
 
-		javaWriter.writeFormat (
-			"\t\t\t\t\thooksImplementation)\n");
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeLineFormat (
+			";");
 
-		javaWriter.writeFormat (
-			"\t\t\t;\n");
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"\n");
+		// database helper
 
-		javaWriter.writeFormat (
-			"\t\t\tdatabaseHelper =\n");
+		formatWriter.writeLineFormat (
+			"databaseHelper =");
 
-		javaWriter.writeFormat (
-			"\t\t\t\tobjectDatabaseHelperProvider.get ()\n");
+		formatWriter.writeLineFormat (
+			"\tobjectDatabaseHelperProvider.get ()");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"\t\t\t\t.model (\n");
+		formatWriter.writeLineFormat (
+			"\t.model (");
 
-		javaWriter.writeFormat (
-			"\t\t\t\t\tobjectModel);\n");
+		formatWriter.writeLineFormat (
+			"\t\tobjectModel);");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
+
+		// components
 
 		for (
 			String componentName
 				: componentNames
 		) {
 
-			javaWriter.writeFormat (
-				"\t\t\t%sImplementation =\n",
+			formatWriter.writeLineFormat (
+				"%sImplementation =",
 				componentName);
 
-			javaWriter.writeFormat (
-				"\t\t\t\t%s.get ()\n",
+			formatWriter.writeLineFormat (
+				"\t%s.get ()",
 				stringFormat (
 					"objectHelper%sImplementationProvider",
 					capitalise (
 						componentName)));
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
-			javaWriter.writeFormat (
-				"\t\t\t\t.objectHelper (\n");
+			formatWriter.writeLineFormat (
+				"\t.objectHelper (");
 
-			javaWriter.writeFormat (
-				"\t\t\t\t\tthis)\n");
+			formatWriter.writeLineFormat (
+				"\t\tthis)");
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
-			javaWriter.writeFormat (
-				"\t\t\t\t.objectDatabaseHelper (\n");
+			formatWriter.writeLineFormat (
+				"\t.objectDatabaseHelper (");
 
-			javaWriter.writeFormat (
-				"\t\t\t\t\tdatabaseHelper)\n");
+			formatWriter.writeLineFormat (
+				"\t\tdatabaseHelper)");
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
-			javaWriter.writeFormat (
-				"\t\t\t\t.model (\n");
+			formatWriter.writeLineFormat (
+				"\t.model (");
 
-			javaWriter.writeFormat (
-				"\t\t\t\t\tobjectModel);\n");
+			formatWriter.writeLineFormat (
+				"\t\tobjectModel);");
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
-		}	
+		}
 
-		javaWriter.writeFormat (
-			"\t\t}\n");
+		// close transaction
 
-		javaWriter.writeFormat (
-			"\t}\n");
+		formatWriter.decreaseIndent ();
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeLineFormat (
+			"}");
+
+		formatWriter.writeNewline ();
+
+		// close method
+
+		formatWriter.decreaseIndent ();
+
+		formatWriter.writeLineFormat (
+			"}");
+
+		formatWriter.writeNewline ();
 
 	}
 
-	void writeImplementation () {
+	void writeImplementation (
+			@NonNull JavaImportRegistry imports,
+			@NonNull FormatWriter formatWriter) {
 
-		javaWriter.writeFormat (
-			"\t// implementation\n");
+		formatWriter.writeLineFormat (
+			"// implementation");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"\t@Override\n");
+		// open method
 
-		javaWriter.writeFormat (
-			"\tpublic\n");
+		formatWriter.writeLineFormat (
+			"@%s",
+			imports.register (
+				Override.class));
 
-		javaWriter.writeFormat (
-			"\tvoid objectManager (\n");
+		formatWriter.writeLineFormat (
+			"public");
 
-		javaWriter.writeFormat (
-			"\t\t\tObjectManager objectManager) {\n");
+		formatWriter.writeLineFormat (
+			"void objectManager (");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeLineFormat (
+			"\t\t%s objectManager) {",
+			imports.register (
+				ObjectManager.class));
+
+		formatWriter.writeNewline ();
+
+		formatWriter.increaseIndent ();
+
+		// initialise components
 
 		for (
 			String componentName
 				: componentNames
 		) {
 
-			javaWriter.writeFormat (
-				"\n");
-
-			javaWriter.writeFormat (
-				"\t\t\t%sImplementation.objectManager (\n",
+			formatWriter.writeLineFormat (
+				"%sImplementation.objectManager (",
 				componentName);
 
-			javaWriter.writeFormat (
-				"\t\t\t\tobjectManager);\n");
+			formatWriter.writeLineFormat (
+				"\tobjectManager);");
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
-			javaWriter.writeFormat (
-				"\t\t\t%sImplementation.setup ();\n",
+			formatWriter.writeLineFormat (
+				"\t%sImplementation.setup ();",
 				componentName);
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
 		}
 
-		javaWriter.writeFormat (
-			"\n");
+		// close method
 
-		javaWriter.writeFormat (
-			"\t}\n");
+		formatWriter.decreaseIndent ();
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeLineFormat (
+			"}");
+
+		formatWriter.writeNewline ();
 
 	}
 
-	void writeDelegations () {
+	void writeDelegations (
+			@NonNull JavaImportRegistry imports,
+			@NonNull FormatWriter formatWriter) {
+
+		Set <Pair <String, List <Class <?>>>> delegatedMethods =
+			new HashSet<> ();
 
 		if (hasExtra) {
 
 			writeDelegate (
+				delegatedMethods,
+				imports,
+				formatWriter,
 				extraMethodsInterface,
 				extraComponentName);
 
@@ -978,6 +1007,9 @@ class ObjectHelperGenerator {
 		if (hasDao) {
 
 			writeDelegate (
+				delegatedMethods,
+				imports,
+				formatWriter,
 				daoMethodsInterface,
 				daoComponentName);
 
@@ -995,6 +1027,9 @@ class ObjectHelperGenerator {
 				componentEntry.getValue ();
 
 			writeDelegate (
+				delegatedMethods,
+				imports,
+				formatWriter,
 				componentClass,
 				stringFormat (
 					"%sImplementation",
@@ -1003,25 +1038,33 @@ class ObjectHelperGenerator {
 		}
 
 		writeDelegate (
+			delegatedMethods,
+			imports,
+			formatWriter,
 			ObjectModelMethods.class,
 			"objectModel");
 
 		writeDelegate (
+			delegatedMethods,
+			imports,
+			formatWriter,
 			ModelMethods.class,
 			"model");
 
 	}
 
 	void writeDelegate (
+			@NonNull Set <Pair <String, List <Class <?>>>> delegatedMethods,
+			@NonNull JavaImportRegistry imports,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Class <?> delegateInterface,
 			@NonNull String delegateName) {
 
-		javaWriter.writeFormat (
-			"\t// delegate %s\n",
+		formatWriter.writeLineFormat (
+			"// delegate %s",
 			delegateInterface.getSimpleName ());
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
 		for (
 			Method method
@@ -1051,34 +1094,34 @@ class ObjectHelperGenerator {
 
 			String returnTypeName =
 				methodReturnSourceName (
+					imports,
 					method);
 
-			javaWriter.writeFormat (
-				"\t@Override\n");
+			formatWriter.writeLineFormat (
+				"@%s",
+				imports.register (
+					Override.class));
 
 			if (
 				arrayIsNotEmpty (
 					method.getTypeParameters ())
 			) {
 
-				javaWriter.writeFormat (
-					"\tpublic <%s>\n",
+				formatWriter.writeLineFormat (
+					"public <%s>",
 					joinWithCommaAndSpace (
-						Arrays.stream (
-							method.getTypeParameters ())
-	
-					.map (
-						this::typeVariableSourceDeclaration)
-
-					.collect (
-						Collectors.toList ()
-
-				)));
+						iterableMap (
+							typeParameter ->
+								typeVariableSourceDeclaration (
+									imports,
+									typeParameter),
+							Arrays.asList (
+								method.getTypeParameters ()))));
 
 			} else {
 
-				javaWriter.writeFormat (
-					"\tpublic\n");
+				formatWriter.writeLineFormat (
+					"public");
 
 			}
 
@@ -1091,29 +1134,28 @@ class ObjectHelperGenerator {
 					parameters)
 			) {
 
-				javaWriter.writeFormat (
-					"\t%s %s () {\n",
+				formatWriter.writeLineFormat (
+					"%s %s () {",
 					returnTypeName,
 					method.getName ());
 
 			} else {
 
-				javaWriter.writeFormat (
-					"\t%s %s (\n",
+				formatWriter.writeLineFormat (
+					"%s %s (",
 					returnTypeName,
 					method.getName ());
 	
 				for (
 					Parameter parameter
-						: listSlice (
-							parameters,
-							0,
-							parameters.size () - 1)
+						: listSliceAllButLastItemRequired (
+							parameters)
 				) {
 	
-					javaWriter.writeFormat (
-						"\t\t\t%s %s,\n",
-						parameterSourceName (
+					formatWriter.writeLineFormat (
+						"\t\t%s %s,",
+						parameterSourceTypeName (
+							imports,
 							parameter),
 						parameter.getName ());
 
@@ -1123,16 +1165,16 @@ class ObjectHelperGenerator {
 					listLastElementRequired (
 						parameters);
 
-				javaWriter.writeFormat (
-					"\t\t\t%s %s) {\n",
-					parameterSourceName (
+				formatWriter.writeLineFormat (
+					"\t\t%s %s) {",
+					parameterSourceTypeName (
+						imports,
 						lastParameter),
 					lastParameter.getName ());
 
 			}
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
 			if (
 				stringEqualSafe (
@@ -1145,15 +1187,15 @@ class ObjectHelperGenerator {
 						parameters)
 				) {
 
-					javaWriter.writeFormat (
-						"\t\t%s.%s ();\n",
+					formatWriter.writeLineFormat (
+						"\t%s.%s ();",
 						delegateName,
 						method.getName ());
 
 				} else {
 
-					javaWriter.writeFormat (
-						"\t\t%s.%s (\n",
+					formatWriter.writeLineFormat (
+						"\t%s.%s (",
 						delegateName,
 						method.getName ());
 
@@ -1165,8 +1207,8 @@ class ObjectHelperGenerator {
 								parameters.size () - 1)
 					) {
 		
-						javaWriter.writeFormat (
-							"\t\t\t%s,\n",
+						formatWriter.writeLineFormat (
+							"\t\t%s,",
 							parameter.getName ());
 		
 					}
@@ -1175,7 +1217,7 @@ class ObjectHelperGenerator {
 						listLastElementRequired (
 							parameters);
 		
-					javaWriter.writeFormat (
+					formatWriter.writeLineFormat (
 						"\t\t\t%s);\n",
 						lastParameter.getName ());
 
@@ -1188,15 +1230,15 @@ class ObjectHelperGenerator {
 						parameters)
 				) {
 
-					javaWriter.writeFormat (
-						"\t\treturn %s.%s ();\n",
+					formatWriter.writeFormat (
+						"\treturn %s.%s ();",
 						delegateName,
 						method.getName ());
 
 				} else {
 
-					javaWriter.writeFormat (
-						"\t\treturn %s.%s (\n",
+					formatWriter.writeLineFormat (
+						"\treturn %s.%s (",
 						delegateName,
 						method.getName ());
 
@@ -1208,8 +1250,8 @@ class ObjectHelperGenerator {
 								parameters.size () - 1)
 					) {
 		
-						javaWriter.writeFormat (
-							"\t\t\t%s,\n",
+						formatWriter.writeLineFormat (
+							"\t\t%s,",
 							parameter.getName ());
 		
 					}
@@ -1218,40 +1260,41 @@ class ObjectHelperGenerator {
 						listLastElementRequired (
 							parameters);
 		
-					javaWriter.writeFormat (
-						"\t\t\t%s);\n",
+					formatWriter.writeLineFormat (
+						"\t\t%s);\n",
 						lastParameter.getName ());
 
 				}
 
 			}
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
-			javaWriter.writeFormat (
-				"\t}\n");
+			formatWriter.writeFormat (
+				"}");
 
-			javaWriter.writeFormat (
-				"\n");
+			formatWriter.writeNewline ();
 
 		}
 
 	}
 
 	String methodReturnSourceName (
+			@NonNull JavaImportRegistry imports,
 			@NonNull Method method) {
 
 		return stringReplaceAllRegex (
 			"\\bRecordType\\b",
 			model.objectClass ().getSimpleName (),
 			typeSourceName (
+				imports,
 				method.getGenericReturnType ()));
 
 	}
 
 	public
 	String typeSourceName (
+			@NonNull JavaImportRegistry imports,
 			@NonNull Type type) {
 
 		if (
@@ -1261,6 +1304,7 @@ class ObjectHelperGenerator {
 		) {
 
 			return classSourceName (
+				imports,
 				(Class <?>)
 				type);
 
@@ -1271,6 +1315,7 @@ class ObjectHelperGenerator {
 		) {
 
 			return parameterizedTypeSourceName (
+				imports,
 				(ParameterizedType)
 				type);
 
@@ -1281,6 +1326,7 @@ class ObjectHelperGenerator {
 		) {
 
 			return typeVariableSourceName (
+				imports,
 				(TypeVariable <?>)
 				type);
 
@@ -1291,6 +1337,7 @@ class ObjectHelperGenerator {
 		) {
 
 			return wildcardTypeSourceName (
+				imports,
 				(WildcardType)
 				type);
 
@@ -1307,6 +1354,7 @@ class ObjectHelperGenerator {
 
 	public
 	String classSourceName (
+			@NonNull JavaImportRegistry imports,
 			@NonNull Class <?> theClass) {
 
 		if (theClass.isArray ()) {
@@ -1314,29 +1362,13 @@ class ObjectHelperGenerator {
 			return stringFormat (
 				"%s[]",
 				classSourceName (
+					imports,
 					theClass.getComponentType ()));
-
-		} else if (
-
-			classEqualSafe (
-				theClass,
-				model.objectClass ())
-
-			|| contains (
-				standardImportClasses,
-				theClass)
-
-			|| stringStartsWithSimple (
-				"java.lang.",
-				theClass.getName ())
-
-		) {
-
-			return theClass.getSimpleName ();
 
 		} else {
 
-			return theClass.getName ();
+			return imports.register (
+				theClass);
 
 		}
 
@@ -1344,6 +1376,7 @@ class ObjectHelperGenerator {
 
 	public
 	String parameterizedTypeSourceName (
+			@NonNull JavaImportRegistry imports,
 			@NonNull ParameterizedType parameterizedType) {
 
 		if (
@@ -1351,7 +1384,7 @@ class ObjectHelperGenerator {
 				parameterizedType.getActualTypeArguments ())
 		) {
 
-			return classNameFull (
+			return imports.register (
 				(Class <?>)
 				parameterizedType.getRawType ()); 
 
@@ -1360,10 +1393,14 @@ class ObjectHelperGenerator {
 			return stringFormat (
 				"%s <%s>",
 				typeSourceName (
+					imports,
 					parameterizedType.getRawType ()),
 				joinWithCommaAndSpace (
 					arrayMap (
-						this::typeSourceName,
+						typeArgument ->
+							typeSourceName (
+								imports,
+								typeArgument),
 						parameterizedType.getActualTypeArguments ())));
 
 		}
@@ -1372,6 +1409,7 @@ class ObjectHelperGenerator {
 
 	public
 	String typeVariableSourceName (
+			@NonNull JavaImportRegistry imports,
 			@NonNull TypeVariable <?> typeVariable) {
 
 		return typeVariable.getName ();
@@ -1380,6 +1418,7 @@ class ObjectHelperGenerator {
 
 	public
 	String typeVariableSourceDeclaration (
+			@NonNull JavaImportRegistry imports,
 			@NonNull TypeVariable <?> typeVariable) {
 
 		List <Type> bounds =
@@ -1409,7 +1448,10 @@ class ObjectHelperGenerator {
 				typeVariable.getName (),
 				joinWithCommaAndSpace (
 					iterableMap (
-						this::typeSourceName,
+						bound ->
+							typeSourceName (
+								imports,
+								bound),
 						bounds)));
 
 		}
@@ -1418,6 +1460,7 @@ class ObjectHelperGenerator {
 
 	public
 	String wildcardTypeSourceName (
+			@NonNull JavaImportRegistry imports,
 			@NonNull WildcardType wildcardType) {
 
 		return wildcardType.toString ();
@@ -1425,7 +1468,8 @@ class ObjectHelperGenerator {
 	}
 
 	public
-	String parameterSourceName (
+	String parameterSourceTypeName (
+			@NonNull JavaImportRegistry imports,
 			@NonNull Parameter parameter) {
 
 		if (parameter.isVarArgs ()) {
@@ -1433,11 +1477,13 @@ class ObjectHelperGenerator {
 			return stringFormat (
 				"%s ...",
 				typeSourceName (
+					imports,
 					parameter.getType ().getComponentType ()));
 
 		} else {
 
 			return typeSourceName (
+				imports,
 				parameter.getParameterizedType ());
 
 		}
@@ -1445,60 +1491,6 @@ class ObjectHelperGenerator {
 	}
 
 	// data
-
-	public static
-	List <Class <?>> standardImportClasses =
-		ImmutableList.of (
-
-		java.util.function.Supplier.class,
-
-		java.util.ArrayList.class,
-		java.util.Date.class,
-		java.util.LinkedHashMap.class,
-		java.util.LinkedHashSet.class,
-		java.util.List.class,
-		java.util.Map.class,
-		java.util.Set.class,
-
-		javax.annotation.PostConstruct.class,
-		javax.inject.Named.class,
-		javax.inject.Provider.class,
-
-		wbs.framework.application.annotations.PrototypeDependency.class,
-		wbs.framework.application.annotations.SingletonDependency.class,
-		wbs.framework.application.context.ApplicationContext.class,
-
-		wbs.framework.entity.helper.EntityHelper.class,
-		wbs.framework.entity.model.Model.class,
-		wbs.framework.entity.record.GlobalId.class,
-		wbs.framework.entity.record.Record.class,
-
-		wbs.framework.database.Database.class,
-		wbs.framework.database.Transaction.class,
-
-		wbs.framework.object.ObjectDatabaseHelper.class,
-		wbs.framework.object.ObjectHelperImplementation.class,
-		wbs.framework.object.ObjectHooks.class,
-		wbs.framework.object.ObjectManager.class,
-		wbs.framework.object.ObjectModel.class,
-		wbs.framework.object.ObjectModelImplementation.class,
-		wbs.framework.object.ObjectTypeEntry.class,
-		wbs.framework.object.ObjectTypeRegistry.class,
-
-		wbs.framework.utils.etc.OptionalUtils.class,
-
-		com.google.common.base.Optional.class,
-
-		org.joda.time.Instant.class,
-		org.joda.time.LocalDate.class,
-		org.joda.time.ReadableInstant.class
-
-	);
-
-	public static
-	Set <Class <?>> standardImportClassesSet =
-		ImmutableSet.copyOf (
-			standardImportClasses);
 
 	public static
 	List <String> componentNames =

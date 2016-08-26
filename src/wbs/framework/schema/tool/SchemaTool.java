@@ -23,7 +23,7 @@ import wbs.framework.logging.TaskLogger;
 import wbs.framework.schema.builder.SchemaFromModel;
 import wbs.framework.schema.helper.SchemaTypesHelper;
 import wbs.framework.schema.model.Schema;
-import wbs.framework.utils.AtomicFileWriter;
+import wbs.framework.utils.formatwriter.AtomicFileWriter;
 
 @Log4j
 public

@@ -13,7 +13,7 @@ import com.google.common.base.Optional;
 
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.FormatWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("htmlFormFieldRenderer")
 @Accessors (fluent = true)
