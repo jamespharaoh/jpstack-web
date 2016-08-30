@@ -1350,10 +1350,6 @@ class ChatUserLogicImplementation
 		Transaction transaction =
 			database.currentTransaction ();
 
-		DateTimeZone timezone =
-			getTimezone (
-				chatUser);
-
 		if (chatUser.getAgeChecked ())
 			return true;
 
@@ -1467,10 +1463,17 @@ class ChatUserLogicImplementation
 			isNotNull (
 				chatAffiliate.getCategory ())
 
-			&& referenceNotEqualWithClass (
-				ChatCategoryRec.class,
-				chatUser.getCategory (),
-				chatAffiliate.getCategory ())
+			&& (
+
+				isNull (
+					chatUser.getCategory ())
+
+				|| referenceNotEqualWithClass (
+					ChatCategoryRec.class,
+					chatUser.getCategory (),
+					chatAffiliate.getCategory ())
+
+			)
 
 		) {
 

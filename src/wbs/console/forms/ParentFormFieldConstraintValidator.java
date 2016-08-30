@@ -1,36 +1,36 @@
 package wbs.console.forms;
 
+import static wbs.framework.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOf;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("parentFormFieldConstraintValidator")
 public
-class ParentFormFieldConstraintValidator<
-	Container extends Record<?>,
-	Native extends Record<?>
+class ParentFormFieldConstraintValidator <
+	Container extends Record <?>,
+	Native extends Record <?>
 >
-	implements FormFieldConstraintValidator<Container,Native> {
+	implements FormFieldConstraintValidator <Container, Native> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// properties
@@ -45,15 +45,16 @@ class ParentFormFieldConstraintValidator<
 
 	@Override
 	public
-	Optional<String> validate (
+	Optional <String> validate (
 			@NonNull Container container,
-			@NonNull Optional<Native> nativeValue) {
+			@NonNull Optional <Native> nativeValue) {
 
-		Record<?> privDelegate =
+		Record <?> privDelegate =
 			createPrivDelegate != null
-				? (Record<?>) objectManager.dereference (
-					nativeValue.get (),
-					createPrivDelegate)
+				? (Record <?>)
+					objectManager.dereference (
+						nativeValue.get (),
+						createPrivDelegate)
 				: nativeValue.get ();
 
 		if (
@@ -62,13 +63,13 @@ class ParentFormFieldConstraintValidator<
 				createPrivCode)
 		) {
 
-			return Optional.of (
+			return optionalOf (
 				stringFormat (
 					"Permission denied"));
 
 		}
 
-		return Optional.<String>absent ();
+		return optionalAbsent ();
 
 	}
 

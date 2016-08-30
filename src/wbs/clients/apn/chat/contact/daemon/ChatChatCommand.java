@@ -1,7 +1,10 @@
 package wbs.clients.apn.chat.contact.daemon;
 
+import static wbs.framework.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOf;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.sms.gsm.GsmUtils.gsmStringSimplifyAllowNonGsm;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -10,6 +13,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
@@ -34,7 +38,6 @@ import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.affiliate.model.AffiliateRec;
-import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
@@ -42,7 +45,6 @@ import wbs.platform.text.model.TextRec;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.core.logic.KeywordFinder;
-import wbs.sms.gsm.GsmUtils;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
@@ -279,10 +281,10 @@ class ChatChatCommand
 				fromChatUser,
 				toChatUser,
 				rest,
-				Optional.of (
+				optionalOf (
 					message.getThreadId ()),
 				ChatMessageMethod.sms,
-				ImmutableList.<MediaRec>of ());
+				ImmutableList.of ());
 
 		if (rejectedReason != null) {
 
@@ -320,20 +322,21 @@ class ChatChatCommand
 
 	}
 
-	Optional<InboxAttemptRec> checkKeyword (
-			String keyword,
-			String rest) {
+	Optional <InboxAttemptRec> checkKeyword (
+			@NonNull String keyword,
+			@NonNull String rest) {
 
-		Optional<ChatKeywordRec> chatKeywordOptional =
+		Optional <ChatKeywordRec> chatKeywordOptional =
 			chatKeywordHelper.findByCode (
 				chat,
-				GsmUtils.gsmStringSimplify (keyword));
+				gsmStringSimplifyAllowNonGsm (
+					keyword));
 
 		if (
 			optionalIsNotPresent (
 				chatKeywordOptional)
 		) {
-			return Optional.<InboxAttemptRec>absent ();
+			return optionalAbsent ();
 		}
 
 		ChatKeywordRec chatKeyword =
@@ -341,14 +344,14 @@ class ChatChatCommand
 
 		if (chatKeyword.getChatBlock ()) {
 
-			return Optional.of (
+			return optionalOf (
 				doBlock ());
 
 		}
 
 		if (chatKeyword.getChatInfo ()) {
 
-			return Optional.of (
+			return optionalOf (
 				doInfo ());
 
 		}
@@ -358,16 +361,16 @@ class ChatChatCommand
 			&& chatKeyword.getCommand () != null
 		) {
 
-			return Optional.of (
+			return optionalOf (
 				commandManagerProvider.get ().handle (
 					inbox,
 					chatKeyword.getCommand (),
-					Optional.<Long>absent (),
+					optionalAbsent (),
 					rest));
 
 		}
 
-		return Optional.<InboxAttemptRec>absent ();
+		return optionalAbsent ();
 
 	}
 

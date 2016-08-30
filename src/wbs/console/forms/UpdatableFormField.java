@@ -9,7 +9,8 @@ import static wbs.framework.utils.etc.Misc.isError;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.isRight;
 import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
+import static wbs.framework.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOr;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -438,10 +439,10 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 
 	@Override
 	public
-	UpdateResult<Generic,Native> update (
+	UpdateResult <Generic, Native> update (
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String,Object> hints,
 			@NonNull String formName) {
 
 		// do nothing if no value present in form
@@ -452,19 +453,19 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 				formName)
 		) {
 
-			return new UpdateResult<Generic,Native> ()
+			return new UpdateResult <Generic, Native> ()
 
 				.updated (
 					false)
 
 				.error (
-					Optional.<String>absent ());
+					optionalAbsent ());
 
 		}
 
 		// get interface value from form
 
-		Either<Optional<Interface>,String> newInterfaceValue =
+		Either <Optional <Interface>, String> newInterfaceValue =
 			requiredValue (
 				renderer.formToInterface (
 					submission,
@@ -588,7 +589,8 @@ class UpdatableFormField<Container,Generic,Native,Interface>
 					oldNativeValue));
 
 		if (
-			optionalEqualOrNotPresentSafe (
+			optionalEqualOrNotPresentWithClass (
+				Object.class,
 				oldGenericValue,
 				newGenericValue)
 		) {

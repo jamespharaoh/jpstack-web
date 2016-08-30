@@ -8,17 +8,17 @@ import wbs.framework.entity.record.Record;
 
 @PrototypeComponent ("nullFormFieldUpdateHook")
 public
-class NullFormFieldUpdateHook<Container,Generic,Native>
-	implements FormFieldUpdateHook<Container,Generic,Native> {
+class NullFormFieldUpdateHook <Container, Generic, Native>
+	implements FormFieldUpdateHook <Container, Generic, Native> {
 
 	@Override
 	public
 	void onUpdate (
-			UpdateResult<Generic,Native> updateResult,
+			UpdateResult <Generic, Native> updateResult,
 			Container container,
-			Record<?> linkObject,
-			Optional<Object> objectRef,
-			Optional<String> objectType) {
+			Record <?> linkObject,
+			Optional <Object> objectRef,
+			Optional <String> objectType) {
 
 		// do nothing
 

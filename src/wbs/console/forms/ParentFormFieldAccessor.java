@@ -1,28 +1,26 @@
 package wbs.console.forms;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectManager;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("parentFormFieldAccessor")
 public
-class ParentFormFieldAccessor<
-	Container extends Record<Container>,
-	Parent extends Record<Parent>
+class ParentFormFieldAccessor <
+	Container extends Record <Container>,
+	Parent extends Record <Parent>
 >
-	implements FormFieldAccessor<Container,Parent> {
+	implements FormFieldAccessor <Container, Parent> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
 	// implementation
@@ -30,7 +28,7 @@ class ParentFormFieldAccessor<
 	@SuppressWarnings ("unchecked")
 	@Override
 	public
-	Optional<Parent> read (
+	Optional <Parent> read (
 			Container container) {
 
 		return Optional.of (
@@ -44,9 +42,9 @@ class ParentFormFieldAccessor<
 	public
 	void write (
 			@NonNull Container container,
-			@NonNull Optional<Parent> nativeValue) {
+			@NonNull Optional <Parent> nativeValue) {
 
-		throw new RuntimeException ();
+		throw new UnsupportedOperationException ();
 
 	}
 

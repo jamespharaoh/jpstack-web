@@ -250,8 +250,8 @@ class OptionalUtils {
 	public static <Type>
 	boolean optionalEqualOrNotPresentWithClass (
 			@NonNull Class <Type> valueClass,
-			@NonNull Optional <Type> optional0,
-			@NonNull Optional <Type> optional1) {
+			@NonNull Optional <? extends Type> optional0,
+			@NonNull Optional <? extends Type> optional1) {
 
 		// verify class instances
 

@@ -3,10 +3,11 @@ package wbs.clients.apn.chat.user.image.console;
 import static wbs.framework.utils.etc.CollectionUtils.listItemAtIndexRequired;
 import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualWithClass;
+import static wbs.framework.utils.etc.OptionalUtils.optionalValueNotEqualWithClass;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -139,12 +140,13 @@ class ChatUserImageListAction
 						index);
 
 				if (
-					referenceEqualWithClass (
+					optionalValueEqualWithClass (
 						ChatUserImageRec.class,
-						itemToRemove,
-						chatUserLogic.getMainChatUserImageByType (
-							chatUser,
-							type))
+						optionalFromNullable (
+							chatUserLogic.getMainChatUserImageByType (
+								chatUser,
+								type)),
+						itemToRemove)
 				) {
 
 					chatUserLogic.setMainChatUserImageByType (
@@ -315,11 +317,12 @@ class ChatUserImageListAction
 						index);
 
 				if (
-					referenceNotEqualWithClass (
+					optionalValueNotEqualWithClass (
 						ChatUserImageRec.class,
-						chatUserLogic.getMainChatUserImageByType (
-							chatUser,
-							type),
+						optionalFromNullable (
+							chatUserLogic.getMainChatUserImageByType (
+								chatUser,
+								type)),
 						chatUserImage)
 				) {
 

@@ -1,19 +1,21 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleHelperRegistry;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -28,48 +30,48 @@ class ParentFormFieldBuilder {
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleHelperRegistry consoleHelperRegistry;
 
-	@Inject
+	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<IdentityFormFieldInterfaceMapping>
+	@PrototypeDependency
+	Provider <IdentityFormFieldInterfaceMapping>
 	identityFormFieldInterfaceMappingProvider;
 
-	@Inject
-	Provider<IdentityFormFieldNativeMapping>
+	@PrototypeDependency
+	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
-	@Inject
-	Provider<ObjectFormFieldRenderer>
+	@PrototypeDependency
+	Provider <ObjectFormFieldRenderer>
 	objectFormFieldRendererProvider;
 
-	@Inject
-	Provider<ParentFormFieldAccessor>
+	@PrototypeDependency
+	Provider <ParentFormFieldAccessor>
 	parentFormFieldAccessorProvider;
 
-	@Inject
-	Provider<ParentFormFieldConstraintValidator>
+	@PrototypeDependency
+	Provider <ParentFormFieldConstraintValidator>
 	parentFormFieldValueConstraintValidatorProvider;
 
-	@Inject
-	Provider<ReadOnlyFormField>
+	@PrototypeDependency
+	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
-	@Inject
-	Provider<RequiredFormFieldValueValidator>
+	@PrototypeDependency
+	Provider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
-	@Inject
-	Provider<SimpleFormFieldAccessor>
+	@PrototypeDependency
+	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
-	@Inject
-	Provider<UpdatableFormField>
+	@PrototypeDependency
+	Provider <UpdatableFormField>
 	updatableFormFieldProvider;
 
 	// builder
@@ -139,11 +141,20 @@ class ParentFormFieldBuilder {
 		// accessor
 
 		FormFieldAccessor accessor =
-			consoleHelper.canGetParent ()
-				? simpleFormFieldAccessorProvider.get ()
-					.name (consoleHelper.parentFieldName ())
-					.nativeClass (consoleHelper.parentClass ())
-				: parentFormFieldAccessorProvider.get ();
+			ifThenElse (
+				consoleHelper.canGetParent (),
+
+			() -> simpleFormFieldAccessorProvider.get ()
+
+				.name (
+					consoleHelper.parentFieldName ())
+
+				.nativeClass (
+					consoleHelper.parentClass ()),
+
+			() -> parentFormFieldAccessorProvider.get ()
+
+		);
 
 		// native mapping
 

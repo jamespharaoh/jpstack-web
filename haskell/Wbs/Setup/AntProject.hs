@@ -268,7 +268,11 @@ writeBuildFile world = do
 			sattr "classpathref" "classpath",
 			sattr "encoding" "utf8",
 			sattr "target" "1.8"
-		] ++ attrs) elems
+		] ++ attrs) ([
+			mkelem "compilerarg" [
+				sattr "value" "-parameters"
+			] []
+		] ++ elems)
 
 	let makeCleanTargets =
 		[

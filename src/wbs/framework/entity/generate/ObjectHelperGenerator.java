@@ -756,7 +756,7 @@ class ObjectHelperGenerator {
 			"\t.model (");
 
 		formatWriter.writeLineFormat (
-			"\t\tmodel)\n");
+			"\t\tmodel)");
 
 		formatWriter.writeNewline ();
 
@@ -801,8 +801,6 @@ class ObjectHelperGenerator {
 
 		if (hasDao) {
 
-			formatWriter.writeNewline ();
-	
 			formatWriter.writeLineFormat (
 				"\t.daoImplementation (");
 
@@ -968,7 +966,7 @@ class ObjectHelperGenerator {
 			formatWriter.writeNewline ();
 
 			formatWriter.writeLineFormat (
-				"\t%sImplementation.setup ();",
+				"%sImplementation.setup ();",
 				componentName);
 
 			formatWriter.writeNewline ();
@@ -1218,7 +1216,7 @@ class ObjectHelperGenerator {
 							parameters);
 		
 					formatWriter.writeLineFormat (
-						"\t\t\t%s);\n",
+						"\t\t\t%s);",
 						lastParameter.getName ());
 
 				}
@@ -1230,7 +1228,7 @@ class ObjectHelperGenerator {
 						parameters)
 				) {
 
-					formatWriter.writeFormat (
+					formatWriter.writeLineFormat (
 						"\treturn %s.%s ();",
 						delegateName,
 						method.getName ());
@@ -1261,7 +1259,7 @@ class ObjectHelperGenerator {
 							parameters);
 		
 					formatWriter.writeLineFormat (
-						"\t\t%s);\n",
+						"\t\t%s);",
 						lastParameter.getName ());
 
 				}
@@ -1270,7 +1268,7 @@ class ObjectHelperGenerator {
 
 			formatWriter.writeNewline ();
 
-			formatWriter.writeFormat (
+			formatWriter.writeLineFormat (
 				"}");
 
 			formatWriter.writeNewline ();
