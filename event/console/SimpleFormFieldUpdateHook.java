@@ -2,13 +2,12 @@ package wbs.platform.event.console;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.forms.FormFieldUpdateHook;
 import wbs.console.request.ConsoleRequestContext;
@@ -50,11 +49,11 @@ class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
 	@Override
 	public
 	void onUpdate (
-			@NonNull UpdateResult<Generic,Native> updateResult,
+			@NonNull UpdateResult <Generic, Native> updateResult,
 			@NonNull Container container,
-			@NonNull Record<?> linkObject,
-			@NonNull Optional<Object> objectRef,
-			@NonNull Optional<String> objectType) {
+			@NonNull Record <?> linkObject,
+			@NonNull Optional <Object> objectRef,
+			@NonNull Optional <String> objectType) {
 
 		// determine if it's an admin event
 

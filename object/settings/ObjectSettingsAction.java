@@ -1,6 +1,7 @@
 package wbs.platform.object.settings;
 
-import javax.inject.Inject;
+import static wbs.framework.utils.etc.OptionalUtils.optionalAbsent;
+
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -11,7 +12,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.console.action.ConsoleAction;
-import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
@@ -21,7 +21,7 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.builder.annotations.BuilderParent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
@@ -32,42 +32,39 @@ import wbs.framework.web.Responder;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSettingsAction")
 public
-class ObjectSettingsAction<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectSettingsAction <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 >
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@BuilderParent
-	ConsoleContextBuilderContainer<ObjectType> container;
-
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
 	// properties
 
 	@Getter @Setter
-	ObjectLookup<ObjectType> objectLookup;
+	ObjectLookup <ObjectType> objectLookup;
 
 	@Getter @Setter
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
-	Provider<Responder> detailsResponder;
+	Provider <Responder> detailsResponder;
 
 	@Getter @Setter
-	Provider<Responder> accessDeniedResponder;
+	Provider <Responder> accessDeniedResponder;
 
 	@Getter @Setter
 	String editPrivKey;
@@ -82,7 +79,7 @@ class ObjectSettingsAction<
 	FormFieldSet formFieldSet;
 
 	@Getter @Setter
-	FieldsProvider<ObjectType,ParentType> formFieldsProvider;
+	FieldsProvider <ObjectType, ParentType> formFieldsProvider;
 
 	// state
 
@@ -177,16 +174,17 @@ class ObjectSettingsAction<
 				formFieldSet,
 				updateResultSet,
 				object,
-				(PermanentRecord<?>) object,
-				Optional.<Object>absent (),
-				Optional.<String>absent (),
+				(PermanentRecord <?>) object,
+				optionalAbsent (),
+				optionalAbsent (),
 				"settings");
 
 		} else {
 
-			PermanentRecord<?> linkObject =
-				(PermanentRecord<?>)
-				objectManager.getParent (object);
+			PermanentRecord <?> linkObject =
+				(PermanentRecord <?>)
+				objectManager.getParent (
+					object);
 
 			Object objectRef =
 				BeanLogic.getProperty (
@@ -220,8 +218,8 @@ class ObjectSettingsAction<
 	void prepareParent () {
 
 		@SuppressWarnings ("unchecked")
-		ConsoleHelper<ParentType> parentHelper =
-			(ConsoleHelper<ParentType>)
+		ConsoleHelper <ParentType> parentHelper =
+			(ConsoleHelper <ParentType>)
 			objectManager.findConsoleHelper (
 				consoleHelper.parentClass ());
 

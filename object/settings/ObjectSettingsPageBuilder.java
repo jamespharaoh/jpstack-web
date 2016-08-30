@@ -1,19 +1,17 @@
 package wbs.platform.object.settings;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
-
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
@@ -34,6 +32,8 @@ import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -47,54 +47,56 @@ import wbs.framework.web.Responder;
 @PrototypeComponent ("objectSettingsPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectSettingsPageBuilder<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectSettingsPageBuilder <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ApplicationContext applicationContext;
 
-	@Inject
+	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
 	// indirect dependencies
 
-	@Inject
-	Provider<ConsoleHelperRegistry> consoleHelperRegistry;
+	@SingletonDependency
+	Provider <ConsoleHelperRegistry> consoleHelperRegistry;
 
-	@Inject
-	Provider<ConsoleManager> consoleManager;
+	@SingletonDependency
+	Provider <ConsoleManager> consoleManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleFile> consoleFile;
+	@PrototypeDependency
+	Provider <ConsoleFile> consoleFile;
 
-	@Inject
-	Provider<ConsoleContextTab> contextTab;
+	@PrototypeDependency
+	Provider <ConsoleContextTab> contextTab;
 
-	@Inject
-	Provider<ObjectRemoveAction> objectRemoveAction;
+	@PrototypeDependency
+	Provider <ObjectRemoveAction> objectRemoveAction;
 
-	@Inject
-	Provider<ObjectSettingsAction<ObjectType,ParentType>> objectSettingsAction;
+	@PrototypeDependency
+	Provider <ObjectSettingsAction <ObjectType, ParentType>>
+	objectSettingsActionProvider;
 
-	@Inject
-	Provider<ObjectSettingsPart<ObjectType,ParentType>> objectSettingsPart;
+	@PrototypeDependency
+	Provider <ObjectSettingsPart <ObjectType, ParentType>>
+	objectSettingsPartProvider;
 
-	@Inject
-	Provider<TabContextResponder> tabContextResponder;
+	@PrototypeDependency
+	Provider <TabContextResponder> tabContextResponder;
 
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer<ObjectType> container;
+	ConsoleContextBuilderContainer <ObjectType> container;
 
 	@BuilderSource
 	ObjectSettingsPageSpec spec;
@@ -186,7 +188,7 @@ class ObjectSettingsPageBuilder<
 				if (consoleHelper.ephemeral ()) {
 
 					settingsAction =
-						objectSettingsAction.get ()
+						objectSettingsActionProvider.get ()
 
 						.detailsResponder (
 							consoleManager.get ().responder (
@@ -224,7 +226,7 @@ class ObjectSettingsPageBuilder<
 				} else {
 
 					settingsAction =
-						objectSettingsAction.get ()
+						objectSettingsActionProvider.get ()
 
 						.detailsResponder (
 							consoleManager.get ().responder (
@@ -353,7 +355,7 @@ class ObjectSettingsPageBuilder<
 			public
 			PagePart get () {
 
-				return objectSettingsPart.get ()
+				return objectSettingsPartProvider.get ()
 
 					.objectLookup (
 						consoleHelper)
