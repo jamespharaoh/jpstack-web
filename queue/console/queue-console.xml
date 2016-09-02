@@ -155,11 +155,16 @@
 
 		<interval-field
 			name="createdTime"
-			label="Created time"/>
+			label="Created time"
+			nullable="yes"/>
 
 		<object-field
 			name="processedUserId"
 			object-type="user"
+			nullable="yes"/>
+
+		<enum-field
+			name="state"
 			nullable="yes"/>
 
 	</field-set>
@@ -170,7 +175,11 @@
 
 		<object-field
 			name="processedUser"
-			label="User"
+			object-type="user"/>
+
+		<object-field
+			name="claimedUser"
+			field="queueItemClaim.user"
 			object-type="user"/>
 
 		<object-field

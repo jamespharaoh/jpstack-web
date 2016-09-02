@@ -12,6 +12,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
@@ -52,11 +53,13 @@ class QueueItemDaoHibernate
 
 			.createAlias (
 				"_queueItem.processedUser",
-				"_processedUser")
+				"_processedUser",
+				JoinType.LEFT_OUTER_JOIN)
 
 			.createAlias (
 				"_processedUser.slice",
-				"_processedUserSlice");
+				"_processedUserSlice",
+				JoinType.LEFT_OUTER_JOIN);
 
 		if (
 			isNotNull (
@@ -108,6 +111,18 @@ class QueueItemDaoHibernate
 				Restrictions.eq (
 					"_processedUser.id",
 					search.processedUserId ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.state ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_queueItem.state",
+					search.state ()));
 
 		}
 

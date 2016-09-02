@@ -21,8 +21,10 @@ class QueueItemSearch
 
 	Long processedUserId;
 
+	QueueItemState state;
+
 	boolean filter;
 
-	Collection<Long> filterQueueIds;
+	Collection <Long> filterQueueIds;
 
 }

@@ -9,9 +9,7 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.entity.record.Record;
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
-import wbs.platform.queue.metamodel.QueueTypeSpec;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
@@ -43,8 +41,6 @@ class QueueItemActionsPart
 
 	// state
 
-	QueueTypeSpec queueTypeSpec;
-
 	QueueItemRec queueItem;
 
 	boolean canSupervise;
@@ -60,23 +56,9 @@ class QueueItemActionsPart
 				requestContext.stuffInteger (
 					"queueItemId"));
 
-		queueTypeSpec =
-			queueConsoleLogic.queueTypeSpec (
-				queueItem.getQueue ().getQueueType ());
-
-		String[] supervisorParts =
-			queueTypeSpec.supervisorPriv ().split (":");
-
-		Record<?> supervisorDelegate =
-			(Record<?>)
-			objectManager.dereference (
-				queueItem.getQueue (),
-				supervisorParts [0]);
-
 		canSupervise =
-			privChecker.canRecursive (
-				supervisorDelegate,
-				supervisorParts [1]);
+			queueConsoleLogic.canSupervise (
+				queueItem.getQueue ());
 
 	}
 
@@ -115,7 +97,15 @@ class QueueItemActionsPart
 			) {
 
 				printFormat (
-					"<p>This queue item is claimed by you.</p>\n");
+					"<p>This queue item is claimed by you. You may return it ",
+					"to the queue.</p>\n");
+
+				printFormat (
+					"<p><input",
+					" type=\"submit\"",
+					" name=\"unclaim\"",
+					" value=\"unclaim\"",
+					">\n");
 
 			} else {
 
@@ -124,6 +114,20 @@ class QueueItemActionsPart
 					objectManager.objectPathMini (
 						queueItem.getQueueItemClaim ().getUser ()),
 					"it to the queue or reclaim it yourself.</p>\n");
+
+				printFormat (
+					"<p><input",
+					" type=\"submit\"",
+					" name=\"unclaim\"",
+					" value=\"unclaim\"",
+					">\n");
+
+				printFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"reclaim\"",
+					" value=\"reclaim\"",
+					"></p>\n");
 
 			}
 
