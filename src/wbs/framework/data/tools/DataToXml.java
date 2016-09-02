@@ -1,11 +1,14 @@
 package wbs.framework.data.tools;
 
-import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.MapUtils.mapIsEmpty;
+import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -20,9 +23,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import lombok.NonNull;
-import lombok.experimental.Accessors;
-
 import org.dom4j.Branch;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -30,6 +30,8 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
+import lombok.NonNull;
+import lombok.experimental.Accessors;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataChildren;
@@ -327,14 +329,19 @@ class DataToXml {
 							object,
 							field.getName ());
 
-					String childrenElementName =
-						camelToHyphen (
-							field.getName ());
+					if (
+						isNotNull (
+							children)
+					) {
 
-					createChildren (
-						element,
-						childrenElementName,
-						children);
+						createChildren (
+							field,
+							(DataChildren)
+								annotation,
+							element,
+							children);
+
+					}
 
 				}
 
@@ -342,8 +349,10 @@ class DataToXml {
 
 		}
 
-		for (Field field
-				: object.getClass ().getDeclaredFields ()) {
+		for (
+			Field field
+				: object.getClass ().getDeclaredFields ()
+		) {
 
 			for (Annotation annotation
 					: field.getAnnotations ()) {
@@ -378,31 +387,44 @@ class DataToXml {
 	}
 
 	void createChildren (
-			Element element,
-			String childrenElementName,
-			Object children) {
+			@NonNull Field field,
+			@NonNull DataChildren dataChildrenAnnotation,
+			@NonNull Element element,
+			@NonNull Object children) {
 
-		if (children == null) {
+		String childrenElementName =
+			ifNull (
+				dataChildrenAnnotation.childrenElement (),
+				camelToHyphen (
+					field.getName ()));
 
-			doNothing ();
+		if (children instanceof Map) {
 
-		} else if (children instanceof Map) {
+			Map <?,?> childrenMap =
+				(Map <?,?>) children;
 
-			Map<?,?> childrenMap =
-				(Map<?,?>) children;
-
-			if (childrenMap.isEmpty ())
+			if (
+				mapIsEmpty (
+					childrenMap)
+			) {
 				return;
+			}
 
-			Element childrenElement =
-				element.addElement (
-					childrenElementName);
+			Element containingElement =
+				ifThenElse (
+					dataChildrenAnnotation.direct (),
+					() -> element,
+					() -> element.addElement (
+						childrenElementName));
 
-			for (Map.Entry<?,?> entry
-					: childrenMap.entrySet ()) {
+			for (
+				Map.Entry<?,?> entry
+					: childrenMap.entrySet ()
+			) {
 
 				Element entryElement =
-					childrenElement.addElement ("entry");
+					containingElement.addElement (
+						"entry");
 
 				if (entry.getKey () instanceof String) {
 
@@ -413,7 +435,8 @@ class DataToXml {
 				} else {
 
 					Element keyElement =
-						entryElement.addElement ("key");
+						entryElement.addElement (
+							"key");
 
 					createElement (
 						keyElement,
@@ -430,7 +453,8 @@ class DataToXml {
 				} else {
 
 					Element valueElement =
-						entryElement.addElement ("value");
+						entryElement.addElement (
+							"value");
 
 					createElement (
 						valueElement,
@@ -442,23 +466,34 @@ class DataToXml {
 
 		} else if (
 			children instanceof List
-			|| children instanceof Set) {
+			|| children instanceof Set
+		) {
 
-			Collection<?> childrenCollection =
-				(Collection<?>) children;
+			Collection <?> childrenCollection =
+				(Collection <?>)
+				children;
 
-			if (childrenCollection.isEmpty ())
+			if (
+				collectionIsEmpty (
+					childrenCollection)
+			) {
 				return;
+			}
 
-			Element childrenElement =
-				element.addElement (
-					childrenElementName);
+			Element containingElement =
+				ifThenElse (
+					dataChildrenAnnotation.direct (),
+					() -> element,
+					() -> element.addElement (
+						childrenElementName));
 
-			for (Object child
-					: childrenCollection) {
+			for (
+				Object child
+					: childrenCollection
+			) {
 
 				createElement (
-					childrenElement,
+					containingElement,
 					child);
 
 			}

@@ -74,8 +74,36 @@ class ClockworkSmsInboundLogDaoHibernate
 
 			criteria.add (
 				Restrictions.ilike (
-					"clockworkSmsInboundLog.details",
+					"_clockworkSmsInboundLog.details",
 					search.details ()));
+
+		}
+
+		// restrict by type
+
+		if (
+			isNotNull (
+				search.type ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_clockworkSmsInboundLog.type",
+					search.type ()));
+
+		}
+
+		// restrict by success
+
+		if (
+			isNotNull (
+				search.success ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_clockworkSmsInboundLog.success",
+					search.success ()));
 
 		}
 

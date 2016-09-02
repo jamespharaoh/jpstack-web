@@ -5,7 +5,6 @@ import java.util.List;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
 import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
@@ -19,7 +18,7 @@ class ClockworkSmsRouteReportResponse {
 	@DataChildren (
 		direct = true,
 		childElement = "Dlr_Resp")
-	List<Item> items =
+	List <Item> items =
 		new ArrayList<> ();	
 
 	@Accessors (fluent = true)

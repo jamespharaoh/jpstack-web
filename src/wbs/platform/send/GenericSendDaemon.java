@@ -39,7 +39,7 @@ class GenericSendDaemon<
 	Logger log ();
 
 	protected abstract
-	GenericSendHelper<Service,Job,Item> helper ();
+	GenericSendHelper <Service, Job, Item> helper ();
 
 	// details
 
@@ -99,10 +99,10 @@ class GenericSendDaemon<
 			stringFormat (
 				"Looking for jobs in sending state"));
 
-		List<Job> jobs =
+		List <Job> jobs =
 			helper ().findSendingJobs ();
 
-		List<Long> jobIds =
+		List <Long> jobIds =
 			jobs.stream ()
 
 			.map (
@@ -170,7 +170,7 @@ class GenericSendDaemon<
 
 		}
 
-		List<Item> items =
+		List <Item> items =
 			helper ().findItemsLimit (
 				service,
 				job,

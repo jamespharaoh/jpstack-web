@@ -1,11 +1,11 @@
 package wbs.framework.utils;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.NumberUtils.lessThanZero;
 import static wbs.framework.utils.etc.StringUtils.pluralise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.millisecondsToDuration;
 
 import java.util.Locale;
-
-import lombok.NonNull;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -20,6 +20,7 @@ import org.joda.time.format.DateTimeFormatter;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("timeFormatter")
@@ -254,51 +255,63 @@ class TimeFormatterImplementation
 	@Override
 	public
 	String prettyDuration (
-			@NonNull ReadableDuration interval) {
+			@NonNull ReadableDuration duration) {
 
-		long millis =
-			interval.getMillis ();
+		long milliseconds =
+			duration.getMillis ();
 
-		if (millis < 2 * 1000L) {
+		if (
+			lessThanZero (
+				milliseconds)
+		) {
+
+			return stringFormat (
+				"-%s",
+				prettyDuration (
+					millisecondsToDuration (
+						- milliseconds)));
+		}
+
+		if (milliseconds < 2 * 1000L) {
 
 			return pluralise (
-				millis,
+				milliseconds,
 				"millisecond");
 
-		} else if (millis < 2 * 60000L) {
+		} else if (milliseconds < 2 * 60000L) {
 
 			return pluralise (
-				millis / 1000L,
+				milliseconds / 1000L,
 				"second");
 
-		} else if (millis < 2 * 3600000L) {
+		} else if (milliseconds < 2 * 3600000L) {
 
 			return pluralise (
-				millis / 60000L,
+				milliseconds / 60000L,
 				"minute");
 
-		} else if (millis < 2 * 86400000L) {
+		} else if (milliseconds < 2 * 86400000L) {
 
 			return pluralise (
-				millis / 3600000L,
+				milliseconds / 3600000L,
 				"hour");
 
-		} else if (millis < 2 * 2678400000L) {
+		} else if (milliseconds < 2 * 2678400000L) {
 
 			return pluralise (
-				millis / 86400000L,
+				milliseconds / 86400000L,
 				"day");
 
-		} else if (millis < 2 * 31557600000L) {
+		} else if (milliseconds < 2 * 31557600000L) {
 
 			return pluralise (
-				millis / 2592000000L,
+				milliseconds / 2592000000L,
 				"month");
 
 		} else {
 
 			return pluralise (
-				millis / 31556736000L,
+				milliseconds / 31556736000L,
 				"year");
 
 		}

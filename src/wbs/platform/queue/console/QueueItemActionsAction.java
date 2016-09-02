@@ -1,15 +1,23 @@
 package wbs.platform.queue.console;
 
+import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
+
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
-
+import lombok.NonNull;
 import wbs.console.action.ConsoleAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
+import wbs.platform.queue.model.QueueItemRec;
+import wbs.platform.queue.model.QueueItemState;
+import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.model.UserRec;
 
 @PrototypeComponent ("queueItemActionsAction")
 public
@@ -21,32 +29,22 @@ class QueueItemActionsAction
 	@Inject
 	Database database;
 
-	/*
 	@Inject
-	EventLogic eventLogic;
+	QueueConsoleLogic queueConsoleLogic;
 
 	@Inject
-	MessageConsoleHelper messageHelper;
+	QueueItemConsoleHelper queueItemHelper;
 
 	@Inject
-	MessageLogic messageLogic;
-
-	@Inject
-	OutboxLogic outboxLogic;
-
-	@Inject
-	ConsoleRequestContext requestContext;
-
-	@Inject
-	UserConsoleHelper userHelper;
-	*/
+	UserConsoleLogic userConsoleLogic;
 
 	// state
 
-	/*
-	MessageRec message;
-	UserRec myUser;
-	*/
+	UserRec user;
+
+	QueueItemRec queueItem;
+
+	boolean canSupervise;
 
 	// details
 
@@ -74,55 +72,47 @@ class QueueItemActionsAction
 				"QueueItemActionsAction.goReal ()",
 				this);
 
-		/*
-
 		// load data
 
-		myUser =
-			userHelper.find (
-				requestContext.userId ());
+		user =
+			userConsoleLogic.userRequired ();
 
-		message =
-			messageHelper.find (
-				requestContext.stuffInt (
-					"messageId"));
+		queueItem =
+			queueItemHelper.findRequired (
+				requestContext.stuffInteger (
+					"queueItemId"));
+
+		canSupervise =
+			queueConsoleLogic.canSupervise (
+				queueItem.getQueue ());
+
+		if (! canSupervise) {
+
+			requestContext.addError (
+				"Permission denied");
+
+			return null;
+
+		}
 
 		// hand off to appropriate method
 
 		if (
-			isNotNull (
+			optionalIsPresent (
 				requestContext.parameter (
-					"manuallyUndeliver"))
+					"unclaim"))
 		) {
 
-			return manuallyUndeliver (
+			return unclaimQueueItem (
 				transaction);
 
 		} else if (
-			isNotNull (
+			optionalIsPresent (
 				requestContext.parameter (
-					"manuallyDeliver"))
+					"reclaim"))
 		) {
 
-			return manuallyDeliver (
-				transaction);
-
-		} else if (
-			isNotNull (
-				requestContext.parameter (
-					"manuallyUnhold"))
-		) {
-
-			return manuallyUnhold (
-				transaction);
-
-		} else if (
-			isNotNull (
-				requestContext.parameter (
-					"manuallyRetry"))
-		) {
-
-			return manuallyRetry (
+			return reclaimQueueItem (
 				transaction);
 
 		} else {
@@ -134,161 +124,81 @@ class QueueItemActionsAction
 	}
 
 	private
-	Responder manuallyUndeliver (
+	Responder unclaimQueueItem (
 			@NonNull Transaction transaction) {
 
 		if (
-			notEqual (
-				message.getDirection (),
-				MessageDirection.out)
-		) {
-			throw new RuntimeException ();
-		}
 
-		if (
-			notIn (
-				message.getStatus (),
-				MessageStatus.sent,
-				MessageStatus.submitted,
-				MessageStatus.delivered)
+			enumNotEqualSafe (
+				queueItem.getState (),
+				QueueItemState.claimed)
+
 		) {
 
 			requestContext.addError (
-				"Message in invalid state for this operation");
+				"Queue item is not claimed");
 
 			return null;
 
 		}
 
-		messageLogic.messageStatus (
-			message,
-			MessageStatus.manuallyUndelivered);
-
-		eventLogic.createEvent (
-			"message_manually_undelivered",
-			myUser,
-			message);
+		queueConsoleLogic.unclaimQueueItem (
+			queueItem,
+			user);
 
 		transaction.commit ();
 
 		requestContext.addNotice (
-			"Message manually undelivered");
+			"Queue item returned to queue");
 
 		return null;
 
 	}
 
 	private
-	Responder manuallyDeliver (
+	Responder reclaimQueueItem (
 			@NonNull Transaction transaction) {
 
 		if (
-			notEqual (
-				message.getDirection (),
-				MessageDirection.out)
-		) {
-			throw new RuntimeException ();
-		}
 
-		if (
-			notIn (
-				message.getStatus (),
-				MessageStatus.undelivered,
-				MessageStatus.reportTimedOut,
-				MessageStatus.manuallyUndelivered)
+			enumNotEqualSafe (
+				queueItem.getState (),
+				QueueItemState.claimed)
+
 		) {
 
-			requestContext.addError (
-				"Message in invalid state for this operation");
+			requestContext.addWarning (
+				"Queue item is not claimed");
 
 			return null;
 
 		}
 
-		messageLogic.messageStatus (
-			message,
-			MessageStatus.manuallyDelivered);
-
-		eventLogic.createEvent (
-			"message_manually_delivered",
-			myUser,
-			message);
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Message manually undelivered");
-
-		return null;
-
-	}
-
-	private
-	Responder manuallyUnhold (
-			@NonNull Transaction transaction) {
-
 		if (
-			notEqual (
-				message.getStatus (),
-				MessageStatus.held)
+
+			referenceEqualWithClass (
+				UserRec.class,
+				queueItem.getQueueItemClaim ().getUser (),
+				user)
+
 		) {
 
-			requestContext.addError (
-				"Message in invalid state for this operation");
+			requestContext.addWarning (
+				"Queue item is already claimed by you");
 
 			return null;
 
 		}
 
-		outboxLogic.unholdMessage (
-			message);
-
-		eventLogic.createEvent (
-			"message_manually_unheld",
-			myUser,
-			message);
+		queueConsoleLogic.reclaimQueueItem (
+			queueItem,
+			queueItem.getQueueItemClaim ().getUser (),
+			user);
 
 		transaction.commit ();
 
 		requestContext.addNotice (
-			"Message manually unheld");
-
-		return null;
-
-	}
-
-	private
-	Responder manuallyRetry (
-			@NonNull Transaction transaction) {
-
-		if (
-			notIn (
-				message.getStatus (),
-				MessageStatus.failed,
-				MessageStatus.cancelled)
-		) {
-
-			requestContext.addError (
-				"Message in invalid state for this operation");
-
-			return null;
-
-		}
-
-		outboxLogic.retryMessage (
-			message);
-
-		eventLogic.createEvent (
-			"message_manually_retried",
-			myUser,
-			message);
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Message manually retried");
-
-		*/
+			"Queue item reclaimed by you");
 
 		return null;
 

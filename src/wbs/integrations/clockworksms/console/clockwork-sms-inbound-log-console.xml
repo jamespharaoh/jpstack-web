@@ -55,6 +55,14 @@
 			name="details"
 			nullable="yes"/>
 
+		<enum-field
+			name="type"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="success"
+			nullable="yes"/>
+
 	</field-set>
 
 	<field-set
@@ -70,6 +78,12 @@
 			name="route"
 			object-type="route"/>
 
+		<enum-field
+			name="type"/>
+
+		<yes-no-field
+			name="success"/>
+
 	</field-set>
 
 	<field-set
@@ -80,6 +94,16 @@
 
 		<timestamp-field
 			name="timestamp"/>
+
+		<object-field
+			name="route"
+			object-type="route"/>
+
+		<enum-field
+			name="type"/>
+
+		<yes-no-field
+			name="success"/>
 
 		<text-area-field
 			name="details"/>

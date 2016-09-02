@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.io.IOUtils;
@@ -31,6 +30,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataToXml;
@@ -41,12 +41,13 @@ import wbs.framework.utils.etc.RuntimeIoException;
 public
 class ClockworkSmsMessageSender {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	DataFromXml clockworkSmsForeignApiDataFromXml;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// properties
@@ -258,7 +259,7 @@ class ClockworkSmsMessageSender {
 
 			responseTrace =
 				new JSONObject (
-					ImmutableMap.<String,Object>builder ()
+					ImmutableMap.<String, Object> builder ()
 
 				.put (
 					"statusCode",

@@ -144,6 +144,17 @@ class TimeUtils {
 
 	}
 
+	// ---------- duration construction
+
+	public static
+	Duration millisecondsToDuration (
+			@NonNull Long milliseconds) {
+
+		return new Duration (
+			milliseconds);
+
+	}
+
 	// ---------- duration comparison
 
 	public static

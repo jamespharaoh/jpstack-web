@@ -19,11 +19,13 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
+import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.meta.ModelMetaLoader;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.queue.logic.DummyQueueCache;
 import wbs.platform.queue.metamodel.QueueTypeSpec;
@@ -71,14 +73,17 @@ class QueueConsoleLogic {
 	@Inject
 	UserConsoleLogic userConsoleLogic;
 
+	@Inject
+	UserPrivChecker privChecker;
+
 	// prototype dependencies
 
 	@Inject
-	Provider<QueueSubjectSorter> queueSubjectSorterProvider;
+	Provider <QueueSubjectSorter> queueSubjectSorterProvider;
 
 	// state
 
-	Map<String,QueueTypeSpec> queueTypeSpecs;
+	Map <String, QueueTypeSpec> queueTypeSpecs;
 
 	// lifecycle
 
@@ -406,6 +411,29 @@ class QueueConsoleLogic {
 		sliceLogic.updateSliceInactivityTimestamp (
 			newUser.getSlice (),
 			Optional.<Instant>absent ());
+
+	}
+
+	public
+	boolean canSupervise (
+			@NonNull QueueRec queue) {
+
+		QueueTypeSpec queueTypeSpec =
+			queueTypeSpec (
+				queue.getQueueType ());
+
+		String[] supervisorParts =
+			queueTypeSpec.supervisorPriv ().split (":");
+
+		Record<?> supervisorDelegate =
+			(Record<?>)
+			objectManager.dereference (
+				queue,
+				supervisorParts [0]);
+
+		return privChecker.canRecursive (
+			supervisorDelegate,
+			supervisorParts [1]);
 
 	}
 

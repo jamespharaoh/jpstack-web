@@ -34,7 +34,7 @@ import wbs.sms.route.core.model.RouteRec;
 @SingletonComponent ("clockworkSmsSenderHelper")
 public
 class ClockworkSmsSenderHelper
-	implements SmsSenderHelper<ClockworkSmsMessageSender> {
+	implements SmsSenderHelper <ClockworkSmsMessageSender> {
 
 	// dependencies
 
@@ -56,7 +56,7 @@ class ClockworkSmsSenderHelper
 	// prototype dependencies
 
 	@Inject
-	Provider<ClockworkSmsMessageSender> clockworkSmsMessageSenderProvider;
+	Provider <ClockworkSmsMessageSender> clockworkSmsMessageSenderProvider;
 
 	// details
 
@@ -70,7 +70,7 @@ class ClockworkSmsSenderHelper
 
 	@Override
 	public
-	SetupRequestResult<ClockworkSmsMessageSender> setupRequest (
+	SetupRequestResult <ClockworkSmsMessageSender> setupRequest (
 			@NonNull OutboxRec smsOutbox) {
 
 		// get stuff

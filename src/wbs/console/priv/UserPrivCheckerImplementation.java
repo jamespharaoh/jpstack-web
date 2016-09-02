@@ -37,7 +37,7 @@ class UserPrivCheckerImplementation
 	// prototype dependencies
 
 	@Inject
-	Provider<UserPrivCheckerBuilder> privCheckerBuilderProvider;
+	Provider <UserPrivCheckerBuilder> privCheckerBuilderProvider;
 
 	// state
 

@@ -3,8 +3,8 @@ package wbs.integrations.clockworksms.api;
 import static wbs.framework.utils.etc.LogicUtils.booleanEqual;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.lowercase;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
@@ -101,6 +101,7 @@ class ClockworkSmsRouteReportAction
 
 	ClockworkSmsRouteReportRequest request;
 	ClockworkSmsRouteReportResponse response;
+	Boolean success = false;
 
 	// implementation
 
@@ -191,7 +192,7 @@ class ClockworkSmsRouteReportAction
 
 		// lookup clockwork sms route in
 
-		Optional<ClockworkSmsRouteOutRec> clockworkSmsRouteOutOptional =
+		Optional <ClockworkSmsRouteOutRec> clockworkSmsRouteOutOptional =
 			clockworkSmsRouteOutHelper.find (
 				smsRoute.getId ());
 
@@ -233,6 +234,8 @@ class ClockworkSmsRouteReportAction
 
 		transaction.commit ();
 
+		success = true;
+
 	}
 
 	private
@@ -242,7 +245,7 @@ class ClockworkSmsRouteReportAction
 
 		// lookup the delivery status
 
-		Optional<ClockworkSmsDeliveryStatusRec> deliveryStatusOptional =
+		Optional <ClockworkSmsDeliveryStatusRec> deliveryStatusOptional =
 			clockworkSmsDeliveryStatusHelper.findByCode (
 				clockworkSmsRouteOut.getClockworkSmsConfig (),
 				lowercase (
@@ -269,7 +272,7 @@ class ClockworkSmsRouteReportAction
 
 		// lookup the delivery status detail code
 
-		Optional<ClockworkSmsDeliveryStatusDetailCodeRec>
+		Optional <ClockworkSmsDeliveryStatusDetailCodeRec>
 		deliveryStatusDetailCodeOptional =
 			clockworkSmsDeliveryStatusDetailCodeHelper.findByCode (
 				clockworkSmsRouteOut.getClockworkSmsConfig (),
@@ -296,7 +299,7 @@ class ClockworkSmsRouteReportAction
 
 		// lookup the message
 
-		Optional<MessageRec> smsMessageOptional =
+		Optional <MessageRec> smsMessageOptional =
 			smsMessageLogic.findMessageByMangledId (
 				item.clientId ());
 
@@ -441,6 +444,9 @@ class ClockworkSmsRouteReportAction
 
 			.setDetails (
 				debugLog)
+
+			.setSuccess (
+				success)
 
 		);
 

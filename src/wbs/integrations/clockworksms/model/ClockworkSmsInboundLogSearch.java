@@ -22,4 +22,8 @@ class ClockworkSmsInboundLogSearch
 
 	String details;
 
+	ClockworkSmsInboundLogType type;
+
+	Boolean success;
+
 }
