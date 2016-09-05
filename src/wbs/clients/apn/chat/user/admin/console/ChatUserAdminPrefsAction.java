@@ -122,7 +122,7 @@ class ChatUserAdminPrefsAction
 				orientParam);
 
 		if (anyOf (
-		
+
 			() -> optionalValueNotEqualSafe (
 				oldGenderOptional,
 				newGender),

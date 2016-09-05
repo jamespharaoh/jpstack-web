@@ -134,6 +134,30 @@ class LogicUtils {
 
 	}
 
+	public static <Type>
+	Type ifThenElse (
+			@NonNull Supplier <Boolean> condition0,
+			@NonNull Supplier <Type> condition0Value,
+			@NonNull Supplier <Boolean> condition1,
+			@NonNull Supplier <Type> condition1Value,
+			@NonNull Supplier <Type> elseValue) {
+
+		if (condition0.get ()) {
+
+			return condition0Value.get ();
+
+		} else if (condition1.get ()) {
+
+			return condition1Value.get ();
+
+		} else {
+
+			return elseValue.get ();
+
+		}
+
+	}
+
 	public static
 	boolean noneIsTrue (
 			List<Boolean> values) {

@@ -26,31 +26,31 @@ import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperIdImplementation")
-public 
-class ObjectHelperIdImplementation<RecordType extends Record<RecordType>>
+public
+class ObjectHelperIdImplementation <RecordType extends Record <RecordType>>
 	implements
-		ObjectHelperComponent<RecordType>,
-		ObjectHelperIdMethods<RecordType> {
+		ObjectHelperComponent <RecordType>,
+		ObjectHelperIdMethods <RecordType> {
 
 	// properties
 
 	@Setter
-	ObjectModel<RecordType> model;
+	ObjectModel <RecordType> model;
 
 	@Setter
-	ObjectHelper<RecordType> objectHelper;
+	ObjectHelper <RecordType> objectHelper;
 
 	@Setter
 	ObjectManager objectManager;
 
 	@Setter
-	ObjectDatabaseHelper<RecordType> objectDatabaseHelper;
+	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
 
 	// public implementation
 
 	@Override
 	public
-	Optional<RecordType> find (
+	Optional <RecordType> find (
 			@NonNull Long id) {
 
 		return Optional.fromNullable (
@@ -101,7 +101,7 @@ class ObjectHelperIdImplementation<RecordType extends Record<RecordType>>
 	public
 	RecordType findOrThrow (
 			@NonNull Long id,
-			@NonNull Supplier<? extends RuntimeException> orThrow) {
+			@NonNull Supplier <? extends RuntimeException> orThrow) {
 
 		RecordType object =
 			objectDatabaseHelper.find (
@@ -125,15 +125,15 @@ class ObjectHelperIdImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	List<RecordType> findManyRequired (
-			@NonNull List<Long> ids) {
+	List <RecordType> findManyRequired (
+			@NonNull List <Long> ids) {
 
-		List<RecordType> objects =
+		List <RecordType> objects =
 			objectDatabaseHelper.findMany (
 				ids);
 
-		List<Long> missingIds =
-			new ArrayList<Long> ();
+		List <Long> missingIds =
+			new ArrayList<> ();
 
 		for (
 			int index = 0;

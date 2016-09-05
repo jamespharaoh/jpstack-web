@@ -12,7 +12,7 @@ import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
-public 
+public
 class ObjectModelImplementation<RecordType extends Record<RecordType>>
 	implements ObjectModel<RecordType> {
 
@@ -47,7 +47,7 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 	// model properties
 
 	@Override
-	public 
+	public
 	String objectName () {
 		return model.objectName ();
 	}
@@ -59,7 +59,7 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 	}
 
 	@Override
-	public 
+	public
 	ModelField codeField () {
 		return model.codeField ();
 	}
@@ -89,7 +89,7 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 	}
 
 	@Override
-	public 
+	public
 	ModelField nameField () {
 		return model.nameField ();
 	}
@@ -253,13 +253,13 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 	}
 
 	@Override
-	public 
+	public
 	Boolean mutable () {
 		return model.mutable ();
 	}
 
 	@Override
-	public 
+	public
 	Class <? extends ObjectHelper <?>> helperClass () {
 		return model.helperClass ();
 	}

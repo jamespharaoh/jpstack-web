@@ -118,7 +118,7 @@ class UpdateManager {
 		) {
 			return;
 		}
-			
+
 
 		// remember the new version
 

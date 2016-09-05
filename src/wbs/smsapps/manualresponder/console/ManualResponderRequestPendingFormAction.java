@@ -1,6 +1,5 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.lessThan;
@@ -14,10 +13,11 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import lombok.Cleanup;
 import lombok.NonNull;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
@@ -154,7 +154,13 @@ class ManualResponderRequestPendingFormAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
-				"ManualResponderRequestPendingFormAction.goIgnore (manualResponderRequestId)",
+				stringFormat (
+					"%s.%s (%s)",
+					"ManualResponderRequestPendingFormAction",
+					"goIgnore",
+					stringFormat (
+						"manualResponderRequestId = %s",
+						manualResponderRequestId)),
 				this);
 
 		ManualResponderRequestRec manualResponderRequest =

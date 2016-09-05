@@ -1,6 +1,6 @@
 package wbs.framework.object;
 
-public 
+public
 interface ObjectHelperImplementation {
 
 	void objectManager (

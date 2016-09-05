@@ -19,7 +19,7 @@ import wbs.framework.entity.record.TypeRecord;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperModelImplementation")
-public 
+public
 class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 	implements
 		ObjectHelperComponent <RecordType>,
@@ -47,7 +47,7 @@ class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 	// public implementation
 
 	@Override
-	public 
+	public
 	String objectName () {
 		return model.objectName ();
 	}

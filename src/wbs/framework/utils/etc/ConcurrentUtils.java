@@ -6,7 +6,7 @@ import java.util.concurrent.Future;
 
 import lombok.NonNull;
 
-public 
+public
 class ConcurrentUtils {
 
 	public static <Type>
@@ -41,7 +41,7 @@ class ConcurrentUtils {
 			throw new RuntimeException (
 				executionException);
 
-		} 
+		}
 
 	}
 

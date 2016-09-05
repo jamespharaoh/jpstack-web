@@ -277,7 +277,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	}
 
 	@Override
-	public 
+	public
 	Optional<String> htmlClass (
 			@NonNull Optional<Interface> interfaceValueOptional) {
 

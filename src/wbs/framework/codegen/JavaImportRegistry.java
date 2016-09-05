@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.TypeUtils.classNameFull;
 
 import lombok.NonNull;
 
-public 
+public
 interface JavaImportRegistry {
 
 	String register (

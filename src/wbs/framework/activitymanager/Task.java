@@ -36,11 +36,11 @@ class Task {
 
 	State state;
 
-	Map<String,String> parameters =
-		new LinkedHashMap<String,String> ();
+	Map <String, String> parameters =
+		new LinkedHashMap <String, String> ();
 
-	List<Task> children =
-		new ArrayList<Task> ();
+	List <Task> children =
+		new ArrayList <Task> ();
 
 	public
 	Interval interval () {

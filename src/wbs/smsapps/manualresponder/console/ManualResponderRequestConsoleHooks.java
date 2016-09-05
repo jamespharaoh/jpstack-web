@@ -18,7 +18,7 @@ import wbs.smsapps.manualresponder.model.ManualResponderRequestSearch;
 @SingletonComponent ("manualResponderRequestConsoleHooks")
 public
 class ManualResponderRequestConsoleHooks
-	implements ConsoleHooks<ManualResponderRequestRec> {
+	implements ConsoleHooks <ManualResponderRequestRec> {
 
 	// dependencies
 
@@ -52,7 +52,7 @@ class ManualResponderRequestConsoleHooks
 
 		// manual responders
 
-		ImmutableList.Builder<Long> manualRespondersBuilder =
+		ImmutableList.Builder <Long> manualRespondersBuilder =
 			ImmutableList.builder ();
 
 		for (
@@ -60,13 +60,13 @@ class ManualResponderRequestConsoleHooks
 				: manualResponderHelper.findAll ()
 		) {
 
-			 if (
-			 	! privChecker.canRecursive (
-			 		manualResponder,
-			 		"supervisor")
-			 ) {
-			 	continue;
-			 }
+			if (
+				! privChecker.canRecursive (
+					manualResponder,
+					"supervisor")
+			) {
+				continue;
+			}
 
 			manualRespondersBuilder.add (
 				manualResponder.getId ());
@@ -75,7 +75,7 @@ class ManualResponderRequestConsoleHooks
 
 		// users
 
-		ImmutableList.Builder<Long> usersBuilder =
+		ImmutableList.Builder <Long> usersBuilder =
 			ImmutableList.builder ();
 
 		for (
@@ -83,13 +83,13 @@ class ManualResponderRequestConsoleHooks
 				: userHelper.findAll ()
 		) {
 
-			 if (
-			 	! privChecker.canRecursive (
-			 		user,
-			 		"supervisor")
-			 ) {
-			 	continue;
-			 }
+			if (
+				! privChecker.canRecursive (
+					user,
+					"supervisor")
+			) {
+				continue;
+			}
 
 			usersBuilder.add (
 				user.getId ());

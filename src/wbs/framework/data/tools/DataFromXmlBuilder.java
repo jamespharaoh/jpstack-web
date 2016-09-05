@@ -219,7 +219,7 @@ class DataFromXmlBuilder {
 	DataFromXml build () {
 
 		return new DataFromXmlImplementation ()
-		
+
 			.dataClassesMap (
 				ImmutableMap.copyOf (
 					dataClassesMap))

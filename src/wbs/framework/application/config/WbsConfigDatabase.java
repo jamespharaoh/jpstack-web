@@ -10,7 +10,7 @@ import wbs.framework.data.annotations.DataClass;
 @Data
 @DataClass ("database")
 @PrototypeComponent ("wbsConfigDatabase")
-public 
+public
 class WbsConfigDatabase {
 
 	@DataAttribute (

@@ -7,7 +7,7 @@ import com.google.common.base.Optional;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 
-public 
+public
 interface ObjectHelperCodeMethods<RecordType extends Record<RecordType>> {
 
 	Optional<RecordType> findByCode (

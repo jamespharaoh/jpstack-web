@@ -41,7 +41,7 @@ class GlobalId {
 			objectId);
 
 	}
-			
+
 
 	public final static
 	GlobalId root =

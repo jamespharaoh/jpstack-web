@@ -143,7 +143,7 @@ class MapUtils {
 	}
 
 	// properties
-	
+
 	public static
 	Properties mapToProperties (
 			@NonNull Map <String, String> propertiesMap) {

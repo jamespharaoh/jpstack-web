@@ -2,7 +2,7 @@ package wbs.integrations.clockworksms.model;
 
 import java.util.List;
 
-public 
+public
 interface ClockworkSmsInboundLogDaoMethods {
 
 	List <Long> searchIds (

@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Accessors (fluent = true)
-public 
+public
 class NullFormatWriter
 	implements FormatWriter {
 
@@ -23,29 +23,29 @@ class NullFormatWriter
 	// implementation
 
 	@Override
-	public 
+	public
 	void writeString (
 			@NonNull String string) {
 
 		doNothing ();
-		
+
 	}
 
 	@Override
-	public 
+	public
 	void writeCharacter (
 			int character) {
 
 		doNothing ();
-		
+
 	}
 
 	@Override
-	public 
+	public
 	void close () {
 
 		doNothing ();
-		
+
 	}
 
 }

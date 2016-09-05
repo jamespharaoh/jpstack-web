@@ -1,8 +1,6 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.DebugUtils.debugFormat;
 import static wbs.framework.utils.etc.Misc.getMethodRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.lang.reflect.InvocationTargetException;
@@ -15,17 +13,18 @@ import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperFindImplementation")
-public 
-class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
+public
+class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 	implements
-		ObjectHelperComponent<RecordType>,
-		ObjectHelperFindMethods<RecordType> {
+		ObjectHelperComponent <RecordType>,
+		ObjectHelperFindMethods <RecordType> {
 
 	// properties
 
@@ -64,10 +63,10 @@ class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	List<RecordType> findByParentAndType (
-			@NonNull Record<?> parent,
+			@NonNull Record <?> parent,
 			@NonNull String typeCode) {
 
-		ObjectHelper<?> parentHelper =
+		ObjectHelper <?> parentHelper =
 			objectManager.objectHelperForClassRequired (
 				parent.getClass ());
 
@@ -84,14 +83,14 @@ class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	List<RecordType> search (
+	List <RecordType> search (
 			@NonNull Object search) {
 
-		List<Long> objectIds =
+		List <Long> objectIds =
 			searchIds (
 				search);
 
-		ImmutableList.Builder<RecordType> objectsBuilder =
+		ImmutableList.Builder <RecordType> objectsBuilder =
 			ImmutableList.builder ();
 
 		for (
@@ -115,7 +114,7 @@ class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
 	List<Long> searchIds (
 			@NonNull Object search) {
 
-		Class<?> searchClass;
+		Class <?> searchClass;
 
 		if (search instanceof Map) {
 
@@ -133,14 +132,14 @@ class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
 			getMethodRequired (
 				model.daoImplementation ().getClass (),
 				"searchIds",
-				ImmutableList.<Class<?>>of (
+				ImmutableList.of (
 					searchClass));
 
 		try {
 
 			@SuppressWarnings ("unchecked")
-			List<Long> objectIds =
-				(List<Long>)
+			List <Long> objectIds =
+				(List <Long>)
 				searchIdsMethod.invoke (
 					model.daoImplementation (),
 					search);
@@ -182,16 +181,6 @@ class ObjectHelperFindImplementation<RecordType extends Record<RecordType>>
 		ObjectHelper <?> parentHelper =
 			objectManager.objectHelperForClassRequired (
 				parent.getClass ());
-
-debugFormat (
-	"parentHelper: %s",
-	optionalFromNullable (
-		parentHelper));
-
-debugFormat (
-	"model: %s",
-	optionalFromNullable (
-		model));
 
 		List <?> objectsUncast =
 			parentHelper.getChildren (

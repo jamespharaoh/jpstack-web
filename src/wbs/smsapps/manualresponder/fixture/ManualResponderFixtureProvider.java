@@ -416,7 +416,7 @@ class ManualResponderFixtureProvider
 				1l)
 
 			.setNumber (
-  				"inbound")
+				"inbound")
 
 			.setRouter (
 				routerHelper.findByCodeRequired (
@@ -457,7 +457,7 @@ class ManualResponderFixtureProvider
 				1l)
 
 			.setNumber (
-  				"inbound")
+				"inbound")
 
 			.setRouter (
 				routerHelper.findByCodeRequired (
@@ -507,7 +507,7 @@ class ManualResponderFixtureProvider
 				1l)
 
 			.setNumber (
-  				"inbound")
+				"inbound")
 
 			.setRouter (
 				routerHelper.findByCodeRequired (
@@ -557,7 +557,7 @@ class ManualResponderFixtureProvider
 				1l)
 
 			.setNumber (
-  				"inbound")
+				"inbound")
 
 			.setRouter (
 				routerHelper.findByCodeRequired (

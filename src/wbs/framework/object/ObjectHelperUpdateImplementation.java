@@ -210,17 +210,17 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 			Constructor<RecordType> constructor =
 				(Constructor<RecordType>)
 				model.objectClass ().getDeclaredConstructor ();
-	
+
 			constructor.setAccessible (
 				true);
-	
+
 			RecordType object =
 				(RecordType)
 				constructor.newInstance ();
-	
+
 			UnsavedRecordDetector.instance.addRecord (
 				object);
-	
+
 			return object;
 
 		} catch (SecurityException securityException) {
@@ -242,7 +242,7 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 			) {
 
 				throw (RuntimeException)
-					invocationTargetException.getTargetException (); 
+					invocationTargetException.getTargetException ();
 
 			} else {
 

@@ -48,11 +48,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Qualifier;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.ClassUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MapMaker;
@@ -65,9 +60,17 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.tuple.Pair;
+
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.activitymanager.RuntimeExceptionWithTask;
 import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.annotations.UninitializedDependency;
 import wbs.framework.application.context.EasyReadWriteLock.HeldLock;
@@ -100,8 +103,9 @@ import wbs.framework.utils.etc.BeanLogic;
  */
 @Accessors (fluent = true)
 @Log4j
+@SingletonComponent ("applicationContext")
 public
-class ApplicationContextImplementation 
+class ApplicationContextImplementation
 	implements ApplicationContext {
 
 	@Getter @Setter
@@ -411,7 +415,8 @@ class ApplicationContextImplementation
 					componentDefinition.name ())
 			) {
 
-				throw new RuntimeException (
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
 					stringFormat (
 						"Singleton component %s already in creation (%s)",
 						componentDefinition.name (),
@@ -425,7 +430,8 @@ class ApplicationContextImplementation
 					componentDefinition.name ())
 			) {
 
-				throw new RuntimeException (
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
 					stringFormat (
 						"Singleton component %s already failed",
 						componentDefinition.name ()));
@@ -461,7 +467,8 @@ class ApplicationContextImplementation
 
 		} else {
 
-			throw new RuntimeException (
+			throw new RuntimeExceptionWithTask (
+				activityManager.currentTask (),
 				stringFormat (
 					"Unrecognised scope %s for component %s",
 					componentDefinition.scope (),
@@ -542,7 +549,8 @@ class ApplicationContextImplementation
 					component)
 			) {
 
-				throw new RuntimeException (
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
 					stringFormat (
 						"Factory component returned null for %s",
 						componentDefinition.name ()));
@@ -619,32 +627,32 @@ class ApplicationContextImplementation
 						componentMetaData.state.name ()));
 
 			}
-		
+
 			try {
 
 				// run post construct
-		
+
 				for (
 					Method method
 						: component.getClass ().getMethods ()
 				) {
-	
+
 					PostConstruct postConstructAnnotation =
 						method.getAnnotation (
 							PostConstruct.class);
-	
+
 					if (postConstructAnnotation == null)
 						continue;
-	
+
 					log.debug (
 						stringFormat (
 							"Running post construct method %s.%s",
 							componentDefinition.name (),
 							method.getName ()));
-	
+
 					method.invoke (
 						component);
-	
+
 				}
 
 				componentMetaData.state =
@@ -889,7 +897,8 @@ class ApplicationContextImplementation
 
 				if (targetComponents.size () != 1) {
 
-					throw new RuntimeException (
+					throw new RuntimeExceptionWithTask (
+						activityManager.currentTask (),
 						stringFormat (
 							"Trying to inject %s components into a single field %s.%s",
 							targetComponents.size (),
@@ -905,7 +914,8 @@ class ApplicationContextImplementation
 
 			default:
 
-				throw new RuntimeException ();
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask ());
 
 			}
 
@@ -940,7 +950,8 @@ class ApplicationContextImplementation
 
 		if (componentDefinition.name () == null) {
 
-			throw new RuntimeException (
+			throw new RuntimeExceptionWithTask (
+				activityManager.currentTask (),
 				stringFormat (
 					"Component definition has no name"));
 
@@ -948,7 +959,8 @@ class ApplicationContextImplementation
 
 		if (componentDefinition.componentClass () == null) {
 
-			throw new RuntimeException (
+			throw new RuntimeExceptionWithTask (
+				activityManager.currentTask (),
 				stringFormat (
 					"Component definition %s has no component class",
 					componentDefinition.componentClass ()));
@@ -957,7 +969,8 @@ class ApplicationContextImplementation
 
 		if (componentDefinition.scope () == null) {
 
-			throw new RuntimeException (
+			throw new RuntimeExceptionWithTask (
+				activityManager.currentTask (),
 				stringFormat (
 					"Copmonent definition %s has no scope",
 					componentDefinition.name ()));
@@ -967,7 +980,8 @@ class ApplicationContextImplementation
 		if (componentDefinitionsByName.containsKey (
 				componentDefinition.name ())) {
 
-			throw new RuntimeException (
+			throw new RuntimeExceptionWithTask (
+				activityManager.currentTask (),
 				stringFormat (
 					"Duplicated component definition name %s",
 					componentDefinition.name ()));
@@ -981,7 +995,8 @@ class ApplicationContextImplementation
 				"prototype")
 		) {
 
-			throw new RuntimeException (
+			throw new RuntimeExceptionWithTask (
+				activityManager.currentTask (),
 				stringFormat (
 					"Component definition %s has invalid scope %s",
 					componentDefinition.name (),
@@ -999,7 +1014,8 @@ class ApplicationContextImplementation
 		if (! Modifier.isPublic (
 				instantiationClass.getModifiers ())) {
 
-			throw new RuntimeException (
+			throw new RuntimeExceptionWithTask (
+				activityManager.currentTask (),
 				stringFormat (
 					"Component definition %s refers to non-public class %s",
 					componentDefinition.name (),
@@ -1010,7 +1026,8 @@ class ApplicationContextImplementation
 		if (Modifier.isAbstract (
 				instantiationClass.getModifiers ())) {
 
-			throw new RuntimeException (
+			throw new RuntimeExceptionWithTask (
+				activityManager.currentTask (),
 				stringFormat (
 					"Component definition %s refers to abstract class %s",
 					componentDefinition.name (),
@@ -1027,7 +1044,8 @@ class ApplicationContextImplementation
 
 		} catch (NoSuchMethodException exception) {
 
-			throw new RuntimeException (
+			throw new RuntimeExceptionWithTask (
+				activityManager.currentTask (),
 				stringFormat (
 					"Component definition %s refers class %s with no default ",
 					componentDefinition.name (),
@@ -1041,7 +1059,8 @@ class ApplicationContextImplementation
 				constructor.getModifiers ())
 		) {
 
-			throw new RuntimeException (
+			throw new RuntimeExceptionWithTask (
+				activityManager.currentTask (),
 				stringFormat (
 					"Component definition %s refers to class %s with non-public ",
 					componentDefinition.name (),
@@ -1388,7 +1407,8 @@ class ApplicationContextImplementation
 
 		if (errors > 0) {
 
-			throw new RuntimeException (
+			throw new RuntimeExceptionWithTask (
+				activityManager.currentTask (),
 				stringFormat (
 					"Aborting due to %s errors",
 					errors));
@@ -1483,7 +1503,10 @@ class ApplicationContextImplementation
 				moreThanOne (
 					numAnnotations)
 			) {
-				throw new RuntimeException ();
+
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask ());
+
 			}
 
 			Named namedAnnotation =
@@ -1528,8 +1551,12 @@ class ApplicationContextImplementation
 
 				}
 
-				if (qualifierAnnotations.size () > 1)
-					throw new RuntimeException ();
+				if (qualifierAnnotations.size () > 1) {
+
+					throw new RuntimeExceptionWithTask (
+						activityManager.currentTask ());
+
+				}
 
 				InjectedProperty injectedProperty =
 					new InjectedProperty ()
@@ -2094,7 +2121,7 @@ class ApplicationContextImplementation
 			componentDefinition;
 
 		componentMetaData.state =
-			ComponentState.unmanaged;		
+			ComponentState.unmanaged;
 
 		componentMetaDatas.put (
 			object,
@@ -2241,8 +2268,12 @@ class ApplicationContextImplementation
 			initComponentDefinition (
 				componentDefinition);
 
-		if (errors > 0)
-			throw new RuntimeException ();
+		if (errors > 0) {
+
+			throw new RuntimeExceptionWithTask (
+				activityManager.currentTask ());
+
+		}
 
 		setComponentValueProperties (
 			componentDefinition,

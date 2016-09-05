@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.apache.commons.io.FileUtils;
 
 import com.google.common.collect.ImmutableList;
@@ -22,6 +20,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
 import wbs.framework.entity.meta.CodeFieldSpec;
@@ -43,17 +42,17 @@ import wbs.framework.entity.meta.ReferenceFieldSpec;
 import wbs.framework.entity.meta.TimestampFieldSpec;
 import wbs.framework.entity.meta.TypeCodeFieldSpec;
 import wbs.framework.utils.etc.RuntimeIoException;
-import wbs.framework.utils.formatwriter.FormatWriter;
 import wbs.framework.utils.formatwriter.AtomicFileWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("modelRecordGenerator")
 public
 class ModelRecordGenerator {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ModelWriterManager modelWriterBuilder;
 
 	// properties

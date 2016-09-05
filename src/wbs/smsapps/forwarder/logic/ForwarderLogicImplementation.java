@@ -1,11 +1,12 @@
 package wbs.smsapps.forwarder.logic;
 
+import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.util.ArrayList;
@@ -418,7 +419,9 @@ class ForwarderLogicImplementation
 					work,
 					part,
 					SendError.invalidRoute,
-					"Route not configured correctly: " + part.forwarderRoute.getCode ());
+					stringFormat (
+						"Route not configured correctly: %s",
+						part.forwarderRoute.getCode ()));
 
 			}
 
@@ -439,7 +442,9 @@ class ForwarderLogicImplementation
 					work,
 					part,
 					SendError.invalidNumFrom,
-					"Number is not valid for route: " + part.numFrom);
+					stringFormat (
+						"Number is not valid for route: %s",
+						part.numFrom));
 
 			}
 
@@ -635,15 +640,22 @@ class ForwarderLogicImplementation
 
 		}
 
-		// if some of these unqueueExMessages already exist but some don't then stop
+		// if some of these unqueueExMessages already exist but some don't then
+		// stop
 
 		if (work.sentSome && work.notSentSome) {
 
-			work.template.errors.add(
-				"Previously sent unqueueExMessages being resent in different groups (very strange!)");
+			work.template.errors.add (
+				stringFormat (
+					"Previously sent unqueueExMessages being resent in ",
+					"different groups (very strange!)"));
 
-			if (work.template.sendError == null)
-				work.template.sendError = SendError.reusedClientId;
+			if (work.template.sendError == null) {
+
+				work.template.sendError =
+					SendError.reusedClientId;
+
+			}
 
 			work.ret = false;
 
@@ -660,11 +672,17 @@ class ForwarderLogicImplementation
 						.getNextForwarderMessageOut() != work.template.parts
 						.get(i + 1).forwarderMessageOut) {
 
-					work.template.errors.add(
-						"Previously sent unqueueExMessages being resent in different groups (very strange!)");
+					work.template.errors.add (
+						stringFormat (
+							"Previously sent unqueueExMessages being resent ",
+							"in different groups (very strange!)"));
 
-					if (work.template.sendError == null)
-						work.template.sendError = SendError.reusedClientId;
+					if (work.template.sendError == null) {
+
+						work.template.sendError =
+							SendError.reusedClientId;
+
+					}
 
 					work.ret = false;
 
@@ -723,8 +741,12 @@ class ForwarderLogicImplementation
 
 			// save the thread id if we haven't got one yet
 
-			if (threadId == null)
-				threadId = sendPart.forwarderMessageOut.getMessage().getThreadId();
+			if (threadId == null) {
+
+				threadId =
+					sendPart.forwarderMessageOut.getMessage ().getThreadId ();
+
+			}
 
 			// link unqueueExMessages where appropriate
 
@@ -787,12 +809,25 @@ class ForwarderLogicImplementation
 
 		if (! sendTemplateCheck (sendTemplate)) {
 
-			if (sendTemplate.sendError == SendError.trackerBlocked)
+			if (
+				enumEqualSafe (
+					sendTemplate.sendError,
+					SendError.trackerBlocked)
+			) {
+
 				return null;
-			if (sendTemplate.errors.size() > 0)
-				throw new RuntimeException(sendTemplate.errors.get(0));
-			else
-				throw new RuntimeException(sendTemplate.parts.get(0).errors.get(0));
+
+			} else if (sendTemplate.errors.size () > 0) {
+
+				throw new RuntimeException (
+					sendTemplate.errors.get (0));
+
+			} else {
+
+				throw new RuntimeException (
+					sendTemplate.parts.get (0).errors.get (0));
+
+			}
 
 		}
 

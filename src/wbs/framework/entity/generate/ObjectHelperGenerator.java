@@ -43,11 +43,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Named;
-import javax.inject.Provider;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -58,8 +53,11 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.tuple.Pair;
+
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.codegen.JavaAnnotationWriter;
@@ -111,11 +109,13 @@ class ObjectHelperGenerator {
 
 	boolean hasDao;
 	String daoMethodsInterfaceName;
+	String daoImplementationClassName;
 	String daoComponentName;
 	Class <?> daoMethodsInterface;
 
 	boolean hasExtra;
 	String extraMethodsInterfaceName;
+	String extraImplementationClassName;
 	String extraComponentName;
 	Class <?> extraMethodsInterface;
 
@@ -213,6 +213,13 @@ class ObjectHelperGenerator {
 					uncapitalise (
 						model.objectName ()));
 
+			daoImplementationClassName =
+				stringFormat (
+					"%s.hibernate.%sDaoHibernate",
+					packageName,
+					capitalise (
+						model.objectName ()));
+
 		} else {
 
 			hasDao =
@@ -249,6 +256,13 @@ class ObjectHelperGenerator {
 				stringFormat (
 					"%sObjectHelperMethodsImplementation",
 					uncapitalise (
+						model.objectName ()));
+
+			extraImplementationClassName =
+				stringFormat (
+					"%s.logic.%sObjectHelperMethodsImplementation",
+					packageName,
+					capitalise (
 						model.objectName ()));
 
 		} else {
@@ -334,266 +348,120 @@ class ObjectHelperGenerator {
 				packageName + ".model",
 				objectHelperInterfaceName);
 
-		classUnitWriter.addBlock (
+		addDependencies (
 			classWriter);
-	
-		classWriter.addBlock (
-			this::writeDependencies);
-		
-		classWriter.addBlock (
-			this::writePrototypeDependencies);
-		
-		classWriter.addBlock (
-			this::writeState);
-		
+
+		addState (
+			classWriter);
+
 		classWriter.addBlock (
 			this::writeLifecycle);
-		
+
 		classWriter.addBlock (
 			this::writeImplementation);
-		
+
 		classWriter.addBlock (
 			this::writeDelegations);
-		
+
+		classUnitWriter.addBlock (
+			classWriter);
+
 		classUnitWriter.write ();
 
 	}
 
-	void writeDependencies (
-			@NonNull JavaImportRegistry imports,
-			@NonNull FormatWriter formatWriter) {
+	void addDependencies (
+			@NonNull JavaClassWriter classWriter) {
 
-		formatWriter.writeLineFormat (
-			"// dependencies");
+		classWriter.addSingletonDependency (
+			ApplicationContext.class);
 
-		formatWriter.writeNewline ();
+		classWriter.addSingletonDependency (
+			Database.class);
 
-		// application context
+		classWriter.addSingletonDependency (
+			EntityHelper.class);
 
-		formatWriter.writeLineFormat (
-			"@%s",
-			imports.register (
-				SingletonDependency.class));
-
-		formatWriter.writeLineFormat (
-			"%s applicationContext;",
-			imports.register (
-				ApplicationContext.class));
-
-		formatWriter.writeNewline ();
-
-		// database
-
-		formatWriter.writeLineFormat (
-			"@%s",
-			imports.register (
-				SingletonDependency.class));
-
-		formatWriter.writeLineFormat (
-			"%s database;",
-			imports.register (
-				Database.class));
-
-		formatWriter.writeNewline ();
-
-		// entity helper
-
-		formatWriter.writeLineFormat (
-			"@%s",
-			imports.register (
-				SingletonDependency.class));
-
-		formatWriter.writeLineFormat (
-			"%s entityHelper;",
-			imports.register (
-				EntityHelper.class));
-
-		formatWriter.writeNewline ();
-
-		// object type registry
-
-		formatWriter.writeLineFormat (
-			"@%s",
-			imports.register (
-				SingletonDependency.class));
-
-		formatWriter.writeLineFormat (
-			"%s objectTypeRegistry;",
-			imports.register (
-				ObjectTypeRegistry.class));
-
-		formatWriter.writeNewline ();
-
-		// dao
+		classWriter.addSingletonDependency (
+			ObjectTypeRegistry.class);
 
 		if (hasDao) {
 
-			formatWriter.writeLineFormat (
-				"@%s",
-				imports.register (
-					SingletonDependency.class));
-	
-			formatWriter.writeLineFormat (
-				"@%s",
-				imports.register (
-					Named.class));
-	
-			formatWriter.writeLineFormat (
-				"%s %s;",
-				imports.register (
-					daoMethodsInterface),
+			classWriter.addNamedSingletonDependency (
+				daoImplementationClassName,
 				daoComponentName);
-	
-			formatWriter.writeNewline ();
 
 		}
 
 		if (hasExtra) {
 
-			formatWriter.writeLineFormat (
-				"@%s",
-				imports.register (
-					SingletonDependency.class));
-	
-			formatWriter.writeLineFormat (
-				"@%s",
-				imports.register (
-					Named.class));
-	
-			formatWriter.writeLineFormat (
-				"%s %s;",
-				imports.register (
-					extraMethodsInterface),
+			classWriter.addNamedSingletonDependency (
+				extraImplementationClassName,
 				extraComponentName);
-	
-			formatWriter.writeNewline ();
 
 		}
 
-	}	
-
-	void writePrototypeDependencies (
-			@NonNull JavaImportRegistry imports,
-			@NonNull FormatWriter formatWriter) {
-
-		formatWriter.writeLineFormat (
-			"// prototype dependencies");
-
-		formatWriter.writeNewline ();
-
-		// object database helper
-
-		formatWriter.writeLineFormat (
-			"@%s",
-			imports.register (
-				PrototypeDependency.class));
-
-		formatWriter.writeLineFormat (
-			"%s <%s>",
-			imports.register (
-				Provider.class),
-			imports.register (
-				ObjectDatabaseHelper.class));
-
-		formatWriter.writeLineFormat (
-			"objectDatabaseHelperProvider;");
-
-		formatWriter.writeNewline ();
+		classWriter.addPrototypeDependency (
+			ObjectDatabaseHelper.class);
 
 		// components
 
 		for (
-			String componentName
-				: componentNames
+			Class <?> componentClass
+				: componentImplementationsByName.values ()
 		) {
 
-			formatWriter.writeLineFormat (
-				"@%s",
-				imports.register (
-					PrototypeDependency.class));
-
-			formatWriter.writeLineFormat (
-				"%s <%s>",
-				imports.register (
-					Provider.class),
-				stringFormat (
-					"%s <%s>",
-					imports.registerFormat (
-						"wbs.framework.object.ObjectHelper%sImplementation",
-						capitalise (
-							componentName)),
-					imports.register (
-						model.objectClass ())));
-
-			formatWriter.writeLineFormat (
-				"%s;",
-				stringFormat (
-					"objectHelper%sImplementationProvider",
-					capitalise (
-						componentName)));
-
-			formatWriter.writeNewline ();
+			classWriter.addPrototypeDependency (
+				componentClass);
 
 		}
 
 	}
 
-	void writeState (
-			@NonNull JavaImportRegistry imports,
-			@NonNull FormatWriter formatWriter) {
+	void addState (
+			@NonNull JavaClassWriter classWriter) {
 
-		formatWriter.writeLineFormat (
-			"// state");
+		classWriter.addState (
+			Model.class,
+			"model");
 
-		formatWriter.writeNewline ();
+		classWriter.addState (
+			Model.class,
+			"parentModel");
 
-		formatWriter.writeLineFormat (
-			"%s model;",
-			imports.register (
-				Model.class));
+		classWriter.addState (
+			ObjectModel.class,
+			"objectModel");;
 
-		formatWriter.writeLineFormat (
-			"%s parentModel;",
-			imports.register (
-				Model.class));
+		classWriter.addState (
+			ObjectDatabaseHelper.class,
+			"databaseHelper");;
 
-		formatWriter.writeLineFormat (
-			"%s objectModel;",
-			imports.register (
-				ObjectModel.class));
-
-		formatWriter.writeLineFormat (
-			"%s databaseHelper;",
-			imports.register (
-				ObjectDatabaseHelper.class));
-
-		formatWriter.writeLineFormat (
-			"%s hooksImplementation;",
-			imports.register (
-				ObjectHooks.class));
-
-		formatWriter.writeNewline ();
+		classWriter.addState (
+			ObjectHooks.class,
+			"hooksImplementation");
 
 		for (
 			String componentName
 				: componentNames
 		) {
 
-			formatWriter.writeLineFormat (
-				"%s <%s> %s;",
-				imports.registerFormat (
-					"wbs.framework.object.ObjectHelper%sImplementation",
-					capitalise (
-						componentName)),
-				imports.register (
-					model.objectClass ()),
+			classWriter.addState (
+				imports ->
+					stringFormat (
+						"%s <%s>",
+						imports.register (
+							stringFormat (
+								"wbs.framework.object.ObjectHelper%sImplementation",
+								capitalise (
+									componentName))),
+						imports.register (
+							model.objectClass ())),
 				stringFormat (
 					"%sImplementation",
 					componentName));
 
 		}
-
-		formatWriter.writeNewline ();
 
 	}
 
@@ -702,14 +570,14 @@ class ObjectHelperGenerator {
 
 			formatWriter.writeLineFormat (
 				"ObjectTypeEntry parentType =");
-	
+
 			formatWriter.writeLineFormat (
 				"\tobjectTypeRegistry.findByCode (");
-	
+
 			formatWriter.writeLineFormat (
 				"\t\t\"%s\");",
 				parentModel.objectTypeCode ());
-	
+
 			formatWriter.writeNewline ();
 
 		}
@@ -788,10 +656,10 @@ class ObjectHelperGenerator {
 				"\t\tparentType.getId ())");
 
 			formatWriter.writeNewline ();
-	
+
 			formatWriter.writeLineFormat (
 				"\t.parentClass (");
-	
+
 			formatWriter.writeLineFormat (
 				"\t\tparentModel.objectClass ())");
 
@@ -807,16 +675,17 @@ class ObjectHelperGenerator {
 			formatWriter.writeLineFormat (
 				"\t\t%s)",
 				daoComponentName);
-	
+
 			formatWriter.writeNewline ();
 
 			formatWriter.writeLineFormat (
 				"\t.daoInterface (");
-	
+
 			formatWriter.writeLineFormat (
 				"\t\t%s.class)",
-				daoMethodsInterfaceName);
-	
+				imports.register (
+					daoMethodsInterface));
+
 			formatWriter.writeNewline ();
 
 		}
@@ -1015,7 +884,7 @@ class ObjectHelperGenerator {
 
 		for (
 			Map.Entry <String, Class <?>> componentEntry
-				: componentClassesByName.entrySet ()
+				: componentInterfacesByName.entrySet ()
 		) {
 
 			String componentName =
@@ -1143,13 +1012,13 @@ class ObjectHelperGenerator {
 					"%s %s (",
 					returnTypeName,
 					method.getName ());
-	
+
 				for (
 					Parameter parameter
 						: listSliceAllButLastItemRequired (
 							parameters)
 				) {
-	
+
 					formatWriter.writeLineFormat (
 						"\t\t%s %s,",
 						parameterSourceTypeName (
@@ -1158,7 +1027,7 @@ class ObjectHelperGenerator {
 						parameter.getName ());
 
 				}
-	
+
 				Parameter lastParameter =
 					listLastElementRequired (
 						parameters);
@@ -1204,17 +1073,17 @@ class ObjectHelperGenerator {
 								0,
 								parameters.size () - 1)
 					) {
-		
+
 						formatWriter.writeLineFormat (
 							"\t\t%s,",
 							parameter.getName ());
-		
+
 					}
-		
+
 					Parameter lastParameter =
 						listLastElementRequired (
 							parameters);
-		
+
 					formatWriter.writeLineFormat (
 						"\t\t\t%s);",
 						lastParameter.getName ());
@@ -1247,17 +1116,17 @@ class ObjectHelperGenerator {
 								0,
 								parameters.size () - 1)
 					) {
-		
+
 						formatWriter.writeLineFormat (
 							"\t\t%s,",
 							parameter.getName ());
-		
+
 					}
-		
+
 					Parameter lastParameter =
 						listLastElementRequired (
 							parameters);
-		
+
 					formatWriter.writeLineFormat (
 						"\t\t%s);",
 						lastParameter.getName ());
@@ -1384,7 +1253,7 @@ class ObjectHelperGenerator {
 
 			return imports.register (
 				(Class <?>)
-				parameterizedType.getRawType ()); 
+				parameterizedType.getRawType ());
 
 		} else {
 
@@ -1503,7 +1372,7 @@ class ObjectHelperGenerator {
 			"update");
 
 	public static
-	Map <String, Class <?>> componentClassesByName =
+	Map <String, Class <?>> componentInterfacesByName =
 		ImmutableMap.copyOf (
 			componentNames.stream ()
 
@@ -1518,6 +1387,29 @@ class ObjectHelperGenerator {
 					"wbs.framework.object",
 					stringFormat (
 						"ObjectHelper%sMethods",
+						capitalise (
+							componentName))))
+
+		)
+
+	);
+
+	public static
+	Map <String, Class <?>> componentImplementationsByName =
+		ImmutableMap.copyOf (
+			componentNames.stream ()
+
+		.collect (
+			Collectors.toMap (
+
+			componentName ->
+				componentName,
+
+			componentName ->
+				classForNameRequired (
+					"wbs.framework.object",
+					stringFormat (
+						"ObjectHelper%sImplementation",
 						capitalise (
 							componentName))))
 

@@ -379,7 +379,7 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 			// check our deleted flag
 
 			try {
-	
+
 				boolean deletedProperty =
 					(Boolean)
 					BeanLogic.getProperty (
@@ -389,10 +389,10 @@ class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
 				if (deletedProperty) {
 					return true;
 				}
-	
+
 			} catch (Exception exception) {
 
-				doNothing ();	
+				doNothing ();
 
 			}
 

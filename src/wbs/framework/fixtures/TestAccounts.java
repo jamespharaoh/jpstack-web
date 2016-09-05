@@ -2,7 +2,7 @@ package wbs.framework.fixtures;
 
 import wbs.framework.application.config.AbstractGenericConfig;
 
-public 
+public
 class TestAccounts
 	extends AbstractGenericConfig <TestAccounts> {
 

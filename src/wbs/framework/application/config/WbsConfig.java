@@ -60,7 +60,7 @@ class WbsConfig {
 
 	@DataChild (
 		required = true)
-	WbsConfigEmail email; 
+	WbsConfigEmail email;
 
 	// security
 

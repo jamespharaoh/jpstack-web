@@ -21,31 +21,31 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.utils.cache.AdvancedCache;
 
 @Accessors (fluent = true)
-@PrototypeComponent ("objectHelperIndexImplemnetation")
+@PrototypeComponent ("objectHelperIndexImplementation")
 public
-class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
+class ObjectHelperIndexImplementation <RecordType extends Record <RecordType>>
 	implements
-		ObjectHelperComponent<RecordType>,
-		ObjectHelperIndexMethods<RecordType> {
+		ObjectHelperComponent <RecordType>,
+		ObjectHelperIndexMethods <RecordType> {
 
 	// properties
 
 	@Setter
-	ObjectModel<RecordType> model;
+	ObjectModel <RecordType> model;
 
 	@Setter
 	ObjectManager objectManager;
 
 	@Setter
-	ObjectHelper<RecordType> objectHelper;
+	ObjectHelper <RecordType> objectHelper;
 
 	@Setter
-	ObjectDatabaseHelper<RecordType> objectDatabaseHelper;
+	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
 
 	// state
 
-	AdvancedCache<Pair<Long,Long>,RecordType> parentIdAndIndexCache;
-	AdvancedCache<Pair<GlobalId,Long>,RecordType> parentGlobalIdAndIndexCache;
+	AdvancedCache <Pair <Long ,Long>, RecordType> parentIdAndIndexCache;
+	AdvancedCache <Pair <GlobalId, Long>, RecordType> parentGlobalIdAndIndexCache;
 
 	// life cycle
 
@@ -63,7 +63,7 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 			parentIdAndIndexCache =
 				new AdvancedCache.IdBuilder<Pair<Long,Long>,Long,RecordType> ()
 
-				.dummy (! allOf (				
+				.dummy (! allOf (
 					() -> model.parentField ().cacheable (),
 					() -> model.indexField ().cacheable ()
 				))
@@ -105,7 +105,7 @@ class ObjectHelperIndexImplementation<RecordType extends Record<RecordType>>
 			parentGlobalIdAndIndexCache =
 				new AdvancedCache.IdBuilder<Pair<GlobalId,Long>,Long,RecordType> ()
 
-				.dummy (! allOf (				
+				.dummy (! allOf (
 					() -> model.parentTypeField ().cacheable (),
 					() -> model.parentIdField ().cacheable (),
 					() -> model.indexField ().cacheable ()

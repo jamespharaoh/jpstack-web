@@ -12,7 +12,7 @@ import com.google.common.collect.ImmutableMap;
 class PhpDouble
 	extends AbstractPhpEntity {
 
-	private 
+	private
 	double value;
 
 	public

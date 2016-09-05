@@ -1174,7 +1174,7 @@ class ChatUserDaoHibernate
 					"_chatUser.genderIn",
 					search.genderIn ()));
 
-		}		
+		}
 
 		if (
 			isNotNull (
@@ -1219,7 +1219,7 @@ class ChatUserDaoHibernate
 					"_chatUser.orientIn",
 					search.orientIn ()));
 
-		}		
+		}
 
 		if (
 			isNotNull (
@@ -1260,7 +1260,7 @@ class ChatUserDaoHibernate
 					search.categoryId ()));
 
 		}
-		
+
 		if (
 			isNotNull (
 				search.numberId ())

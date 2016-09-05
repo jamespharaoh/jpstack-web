@@ -391,7 +391,7 @@ class ClockworkSmsFixtureProvider
 
 		.add (
 			new DefaultDeliveryStatus ()
-			
+
 			.status (
 				"EXPIRED")
 
@@ -453,7 +453,7 @@ class ClockworkSmsFixtureProvider
 
 		.add (
 			new DefaultDeliveryStatus ()
-			
+
 			.status (
 				"UNKNOWN")
 
@@ -461,7 +461,7 @@ class ClockworkSmsFixtureProvider
 				"No final delivery status received from the network.")
 
 			.ourStatus (
-				MessageStatus.sent)) 	
+				MessageStatus.sent))
 
 		.build ();
 
@@ -485,7 +485,7 @@ class ClockworkSmsFixtureProvider
 				1l)
 
 			.theirDescription (
-				"Unknown – No details provided by network")) 	
+				"Unknown – No details provided by network"))
 
 		.add (
 			new DefaultDeliveryStatusDetailCode ()
@@ -580,7 +580,7 @@ class ClockworkSmsFixtureProvider
 		String status;
 		String theirDescription;
 		String theirCommonCauses;
-		MessageStatus ourStatus; 
+		MessageStatus ourStatus;
 	}
 
 	@Accessors (fluent = true)

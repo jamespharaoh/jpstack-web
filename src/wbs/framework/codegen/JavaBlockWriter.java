@@ -3,7 +3,7 @@ package wbs.framework.codegen;
 import wbs.framework.utils.formatwriter.FormatWriter;
 
 @FunctionalInterface
-public 
+public
 interface JavaBlockWriter {
 
 	void writeBlock (

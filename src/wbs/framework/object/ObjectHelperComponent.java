@@ -2,7 +2,7 @@ package wbs.framework.object;
 
 import wbs.framework.entity.record.Record;
 
-public 
+public
 interface ObjectHelperComponent <RecordType extends Record <RecordType>> {
 
 	ObjectHelperComponent <RecordType> objectHelper (
@@ -10,10 +10,10 @@ interface ObjectHelperComponent <RecordType extends Record <RecordType>> {
 
 	ObjectHelperComponent <RecordType> objectDatabaseHelper (
 			ObjectDatabaseHelper <RecordType> objectDatabaseHelper);
-		
+
 	ObjectHelperComponent <RecordType> objectManager (
 			ObjectManager objectManager);
-		
+
 	ObjectHelperComponent <RecordType> model (
 			ObjectModel <RecordType> model);
 

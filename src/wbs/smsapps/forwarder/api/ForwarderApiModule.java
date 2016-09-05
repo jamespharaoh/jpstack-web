@@ -315,18 +315,59 @@ class ForwarderApiModule
 
 	private final static
 	RpcDefinition sendRequestDef =
-		Rpc.rpcDefinition ("forwarder-send-request", RpcType.rStructure,
-			Rpc.rpcDefinition ("slice", RpcType.rString),
-			Rpc.rpcDefinition ("forwarder", RpcType.rString),
-			Rpc.rpcDefinition ("password", RpcType.rString),
-			Rpc.rpcDefinition ("num-from", RpcType.rString),
-			Rpc.rpcDefinition ("num-to", RpcType.rString, RpcChecker.stringNumeric),
-			Rpc.rpcDefinition ("message", RpcType.rString),
-			Rpc.rpcDefinition ("route", "free", RpcType.rString),
-			Rpc.rpcDefinition ("service", "default", RpcType.rString),
-			Rpc.rpcDefinition ("client-id", null, RpcType.rString),
-			Rpc.rpcDefinition ("reply-to-server-id", null, RpcType.rInteger),
-			Rpc.rpcDefinition ("pri", 0, RpcType.rInteger));
+		Rpc.rpcDefinition (
+			"forwarder-send-request",
+			RpcType.rStructure,
+
+			Rpc.rpcDefinition (
+				"slice",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"forwarder",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"password",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"num-from",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"num-to",
+				RpcType.rString,
+				RpcChecker.stringNumeric),
+
+			Rpc.rpcDefinition (
+				"message",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"route",
+				"free",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"service",
+				"default",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"client-id",
+				null,
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"reply-to-server-id",
+				null,
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"pri",
+				0,
+				RpcType.rInteger));
 
 	public
 	class SendRpcHandler
@@ -400,14 +441,16 @@ class ForwarderApiModule
 					"forwarer-send-response",
 					Rpc.rpcElem (
 						"server-id",
-						sendTemplate.parts.get (0).forwarderMessageOut.getId ()));
+						sendTemplate.parts.get (0)
+							.forwarderMessageOut
+							.getId ()));
 
 			} else {
 
 				// return failure
 
 				throw new RuntimeException (
-						"Need to elaborate on error here...");
+					"Need to elaborate on error here...");
 
 			}
 
@@ -961,25 +1004,40 @@ class ForwarderApiModule
 
 							case mms:
 
-								if (sendExMessage.url != null)
-									errors
-											.add("Parameter should not be set when message type is mms: url");
+								if (sendExMessage.url != null) {
+
+									errors.add (
+										stringFormat (
+											"Parameter should not be set when ",
+											"message type is mms: url"));
+
+								}
 
 								break;
 
 							case sms:
 
-								if (sendExMessage.url != null)
-									errors
-											.add("Parameter should not be set when message type is sms: url");
+								if (sendExMessage.url != null) {
+
+									errors.add (
+										stringFormat (
+											"Parameter should not be set when ",
+											"message type is sms: url"));
+
+								}
 
 								break;
 
 							case wapPush:
 
-								if (sendExMessage.url == null)
-									errors
-											.add("Parameter must be set when message type is wap push: url");
+								if (sendExMessage.url == null) {
+
+									errors.add (
+										stringFormat (
+											"Parameter must be set when ",
+											"message type is wap push: url"));
+
+								}
 
 								break;
 
@@ -994,8 +1052,10 @@ class ForwarderApiModule
 		private
 		void createTemplate () {
 
-			for (SendExMessageChain sendExMessageChain
-					: messageChains) {
+			for (
+				SendExMessageChain sendExMessageChain
+					: messageChains
+			) {
 
 				sendExMessageChain.sendTemplate =
 					new ForwarderLogicImplementation.SendTemplate ();
@@ -1136,13 +1196,27 @@ class ForwarderApiModule
 				}
 
 				for (int j = 0; j < sendExMessageChain.messages.size(); j++) {
-					SendExMessage sem = sendExMessageChain.messages.get(j);
+
+					SendExMessage sem =
+						sendExMessageChain.messages.get (j);
+
 					for (String error : sem.part.errors) {
-						sendExMessageChain.errors.add(String.format("Message %d: %s", j,
+
+						sendExMessageChain.errors.add (
+							String.format (
+								"Message %d: %s",
+								j,
 								error));
-						errors.add(String.format("Chain %d: Message %d: %s", index,
-								j, error));
+
+						errors.add (
+							String.format (
+								"Chain %d: Message %d: %s",
+								index,
+								j,
+								error));
+
 					}
+
 				}
 			}
 		}
@@ -1228,7 +1302,10 @@ class ForwarderApiModule
 
 			// constrcut message chain part
 
-			if (sendExMessageChain.sendTemplate.sendError == null && cancel) {
+			if (
+				sendExMessageChain.sendTemplate.sendError == null
+				&& cancel
+			) {
 
 				// cancelled due to other error
 
@@ -1242,7 +1319,10 @@ class ForwarderApiModule
 					Rpc.rpcElem ("success", false),
 					messagesPart);
 
-			} else if (sendExMessageChain.sendTemplate.sendError == null && ! cancel) {
+			} else if (
+				sendExMessageChain.sendTemplate.sendError == null
+				&& ! cancel
+			) {
 
 				// success
 

@@ -56,7 +56,7 @@ class ImChatApiLogicImplementation
 	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@SingletonDependency 
+	@SingletonDependency
 	Database database;
 
 	@SingletonDependency

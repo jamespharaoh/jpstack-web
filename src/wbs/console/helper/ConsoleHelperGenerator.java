@@ -462,12 +462,12 @@ class ConsoleHelperGenerator {
 
 			javaWriter.writeFormat (
 				"\t@Named\n");
-	
+
 			javaWriter.writeFormat (
 				"\t%s %s;\n",
 				daoMethodsInterfaceName,
 				daoComponentName);
-	
+
 			javaWriter.writeFormat (
 				"\n");
 
@@ -480,18 +480,18 @@ class ConsoleHelperGenerator {
 
 			javaWriter.writeFormat (
 				"\t@Named\n");
-	
+
 			javaWriter.writeFormat (
 				"\t%s %s;\n",
 				extraMethodsInterfaceName,
 				extraComponentName);
-	
+
 			javaWriter.writeFormat (
 				"\n");
 
 		}
 
-	}	
+	}
 
 	void writePrototypeDependencies () {
 
@@ -685,14 +685,14 @@ class ConsoleHelperGenerator {
 
 			javaWriter.writeFormat (
 				"\t\t\tObjectTypeEntry parentType =\n");
-	
+
 			javaWriter.writeFormat (
 				"\t\t\t\tobjectTypeRegistry.findByCode (\n");
-	
+
 			javaWriter.writeFormat (
 				"\t\t\t\t\t\"%s\");\n",
 				parentModel.objectTypeCode ());
-	
+
 			javaWriter.writeFormat (
 				"\n");
 
@@ -770,10 +770,10 @@ class ConsoleHelperGenerator {
 
 			javaWriter.writeFormat (
 				"\n");
-	
+
 			javaWriter.writeFormat (
 				"\t\t\t\t.parentClass (\n");
-	
+
 			javaWriter.writeFormat (
 				"\t\t\t\t\tparentModel.objectClass ())\n");
 
@@ -786,24 +786,24 @@ class ConsoleHelperGenerator {
 
 			javaWriter.writeFormat (
 				"\n");
-	
+
 			javaWriter.writeFormat (
 				"\t\t\t\t.daoImplementation (\n");
 
 			javaWriter.writeFormat (
 				"\t\t\t\t\t%s)\n",
 				daoComponentName);
-	
+
 			javaWriter.writeFormat (
 				"\n");
 
 			javaWriter.writeFormat (
 				"\t\t\t\t.daoInterface (\n");
-	
+
 			javaWriter.writeFormat (
 				"\t\t\t\t\t%s.class)\n",
 				daoMethodsInterfaceName);
-	
+
 			javaWriter.writeFormat (
 				"\n");
 
@@ -891,7 +891,7 @@ class ConsoleHelperGenerator {
 			javaWriter.writeFormat (
 				"\n");
 
-		}	
+		}
 
 		javaWriter.writeFormat (
 			"\t\t}\n");
@@ -1066,7 +1066,7 @@ class ConsoleHelperGenerator {
 					joinWithCommaAndSpace (
 						Arrays.stream (
 							method.getTypeParameters ())
-	
+
 					.map (
 						this::typeVariableSourceDeclaration)
 
@@ -1102,7 +1102,7 @@ class ConsoleHelperGenerator {
 					"\t%s %s (\n",
 					returnTypeName,
 					method.getName ());
-	
+
 				for (
 					Parameter parameter
 						: listSlice (
@@ -1110,7 +1110,7 @@ class ConsoleHelperGenerator {
 							0,
 							parameters.size () - 1)
 				) {
-	
+
 					javaWriter.writeFormat (
 						"\t\t\t%s %s,\n",
 						parameterSourceName (
@@ -1118,7 +1118,7 @@ class ConsoleHelperGenerator {
 						parameter.getName ());
 
 				}
-	
+
 				Parameter lastParameter =
 					listLastElementRequired (
 						parameters);
@@ -1164,17 +1164,17 @@ class ConsoleHelperGenerator {
 								0,
 								parameters.size () - 1)
 					) {
-		
+
 						javaWriter.writeFormat (
 							"\t\t\t%s,\n",
 							parameter.getName ());
-		
+
 					}
-		
+
 					Parameter lastParameter =
 						listLastElementRequired (
 							parameters);
-		
+
 					javaWriter.writeFormat (
 						"\t\t\t%s);\n",
 						lastParameter.getName ());
@@ -1207,17 +1207,17 @@ class ConsoleHelperGenerator {
 								0,
 								parameters.size () - 1)
 					) {
-		
+
 						javaWriter.writeFormat (
 							"\t\t\t%s,\n",
 							parameter.getName ());
-		
+
 					}
-		
+
 					Parameter lastParameter =
 						listLastElementRequired (
 							parameters);
-		
+
 					javaWriter.writeFormat (
 						"\t\t\t%s);\n",
 						lastParameter.getName ());
@@ -1353,7 +1353,7 @@ class ConsoleHelperGenerator {
 
 			return classNameFull (
 				(Class <?>)
-				parameterizedType.getRawType ()); 
+				parameterizedType.getRawType ());
 
 		} else {
 

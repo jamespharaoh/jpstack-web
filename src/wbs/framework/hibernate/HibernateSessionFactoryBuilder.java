@@ -301,7 +301,7 @@ class HibernateSessionFactoryBuilder {
 
 		config.setProperties (
 			configProperties);
-				
+
 		SessionFactory sessionFactory =
 			buildSessionFactory (
 				config);

@@ -1009,7 +1009,7 @@ class DataFromXmlImplementation
 
 					if (
 
-						isNull (							
+						isNull (
 
 							entryKey)
 

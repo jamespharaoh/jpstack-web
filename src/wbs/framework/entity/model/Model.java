@@ -1,6 +1,6 @@
 package wbs.framework.entity.model;
 
-public 
+public
 interface Model
 	extends ModelMethods {
 

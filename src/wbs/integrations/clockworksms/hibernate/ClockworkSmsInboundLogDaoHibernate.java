@@ -15,7 +15,7 @@ import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogDao;
 import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogRec;
 import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogSearch;
 
-public 
+public
 class ClockworkSmsInboundLogDaoHibernate
 	extends HibernateDao
 	implements ClockworkSmsInboundLogDao {

@@ -13,11 +13,12 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.joda.time.Duration;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
+
+import org.joda.time.Duration;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -316,7 +317,11 @@ class ForwarderApiLogicImplementation
 	 * Retrieves from the database and outputs the specified
 	 * forwarder_message_in.
 	 */
-	private String printMessageIn(RequestContext requestContext, ForwarderMessageInRec fmi) {
+	private
+	String printMessageIn (
+			@NonNull RequestContext requestContext,
+			@NonNull ForwarderMessageInRec fmi) {
+
 		try {
 
 			return "MESSAGE\n"

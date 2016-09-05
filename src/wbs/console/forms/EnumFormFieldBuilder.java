@@ -141,13 +141,13 @@ class EnumFormFieldBuilder {
 			() -> ifThenElse (
 				isNotNull (
 					propertyClass.getEnclosingClass ()),
-	
+
 				() -> stringFormat (
 					"%s%sConsoleHelper",
 					uncapitalise (
 						propertyClass.getEnclosingClass ().getSimpleName ()),
 					propertyClass.getSimpleName ()),
-	
+
 				() -> stringFormat (
 					"%sConsoleHelper",
 					uncapitalise (
@@ -161,7 +161,7 @@ class EnumFormFieldBuilder {
 			applicationContext.getComponentRequired (
 				enumConsoleHelperName,
 				EnumConsoleHelper.class);
-	
+
 		Optional <Optional <Object>> implicitValue =
 			spec.implicitValue () != null
 				? Optional.of (

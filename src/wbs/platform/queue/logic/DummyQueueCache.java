@@ -13,7 +13,7 @@ import wbs.platform.queue.model.QueueSubjectObjectHelper;
 import wbs.platform.queue.model.QueueSubjectRec;
 
 @SingletonComponent ("dummyQueueCache")
-public 
+public
 class DummyQueueCache
 	implements QueueCache {
 
@@ -28,7 +28,7 @@ class DummyQueueCache
 	// implementation
 
 	@Override
-	public 
+	public
 	QueueItemRec findQueueItemByIndex (
 			@NonNull QueueSubjectRec subject,
 			@NonNull Long index) {
@@ -40,7 +40,7 @@ class DummyQueueCache
 	}
 
 	@Override
-	public 
+	public
 	List <QueueSubjectRec> findQueueSubjects () {
 
 		return queueSubjectHelper.findActive ();
@@ -48,7 +48,7 @@ class DummyQueueCache
 	}
 
 	@Override
-	public 
+	public
 	List <QueueSubjectRec> findQueueSubjects (
 			@NonNull QueueRec queue) {
 

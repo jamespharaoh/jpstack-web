@@ -18,7 +18,7 @@ class DummyCache<Key,Value>
 	Function<Key,Optional<Value>> lookupByKey;
 
 	@Override
-	public 
+	public
 	Optional <Value> get (
 			@NonNull Key key) {
 

@@ -8,7 +8,7 @@ import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.SimpleExceptionLogger;
 
 @SingletonComponent ("schemaToolComponents")
-public 
+public
 class SchemaToolComponents {
 
 	// prototype dependencies
@@ -22,7 +22,7 @@ class SchemaToolComponents {
 	public
 	ExceptionLogger exceptionLogger () {
 
-		return simpleExceptionLoggerProvider.get (); 
+		return simpleExceptionLoggerProvider.get ();
 
 	}
 

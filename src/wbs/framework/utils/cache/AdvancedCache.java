@@ -7,7 +7,7 @@ import com.google.common.base.Optional;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-public 
+public
 interface AdvancedCache<Key,Value> {
 
 	Optional<Value> get (

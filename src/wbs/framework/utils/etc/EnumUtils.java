@@ -2,7 +2,7 @@ package wbs.framework.utils.etc;
 
 import lombok.NonNull;
 
-public 
+public
 class EnumUtils {
 
 	public static <Type extends Enum <?>>

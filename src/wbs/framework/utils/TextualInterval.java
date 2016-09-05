@@ -218,7 +218,7 @@ class TextualInterval {
 						thisMonth.toLocalDate (1).toDateTime (
 							new LocalTime (
 								toJavaIntegerRequired (
-									hourOffset), 
+									hourOffset),
 								0),
 							timezone)),
 					lastMonth.toString (

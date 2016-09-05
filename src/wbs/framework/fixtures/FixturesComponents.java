@@ -9,7 +9,7 @@ import wbs.framework.utils.ThreadManager;
 import wbs.framework.utils.ThreadManagerImplementation;
 
 @SingletonComponent ("fixturesComponents")
-public 
+public
 class FixturesComponents {
 
 	// dependencies
@@ -25,7 +25,7 @@ class FixturesComponents {
 	// components
 
 	@SingletonComponent ("testAccounts")
-	public 
+	public
 	TestAccounts testAccounts () {
 
 		return (TestAccounts) (

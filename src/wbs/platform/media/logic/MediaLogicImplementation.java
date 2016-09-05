@@ -1060,7 +1060,7 @@ class MediaLogicImplementation
 		// same image if already fits
 
 		if (allOf (
-		
+
 			() -> lessThan (
 				image.getWidth (),
 				maxWidth),
@@ -1068,7 +1068,7 @@ class MediaLogicImplementation
 			() -> lessThan (
 				image.getHeight (),
 				maxHeight)
-		
+
 		)) {
 
 			return image;

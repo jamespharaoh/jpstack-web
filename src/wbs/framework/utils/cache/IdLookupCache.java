@@ -61,7 +61,7 @@ class IdLookupCache<Key,Id,Value>
 
 		.maximumSize (
 			maximumCacheSize)
-									
+
 		.expireAfterAccess (
 			keepDuration.getMillis (),
 			TimeUnit.MILLISECONDS)
@@ -71,7 +71,7 @@ class IdLookupCache<Key,Id,Value>
 	// public implementation
 
 	@Override
-	public 
+	public
 	Optional<Value> get (
 			@NonNull Key key) {
 

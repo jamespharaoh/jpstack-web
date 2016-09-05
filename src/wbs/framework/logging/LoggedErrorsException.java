@@ -5,7 +5,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 @Accessors (fluent = true)
-public 
+public
 class LoggedErrorsException
 	extends RuntimeException {
 

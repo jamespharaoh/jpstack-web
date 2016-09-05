@@ -8,7 +8,7 @@ import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.SimpleExceptionLogger;
 
 @SingletonComponent ("modelGenerateComponents")
-public 
+public
 class ModelGenerateComponents {
 
 	// prototype dependencies
@@ -22,7 +22,7 @@ class ModelGenerateComponents {
 	public
 	ExceptionLogger exceptionLogger () {
 
-		return simpleExceptionLoggerProvider.get (); 
+		return simpleExceptionLoggerProvider.get ();
 
 	}
 

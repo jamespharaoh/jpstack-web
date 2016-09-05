@@ -138,7 +138,7 @@ class ChatUserAdminDeletePart
 				"></p>\n");
 
 		} else if (allOf (
-		
+
 			() -> isNotNull (
 				chatUser.getOldNumber ()),
 

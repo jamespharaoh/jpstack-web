@@ -53,7 +53,7 @@ class JavaAnnotationWriter {
 
 	// implementation
 
-	public 
+	public
 	void writeAnnotation (
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
@@ -94,30 +94,30 @@ class JavaAnnotationWriter {
 			} else {
 
 				boolean first = true;
-	
+
 				for (
 					Map.Entry <String, String> attributeEntry
 						: attributes.entrySet ()
 				) {
-	
+
 					if (! first) {
-	
+
 						formatWriter.writeFormat (
 							", ");
-	
+
 					}
-	
+
 					formatWriter.writeNewline ();
-	
+
 					formatWriter.writeIndent ();
-	
+
 					formatWriter.writeFormat (
 						"\t%s = %s",
 						attributeEntry.getKey (),
 						attributeEntry.getValue ());
-	
+
 					first = false;
-	
+
 				}
 
 			}

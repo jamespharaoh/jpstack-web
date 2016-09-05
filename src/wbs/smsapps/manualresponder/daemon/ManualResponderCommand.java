@@ -375,7 +375,9 @@ class ManualResponderCommand
 					timeFormatter.timestampString (
 						timeFormatter.timezone (
 							ifNull (
-								manualResponder.getSlice ().getDefaultTimezone (),
+								manualResponder
+									.getSlice ()
+									.getDefaultTimezone (),
 								wbsConfig.defaultTimezone ())),
 						transaction.now ()),
 					"\n",

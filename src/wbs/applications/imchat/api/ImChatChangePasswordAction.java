@@ -47,7 +47,7 @@ class ImChatChangePasswordAction
 
 	// prototype dependencies
 
-	@PrototypeDependency 
+	@PrototypeDependency
 	Provider <JsonResponder> jsonResponderProvider;
 
 	// implementation

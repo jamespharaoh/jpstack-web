@@ -1842,7 +1842,7 @@ class ChatUserLogicImplementation
 	}
 
 	@Override
-	public 
+	public
 	long getAgeInYears (
 			@NonNull ChatUserRec chatUser,
 			@NonNull Instant now) {

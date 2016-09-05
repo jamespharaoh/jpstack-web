@@ -12,14 +12,14 @@ import wbs.framework.data.annotations.DataClass;
 @Accessors (fluent = true)
 @Data
 @DataClass ("DlrList_Resp")
-public 
+public
 class ClockworkSmsRouteReportResponse {
 
 	@DataChildren (
 		direct = true,
 		childElement = "Dlr_Resp")
 	List <Item> items =
-		new ArrayList<> ();	
+		new ArrayList<> ();
 
 	@Accessors (fluent = true)
 	@Data

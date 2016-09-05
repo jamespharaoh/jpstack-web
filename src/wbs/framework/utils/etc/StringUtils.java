@@ -1,14 +1,20 @@
 package wbs.framework.utils.etc;
 
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.NullUtils.nullIf;
+import static wbs.framework.utils.etc.TypeUtils.isInstanceOf;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
 
 import com.google.common.base.Optional;
 
@@ -982,6 +988,16 @@ class StringUtils {
 	}
 
 	public static
+	String stringFormatList (
+			List <?> arguments) {
+
+		return stringFormat (
+			arguments.toArray (
+				new Object [] {}));
+
+	}
+
+	public static
 	String fixNewlines (
 			@NonNull String input) {
 
@@ -1395,6 +1411,62 @@ class StringUtils {
 		return subject.replaceAll (
 			fromPattern,
 			to);
+
+	}
+
+	public static <Input>
+	Function <Input, String> stringFormatLaterArray (
+			@Nonnull Object[] arguments) {
+
+		return new Function <Input, String> () {
+
+			@Override
+			public
+			String apply (
+					@NonNull Input input) {
+
+				return stringFormatList (
+					Arrays.stream (
+						arguments)
+
+					.map (
+						argument ->
+							ifThenElse (
+
+							() -> isInstanceOf (
+								String.class,
+								argument),
+
+								() ->
+									argument,
+
+							() -> isInstanceOf (
+								Function.class,
+								argument),
+
+								() -> {
+
+									@SuppressWarnings ("unchecked")
+									Function <Input, ?> function =
+										(Function <Input, ?>)
+										argument;
+
+									return function.apply (
+										input);
+								},
+
+							() -> {
+								throw new RuntimeException ();
+							}))
+
+					.collect (
+						Collectors.toList ())
+
+				);
+
+			}
+
+		};
 
 	}
 

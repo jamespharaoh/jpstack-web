@@ -1,6 +1,7 @@
 package wbs.smsapps.forwarder.daemon;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
 import java.io.IOException;
@@ -20,11 +21,12 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.joda.time.Duration;
-
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -209,14 +211,20 @@ class ForwarderDaemon
 									.getText (),
 								"utf-8"));
 
-					} else if (paramName.equals("num_from")
-							|| paramName.equals("numfrom")) {
+					} else if (
+						paramName.equals ("num_from")
+						|| paramName.equals ("numfrom")
+					) {
 
-						stringBuilder.append(URLEncoder.encode(forwarderMessageIn.getMessage()
-								.getNumFrom(), "utf-8"));
+						stringBuilder.append (
+							URLEncoder.encode (
+								forwarderMessageIn.getMessage ().getNumFrom (),
+								"utf-8"));
 
-					} else if (paramName.equals("num_to")
-							|| paramName.equals("numto")) {
+					} else if (
+						paramName.equals ("num_to")
+						|| paramName.equals ("numto")
+					) {
 
 						stringBuilder.append (
 							URLEncoder.encode (
@@ -356,8 +364,13 @@ class ForwarderDaemon
 				@NonNull ForwarderMessageInRec forwarderMessageIn) {
 
 			if (
-				forwarderMessageIn.getForwarder ().getUrl ().length () == 0
-				|| forwarderMessageIn.getForwarder ().getUrlParams ().length () == 0
+
+				stringIsEmpty (
+					forwarderMessageIn.getForwarder ().getUrl ())
+
+				|| stringIsEmpty (
+					forwarderMessageIn.getForwarder ().getUrlParams ())
+
 			) {
 
 				return false;
@@ -403,7 +416,14 @@ class ForwarderDaemon
 			@Cleanup
 			Transaction checkTransaction =
 				database.beginReadWrite (
-					"ForwarderDaemon.WorkerThread.doMessage (forwarderMessageInId)",
+					stringFormat (
+						"%s.%s.%s (%s)",
+						"ForwarderDaemon",
+						"WorkerThread",
+						"doMessage",
+						stringFormat (
+							"forwarderMessageInId = %s",
+							forwarderMessageInId)),
 					this);
 
 			ForwarderMessageInRec forwarderMessageIn =

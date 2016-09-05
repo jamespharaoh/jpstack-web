@@ -274,7 +274,7 @@ class Misc {
 		void close () {
 
 			file.delete ();
-			
+
 		}
 
 	}
@@ -307,9 +307,9 @@ class Misc {
 			OutputStream outputStream =
 				new FileOutputStream (
 					tempFile.file ());
-	
+
 			success = true;
-	
+
 			return tempFile;
 
 		} catch (IOException ioException) {
@@ -347,35 +347,35 @@ class Misc {
 						new String [] {}));
 
 			// debug log any error output
-	
+
 			@Cleanup
 			BufferedReader bufferedReader =
 				new BufferedReader (
 					new InputStreamReader (
 						process.getErrorStream (),
 						"utf-8"));
-	
+
 			String line;
-	
+
 			while ((line = bufferedReader.readLine ()) != null) {
-	
+
 				logger.debug (
 					line);
-	
+
 			}
-	
+
 			bufferedReader.close ();
 
 			try {
-	
+
 				return process.waitFor ();
-	
+
 			} catch (InterruptedException exception) {
-	
+
 				process.destroy ();
-	
+
 				throw exception;
-	
+
 			}
 
 		} catch (IOException ioException) {

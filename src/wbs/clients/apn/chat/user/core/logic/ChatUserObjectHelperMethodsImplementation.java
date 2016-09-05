@@ -38,16 +38,16 @@ class ChatUserObjectHelperMethodsImplementation
 	// indirect dependencies
 
 	@Inject
-	Provider<ChatNumberReportLogic> chatNumberReportLogicProvider;
+	Provider <ChatNumberReportLogic> chatNumberReportLogicProvider;
 
 	@Inject
-	Provider<ChatUserObjectHelper> chatUserHelperProvider;
+	Provider <ChatUserObjectHelper> chatUserHelperProvider;
 
 	@Inject
-	Provider<ChatUserLogic> chatUserLogicProvider;
+	Provider <ChatUserLogic> chatUserLogicProvider;
 
 	@Inject
-	Provider<NumberLogic> numberLogicProvider;
+	Provider <NumberLogic> numberLogicProvider;
 
 	// implementation
 

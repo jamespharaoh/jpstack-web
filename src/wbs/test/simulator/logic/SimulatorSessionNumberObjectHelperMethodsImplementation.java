@@ -20,7 +20,7 @@ class SimulatorSessionNumberObjectHelperMethodsImplementation
 	// indirect dependencies
 
 	@Inject
-	Provider<SimulatorSessionNumberObjectHelper>
+	Provider <SimulatorSessionNumberObjectHelper>
 	simulatorSessionNumberHelperProvider;
 
 	// implementation

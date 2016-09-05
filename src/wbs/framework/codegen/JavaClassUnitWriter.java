@@ -1,11 +1,12 @@
 package wbs.framework.codegen;
 
 import static wbs.framework.utils.etc.CollectionUtils.listLastElementRequired;
-import static wbs.framework.utils.etc.MapUtils.mapItemForKeyRequired;
+import static wbs.framework.utils.etc.MapUtils.mapItemForKeyOrThrow;
 import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
 import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
@@ -109,7 +111,7 @@ class JavaClassUnitWriter {
 					new ImportResolver (),
 					formatWriter));
 
-	}	
+	}
 
 	class ImportCollector
 		implements JavaImportRegistry {
@@ -139,7 +141,7 @@ class JavaClassUnitWriter {
 					simpleClassName)
 
 				&& stringEqualSafe (
-					importedClassMappings.get (	
+					importedClassMappings.get (
 						simpleClassName),
 					fullClassName)
 
@@ -180,7 +182,7 @@ class JavaClassUnitWriter {
 			}
 
 			return "";
-						
+
 		}
 
 	}
@@ -214,11 +216,18 @@ class JavaClassUnitWriter {
 						stringSplitFullStop (
 							fullClassName));
 
+				String simpleMemberName =
+					mapItemForKeyOrThrow (
+						importedClassMappings,
+						simpleClassName,
+						() -> new NoSuchElementException (
+							stringFormat (
+								"No such import: %s",
+								simpleClassName)));
+
 				if (
 					stringNotEqualSafe (
-						mapItemForKeyRequired (
-							importedClassMappings,
-							simpleClassName),
+						simpleMemberName,
 						fullClassName)
 				) {
 					shouldNeverHappen ();

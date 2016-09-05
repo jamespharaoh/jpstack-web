@@ -13,7 +13,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 @Accessors (fluent = true)
-public 
+public
 class AbstractGenericConfig <Config extends AbstractGenericConfig <Config>>{
 
 	// state

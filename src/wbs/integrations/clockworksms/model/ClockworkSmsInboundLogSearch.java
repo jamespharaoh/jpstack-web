@@ -12,7 +12,7 @@ import wbs.framework.utils.TextualInterval;
 @Data
 @EqualsAndHashCode
 @ToString
-public 
+public
 class ClockworkSmsInboundLogSearch
 	implements Serializable {
 

@@ -1,6 +1,6 @@
 package wbs.framework.application.context;
 
-public 
+public
 interface ComponentFactory {
 
 	Object makeComponent ();

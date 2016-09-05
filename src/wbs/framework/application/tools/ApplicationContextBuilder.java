@@ -300,7 +300,7 @@ class ApplicationContextBuilder {
 				PluginLayerSpec layer =
 					plugin.layersByName ().get (
 						layerName);
-		
+
 				if (layer != null) {
 
 					registerLayerComponents (

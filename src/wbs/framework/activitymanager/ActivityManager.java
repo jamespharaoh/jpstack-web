@@ -16,4 +16,6 @@ interface ActivityManager {
 			String summary,
 			Object owner);
 
+	Task currentTask ();
+
 }

@@ -26,7 +26,7 @@ import wbs.framework.utils.cache.AdvancedCache;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperCodeImplementation")
-public 
+public
 class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 	implements
 		ObjectHelperCodeMethods<RecordType>,
@@ -61,7 +61,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 		if (allOf (
 			() -> isNotNull (model.parentField ()),
 			() -> isNotNull (model.codeField ())
-		)) { 
+		)) {
 
 			parentIdAndCodeCache =
 				new AdvancedCache.IdBuilder <
@@ -70,7 +70,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 					RecordType
 				> ()
 
-				.dummy (! allOf (				
+				.dummy (! allOf (
 					() -> model.parentField ().cacheable (),
 					() -> model.codeField ().cacheable ()
 				))

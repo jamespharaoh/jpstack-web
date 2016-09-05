@@ -446,6 +446,14 @@ class ActivityManagerImplementation
 
 	}
 
+	@Override
+	public 
+	Task currentTask () {
+
+		return currentTask.get ();
+
+	}
+
 	@Accessors (fluent = true)
 	class ActiveTaskImplementation
 		implements ActiveTask {

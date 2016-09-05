@@ -308,26 +308,26 @@ class ChatDateDaemon
 					chat.getCode ()));
 
 			if (! chat.getDatingEnabled ()) {
-	
+
 				log.warn (
 					"Dating disabled for " + chat.getCode ());
-	
+
 				return Optional.absent ();
-	
+
 			}
-	
+
 			log.info (
 				"Begin dating for " + chat.getCode ());
-	
+
 			hour =
 				transaction.now ()
-	
+
 				.toDateTime (
 					chatMiscLogic.timezone (
 						chat))
-	
+
 				.getHourOfDay ();
-	
+
 			today =
 				LocalDate.now ();
 
@@ -345,7 +345,7 @@ class ChatDateDaemon
 					this);
 
 			// first cache some database info to make this a little quicker
-	
+
 			datingUsers =
 				chatUserHelper.findDating (
 					chat);
@@ -367,7 +367,7 @@ class ChatDateDaemon
 				ChatUserRec chatUser
 					: datingUsers
 			) {
-	
+
 				@Cleanup
 				ActiveTask activeIteration =
 					activityManager.start (
@@ -380,23 +380,23 @@ class ChatDateDaemon
 
 				if (chatUser.getNumber () == null)
 					continue;
-	
+
 				if (chatUser.getNumber ().getNetwork ().getId () == 0)
 					continue;
-	
+
 				ChatCreditCheckResult creditCheckResult =
 					chatCreditLogic.userSpendCreditCheck (
 						chatUser,
 						false,
 						Optional.<Long>absent ());
-	
+
 				if (creditCheckResult.failed ())
 					continue;
-	
+
 				chatData.otherUserInfos.add (
 					new DatingUserInfo (
 						chatUser));
-	
+
 			}
 
 		}
@@ -411,7 +411,7 @@ class ChatDateDaemon
 					this);
 
 			// then add all the monitors too
-	
+
 			Collection<Long> monitorIds =
 				chatUserHelper.searchIds (
 					new ChatUserSearch ()
@@ -423,12 +423,12 @@ class ChatDateDaemon
 					ChatUserType.monitor)
 
 			);
-	
+
 			for (
 				Long chatUserId
 					: monitorIds
 			) {
-	
+
 				@Cleanup
 				ActiveTask activeIteration =
 					activityManager.start (
@@ -441,11 +441,11 @@ class ChatDateDaemon
 				ChatUserRec chatUser =
 					chatUserHelper.findRequired (
 						chatUserId);
-	
+
 				chatData.otherUserInfos.add (
 					new DatingUserInfo (
 						chatUser));
-	
+
 			}
 
 		}
@@ -461,7 +461,7 @@ class ChatDateDaemon
 
 			// put all active dating users who may still need a message into
 			// datingUserIds
-	
+
 			for (
 				ChatUserRec chatUser
 					: datingUsers
@@ -478,68 +478,68 @@ class ChatDateDaemon
 						this);
 
 				if (chatUser.getType () != ChatUserType.user) {
-	
+
 					log.debug ("Ignoring " + chatUser.getId () + " (user type)");
-	
+
 					continue;
-	
+
 				}
-	
+
 				chatData.numUsers ++;
-	
+
 				ChatCreditCheckResult creditCheckResult =
 					chatCreditLogic.userSpendCreditCheck (
 						chatUser,
 						false,
 						Optional.<Long>absent ());
-	
+
 				if (creditCheckResult.failed ()) {
-	
+
 					chatData.numCredit ++;
-	
+
 					log.info (
 						stringFormat (
 							"Ignoring %s ",
 							chatUser,
 							"(%s)",
 							creditCheckResult.details ()));
-	
+
 					continue;
-	
+
 				}
-	
+
 				if (
 					! checkHours (
 						hour,
 						chatUser.getDateStartHour (),
 						chatUser.getDateEndHour ())
 				) {
-	
+
 					chatData.numHours ++;
-	
+
 					log.debug (
 						stringFormat (
 							"Ignoring %s ",
 							chatUser.getId (),
 							"(time)"));
-	
+
 					continue;
-	
+
 				}
-	
+
 				if (chatUser.getOnline ()) {
-	
+
 					chatData.numOnline ++;
-	
+
 					log.info (
 						stringFormat (
 							"Ignoring %s (online)",
 							chatUser.getId ()));
-	
+
 					continue;
-	
+
 				}
-	
+
 				if (allOf (
 
 					() -> isNotNull (
@@ -553,22 +553,22 @@ class ChatDateDaemon
 						chatUser.getDateDailyCount ())
 
 				)) {
-	
+
 					chatData.numSent ++;
-	
+
 					log.debug (
 						"Ignoring " + chatUser.getId () + " (daily limit)");
-	
+
 					continue;
-	
+
 				}
-	
+
 				log.debug (
 					"Including " + chatUser.getId ());
-	
+
 				chatData.datingUserIds.add (
 					chatUser.getId ());
-	
+
 			}
 
 		}
