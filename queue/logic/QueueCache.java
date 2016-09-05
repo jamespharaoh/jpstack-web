@@ -6,7 +6,7 @@ import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
 
-public 
+public
 interface QueueCache {
 
 	QueueItemRec findQueueItemByIndex (

@@ -51,7 +51,7 @@ class MasterQueueCache
 	void setup () {
 
 		// create queue item index
-	
+
 		queueItemsBySubjectAndIndex =
 			ImmutableMap.copyOf (
 
@@ -59,25 +59,25 @@ class MasterQueueCache
 				ImmutableList.of (
 					QueueItemState.pending,
 					QueueItemState.claimed))
-	
+
 			.stream ()
-	
+
 			.filter (
 				queueItem ->
 					isNotNull (
 						queueItem.getQueueSubject ()))
-	
+
 			.collect (
 				Collectors.toMap (
-	
+
 				queueItem ->
 					Pair.of (
 						queueItem.getQueueSubject ().getId (),
 						queueItem.getIndex ()),
-	
+
 				queueItem ->
 					queueItem)
-	
+
 			)
 
 		);

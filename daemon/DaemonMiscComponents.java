@@ -8,7 +8,7 @@ import wbs.framework.utils.ThreadManager;
 import wbs.framework.utils.ThreadManagerImplementation;
 
 @SingletonComponent ("daemonMiscComponents")
-public 
+public
 class DaemonMiscComponents {
 
 	// unitialized dependencies

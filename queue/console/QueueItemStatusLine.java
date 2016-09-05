@@ -126,7 +126,7 @@ class QueueItemStatusLine
 		backgroundThread =
 			threadManager.startThread (
 				this::backgroundLoop,
-				"queue-item-status-line"); 
+				"queue-item-status-line");
 
 	}
 
@@ -155,28 +155,28 @@ class QueueItemStatusLine
 
 				.userId (
 					userId)
-	
+
 				.totalAvailableItems (
 					0l)
-	
+
 				.userClaimedItems (
 					0l);
 
 		});
 
 		synchronized (userData) {
-	
+
 			userData
 
 				.lastContact (
 					Instant.now ());
-	
+
 			return futureValue (
 				stringFormat (
 					"updateQueueItems (%s, %s);\n",
 					userData.totalAvailableItems (),
 					userData.userClaimedItems ()));
-	
+
 		}
 
 	}
@@ -273,19 +273,19 @@ class QueueItemStatusLine
 			UserRec user =
 				userHelper.findRequired (
 					userData.userId ());
-	
+
 			SortedQueueSubjects sortedSubjects =
 				queueSubjectSorterProvider.get ()
-	
+
 				.queueCache (
 					queueCache)
-	
+
 				.loggedInUser (
 					user)
-	
+
 				.effectiveUser (
 					user)
-	
+
 				.sort ();
 
 			synchronized (userData) {

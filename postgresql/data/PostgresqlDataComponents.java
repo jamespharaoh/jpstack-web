@@ -13,7 +13,7 @@ import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.DbPool;
 
 @SingletonComponent ("postgresqlDataComponents")
-public 
+public
 class PostgresqlDataComponents {
 
 	// dependencies

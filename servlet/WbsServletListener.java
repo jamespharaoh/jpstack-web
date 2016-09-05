@@ -14,7 +14,9 @@ import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.application.tools.ApplicationContextBuilder;
 import wbs.framework.application.tools.ThreadLocalProxyComponentFactory;
@@ -34,7 +36,7 @@ class WbsServletListener
 	@Override
 	public
 	void contextDestroyed (
-			ServletContextEvent event) {
+			@NonNull ServletContextEvent event) {
 
 		if (applicationContext == null)
 			return;
@@ -50,7 +52,7 @@ class WbsServletListener
 	@Override
 	public
 	void contextInitialized (
-			ServletContextEvent event) {
+			@NonNull ServletContextEvent event) {
 
 		log.info (
 			stringFormat (
@@ -109,7 +111,7 @@ class WbsServletListener
 	@Override
 	public
 	void requestDestroyed (
-			ServletRequestEvent event) {
+			@NonNull ServletRequestEvent event) {
 
 		for (
 			String requestBeanName
@@ -135,7 +137,7 @@ class WbsServletListener
 	@Override
 	public
 	void requestInitialized (
-			ServletRequestEvent event) {
+			@NonNull ServletRequestEvent event) {
 
 		boolean setServletContext = false;
 		boolean setServletRequest = false;
@@ -193,8 +195,10 @@ class WbsServletListener
 
 			if (! success) {
 
-				for (String requestBeanName
-						: setRequestBeanNames) {
+				for (
+					String requestBeanName
+						: setRequestBeanNames
+				) {
 
 					ThreadLocalProxyComponentFactory.Control control =
 						(ThreadLocalProxyComponentFactory.Control)

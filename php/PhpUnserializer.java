@@ -85,7 +85,7 @@ class PhpUnserializer {
 		return i == 1 ? PhpBoolean.pTrue : PhpBoolean.pFalse;
 	}
 
-	private static 
+	private static
 	PhpEntity unserializeI (
 			CountingInputStream in)
 		throws IOException {

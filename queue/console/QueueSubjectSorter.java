@@ -132,7 +132,7 @@ class QueueSubjectSorter {
 					getClass ().getSimpleName (),
 					"sort",
 					joinWithCommaAndSpace (
-						stringFormat (	
+						stringFormat (
 							"queue=%s",
 							ifNull (
 								queue,
@@ -143,7 +143,7 @@ class QueueSubjectSorter {
 								effectiveUser,
 								"null")))),
 				this);
-						
+
 		loggedInUserPrivChecker =
 			userPrivCheckerBuilderProvider.get ()
 
