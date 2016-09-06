@@ -447,7 +447,7 @@ class ActivityManagerImplementation
 	}
 
 	@Override
-	public 
+	public
 	Task currentTask () {
 
 		return currentTask.get ();

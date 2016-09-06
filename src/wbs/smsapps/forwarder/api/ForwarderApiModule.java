@@ -31,6 +31,7 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.WebApiAction;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -554,16 +555,48 @@ class ForwarderApiModule
 
 	private final static
 	RpcDefinition sendExRequestDef =
-		Rpc.rpcDefinition ("forwarder-send-ex-request", RpcType.rStructure,
-			Rpc.rpcDefinition ("slice", RpcType.rString),
-			Rpc.rpcDefinition ("forwarder", RpcType.rString),
-			Rpc.rpcDefinition ("password", RpcType.rString),
-			Rpc.rpcDefinition ("allow-partial", false, RpcType.rBoolean),
-			Rpc.rpcDefinition ("message-chains", RpcType.rList,
-				Rpc.rpcDefinition ("message-chain", RpcType.rStructure,
-				Rpc.rpcDefinition ("reply-to-server-id", null, RpcType.rInteger),
-					Rpc.rpcDefinition ("unqueueExMessages", RpcType.rList,
-						Rpc.rpcDefinition ("message", RpcType.rStructure,
+
+		Rpc.rpcDefinition (
+			"forwarder-send-ex-request",
+			RpcType.rStructure,
+
+			Rpc.rpcDefinition (
+				"slice",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"forwarder",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"password",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"allow-partial",
+				false,
+				RpcType.rBoolean),
+
+			Rpc.rpcDefinition (
+				"message-chains",
+				RpcType.rList,
+
+				Rpc.rpcDefinition (
+					"message-chain",
+					RpcType.rStructure,
+
+				Rpc.rpcDefinition (
+					"reply-to-server-id",
+					null,
+					RpcType.rInteger),
+
+					Rpc.rpcDefinition (
+						"unqueueExMessages",
+						RpcType.rList,
+
+						Rpc.rpcDefinition (
+							"message",
+							RpcType.rStructure,
 
 							Rpc.rpcDefinition (
 								"type",
@@ -956,17 +989,43 @@ class ForwarderApiModule
 								(String)
 								mp.get ("num-to");
 
-							sendExMessage.numFrom = (String) mp.get("num-from");
-							sendExMessage.message = (String) mp.get("message");
+							sendExMessage.numFrom =
+								(String)
+								mp.get ("num-from");
+
+							sendExMessage.message =
+								(String)
+								mp.get ("message");
+
 							char pound = '\u00A3';
-							sendExMessage.message = sendExMessage.message.replaceAll("&pound;", ""
-									+ pound);
-							sendExMessage.url = (String) mp.get("url");
-							sendExMessage.clientId = (String) mp.get("client-id");
-							sendExMessage.route = (String) mp.get("route");
-							sendExMessage.service = (String) mp.get("service");
-							sendExMessage.pri = (Long) mp.get("pri");
-							sendExMessage.retryDays = (Long) mp.get("retry-days");
+
+							sendExMessage.message =
+								sendExMessage.message.replaceAll (
+									"&pound;", "" + pound);
+
+							sendExMessage.url =
+								(String)
+								mp.get ("url");
+
+							sendExMessage.clientId =
+								(String)
+								mp.get ("client-id");
+
+							sendExMessage.route =
+								(String)
+								mp.get ("route");
+
+							sendExMessage.service =
+								(String)
+								mp.get ("service");
+
+							sendExMessage.pri =
+								(Long)
+								mp.get ("pri");
+
+							sendExMessage.retryDays =
+								(Long)
+								mp.get ("retry-days");
 
 							@SuppressWarnings ("unchecked")
 							Set<String> tagsTemp =
@@ -980,22 +1039,33 @@ class ForwarderApiModule
 								try {
 
 									List<Map<String,Object>> mediaList =
-										forwarderApiLogic.unsafeListMapStringObject (
-											mp.get ("medias"));
+										forwarderApiLogic
+											.unsafeListMapStringObject (
+												mp.get ("medias"));
 
 									if (mediaList == null) {
 
 										errors.add (
-											"Must provide media list for mms type.");
+											stringFormat (
+												"Must provide media list for ",
+												"mms type."));
 
 										break;
 
 									}
-									sendExMessage.medias = getMedias(mediaList);
-									sendExMessage.subject = sendExMessage.message;
+
+									sendExMessage.medias =
+										getMedias (
+											mediaList);
+
+									sendExMessage.subject =
+										sendExMessage.message;
 
 								} catch (ReportableException e) {
-									errors.add("Error: " + e.getMessage());
+
+									errors.add (
+										"Error: " + e.getMessage ());
+
 								}
 
 							}
@@ -1403,14 +1473,32 @@ class ForwarderApiModule
 				// success
 
 				ret.add (
-					Rpc.rpcElem ("server-id", sem.part.forwarderMessageOut.getId ()),
-					Rpc.rpcElem ("status", Rpc.stSuccess),
-					Rpc.rpcElem ("status-code", "success"),
-					Rpc.rpcElem ("status-message", "Message sent"),
-					Rpc.rpcList ("status-unqueueExMessages", "status-message",
-						ImmutableList.<String>of (
+
+					Rpc.rpcElem (
+						"server-id",
+						sem.part.forwarderMessageOut.getId ()),
+
+					Rpc.rpcElem (
+						"status",
+						Rpc.stSuccess),
+
+					Rpc.rpcElem (
+						"status-code",
+						"success"),
+
+					Rpc.rpcElem (
+						"status-message",
+						"Message sent"),
+
+					Rpc.rpcList (
+						"status-unqueueExMessages",
+						"status-message",
+						ImmutableList.of (
 							"Message sent")),
-					Rpc.rpcElem ("success", true));
+
+					Rpc.rpcElem (
+						"success",
+						true));
 
 			} else if (sem.part.sendError != null) {
 
@@ -2110,80 +2198,42 @@ class ForwarderApiModule
 							forwarderMessageOutReport.getNewMessageStatus ());
 
 					RpcStructure struct =
-						Rpc.rpcStruct ("report",
-							Rpc.rpcElem ("server-id", forwarderMessageOut.getId ()),
-							Rpc.rpcElem ("client-id", forwarderMessageOut.getOtherId ()),
-							Rpc.rpcElem ("report-id", forwarderMessageOutReport.getId ()),
-							Rpc.rpcElem ("message-status", forwarderMessageStatus.status),
-							Rpc.rpcElem ("message-status-code", forwarderMessageStatus.statusCode));
+						Rpc.rpcStruct (
+							"report",
+
+							Rpc.rpcElem (
+								"server-id",
+								forwarderMessageOut.getId ()),
+
+							Rpc.rpcElem (
+								"client-id",
+								forwarderMessageOut.getOtherId ()),
+
+							Rpc.rpcElem (
+								"report-id",
+								forwarderMessageOutReport.getId ()),
+
+							Rpc.rpcElem (
+								"message-status",
+								forwarderMessageStatus.status),
+
+							Rpc.rpcElem (
+								"message-status-code",
+								forwarderMessageStatus.statusCode));
 
 					if (advancedReporting != null && advancedReporting) {
 
 						struct.add (
 							Rpc.rpcElem (
 								"advanced-message-status",
-								forwarderMessageOutReport.getNewMessageStatus ().getOrdinal ()));
+								forwarderMessageOutReport.getNewMessageStatus ()
+									.getOrdinal ()));
 
 					}
 
 					reportsPart.add (struct);
 
 				}
-
-			}
-
-			if (advancedReporting != null && advancedReporting) {
-
-				/*
-				List<ForwarderMessageOutRec> pendingReportList =
-					forwarderDao.findForwarderMessageOutsPendingByForwarderIdLimitAdvanced (
-						forwarder.getId (), maxResults);
-
-				for (ForwarderMessageOutRec fmo : pendingReportList) {
-
-					MessageRec message =
-						fmo.getMessage ();
-
-					Set<MessageReportRec> reports =
-						message.getReports ();
-
-					for (MessageReportRec mr : reports) {
-
-						MessageReportCodeRec codeRec = mr.getMessageReportCode ();
-						if (codeRec == null)
-							break;
-
-						RpcStructure struct =
-							rpcStruct ("advancedreport",
-								rpcElem ("server-id", fmo.getId ()),
-								rpcElem ("client-id", fmo.getOtherId ()),
-								rpcElem ("report-id", mr.getId ()),
-								// dr details
-								rpcElem ("type", messageReportTypes.get (codeRec.getType ())),
-								rpcElem ("permanent", codeRec.getPermanent ()),
-								rpcElem ("status", codeRec.getStatus ()),
-								rpcElem ("success", codeRec.getSuccess ()));
-
-						if (codeRec.getStatusType () != null)
-							struct.add (
-								rpcElem ("statustype", codeRec.getStatusType ()));
-
-						if (codeRec.getReason () != null)
-							struct.add (
-								rpcElem ("reason", codeRec.getReason ()));
-
-						if (codeRec.getDescription () != null)
-							struct.add (
-								rpcElem ("description", codeRec.getDescription ()));
-
-						advancedReportsPart.add (struct);
-
-					}
-
-					//fmo.setMessageReportPending (false);
-
-				}
-				*/
 
 			}
 

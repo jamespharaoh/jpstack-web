@@ -1,10 +1,30 @@
 package wbs.framework.utils.etc;
 
+import static wbs.framework.utils.etc.ArrayUtils.arrayIsEmpty;
+import static wbs.framework.utils.etc.ArrayUtils.arrayMap;
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
+import static wbs.framework.utils.etc.IterableUtils.iterableMap;
+import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualUnsafe;
+import static wbs.framework.utils.etc.MapUtils.mapItemForKeyOrKey;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
+
+import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
+
+import wbs.framework.codegen.JavaImportRegistry;
 
 public
 class TypeUtils {
@@ -31,9 +51,9 @@ class TypeUtils {
 
 	}
 
-	public static <Type>
-	Type dynamicCast (
-			@NonNull Class <Type> classToCastTo,
+	public static <CastType>
+	CastType dynamicCast (
+			@NonNull Class <CastType> classToCastTo,
 			@NonNull Object value) {
 
 		return classToCastTo.cast (
@@ -304,6 +324,218 @@ class TypeUtils {
 			@NonNull Object object) {
 
 		return object.getClass ().getPackage ().getName ();
+
+	}
+
+	public static
+	String typeSourceName (
+			@NonNull JavaImportRegistry imports,
+			@NonNull Map <String, String> typeParameterMappings,
+			@NonNull Type type) {
+
+		if (
+			isInstanceOf (
+				Class.class,
+				type)
+		) {
+
+			return classSourceName (
+				imports,
+				(Class <?>)
+				type);
+
+		} else if (
+			isInstanceOf (
+				ParameterizedType.class,
+				type)
+		) {
+
+			return parameterizedTypeSourceName (
+				imports,
+				typeParameterMappings,
+				(ParameterizedType)
+				type);
+
+		} else if (
+			isInstanceOf (
+				TypeVariable.class,
+				type)
+		) {
+
+			return typeVariableSourceName (
+				imports,
+				typeParameterMappings,
+				(TypeVariable <?>)
+				type);
+
+		} else if (
+			isInstanceOf (
+				WildcardType.class,
+				type)
+		) {
+
+			return wildcardTypeSourceName (
+				imports,
+				(WildcardType)
+				type);
+
+		} else {
+
+			throw new RuntimeException (
+				stringFormat (
+					"Don't know how to handle a %s",
+					type.getClass ().getSimpleName ()));
+
+		}
+
+	}
+
+	public static
+	String classSourceName (
+			@NonNull JavaImportRegistry imports,
+			@NonNull Class <?> theClass) {
+
+		if (theClass.isArray ()) {
+
+			return stringFormat (
+				"%s[]",
+				classSourceName (
+					imports,
+					theClass.getComponentType ()));
+
+		} else {
+
+			return imports.register (
+				theClass);
+
+		}
+
+	}
+
+	public static
+	String parameterizedTypeSourceName (
+			@NonNull JavaImportRegistry imports,
+			@NonNull Map <String, String> typeParameterMappings,
+			@NonNull ParameterizedType parameterizedType) {
+
+		if (
+			arrayIsEmpty (
+				parameterizedType.getActualTypeArguments ())
+		) {
+
+			return imports.register (
+				(Class <?>)
+				parameterizedType.getRawType ());
+
+		} else {
+
+			return stringFormat (
+				"%s <%s>",
+				typeSourceName (
+					imports,
+					typeParameterMappings,
+					parameterizedType.getRawType ()),
+				joinWithCommaAndSpace (
+					arrayMap (
+						typeArgument ->
+							typeSourceName (
+								imports,
+								typeParameterMappings,
+								typeArgument),
+						parameterizedType.getActualTypeArguments ())));
+
+		}
+
+	}
+
+	public static
+	String typeVariableSourceName (
+			@NonNull JavaImportRegistry imports,
+			@NonNull Map <String, String> typeParameterMappings,
+			@NonNull TypeVariable <?> typeVariable) {
+
+		return mapItemForKeyOrKey (
+			typeParameterMappings,
+			typeVariable.getName ());
+
+	}
+
+	public static
+	String typeVariableSourceDeclaration (
+			@NonNull JavaImportRegistry imports,
+			@NonNull Map <String, String> typeParameterMappings,
+			@NonNull TypeVariable <?> typeVariable) {
+
+		List <Type> bounds =
+			Arrays.stream (
+				typeVariable.getBounds ())
+
+			.filter (
+				bound ->
+					referenceNotEqualUnsafe (
+						bound,
+						Object.class))
+
+			.collect (
+				Collectors.toList ());
+
+		if (
+			collectionIsEmpty (
+				bounds)
+		) {
+
+			return typeVariable.getName ();
+
+		} else {
+
+			return stringFormat (
+				"%s extends %s",
+				typeVariable.getName (),
+				joinWithCommaAndSpace (
+					iterableMap (
+						bound ->
+							typeSourceName (
+								imports,
+								typeParameterMappings,
+								bound),
+						bounds)));
+
+		}
+
+	}
+
+	public static
+	String wildcardTypeSourceName (
+			@NonNull JavaImportRegistry imports,
+			@NonNull WildcardType wildcardType) {
+
+		return wildcardType.toString ();
+
+	}
+
+	public static
+	String parameterSourceTypeName (
+			@NonNull JavaImportRegistry imports,
+			@NonNull Map <String, String> typeParameterMappings,
+			@NonNull Parameter parameter) {
+
+		if (parameter.isVarArgs ()) {
+
+			return stringFormat (
+				"%s ...",
+				typeSourceName (
+					imports,
+					typeParameterMappings,
+					parameter.getType ().getComponentType ()));
+
+		} else {
+
+			return typeSourceName (
+				imports,
+				typeParameterMappings,
+				parameter.getParameterizedType ());
+
+		}
 
 	}
 

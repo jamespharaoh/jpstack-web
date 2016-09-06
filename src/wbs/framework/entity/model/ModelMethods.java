@@ -47,30 +47,30 @@ interface ModelMethods {
 	Boolean create ();
 	Boolean mutable ();
 
-	Class <? extends Record<?>> parentClass ();
-	Class <? extends ObjectHelper<?>> helperClass ();
+	Class <? extends Record <?>> parentClass ();
+	Class <? extends ObjectHelper <?>> helperClass ();
 
 	// property accessors
 
-	Record<?> getParent (
-			Record<?> object);
+	Record <?> getParent (
+			Record <?> object);
 
-	Record<?> getParentType (
-			Record<?> object);
+	Record <?> getParentType (
+			Record <?> object);
 
 	Long getParentId (
-			Record<?> object);
+			Record <?> object);
 
 	String getTypeCode (
-			Record<?> record);
+			Record <?> record);
 
 	String getCode (
-			Record<?> record);
+			Record <?> record);
 
 	String getName (
-			Record<?> record);
+			Record <?> record);
 
 	String getDescription (
-			Record<?> record);
+			Record <?> record);
 
 }

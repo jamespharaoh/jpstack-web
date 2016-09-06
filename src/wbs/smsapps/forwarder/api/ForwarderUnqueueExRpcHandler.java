@@ -1,8 +1,8 @@
 package wbs.smsapps.forwarder.api;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NumberUtils.moreThan;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.util.ArrayList;
@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import lombok.Cleanup;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -217,8 +218,14 @@ class ForwarderUnqueueExRpcHandler
 				// if this report doesn't belong to this forwarder pretend
 				// it doesn't exist
 
-				if (unqueueExMessage.forwarderMessageIn.getForwarder() != forwarder)
+				if (
+					referenceNotEqualWithClass (
+						ForwarderRec.class,
+						unqueueExMessage.forwarderMessageIn.getForwarder (),
+						forwarder)
+				) {
 					unqueueExMessage.forwarderMessageIn = null;
+				}
 
 			}
 
@@ -255,7 +262,8 @@ class ForwarderUnqueueExRpcHandler
 				if (
 					referenceNotEqualWithClass (
 						ForwarderRec.class,
-						unqueueExReport.fmOutReport.getForwarderMessageOut ().getForwarder (),
+						unqueueExReport.fmOutReport.getForwarderMessageOut ()
+							.getForwarder (),
 						forwarder)
 				) {
 					unqueueExReport.fmOutReport = null;
@@ -263,12 +271,21 @@ class ForwarderUnqueueExRpcHandler
 
 				// if this report is not pending yet then pretend it doesn't
 				// exist
-				else if (unqueueExReport.fmOutReport.getForwarderMessageOut()
-						.getReportIndexPending() != null
-						&& unqueueExReport.fmOutReport.getIndex() > unqueueExReport.fmOutReport
-								.getForwarderMessageOut()
-								.getReportIndexPending())
+				else if (
+
+					isNotNull (
+						unqueueExReport.fmOutReport.getForwarderMessageOut ()
+							.getReportIndexPending ())
+
+					&& moreThan (
+						unqueueExReport.fmOutReport.getIndex (),
+						unqueueExReport.fmOutReport.getForwarderMessageOut ()
+							.getReportIndexPending ())
+
+				) {
 					unqueueExReport.fmOutReport = null;
+				}
+
 			}
 
 			// keep track of whether any failed

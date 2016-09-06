@@ -1,22 +1,23 @@
 package wbs.framework.entity.generate;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
+import static wbs.framework.utils.etc.FileUtils.directoryCreateWithParents;
+import static wbs.framework.utils.etc.FileUtils.fileExistsFormat;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import java.io.File;
-import java.io.IOException;
-
+import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import org.apache.commons.io.FileUtils;
-
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
+import wbs.framework.codegen.JavaClassUnitWriter;
+import wbs.framework.codegen.JavaInterfaceWriter;
 import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.utils.formatwriter.AtomicFileWriter;
+import wbs.framework.utils.formatwriter.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("modelInterfacesGenerator")
@@ -36,9 +37,6 @@ class ModelInterfacesGenerator {
 
 	// state
 
-	String modelPackageName;
-	String consolePackageName;
-
 	String recordName;
 	String daoName;
 	String daoMethodsName;
@@ -46,49 +44,25 @@ class ModelInterfacesGenerator {
 	String objectHelperMethodsName;
 	String consoleHelperName;
 
-	String sourceModelDirectoryName;
-	String sourceModelFilename;
-
-	String targetModelDirectoryName;
-	String targetConsoleDirectoryName;
-
-	String daoFilename;
-	String objectHelperFilename;
-	String consoleHelperFilename;
-
 	boolean gotObjectHelperMethods;
 	boolean gotDaoMethods;
 
 	// implementation
 
 	public
-	void generateInterfaces ()
-		throws IOException {
+	void generateInterfaces () {
 
 		setup ();
 		findRelated ();
 
-		generateDao ();
-		generateObjectHelper ();
-		generateConsoleHelper ();
+		generateDaoInterface ();
+		generateObjectHelperInterface ();
+		generateConsoleHelperInterface ();
 
 	}
 
 	private
-	void setup ()
-		throws IOException {
-
-		// package names
-
-		modelPackageName =
-			stringFormat (
-				"%s.model",
-				plugin.packageName ());
-
-		consolePackageName =
-			stringFormat (
-				"%s.console",
-				plugin.packageName ());
+	void setup () {
 
 		// class and interface names
 
@@ -128,117 +102,77 @@ class ModelInterfacesGenerator {
 				capitalise (
 					modelMeta.name ()));
 
-		// directory and filenames
-
-		sourceModelDirectoryName =
-			stringFormat (
-				"src/%s",
-				modelPackageName.replace ('.', '/'));
-
-		sourceModelFilename =
-			stringFormat (
-				"%s/%s-model.xml",
-				sourceModelDirectoryName,
-				camelToHyphen (
-					modelMeta.name ()));
-
-		targetModelDirectoryName =
-			stringFormat (
-				"work/generated/%s",
-				modelPackageName.replace ('.', '/'));
-
-		targetConsoleDirectoryName =
-			stringFormat (
-				"work/generated/%s",
-				consolePackageName.replace ('.', '/'));
-
-		FileUtils.forceMkdir (
-			new File (
-				targetModelDirectoryName));
-
-		FileUtils.forceMkdir (
-			new File (
-				targetConsoleDirectoryName));
-
-		daoFilename =
-			stringFormat (
-				"%s/%s.java",
-				targetModelDirectoryName,
-				daoName);
-
-		objectHelperFilename =
-			stringFormat (
-				"%s/%s.java",
-				targetModelDirectoryName,
-				objectHelperName);
-
-		consoleHelperFilename =
-			stringFormat (
-				"%s/%s.java",
-				targetConsoleDirectoryName,
-				consoleHelperName);
-
 	}
 
 	private
 	void findRelated () {
 
-		String objectHelperMethodsFilename =
-			stringFormat (
-				"%s/%s.java",
-				sourceModelDirectoryName,
+		gotObjectHelperMethods =
+			fileExistsFormat (
+				"src/%s/model/%s.java",
+				plugin.packageName ().replace ('.', '/'),
 				objectHelperMethodsName);
 
-		gotObjectHelperMethods =
-			new File (
-				objectHelperMethodsFilename
-			).exists ();
-
-		String daoMethodsFilename =
-			stringFormat (
-				"%s/%s.java",
-				sourceModelDirectoryName,
-				daoMethodsName);
-
 		gotDaoMethods =
-			new File (
-				daoMethodsFilename
-			).exists ();
+			fileExistsFormat (
+				"src/%s/model/%s.java",
+				plugin.packageName ().replace ('.', '/'),
+				daoMethodsName);
 
 	}
 
 	private
-	void generateObjectHelper ()
-		throws IOException {
+	void generateObjectHelperInterface () {
 
-		if (
-			FileUtils.isFileNewer (
-				new File (objectHelperFilename),
-				new File (sourceModelFilename))
-		) {
-			return;
-		}
+		// create directory
 
-		InterfaceWriter objectHelperWriter =
-			new InterfaceWriter ()
+		String directory =
+			stringFormat (
+				"work/generated/%s/model",
+				plugin.packageName ().replace ('.', '/'));
 
-			.packageName (
-				modelPackageName)
+		directoryCreateWithParents (
+			directory);
 
-			.name (
+		// write interface
+
+		String filename =
+			stringFormat (
+				"%s/%s.java",
+				directory,
 				objectHelperName);
+
+		@Cleanup
+		FormatWriter formatWriter =
+			new AtomicFileWriter (
+				filename);
+
+		JavaClassUnitWriter classUnitWriter =
+			new JavaClassUnitWriter ()
+
+			.formatWriter (
+				formatWriter)
+
+			.packageNameFormat (
+				"%s.model",
+				plugin.packageName ());
+
+		JavaInterfaceWriter objectHelperWriter =
+			new JavaInterfaceWriter ()
+
+			.interfaceName (
+				objectHelperName)
+
+			.addInterfaceModifier (
+				"public");
 
 		if (gotObjectHelperMethods) {
 
 			objectHelperWriter
 
-				.addImport (
-					"%s.%s",
-					modelPackageName,
-					objectHelperMethodsName)
-
-				.addInterface (
-					"%s",
+				.addInterfaceFormat (
+					"%s.model.%s",
+					plugin.packageName (),
 					objectHelperMethodsName);
 
 		}
@@ -247,115 +181,156 @@ class ModelInterfacesGenerator {
 
 			objectHelperWriter
 
-				.addImport (
-					"%s.%s",
-					modelPackageName,
-					daoMethodsName)
-
-				.addInterface (
-					"%s",
+				.addInterfaceFormat (
+					"%s.model.%s",
+					plugin.packageName (),
 					daoMethodsName);
 
 		}
 
 		objectHelperWriter
 
-			.addImport (
-				"wbs.framework.object.ObjectHelper")
-
 			.addInterface (
-				"ObjectHelper<%s>",
-				recordName);
+				imports ->
+					stringFormat (
+						"%s <%s>",
+						imports.register (
+							"wbs.framework.object.ObjectHelper"),
+						imports.registerFormat (
+							"%s.model.%s",
+							plugin.packageName (),
+							recordName)));
 
-		objectHelperWriter.write (
-			objectHelperFilename);
+		classUnitWriter.addBlock (
+			objectHelperWriter);
+
+		classUnitWriter.write ();
 
 	}
 
 	private
-	void generateDao ()
-		throws IOException {
+	void generateDaoInterface () {
 
 		if (! gotDaoMethods) {
 			return;
 		}
 
-		if (
-			FileUtils.isFileNewer (
-				new File (daoFilename),
-				new File (sourceModelFilename))
-		) {
-			return;
-		}
+		// create directory
 
-		// write dao
+		String directory =
+			stringFormat (
+				"work/generated/%s/model",
+				plugin.packageName ().replace ('.', '/'));
 
-		InterfaceWriter daoWriter =
-			new InterfaceWriter ()
+		directoryCreateWithParents (
+			directory);
 
-			.packageName (
-				modelPackageName)
+		// write interface
 
-			.name (
+		String filename =
+			stringFormat (
+				"%s/%s.java",
+				directory,
 				daoName);
+
+		// write interface
+
+		@Cleanup
+		FormatWriter formatWriter =
+			new AtomicFileWriter (
+				filename);
+
+		JavaClassUnitWriter classUnitWriter =
+			new JavaClassUnitWriter ()
+
+			.formatWriter (
+				formatWriter)
+
+			.packageNameFormat (
+				"%s.model",
+				plugin.packageName ());
+
+		JavaInterfaceWriter daoWriter =
+			new JavaInterfaceWriter ()
+
+			.interfaceName (
+				daoName)
+
+			.addInterfaceModifier (
+				"public");
 
 		if (gotDaoMethods) {
 
 			daoWriter
 
-				.addImport (
-					"%s.%s",
-					modelPackageName,
-					daoMethodsName)
-
-				.addInterface (
-					"%s",
+				.addInterfaceFormat (
+					"%s.model.%s",
+					plugin.packageName (),
 					daoMethodsName);
 
 		}
 
-		daoWriter.write (
-			daoFilename);
+		classUnitWriter.addBlock (
+			daoWriter);
+
+		classUnitWriter.write ();
 
 	}
 
 	private
-	void generateConsoleHelper ()
-		throws IOException {
+	void generateConsoleHelperInterface () {
 
-		if (
-			FileUtils.isFileNewer (
-				new File (consoleHelperFilename),
-				new File (sourceModelFilename))
-		) {
-			return;
-		}
+		// create directory
 
-		InterfaceWriter consoleHelperWriter =
-			new InterfaceWriter ()
+		String directory =
+			stringFormat (
+				"work/generated/%s/console",
+				plugin.packageName ().replace ('.', '/'));
 
-			.packageName (
-				consolePackageName)
+		directoryCreateWithParents (
+			directory);
 
-			.name (
+		// write interface
+
+		String filename =
+			stringFormat (
+				"%s/%s.java",
+				directory,
+				consoleHelperName);
+
+		// write interface
+
+		@Cleanup
+		FormatWriter formatWriter =
+			new AtomicFileWriter (
+				filename);
+
+		JavaClassUnitWriter classUnitWriter =
+			new JavaClassUnitWriter ()
+
+			.formatWriter (
+				formatWriter)
+
+			.packageNameFormat (
+				"%s.console",
+				plugin.packageName ());
+
+		JavaInterfaceWriter consoleHelperWriter =
+			new JavaInterfaceWriter ()
+
+			.interfaceName (
 				consoleHelperName)
 
-			.addImport (
-				"%s.%s",
-				modelPackageName,
-				recordName);
+			.addInterfaceModifier (
+				"public");
 
 		if (gotObjectHelperMethods) {
 
 			consoleHelperWriter
 
-				.addImport (
-					"%s.%s",
-					modelPackageName,
-					objectHelperMethodsName)
-
-				.addInterface (
-					"%s",
+				.addInterfaceFormat (
+					"%s.model.%s",
+					plugin.packageName (),
 					objectHelperMethodsName);
 
 		}
@@ -364,28 +339,30 @@ class ModelInterfacesGenerator {
 
 			consoleHelperWriter
 
-				.addImport (
-					"%s.%s",
-					modelPackageName,
-					daoMethodsName)
-
-				.addInterface (
-					"%s",
+				.addInterfaceFormat (
+					"%s.model.%s",
+					plugin.packageName (),
 					daoMethodsName);
 
 		}
 
 		consoleHelperWriter
 
-			.addImport (
-				"wbs.console.helper.ConsoleHelper")
-
 			.addInterface (
-				"ConsoleHelper<%s>",
-				recordName);
+				imports ->
+					stringFormat (
+						"%s <%s>",
+						imports.register (
+							"wbs.console.helper.ConsoleHelper"),
+						imports.registerFormat (
+							"%s.model.%s",
+							plugin.packageName (),
+							recordName)));
 
-		consoleHelperWriter.write (
-			consoleHelperFilename);
+		classUnitWriter.addBlock (
+			consoleHelperWriter);
+
+		classUnitWriter.write ();
 
 	}
 

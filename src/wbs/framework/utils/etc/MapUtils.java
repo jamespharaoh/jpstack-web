@@ -88,6 +88,31 @@ class MapUtils {
 
 	}
 
+	public static <Type>
+	Type mapItemForKeyOrKey (
+			@NonNull Map <Type, Type> map,
+			@NonNull Type key) {
+
+		Type value =
+			map.get (
+				key);
+
+		if (value != null) {
+
+			return value;
+
+		} else if (map.containsKey (key)) {
+
+			throw new NullPointerException ();
+
+		} else {
+
+			return key;
+
+		}
+
+	}
+
 	public static <KeyType, ValueType>
 	ValueType mapItemForKeyOrThrow (
 			@NonNull Map <KeyType, ValueType> map,

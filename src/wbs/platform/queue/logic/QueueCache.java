@@ -13,9 +13,9 @@ interface QueueCache {
 			QueueSubjectRec subject,
 			Long index);
 
-	List<QueueSubjectRec> findQueueSubjects ();
+	List <QueueSubjectRec> findQueueSubjects ();
 
-	List<QueueSubjectRec> findQueueSubjects (
+	List <QueueSubjectRec> findQueueSubjects (
 			QueueRec queue);
 
 }

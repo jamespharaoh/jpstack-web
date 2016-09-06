@@ -16,6 +16,7 @@ import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
 import wbs.api.mvc.ApiAction;
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
@@ -152,26 +153,41 @@ class ForwarderOutAction
 
 					}
 
-					if (inId < 1)
-						throw new ReportableException ("Parameter in_id is invalid");
+					if (inId < 1) {
+
+						throw new ReportableException (
+							"Parameter in_id is invalid");
+
+					}
 
 				} else if (paramName.equals ("my_id")) {
 
 					myId = value;
 
-					if (myId.length () == 0)
-						throw new ReportableException ("Parameter my_id should not be empty");
+					if (myId.length () == 0) {
+
+						throw new ReportableException (
+							"Parameter my_id should not be empty");
+
+					}
 
 				} else if (paramName.equals ("pri")) {
+
 					try {
+
 						pri = Long.parseLong (value);
+
 					} catch (NumberFormatException e) {
-						throw new ReportableException ("pri should be an integer value");
+
+						throw new ReportableException (
+							"pri should be an integer value");
+
 					}
 
 				} else {
 
-					throw new ReportableException ("Invalid parameter: " + paramName);
+					throw new ReportableException (
+						"Invalid parameter: " + paramName);
 
 				}
 

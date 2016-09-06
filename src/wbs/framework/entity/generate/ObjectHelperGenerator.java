@@ -1,45 +1,23 @@
 package wbs.framework.entity.generate;
 
-import static wbs.framework.utils.etc.ArrayUtils.arrayIsEmpty;
-import static wbs.framework.utils.etc.ArrayUtils.arrayIsNotEmpty;
-import static wbs.framework.utils.etc.ArrayUtils.arrayMap;
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
-import static wbs.framework.utils.etc.CollectionUtils.listLastElementRequired;
-import static wbs.framework.utils.etc.CollectionUtils.listSlice;
 import static wbs.framework.utils.etc.CollectionUtils.listSliceAllButLastItemRequired;
-import static wbs.framework.utils.etc.IterableUtils.iterableMap;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualUnsafe;
-import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringReplaceAllRegex;
 import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
 import static wbs.framework.utils.etc.StringUtils.uncapitalise;
 import static wbs.framework.utils.etc.TypeUtils.classForName;
 import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.framework.utils.etc.TypeUtils.classPackageName;
-import static wbs.framework.utils.etc.TypeUtils.isInstanceOf;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -55,7 +33,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.annotations.SingletonDependency;
@@ -346,7 +323,11 @@ class ObjectHelperGenerator {
 
 			.addImplements (
 				packageName + ".model",
-				objectHelperInterfaceName);
+				objectHelperInterfaceName)
+
+			.addTypeParameterMapping (
+				"RecordType",
+				model.objectClass ().getSimpleName ());
 
 		addDependencies (
 			classWriter);
@@ -360,8 +341,8 @@ class ObjectHelperGenerator {
 		classWriter.addBlock (
 			this::writeImplementation);
 
-		classWriter.addBlock (
-			this::writeDelegations);
+		addDelegations (
+			classWriter);
 
 		classUnitWriter.addBlock (
 			classWriter);
@@ -853,19 +834,12 @@ class ObjectHelperGenerator {
 
 	}
 
-	void writeDelegations (
-			@NonNull JavaImportRegistry imports,
-			@NonNull FormatWriter formatWriter) {
-
-		Set <Pair <String, List <Class <?>>>> delegatedMethods =
-			new HashSet<> ();
+	void addDelegations (
+			@NonNull JavaClassWriter javaWriter) {
 
 		if (hasExtra) {
 
-			writeDelegate (
-				delegatedMethods,
-				imports,
-				formatWriter,
+			javaWriter.addDelegation (
 				extraMethodsInterface,
 				extraComponentName);
 
@@ -873,10 +847,7 @@ class ObjectHelperGenerator {
 
 		if (hasDao) {
 
-			writeDelegate (
-				delegatedMethods,
-				imports,
-				formatWriter,
+			javaWriter.addDelegation (
 				daoMethodsInterface,
 				daoComponentName);
 
@@ -893,10 +864,7 @@ class ObjectHelperGenerator {
 			Class <?> componentClass =
 				componentEntry.getValue ();
 
-			writeDelegate (
-				delegatedMethods,
-				imports,
-				formatWriter,
+			javaWriter.addDelegation (
 				componentClass,
 				stringFormat (
 					"%sImplementation",
@@ -904,456 +872,13 @@ class ObjectHelperGenerator {
 
 		}
 
-		writeDelegate (
-			delegatedMethods,
-			imports,
-			formatWriter,
+		javaWriter.addDelegation (
 			ObjectModelMethods.class,
 			"objectModel");
 
-		writeDelegate (
-			delegatedMethods,
-			imports,
-			formatWriter,
+		javaWriter.addDelegation (
 			ModelMethods.class,
 			"model");
-
-	}
-
-	void writeDelegate (
-			@NonNull Set <Pair <String, List <Class <?>>>> delegatedMethods,
-			@NonNull JavaImportRegistry imports,
-			@NonNull FormatWriter formatWriter,
-			@NonNull Class <?> delegateInterface,
-			@NonNull String delegateName) {
-
-		formatWriter.writeLineFormat (
-			"// delegate %s",
-			delegateInterface.getSimpleName ());
-
-		formatWriter.writeNewline ();
-
-		for (
-			Method method
-				: delegateInterface.getMethods ()
-		) {
-
-			// don't add the same method twice
-
-			Pair <String, List <Class <?>>> methodKey =
-				Pair.of (
-					method.getName (),
-					ImmutableList.copyOf (
-						method.getParameterTypes ()));
-
-			if (
-				contains (
-					delegatedMethods,
-					methodKey)
-			) {
-				continue;
-			}
-
-			delegatedMethods.add (
-				methodKey);
-
-			// write method delegate
-
-			String returnTypeName =
-				methodReturnSourceName (
-					imports,
-					method);
-
-			formatWriter.writeLineFormat (
-				"@%s",
-				imports.register (
-					Override.class));
-
-			if (
-				arrayIsNotEmpty (
-					method.getTypeParameters ())
-			) {
-
-				formatWriter.writeLineFormat (
-					"public <%s>",
-					joinWithCommaAndSpace (
-						iterableMap (
-							typeParameter ->
-								typeVariableSourceDeclaration (
-									imports,
-									typeParameter),
-							Arrays.asList (
-								method.getTypeParameters ()))));
-
-			} else {
-
-				formatWriter.writeLineFormat (
-					"public");
-
-			}
-
-			List <Parameter> parameters =
-				ImmutableList.copyOf (
-					method.getParameters ());
-
-			if (
-				collectionIsEmpty (
-					parameters)
-			) {
-
-				formatWriter.writeLineFormat (
-					"%s %s () {",
-					returnTypeName,
-					method.getName ());
-
-			} else {
-
-				formatWriter.writeLineFormat (
-					"%s %s (",
-					returnTypeName,
-					method.getName ());
-
-				for (
-					Parameter parameter
-						: listSliceAllButLastItemRequired (
-							parameters)
-				) {
-
-					formatWriter.writeLineFormat (
-						"\t\t%s %s,",
-						parameterSourceTypeName (
-							imports,
-							parameter),
-						parameter.getName ());
-
-				}
-
-				Parameter lastParameter =
-					listLastElementRequired (
-						parameters);
-
-				formatWriter.writeLineFormat (
-					"\t\t%s %s) {",
-					parameterSourceTypeName (
-						imports,
-						lastParameter),
-					lastParameter.getName ());
-
-			}
-
-			formatWriter.writeNewline ();
-
-			if (
-				stringEqualSafe (
-					returnTypeName,
-					"void")
-			) {
-
-				if (
-					collectionIsEmpty (
-						parameters)
-				) {
-
-					formatWriter.writeLineFormat (
-						"\t%s.%s ();",
-						delegateName,
-						method.getName ());
-
-				} else {
-
-					formatWriter.writeLineFormat (
-						"\t%s.%s (",
-						delegateName,
-						method.getName ());
-
-					for (
-						Parameter parameter
-							: listSlice (
-								parameters,
-								0,
-								parameters.size () - 1)
-					) {
-
-						formatWriter.writeLineFormat (
-							"\t\t%s,",
-							parameter.getName ());
-
-					}
-
-					Parameter lastParameter =
-						listLastElementRequired (
-							parameters);
-
-					formatWriter.writeLineFormat (
-						"\t\t\t%s);",
-						lastParameter.getName ());
-
-				}
-
-			} else {
-
-				if (
-					collectionIsEmpty (
-						parameters)
-				) {
-
-					formatWriter.writeLineFormat (
-						"\treturn %s.%s ();",
-						delegateName,
-						method.getName ());
-
-				} else {
-
-					formatWriter.writeLineFormat (
-						"\treturn %s.%s (",
-						delegateName,
-						method.getName ());
-
-					for (
-						Parameter parameter
-							: listSlice (
-								parameters,
-								0,
-								parameters.size () - 1)
-					) {
-
-						formatWriter.writeLineFormat (
-							"\t\t%s,",
-							parameter.getName ());
-
-					}
-
-					Parameter lastParameter =
-						listLastElementRequired (
-							parameters);
-
-					formatWriter.writeLineFormat (
-						"\t\t%s);",
-						lastParameter.getName ());
-
-				}
-
-			}
-
-			formatWriter.writeNewline ();
-
-			formatWriter.writeLineFormat (
-				"}");
-
-			formatWriter.writeNewline ();
-
-		}
-
-	}
-
-	String methodReturnSourceName (
-			@NonNull JavaImportRegistry imports,
-			@NonNull Method method) {
-
-		return stringReplaceAllRegex (
-			"\\bRecordType\\b",
-			model.objectClass ().getSimpleName (),
-			typeSourceName (
-				imports,
-				method.getGenericReturnType ()));
-
-	}
-
-	public
-	String typeSourceName (
-			@NonNull JavaImportRegistry imports,
-			@NonNull Type type) {
-
-		if (
-			isInstanceOf (
-				Class.class,
-				type)
-		) {
-
-			return classSourceName (
-				imports,
-				(Class <?>)
-				type);
-
-		} else if (
-			isInstanceOf (
-				ParameterizedType.class,
-				type)
-		) {
-
-			return parameterizedTypeSourceName (
-				imports,
-				(ParameterizedType)
-				type);
-
-		} else if (
-			isInstanceOf (
-				TypeVariable.class,
-				type)
-		) {
-
-			return typeVariableSourceName (
-				imports,
-				(TypeVariable <?>)
-				type);
-
-		} else if (
-			isInstanceOf (
-				WildcardType.class,
-				type)
-		) {
-
-			return wildcardTypeSourceName (
-				imports,
-				(WildcardType)
-				type);
-
-		} else {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Don't know how to handle a %s",
-					type.getClass ().getSimpleName ()));
-
-		}
-
-	}
-
-	public
-	String classSourceName (
-			@NonNull JavaImportRegistry imports,
-			@NonNull Class <?> theClass) {
-
-		if (theClass.isArray ()) {
-
-			return stringFormat (
-				"%s[]",
-				classSourceName (
-					imports,
-					theClass.getComponentType ()));
-
-		} else {
-
-			return imports.register (
-				theClass);
-
-		}
-
-	}
-
-	public
-	String parameterizedTypeSourceName (
-			@NonNull JavaImportRegistry imports,
-			@NonNull ParameterizedType parameterizedType) {
-
-		if (
-			arrayIsEmpty (
-				parameterizedType.getActualTypeArguments ())
-		) {
-
-			return imports.register (
-				(Class <?>)
-				parameterizedType.getRawType ());
-
-		} else {
-
-			return stringFormat (
-				"%s <%s>",
-				typeSourceName (
-					imports,
-					parameterizedType.getRawType ()),
-				joinWithCommaAndSpace (
-					arrayMap (
-						typeArgument ->
-							typeSourceName (
-								imports,
-								typeArgument),
-						parameterizedType.getActualTypeArguments ())));
-
-		}
-
-	}
-
-	public
-	String typeVariableSourceName (
-			@NonNull JavaImportRegistry imports,
-			@NonNull TypeVariable <?> typeVariable) {
-
-		return typeVariable.getName ();
-
-	}
-
-	public
-	String typeVariableSourceDeclaration (
-			@NonNull JavaImportRegistry imports,
-			@NonNull TypeVariable <?> typeVariable) {
-
-		List <Type> bounds =
-			Arrays.stream (
-				typeVariable.getBounds ())
-
-			.filter (
-				bound ->
-					referenceNotEqualUnsafe (
-						bound,
-						Object.class))
-
-			.collect (
-				Collectors.toList ());
-
-		if (
-			collectionIsEmpty (
-				bounds)
-		) {
-
-			return typeVariable.getName ();
-
-		} else {
-
-			return stringFormat (
-				"%s extends %s",
-				typeVariable.getName (),
-				joinWithCommaAndSpace (
-					iterableMap (
-						bound ->
-							typeSourceName (
-								imports,
-								bound),
-						bounds)));
-
-		}
-
-	}
-
-	public
-	String wildcardTypeSourceName (
-			@NonNull JavaImportRegistry imports,
-			@NonNull WildcardType wildcardType) {
-
-		return wildcardType.toString ();
-
-	}
-
-	public
-	String parameterSourceTypeName (
-			@NonNull JavaImportRegistry imports,
-			@NonNull Parameter parameter) {
-
-		if (parameter.isVarArgs ()) {
-
-			return stringFormat (
-				"%s ...",
-				typeSourceName (
-					imports,
-					parameter.getType ().getComponentType ()));
-
-		} else {
-
-			return typeSourceName (
-				imports,
-				parameter.getParameterizedType ());
-
-		}
 
 	}
 

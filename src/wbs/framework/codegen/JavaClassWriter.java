@@ -1,30 +1,52 @@
 package wbs.framework.codegen;
 
+import static wbs.framework.utils.etc.ArrayUtils.arrayIsNotEmpty;
 import static wbs.framework.utils.etc.CollectionUtils.collectionHasOneElement;
 import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
 import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.CollectionUtils.listFirstElementRequired;
 import static wbs.framework.utils.etc.CollectionUtils.listLastElementRequired;
+import static wbs.framework.utils.etc.CollectionUtils.listSlice;
 import static wbs.framework.utils.etc.CollectionUtils.listSliceAllButLastItemRequired;
+import static wbs.framework.utils.etc.IterableUtils.iterableMap;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
+import static wbs.framework.utils.etc.Misc.contains;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
+import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
 import static wbs.framework.utils.etc.StringUtils.uncapitalise;
+import static wbs.framework.utils.etc.TypeUtils.parameterSourceTypeName;
+import static wbs.framework.utils.etc.TypeUtils.typeSourceName;
+import static wbs.framework.utils.etc.TypeUtils.typeVariableSourceDeclaration;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import javax.inject.Provider;
+
+import com.google.common.collect.ImmutableList;
 
 import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -70,6 +92,14 @@ class JavaClassWriter
 
 	@Getter @Setter
 	List <State> states =
+		new ArrayList<> ();
+
+	@Getter @Setter
+	Map <String, String> typeParameterMappings =
+		new HashMap<> ();
+
+	@Getter @Setter
+	List <Pair <Class <?>, String>> delegations =
 		new ArrayList<> ();
 
 	// setters and getters
@@ -360,6 +390,33 @@ class JavaClassWriter
 
 	}
 
+	public
+	JavaClassWriter addTypeParameterMapping (
+			@NonNull String parameterName,
+			@NonNull String parameterValue) {
+
+		typeParameterMappings.put (
+			parameterName,
+			parameterValue);
+
+		return this;
+
+	}
+
+	public
+	JavaClassWriter addDelegation (
+			@NonNull Class <?> delegateInterface,
+			@NonNull String delegateName) {
+
+		delegations.add (
+			Pair.of (
+				delegateInterface,
+				delegateName));
+
+		return this;
+
+	}
+
 	// implementation
 
 	@Override
@@ -509,13 +566,17 @@ class JavaClassWriter
 
 		writeState (
 			imports,
-				formatWriter);
+			formatWriter);
 
 		blocks.forEach (
 			block ->
 				block.writeBlock (
 					imports,
 					formatWriter));
+
+		writeDelegations (
+			imports,
+			formatWriter);
 
 		formatWriter.decreaseIndent ();
 
@@ -646,6 +707,266 @@ class JavaClassWriter
 
 	}
 
+	void writeDelegations (
+			@NonNull JavaImportRegistry imports,
+			@NonNull FormatWriter formatWriter) {
+
+		Set <Pair <String, List <Class <?>>>> delegatedMethods =
+			new HashSet<> ();
+
+		for (
+			Pair <Class <?>, String> delegate
+				: delegations
+		) {
+
+			Class <?> delegateInterface =
+				delegate.getLeft ();
+
+			String delegateName =
+				delegate.getRight ();
+
+			formatWriter.writeLineFormat (
+				"// delegate %s",
+				camelToSpaces (
+					uncapitalise (
+						delegateInterface.getSimpleName ())));
+
+			formatWriter.writeNewline ();
+
+			for (
+				Method method
+					: delegateInterface.getMethods ()
+			) {
+
+				// don't add the same method twice
+
+				Pair <String, List <Class <?>>> methodKey =
+					Pair.of (
+						method.getName (),
+						ImmutableList.copyOf (
+							method.getParameterTypes ()));
+
+				if (
+					contains (
+						delegatedMethods,
+						methodKey)
+				) {
+					continue;
+				}
+
+				delegatedMethods.add (
+					methodKey);
+
+				// write method delegate
+
+				writeDelegationMethod (
+					imports,
+					formatWriter,
+					delegateInterface,
+					delegateName,
+					method);
+
+			}
+
+		}
+
+	}
+
+	void writeDelegationMethod (
+			@NonNull JavaImportRegistry imports,
+			@NonNull FormatWriter formatWriter,
+			@NonNull Class <?> delegationInterface,
+			@NonNull String delegationName,
+			@NonNull Method method) {
+
+		String returnTypeName =
+			typeSourceName (
+				imports,
+				typeParameterMappings,
+				method.getGenericReturnType ());
+
+		formatWriter.writeLineFormat (
+			"@%s",
+			imports.register (
+				Override.class));
+
+		if (
+			arrayIsNotEmpty (
+				method.getTypeParameters ())
+		) {
+
+			formatWriter.writeLineFormat (
+				"public <%s>",
+				joinWithCommaAndSpace (
+					iterableMap (
+						typeParameter ->
+							typeVariableSourceDeclaration (
+								imports,
+								typeParameterMappings,
+								typeParameter),
+						Arrays.asList (
+							method.getTypeParameters ()))));
+
+		} else {
+
+			formatWriter.writeLineFormat (
+				"public");
+
+		}
+
+		List <Parameter> parameters =
+			ImmutableList.copyOf (
+				method.getParameters ());
+
+		if (
+			collectionIsEmpty (
+				parameters)
+		) {
+
+			formatWriter.writeLineFormat (
+				"%s %s () {",
+				returnTypeName,
+				method.getName ());
+
+		} else {
+
+			formatWriter.writeLineFormat (
+				"%s %s (",
+				returnTypeName,
+				method.getName ());
+
+			for (
+				Parameter parameter
+					: listSliceAllButLastItemRequired (
+						parameters)
+			) {
+
+				formatWriter.writeLineFormat (
+					"\t\t%s %s,",
+					parameterSourceTypeName (
+						imports,
+						typeParameterMappings,
+						parameter),
+					parameter.getName ());
+
+			}
+
+			Parameter lastParameter =
+				listLastElementRequired (
+					parameters);
+
+			formatWriter.writeLineFormat (
+				"\t\t%s %s) {",
+				parameterSourceTypeName (
+					imports,
+					typeParameterMappings,
+					lastParameter),
+				lastParameter.getName ());
+
+		}
+
+		formatWriter.writeNewline ();
+
+		if (
+			stringEqualSafe (
+				returnTypeName,
+				"void")
+		) {
+
+			if (
+				collectionIsEmpty (
+					parameters)
+			) {
+
+				formatWriter.writeLineFormat (
+					"\t%s.%s ();",
+					delegationName,
+					method.getName ());
+
+			} else {
+
+				formatWriter.writeLineFormat (
+					"\t%s.%s (",
+					delegationName,
+					method.getName ());
+
+				for (
+					Parameter parameter
+						: listSlice (
+							parameters,
+							0,
+							parameters.size () - 1)
+				) {
+
+					formatWriter.writeLineFormat (
+						"\t\t%s,",
+						parameter.getName ());
+
+				}
+
+				Parameter lastParameter =
+					listLastElementRequired (
+						parameters);
+
+				formatWriter.writeLineFormat (
+					"\t\t%s);",
+					lastParameter.getName ());
+
+			}
+
+		} else {
+
+			if (
+				collectionIsEmpty (
+					parameters)
+			) {
+
+				formatWriter.writeLineFormat (
+					"\treturn %s.%s ();",
+					delegationName,
+					method.getName ());
+
+			} else {
+
+				formatWriter.writeLineFormat (
+					"\treturn %s.%s (",
+					delegationName,
+					method.getName ());
+
+				for (
+					Parameter parameter
+						: listSlice (
+							parameters,
+							0,
+							parameters.size () - 1)
+				) {
+
+					formatWriter.writeLineFormat (
+						"\t\t%s,",
+						parameter.getName ());
+
+				}
+
+				Parameter lastParameter =
+					listLastElementRequired (
+						parameters);
+
+				formatWriter.writeLineFormat (
+					"\t\t%s);",
+					lastParameter.getName ());
+
+			}
+
+		}
+
+		formatWriter.writeNewline ();
+
+		formatWriter.writeLineFormat (
+			"}");
+
+		formatWriter.writeNewline ();
+
+	}
 
 	@Accessors (fluent = true)
 	@Data
