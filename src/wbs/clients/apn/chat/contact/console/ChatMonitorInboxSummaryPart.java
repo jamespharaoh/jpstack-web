@@ -21,16 +21,18 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 import lombok.NonNull;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
+import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+
 import wbs.clients.apn.chat.contact.model.ChatContactNoteObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatContactNoteRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
@@ -179,7 +181,7 @@ class ChatMonitorInboxSummaryPart
 		monitorInbox =
 			chatMonitorInboxHelper.findRequired (
 				requestContext.stuffInteger (
- 					"chatMonitorInboxId"));
+					"chatMonitorInboxId"));
 
 		monitorChatUser =
 			monitorInbox.getMonitorChatUser ();
@@ -504,7 +506,8 @@ class ChatMonitorInboxSummaryPart
 			monitorChatUser.getChatUserImageList ().isEmpty ()
 				? "-"
 				: mediaConsoleLogic.mediaThumb100 (
-					monitorChatUser.getChatUserImageList ().get (0).getMedia ()));
+					monitorChatUser.getChatUserImageList ().get (0)
+						.getMedia ()));
 
 		printFormat (
 			"<td>%s</td>\n",

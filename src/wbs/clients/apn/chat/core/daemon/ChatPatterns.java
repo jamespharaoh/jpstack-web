@@ -1,5 +1,8 @@
 package wbs.clients.apn.chat.core.daemon;
 
+import static wbs.framework.utils.etc.StringUtils.joinWithPipe;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+
 import java.util.regex.Pattern;
 
 public
@@ -14,7 +17,21 @@ class ChatPatterns {
 	public final static
 	Pattern gay =
 		Pattern.compile (
-			"\\b(gay|lesbian|queer|homo|homosexual|bent|bender|fairy|dyke|fag|faggot|poof)\\b",
+			stringFormat (
+				"\\b(%s)\\b",
+				joinWithPipe (
+					"gay",
+					"lesbian",
+					"queer",
+					"homo",
+					"homosexual",
+					"bent",
+					"bender",
+					"fairy",
+					"dyke",
+					"fag",
+					"faggot",
+					"poof")),
 			Pattern.CASE_INSENSITIVE);
 
 	public final static

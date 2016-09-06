@@ -23,15 +23,16 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
 import wbs.clients.apn.chat.approval.model.ChatApprovalRegexpObjectHelper;
 import wbs.clients.apn.chat.approval.model.ChatApprovalRegexpRec;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
@@ -988,7 +989,7 @@ class ChatMessageLogicImplementation
 		try {
 
 			//jigsawApi.pushServer (
-			//	jigsawRequest);
+				//jigsawRequest);
 
 		} catch (Exception exception) {
 
@@ -1077,7 +1078,9 @@ class ChatMessageLogicImplementation
 			System.nanoTime ();
 
 		log.info (
-			"Call to urban airship (prod) took " + (urbanEnd - urbanStart) + "ns");
+			stringFormat (
+				"Call to urban airship (prod) took %sns",
+				urbanEnd - urbanStart));
 
 		urbanStart = System.nanoTime ();
 		try {

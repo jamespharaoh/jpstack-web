@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.user.admin.console;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Set;
 
@@ -52,7 +53,7 @@ class ChatUserAdminInfoPart
 	public
 	Set<ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())
@@ -102,46 +103,69 @@ class ChatUserAdminInfoPart
 				">\n");
 
 			printFormat (
-					"<table class=\"details\" border=\"0\" cellspacing=\"1\">\n",
+				"<table",
+				" class=\"details\"",
+				" border=\"0\"",
+				" cellspacing=\"1\"",
+				">\n");
 
-					"<tr> <th>Info</th> <td>\n",
+			printFormat (
+				"<tr>\n",
+				"<th>Info</th>\n",
+				"<td><textarea",
+				" id=\"info\"",
+				" name=\"info\"",
+				" rows=\"3\"",
+				" cols=\"64\"",
+				" onkeyup=\"%h\"",
+				stringFormat (
+					"gsmCharCount (%s, %s, %s)",
+					"this",
+					"document.getElementById ('chars')",
+					"0"),
+				" onfocus=\"%h\"",
+				stringFormat (
+					"gsmCharCount (%s, %s, %s)",
+					"this",
+					"document.getElementById ('chars')",
+					"0"),
+				">%h</textarea></td>\n",
+				ifNull (
+					requestContext.getForm ("info"),
+					chatUser.getInfoText () != null
+						? chatUser.getInfoText ().getText ()
+						: ""),
+				"</tr>\n");
 
-					"<textarea id=\"info\" name=\"info\" rows=\"3\" cols=\"64\""
-							+ " onkeyup=\"gsmCharCount (this, document.getElementById ('chars'), 0)\""
-							+ " onfocus=\"gsmCharCount (this, document.getElementById ('chars'), 0)\">"
-							+ "%h</textarea> </td> </tr>\n",
-					ifNull (
-						requestContext.getForm ("info"),
-						chatUser.getInfoText () != null
-							? chatUser.getInfoText ().getText ()
-							: ""),
+			printFormat (
+				"<tr>\n",
+				"<th>Chars</th>\n",
+				"<td><span id=\"chars\">&nbsp;</span></td>\n",
+				"</tr>\n");
 
-					"<tr> <th>Chars</th> <td><span id=\"chars\">&nbsp;</span></td> </tr>\n",
+			printFormat (
+				"<tr>\n",
+				"<th>Reason</th>\n",
+				"<td>%s</td>\n",
+				chatConsoleLogic.selectForChatUserEditReason (
+					"editReason",
+					requestContext.getForm ("editReason")),
+				"</tr>\n");
 
-					"<tr> <th>Reason</th> <td>\n",
-					"%s\n",
-					chatConsoleLogic.selectForChatUserEditReason (
-						"editReason",
-						requestContext.getForm ("editReason")),
+			printFormat (
+				"<tr>\n",
+				"<th>Action</th>\n",
+				"<td><input\n",
+				" type=\"submit\"\n",
+				" value=\"save changes\"",
+				"></td>\n",
+				"</tr>\n");
 
-					"</td> </tr>\n");
+			printFormat (
+				"</table>\n");
 
-				printFormat (
-					"<tr>\n",
-					"<th>Action</th>\n",
-
-					"<td><input\n",
-					" type=\"submit\"\n",
-					" value=\"save changes\"",
-					"></td>\n",
-
-					"</tr>\n");
-
-				printFormat (
-					"</table>\n");
-
-				printFormat (
-					"</form>\n");
+			printFormat (
+				"</form>\n");
 
 		}
 
@@ -176,33 +200,39 @@ class ChatUserAdminInfoPart
 		) {
 
 			printFormat (
-				"<tr>\n",
+				"<tr>\n");
 
+			printFormat (
 				"<td>%h</td>\n",
 				timeFormatter.timestampTimezoneString (
 					chatUserLogic.getTimezone (
 						chatUser),
-					chatUserInfo.getCreationTime ()),
+					chatUserInfo.getCreationTime ()));
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatUserInfo.getOriginalText () != null
 					? chatUserInfo.getOriginalText ().getText ()
-					: "-",
+					: "-");
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatUserInfo.getEditedText () != null
 					? chatUserInfo.getEditedText ().getText ()
-					: "-",
+					: "-");
 
+			printFormat (
 				"<td>%h</td>\n",
 				chatConsoleLogic.textForChatUserInfoStatus (
-					chatUserInfo.getStatus ()),
+					chatUserInfo.getStatus ()));
 
+			printFormat (
 				chatUserInfo.getModerator () == null
-					? "-"
+					? "<td>-</td>"
 					: objectManager.tdForObjectMiniLink (
-						chatUserInfo.getModerator ()),
+						chatUserInfo.getModerator ()));
 
+			printFormat (
 				"</tr>\n");
 
 		}

@@ -209,7 +209,8 @@ class ChatSupervisorConversationPart
 			monitorChatUser.getChatUserImageList ().isEmpty ()
 				? "-"
 				: mediaConsoleLogic.mediaThumb100 (
-					monitorChatUser.getChatUserImageList ().get (0).getMedia ()),
+					monitorChatUser.getChatUserImageList ().get (0)
+						.getMedia ()),
 
 			"<td>%s</td>\n",
 			userChatUser.getChatUserImageList ().isEmpty ()

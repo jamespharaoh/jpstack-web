@@ -13,14 +13,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -389,20 +390,41 @@ class ChatUserOnlineDaemon
 
 		// or a dating hint
 		/*
-		if ((chatUser.getDateMode() == null || chatUser.getDateMode() == ChatUserDateMode.none)
-				&& (chatUser.getLastDateHint() == null || chatUser
-						.getLastDateHint().getTime()
-						+ 7 * 24 * 60 * 60 * 1000 < timestamp.getTime())
-				&& chatUser.getLastJoin() != null
-				&& chatUser.getLastJoin().getTime() + 5 * 60 * 1000 < timestamp
-						.getTime()) {
+		if (
+
+			(
+
+				chatUser.getDateMode () == null
+
+				|| chatUser.getDateMode () == ChatUserDateMode.none
+
+			)
+
+			&& (
+
+				chatUser.getLastDateHint() == null
+
+				|| (
+					chatUser.getLastDateHint ().getTime ()
+					+ 7 * 24 * 60 * 60 * 1000
+				) < timestamp.getTime ()
+
+			)
+
+			&& chatUser.getLastJoin () != null
+
+			&& chatUser.getLastJoin ().getTime () + 5 * 60 * 1000
+				< timestamp.getTime ()
+
+		) {
 
 			logger.info ("Sending date join hint to user "
 					+ chatUser.getCode());
 
 			chatDateLogic.chatUserDateJoinHint (chatUser);
 
-		}*/
+		}
+		*/
 
 		// see if they need a picture hint
 

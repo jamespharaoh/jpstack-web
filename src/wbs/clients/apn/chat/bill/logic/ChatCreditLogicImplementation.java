@@ -18,15 +18,16 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+
 import wbs.clients.apn.chat.bill.model.ChatNetworkObjectHelper;
 import wbs.clients.apn.chat.bill.model.ChatNetworkRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditLimitLogObjectHelper;
@@ -711,8 +712,11 @@ class ChatCreditLogicImplementation
 
 		// check number has not had too many permanent failures
 
-		if (chatNumberReportLogic.isNumberReportPastPermanentDeliveryConstraint (
-				chatUser.getNumber ())) {
+		if (
+			chatNumberReportLogic
+				.isNumberReportPastPermanentDeliveryConstraint (
+					chatUser.getNumber ())
+		) {
 
 			log.debug (
 				stringFormat (

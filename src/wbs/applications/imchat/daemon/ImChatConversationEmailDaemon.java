@@ -1,14 +1,16 @@
 package wbs.applications.imchat.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
-
-import org.joda.time.Duration;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+
 import wbs.applications.imchat.logic.ImChatLogic;
 import wbs.applications.imchat.model.ImChatConversationObjectHelper;
 import wbs.applications.imchat.model.ImChatConversationRec;
@@ -109,7 +111,13 @@ class ImChatConversationEmailDaemon
 		@Cleanup
 		Transaction updateTransaction =
 			database.beginReadWrite (
-				"ImChatConcersationEmailDaemon.doConversation (conversationId) begin",
+				stringFormat (
+					"%s.%s (%s) begin",
+					"ImChatConcersationEmailDaemon",
+					"doConversation",
+					stringFormat (
+						"conversationId = %s",
+						conversationId)),
 				this);
 
 		ImChatConversationRec conversation =
@@ -133,7 +141,13 @@ class ImChatConversationEmailDaemon
 		@Cleanup
 		Transaction emailTransaction =
 			database.beginReadOnly (
-				"ImChatConversationEmailDaemon.doConversation (conversationId) end",
+				stringFormat (
+					"%s.%s (%s) end",
+					"ImChatConversationEmailDaemon",
+					"doConversation",
+					stringFormat (
+						"conversationId = %s",
+						conversationId)),
 				this);
 
 		conversation =

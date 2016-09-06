@@ -40,12 +40,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
-import org.apache.http.HttpStatus;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -53,6 +47,13 @@ import com.google.common.collect.ImmutableSet;
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.apache.http.HttpStatus;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.WebApiAction;
 import wbs.api.mvc.WebApiManager;
@@ -586,19 +587,44 @@ class ChatApiServletModule
 			.build ();
 
 	private final static
-	Map<ChatUserInfoStatus,String> chatUserInfoStatusMuneMap =
-		ImmutableMap.<ChatUserInfoStatus,String>builder ()
-			.put (ChatUserInfoStatus.set, "set")
-			.put (ChatUserInfoStatus.autoEdited, "auto-edited")
-			.put (ChatUserInfoStatus.moderatorPending, "moderator-pending")
-			.put (ChatUserInfoStatus.moderatorApproved, "moderator-approved")
-			.put (ChatUserInfoStatus.moderatorRejected, "moderator-rejected")
-			.put (ChatUserInfoStatus.moderatorAutoEdited, "moderator-auto-edited")
-			.put (ChatUserInfoStatus.moderatorEdited, "moderator-edited")
-			.put (ChatUserInfoStatus.console, "console")
-			.build ();
+	Map <ChatUserInfoStatus, String> chatUserInfoStatusMuneMap =
+		ImmutableMap.<ChatUserInfoStatus, String> builder ()
 
-	// ============================================================ custom rpc status codes
+		.put (
+			ChatUserInfoStatus.set,
+			"set")
+
+		.put (
+			ChatUserInfoStatus.autoEdited,
+			"auto-edited")
+
+		.put (
+			ChatUserInfoStatus.moderatorPending,
+			"moderator-pending")
+
+		.put (
+			ChatUserInfoStatus.moderatorApproved,
+			"moderator-approved")
+
+		.put (
+			ChatUserInfoStatus.moderatorRejected,
+			"moderator-rejected")
+
+		.put (
+			ChatUserInfoStatus.moderatorAutoEdited,
+			"moderator-auto-edited")
+
+		.put (
+			ChatUserInfoStatus.moderatorEdited,
+			"moderator-edited")
+
+		.put (
+			ChatUserInfoStatus.console,
+			"console")
+
+		.build ();
+
+	// ================================================ custom rpc status codes
 
 	private final static
 	int
@@ -618,24 +644,101 @@ class ChatApiServletModule
 
 	private final static
 	RpcDefinition profilesRequestDef =
-		Rpc.rpcDefinition ("chat-profiles-request", RpcType.rStructure,
-			Rpc.rpcDefinition ("chat-id", RpcType.rInteger),
-			Rpc.rpcDefinition ("number", null, RpcType.rString),
-			Rpc.rpcDefinition ("limit", null, RpcType.rInteger),
-			Rpc.rpcDefinition ("codes", null, RpcType.rList, Rpc.rpcSetChecker (),
-				Rpc.rpcDefinition ("code", null, RpcType.rString)),
-			Rpc.rpcDefinition ("last-action", null, RpcType.rInteger),
-			Rpc.rpcDefinition ("has-image", null, RpcType.rBoolean),
-			Rpc.rpcDefinition ("has-video", null, RpcType.rBoolean),
-			Rpc.rpcDefinition ("has-audio", null, RpcType.rBoolean),
-			Rpc.rpcDefinition ("is-dating", null, RpcType.rBoolean),
-			Rpc.rpcDefinition ("is-online", null, RpcType.rBoolean),
-			Rpc.rpcDefinition ("types", null, RpcType.rList, Rpc.rpcSetChecker (),
-				Rpc.rpcDefinition ("type", RpcType.rString, Rpc.rpcEnumChecker (typeEnumMap))),
-			Rpc.rpcDefinition ("genders", null, RpcType.rList, Rpc.rpcSetChecker (),
-				Rpc.rpcDefinition ("gender", RpcType.rString, Rpc.rpcEnumChecker (genderEnumMap))),
-			Rpc.rpcDefinition ("orients", null, RpcType.rList, Rpc.rpcSetChecker (),
-				Rpc.rpcDefinition ("orient", RpcType.rString, Rpc.rpcEnumChecker (orientEnumMap))));
+
+		Rpc.rpcDefinition (
+			"chat-profiles-request",
+			RpcType.rStructure,
+
+			Rpc.rpcDefinition (
+				"chat-id",
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"number",
+				null,
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"limit",
+				null,
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"codes",
+				null,
+				RpcType.rList,
+				Rpc.rpcSetChecker (),
+
+				Rpc.rpcDefinition (
+					"code",
+					null,
+					RpcType.rString)),
+
+			Rpc.rpcDefinition (
+				"last-action",
+				null,
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"has-image",
+				null,
+				RpcType.rBoolean),
+
+			Rpc.rpcDefinition (
+				"has-video",
+				null,
+				RpcType.rBoolean),
+
+			Rpc.rpcDefinition (
+				"has-audio",
+				null,
+				RpcType.rBoolean),
+
+			Rpc.rpcDefinition (
+				"is-dating",
+				null,
+				RpcType.rBoolean),
+
+			Rpc.rpcDefinition (
+				"is-online",
+				null,
+				RpcType.rBoolean),
+
+			Rpc.rpcDefinition (
+				"types",
+				null,
+				RpcType.rList,
+				Rpc.rpcSetChecker (),
+
+				Rpc.rpcDefinition (
+					"type",
+					RpcType.rString,
+					Rpc.rpcEnumChecker (
+						typeEnumMap))),
+
+			Rpc.rpcDefinition (
+				"genders",
+				null,
+				RpcType.rList,
+				Rpc.rpcSetChecker (),
+
+				Rpc.rpcDefinition (
+					"gender",
+					RpcType.rString,
+					Rpc.rpcEnumChecker (
+						genderEnumMap))),
+
+			Rpc.rpcDefinition (
+				"orients",
+				null,
+				RpcType.rList,
+				Rpc.rpcSetChecker (),
+
+				Rpc.rpcDefinition (
+					"orient",
+					RpcType.rString,
+					Rpc.rpcEnumChecker (
+						orientEnumMap))));
 
 	@RpcExport ("profiles")
 	public
@@ -873,7 +976,8 @@ class ChatApiServletModule
 					chatUserHelper.findRequired (
 						userId);
 
-				// ignore system chat user, unless they are asked for specifically
+				// ignore system chat user, unless they are asked for
+				// specifically
 
 				if (
 
@@ -892,7 +996,9 @@ class ChatApiServletModule
 					continue;
 				}
 
-				// ignore specifically excluded users, unless specifically requested
+				// ignore specifically excluded users, unless specifically
+				// requested
+
 				if (user.getHiddenFromChatTube ()
 						&& codes != null)
 					continue;
@@ -916,9 +1022,14 @@ class ChatApiServletModule
 					profile.add (
 						Rpc.rpcElem ("info", user.getInfoText ().getText ()));
 
-				if (user.getMainChatUserImage () != null)
+				if (user.getMainChatUserImage () != null) {
+
 					profile.add (
-						Rpc.rpcElem ("media-id", user.getMainChatUserImage ().getMedia ().getId ()));
+						Rpc.rpcElem (
+							"media-id",
+							user.getMainChatUserImage ().getMedia ().getId ()));
+
+				}
 
 				if (user.getChatUserImageList ().size () > 0) {
 
@@ -928,21 +1039,34 @@ class ChatApiServletModule
 							"image",
 							RpcType.rStructure);
 
-					for (ChatUserImageRec cui
-							: user.getChatUserImageList ()) {
+					for (
+						ChatUserImageRec chatUserImage
+							: user.getChatUserImageList ()
+					) {
 
 						RpcStructure image =
-							Rpc.rpcStruct ("image",
-								Rpc.rpcElem ("media-id", cui.getMedia ().getId ()),
-								Rpc.rpcElem ("classification", "unknown"),
-								Rpc.rpcElem ("selected", cui == user.getMainChatUserImage ()));
+							Rpc.rpcStruct (
+								"image",
 
-						if (cui.getFullMedia () != null) {
+								Rpc.rpcElem (
+									"media-id",
+									chatUserImage.getMedia ().getId ()),
+
+								Rpc.rpcElem (
+									"classification",
+									"unknown"),
+
+								Rpc.rpcElem (
+									"selected",
+									chatUserImage
+										== user.getMainChatUserImage ()));
+
+						if (chatUserImage.getFullMedia () != null) {
 
 							image.add (
 								Rpc.rpcElem (
 								"full-media-id",
-								cui.getFullMedia ().getId ()));
+								chatUserImage.getFullMedia ().getId ()));
 
 						}
 
@@ -955,21 +1079,52 @@ class ChatApiServletModule
 				}
 
 				if (user.getChatUserVideoList ().size () > 0) {
-					RpcList videos = new RpcList ("videos", "video", RpcType.rStructure);
-					for (ChatUserImageRec cui: user.getChatUserVideoList ()) {
+
+					RpcList videos =
+						new RpcList (
+							"videos",
+							"video",
+							RpcType.rStructure);
+
+					for (
+						ChatUserImageRec chatUserImage
+							: user.getChatUserVideoList ()
+					) {
 
 						RpcStructure video =
-							Rpc.rpcStruct ("video",
-								Rpc.rpcElem ("media-id", cui.getMedia ().getId ()),
-								Rpc.rpcElem ("classification", "unknown"),
-								Rpc.rpcElem ("selected", cui == user.getMainChatUserVideo ()));
+							Rpc.rpcStruct (
+								"video",
 
-						if (cui.getFullMedia () != null) {
+								Rpc.rpcElem (
+									"media-id",
+									chatUserImage.getMedia ().getId ()),
+
+								Rpc.rpcElem (
+									"classification",
+									"unknown"),
+
+								Rpc.rpcElem (
+									"selected",
+									chatUserImage
+										== user.getMainChatUserVideo ()));
+
+						if (chatUserImage.getFullMedia () != null) {
 
 							video.add (
-								Rpc.rpcElem ("full-media-id", cui.getFullMedia ().getId ()),
-								Rpc.rpcElem ("full-media-filename", cui.getFullMedia ().getFilename ()),
-								Rpc.rpcElem ("full-media-mime-type", cui.getFullMedia ().getMediaType ().getMimeType ()));
+
+								Rpc.rpcElem (
+									"full-media-id",
+									chatUserImage.getFullMedia ().getId ()),
+
+								Rpc.rpcElem (
+									"full-media-filename",
+									chatUserImage.getFullMedia ()
+										.getFilename ()),
+
+								Rpc.rpcElem (
+									"full-media-mime-type",
+									chatUserImage.getFullMedia ()
+										.getMediaType ().getMimeType ()));
 
 						}
 
@@ -989,17 +1144,32 @@ class ChatApiServletModule
 							"audio",
 							RpcType.rStructure);
 
-					for (ChatUserImageRec cui: user.getChatUserAudioList ()) {
+					for (
+						ChatUserImageRec chatUserImage
+							: user.getChatUserAudioList ()
+					) {
 
 						videos.add (
-							Rpc.rpcStruct ("audio",
-								Rpc.rpcElem ("media-id", cui.getMedia ().getId ()),
-								Rpc.rpcElem ("classification", "unknown"),
-								Rpc.rpcElem ("selected", cui == user.getMainChatUserAudio ())));
+							Rpc.rpcStruct (
+								"audio",
+
+								Rpc.rpcElem (
+									"media-id",
+									chatUserImage.getMedia ().getId ()),
+
+								Rpc.rpcElem (
+									"classification",
+									"unknown"),
+
+								Rpc.rpcElem (
+									"selected",
+									chatUserImage
+										== user.getMainChatUserAudio ())));
 
 					}
 
-					profile.add (videos);
+					profile.add (
+						videos);
 
 				}
 
@@ -1011,8 +1181,10 @@ class ChatApiServletModule
 							"profile-field",
 							RpcType.rStructure);
 
-					for (ChatUserProfileFieldRec userField
-							: user.getProfileFields ().values ()) {
+					for (
+						ChatUserProfileFieldRec userField
+							: user.getProfileFields ().values ()
+					) {
 
 						profileFields.add (
 
@@ -1021,11 +1193,13 @@ class ChatApiServletModule
 
 								Rpc.rpcElem (
 									"name",
-									userField.getChatProfileField ().getCode ()),
+									userField.getChatProfileField ()
+										.getCode ()),
 
 								Rpc.rpcElem (
 									"value",
-									userField.getChatProfileFieldValue ().getCode ())));
+									userField.getChatProfileFieldValue ()
+										.getCode ())));
 
 					}
 
@@ -1354,34 +1528,143 @@ class ChatApiServletModule
 
 	// ==================================================== profile rpc handler
 
-	private final static RpcDefinition profileRequestDef =
-		Rpc.rpcDefinition ("chat-profile-request", RpcType.rStructure,
-			Rpc.rpcDefinition ("chat-id", RpcType.rInteger),
-			Rpc.rpcDefinition ("number", RpcType.rString),
-			Rpc.rpcDefinition ("scheme-code", null, RpcType.rString),
-			Rpc.rpcDefinition ("affiliate-code", null, RpcType.rString),
-			Rpc.rpcDefinition ("name", null, RpcType.rString),
-			Rpc.rpcDefinition ("gender", null, RpcType.rString, Rpc.rpcEnumChecker (genderEnumMap)),
-			Rpc.rpcDefinition ("orient", null, RpcType.rString, Rpc.rpcEnumChecker (orientEnumMap)),
-			Rpc.rpcDefinition ("info", null, RpcType.rString),
-			Rpc.rpcDefinition ("dob", null, RpcType.rDate),
-			Rpc.rpcDefinition ("location", null, RpcType.rString),
-			Rpc.rpcDefinition ("longitude", null, RpcType.rFloat),
-			Rpc.rpcDefinition ("latitude", null, RpcType.rFloat),
-			Rpc.rpcDefinition ("date-mode", null, RpcType.rString, Rpc.rpcEnumChecker (dateModeEnumMap)),
-			Rpc.rpcDefinition ("date-radius-miles", null, RpcType.rInteger),
-			Rpc.rpcDefinition ("date-start-hour", null, RpcType.rInteger),
-			Rpc.rpcDefinition ("date-end-hour", null, RpcType.rInteger),
-			Rpc.rpcDefinition ("date-daily-max", null, RpcType.rInteger),
-			Rpc.rpcDefinition ("image", null, RpcType.rBinary),
-			Rpc.rpcDefinition ("email", null, RpcType.rString),
-			Rpc.rpcDefinition ("jigsaw-application-identifier", null, RpcType.rString),
-			Rpc.rpcDefinition ("jigsaw-token", null, RpcType.rString),
-			Rpc.rpcDefinition ("charges-confirmed", null, RpcType.rBoolean),
-			Rpc.rpcDefinition ("profile-fields", null, RpcType.rList, new MapRpcChecker ("name", "value"),
-				Rpc.rpcDefinition ("profile-field", RpcType.rStructure,
-					Rpc.rpcDefinition ("name", RpcType.rString),
-					Rpc.rpcDefinition ("value", RpcType.rString))));
+	private final static
+	RpcDefinition profileRequestDef =
+		Rpc.rpcDefinition (
+			"chat-profile-request",
+			RpcType.rStructure,
+
+			Rpc.rpcDefinition (
+				"chat-id",
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"number",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"scheme-code",
+				null,
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"affiliate-code",
+				null,
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"name",
+				null,
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"gender",
+				null,
+				RpcType.rString,
+				Rpc.rpcEnumChecker (
+					genderEnumMap)),
+
+			Rpc.rpcDefinition (
+				"orient",
+				null,
+				RpcType.rString,
+				Rpc.rpcEnumChecker (
+					orientEnumMap)),
+
+			Rpc.rpcDefinition (
+				"info",
+				null,
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"dob",
+				null,
+				RpcType.rDate),
+
+			Rpc.rpcDefinition (
+				"location",
+				null,
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"longitude",
+				null,
+				RpcType.rFloat),
+
+			Rpc.rpcDefinition (
+				"latitude",
+				null,
+				RpcType.rFloat),
+
+			Rpc.rpcDefinition (
+				"date-mode",
+				null,
+				RpcType.rString,
+				Rpc.rpcEnumChecker (
+					dateModeEnumMap)),
+
+			Rpc.rpcDefinition (
+				"date-radius-miles",
+				null,
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"date-start-hour",
+				null,
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"date-end-hour",
+				null,
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"date-daily-max",
+				null,
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"image",
+				null,
+				RpcType.rBinary),
+
+			Rpc.rpcDefinition (
+				"email",
+				null,
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"jigsaw-application-identifier",
+				null,
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"jigsaw-token",
+				null,
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"charges-confirmed",
+				null,
+				RpcType.rBoolean),
+
+			Rpc.rpcDefinition (
+				"profile-fields",
+				null,
+				RpcType.rList,
+				new MapRpcChecker ("name", "value"),
+
+				Rpc.rpcDefinition (
+					"profile-field",
+					RpcType.rStructure,
+
+					Rpc.rpcDefinition (
+						"name",
+						RpcType.rString),
+
+					Rpc.rpcDefinition (
+						"value",
+						RpcType.rString))));
 
 	@RpcExport ("profile")
 	public
@@ -1495,8 +1778,14 @@ class ChatApiServletModule
 			chargesConfirmed = (Boolean) params.get ("charges-confirmed");
 			image = (byte[]) params.get ("image");
 			email = (String) params.get ("email");
-			jigsawApplicationIdentifier = (String) params.get ("jigsaw-application-identifier");
-			jigsawToken = (String) params.get ("jigsaw-token");
+
+			jigsawApplicationIdentifier =
+				(String)
+				params.get ("jigsaw-application-identifier");
+
+			jigsawToken =
+				(String)
+				params.get ("jigsaw-token");
 
 			@SuppressWarnings ("unchecked")
 			Map<String,String> profileFieldsTemp =
@@ -1867,14 +2156,32 @@ class ChatApiServletModule
 						"charges-confirmed",
 						chatUser.getChargesConfirmed ()));
 
-			if (chatUser.getGender() != null)
-				profile.add (Rpc.rpcElem ("gender", chatUser.getGender ().toString ()));
+			if (chatUser.getGender() != null) {
 
-			if (chatUser.getOrient() != null)
-				profile.add (Rpc.rpcElem ("orient", chatUser.getOrient ().toString ()));
+				profile.add (
+					Rpc.rpcElem (
+						"gender",
+						chatUser.getGender ().toString ()));
 
-			if (chatUser.getName() != null)
-				profile.add (Rpc.rpcElem ("name", chatUser.getName ()));
+			}
+
+			if (chatUser.getOrient() != null) {
+
+				profile.add (
+					Rpc.rpcElem (
+						"orient",
+						chatUser.getOrient ().toString ()));
+
+			}
+
+			if (chatUser.getName() != null) {
+
+				profile.add (
+					Rpc.rpcElem (
+						"name",
+						chatUser.getName ()));
+
+			}
 
 			if (chatUser.getNewChatUserName () != null) {
 
@@ -1887,8 +2194,14 @@ class ChatApiServletModule
 
 			}
 
-			if (chatUser.getInfoText () != null)
-				profile.add (Rpc.rpcElem ("info", chatUser.getInfoText ().getText ()));
+			if (chatUser.getInfoText () != null) {
+
+				profile.add (
+					Rpc.rpcElem (
+						"info",
+						chatUser.getInfoText ().getText ()));
+
+			}
 
 			if (chatUser.getNewChatUserInfo () != null) {
 
@@ -2040,11 +2353,11 @@ class ChatApiServletModule
 	class ProfileDeleteRpcHandler
 		implements RpcHandler {
 
-		List<String> errors =
-			new ArrayList<String> ();
+		List <String> errors =
+			new ArrayList<> ();
 
-		List<String> errorCodes =
-			new ArrayList<String> ();
+		List <String> errorCodes =
+			new ArrayList<> ();
 
 		Long chatId;
 		String number;
@@ -2059,7 +2372,12 @@ class ChatApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
-					"ChatApiServletModule.ProfileDeleteRpcHandler.handle (source)",
+					stringFormat (
+						"%s.%s.%s (%s)",
+						"ChatApiServletModule",
+						"ProfileDeleteRpcHandler",
+						"handle",
+						"source"),
 					this);
 
 			// get params
@@ -2139,7 +2457,12 @@ class ChatApiServletModule
 
 			chatUser.setNumber (null);
 
-			log.info ("Delete chat user " + chatUser.getId () + ", number was " + number);
+			log.info (
+				stringFormat (
+					"Delete chat user %s, ",
+					chatUser.getId (),
+					"number was %s",
+					number));
 
 		}
 
@@ -2247,7 +2570,12 @@ class ChatApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
-					"ChatApiServletModule.MessageSendRpcHandler.handle (source)",
+					stringFormat (
+						"%s.%s.%s (%s)",
+						"ChatApiServletModule",
+						"MessageSendRpcHandler",
+						"handle",
+						"source"),
 					this);
 
 			// get params
@@ -2301,8 +2629,15 @@ class ChatApiServletModule
 			number = (String) params.get ("number");
 			toCode = (String) params.get ("to-code");
 			message = (String) params.get ("message");
-			this.source = (ChatMessageMethod) params.get ("source");
-			attachments = (List<MessageSendAttachment>) params.get ("attachments");
+
+			this.source =
+				(ChatMessageMethod)
+				params.get ("source");
+
+			attachments =
+				(List <MessageSendAttachment>)
+				params.get ("attachments");
+
 		}
 
 		private
@@ -2518,7 +2853,12 @@ class ChatApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
-					"ChatApiServletModule.MessagePollRpcHandler.handle (source)",
+					stringFormat (
+						"%s.%s.%s (%s)",
+						"ChatApiServletModule",
+						"MessagePollRpcHandler",
+						"handle",
+						"source"),
 					this);
 
 			// get params
@@ -2620,7 +2960,9 @@ class ChatApiServletModule
 							"chat-message-poll-response",
 							stCredit,
 							"credit",
-							"This profile has been barred due to billing problems"));
+							stringFormat (
+								"This profile has been barred due to billing ",
+								"problems")));
 
 				}
 
@@ -2816,17 +3158,26 @@ class ChatApiServletModule
 					for (MediaRec media : message.getMedias ()) {
 
 						attachments.add (
-							Rpc.rpcStruct ("attachment",
-								Rpc.rpcElem ("type", media.getMediaType ().getMimeType ()),
-								Rpc.rpcElem ("media-id", media.getId ())));
+							Rpc.rpcStruct (
+								"attachment",
+
+								Rpc.rpcElem (
+									"type",
+									media.getMediaType ().getMimeType ()),
+
+								Rpc.rpcElem (
+									"media-id",
+									media.getId ())));
 
 					}
 
-					respMessage.add (attachments);
+					respMessage.add (
+						attachments);
 
 				}
 
-				respMessages.add (respMessage);
+				respMessages.add (
+					respMessage);
 
 			}
 		}
@@ -2836,22 +3187,79 @@ class ChatApiServletModule
 
 	private final static
 	RpcDefinition imageUpdateRequestDef =
-		Rpc.rpcDefinition ("chat-image-update-request", RpcType.rStructure,
-			Rpc.rpcDefinition ("chat-id", RpcType.rInteger),
-			Rpc.rpcDefinition ("number", RpcType.rString),
-			Rpc.rpcDefinition ("type", RpcType.rString, Rpc.rpcEnumChecker (imageTypeEnumMap)),
-			Rpc.rpcDefinition ("add", null, RpcType.rList,
-				Rpc.rpcDefinition ("image-data", RpcType.rBinary)),
-			Rpc.rpcDefinition ("add-files", null, RpcType.rList,
-				Rpc.rpcDefinition ("add-file", RpcType.rStructure, new PublicMemberRpcChecker (ImageUpdateAdd.class),
-					Rpc.rpcDefinition ("filename", null, RpcType.rString),
-					Rpc.rpcDefinition ("mime-type", null, RpcType.rString),
-					Rpc.rpcDefinition ("image-data", RpcType.rBinary))),
-			Rpc.rpcDefinition ("reorder", null, RpcType.rList,
-				Rpc.rpcDefinition ("image-id", RpcType.rInteger)),
-			Rpc.rpcDefinition ("delete", null, RpcType.rList,
-				Rpc.rpcDefinition ("image-id", RpcType.rInteger)),
-			Rpc.rpcDefinition ("selected-image-id", null, RpcType.rInteger));
+		Rpc.rpcDefinition (
+			"chat-image-update-request",
+			RpcType.rStructure,
+
+			Rpc.rpcDefinition (
+				"chat-id",
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"number",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"type",
+				RpcType.rString,
+				Rpc.rpcEnumChecker (imageTypeEnumMap)),
+
+			Rpc.rpcDefinition (
+				"add",
+				null,
+				RpcType.rList,
+
+				Rpc.rpcDefinition (
+					"image-data",
+					RpcType.rBinary)),
+
+			Rpc.rpcDefinition (
+				"add-files",
+				null,
+				RpcType.rList,
+
+				Rpc.rpcDefinition (
+					"add-file",
+					RpcType.rStructure,
+					new PublicMemberRpcChecker (
+						ImageUpdateAdd.class),
+
+					Rpc.rpcDefinition (
+						"filename",
+						null,
+						RpcType.rString),
+
+					Rpc.rpcDefinition (
+						"mime-type",
+						null,
+						RpcType.rString),
+
+					Rpc.rpcDefinition (
+						"image-data",
+						RpcType.rBinary))),
+
+			Rpc.rpcDefinition (
+				"reorder",
+				null,
+				RpcType.rList,
+
+				Rpc.rpcDefinition (
+					"image-id",
+					RpcType.rInteger)),
+
+			Rpc.rpcDefinition (
+				"delete",
+				null,
+				RpcType.rList,
+
+				Rpc.rpcDefinition (
+					"image-id",
+					RpcType.rInteger)),
+
+			Rpc.rpcDefinition (
+				"selected-image-id",
+				null,
+				RpcType.rInteger));
 
 	public static
 	class ImageUpdateAdd {
@@ -2894,7 +3302,12 @@ class ChatApiServletModule
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
-					"ChatApiServletModule.ImageUpdateRpcHandler.handle (source)",
+					stringFormat (
+						"%s.%s.%s (%s)",
+						"ChatApiServletModule",
+						"ImageUpdateRpcHandler",
+						"handle",
+						"source"),
 					this);
 
 			// get params
@@ -3054,7 +3467,9 @@ class ChatApiServletModule
 								"chat-update-image-response",
 								Rpc.stRequestInvalid,
 								"request-invalid",
-								"The delete image ids contains an invalid image id"));
+								stringFormat (
+									"The delete image ids contains an invalid ",
+									"image id")));
 
 					}
 
@@ -3154,7 +3569,9 @@ class ChatApiServletModule
 							"chat-update-image-response",
 							Rpc.stRequestInvalid,
 							"request-invalid",
-							"The reorder image ids do not match the current list"));
+							stringFormat (
+								"The reorder image ids do not match the ",
+								"current list")));
 
 				}
 
@@ -3295,9 +3712,12 @@ class ChatApiServletModule
 
 						Rpc.rpcElem (
 							"selected",
-							chatUserImage == chatUserLogic.getMainChatUserImageByType (
-								chatUser,
-								type)),
+							referenceEqualWithClass (
+								ChatUserImageRec.class,
+								chatUserImage,
+								chatUserLogic.getMainChatUserImageByType (
+									chatUser,
+									type))),
 
 						Rpc.rpcElem (
 							"status",
@@ -3311,9 +3731,19 @@ class ChatApiServletModule
 				if (chatUserImage.getFullMedia () != null) {
 
 					respImage.add (
-						Rpc.rpcElem ("full-media-id", chatUserImage.getFullMedia ().getId ()),
-						Rpc.rpcElem ("full-media-filename", chatUserImage.getFullMedia ().getFilename ()),
-						Rpc.rpcElem ("full-media-mime-type", chatUserImage.getFullMedia ().getMediaType ().getMimeType ()));
+
+						Rpc.rpcElem (
+							"full-media-id",
+							chatUserImage.getFullMedia ().getId ()),
+
+						Rpc.rpcElem (
+							"full-media-filename",
+							chatUserImage.getFullMedia ().getFilename ()),
+
+						Rpc.rpcElem (
+							"full-media-mime-type",
+							chatUserImage.getFullMedia ().getMediaType ()
+								.getMimeType ()));
 
 				}
 
@@ -3332,9 +3762,15 @@ class ChatApiServletModule
 			// retrieve all images
 
 			respOtherImages =
-				Rpc.rpcList ("other-images", "image", RpcType.rStructure);
+				Rpc.rpcList (
+					"other-images",
+					"image",
+					RpcType.rStructure);
 
-			for (ChatUserImageRec chatUserImage : chatUser.getChatUserImages ()) {
+			for (
+				ChatUserImageRec chatUserImage
+					: chatUser.getChatUserImages ()
+			) {
 
 				if (chatUserImage.getType () != type) continue;
 
@@ -3366,9 +3802,12 @@ class ChatApiServletModule
 
 						Rpc.rpcElem (
 							"selected",
-							chatUserImage == chatUserLogic.getMainChatUserImageByType (
-								chatUser,
-								type)),
+							referenceEqualWithClass (
+								ChatUserImageRec.class,
+								chatUserImage,
+								chatUserLogic.getMainChatUserImageByType (
+									chatUser,
+									type))),
 
 						Rpc.rpcElem (
 							"status",
@@ -3393,7 +3832,8 @@ class ChatApiServletModule
 
 						Rpc.rpcElem (
 							"full-media-mime-type",
-							chatUserImage.getFullMedia ().getMediaType ().getMimeType ()));
+							chatUserImage.getFullMedia ().getMediaType ()
+								.getMimeType ()));
 
 				}
 
@@ -3418,14 +3858,44 @@ class ChatApiServletModule
 
 	private final static
 	RpcDefinition creditRequestDef =
-		Rpc.rpcDefinition ("chat-credit-request", RpcType.rStructure,
-			Rpc.rpcDefinition ("chat-id", RpcType.rInteger),
-			Rpc.rpcDefinition ("number", RpcType.rString),
-			Rpc.rpcDefinition ("send-count", null, RpcType.rInteger, RpcChecker.integerZeroOrMore),
-			Rpc.rpcDefinition ("send-amount", null, RpcType.rInteger, RpcChecker.integerZeroOrMore),
-			Rpc.rpcDefinition ("credit-amount", null, RpcType.rInteger),
-			Rpc.rpcDefinition ("bill-amount", null, RpcType.rInteger),
-			Rpc.rpcDefinition ("details", null, RpcType.rString));
+		Rpc.rpcDefinition (
+			"chat-credit-request",
+			RpcType.rStructure,
+
+			Rpc.rpcDefinition (
+				"chat-id",
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"number",
+				RpcType.rString),
+
+			Rpc.rpcDefinition (
+				"send-count",
+				null,
+				RpcType.rInteger,
+				RpcChecker.integerZeroOrMore),
+
+			Rpc.rpcDefinition (
+				"send-amount",
+				null,
+				RpcType.rInteger,
+				RpcChecker.integerZeroOrMore),
+
+			Rpc.rpcDefinition (
+				"credit-amount",
+				null,
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"bill-amount",
+				null,
+				RpcType.rInteger),
+
+			Rpc.rpcDefinition (
+				"details",
+				null,
+				RpcType.rString));
 
 	@RpcExport ("credit")
 	public

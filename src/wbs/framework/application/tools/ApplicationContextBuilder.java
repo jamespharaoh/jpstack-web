@@ -30,6 +30,7 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
 import wbs.api.module.ApiModule;
 import wbs.api.module.ApiModuleFactory;
 import wbs.api.module.ApiModuleSpec;
@@ -1073,17 +1074,6 @@ class ApplicationContextBuilder {
 			stringFormat (
 				"%sObjectHelper",
 				model.name ());
-
-		String objectHelperInterfaceName =
-			stringFormat (
-				"%s.model.%sObjectHelper",
-				model.plugin ().packageName (),
-				capitalise (
-					model.name ()));
-
-		Class <?> objectHelperInterface =
-			classForNameRequired (
-				objectHelperInterfaceName);
 
 		String objectHelperImplementationClassName =
 			stringFormat (

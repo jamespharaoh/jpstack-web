@@ -11,7 +11,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.CodeFieldSpec;
-import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("codeFieldWriter")
 @ModelWriter
@@ -27,7 +26,7 @@ class CodeFieldWriter {
 	CodeFieldSpec spec;
 
 	@BuilderTarget
-	FormatWriter javaWriter;
+	ModelFieldWriterTarget target;
 
 	// build
 
@@ -41,21 +40,21 @@ class CodeFieldWriter {
 		new JavaPropertyWriter ()
 
 			.thisClassNameFormat (
-				"%s",
+				"%s.model.%s",
+				context.modelMeta ().plugin ().packageName (),
 				context.recordClassName ())
 
-			.typeNameFormat (
-				"String")
+			.typeClass (
+				String.class)
 
-			.propertyNameFormat (
-				"%s",
+			.propertyName (
 				ifNull (
 					spec.name (),
 					"code"))
 
-			.write (
-				javaWriter,
-				"\t");
+			.writeBlock (
+				target.imports (),
+				target.formatWriter ());
 
 	}
 

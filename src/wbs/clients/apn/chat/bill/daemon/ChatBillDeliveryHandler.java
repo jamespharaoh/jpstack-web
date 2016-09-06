@@ -9,13 +9,14 @@ import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -273,9 +274,10 @@ class ChatBillDeliveryHandler
 
 		log.info (
 			stringFormat (
-				"Delivery report processed for message %s %s for chat user %s %s",
+				"Delivery report processed for message %s %s ",
 				message.getId (),
 				delivery.getNewMessageStatus (),
+				"for chat user %s %s",
 				chatUser.getId (),
 				chatCreditLogic.userCreditDebug (chatUser)));
 

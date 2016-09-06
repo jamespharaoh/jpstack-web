@@ -52,23 +52,23 @@ class ModelMetaSpec {
 
 	@DataChildren (
 		childrenElement = "implements-interfaces")
-	List<ModelImplementsInterfaceSpec> implementsInterfaces =
-		new ArrayList<ModelImplementsInterfaceSpec> ();
+	List <ModelImplementsInterfaceSpec> implementsInterfaces =
+		new ArrayList<> ();
 
 	@DataChildren (
 		childrenElement = "fields")
-	List<ModelFieldSpec> fields =
-		new ArrayList<ModelFieldSpec> ();
+	List <ModelFieldSpec> fields =
+		new ArrayList<> ();
 
 	@DataChildren (
 		childrenElement = "collections")
-	List<ModelCollectionSpec> collections =
-		new ArrayList<ModelCollectionSpec> ();
+	List <ModelCollectionSpec> collections =
+		new ArrayList<> ();
 
 	@DataChildren (
 		direct = true,
 		excludeChildren = { "fields", "collections" })
-	List<Object> children =
-		new ArrayList<Object> ();
+	List <Object> children =
+		new ArrayList<> ();
 
 }

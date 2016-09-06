@@ -12,7 +12,7 @@ import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.BuilderFactory;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.framework.entity.generate.fields.ModelFieldWriterTarget;
 
 @SingletonComponent ("modelWriterManager")
 public
@@ -64,12 +64,12 @@ class ModelWriterManager {
 	void write (
 			ModelFieldWriterContext context,
 			List<?> sourceItems,
-			FormatWriter javaWriter) {
+			ModelFieldWriterTarget target) {
 
 		modelWriter.descend (
 			context,
 			sourceItems,
-			javaWriter,
+			target,
 			MissingBuilderBehaviour.error);
 
 	}

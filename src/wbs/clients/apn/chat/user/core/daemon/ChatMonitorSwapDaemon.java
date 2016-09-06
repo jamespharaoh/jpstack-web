@@ -1,6 +1,7 @@
 package wbs.clients.apn.chat.user.core.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
@@ -9,13 +10,14 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.joda.time.Duration;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -171,7 +173,20 @@ class ChatMonitorSwapDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
-				"ChatMonitorSwapDaemon.doMonitorSwapReal (chatId, gender, orient)",
+				stringFormat (
+					"%s.%s (%s)",
+					"ChatMonitorSwapDaemon",
+					"doMonitorSwapReal",
+					joinWithCommaAndSpace (
+						stringFormat (
+							"chatId = %s",
+							chatId),
+						stringFormat (
+							"gender = %s",
+							gender),
+						stringFormat (
+							"orient = %s",
+							orient))),
 				this);
 
 		ChatRec chat =

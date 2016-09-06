@@ -67,9 +67,10 @@ interface ChatMessageLogic {
 	 * verification process.
 	 *
 	 * @param chatUser
-	 *            ChatUserRec of chat user to inc count of
+	 *     ChatUserRec of chat user to inc count of
+	 *
 	 * @param threadId
-	 *            threadId of existing message thread to associate allMessages with
+	 *     Thread id of existing message thread to associate messages with
 	 */
 	void chatUserRejectionCountInc (
 			ChatUserRec chatUser,

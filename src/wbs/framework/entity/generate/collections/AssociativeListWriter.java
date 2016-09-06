@@ -1,11 +1,16 @@
 package wbs.framework.entity.generate.collections;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
+
+import lombok.NonNull;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginManager;
@@ -19,8 +24,8 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
+import wbs.framework.entity.generate.fields.ModelFieldWriterTarget;
 import wbs.framework.entity.meta.AssociativeListSpec;
-import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("associativeListWriter")
 @ModelWriter
@@ -41,14 +46,14 @@ class AssociativeListWriter {
 	AssociativeListSpec spec;
 
 	@BuilderTarget
-	FormatWriter javaWriter;
+	ModelFieldWriterTarget target;
 
 	// build
 
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		PluginModelSpec fieldTypePluginModel =
 			pluginManager.pluginModelsByName ().get (
@@ -75,24 +80,34 @@ class AssociativeListWriter {
 		new JavaPropertyWriter ()
 
 			.thisClassNameFormat (
-				"%s",
+				"%s.model.%s",
+				context.modelMeta ().plugin ().packageName (),
 				context.recordClassName ())
 
-			.typeNameFormat (
-				"List<%s>",
-				fullFieldTypeName)
+			.typeName (
+				imports ->
+					stringFormat (
+						"%s <%s>",
+						imports.register (
+							List.class),
+						imports.register (
+							fullFieldTypeName)))
 
-			.propertyNameFormat (
-				"%s",
+			.propertyName (
 				fieldName)
 
-			.defaultValueFormat (
-				"new ArrayList<%s> ()",
-				fullFieldTypeName)
+			.defaultValue (
+				imports ->
+					stringFormat (
+						"new %s <%s> ()",
+						imports.register (
+							ArrayList.class),
+						imports.register (
+							fullFieldTypeName)))
 
-			.write (
-				javaWriter,
-				"\t");
+			.writeBlock (
+				target.imports (),
+				target.formatWriter ());
 
 	}
 

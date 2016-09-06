@@ -2,6 +2,8 @@ package wbs.clients.apn.chat.contact.logic;
 
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
+import static wbs.framework.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOf;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collection;
@@ -564,14 +566,14 @@ class ChatSendLogicImplementation
 
 	@Override
 	public
-	Optional<MessageRec> sendSystemMagic (
+	Optional <MessageRec> sendSystemMagic (
 			@NonNull ChatUserRec chatUser,
-			@NonNull Optional<Long> threadId,
+			@NonNull Optional <Long> threadId,
 			@NonNull String templateCode,
 			@NonNull CommandRec magicCommand,
 			@NonNull Long magicRef,
 			@NonNull TemplateMissing templateMissing,
-			@NonNull Map<String,String> suppliedParams) {
+			@NonNull Map <String, String> suppliedParams) {
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -590,12 +592,15 @@ class ChatSendLogicImplementation
 
 				throw new RuntimeException (
 					stringFormat (
-						"System template not found: %s for chat %s, user %s and ",
+						"System template not found: %s ",
 						templateCode,
+						"for chat %s, ",
 						chatUser.getChat ().getId (),
+						"user %s ",
 						chatUser.getId (),
-						"thread %s and template code %s",
+						"and thread %s ",
 						threadId,
+						"and template code %s",
 						templateCode));
 
 			} else {
@@ -642,12 +647,12 @@ class ChatSendLogicImplementation
 
 		chatHelpLogLogic.createChatHelpLogOut (
 			chatUser,
-			Optional.<ChatHelpLogRec>absent (),
-			Optional.<UserRec>absent (),
+			optionalAbsent (),
+			optionalAbsent (),
 			message,
-			Optional.<ChatMessageRec>absent (),
+			optionalAbsent (),
 			finalText,
-			Optional.of (
+			optionalOf (
 				ifThenElse (
 					referenceEqualWithClass (
 						CommandRec.class,
@@ -659,7 +664,7 @@ class ChatSendLogicImplementation
 						magicRef),
 					() -> magicCommand)));
 
-		return Optional.of (
+		return optionalOf (
 			message);
 
 	}
@@ -668,12 +673,12 @@ class ChatSendLogicImplementation
 	public
 	Long sendMessageMagic (
 			@NonNull ChatUserRec chatUser,
-			@NonNull Optional<Long> threadId,
-			@NonNull Collection<TextRec> parts,
+			@NonNull Optional <Long> threadId,
+			@NonNull Collection <TextRec> parts,
 			@NonNull CommandRec magicCommand,
 			@NonNull ServiceRec service,
 			@NonNull Long magicRef,
-			@NonNull Optional<UserRec> user) {
+			@NonNull Optional <UserRec> user) {
 
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();

@@ -2,15 +2,15 @@ package wbs.clients.apn.chat.date.daemon;
 
 import static wbs.framework.utils.etc.LogicUtils.allOf;
 import static wbs.framework.utils.etc.LogicUtils.equalSafe;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.min;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.framework.utils.etc.NumberUtils.lessThanOne;
 import static wbs.framework.utils.etc.NumberUtils.roundToIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -21,10 +21,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
@@ -32,6 +28,11 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
@@ -479,7 +480,11 @@ class ChatDateDaemon
 
 				if (chatUser.getType () != ChatUserType.user) {
 
-					log.debug ("Ignoring " + chatUser.getId () + " (user type)");
+					log.debug (
+						stringFormat (
+							"Ignoring %s ",
+							chatUser.getId (),
+							"(user type)"));
 
 					continue;
 
@@ -717,7 +722,11 @@ class ChatDateDaemon
 
 		if (thisUser.getDateMode () == ChatUserDateMode.none) {
 
-			log.debug ("Ignoring " + thisUserId + " (dating mode check failed)");
+			log.debug (
+				stringFormat (
+					"Ignoring %s ",
+					thisUserId,
+					"(dating mode check failed)"));
 
 			return false;
 

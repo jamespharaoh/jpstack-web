@@ -1,7 +1,7 @@
 package wbs.clients.apn.chat.contact.console;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
@@ -196,8 +196,10 @@ class ChatMessagePendingFormResponder
 			"<td><select id=\"templateId\">\n",
 			"<option>\n");
 
-		for (ChatHelpTemplateRec chatHelpTemplate
-				: chatHelpTemplates) {
+		for (
+			ChatHelpTemplateRec chatHelpTemplate
+				: chatHelpTemplates
+		) {
 
 			printFormat (
 				"<option",

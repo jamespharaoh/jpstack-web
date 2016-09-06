@@ -1,5 +1,7 @@
 package wbs.framework.entity.generate.fields;
 
+import lombok.NonNull;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -9,7 +11,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.IdentityStringFieldSpec;
-import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("identityStringFieldWriter")
 @ModelWriter
@@ -25,33 +26,33 @@ class IdentityStringFieldWriter {
 	IdentityStringFieldSpec spec;
 
 	@BuilderTarget
-	FormatWriter javaWriter;
+	ModelFieldWriterTarget target;
 
 	// build
 
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		// write field
 
 		new JavaPropertyWriter ()
 
 			.thisClassNameFormat (
-				"%s",
+				"%s.model.%s",
+				context.modelMeta ().plugin ().packageName (),
 				context.recordClassName ())
 
-			.typeNameFormat (
-				"String")
+			.typeClass (
+				String.class)
 
-			.propertyNameFormat (
-				"%s",
+			.propertyName (
 				spec.name ())
 
-			.write (
-				javaWriter,
-				"\t");
+			.writeBlock (
+				target.imports (),
+				target.formatWriter ());
 
 	}
 

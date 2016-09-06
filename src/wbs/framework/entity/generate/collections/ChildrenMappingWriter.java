@@ -1,11 +1,12 @@
 package wbs.framework.entity.generate.collections;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -24,9 +25,9 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
+import wbs.framework.entity.generate.fields.ModelFieldWriterTarget;
 import wbs.framework.entity.meta.ChildrenMappingSpec;
 import wbs.framework.entity.meta.ModelMetaLoader;
-import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("childrenMappingWriter")
 @ModelWriter
@@ -50,7 +51,7 @@ class ChildrenMappingWriter {
 	ChildrenMappingSpec spec;
 
 	@BuilderTarget
-	FormatWriter javaWriter;
+	ModelFieldWriterTarget target;
 
 	// build
 
@@ -105,26 +106,38 @@ class ChildrenMappingWriter {
 		new JavaPropertyWriter ()
 
 			.thisClassNameFormat (
-				"%s",
+				"%s.model.%s",
+				context.modelMeta ().plugin ().packageName (),
 				context.recordClassName ())
 
-			.typeNameFormat (
-				"Map <%s, %s>",
-				keyType.getSimpleName (),
-				fullFieldTypeName)
+			.typeName (
+				imports ->
+					stringFormat (
+						"%s <%s, %s>",
+						imports.register (
+							Map.class),
+						imports.register (
+							keyType),
+						imports.register (
+							fullFieldTypeName)))
 
-			.propertyNameFormat (
-				"%s",
+			.propertyName (
 				fieldName)
 
-			.defaultValueFormat (
-				"new LinkedHashMap <%s, %s> ()",
-				keyType.getSimpleName (),
-				fullFieldTypeName)
+			.defaultValue (
+				imports ->
+					stringFormat (
+						"new %s <%s, %s> ()",
+						imports.register (
+							LinkedHashMap.class),
+						imports.register (
+							keyType),
+						imports.register (
+							fullFieldTypeName)))
 
-			.write (
-				javaWriter,
-				"\t");
+			.writeBlock (
+				target.imports (),
+				target.formatWriter ());
 
 
 	}

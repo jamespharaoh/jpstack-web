@@ -9,6 +9,7 @@ import java.util.List;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+
 import wbs.applications.imchat.model.ImChatObjectHelper;
 import wbs.applications.imchat.model.ImChatProfileObjectHelper;
 import wbs.applications.imchat.model.ImChatProfileRec;
@@ -73,7 +74,7 @@ class ImChatProfileListAction
 
 		// retrieve profiles
 
-		List<ImChatProfileRec> profiles =
+		List <ImChatProfileRec> profiles =
 			imChatProfileHelper.findByParent (
 				imChat);
 
@@ -82,8 +83,8 @@ class ImChatProfileListAction
 
 		// create response
 
-		List<ImChatProfileData> profileDatas =
-			new ArrayList<ImChatProfileData> ();
+		List <ImChatProfileData> profileDatas =
+			new ArrayList<> ();
 
 		for (
 			ImChatProfileRec profile

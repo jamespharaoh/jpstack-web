@@ -8,6 +8,7 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.emptyStringToAbsent;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
 import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TimeUtils.dateToInstantNullSafe;
 
 import java.io.Serializable;
@@ -18,13 +19,14 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -266,7 +268,9 @@ class ChatUserSearchOldAction
 			if (Boolean.FALSE.equals (searchPicture)) {
 
 				requestContext.addError (
-					"Search doesn't make sense, photo download for users without a picture?");
+					stringFormat (
+						"Search doesn't make sense, photo download for users ",
+						"without a picture?"));
 
 				return null;
 

@@ -51,13 +51,13 @@ class ChatUserInitiationLogConsoleHooks
 				: chatHelper.findAll ()
 		) {
 
-			 if (
-			 	! privChecker.canRecursive (
-			 		chat,
-			 		"supervisor")
-			 ) {
-			 	continue;
-			 }
+			if (
+				! privChecker.canRecursive (
+					chat,
+					"supervisor")
+			) {
+				continue;
+			}
 
 			chatsBuilder.add (
 				chat.getId ());

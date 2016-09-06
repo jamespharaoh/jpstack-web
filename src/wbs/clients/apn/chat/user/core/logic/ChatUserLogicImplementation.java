@@ -29,16 +29,17 @@ import java.util.Set;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+
+import lombok.NonNull;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-
-import lombok.NonNull;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.category.model.ChatCategoryRec;
@@ -1334,9 +1335,15 @@ class ChatUserLogicImplementation
 	 * Checks if a given chat user has given adequate evidence they are over 18:
 	 *
 	 * <ul>
-	 * <li>responding "yes" to a message asking them (the old method)</li>
-	 * <li>sending in their date of birth which shows them to be at least 18</li>
-	 * <li>going through adult verfication</li>
+	 *   <li>
+	 *     responding "yes" to a message asking them (the old method)
+	 *   </li>
+	 *   <li>
+	 *     sending in their date of birth which shows them to be at least 18
+	 *   </li>
+	 *   <li>
+	 *     going through adult verfication
+	 *   </li>
 	 * </ul>
 	 *
 	 * @param chatUser

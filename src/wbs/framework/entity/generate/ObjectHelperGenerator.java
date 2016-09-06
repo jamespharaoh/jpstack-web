@@ -318,11 +318,12 @@ class ObjectHelperGenerator {
 			.addClassModifier (
 				"public")
 
-			.addImplements (
+			.addImplementsClass (
 				ObjectHelperImplementation.class)
 
-			.addImplements (
-				packageName + ".model",
+			.addImplementsFormat (
+				"%s.model.%s",
+				packageName,
 				objectHelperInterfaceName)
 
 			.addTypeParameterMapping (

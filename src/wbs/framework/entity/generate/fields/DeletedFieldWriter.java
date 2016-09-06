@@ -1,5 +1,7 @@
 package wbs.framework.entity.generate.fields;
 
+import lombok.NonNull;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -9,7 +11,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.DeletedFieldSpec;
-import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("deletedFieldWriter")
 @ModelWriter
@@ -25,35 +26,36 @@ class DeletedFieldWriter {
 	DeletedFieldSpec spec;
 
 	@BuilderTarget
-	FormatWriter javaWriter;
+	ModelFieldWriterTarget target;
 
 	// build
 
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		// write field
 
 		new JavaPropertyWriter ()
 
 			.thisClassNameFormat (
-				"%s",
+				"%s.model.%s",
+				context.modelMeta ().plugin ().packageName (),
 				context.recordClassName ())
 
-			.typeNameFormat (
-				"Boolean")
+			.typeClass (
+				Boolean.class)
 
-			.propertyNameFormat (
+			.propertyName (
 				"deleted")
 
-			.defaultValueFormat (
+			.defaultValue (
 				"false")
 
-			.write (
-				javaWriter,
-				"\t");
+			.writeBlock (
+				target.imports (),
+				target.formatWriter ());
 
 	}
 

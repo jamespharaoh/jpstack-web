@@ -12,15 +12,16 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
@@ -477,7 +478,12 @@ class ChatMiscLogicImplementation
 					@Cleanup
 					Transaction transaction =
 						database.beginReadWrite (
-							"ChatMiscLogicImplementation.userJoin.locatorCallback.success (..)",
+							stringFormat (
+								"%s.%s.%s.%s (...)",
+								"ChatMiscLogicImplementation",
+								"userJoin",
+								"locatorCallback",
+								"success"),
 							this);
 
 					ChatUserRec chatUser =

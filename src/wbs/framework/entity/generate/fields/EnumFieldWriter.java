@@ -1,10 +1,12 @@
 package wbs.framework.entity.generate.fields;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
+
+import lombok.NonNull;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginCustomTypeSpec;
@@ -19,7 +21,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.EnumFieldSpec;
-import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("enumFieldWriter")
 @ModelWriter
@@ -40,14 +41,14 @@ class EnumFieldWriter {
 	EnumFieldSpec spec;
 
 	@BuilderTarget
-	FormatWriter javaWriter;
+	ModelFieldWriterTarget target;
 
 	// build
 
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		String fieldTypePackageName;
 
@@ -102,15 +103,14 @@ class EnumFieldWriter {
 			new JavaPropertyWriter ()
 
 			.thisClassNameFormat (
-				"%s",
+				"%s.model.%s",
+				context.modelMeta ().plugin ().packageName (),
 				context.recordClassName ())
 
-			.typeNameFormat (
-				"%s",
+			.typeName (
 				fullFieldTypeName)
 
-			.propertyNameFormat (
-				"%s",
+			.propertyName (
 				fieldName);
 
 		if (spec.defaultValue () != null) {
@@ -122,9 +122,9 @@ class EnumFieldWriter {
 
 		}
 
-		propertyWriter.write (
-			javaWriter,
-			"\t");
+		propertyWriter.writeBlock (
+			target.imports (),
+			target.formatWriter ());
 
 	}
 

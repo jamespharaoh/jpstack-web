@@ -8,12 +8,13 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.joda.time.Duration;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
+
+import org.joda.time.Duration;
+
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
@@ -137,7 +138,13 @@ class ChatUserJoinOutboundDaemon
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
-				"ChatUserJoinOutboundDaemon.doChatUserJoinOutbound (chatUserId)",
+				stringFormat (
+					"%s.%s (%s)",
+					"ChatUserJoinOutboundDaemon",
+					"doChatUserJoinOutbound",
+					stringFormat (
+						"chatUserId = %s",
+						chatUserId)),
 				this);
 
 		// find the user

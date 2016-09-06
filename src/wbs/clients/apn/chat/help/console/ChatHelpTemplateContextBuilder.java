@@ -1,9 +1,9 @@
 package wbs.clients.apn.chat.help.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +11,10 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
+import lombok.NonNull;
 
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -133,8 +133,9 @@ class ChatHelpTemplateContextBuilder {
 		buildCreatePage ();
 		buildSettingsPage ();
 
-		ConsoleContextBuilderContainer<ChatHelpTemplateRec> listContainer =
-			new ConsoleContextBuilderContainerImplementation<ChatHelpTemplateRec> ()
+		ConsoleContextBuilderContainer <ChatHelpTemplateRec> listContainer =
+			new ConsoleContextBuilderContainerImplementation
+				<ChatHelpTemplateRec> ()
 
 			.consoleHelper (
 				chatHelpTemplateHelper)
@@ -167,8 +168,9 @@ class ChatHelpTemplateContextBuilder {
 			consoleModule,
 			MissingBuilderBehaviour.error);
 
-		ConsoleContextBuilderContainer<ChatHelpTemplateRec> objectContainer =
-			new ConsoleContextBuilderContainerImplementation<ChatHelpTemplateRec> ()
+		ConsoleContextBuilderContainer <ChatHelpTemplateRec> objectContainer =
+			new ConsoleContextBuilderContainerImplementation
+				<ChatHelpTemplateRec> ()
 
 			.consoleHelper (
 				chatHelpTemplateHelper)
@@ -246,7 +248,7 @@ class ChatHelpTemplateContextBuilder {
 				parentContextTabName)
 
 			.stuff (
-				ImmutableMap.<String,Object>of (
+				ImmutableMap.<String, Object> of (
 					"chatHelpTemplateType",
 					typeCamel)));
 
@@ -284,7 +286,7 @@ class ChatHelpTemplateContextBuilder {
 				parentContextTabName)
 
 			.stuff (
-				ImmutableMap.<String,Object>of (
+				ImmutableMap.<String, Object> of (
 					"chatHelpTemplateType",
 					typeCamel)));
 

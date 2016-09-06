@@ -15,7 +15,6 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
-import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
 import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
 import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
@@ -75,7 +74,7 @@ class JavaClassWriter
 	String extendsClassName;
 
 	@Getter @Setter
-	List <String> implementsInterfaceNames =
+	List <Function <JavaImportRegistry, String>> implementsInterfaces =
 		new ArrayList<> ();
 
 	@Getter @Setter
@@ -138,37 +137,43 @@ class JavaClassWriter
 
 	public
 	JavaClassWriter addImplements (
-			@NonNull String interfaceName) {
+			@NonNull Function <JavaImportRegistry, String>
+				implementsInterface) {
 
-		implementsInterfaceNames.add (
-			interfaceName);
-
-		return this;
-
-	}
-
-	public
-	JavaClassWriter addImplements (
-			@NonNull String packageName,
-			@NonNull String interfaceName) {
-
-		implementsInterfaceNames.add (
-			joinWithFullStop (
-				packageName,
-				interfaceName));
+		implementsInterfaces.add (
+			implementsInterface);
 
 		return this;
 
 	}
 
 	public
-	JavaClassWriter addImplements (
+	JavaClassWriter addImplementsName (
+			@NonNull String interfaceName) {
+
+		return addImplements (
+			imports ->
+				imports.register (
+					interfaceName));
+
+	}
+
+	public
+	JavaClassWriter addImplementsFormat (
+			@NonNull String ... arguments) {
+
+		return addImplementsName (
+			stringFormatArray (
+				arguments));
+
+	}
+
+	public
+	JavaClassWriter addImplementsClass (
 			@NonNull Class <?> interfaceClass) {
 
-		implementsInterfaceNames.add (
+		return addImplementsName (
 			interfaceClass.getName ());
-
-		return this;
 
 	}
 
@@ -460,7 +465,7 @@ class JavaClassWriter
 				extendsClassName)
 
 			&& collectionIsEmpty (
-				implementsInterfaceNames)
+				implementsInterfaces)
 
 		) {
 
@@ -485,7 +490,7 @@ class JavaClassWriter
 
 			if (
 				collectionIsEmpty (
-					implementsInterfaceNames)
+					implementsInterfaces)
 			) {
 
 				formatWriter.writeLineFormat (
@@ -508,19 +513,22 @@ class JavaClassWriter
 
 		if (
 			collectionIsNotEmpty (
-				implementsInterfaceNames)
+				implementsInterfaces)
 		) {
 
 			if (
 				collectionHasOneElement (
-					implementsInterfaceNames)
+					implementsInterfaces)
 			) {
+
+				Function <JavaImportRegistry, String> implementsInterface =
+					listFirstElementRequired (
+						implementsInterfaces);
 
 				formatWriter.writeLineFormat (
 					"\timplements %s {",
-					imports.register (
-						listFirstElementRequired (
-							implementsInterfaceNames)));
+					implementsInterface.apply (
+						imports));
 
 			} else {
 
@@ -528,23 +536,26 @@ class JavaClassWriter
 					"\timplements");
 
 				for (
-					String implementsInterfaceName
+					Function <JavaImportRegistry, String> implementsInterface
 						: listSliceAllButLastItemRequired (
-							implementsInterfaceNames)
+							implementsInterfaces)
 				) {
 
 					formatWriter.writeLineFormat (
 						"\t\t%s,",
-						imports.register (
-							implementsInterfaceName));
+						implementsInterface.apply (
+							imports));
 
 				}
 
+				Function <JavaImportRegistry, String> implementsInterface =
+					listLastElementRequired (
+						implementsInterfaces);
+
 				formatWriter.writeLineFormat (
 					"\t\t%s {",
-					imports.register (
-						listLastElementRequired (
-							implementsInterfaceNames)));
+					implementsInterface.apply (
+						imports));
 
 			}
 

@@ -1,10 +1,12 @@
 package wbs.framework.entity.generate.fields;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import javax.inject.Inject;
+
+import lombok.NonNull;
 
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.application.scaffold.PluginManager;
@@ -18,7 +20,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.SlaveFieldSpec;
-import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("slaveFieldWriter")
 @ModelWriter
@@ -39,14 +40,14 @@ class SlaveFieldWriter {
 	SlaveFieldSpec spec;
 
 	@BuilderTarget
-	FormatWriter javaWriter;
+	ModelFieldWriterTarget target;
 
 	// build
 
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		PluginModelSpec fieldTypePluginModel =
 			pluginManager.pluginModelsByName ().get (
@@ -64,26 +65,24 @@ class SlaveFieldWriter {
 
 		// write field
 
-		JavaPropertyWriter propertyWriter =
-			new JavaPropertyWriter ()
+		new JavaPropertyWriter ()
 
 			.thisClassNameFormat (
-				"%s",
+				"%s.model.%s",
+				context.modelMeta ().plugin ().packageName (),
 				context.recordClassName ())
 
-			.typeNameFormat (
-				"%s",
+			.typeName (
 				fullFieldTypeName)
 
-			.propertyNameFormat (
-				"%s",
+			.propertyName (
 				ifNull (
 					spec.name (),
-					spec.typeName ()));
+					spec.typeName ()))
 
-		propertyWriter.write (
-			javaWriter,
-			"\t");
+			.writeBlock (
+				target.imports (),
+				target.formatWriter ());
 
 	}
 

@@ -136,14 +136,51 @@ class ChatUserOnlinePart
 	void renderHtmlHeadContent () {
 
 		printFormat (
+
 			"<style type=\"text/css\">\n",
-			"table.list td.chat-user-type-user { text-align: center; background: #cccccc; color: black; }\n",
-			"table.list td.chat-user-type-monitor { text-align: center; background: #999999; color: white; }\n",
-			"table.list td.gender-male { text-align: center; background: #ccccff; color: black; }\n",
-			"table.list td.gender-female { text-align: center; background: #ffcccc; color: black; }\n",
-			"table.list td.orient-gay { text-align: center; background: #ffccff; color: black; }\n",
-			"table.list td.orient-bi { text-align: center; background: #ffffcc; color: black; \n",
-			"table.list td.orient-straight { text-align: center; background: #ccffff; color: black; }\n",
+
+			"table.list td.chat-user-type-user {\n",
+			"  text-align: center;\n",
+			"  background: #cccccc;\n",
+			"  color: black;\n",
+			"}\n",
+
+			"table.list td.chat-user-type-monitor {\n",
+			"  text-align: center;\n",
+			"  background: #999999;\n",
+			"  color: white;\n",
+			"}\n",
+
+			"table.list td.gender-male {\n",
+			"  text-align: center;\n",
+			"  background: #ccccff;\n",
+			"  color: black;\n",
+			"}\n",
+
+			"table.list td.gender-female {\n",
+			"  text-align: center;\n",
+			"  background: #ffcccc;\n",
+			"  color: black;\n",
+			"}\n",
+
+			"table.list td.orient-gay {\n",
+			"  text-align: center;\n",
+			"  background: #ffccff;\n",
+			"  color: black;\n",
+			"}\n",
+
+			"table.list td.orient-bi {\n",
+			"  text-align: center;\n",
+			"  background: #ffffcc;\n",
+			"  color: black;\n",
+			"}\n",
+
+			"table.list td.orient-straight {\n",
+			"  text-align: center;\n",
+			"  background: #ccffff;\n",
+			"  color: black;\n",
+			"}\n",
+
 			"</style>\n");
 
 	}

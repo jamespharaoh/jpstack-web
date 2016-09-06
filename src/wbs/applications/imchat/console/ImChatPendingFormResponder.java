@@ -147,7 +147,9 @@ class ImChatPendingFormResponder
 		printFormat (
 			"top.show_inbox (true);\n",
 			"top.frames ['main'].location = 'about:blank';\n",
-			"window.setTimeout (function () { top.frames ['main'].location = '%j' }, 1);\n",
+			"window.setTimeout (function () {\n",
+			"\ttop.frames ['main'].location = '%j';\n",
+			"}, 1);\n",
 			summaryUrl);
 
 		printFormat (

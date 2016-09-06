@@ -8,13 +8,14 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.joda.time.Duration;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
@@ -196,8 +197,9 @@ class ChatAdultExpiryDaemon
 
 			log.info (
 				stringFormat (
-					"Not sending adult expiry message to %s due to lack of scheme",
-					chatUserPath));
+					"Not sending adult expiry message to %s ",
+					chatUserPath,
+					"due to lack of scheme"));
 
 		} else {
 

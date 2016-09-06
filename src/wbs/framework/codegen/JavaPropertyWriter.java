@@ -1,78 +1,185 @@
 package wbs.framework.codegen;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
 
 import java.lang.reflect.Method;
+import java.util.function.Function;
 
 import lombok.NonNull;
+
 import wbs.framework.utils.formatwriter.FormatWriter;
 
 public
-class JavaPropertyWriter {
+class JavaPropertyWriter
+	implements JavaBlockWriter {
 
 	// properties
 
-	String thisClassName;
-	String typeName;
-	String setterTypeName;
+	Function <JavaImportRegistry, String> thisClassName;
+	Function <JavaImportRegistry, String> typeName;
+	Function <JavaImportRegistry, String> setterTypeName;
 	String setterConversion;
 	String propertyName;
-	String defaultValue;
+	Function <JavaImportRegistry, String> defaultValue;
+
+	// this class name
 
 	public
-	JavaPropertyWriter thisClassNameFormat (
-			Object... arguments) {
+	JavaPropertyWriter thisClassName (
+			@NonNull Function <JavaImportRegistry, String> thisClassName) {
 
-		if (thisClassName != null) {
+		if (
+			isNotNull (
+				this.thisClassName)
+		) {
 			throw new IllegalStateException ();
 		}
 
-		thisClassName =
-			stringFormatArray (
-				arguments);
+		this.thisClassName =
+			thisClassName;
 
 		return this;
+
+	}
+
+	public
+	JavaPropertyWriter thisClassName (
+			@NonNull String thisClassName) {
+
+		return thisClassName (
+			imports ->
+				imports.register (
+					thisClassName));
+
+	}
+
+	public
+	JavaPropertyWriter thisClassNameFormat (
+			@NonNull Object ... arguments) {
+
+		return thisClassName (
+			stringFormatArray (
+				arguments));
+
+	}
+
+	public
+	JavaPropertyWriter thisClass (
+			@NonNull Class <?> thisClass) {
+
+		return thisClassName (
+			thisClass.getName ());
+
+	}
+
+	// type name
+
+	public
+	JavaPropertyWriter typeName (
+			@NonNull Function <JavaImportRegistry, String> typeName) {
+
+		if (
+			isNotNull (
+				this.typeName)
+		) {
+			throw new IllegalStateException ();
+		}
+
+		this.typeName =
+			typeName;
+
+		return this;
+
+	}
+
+	public
+	JavaPropertyWriter typeName (
+			@NonNull String typeName) {
+
+		return typeName (
+			imports ->
+				imports.register (
+					typeName));
 
 	}
 
 	public
 	JavaPropertyWriter typeNameFormat (
-			Object... arguments) {
+			@NonNull Object ... arguments) {
 
-		if (typeName != null) {
+		return typeName (
+			stringFormatArray (
+				arguments));
+
+	}
+
+	public
+	JavaPropertyWriter typeClass (
+			@NonNull Class <?> typeClass) {
+
+		return typeName (
+			typeClass.getName ());
+
+	}
+
+	// setter type name
+
+	public
+	JavaPropertyWriter setterTypeName (
+			@NonNull Function <JavaImportRegistry, String> setterTypeName) {
+
+		if (
+			isNotNull (
+				this.setterTypeName)
+		) {
 			throw new IllegalStateException ();
 		}
 
-		typeName =
-			stringFormatArray (
-				arguments);
+		this.setterTypeName =
+			setterTypeName;
 
 		return this;
+
+	}
+
+	public
+	JavaPropertyWriter setterTypeName (
+			@NonNull String setterTypeName) {
+
+		return setterTypeName (
+			imports ->
+				imports.register (
+					setterTypeName));
 
 	}
 
 	public
 	JavaPropertyWriter setterTypeNameFormat (
-			@NonNull Object... arguments) {
+			@NonNull Object ... arguments) {
 
-		if (setterTypeName != null) {
-			throw new IllegalStateException ();
-		}
-
-		setterTypeName =
+		return setterTypeName (
 			stringFormatArray (
-				arguments);
-
-		return this;
+				arguments));
 
 	}
 
 	public
+	JavaPropertyWriter setterTypeClass (
+			@NonNull Class <?> setterTypeClass) {
+
+		return setterTypeName (
+			setterTypeClass.getName ());
+
+	}
+
+	// setter conversation
+
+	public
 	JavaPropertyWriter setterConversionFormat (
-			@NonNull Object... arguments) {
+			@NonNull Object ... arguments) {
 
 		if (setterConversion != null) {
 			throw new IllegalStateException ();
@@ -97,123 +204,159 @@ class JavaPropertyWriter {
 
 	}
 
-	public
-	JavaPropertyWriter propertyNameFormat (
-			Object... arguments) {
+	// property name
 
-		if (propertyName != null) {
+	public
+	JavaPropertyWriter propertyName (
+			@NonNull String propertyName) {
+
+		if (
+			isNotNull (
+				this.propertyName)
+		) {
 			throw new IllegalStateException ();
 		}
 
-		propertyName =
-			stringFormatArray (
-				arguments);
+		this.propertyName =
+			propertyName;
 
 		return this;
+
+	}
+
+	public
+	JavaPropertyWriter propertyNameFormat (
+			@NonNull Object ... arguments) {
+
+		return propertyName (
+			stringFormatArray (
+				arguments));
+
+	}
+
+	// default value
+
+	public
+	JavaPropertyWriter defaultValue (
+			@NonNull Function <JavaImportRegistry, String> defaultValue) {
+
+		if (
+			isNotNull (
+				this.defaultValue)
+		) {
+			throw new IllegalStateException ();
+		}
+
+		this.defaultValue =
+			defaultValue;
+
+		return this;
+
+	}
+
+	public
+	JavaPropertyWriter defaultValue (
+			@NonNull String defaultValue) {
+
+		return defaultValue (
+			imports ->
+				defaultValue);
 
 	}
 
 	public
 	JavaPropertyWriter defaultValueFormat (
-			Object... arguments) {
+			@NonNull Object ... arguments) {
 
-		if (defaultValue != null) {
-			throw new IllegalStateException ();
-		}
-
-		defaultValue =
+		return defaultValue (
 			stringFormatArray (
-				arguments);
-
-		return this;
+				arguments));
 
 	}
 
+	// implementation
+
+	@Override
 	public
-	void write (
-			FormatWriter javaWriter,
-			String indent) {
+	void writeBlock (
+			@NonNull JavaImportRegistry imports,
+			@NonNull FormatWriter formatWriter) {
 
 		// write member variable
 
 		if (defaultValue == null) {
 
-			javaWriter.writeFormat (
-				"%s%s %s;\n",
-				indent,
-				typeName,
+			formatWriter.writeLineFormat (
+				"%s %s;",
+				typeName.apply (
+					imports),
 				propertyName);
 
 		} else {
 
-			javaWriter.writeFormat (
-				"%s%s %s =\n",
-				indent,
-				typeName,
+			formatWriter.writeLineFormat (
+				"%s %s =",
+				typeName.apply (
+					imports),
 				propertyName);
 
-			javaWriter.writeFormat (
-				"%s\t%s;\n",
-				indent,
-				defaultValue);
+			formatWriter.writeLineFormat (
+				"\t%s;",
+				defaultValue.apply (
+					imports));
 
 		}
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
 		// write getter
 
-		javaWriter.writeFormat (
-			"%spublic\n",
-			indent);
+		formatWriter.writeLineFormat (
+			"public");
 
-		javaWriter.writeFormat (
-			"%s%s get%s () {\n",
-			indent,
-			typeName,
+		formatWriter.writeLineFormat (
+			"%s get%s () {",
+			typeName.apply (
+				imports),
 			capitalise (
 				propertyName));
 
-		javaWriter.writeFormat (
-			"%s\treturn %s;\n",
-			indent,
+		formatWriter.writeLineFormat (
+			"\treturn %s;",
 			propertyName);
 
-		javaWriter.writeFormat (
-			"%s}\n",
-			indent);
+		formatWriter.writeLineFormat (
+			"}");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeLineFormat ();
 
 		// write setter
 
-		javaWriter.writeFormat (
-			"%spublic\n",
-			indent);
+		formatWriter.writeLineFormat (
+			"public");
 
-		javaWriter.writeFormat (
-			"%s%s set%s (\n",
-			indent,
-			thisClassName,
+		formatWriter.writeLineFormat (
+			"%s set%s (",
+			thisClassName.apply (
+				imports),
 			capitalise (
 				propertyName));
 
-		javaWriter.writeFormat (
-			"%s\t\t%s %s) {\n",
-			indent,
-			ifNull (
-				setterTypeName,
-				typeName),
+		formatWriter.writeLineFormat (
+			"\t\t%s %s) {",
+			ifThenElse (
+				isNotNull (
+					setterTypeName),
+				() -> setterTypeName.apply (
+					imports),
+				() -> typeName.apply (
+					imports)),
 			propertyName);
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"%s\tthis.%s =\n",
-			indent,
+		formatWriter.writeLineFormat (
+			"\tthis.%s =",
 			propertyName);
 
 		if (
@@ -221,41 +364,33 @@ class JavaPropertyWriter {
 				setterConversion)
 		) {
 
-			javaWriter.writeFormat (
-				"%s\t\t%s (\n",
-				indent,
+			formatWriter.writeLineFormat (
+				"\t\t%s (",
 				setterConversion);
 
-			javaWriter.writeFormat (
-				"%s\t\t\t%s);\n",
-				indent,
+			formatWriter.writeLineFormat (
+				"\t\t\t%s);",
 				propertyName);
 
 		} else {
 
-			javaWriter.writeFormat (
-				"%s\t\t%s;\n",
-				indent,
+			formatWriter.writeLineFormat (
+				"\t\t%s;",
 				propertyName);
 
 		}
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"%s\treturn this;\n",
-			indent);
+		formatWriter.writeLineFormat (
+			"\treturn this;");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
-		javaWriter.writeFormat (
-			"%s}\n",
-			indent);
+		formatWriter.writeLineFormat (
+			"}");
 
-		javaWriter.writeFormat (
-			"\n");
+		formatWriter.writeNewline ();
 
 	}
 

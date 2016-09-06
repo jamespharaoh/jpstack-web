@@ -25,6 +25,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.framework.utils.formatwriter.FormatWriter;
 import wbs.framework.utils.formatwriter.NullFormatWriter;
 
@@ -122,9 +123,15 @@ class JavaClassUnitWriter {
 				@NonNull String fullClassName) {
 
 			if (
+
 				contains (
 					primitiveTypeNames,
 					fullClassName)
+
+				|| contains (
+					primitiveArrayTypeNames,
+					fullClassName)
+
 			) {
 				return fullClassName;
 			}
@@ -202,12 +209,26 @@ class JavaClassUnitWriter {
 					fullClassName)
 
 				|| contains (
+					primitiveArrayTypeNames,
+					fullClassName)
+
+				|| contains (
 					nonImportedClassNames,
 					fullClassName)
 
 			) {
 
 				return fullClassName;
+
+			} else if (
+				! fullClassName.contains (
+					".")
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Not a fully qualified class name: %s",
+						fullClassName));
 
 			} else {
 
@@ -245,10 +266,22 @@ class JavaClassUnitWriter {
 	ImmutableSet <String> primitiveTypeNames =
 		ImmutableSet.of (
 			"boolean",
+			"byte",
 			"double",
 			"float",
 			"int",
 			"long",
 			"void");
+
+	public final static
+	ImmutableSet <String> primitiveArrayTypeNames =
+		ImmutableSet.of (
+			"boolean[]",
+			"byte[]",
+			"double[]",
+			"float[]",
+			"int[]",
+			"long[]",
+			"void[]");
 
 }

@@ -14,15 +14,16 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
@@ -233,13 +234,16 @@ class ChatInfoLogicImplementation
 				"chatLogic.sendUserInfo (...)",
 				"MessageSplitter.split (...) threw IllegalArgumentException",
 
-				"Error probably caused by illegal characters in user's info. Ignoring error.\n" +
-				"\n" +
-				"thisUser.id = " + thisUser.getId () + "\n" +
-				"otherUser.id = " + otherUser.getId () + "\n" +
-				"\n" +
-				exceptionLogic.throwableDump (
-					exception),
+				stringFormat (
+					"Error probably caused by illegal characters in user's ",
+					"info. Ignoring error.\n",
+					"\n",
+					"thisUser.id = " + thisUser.getId () + "\n",
+					"otherUser.id = " + otherUser.getId () + "\n",
+					"\n",
+					"%s",
+					exceptionLogic.throwableDump (
+						exception)),
 
 				Optional.absent (),
 				GenericExceptionResolution.ignoreWithNoWarning);

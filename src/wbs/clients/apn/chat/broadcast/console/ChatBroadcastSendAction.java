@@ -17,15 +17,17 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.Range;
-import org.apache.log4j.Level;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import org.apache.commons.lang3.Range;
+
+import org.apache.log4j.Level;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.broadcast.logic.ChatBroadcastLogic;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberObjectHelper;
@@ -633,8 +635,9 @@ class ChatBroadcastSendAction
 
 						requestContext.addNotice (
 							stringFormat (
-								"Purged %d numbers due to blocking and/or barring",
-								removedNumbers));
+								"Purged %d numbers ",
+								removedNumbers,
+								"due to blocking and/or barring"));
 
 					}
 
@@ -814,8 +817,8 @@ class ChatBroadcastSendAction
 						.setState (
 							ChatBroadcastNumberState.accepted)
 
- 						.setAddedByUser (
- 							userConsoleLogic.userRequired ())
+						.setAddedByUser (
+							userConsoleLogic.userRequired ())
 
 					);
 

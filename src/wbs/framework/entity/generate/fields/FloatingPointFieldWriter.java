@@ -1,5 +1,7 @@
 package wbs.framework.entity.generate.fields;
 
+import lombok.NonNull;
+
 import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -9,7 +11,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.FloatingPointFieldSpec;
-import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("floatingPointFieldWriter")
 @ModelWriter
@@ -25,14 +26,14 @@ class FloatingPointFieldWriter {
 	FloatingPointFieldSpec spec;
 
 	@BuilderTarget
-	FormatWriter javaWriter;
+	ModelFieldWriterTarget target;
 
 	// build
 
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		// write field
 
@@ -40,11 +41,12 @@ class FloatingPointFieldWriter {
 			new JavaPropertyWriter ()
 
 			.thisClassNameFormat (
-				"%s",
+				"%s.model.%s",
+				context.modelMeta ().plugin ().packageName (),
 				context.recordClassName ())
 
-			.typeNameFormat (
-				"Double")
+			.typeClass (
+				Double.class)
 
 			.propertyNameFormat (
 				"%s",
@@ -58,9 +60,9 @@ class FloatingPointFieldWriter {
 
 		}
 
-		propertyWriter.write (
-			javaWriter,
-			"\t");
+		propertyWriter.writeBlock (
+			target.imports (),
+			target.formatWriter ());
 
 	}
 
