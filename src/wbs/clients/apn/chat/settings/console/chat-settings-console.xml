@@ -234,6 +234,9 @@
 			name="billBlockedUsers"/>
 
 		<seconds-field
+			name="billTimeLimit"/>
+
+		<seconds-field
 			name="chatQueuePreferredTime"/>
 
 		<seconds-field

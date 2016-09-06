@@ -10,6 +10,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
+
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
@@ -20,9 +24,6 @@ import org.hibernate.criterion.Subqueries;
 import org.hibernate.sql.JoinType;
 import org.joda.time.Instant;
 
-import com.google.common.collect.ImmutableList;
-
-import lombok.NonNull;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.category.model.ChatCategoryRec;
@@ -111,7 +112,8 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findWantingBill (
+	List <ChatUserRec> findWantingBill (
+			@NonNull ChatRec chat,
 			@NonNull Instant startTime) {
 
 		return findMany (
@@ -120,6 +122,11 @@ class ChatUserDaoHibernate
 
 			createCriteria (
 				ChatUserRec.class)
+
+			.add (
+				Restrictions.eq (
+					"chat",
+					chat))
 
 			.add (
 				Restrictions.eq (
@@ -151,7 +158,7 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findWantingWarning () {
+	List <ChatUserRec> findWantingWarning () {
 
 		return findMany (
 			"findWantingWarning",
@@ -189,7 +196,7 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findAdultExpiryLimit (
+	List <ChatUserRec> findAdultExpiryLimit (
 			@NonNull Instant now,
 			int maxResults) {
 
@@ -214,7 +221,7 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findOnline (
+	List <ChatUserRec> findOnline (
 			@NonNull ChatUserType type) {
 
 		return findMany (
@@ -244,7 +251,7 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findOnlineOrMonitorCategory (
+	List <ChatUserRec> findOnlineOrMonitorCategory (
 			@NonNull ChatRec chat,
 			@NonNull ChatCategoryRec category) {
 
@@ -284,7 +291,7 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> find (
+	List <ChatUserRec> find (
 			@NonNull ChatRec chat,
 			@NonNull ChatUserType type,
 			@NonNull Orient orient,
@@ -323,7 +330,7 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findWantingJoinOutbound (
+	List <ChatUserRec> findWantingJoinOutbound (
 			@NonNull Instant now) {
 
 		return findMany (
@@ -344,7 +351,7 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findWantingAdultAd (
+	List <ChatUserRec> findWantingAdultAd (
 			@NonNull Instant now) {
 
 		return findMany (
@@ -365,7 +372,7 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findOnline (
+	List <ChatUserRec> findOnline (
 			@NonNull ChatRec chat) {
 
 		return findMany (
@@ -421,7 +428,7 @@ class ChatUserDaoHibernate
 				JoinType.LEFT_OUTER_JOIN);
 
 		for (
-			Map.Entry<String,Object> entry
+			Map.Entry <String, Object> entry
 				: searchMap.entrySet ()
 		) {
 
@@ -1573,7 +1580,7 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> find (
+	List <ChatUserRec> find (
 			@NonNull ChatAffiliateRec chatAffiliate) {
 
 		return findMany (
@@ -1594,7 +1601,7 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findDating (
+	List <ChatUserRec> findDating (
 			@NonNull ChatRec chat) {
 
 		return findMany (
@@ -1632,7 +1639,7 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findWantingAd (
+	List <ChatUserRec> findWantingAd (
 			@NonNull Instant now) {
 
 		return findMany (
@@ -1653,7 +1660,7 @@ class ChatUserDaoHibernate
 
 	@Override
 	public
-	List<ChatUserRec> findWantingQuietOutbound (
+	List <ChatUserRec> findWantingQuietOutbound (
 			@NonNull Instant now) {
 
 		return findMany (

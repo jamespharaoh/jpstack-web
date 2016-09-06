@@ -1,13 +1,15 @@
 package wbs.clients.apn.chat.bill.daemon;
 
+import static wbs.framework.utils.etc.OptionalUtils.optionalOf;
+
 import javax.inject.Inject;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
@@ -83,7 +85,7 @@ class ChatCheckCreditCommand
 	CommandRec command;
 
 	@Getter @Setter
-	Optional<Long> commandRef;
+	Optional <Long> commandRef;
 
 	@Getter @Setter
 	String rest;
@@ -107,7 +109,7 @@ class ChatCheckCreditCommand
 	InboxAttemptRec handle () {
 
 		ChatRec chat =
-			(ChatRec) (Object)
+			(ChatRec)
 			objectManager.getParent (
 				command);
 
@@ -134,7 +136,7 @@ class ChatCheckCreditCommand
 			chatCreditLogic.userSpendCreditCheck (
 				chatUser,
 				true,
-				Optional.of (
+				optionalOf (
 					message.getThreadId ()));
 
 		if (creditCheckResult.failed ()) {
@@ -148,8 +150,10 @@ class ChatCheckCreditCommand
 
 			return smsInboxLogic.inboxProcessed (
 				inbox,
-				Optional.of (defaultService),
-				Optional.of (affiliate),
+				optionalOf (
+					defaultService),
+				optionalOf (
+					affiliate),
 				command);
 
 		}
@@ -159,25 +163,26 @@ class ChatCheckCreditCommand
 		String creditString =
 			currencyLogic.formatText (
 				chat.getCurrency (),
-				Long.valueOf(chatUser.getCredit ()));
+				chatUser.getCredit ());
 
 		chatSendLogic.sendSystemRbFree (
 			chatUser,
-			Optional.of (message.getThreadId ()),
+			optionalOf (
+				message.getThreadId ()),
 			"check_credit",
 			TemplateMissing.error,
-			ImmutableMap.<String,String>builder ()
-				.put (
-					"credit",
-					creditString)
-				.build ());
+			ImmutableMap.of (
+				"credit",
+				creditString));
 
 		// process inbox
 
 		return smsInboxLogic.inboxProcessed (
 			inbox,
-			Optional.of (defaultService),
-			Optional.of (affiliate),
+			optionalOf (
+				defaultService),
+			optionalOf (
+				affiliate),
 			command);
 
 	}

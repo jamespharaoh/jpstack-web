@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.core.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -229,84 +227,6 @@ class ChatConsoleLogicImplementation
 			name,
 			options,
 			value);
-
-	}
-
-	@Override
-	public
-	String selectForGender (
-			String name,
-			String value) {
-
-		StringBuilder stringBuilder =
-			new StringBuilder ();
-
-		stringBuilder.append (
-			stringFormat (
-				"<select name=\"%h\">",
-				name));
-
-		stringBuilder.append (
-			Html.option (
-				"",
-				"",
-				value));
-
-		stringBuilder.append (
-			Html.option (
-				"male",
-				"male",
-				value));
-
-		stringBuilder.append (
-			Html.option (
-				"female",
-				"female",
-				value));
-
-		return stringBuilder.toString ();
-
-	}
-
-	@Override
-	public
-	String selectForOrient (
-			String name,
-			String value) {
-
-		StringBuilder stringBuilder =
-			new StringBuilder ();
-
-		stringBuilder.append (
-			stringFormat (
-				"<select name=\"%h\">",
-				name));
-
-		stringBuilder.append (
-			Html.option (
-				"",
-				"",
-				value));
-
-		stringBuilder.append (
-			Html.option (
-				"gay",
-				"gay",
-				value));
-
-		stringBuilder.append (
-			Html.option (
-				"bi",
-				"bi",
-				value));
-
-		stringBuilder.append (
-			Html.option (
-				"straight",
-				"straight",
-				value));
-
-		return stringBuilder.toString ();
 
 	}
 

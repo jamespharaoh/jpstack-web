@@ -10,15 +10,19 @@ interface ChatConsoleLogic {
 	String textForChatUser (
 			ChatUserRec chatUser);
 
+	@Deprecated
 	String tdForChatUserTypeShort (
 			ChatUserRec chatUser);
 
+	@Deprecated
 	String tdForChatUserGenderShort (
 			ChatUserRec chatUser);
 
+	@Deprecated
 	String tdForChatUserOrientShort (
 			ChatUserRec chatUser);
 
+	@Deprecated
 	String tdsForChatUserTypeGenderOrientShort (
 			ChatUserRec chatUser);
 
@@ -28,15 +32,8 @@ interface ChatConsoleLogic {
 	String textForChatUserEditReason (
 			ChatUserEditReason reason);
 
+	@Deprecated
 	String selectForChatUserEditReason (
-			String name,
-			String value);
-
-	String selectForGender (
-			String name,
-			String value);
-
-	String selectForOrient (
 			String name,
 			String value);
 

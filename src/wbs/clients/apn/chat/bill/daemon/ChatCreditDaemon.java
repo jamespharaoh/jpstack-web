@@ -1,19 +1,22 @@
 package wbs.clients.apn.chat.bill.daemon;
 
+import static wbs.framework.utils.etc.IterableUtils.iterableMapToList;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-
-import org.joda.time.Duration;
-import org.joda.time.Instant;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
+import wbs.clients.apn.chat.core.model.ChatObjectHelper;
+import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
@@ -33,6 +36,9 @@ class ChatCreditDaemon
 	ChatCreditLogic chatCreditLogic;
 
 	@Inject
+	ChatObjectHelper chatHelper;
+
+	@Inject
 	ChatUserObjectHelper chatUserHelper;
 
 	@Inject
@@ -45,7 +51,7 @@ class ChatCreditDaemon
 	Duration getSleepDuration () {
 
 		return Duration.standardSeconds (
-			15);
+			30);
 
 	}
 
@@ -75,28 +81,6 @@ class ChatCreditDaemon
 
 	// implementation
 
-	private
-	void doUserCredit (
-			@NonNull Long chatUserId) {
-
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatCreditDaemon.doUserCredit (chatUserId)",
-				this);
-
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				chatUserId);
-
-		chatCreditLogic.userBill (
-			chatUser,
-			false);
-
-		transaction.commit ();
-
-	}
-
 	@Override
 	protected
 	void runOnce () {
@@ -110,43 +94,92 @@ class ChatCreditDaemon
 				"ChatCreditDaemon.runOnce ()",
 				this);
 
-		Instant threeMonthsAgo =
+		List <Long> chatIds =
+			iterableMapToList (
+				ChatRec::getId,
+				chatHelper.findAll ());
+
+		transaction.close ();
+
+		chatIds.forEach (
+			this::doChat);
+
+	}
+
+	private
+	void doChat (
+			@NonNull Long chatId) {
+
+		@Cleanup
+		Transaction transaction =
+			database.beginReadOnly (
+				stringFormat (
+					"%s.%s (%s)",
+					"ChatCreditDaemon",
+					"doChat",
+					stringFormat (
+						"chatId = %s",
+						chatId)),
+				this);
+
+		ChatRec chat =
+			chatHelper.findRequired (
+				chatId);
+
+		Instant cutoffTime =
 			transaction.now ().minus (
-				Duration.standardDays (90));
+				Duration.standardSeconds (
+					chat.getBillTimeLimit ()));
 
 		log.debug (
 			stringFormat (
 				"Chat billing after %s",
-				threeMonthsAgo));
+				cutoffTime));
 
 		List <Long> chatUserIds =
-			chatUserHelper.findWantingBill (
-				threeMonthsAgo)
-
-			.stream ()
-
-			.map (
-				ChatUserRec::getId)
-
-			.collect (
-				Collectors.toList ());
+			iterableMapToList (
+				ChatUserRec::getId,
+				chatUserHelper.findWantingBill (
+					chat,
+					cutoffTime));
 
 		transaction.close ();
 
 		log.debug (
 			stringFormat (
-				"Chat billing after %s",
+				"Found %s users",
 				chatUserIds.size ()));
 
-		for (
-			Long chatUserId
-				: chatUserIds
-		) {
+		chatUserIds.forEach (
+			this::doUserCredit);
 
-			doUserCredit (
+	}
+
+	private
+	void doUserCredit (
+			@NonNull Long chatUserId) {
+
+		@Cleanup
+		Transaction transaction =
+			database.beginReadWrite (
+				stringFormat (
+					"%s.%s (%s)",
+					"ChatCreditDaemon",
+					"doUserCredit",
+					stringFormat (
+						"chatUserId = %s",
+						chatUserId)),
+				this);
+
+		ChatUserRec chatUser =
+			chatUserHelper.findRequired (
 				chatUserId);
 
-		}
+		chatCreditLogic.userBill (
+			chatUser,
+			false);
+
+		transaction.commit ();
 
 	}
 

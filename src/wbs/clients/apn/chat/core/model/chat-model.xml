@@ -199,6 +199,10 @@
 			name="billBlockedUsers"
 			default="no"/>
 
+		<integer-field
+			name="billTimeLimit"
+			default="0"/>
+
 		<!-- queue preferred times -->
 
 		<integer-field

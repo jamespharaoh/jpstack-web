@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
@@ -30,7 +31,10 @@ class IterableUtils {
 
 	public static <InputType, OutputType>
 	Iterable <OutputType> iterableMap (
-			@NonNull Function <? super InputType, ? extends OutputType> mapFunction,
+			@NonNull Function <
+				? super InputType,
+				? extends OutputType
+			> mapFunction,
 			@NonNull Iterable <InputType> input) {
 
 		List <OutputType> output =
@@ -48,6 +52,21 @@ class IterableUtils {
 		}
 
 		return output;
+
+	}
+
+	public static <InputType, OutputType>
+	List <OutputType> iterableMapToList (
+			@NonNull Function <
+				? super InputType,
+				? extends OutputType
+			> mapFunction,
+			@NonNull Iterable <InputType> input) {
+
+		return ImmutableList.copyOf (
+			iterableMap (
+				mapFunction,
+				input));
 
 	}
 
