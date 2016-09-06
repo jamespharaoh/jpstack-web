@@ -2,9 +2,10 @@ package wbs.platform.object.core.hibernate;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.criterion.Restrictions;
 
-import lombok.NonNull;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.entity.record.Record;
 import wbs.framework.hibernate.HibernateDao;
@@ -59,7 +60,7 @@ class ObjectTypeDaoHibernate
 
 	@Override
 	public
-	List<ObjectTypeRec> findAll () {
+	List <ObjectTypeRec> findAll () {
 
 		return findMany (
 			"findAll ()",
