@@ -19,7 +19,7 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;

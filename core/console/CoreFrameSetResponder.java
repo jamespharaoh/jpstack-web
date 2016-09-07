@@ -8,8 +8,8 @@ import org.joda.time.Instant;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsolePrintResponder;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.config.WbsConfig;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("coreFrameSetResponder")

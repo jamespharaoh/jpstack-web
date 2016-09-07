@@ -17,9 +17,9 @@ import javax.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
-import wbs.framework.application.context.ApplicationContext;
-import wbs.framework.application.tools.ApplicationContextBuilder;
-import wbs.framework.application.tools.ThreadLocalProxyComponentFactory;
+import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.tools.ComponentManagerBuilder;
+import wbs.framework.component.tools.ThreadLocalProxyComponentFactory;
 import wbs.framework.web.RequestContextImplementation;
 
 @Log4j
@@ -31,7 +31,7 @@ class WbsServletListener
 
 	ServletContext servletContext;
 
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	@Override
 	public
@@ -79,7 +79,7 @@ class WbsServletListener
 					"layerNames"));
 
 		applicationContext =
-			new ApplicationContextBuilder ()
+			new ComponentManagerBuilder ()
 
 			.primaryProjectName (
 				primaryProjectName)

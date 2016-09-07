@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.Record;
 import wbs.framework.utils.TimeFormatter;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;

@@ -5,7 +5,7 @@ import lombok.NonNull;
 import org.hibernate.FlushMode;
 import org.hibernate.criterion.Restrictions;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.text.model.TextDao;
 import wbs.platform.text.model.TextRec;

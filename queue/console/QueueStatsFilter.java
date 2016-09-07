@@ -12,7 +12,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
-import wbs.framework.application.annotations.PrototypeComponent;
+
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueObjectHelper;

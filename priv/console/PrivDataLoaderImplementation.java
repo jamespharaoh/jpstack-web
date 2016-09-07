@@ -28,7 +28,7 @@ import wbs.console.priv.UserPrivData.PrivPair;
 import wbs.console.priv.UserPrivData.SharedData;
 import wbs.console.priv.UserPrivData.UserData;
 import wbs.console.priv.UserPrivDataLoader;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;

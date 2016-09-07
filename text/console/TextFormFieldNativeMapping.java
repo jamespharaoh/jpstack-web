@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 import com.google.common.base.Optional;
 
 import wbs.console.forms.FormFieldNativeMapping;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 

@@ -7,7 +7,8 @@ import java.util.Arrays;
 import javax.inject.Inject;
 
 import lombok.NonNull;
-import wbs.framework.application.annotations.SingletonComponent;
+
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.platform.lock.model.LockObjectHelper;
 import wbs.platform.lock.model.LockRec;
 

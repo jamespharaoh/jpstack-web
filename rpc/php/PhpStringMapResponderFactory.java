@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.api.mvc.StringMapResponderFactory;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.web.Responder;
 
 @SingletonComponent ("phpStringMapResponderFactory")

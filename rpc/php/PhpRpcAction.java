@@ -22,8 +22,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 import wbs.api.mvc.WebApiAction;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.php.PhpEntity;
@@ -46,7 +46,7 @@ class PhpRpcAction
 	implements WebApiAction {
 
 	@Inject
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	@Inject
 	RequestContext requestContext;

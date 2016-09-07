@@ -21,8 +21,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.tools.BackgroundProcess;
+
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.tools.BackgroundProcess;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;

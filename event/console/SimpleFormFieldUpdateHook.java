@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.forms.FormFieldUpdateHook;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.CommonRecord;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.EventRecord;

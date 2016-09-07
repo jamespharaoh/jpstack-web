@@ -2,7 +2,7 @@ package wbs.platform.scaffold.fixture;
 
 import javax.inject.Inject;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.scaffold.model.RootObjectHelper;

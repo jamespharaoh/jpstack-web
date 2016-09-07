@@ -31,8 +31,8 @@ import nu.xom.ParsingException;
 import nu.xom.Serializer;
 import nu.xom.ValidityException;
 import wbs.api.mvc.WebApiAction;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.rpc.core.Rpc;
@@ -51,7 +51,7 @@ class XmlRpcAction
 	implements WebApiAction {
 
 	@Inject
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	@Inject
 	RequestContext requestContext;

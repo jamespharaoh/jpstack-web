@@ -20,7 +20,7 @@ import wbs.console.helper.ConsoleHelper;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
 import wbs.platform.user.model.UserObjectHelper;

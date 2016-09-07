@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.user.console.UserConsoleLogic;

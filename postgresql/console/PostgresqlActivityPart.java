@@ -8,7 +8,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.platform.postgresql.model.PostgresqlStatActivityObjectHelper;
 import wbs.platform.postgresql.model.PostgresqlStatActivityRec;
 

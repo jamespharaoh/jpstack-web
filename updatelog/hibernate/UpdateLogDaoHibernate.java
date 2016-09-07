@@ -3,7 +3,8 @@ package wbs.platform.updatelog.hibernate;
 import org.hibernate.criterion.Restrictions;
 
 import lombok.NonNull;
-import wbs.framework.application.annotations.SingletonComponent;
+
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.updatelog.model.UpdateLogDao;
 import wbs.platform.updatelog.model.UpdateLogRec;

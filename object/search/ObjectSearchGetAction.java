@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.web.Responder;
 
 @Accessors (fluent = true)
