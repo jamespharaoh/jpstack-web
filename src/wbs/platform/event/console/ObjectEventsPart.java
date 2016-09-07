@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.GlobalId;
 import wbs.platform.event.model.EventLinkObjectHelper;
 import wbs.platform.event.model.EventLinkRec;

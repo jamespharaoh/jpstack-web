@@ -6,11 +6,11 @@ import java.util.Map;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.PrototypeComponent;
+
 import com.google.common.base.Optional;
 
 import fj.data.Either;
-
-import wbs.framework.application.annotations.PrototypeComponent;
 
 @PrototypeComponent ("identityFormFieldInterfaceMapping")
 public

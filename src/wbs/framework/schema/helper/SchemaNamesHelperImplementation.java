@@ -6,7 +6,7 @@ import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 
 @SingletonComponent ("schemaNamesHelper")
 public

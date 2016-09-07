@@ -22,8 +22,8 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.FileUtils;
 
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.scaffold.PluginSpec;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;

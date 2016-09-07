@@ -15,8 +15,8 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabList;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.utils.AbstractStringSubstituter;
 
 /**

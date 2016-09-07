@@ -12,7 +12,7 @@ import wbs.clients.apn.chat.broadcast.model.ChatBroadcastDao;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastRec;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastState;
 import wbs.clients.apn.chat.core.model.ChatRec;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
 
 @SingletonComponent ("chatBroadcastDao")

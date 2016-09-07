@@ -10,7 +10,7 @@ import javax.inject.Provider;
 
 import org.joda.time.Instant;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectHelper;

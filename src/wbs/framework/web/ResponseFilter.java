@@ -10,7 +10,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 
 @SingletonComponent ("responseFilter")
 public

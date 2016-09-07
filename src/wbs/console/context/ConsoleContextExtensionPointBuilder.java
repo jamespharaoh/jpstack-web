@@ -6,13 +6,13 @@ import lombok.experimental.Accessors;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)

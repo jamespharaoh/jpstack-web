@@ -13,7 +13,7 @@ import com.google.common.collect.ImmutableList;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.console.part.PagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTablePart")

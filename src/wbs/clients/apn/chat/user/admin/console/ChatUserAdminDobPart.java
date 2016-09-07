@@ -5,8 +5,8 @@ import static wbs.framework.utils.etc.NullUtils.ifNull;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("chatUserAdminDobPart")

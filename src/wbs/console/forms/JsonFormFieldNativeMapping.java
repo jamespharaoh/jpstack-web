@@ -5,9 +5,10 @@ import lombok.experimental.Accessors;
 
 import org.json.simple.JSONValue;
 
+import wbs.framework.component.annotations.PrototypeComponent;
+
 import com.google.common.base.Optional;
 
-import wbs.framework.application.annotations.PrototypeComponent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 @Accessors (fluent = true)

@@ -4,7 +4,8 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
+
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 
 @PrototypeComponent ("requiredFormFieldValueValidator")

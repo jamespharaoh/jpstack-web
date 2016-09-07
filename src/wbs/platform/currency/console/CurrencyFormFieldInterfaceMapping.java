@@ -19,7 +19,7 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 
 import wbs.console.forms.FormFieldInterfaceMapping;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import wbs.platform.currency.logic.CurrencyLogic;

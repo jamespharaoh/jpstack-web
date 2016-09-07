@@ -16,7 +16,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.html.SelectBuilder;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.sms.network.console.NetworkConsoleHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;

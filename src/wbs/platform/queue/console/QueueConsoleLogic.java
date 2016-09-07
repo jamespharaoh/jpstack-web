@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 import wbs.console.priv.UserPrivChecker;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.meta.model.ModelMetaLoader;

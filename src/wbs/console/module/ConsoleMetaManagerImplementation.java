@@ -30,9 +30,9 @@ import wbs.console.context.ConsoleContextExtensionPoint;
 import wbs.console.context.ConsoleContextHint;
 import wbs.console.context.ConsoleContextLink;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataToXml;
 
 @Log4j

@@ -8,7 +8,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.annotations.PrototypeComponent;
+
+import wbs.framework.component.annotations.PrototypeComponent;
 
 @PrototypeComponent ("cryptorImplementation")
 @Accessors (fluent = true)

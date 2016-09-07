@@ -15,8 +15,8 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabList;
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.PageNotFoundException;
 import wbs.framework.web.WebFile;
 

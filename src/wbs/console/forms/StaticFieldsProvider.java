@@ -2,7 +2,7 @@ package wbs.console.forms;
 
 import lombok.NonNull;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.Record;
 
 @PrototypeComponent ("staticFieldsProvider")

@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 import wbs.applications.imchat.model.ImChatCustomerRec;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.platform.event.console.EventConsoleLogic;
 import wbs.platform.event.console.EventLinkConsoleHelper;

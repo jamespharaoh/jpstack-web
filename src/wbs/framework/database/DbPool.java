@@ -30,7 +30,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 
 /**
  * TODO a maximum connection life would be nice

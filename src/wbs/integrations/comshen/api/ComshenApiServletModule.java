@@ -12,7 +12,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
-import wbs.framework.application.annotations.SingletonComponent;
+
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.AbstractWebFile;

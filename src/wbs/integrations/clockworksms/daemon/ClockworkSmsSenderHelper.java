@@ -14,8 +14,9 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.config.WbsConfig;
+
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.integrations.clockworksms.foreignapi.ClockworkSmsMessageRequest;
 import wbs.integrations.clockworksms.foreignapi.ClockworkSmsMessageResponse;

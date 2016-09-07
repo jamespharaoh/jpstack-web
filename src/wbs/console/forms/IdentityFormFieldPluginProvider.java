@@ -6,8 +6,8 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonComponent;
 
 @SingletonComponent ("identityFormFieldPluginProvider")
 @SuppressWarnings ({ "rawtypes", "unchecked" })

@@ -13,11 +13,12 @@ import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.ReadableInstant;
 
+import wbs.framework.component.annotations.SingletonComponent;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("statsConsoleLogic")
 public

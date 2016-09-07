@@ -5,7 +5,7 @@ import lombok.NonNull;
 import com.google.common.base.Optional;
 
 import wbs.console.forms.FormFieldConstraintValidator;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 
 @PrototypeComponent ("textAreaFormFieldValueValidator")
 public

@@ -11,10 +11,10 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.config.WbsConfig;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
 
 @SingletonComponent ("cryptorFactory")
 public

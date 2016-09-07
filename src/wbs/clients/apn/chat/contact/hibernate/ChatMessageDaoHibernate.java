@@ -18,7 +18,7 @@ import wbs.clients.apn.chat.contact.model.ChatMessageSearch;
 import wbs.clients.apn.chat.contact.model.ChatMessageStatus;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.user.model.UserRec;
 

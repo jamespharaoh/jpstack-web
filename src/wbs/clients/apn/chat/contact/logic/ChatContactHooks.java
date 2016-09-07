@@ -3,7 +3,7 @@ package wbs.clients.apn.chat.contact.logic;
 import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectHooks;

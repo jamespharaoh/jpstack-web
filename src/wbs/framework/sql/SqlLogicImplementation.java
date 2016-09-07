@@ -14,9 +14,9 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 
-import com.google.common.collect.ImmutableSet;
+import wbs.framework.component.annotations.SingletonComponent;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import com.google.common.collect.ImmutableSet;
 
 @SingletonComponent ("sqlLogic")
 public

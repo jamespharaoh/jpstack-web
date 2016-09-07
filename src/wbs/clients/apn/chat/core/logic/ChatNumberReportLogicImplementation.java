@@ -12,8 +12,8 @@ import lombok.extern.log4j.Log4j;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.sms.number.core.model.ChatUserNumberReportObjectHelper;

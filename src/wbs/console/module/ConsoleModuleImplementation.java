@@ -24,10 +24,10 @@ import wbs.console.supervisor.SupervisorConfig;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.ContextTabPlacement;
 import wbs.console.tab.TabContextResponder;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.web.PathHandler;
@@ -44,7 +44,7 @@ class ConsoleModuleImplementation
 	// singleton dependencies
 
 	@SingletonDependency
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	// prototype dependencies
 

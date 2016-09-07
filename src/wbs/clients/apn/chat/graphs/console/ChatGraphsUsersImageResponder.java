@@ -18,8 +18,8 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.core.model.ChatStatsObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatStatsRec;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 import wbs.platform.graph.console.GraphScale;
 

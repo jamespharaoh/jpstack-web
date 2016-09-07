@@ -10,8 +10,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.manager.ComponentManager;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("actionRequestHandler")
@@ -22,7 +22,7 @@ class ActionRequestHandler
 	// dependencies
 
 	@Inject
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	// properties
 

@@ -3,7 +3,8 @@ package wbs.console.helper;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.framework.application.context.ComponentFactory;
+
+import wbs.framework.component.tools.ComponentFactory;
 
 @Accessors (fluent = true)
 public

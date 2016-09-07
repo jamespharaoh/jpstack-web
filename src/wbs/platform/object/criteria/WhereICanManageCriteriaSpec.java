@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.module.ConsoleModuleData;
 import wbs.console.priv.UserPrivChecker;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.Record;
 

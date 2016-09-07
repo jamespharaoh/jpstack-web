@@ -17,11 +17,11 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormFieldSetSpec;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleHelperRegistry;
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @SingletonComponent ("consoleModuleBuilder")
 public

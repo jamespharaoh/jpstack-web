@@ -9,8 +9,8 @@ import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeKeywordObjectHelper;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeKeywordRec;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatAffiliateKeywordsListPart")
 public

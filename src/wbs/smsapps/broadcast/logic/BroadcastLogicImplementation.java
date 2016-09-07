@@ -6,7 +6,7 @@ import javax.inject.Inject;
 
 import lombok.NonNull;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;

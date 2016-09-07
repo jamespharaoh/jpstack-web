@@ -32,8 +32,9 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;

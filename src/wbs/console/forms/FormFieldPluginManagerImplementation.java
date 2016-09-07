@@ -9,9 +9,9 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @SingletonComponent ("formFieldPluginManager")
 public

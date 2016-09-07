@@ -12,6 +12,8 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.SingletonComponent;
+
 import com.google.common.base.Optional;
 
 import urn.ebay.api.PayPalAPI.DoExpressCheckoutPaymentReq;
@@ -32,8 +34,6 @@ import urn.ebay.apis.eBLBaseComponents.PaymentActionCodeType;
 import urn.ebay.apis.eBLBaseComponents.PaymentDetailsType;
 import urn.ebay.apis.eBLBaseComponents.PaymentInfoType;
 import urn.ebay.apis.eBLBaseComponents.SetExpressCheckoutRequestDetailsType;
-
-import wbs.framework.application.annotations.SingletonComponent;
 
 @Log4j
 @SingletonComponent ("paypalApi")

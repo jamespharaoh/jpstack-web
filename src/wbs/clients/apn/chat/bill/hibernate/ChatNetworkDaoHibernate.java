@@ -8,7 +8,7 @@ import org.hibernate.criterion.Restrictions;
 import wbs.clients.apn.chat.bill.model.ChatNetworkDao;
 import wbs.clients.apn.chat.bill.model.ChatNetworkRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.sms.network.model.NetworkRec;
 

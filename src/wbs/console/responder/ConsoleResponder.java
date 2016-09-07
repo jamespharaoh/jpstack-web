@@ -2,7 +2,7 @@ package wbs.console.responder;
 
 import java.io.IOException;
 
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;

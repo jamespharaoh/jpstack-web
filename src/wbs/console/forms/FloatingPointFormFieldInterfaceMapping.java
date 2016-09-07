@@ -7,11 +7,12 @@ import java.util.Map;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.PrototypeComponent;
+
 import com.google.common.base.Optional;
 
 import fj.data.Either;
 
-import wbs.framework.application.annotations.PrototypeComponent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 @PrototypeComponent ("doubleFormFieldInterfaceMapping")

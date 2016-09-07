@@ -5,7 +5,7 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import javax.inject.Inject;
 
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 import wbs.smsapps.alerts.model.AlertsNumberRec;
 import wbs.smsapps.alerts.model.AlertsSettingsObjectHelper;

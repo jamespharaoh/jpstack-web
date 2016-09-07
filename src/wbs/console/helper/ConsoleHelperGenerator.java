@@ -58,8 +58,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelMethods;
@@ -1464,9 +1465,9 @@ class ConsoleHelperGenerator {
 		javax.inject.Named.class,
 		javax.inject.Provider.class,
 
-		wbs.framework.application.annotations.PrototypeDependency.class,
-		wbs.framework.application.annotations.SingletonDependency.class,
-		wbs.framework.application.context.ApplicationContext.class,
+		wbs.framework.component.annotations.PrototypeDependency.class,
+		wbs.framework.component.annotations.SingletonDependency.class,
+		wbs.framework.component.manager.ComponentManager.class,
 
 		wbs.framework.entity.helper.EntityHelper.class,
 		wbs.framework.entity.model.Model.class,

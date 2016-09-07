@@ -6,7 +6,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.integrations.smsarena.model.SmsArenaConfigObjectHelper;

@@ -17,7 +17,7 @@ import lombok.extern.log4j.Log4j;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.ContextTabPlacement;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.web.WebFile;

@@ -19,15 +19,15 @@ import com.google.common.base.Optional;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.EnumConsoleHelper;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.utils.etc.BeanLogic;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -39,7 +39,7 @@ class EnumFormFieldBuilder {
 	// singleton dependencies
 
 	@SingletonDependency
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;

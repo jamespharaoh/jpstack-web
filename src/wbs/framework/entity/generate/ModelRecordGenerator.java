@@ -20,12 +20,12 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.codegen.JavaClassUnitWriter;
 import wbs.framework.codegen.JavaClassWriter;
 import wbs.framework.codegen.JavaImportRegistry;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
 import wbs.framework.entity.generate.fields.ModelFieldWriterTarget;
 import wbs.framework.entity.meta.fields.DateFieldSpec;

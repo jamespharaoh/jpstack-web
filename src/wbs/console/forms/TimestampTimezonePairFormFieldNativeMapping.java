@@ -7,9 +7,9 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
-import com.google.common.base.Optional;
+import wbs.framework.component.annotations.PrototypeComponent;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import com.google.common.base.Optional;
 
 @PrototypeComponent ("timestampTimezonePairFormFieldNativeMapping")
 public

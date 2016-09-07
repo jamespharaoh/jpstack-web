@@ -14,23 +14,21 @@ import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.helper.ConsoleHelper;
-import wbs.console.module.ConsoleManager;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePart;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.annotations.WeakSingletonDependency;
-import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
@@ -44,7 +42,7 @@ class SupervisorPageBuilder <
 	// singleton dependencies
 
 	@SingletonDependency
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;

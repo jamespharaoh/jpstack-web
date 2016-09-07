@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
 import wbs.console.context.ConsoleContextExtensionPoint;
 import wbs.console.context.ConsoleContextHint;
 import wbs.console.context.ConsoleContextLink;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 

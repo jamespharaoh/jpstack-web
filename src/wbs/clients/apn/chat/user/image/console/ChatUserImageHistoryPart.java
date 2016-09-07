@@ -13,8 +13,8 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.user.console.UserConsoleLogic;
 

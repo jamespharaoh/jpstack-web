@@ -10,9 +10,9 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import wbs.console.module.ConsoleMetaManager;
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.context.ComponentFactory;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.object.ObjectHelper;
 
 @Accessors (fluent = true)

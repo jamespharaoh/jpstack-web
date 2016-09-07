@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 
 import javax.inject.Inject;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 

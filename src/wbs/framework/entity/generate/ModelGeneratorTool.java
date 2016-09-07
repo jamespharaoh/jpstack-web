@@ -10,7 +10,8 @@ import javax.inject.Provider;
 import com.google.common.collect.Iterables;
 
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.scaffold.PluginSpec;
+
+import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 

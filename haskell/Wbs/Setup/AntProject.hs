@@ -783,7 +783,7 @@ writeBuildFile world = do
 
 				mkelem "java" [
 					sattr "classname"
-						"wbs.framework.application.tools.BeanRunner",
+						"wbs.framework.component.tools.ComponentRunner",
 					sattr "classpathref" "classpath",
 					sattr "failonerror" "true"
 				] [
@@ -803,7 +803,7 @@ writeBuildFile world = do
 
 				mkelem "java" [
 					sattr "classname"
-						"wbs.framework.application.tools.BeanRunner",
+						"wbs.framework.component.tools.ComponentRunner",
 					sattr "classpathref" "classpath",
 					sattr "failonerror" "true"
 				] [
@@ -831,7 +831,7 @@ writeBuildFile world = do
 
 				mkelem "java" [
 					sattr "classname"
-						"wbs.framework.application.tools.BeanRunner",
+						"wbs.framework.component.tools.ComponentRunner",
 					sattr "classpathref" "classpath",
 					sattr "failonerror" "true"
 				] [
@@ -854,7 +854,7 @@ writeBuildFile world = do
 
 				mkelem "java" [
 					sattr "classname"
-						"wbs.framework.application.tools.BeanRunner",
+						"wbs.framework.component.tools.ComponentRunner",
 					sattr "classpathref" "classpath",
 					sattr "failonerror" "true"
 				] [
@@ -869,7 +869,7 @@ writeBuildFile world = do
 
 				mkelem "java" [
 					sattr "classname"
-						"wbs.framework.application.tools.BeanRunner",
+						"wbs.framework.component.tools.ComponentRunner",
 					sattr "classpathref" "classpath",
 					sattr "failonerror" "true"
 				] [

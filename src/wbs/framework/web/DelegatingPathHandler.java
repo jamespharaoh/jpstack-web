@@ -14,7 +14,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.annotations.PrototypeComponent;
+
+import wbs.framework.component.annotations.PrototypeComponent;
 
 /**
  * Implementation of PathHandler which delegates to other PathHandlers or

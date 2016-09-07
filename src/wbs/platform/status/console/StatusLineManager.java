@@ -14,9 +14,9 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j;
 
-import com.google.common.collect.ImmutableList;
+import wbs.framework.component.annotations.SingletonComponent;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import com.google.common.collect.ImmutableList;
 
 @Log4j
 @SingletonComponent ("statusLineManager")

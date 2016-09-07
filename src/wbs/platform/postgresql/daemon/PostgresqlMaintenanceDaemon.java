@@ -31,7 +31,8 @@ import com.google.common.base.Optional;
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.annotations.SingletonComponent;
+
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.utils.ThreadManager;

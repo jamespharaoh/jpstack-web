@@ -22,7 +22,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.helper.EnumConsoleHelper;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.utils.formatwriter.FormatWriter;
 
 @Accessors (fluent = true)

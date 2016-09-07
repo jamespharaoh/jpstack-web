@@ -17,7 +17,7 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
-import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.component.manager.ComponentManager;
 
 @Log4j
 @SuppressWarnings ("serial")
@@ -29,7 +29,7 @@ class WbsServlet
 	ActivityManager activityManager;
 
 	protected
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	protected
 	RequestContext requestContext;
@@ -316,7 +316,7 @@ class WbsServlet
 			getServletContext ();
 
 		applicationContext =
-			(ApplicationContext)
+			(ComponentManager)
 			servletContext.getAttribute (
 				"wbs-application-context");
 

@@ -1,12 +1,10 @@
 package wbs.console.combo;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-import javax.mail.MailSessionDefinition;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -18,15 +16,15 @@ import wbs.console.part.PagePart;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 
@@ -39,7 +37,7 @@ class ContextTabFormActionPageBuilder {
 	// singleton dependencies
 
 	@SingletonDependency
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;

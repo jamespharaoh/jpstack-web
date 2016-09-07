@@ -2,9 +2,9 @@ package wbs.applications.imchat.api;
 
 import javax.inject.Provider;
 
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.UninitializedDependency;
 import wbs.framework.web.Action;
 
 @SingletonComponent ("imChatMediaConfig")

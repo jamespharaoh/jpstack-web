@@ -21,8 +21,8 @@ import org.joda.time.Instant;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.config.WbsConfig;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.config.WbsConfig;
 import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.model.RootRec;
 import wbs.platform.scaffold.model.SliceRec;

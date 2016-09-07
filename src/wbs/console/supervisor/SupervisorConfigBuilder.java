@@ -20,13 +20,13 @@ import wbs.console.reporting.StatsFormatter;
 import wbs.console.reporting.StatsGrouper;
 import wbs.console.reporting.StatsProvider;
 import wbs.console.reporting.StatsResolver;
-import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorConfigBuilder")

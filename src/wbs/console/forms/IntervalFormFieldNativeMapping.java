@@ -9,9 +9,9 @@ import lombok.NonNull;
 import org.joda.time.Interval;
 
 import wbs.console.misc.ConsoleUserHelper;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.config.WbsConfig;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.utils.TextualInterval;
 
 @PrototypeComponent ("intervalFormFieldNativeMapping")

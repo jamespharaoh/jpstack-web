@@ -2,8 +2,8 @@ package wbs.clients.apn.chat.infosite.api;
 
 import java.io.IOException;
 
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.PrintResponder;
 import wbs.framework.web.RequestContext;
 

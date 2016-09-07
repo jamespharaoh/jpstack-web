@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.graphs.console;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 
 @PrototypeComponent ("chatGraphsJoinersPart")
 public

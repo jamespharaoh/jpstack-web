@@ -15,7 +15,7 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.Record;
 import wbs.platform.scaffold.model.RootObjectHelper;
 

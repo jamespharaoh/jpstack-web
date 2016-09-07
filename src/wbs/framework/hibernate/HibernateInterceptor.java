@@ -6,7 +6,7 @@ import javax.inject.Provider;
 
 import org.hibernate.EmptyInterceptor;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.object.ObjectManager;
 
 @PrototypeComponent ("hibernateInterceptor")

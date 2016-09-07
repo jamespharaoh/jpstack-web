@@ -11,7 +11,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.clients.apn.chat.user.core.model.Orient;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 
 import junit.framework.TestCase;
 

@@ -13,8 +13,8 @@ import wbs.clients.apn.chat.user.core.model.ChatUsersSummaryObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUsersSummaryRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatStatisticsPart")
 public

@@ -3,8 +3,8 @@ package wbs.framework.fixtures;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.config.GenericConfigLoader;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.config.GenericConfigLoader;
 import wbs.framework.utils.ThreadManager;
 import wbs.framework.utils.ThreadManagerImplementation;
 

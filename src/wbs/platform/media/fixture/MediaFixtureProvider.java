@@ -4,7 +4,7 @@ import javax.inject.Inject;
 
 import lombok.NonNull;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.platform.media.model.MediaTypeObjectHelper;
 

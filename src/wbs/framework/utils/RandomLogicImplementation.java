@@ -8,7 +8,7 @@ import java.util.Random;
 
 import javax.annotation.PostConstruct;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 
 @SingletonComponent ("randomLogic")
 public

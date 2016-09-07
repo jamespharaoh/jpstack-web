@@ -26,7 +26,8 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.annotations.SingletonComponent;
+
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.integrations.digitalselect.daemon.DigitalSelectSender.State;

@@ -15,11 +15,12 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.Range;
 
+import wbs.framework.component.annotations.PrototypeComponent;
+
 import com.google.common.base.Optional;
 
 import fj.data.Either;
 
-import wbs.framework.application.annotations.PrototypeComponent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 

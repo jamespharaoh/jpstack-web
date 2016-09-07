@@ -4,7 +4,7 @@ import javax.inject.Provider;
 
 import wbs.console.combo.ConsoleFormActionHelper;
 import wbs.console.module.ConsoleManager;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.Responder;
 
 public abstract

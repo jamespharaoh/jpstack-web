@@ -6,7 +6,7 @@ import lombok.NonNull;
 
 import org.hibernate.criterion.Restrictions;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.services.ticket.core.model.TicketDao;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;

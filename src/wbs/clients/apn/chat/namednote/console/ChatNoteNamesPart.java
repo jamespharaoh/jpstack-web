@@ -9,8 +9,8 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameObjectHelper;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameRec;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatNoteNamesPart")
 public

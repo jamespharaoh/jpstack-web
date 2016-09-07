@@ -5,7 +5,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import lombok.NonNull;
-import wbs.framework.application.annotations.SingletonComponent;
+
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;

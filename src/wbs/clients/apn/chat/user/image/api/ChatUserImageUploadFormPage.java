@@ -9,8 +9,8 @@ import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.PrintResponder;
 import wbs.framework.web.RequestContext;
 

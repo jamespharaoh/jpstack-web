@@ -13,8 +13,8 @@ import wbs.clients.apn.chat.contact.model.ChatContactRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.annotations.WeakSingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectHooks;
 

@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableSet;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 
 @PrototypeComponent ("queueItemsStatusLinePart")
 public

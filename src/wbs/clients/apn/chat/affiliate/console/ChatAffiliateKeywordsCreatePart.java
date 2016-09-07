@@ -8,8 +8,8 @@ import javax.inject.Named;
 import wbs.clients.apn.chat.core.console.ChatKeywordJoinTypeConsoleHelper;
 import wbs.console.helper.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatAffiliateKeywordsCreatePart")
 public

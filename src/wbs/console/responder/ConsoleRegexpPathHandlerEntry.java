@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import javax.servlet.ServletException;
 
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.RegexpPathHandler;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.WebFile;

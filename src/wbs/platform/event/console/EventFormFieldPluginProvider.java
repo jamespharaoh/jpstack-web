@@ -12,7 +12,7 @@ import lombok.NonNull;
 import wbs.console.forms.FormFieldBuilderContext;
 import wbs.console.forms.FormFieldPluginProvider;
 import wbs.console.helper.ConsoleHelper;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.entity.record.Record;
 
 @SingletonComponent ("eventFormFieldPluginProvider")

@@ -10,7 +10,7 @@ import lombok.Cleanup;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;

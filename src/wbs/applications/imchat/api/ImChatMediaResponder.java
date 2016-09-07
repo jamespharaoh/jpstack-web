@@ -8,8 +8,9 @@ import java.io.IOException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.AbstractResponder;
 import wbs.framework.web.RequestContext;
 

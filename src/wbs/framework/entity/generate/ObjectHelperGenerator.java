@@ -34,13 +34,13 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.io.FileUtils;
 
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.codegen.JavaAnnotationWriter;
 import wbs.framework.codegen.JavaClassUnitWriter;
 import wbs.framework.codegen.JavaClassWriter;
 import wbs.framework.codegen.JavaImportRegistry;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.helper.EntityHelper;
@@ -356,7 +356,7 @@ class ObjectHelperGenerator {
 			@NonNull JavaClassWriter classWriter) {
 
 		classWriter.addSingletonDependency (
-			ApplicationContext.class);
+			ComponentManager.class);
 
 		classWriter.addSingletonDependency (
 			Database.class);
@@ -575,7 +575,7 @@ class ObjectHelperGenerator {
 				OptionalUtils.class));
 
 		formatWriter.writeLineFormat (
-			"\t\tapplicationContext.getComponent (");
+			"\t\tcomponentManager.getComponent (");
 
 		formatWriter.writeLineFormat (
 			"\t\t\t\"%s\",",

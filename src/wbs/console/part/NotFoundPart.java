@@ -1,6 +1,6 @@
 package wbs.console.part;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 
 @PrototypeComponent ("notFoundPart")
 public

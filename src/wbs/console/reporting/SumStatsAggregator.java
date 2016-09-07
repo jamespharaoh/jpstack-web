@@ -3,7 +3,8 @@ package wbs.console.reporting;
 import java.util.List;
 
 import lombok.NonNull;
-import wbs.framework.application.annotations.SingletonComponent;
+
+import wbs.framework.component.annotations.SingletonComponent;
 
 @SingletonComponent ("sumStatsAggregator")
 public

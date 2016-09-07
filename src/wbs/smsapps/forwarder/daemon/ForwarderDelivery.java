@@ -8,7 +8,8 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-import wbs.framework.application.annotations.PrototypeComponent;
+
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.sms.message.core.model.MessageStatus;

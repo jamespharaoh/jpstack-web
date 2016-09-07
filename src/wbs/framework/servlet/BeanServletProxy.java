@@ -9,7 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.component.manager.ComponentManager;
 
 public
 class BeanServletProxy
@@ -46,8 +46,8 @@ class BeanServletProxy
 		ServletContext servletContext =
 			servletConfig.getServletContext ();
 
-		ApplicationContext applicationContext =
-			(ApplicationContext)
+		ComponentManager applicationContext =
+			(ComponentManager)
 			servletContext.getAttribute (
 				"wbs-application-context");
 

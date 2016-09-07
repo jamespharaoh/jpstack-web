@@ -11,7 +11,8 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 
 import wbs.console.forms.FormFieldInterfaceMapping;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
+
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import wbs.platform.media.model.MediaRec;
 

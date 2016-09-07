@@ -5,7 +5,8 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalMapRequired;
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-import wbs.framework.application.annotations.PrototypeComponent;
+
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.NumberUtils;
 
 @PrototypeComponent ("javaIintegerFormFieldNativeMapping")

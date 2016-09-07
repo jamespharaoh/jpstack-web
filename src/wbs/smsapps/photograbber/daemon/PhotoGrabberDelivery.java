@@ -10,7 +10,8 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-import wbs.framework.application.annotations.SingletonComponent;
+
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.service.model.ServiceObjectHelper;

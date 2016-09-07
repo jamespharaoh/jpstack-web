@@ -28,10 +28,10 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.request.Cryptor;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
@@ -49,7 +49,7 @@ class GenericConsoleHelperProvider
 	// singleton dependencies
 
 	@SingletonDependency
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;

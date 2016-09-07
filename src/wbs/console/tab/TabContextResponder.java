@@ -13,8 +13,8 @@ import lombok.experimental.Accessors;
 
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.web.Responder;
@@ -34,7 +34,7 @@ class TabContextResponder
 	ConsoleRequestContext requestContext;
 
 	@Inject
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	@Inject
 	Provider<TabbedResponder> tabbedPage;

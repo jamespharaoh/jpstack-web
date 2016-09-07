@@ -31,10 +31,10 @@ import wbs.console.forms.EntityFinder;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.context.ApplicationContext;
-import wbs.framework.application.context.NoSuchComponentException;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.tools.NoSuchComponentException;
 import wbs.framework.entity.model.ModelMethods;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
@@ -51,7 +51,7 @@ class ConsoleHelperBuilder {
 	// singleton dependencies
 
 	@SingletonDependency
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	@SingletonDependency
 	ConsoleHelperProviderManager consoleHelperPoviderManager;

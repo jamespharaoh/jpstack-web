@@ -15,7 +15,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
-import wbs.framework.application.annotations.PrototypeComponent;
+
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemState;

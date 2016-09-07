@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import wbs.clients.apn.chat.user.core.model.ChatUserEditReason;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.utils.etc.Html;
 
 @SingletonComponent ("chatConsoleLogic")

@@ -17,7 +17,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.console.forms.FormField.FormType;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.utils.formatwriter.FormatWriter;
 
 @PrototypeComponent ("textFormFieldRenderer")

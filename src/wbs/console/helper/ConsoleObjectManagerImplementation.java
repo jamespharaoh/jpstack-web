@@ -15,8 +15,8 @@ import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;

@@ -18,7 +18,7 @@ import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.Record;
 import wbs.services.ticket.core.console.TicketConsoleHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;

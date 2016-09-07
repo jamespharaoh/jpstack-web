@@ -10,7 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.component.manager.ComponentManager;
 
 public
 class BeanFilterProxy
@@ -50,8 +50,8 @@ class BeanFilterProxy
 		ServletContext servletContext =
 			filterConfig.getServletContext ();
 
-		ApplicationContext applicationContext =
-			(ApplicationContext)
+		ComponentManager applicationContext =
+			(ComponentManager)
 			servletContext.getAttribute ("wbs-application-context");
 
 		target =

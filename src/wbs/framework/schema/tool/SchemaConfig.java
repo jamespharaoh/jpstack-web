@@ -1,6 +1,6 @@
 package wbs.framework.schema.tool;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.sql.SqlLogic;
 import wbs.framework.sql.SqlLogicImplementation;
 

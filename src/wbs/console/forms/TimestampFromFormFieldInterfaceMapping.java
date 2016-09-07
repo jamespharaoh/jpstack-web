@@ -19,8 +19,8 @@ import lombok.experimental.Accessors;
 import org.joda.time.Instant;
 
 import wbs.console.misc.ConsoleUserHelper;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.utils.TextualInterval;
 
 import fj.data.Either;

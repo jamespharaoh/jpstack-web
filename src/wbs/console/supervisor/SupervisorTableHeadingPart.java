@@ -11,8 +11,8 @@ import org.joda.time.Instant;
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.reporting.StatsPeriod;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTableHeadingPart")

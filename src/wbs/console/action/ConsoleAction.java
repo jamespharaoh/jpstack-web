@@ -15,8 +15,7 @@ import wbs.console.misc.ConsoleExceptionHandler;
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.web.Action;
@@ -28,10 +27,6 @@ class ConsoleAction
 	implements Action {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	protected
-	ApplicationContext applicationContext;
 
 	@SingletonDependency
 	protected

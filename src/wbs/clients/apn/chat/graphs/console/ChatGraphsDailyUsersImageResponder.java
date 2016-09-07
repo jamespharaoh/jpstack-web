@@ -18,8 +18,8 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserSessionObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserSessionRec;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatGraphsDailyUsersImageResponder")
 public

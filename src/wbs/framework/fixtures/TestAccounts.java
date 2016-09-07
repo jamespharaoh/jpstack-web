@@ -1,6 +1,6 @@
 package wbs.framework.fixtures;
 
-import wbs.framework.application.config.AbstractGenericConfig;
+import wbs.framework.component.config.AbstractGenericConfig;
 
 public
 class TestAccounts

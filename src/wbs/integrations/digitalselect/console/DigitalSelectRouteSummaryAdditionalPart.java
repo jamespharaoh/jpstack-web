@@ -5,8 +5,8 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import javax.inject.Inject;
 
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.config.WbsConfig;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.config.WbsConfig;
 import wbs.integrations.digitalselect.model.DigitalSelectRouteOutRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
 import wbs.sms.route.core.model.RouteRec;

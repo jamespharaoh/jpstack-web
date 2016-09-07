@@ -42,7 +42,8 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.annotations.SingletonComponent;
+
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.entity.record.GlobalId;
 import wbs.platform.media.model.ContentObjectHelper;
 import wbs.platform.media.model.ContentRec;

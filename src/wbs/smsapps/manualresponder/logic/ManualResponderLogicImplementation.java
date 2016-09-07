@@ -16,7 +16,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-import wbs.framework.application.annotations.SingletonComponent;
+
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.affiliate.model.AffiliateRec;

@@ -10,7 +10,7 @@ import wbs.clients.apn.chat.namednote.model.ChatNamedNoteDao;
 import wbs.clients.apn.chat.namednote.model.ChatNamedNoteRec;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
 
 @SingletonComponent ("chatNamedNoteDaoHibernate")

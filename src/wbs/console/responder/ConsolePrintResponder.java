@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.utils.formatwriter.FormatWriter;
 import wbs.framework.utils.formatwriter.WriterFormatWriter;
 

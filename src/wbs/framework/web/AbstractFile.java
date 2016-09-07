@@ -7,7 +7,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
-import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.component.manager.ComponentManager;
 
 /**
  * WebFile which delegates to "RequestHandlers".
@@ -22,7 +22,7 @@ class AbstractFile
 	// dependencies
 
 	@Inject
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	@Inject
 	RequestContext requestContext;

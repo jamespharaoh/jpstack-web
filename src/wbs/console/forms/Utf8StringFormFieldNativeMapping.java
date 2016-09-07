@@ -5,9 +5,9 @@ import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
 import static wbs.framework.utils.etc.StringUtils.utf8ToString;
 import lombok.NonNull;
 
-import com.google.common.base.Optional;
+import wbs.framework.component.annotations.PrototypeComponent;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import com.google.common.base.Optional;
 
 @PrototypeComponent ("utf8StringFormFieldNativeMapping")
 public

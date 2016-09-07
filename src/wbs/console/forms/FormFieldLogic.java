@@ -30,7 +30,7 @@ import lombok.extern.log4j.Log4j;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.utils.formatwriter.FormatWriter;
 

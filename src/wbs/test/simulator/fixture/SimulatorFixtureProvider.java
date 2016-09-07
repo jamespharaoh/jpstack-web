@@ -2,7 +2,7 @@ package wbs.test.simulator.fixture;
 
 import javax.inject.Inject;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;

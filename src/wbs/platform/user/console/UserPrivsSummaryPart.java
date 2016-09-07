@@ -15,7 +15,7 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.group.model.GroupRec;

@@ -5,7 +5,7 @@ import javax.inject.Inject;
 import org.joda.time.Instant;
 
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.smsapps.subscription.model.SubscriptionSendRec;
 

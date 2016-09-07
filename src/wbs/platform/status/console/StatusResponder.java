@@ -16,7 +16,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 
 @PrototypeComponent ("statusResponder")
 public

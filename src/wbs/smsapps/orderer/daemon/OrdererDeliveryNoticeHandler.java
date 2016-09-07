@@ -9,8 +9,9 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.config.WbsConfig;
+
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.EmailLogic;

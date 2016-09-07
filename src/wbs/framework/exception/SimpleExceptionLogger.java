@@ -8,7 +8,8 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.annotations.PrototypeComponent;
+
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.Record;
 
 @Log4j

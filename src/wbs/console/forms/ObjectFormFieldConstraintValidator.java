@@ -3,9 +3,9 @@ package wbs.console.forms;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import com.google.common.base.Optional;
+import wbs.framework.component.annotations.PrototypeComponent;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectFormFieldConstraintValidator")

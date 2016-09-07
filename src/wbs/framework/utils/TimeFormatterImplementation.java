@@ -18,10 +18,11 @@ import org.joda.time.ReadableInstant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import wbs.framework.component.annotations.SingletonComponent;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("timeFormatter")
 public

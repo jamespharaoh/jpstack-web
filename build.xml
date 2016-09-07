@@ -591,7 +591,7 @@
     </database-init>
   </target>
   <target name="just-generate-records">
-    <java classname="wbs.framework.application.tools.BeanRunner" classpathref="classpath" failonerror="true">
+    <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
       <arg value="generate,model-meta,model-generate,utils"/>
@@ -601,7 +601,7 @@
     </java>
   </target>
   <target name="just-generate-helpers">
-    <java classname="wbs.framework.application.tools.BeanRunner" classpathref="classpath" failonerror="true">
+    <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
       <arg value="entity,generate,model,model-meta,object-generate,schema,utils"/>
@@ -611,7 +611,7 @@
     </java>
   </target>
   <target name="just-schema-create">
-    <java classname="wbs.framework.application.tools.BeanRunner" classpathref="classpath" failonerror="true">
+    <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
       <arg value="utils,config,data,entity,model-meta,schema,sql,schema-tool"/>
@@ -621,7 +621,7 @@
     </java>
   </target>
   <target name="just-fixtures">
-    <java classname="wbs.framework.application.tools.BeanRunner" classpathref="classpath" failonerror="true">
+    <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
       <arg value="utils,config,data,entity,schema,sql,model,model-meta,hibernate,object,logic,fixture"/>
@@ -629,7 +629,7 @@
       <arg value="wbs.framework.entity.fixtures.ModelFixtureCreator"/>
       <arg value="runModelFixtureCreators"/>
     </java>
-    <java classname="wbs.framework.application.tools.BeanRunner" classpathref="classpath" failonerror="true">
+    <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
       <arg value="utils,config,data,entity,schema,sql,model,model-meta,hibernate,object,logic,fixture"/>

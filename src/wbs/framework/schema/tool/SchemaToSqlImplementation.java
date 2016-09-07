@@ -9,7 +9,8 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import lombok.NonNull;
-import wbs.framework.application.annotations.SingletonComponent;
+
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.schema.model.Schema;
 import wbs.framework.schema.model.SchemaColumn;
 import wbs.framework.schema.model.SchemaForeignKey;

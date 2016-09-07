@@ -29,9 +29,10 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.config.WbsConfig;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.utils.etc.RuntimeIoException;

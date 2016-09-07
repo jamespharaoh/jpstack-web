@@ -26,8 +26,9 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.config.WbsConfig;
+
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Html;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;

@@ -5,7 +5,7 @@ import java.util.WeakHashMap;
 
 import javax.inject.Inject;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 
 @SingletonComponent ("transactionCacheFactory")
 // TODO get rid of this abomination

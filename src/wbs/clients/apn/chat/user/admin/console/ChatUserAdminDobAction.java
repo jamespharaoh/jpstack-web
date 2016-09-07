@@ -2,8 +2,6 @@ package wbs.clients.apn.chat.user.admin.console;
 
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
 
-import javax.inject.Inject;
-
 import lombok.Cleanup;
 
 import org.joda.time.LocalDate;
@@ -12,8 +10,8 @@ import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;

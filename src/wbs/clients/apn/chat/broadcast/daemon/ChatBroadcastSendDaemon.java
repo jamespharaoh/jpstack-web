@@ -8,8 +8,8 @@ import wbs.clients.apn.chat.broadcast.logic.ChatBroadcastSendHelper;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberRec;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.send.GenericSendDaemon;
 import wbs.platform.send.GenericSendHelper;
 

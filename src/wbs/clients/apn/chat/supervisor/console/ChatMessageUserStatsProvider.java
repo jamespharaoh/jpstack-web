@@ -25,8 +25,8 @@ import wbs.console.reporting.StatsDatum;
 import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @SingletonComponent ("chatMessageUserStatsProvider")
 public

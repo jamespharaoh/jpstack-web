@@ -14,7 +14,7 @@ import javax.inject.Named;
 
 import lombok.Cleanup;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.rpc.core.Rpc;

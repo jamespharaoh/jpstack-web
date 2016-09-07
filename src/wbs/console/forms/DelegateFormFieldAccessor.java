@@ -8,8 +8,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("delegateFormFieldacessor")

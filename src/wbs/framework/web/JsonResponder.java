@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 
 import org.json.simple.JSONValue;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataToJson;
 
 @Accessors (fluent = true)

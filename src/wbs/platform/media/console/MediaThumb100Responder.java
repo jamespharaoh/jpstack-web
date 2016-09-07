@@ -1,6 +1,6 @@
 package wbs.platform.media.console;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.platform.media.model.MediaRec;
 
 @PrototypeComponent ("mediaThumb100Responder")

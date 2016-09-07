@@ -10,11 +10,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.scaffold.PluginModelSpec;
-import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.codegen.JavaClassUnitWriter;
 import wbs.framework.codegen.JavaInterfaceWriter;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.scaffold.PluginModelSpec;
+import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.utils.formatwriter.AtomicFileWriter;
 import wbs.framework.utils.formatwriter.FormatWriter;

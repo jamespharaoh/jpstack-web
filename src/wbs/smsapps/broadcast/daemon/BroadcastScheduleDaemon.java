@@ -6,7 +6,7 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.log4j.Logger;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.platform.send.GenericScheduleDaemon;
 import wbs.platform.send.GenericSendHelper;
 import wbs.smsapps.broadcast.logic.BroadcastSendHelper;

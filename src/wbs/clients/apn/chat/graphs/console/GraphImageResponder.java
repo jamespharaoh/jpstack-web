@@ -15,7 +15,7 @@ import javax.imageio.ImageIO;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.graph.console.GraphScale;
 
 public abstract

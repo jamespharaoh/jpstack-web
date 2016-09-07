@@ -9,9 +9,9 @@ import javax.inject.Provider;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.api.mvc.ApiFile;
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.RegexpPathHandler;
 import wbs.framework.web.RequestContext;

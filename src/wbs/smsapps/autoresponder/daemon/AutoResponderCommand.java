@@ -11,8 +11,9 @@ import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.config.WbsConfig;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.EmailLogic;

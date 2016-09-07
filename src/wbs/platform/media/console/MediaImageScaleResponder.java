@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 
 import javax.inject.Inject;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaRec;

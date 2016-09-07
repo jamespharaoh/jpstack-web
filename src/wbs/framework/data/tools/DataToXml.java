@@ -3,6 +3,7 @@ package wbs.framework.data.tools;
 import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
 import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
 import static wbs.framework.utils.etc.MapUtils.mapIsEmpty;
+import static wbs.framework.utils.etc.Misc.booleanToYesNo;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
@@ -23,6 +24,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import lombok.NonNull;
+import lombok.experimental.Accessors;
+
 import org.dom4j.Branch;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -30,8 +34,6 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 
-import lombok.NonNull;
-import lombok.experimental.Accessors;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataChildren;
@@ -69,6 +71,8 @@ class DataToXml {
 		xmlWriter.write (
 			document);
 
+		xmlWriter.flush ();
+
 	}
 
 	public
@@ -79,7 +83,8 @@ class DataToXml {
 
 		write (
 			new FileWriter (
-				new File (filename)),
+				new File (
+					filename)),
 			object);
 
 	}
@@ -109,8 +114,8 @@ class DataToXml {
 	}
 
 	void createElement (
-			Branch parent,
-			Object object) {
+			@NonNull Branch parent,
+			@NonNull Object object) {
 
 		if (object instanceof String) {
 
@@ -127,8 +132,10 @@ class DataToXml {
 			Element listElement =
 				parent.addElement ("list");
 
-			for (Object item
-					: (List<?>) object) {
+			for (
+				Object item
+					: (List<?>) object
+			) {
 
 				createElement (
 					listElement,
@@ -234,8 +241,10 @@ class DataToXml {
 			parent.addElement (
 				elementName);
 
-		for (Field field
-				: object.getClass ().getDeclaredFields ()) {
+		for (
+			Field field
+				: object.getClass ().getDeclaredFields ()
+		) {
 
 			for (Annotation annotation
 					: field.getAnnotations ()) {
@@ -394,7 +403,8 @@ class DataToXml {
 
 		String childrenElementName =
 			ifNull (
-				dataChildrenAnnotation.childrenElement (),
+				nullIfEmptyString (
+					dataChildrenAnnotation.childrenElement ()),
 				camelToHyphen (
 					field.getName ()));
 
@@ -449,6 +459,13 @@ class DataToXml {
 					entryElement.addAttribute (
 						"value",
 						(String) entry.getValue ());
+
+				} else if (entry.getValue () instanceof Boolean) {
+
+					entryElement.addAttribute (
+						"value",
+						booleanToYesNo (
+							(Boolean) entry.getValue ()));
 
 				} else {
 

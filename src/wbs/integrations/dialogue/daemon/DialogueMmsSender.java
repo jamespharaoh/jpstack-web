@@ -33,8 +33,9 @@ import com.google.common.collect.ImmutableList;
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.config.WbsConfig;
+
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.config.WbsConfig;
 import wbs.integrations.dialogue.model.DialogueMmsRouteObjectHelper;
 import wbs.integrations.dialogue.model.DialogueMmsRouteRec;
 import wbs.platform.media.model.MediaRec;

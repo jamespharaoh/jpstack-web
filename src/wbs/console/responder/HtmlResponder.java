@@ -9,7 +9,7 @@ import org.joda.time.Instant;
 
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 
 public abstract

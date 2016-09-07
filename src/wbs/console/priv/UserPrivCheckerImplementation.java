@@ -11,9 +11,9 @@ import lombok.experimental.Accessors;
 
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.ProxiedRequestComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.ProxiedRequestComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 

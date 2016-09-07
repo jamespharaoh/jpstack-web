@@ -14,7 +14,7 @@ import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;

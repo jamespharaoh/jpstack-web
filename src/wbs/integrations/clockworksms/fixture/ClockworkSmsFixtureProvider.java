@@ -16,7 +16,8 @@ import com.google.common.collect.ImmutableList;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import wbs.framework.application.annotations.PrototypeComponent;
+
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;

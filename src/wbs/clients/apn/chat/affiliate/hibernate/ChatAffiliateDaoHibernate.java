@@ -9,7 +9,7 @@ import org.hibernate.criterion.Restrictions;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateDao;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
 
 @SingletonComponent ("chatAffiliateDao")

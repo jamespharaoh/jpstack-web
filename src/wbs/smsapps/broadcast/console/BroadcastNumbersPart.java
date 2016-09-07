@@ -4,7 +4,7 @@ import javax.inject.Inject;
 
 import lombok.experimental.Accessors;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.smsapps.broadcast.model.BroadcastRec;
 
 @Accessors (fluent = true)

@@ -12,7 +12,7 @@ import com.google.common.base.Optional;
 
 import fj.data.Either;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.JsonToHtml;
 import wbs.framework.utils.formatwriter.FormatWriter;
 import wbs.framework.utils.formatwriter.WriterFormatWriter;

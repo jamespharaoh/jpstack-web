@@ -7,9 +7,9 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.builder.BuilderFactory;
 
 @SingletonComponent ("modelBuilderManager")

@@ -1,6 +1,6 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 
 @SingletonComponent ("chatUserConfigConfig")
 public

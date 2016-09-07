@@ -19,7 +19,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.utils.TimeFormatter;
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
 import wbs.platform.queue.logic.DummyQueueCache;

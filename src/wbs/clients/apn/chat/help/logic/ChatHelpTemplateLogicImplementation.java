@@ -11,8 +11,8 @@ import wbs.clients.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.misc.MapStringSubstituter;
 import wbs.sms.gsm.MessageSplitter;
 

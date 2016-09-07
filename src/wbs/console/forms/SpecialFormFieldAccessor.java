@@ -11,8 +11,8 @@ import lombok.experimental.Accessors;
 
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.Record;
 import wbs.framework.utils.etc.BeanLogic;

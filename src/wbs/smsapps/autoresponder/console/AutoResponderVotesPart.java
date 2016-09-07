@@ -15,7 +15,7 @@ import org.joda.time.Instant;
 
 import lombok.extern.log4j.Log4j;
 import wbs.console.part.AbstractPagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.utils.IntervalFormatter;
 import wbs.framework.utils.TextualInterval;
 import wbs.platform.service.model.ServiceObjectHelper;

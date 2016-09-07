@@ -30,7 +30,7 @@ import org.apache.http.protocol.HttpContext;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 
 @Log4j
 @SingletonComponent ("urbanAirshipApi")

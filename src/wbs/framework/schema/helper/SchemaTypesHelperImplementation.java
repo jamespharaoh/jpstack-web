@@ -30,11 +30,11 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.scaffold.PluginCustomTypeSpec;
-import wbs.framework.application.scaffold.PluginEnumTypeSpec;
-import wbs.framework.application.scaffold.PluginManager;
-import wbs.framework.application.scaffold.PluginSpec;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.scaffold.PluginCustomTypeSpec;
+import wbs.framework.component.scaffold.PluginEnumTypeSpec;
+import wbs.framework.component.scaffold.PluginManager;
+import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.hibernate.EnumUserType;
 import wbs.framework.logging.TaskLogger;
 

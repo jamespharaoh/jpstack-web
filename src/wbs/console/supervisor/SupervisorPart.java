@@ -36,9 +36,9 @@ import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.context.ApplicationContext;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorPart")
@@ -49,7 +49,7 @@ class SupervisorPart
 	// singleton dependencies
 
 	@SingletonDependency
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	@SingletonDependency
 	ConsoleManager consoleManager;

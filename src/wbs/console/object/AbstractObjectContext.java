@@ -14,8 +14,8 @@ import wbs.console.lookup.StringLookup;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.request.Cryptor;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.annotations.WeakSingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.web.PageNotFoundException;
 

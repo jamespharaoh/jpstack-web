@@ -20,7 +20,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.TextualInterval;

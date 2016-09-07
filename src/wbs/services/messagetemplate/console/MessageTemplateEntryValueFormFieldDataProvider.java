@@ -3,7 +3,7 @@ package wbs.services.messagetemplate.console;
 import lombok.NonNull;
 
 import wbs.console.forms.FormFieldDataProvider;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.services.messagetemplate.model.MessageTemplateEntryValueRec;
 import wbs.services.messagetemplate.model.MessageTemplateSetRec;
 

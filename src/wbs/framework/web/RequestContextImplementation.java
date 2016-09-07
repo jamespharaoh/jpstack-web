@@ -43,7 +43,8 @@ import com.google.common.collect.ImmutableMap;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
-import wbs.framework.application.annotations.ProxiedRequestComponent;
+
+import wbs.framework.component.annotations.ProxiedRequestComponent;
 import wbs.framework.utils.etc.RuntimeIoException;
 
 @Accessors (fluent = true)

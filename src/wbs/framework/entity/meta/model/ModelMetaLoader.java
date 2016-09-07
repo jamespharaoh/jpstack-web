@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
@@ -19,9 +18,12 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.scaffold.PluginManager;
-import wbs.framework.application.scaffold.PluginSpec;
+
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.scaffold.PluginManager;
+import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.logging.TaskLogger;
@@ -32,14 +34,14 @@ import wbs.framework.logging.TaskLogger;
 public
 class ModelMetaLoader {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	PluginManager pluginManager;
 
-	// collection dependencies
+	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	@ModelMetaData
 	Map <Class <?>, Provider <Object>> modelMetaDataProviders;
 

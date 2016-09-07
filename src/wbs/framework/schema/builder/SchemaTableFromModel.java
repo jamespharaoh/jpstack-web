@@ -18,7 +18,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.framework.application.annotations.PrototypeComponent;
+
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.logging.TaskLogger;

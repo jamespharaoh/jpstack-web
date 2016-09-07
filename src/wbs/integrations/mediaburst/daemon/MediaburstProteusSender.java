@@ -24,8 +24,9 @@ import nu.xom.Element;
 import nu.xom.Nodes;
 import nu.xom.ParsingException;
 import nu.xom.Serializer;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.config.WbsConfig;
+
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Xom;
 import wbs.integrations.mediaburst.model.MediaburstNetworkObjectHelper;

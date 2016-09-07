@@ -9,7 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.Action;
 import wbs.framework.web.RequestContext;

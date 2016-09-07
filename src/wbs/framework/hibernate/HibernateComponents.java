@@ -10,10 +10,10 @@ import javax.inject.Provider;
 
 import org.hibernate.SessionFactory;
 
-import com.google.common.collect.ImmutableMap;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.config.WbsConfig;
 
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.config.WbsConfig;
+import com.google.common.collect.ImmutableMap;
 
 @SingletonComponent ("hibernateComponents")
 public

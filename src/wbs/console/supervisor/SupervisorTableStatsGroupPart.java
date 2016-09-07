@@ -13,8 +13,8 @@ import wbs.console.reporting.StatsFormatter;
 import wbs.console.reporting.StatsGrouper;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsResolver;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTableStatsGroupPart")

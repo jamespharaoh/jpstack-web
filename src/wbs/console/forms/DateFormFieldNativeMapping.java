@@ -10,9 +10,9 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
 
-import com.google.common.base.Optional;
+import wbs.framework.component.annotations.PrototypeComponent;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("dateFormFieldNativeMapping")

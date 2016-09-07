@@ -16,9 +16,9 @@ import org.hibernate.JDBCException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.json.simple.JSONObject;
 
-import com.google.common.collect.ImmutableMap;
+import wbs.framework.component.annotations.SingletonComponent;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import com.google.common.collect.ImmutableMap;
 
 @Log4j
 @SingletonComponent ("exceptionUtils")

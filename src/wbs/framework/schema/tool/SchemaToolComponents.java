@@ -2,8 +2,8 @@ package wbs.framework.schema.tool;
 
 import javax.inject.Provider;
 
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.UninitializedDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.UninitializedDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.SimpleExceptionLogger;
 

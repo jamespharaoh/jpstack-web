@@ -21,8 +21,8 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.responder.HtmlResponder;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.currency.logic.CurrencyLogic;
 

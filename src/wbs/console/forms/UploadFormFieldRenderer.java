@@ -20,7 +20,7 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 
 import wbs.console.forms.FormField.FormType;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.RuntimeIoException;
 import wbs.framework.utils.formatwriter.FormatWriter;
 

@@ -4,8 +4,9 @@ import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
 
 import lombok.NonNull;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.platform.scaffold.model.SliceObjectHelper;

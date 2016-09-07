@@ -22,7 +22,8 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.application.config.WbsConfig;
+
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.integrations.mig.model.MigRouteOutObjectHelper;
 import wbs.integrations.mig.model.MigRouteOutRec;

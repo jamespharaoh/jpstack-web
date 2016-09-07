@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsGrouper;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.platform.queue.model.QueueRec;
 
 @SingletonComponent ("queueStatsGrouper")

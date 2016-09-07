@@ -6,14 +6,14 @@ import lombok.experimental.Accessors;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.part.PagePart;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
-import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorSimplePartBuilder")
@@ -24,7 +24,7 @@ class SupervisorSimplePartBuilder {
 	// singleton dependencies
 
 	@SingletonDependency
-	ApplicationContext applicationContext;
+	ComponentManager applicationContext;
 
 	// builder
 

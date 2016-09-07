@@ -16,7 +16,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.YearMonth;
 
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.graph.console.GraphScale;
 
 public abstract

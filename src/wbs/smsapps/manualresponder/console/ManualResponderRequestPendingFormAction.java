@@ -21,7 +21,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;

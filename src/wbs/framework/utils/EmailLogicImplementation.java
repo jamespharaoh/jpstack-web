@@ -18,8 +18,9 @@ import com.sun.mail.smtp.SMTPMessage;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.config.WbsConfig;
+
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.config.WbsConfig;
 
 @SingletonComponent ("emailLogic")
 @Accessors (fluent = true)

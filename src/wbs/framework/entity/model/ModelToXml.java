@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("modelToXml")

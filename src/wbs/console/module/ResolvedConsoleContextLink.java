@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)
 @Data

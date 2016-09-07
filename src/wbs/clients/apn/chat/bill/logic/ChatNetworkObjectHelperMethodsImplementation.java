@@ -8,7 +8,7 @@ import wbs.clients.apn.chat.bill.model.ChatNetworkObjectHelper;
 import wbs.clients.apn.chat.bill.model.ChatNetworkObjectHelperMethods;
 import wbs.clients.apn.chat.bill.model.ChatNetworkRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
 
 public
 class ChatNetworkObjectHelperMethodsImplementation

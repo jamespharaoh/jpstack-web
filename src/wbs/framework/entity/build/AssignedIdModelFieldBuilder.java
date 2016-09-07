@@ -4,12 +4,12 @@ import static wbs.framework.utils.etc.NullUtils.ifNull;
 
 import com.google.common.collect.ImmutableList;
 
-import wbs.framework.application.annotations.PrototypeComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.meta.ids.AssignedIdFieldSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;

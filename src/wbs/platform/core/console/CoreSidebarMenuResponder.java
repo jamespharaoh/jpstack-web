@@ -18,7 +18,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.utils.etc.ABSwap;
 import wbs.platform.menu.console.MenuGroupConsoleHelper;

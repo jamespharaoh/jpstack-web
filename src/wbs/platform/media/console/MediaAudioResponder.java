@@ -7,7 +7,7 @@ import javax.inject.Inject;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
 

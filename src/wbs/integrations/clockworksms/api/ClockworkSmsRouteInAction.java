@@ -14,7 +14,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.Cleanup;
 import lombok.NonNull;
 import wbs.api.mvc.ApiLoggingAction;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.Database;

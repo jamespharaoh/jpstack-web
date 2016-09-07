@@ -24,8 +24,8 @@ import lombok.experimental.Accessors;
 
 import wbs.console.forms.FormField.FormType;
 import wbs.console.helper.ConsoleObjectManager;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.utils.etc.OptionalUtils;

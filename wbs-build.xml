@@ -54,8 +54,8 @@
 			package="wbs.framework.web"/>
 
 		<plugin
-			name="application-config"
-			package="wbs.framework.application.config"/>
+			name="component-config"
+			package="wbs.framework.component.config"/>
 
 		<!-- api -->
 

@@ -15,9 +15,10 @@ import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.scaffold.PluginModelSpec;
-import wbs.framework.application.scaffold.PluginSpec;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.scaffold.PluginModelSpec;
+import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.build.ModelBuilderManager;
 import wbs.framework.entity.build.ModelFieldBuilderContext;
 import wbs.framework.entity.build.ModelFieldBuilderTarget;

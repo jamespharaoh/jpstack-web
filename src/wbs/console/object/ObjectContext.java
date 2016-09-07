@@ -13,7 +13,7 @@ import wbs.console.lookup.ObjectLookup;
 import wbs.console.lookup.StringLookup;
 import wbs.console.request.Cryptor;
 import wbs.console.tab.ConsoleContextTab;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.web.WebFile;

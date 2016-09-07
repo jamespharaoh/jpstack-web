@@ -16,7 +16,8 @@ import lombok.Cleanup;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import wbs.framework.application.annotations.SingletonComponent;
+
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.sms.message.core.model.MessageObjectHelper;

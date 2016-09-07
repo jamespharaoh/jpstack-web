@@ -8,8 +8,8 @@ import wbs.clients.apn.chat.core.console.ChatConsoleHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.console.helper.ConsoleHooks;
 import wbs.console.priv.UserPrivChecker;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @SingletonComponent ("chatUserInitiationLogConsoleHooks")
 public

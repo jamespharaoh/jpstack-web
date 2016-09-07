@@ -25,7 +25,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.sms.route.core.model.RouteRec;

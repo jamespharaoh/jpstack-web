@@ -10,7 +10,8 @@ import java.util.regex.Pattern;
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-import wbs.framework.application.annotations.SingletonComponent;
+
+import wbs.framework.component.annotations.SingletonComponent;
 
 @SingletonComponent ("intervalFormatter")
 public

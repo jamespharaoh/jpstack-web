@@ -20,7 +20,7 @@ import com.google.common.base.Optional;
 import lombok.Cleanup;
 import lombok.NonNull;
 import wbs.api.mvc.ApiLoggingAction;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.data.tools.DataToXml;

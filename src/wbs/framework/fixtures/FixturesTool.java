@@ -12,10 +12,10 @@ import javax.inject.Provider;
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 
-import wbs.framework.application.scaffold.PluginFixtureSpec;
-import wbs.framework.application.scaffold.PluginManager;
-import wbs.framework.application.scaffold.PluginSpec;
-import wbs.framework.application.tools.BackgroundProcess;
+import wbs.framework.component.scaffold.PluginFixtureSpec;
+import wbs.framework.component.scaffold.PluginManager;
+import wbs.framework.component.scaffold.PluginSpec;
+import wbs.framework.component.tools.BackgroundProcess;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 

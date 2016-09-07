@@ -7,10 +7,10 @@ import javax.annotation.PostConstruct;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonComponent;
 
 @SingletonComponent ("consoleMetaModuleBuilder")
 public

@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletException;
 
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 
 @SingletonComponent ("pathHandlerServlet")
 public

@@ -5,7 +5,7 @@ import javax.inject.Inject;
 import lombok.NonNull;
 import wbs.console.helper.ConsoleHooks;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.event.logic.EventLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;

@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 import org.joda.time.Instant;
 
 import wbs.console.priv.UserPrivChecker;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.Record;
 import wbs.sms.number.core.console.NumberPlugin;
 import wbs.sms.number.core.model.NumberRec;

@@ -13,8 +13,8 @@ import wbs.clients.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatMessagePendingFormResponder")
 public

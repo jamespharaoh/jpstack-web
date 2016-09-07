@@ -4,7 +4,7 @@ import javax.inject.Inject;
 
 import wbs.console.request.Cryptor;
 import wbs.console.request.CryptorFactory;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 
 @SingletonComponent ("textConsoleConfig")
 public

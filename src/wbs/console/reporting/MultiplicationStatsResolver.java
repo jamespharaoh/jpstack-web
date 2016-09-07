@@ -9,11 +9,12 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.PrototypeComponent;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.framework.application.annotations.PrototypeComponent;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("multiplicationStatsResolver")

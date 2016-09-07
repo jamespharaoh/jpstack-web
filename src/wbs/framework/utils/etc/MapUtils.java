@@ -35,6 +35,18 @@ class MapUtils {
 
 	}
 
+	// key lookup
+
+	public static <KeyType>
+	boolean mapContainsKey (
+			@NonNull Map <KeyType, ?> map,
+			@NonNull KeyType key) {
+
+		return map.containsKey (
+			key);
+
+	}
+
 	// item lookup
 
 	public static <KeyType, ValueType>

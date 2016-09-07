@@ -3,7 +3,7 @@ package wbs.console.responder;
 import javax.inject.Provider;
 
 import wbs.console.module.ConsoleManager;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.RequestHandler;
 import wbs.framework.web.Responder;
 

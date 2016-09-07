@@ -46,10 +46,10 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.application.annotations.PrototypeDependency;
-import wbs.framework.application.annotations.SingletonComponent;
-import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.utils.formatwriter.FormatWriter;
 
 @Accessors (fluent = true)

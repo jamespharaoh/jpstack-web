@@ -37,7 +37,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
-import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.utils.TextualInterval;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.currency.logic.CurrencyLogic;

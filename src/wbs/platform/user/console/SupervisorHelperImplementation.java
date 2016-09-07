@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableList;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.supervisor.SupervisorHelper;
-import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.platform.scaffold.model.SliceRec;
 
 @SingletonComponent ("supervisorHelper")
