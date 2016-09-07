@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.broadcast.daemon;
 
-import javax.inject.Inject;
-
 import lombok.extern.log4j.Log4j;
 
 import org.apache.log4j.Logger;
@@ -11,6 +9,7 @@ import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberRec;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.platform.send.GenericSendDaemon;
 import wbs.platform.send.GenericSendHelper;
 
@@ -19,22 +18,22 @@ import wbs.platform.send.GenericSendHelper;
 public
 class ChatBroadcastSendDaemon
 	extends
-		GenericSendDaemon<
+		GenericSendDaemon <
 			ChatRec,
 			ChatBroadcastRec,
 			ChatBroadcastNumberRec
 		> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatBroadcastSendHelper chatBroadcastSendHelper;
 
 	// implementation
 
 	@Override
 	protected
-	GenericSendHelper<
+	GenericSendHelper <
 		ChatRec,
 		ChatBroadcastRec,
 		ChatBroadcastNumberRec

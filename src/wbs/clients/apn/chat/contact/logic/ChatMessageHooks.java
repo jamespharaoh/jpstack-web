@@ -4,37 +4,38 @@ import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
+
+import lombok.NonNull;
 
 import wbs.clients.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.application.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectHooks;
 
 public
 class ChatMessageHooks
-	implements ObjectHooks<ChatMessageRec> {
+	implements ObjectHooks <ChatMessageRec> {
 
 	// dependencies
 
-	@Inject
+	@WeakSingletonDependency
+	Provider <ChatContactObjectHelper> chatContactHelper;
+
+	@SingletonDependency
 	Database database;
-
-	// indirect dependencies
-
-	@Inject
-	Provider<ChatContactObjectHelper> chatContactHelper;
 
 	// implementation
 
 	@Override
 	public
 	void beforeInsert (
-			ChatMessageRec chatMessage) {
+			@NonNull ChatMessageRec chatMessage) {
 
 		ChatUserRec fromChatUser =
 			chatMessage.getFromUser ();

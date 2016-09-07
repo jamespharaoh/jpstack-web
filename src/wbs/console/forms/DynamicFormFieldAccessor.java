@@ -3,27 +3,32 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TypeUtils.objectClassNameSimple;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("dynamicFormFieldAccessor")
 public
-class DynamicFormFieldAccessor<
-	Container extends Record<Container>,
+class DynamicFormFieldAccessor <
+	Container extends Record <Container>,
 	Native
 >
-	implements FormFieldAccessor<Container,Native> {
+	implements FormFieldAccessor <Container, Native> {
+
+	// singleton dependencies
+
+	@SingletonDependency
+	ConsoleObjectManager consoleObjectManager;
 
 	// properties
 
@@ -31,21 +36,18 @@ class DynamicFormFieldAccessor<
 	String name;
 
 	@Getter @Setter
-	Class<? extends Native> nativeClass;
-
-	@Inject
-	ConsoleObjectManager consoleObjectManager;
+	Class <? extends Native> nativeClass;
 
 	// implementation
 
 	@Override
 	public
-	Optional<Native> read (
+	Optional <Native> read (
 			@NonNull Container container) {
 
 		// get native object
 
-		ConsoleHelper<?> consoleHelper =
+		ConsoleHelper <?> consoleHelper =
 			consoleObjectManager.findConsoleHelper (
 				(Container)
 				container);

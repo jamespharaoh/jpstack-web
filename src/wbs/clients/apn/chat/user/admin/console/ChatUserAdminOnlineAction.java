@@ -4,9 +4,8 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
-
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -14,6 +13,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.action.ConsoleAction;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -25,21 +25,21 @@ public
 class ChatUserAdminOnlineAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// details

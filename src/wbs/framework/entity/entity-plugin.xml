@@ -3,46 +3,52 @@
 	package="wbs.framework.entity">
 
 	<layer name="model-meta">
-		<component class="meta.AssignedIdFieldSpec"/>
-		<component class="meta.AssociativeCollectionSpec"/>
-		<component class="meta.AssociativeListSpec"/>
-		<component class="meta.BinaryFieldSpec"/>
-		<component class="meta.ChildrenCollectionSpec"/>
-		<component class="meta.ChildrenListSpec"/>
-		<component class="meta.ChildrenMappingSpec"/>
-		<component class="meta.CodeFieldSpec"/>
-		<component class="meta.ComponentFieldSpec"/>
-		<component class="meta.DateFieldSpec"/>
-		<component class="meta.DeletedFieldSpec"/>
-		<component class="meta.DescriptionFieldSpec"/>
-		<component class="meta.EnumFieldSpec"/>
-		<component class="meta.FloatingPointFieldSpec"/>
-		<component class="meta.ForeignIdFieldSpec"/>
-		<component class="meta.GeneratedIdFieldSpec"/>
-		<component class="meta.IdentityDateFieldSpec"/>
-		<component class="meta.IdentityIntegerFieldSpec"/>
-		<component class="meta.IdentityReferenceFieldSpec"/>
-		<component class="meta.IdentityStringFieldSpec"/>
-		<component class="meta.IndexFieldSpec"/>
-		<component class="meta.IntegerFieldSpec"/>
-		<component class="meta.MasterFieldSpec"/>
-		<component class="meta.ModelCollectionsSpec"/>
-		<component class="meta.ModelFieldsSpec"/>
-		<component class="meta.ModelImplementsInterfaceSpec"/>
-		<component class="meta.ModelImplementsInterfacesSpec"/>
-		<component class="meta.ModelMetaLoader"/>
-		<component class="meta.ModelMetaSpec"/>
-		<component class="meta.NameFieldSpec"/>
-		<component class="meta.ParentFieldSpec"/>
-		<component class="meta.ParentIdFieldSpec"/>
-		<component class="meta.ParentTypeFieldSpec"/>
-		<component class="meta.ReferenceFieldSpec"/>
-		<component class="meta.SlaveFieldSpec"/>
-		<component class="meta.StringFieldSpec"/>
-		<component class="meta.TimestampFieldSpec"/>
-		<component class="meta.TypeCodeFieldSpec"/>
-		<component class="meta.TypeFieldSpec"/>
-		<component class="meta.YesNoFieldSpec"/>
+
+		<component class="meta.collections.AssociativeCollectionSpec"/>
+		<component class="meta.collections.AssociativeListSpec"/>
+		<component class="meta.collections.ChildrenCollectionSpec"/>
+		<component class="meta.collections.ChildrenListSpec"/>
+		<component class="meta.collections.ChildrenMappingSpec"/>
+
+		<component class="meta.fields.BinaryFieldSpec"/>
+		<component class="meta.fields.ComponentFieldSpec"/>
+		<component class="meta.fields.DateFieldSpec"/>
+		<component class="meta.fields.DeletedFieldSpec"/>
+		<component class="meta.fields.DescriptionFieldSpec"/>
+		<component class="meta.fields.EnumFieldSpec"/>
+		<component class="meta.fields.FloatingPointFieldSpec"/>
+		<component class="meta.fields.IntegerFieldSpec"/>
+		<component class="meta.fields.NameFieldSpec"/>
+		<component class="meta.fields.ReferenceFieldSpec"/>
+		<component class="meta.fields.StringFieldSpec"/>
+		<component class="meta.fields.TimestampFieldSpec"/>
+		<component class="meta.fields.YesNoFieldSpec"/>
+
+		<component class="meta.identities.CodeFieldSpec"/>
+		<component class="meta.identities.IdentityDateFieldSpec"/>
+		<component class="meta.identities.IdentityIntegerFieldSpec"/>
+		<component class="meta.identities.IdentityReferenceFieldSpec"/>
+		<component class="meta.identities.IdentityStringFieldSpec"/>
+		<component class="meta.identities.IndexFieldSpec"/>
+		<component class="meta.identities.MasterFieldSpec"/>
+		<component class="meta.identities.ParentFieldSpec"/>
+		<component class="meta.identities.ParentIdFieldSpec"/>
+		<component class="meta.identities.ParentTypeFieldSpec"/>
+		<component class="meta.identities.SlaveFieldSpec"/>
+		<component class="meta.identities.TypeCodeFieldSpec"/>
+		<component class="meta.identities.TypeFieldSpec"/>
+
+		<component class="meta.ids.AssignedIdFieldSpec"/>
+		<component class="meta.ids.ForeignIdFieldSpec"/>
+		<component class="meta.ids.GeneratedIdFieldSpec"/>
+
+		<component class="meta.model.ModelCollectionsSpec"/>
+		<component class="meta.model.ModelFieldsSpec"/>
+		<component class="meta.model.ModelImplementsInterfaceSpec"/>
+		<component class="meta.model.ModelImplementsInterfacesSpec"/>
+		<component class="meta.model.ModelMetaLoader"/>
+		<component class="meta.model.ModelMetaSpec"/>
+
 	</layer>
 
 	<layer name="generate">

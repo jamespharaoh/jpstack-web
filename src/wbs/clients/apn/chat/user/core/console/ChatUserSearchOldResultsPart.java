@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.collect.ImmutableSet;
@@ -32,6 +31,7 @@ import wbs.console.misc.Percentager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
@@ -41,39 +41,40 @@ public
 class ChatUserSearchOldResultsPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatConsoleLogic chatConsoleLogic;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	EnumConsoleHelper <?> chatUserCreditModeConsoleHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// value dependencies
 
-	@Inject
+	@SingletonDependency
 	@Named ("chatUserSearchItemsPerSubPage")
 	Integer itemsPerSubPage;
 
-	@Inject
+	@SingletonDependency
 	@Named ("chatUserSearchSubPagesPerPage")
 	Integer subPagesPerPage;
 
@@ -81,7 +82,7 @@ class ChatUserSearchOldResultsPart
 
 	ConsoleContext targetContext;
 
-	List<ChatUserRec> chatUsers;
+	List <ChatUserRec> chatUsers;
 
 	PageBuilder pageBuilders [] =
 		new PageBuilder [] {

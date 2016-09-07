@@ -1,7 +1,6 @@
 package wbs.clients.apn.chat.contact.logic;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import lombok.NonNull;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -9,6 +8,8 @@ import wbs.clients.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatContactObjectHelperMethods;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.application.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 
@@ -16,23 +17,24 @@ public
 class ChatContactObjectHelperMethodsImplementation
 	implements ChatContactObjectHelperMethods {
 
-	@Inject
+	// singleton dependencies
+
+	@WeakSingletonDependency
+	ChatContactObjectHelper chatContactHelper;
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
-	Provider<ChatContactObjectHelper> chatContactHelperProvider;
+	// implementation
 
 	@Override
 	public
 	ChatContactRec findOrCreate (
-			ChatUserRec fromUser,
-			ChatUserRec toUser) {
+			@NonNull ChatUserRec fromUser,
+			@NonNull ChatUserRec toUser) {
 
 		Transaction transaction =
 			database.currentTransaction ();
-
-		ChatContactObjectHelper chatContactHelper =
-			chatContactHelperProvider.get ();
 
 		// get cache
 

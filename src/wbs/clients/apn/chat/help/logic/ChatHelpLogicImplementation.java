@@ -4,11 +4,10 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
+
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -17,6 +16,7 @@ import wbs.clients.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
@@ -31,24 +31,24 @@ public
 class ChatHelpLogicImplementation
 	implements ChatHelpLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatHelpLogLogic chatHelpLogLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpTemplateObjectHelper chatHelpTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatSendLogic chatSendLogic;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// implementation

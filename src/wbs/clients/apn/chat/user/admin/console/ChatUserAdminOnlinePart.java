@@ -1,20 +1,23 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatUserAdminOnlinePart")
 public
 class ChatUserAdminOnlinePart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
+
+	// state
 
 	ChatUserRec chatUser;
 

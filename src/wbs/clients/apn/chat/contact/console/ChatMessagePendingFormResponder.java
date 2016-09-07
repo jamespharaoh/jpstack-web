@@ -7,8 +7,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
@@ -16,27 +14,29 @@ import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatMessagePendingFormResponder")
 public
 class ChatMessagePendingFormResponder
 	extends HtmlResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatHelpTemplateConsoleHelper chatHelpTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// state
 
 	ChatMessageRec chatMessage;
-	List<ChatHelpTemplateRec> chatHelpTemplates;
+
+	List <ChatHelpTemplateRec> chatHelpTemplates;
 
 	// implementation
 

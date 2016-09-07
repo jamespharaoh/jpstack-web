@@ -8,8 +8,6 @@ import static wbs.framework.utils.etc.TimeUtils.localDateNotEqual;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
@@ -21,6 +19,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.Html;
 
@@ -29,27 +28,28 @@ public
 class ChatUserHistoryPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageLogic chatMessageLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// state
 
 	ChatUserRec chatUser;
-	List<ChatMessageRec> chatMessages;
+
+	List <ChatMessageRec> chatMessages;
 
 	// implementation
 

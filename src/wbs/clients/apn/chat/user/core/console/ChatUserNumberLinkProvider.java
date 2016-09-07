@@ -3,8 +3,6 @@ package wbs.clients.apn.chat.user.core.console;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.joda.time.Instant;
 
 import wbs.clients.apn.chat.user.core.model.ChatUserDao;
@@ -14,6 +12,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.sms.number.core.console.NumberPlugin;
 import wbs.sms.number.core.model.NumberRec;
@@ -23,18 +22,18 @@ public
 class ChatUserNumberLinkProvider
 	implements NumberPlugin {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserDao chatUserDao;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// details

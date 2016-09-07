@@ -6,8 +6,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastObjectHelper;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastRec;
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
@@ -15,6 +13,7 @@ import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.TimeFormatter;
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -24,30 +23,30 @@ public
 class ChatBroadcastListPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatBroadcastObjectHelper chatBroadcastHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// state
 
 	ChatRec chat;
-	List<ChatBroadcastRec> broadcasts;
+	List <ChatBroadcastRec> broadcasts;
 
 	// implementation
 

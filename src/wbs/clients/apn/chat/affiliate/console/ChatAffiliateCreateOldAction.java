@@ -6,12 +6,11 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.experimental.Accessors;
+
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.core.console.ChatConsoleHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -32,6 +31,7 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.priv.UserPrivDataLoader;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -45,40 +45,40 @@ class ChatAffiliateCreateOldAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatAffiliateConsoleHelper chatAffiliateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatConsoleHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatKeywordConsoleHelper chatKeywordHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatSchemeConsoleHelper chatSchemeHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatSchemeKeywordConsoleHelper chatSchemeKeywordHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	KeywordLogic keywordLogic;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	UserPrivDataLoader privDataLoader;
 
 	// details

@@ -62,7 +62,12 @@ class ComponentDefinition {
 
 	@DataChildren
 	@Getter @Setter
-	Set <String> orderedDependencies =
+	Set <String> strongDependencies =
+		new HashSet<> ();
+
+	@DataChildren
+	@Getter @Setter
+	Set <String> weakDependencies =
 		new HashSet<> ();
 
 	public

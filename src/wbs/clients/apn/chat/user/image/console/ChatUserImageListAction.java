@@ -18,11 +18,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -31,6 +30,7 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -41,21 +41,21 @@ public
 class ChatUserImageListAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// details

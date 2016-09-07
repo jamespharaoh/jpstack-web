@@ -6,8 +6,6 @@ import static wbs.framework.utils.etc.TimeUtils.localDateNotEqual;
 
 import java.util.Collection;
 
-import javax.inject.Inject;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
@@ -20,6 +18,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -30,27 +29,27 @@ public
 class ChatHelpLogPendingSummaryPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatConsoleLogic chatConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpLogConsoleHelper chatHelpLogHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	MessageConsoleLogic messageConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// state

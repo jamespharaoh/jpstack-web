@@ -1,29 +1,28 @@
 package wbs.console.combo;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("contextFormActionPart")
 public
-class ContextFormActionPart<FormState>
+class ContextFormActionPart <FormState>
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
 	// properties
@@ -32,7 +31,7 @@ class ContextFormActionPart<FormState>
 	FormFieldSet formFields;
 
 	@Getter @Setter
-	ConsoleFormActionHelper<FormState> formActionHelper;
+	ConsoleFormActionHelper <FormState> formActionHelper;
 
 	@Getter @Setter
 	String helpText;

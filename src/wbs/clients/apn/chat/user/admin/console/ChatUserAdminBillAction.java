@@ -2,8 +2,6 @@ package wbs.clients.apn.chat.user.admin.console;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import lombok.Cleanup;
 
 import org.joda.time.Instant;
@@ -19,6 +17,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -30,30 +29,30 @@ public
 class ChatUserAdminBillAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserBillLogObjectHelper chatUserBillLogHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserDao chatUserDao;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// details

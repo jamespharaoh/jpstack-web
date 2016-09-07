@@ -11,8 +11,8 @@ import com.google.common.collect.Iterables;
 
 import lombok.extern.log4j.Log4j;
 import wbs.framework.application.scaffold.PluginSpec;
-import wbs.framework.entity.meta.ModelMetaLoader;
-import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.model.ModelMetaLoader;
+import wbs.framework.entity.meta.model.ModelMetaSpec;
 
 @Log4j
 public

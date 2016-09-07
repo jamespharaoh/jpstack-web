@@ -2,8 +2,6 @@ package wbs.clients.apn.chat.graphs.console;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
@@ -16,6 +14,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.utils.TextualInterval;
 
@@ -26,19 +25,19 @@ class ChatGraphsJoinersImageResponder
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// state

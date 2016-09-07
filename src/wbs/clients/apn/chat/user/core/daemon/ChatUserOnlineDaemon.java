@@ -11,8 +11,6 @@ import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
@@ -31,6 +29,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.clients.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
@@ -42,24 +41,24 @@ public
 class ChatUserOnlineDaemon
 	extends SleepingDaemonService {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatInfoLogic chatInfoLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
 	// details

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -14,6 +13,7 @@ import com.google.common.base.Optional;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
@@ -28,6 +28,8 @@ import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -52,50 +54,52 @@ class ChatVideoGetCommand
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatHelpLogic chatHelpLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpLogLogic chatHelpLogLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatInfoLogic chatInfoLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatSendLogic chatSendLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
-	Provider<MessageSender> messageSender;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <MessageSender> messageSender;
 
 	// properties
 

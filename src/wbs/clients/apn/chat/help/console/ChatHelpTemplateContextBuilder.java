@@ -8,7 +8,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
@@ -27,6 +26,8 @@ import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.object.ObjectContext;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -42,41 +43,41 @@ import wbs.platform.object.settings.ObjectSettingsPageSpec;
 public
 class ChatHelpTemplateContextBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatHelpTemplateConsoleHelper chatHelpTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
 	// prototype dependences
 
-	@Inject
-	Provider<SimpleConsoleContext> simpleConsoleContextProvider;
+	@PrototypeDependency
+	Provider <SimpleConsoleContext> simpleConsoleContextProvider;
 
-	@Inject
-	Provider<ConsoleContextTab> contextTabProvider;
+	@PrototypeDependency
+	Provider <ConsoleContextTab> contextTabProvider;
 
-	@Inject
-	Provider<ConsoleContextType> contextTypeProvider;
+	@PrototypeDependency
+	Provider <ConsoleContextType> contextTypeProvider;
 
-	@Inject
-	Provider<ObjectContext> objectContextProvider;
+	@PrototypeDependency
+	Provider <ObjectContext> objectContextProvider;
 
-	@Inject
-	Provider<ObjectCreatePageSpec> objectCreatePageSpecProvider;
+	@PrototypeDependency
+	Provider <ObjectCreatePageSpec> objectCreatePageSpecProvider;
 
-	@Inject
-	Provider<ObjectListPageSpec> objectListPageSpecProvider;
+	@PrototypeDependency
+	Provider <ObjectListPageSpec> objectListPageSpecProvider;
 
-	@Inject
-	Provider<ObjectSettingsPageSpec> objectSettingsPageSpecProvider;
+	@PrototypeDependency
+	Provider <ObjectSettingsPageSpec> objectSettingsPageSpecProvider;
 
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer<ChatHelpTemplateRec> container;
+	ConsoleContextBuilderContainer <ChatHelpTemplateRec> container;
 
 	@BuilderSource
 	ChatHelpTemplateContextSpec spec;

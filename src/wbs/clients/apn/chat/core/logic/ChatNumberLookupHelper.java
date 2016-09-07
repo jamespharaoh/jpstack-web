@@ -2,12 +2,11 @@ package wbs.clients.apn.chat.core.logic;
 
 import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.object.ObjectManager;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.number.lookup.logic.NumberLookupHelper;
@@ -18,12 +17,12 @@ public
 class ChatNumberLookupHelper
 	implements NumberLookupHelper {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
 	// details

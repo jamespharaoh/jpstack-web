@@ -12,7 +12,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
-import wbs.framework.entity.meta.DateFieldSpec;
+import wbs.framework.entity.meta.fields.DateFieldSpec;
 
 @PrototypeComponent ("dateFieldWriter")
 @ModelWriter

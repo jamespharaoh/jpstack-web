@@ -8,8 +8,6 @@ import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
@@ -26,6 +24,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -39,21 +38,21 @@ public
 class ChatMonitorSwapDaemon
 	extends SleepingDaemonService {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
 	// details

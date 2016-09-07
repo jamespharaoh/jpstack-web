@@ -17,7 +17,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
-import wbs.framework.entity.meta.TimestampFieldSpec;
+import wbs.framework.entity.meta.fields.TimestampFieldSpec;
 import wbs.framework.utils.etc.TimeUtils;
 
 @PrototypeComponent ("timestampFieldWriter")

@@ -5,8 +5,6 @@ import static wbs.framework.utils.etc.NumberUtils.moreThanZero;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateUsersSummaryObjectHelper;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateUsersSummaryRec;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
@@ -16,23 +14,28 @@ import wbs.clients.apn.chat.user.core.model.ChatUsersSummaryRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatStatisticsPart")
 public
 class ChatStatisticsPart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatAffiliateUsersSummaryObjectHelper chatAffiliateUsersSummaryHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUsersSummaryObjectHelper chatUsersSummaryHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	// state
 
 	ChatRec chat;
 	ChatUsersSummaryRec users;

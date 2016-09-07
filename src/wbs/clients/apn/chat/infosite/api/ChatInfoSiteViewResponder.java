@@ -5,14 +5,13 @@ import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.clients.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
 import wbs.clients.apn.chat.infosite.model.ChatInfoSiteRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.web.PrintResponder;
 import wbs.framework.web.RequestContext;
 
@@ -21,15 +20,15 @@ public
 class ChatInfoSiteViewResponder
 	extends PrintResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatHelpTemplateObjectHelper chatHelpTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatInfoSiteObjectHelper chatInfoSiteHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// state

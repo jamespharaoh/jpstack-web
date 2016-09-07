@@ -21,7 +21,7 @@ import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.entity.build.ModelBuilderManager;
 import wbs.framework.entity.build.ModelFieldBuilderContext;
 import wbs.framework.entity.build.ModelFieldBuilderTarget;
-import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.schema.helper.SchemaNamesHelper;

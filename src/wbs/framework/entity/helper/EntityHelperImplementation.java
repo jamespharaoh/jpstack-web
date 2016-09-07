@@ -1,8 +1,8 @@
 package wbs.framework.entity.helper;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,20 +13,20 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.FileUtils;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataToXml;
-import wbs.framework.entity.meta.ModelMetaLoader;
-import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.model.ModelMetaLoader;
+import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelBuilder;
 
@@ -45,24 +45,24 @@ class EntityHelperImplementation
 	// prototype dependencies
 
 	@Inject
-	Provider<ModelBuilder> modelBuilder;
+	Provider <ModelBuilder> modelBuilder;
 
 	// properties
 
 	@Getter
-	List<String> entityClassNames;
+	List <String> entityClassNames;
 
 	@Getter
-	List<Class<?>> entityClasses;
+	List <Class <?>> entityClasses;
 
 	@Getter
-	List<Model> models;
+	List <Model> models;
 
 	@Getter
-	Map<Class<?>,Model> modelsByClass;
+	Map <Class <?>, Model> modelsByClass;
 
 	@Getter
-	Map<String,Model> modelsByName;
+	Map <String, Model> modelsByName;
 
 	@PostConstruct
 	public
@@ -77,8 +77,8 @@ class EntityHelperImplementation
 
 	void initEntityClassNames () {
 
-		ImmutableList.Builder<String> entityClassNamesBuilder =
-			ImmutableList.<String>builder ();
+		ImmutableList.Builder <String> entityClassNamesBuilder =
+			ImmutableList.builder ();
 
 		for (
 			ModelMetaSpec modelMeta
@@ -108,17 +108,21 @@ class EntityHelperImplementation
 
 	void initEntityClasses () {
 
-		ImmutableList.Builder<Class<?>> entityClassesBuilder =
-			ImmutableList.<Class<?>>builder ();
+		ImmutableList.Builder <Class <?>> entityClassesBuilder =
+			ImmutableList.builder ();
 
 		int errors = 0;
 
-		for (String entityClassName : entityClassNames) {
+		for (
+			String entityClassName
+				: entityClassNames
+		) {
 
 			try {
 
-				Class<?> entityClass =
-					Class.forName (entityClassName);
+				Class <?> entityClass =
+					Class.forName (
+						entityClassName);
 
 				entityClassesBuilder.add (
 					entityClass);
@@ -170,14 +174,14 @@ class EntityHelperImplementation
 
 		}
 
-		ImmutableList.Builder<Model> modelsBuilder =
-			ImmutableList.<Model>builder ();
+		ImmutableList.Builder <Model> modelsBuilder =
+			ImmutableList.builder ();
 
-		ImmutableMap.Builder<Class<?>,Model> modelsByClassBuilder =
-			ImmutableMap.<Class<?>,Model>builder ();
+		ImmutableMap.Builder <Class <?>, Model> modelsByClassBuilder =
+			ImmutableMap.builder ();
 
-		ImmutableMap.Builder<String,Model> modelsByNameBuilder =
-			ImmutableMap.<String,Model>builder ();
+		ImmutableMap.Builder <String, Model> modelsByNameBuilder =
+			ImmutableMap.builder ();
 
 		int errors = 0;
 

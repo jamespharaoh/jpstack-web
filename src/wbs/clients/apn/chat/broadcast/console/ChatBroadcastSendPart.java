@@ -3,7 +3,6 @@ package wbs.clients.apn.chat.broadcast.console;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
@@ -22,6 +21,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.etc.OptionalUtils;
 
 @PrototypeComponent ("chatBroadcastSendPart")
@@ -29,18 +29,19 @@ public
 class ChatBroadcastSendPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	ConsoleModule chatBroadcastConsoleModule;
 
-	@Inject
+	@SingletonDependency
 	ChatConsoleLogic chatConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatConsoleHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
 	// state

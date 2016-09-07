@@ -2,8 +2,6 @@ package wbs.clients.apn.chat.user.pending.console;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -12,6 +10,7 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.platform.media.console.MediaConsoleLogic;
 
 @PrototypeComponent ("chatUserPendingSummaryPart")
@@ -19,18 +18,18 @@ public
 class ChatUserPendingSummaryPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
 
-	@Inject
+	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
 
 	// state

@@ -25,7 +25,7 @@ import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
 import wbs.framework.entity.generate.fields.ModelFieldWriterTarget;
-import wbs.framework.entity.meta.AssociativeListSpec;
+import wbs.framework.entity.meta.collections.AssociativeListSpec;
 
 @PrototypeComponent ("associativeListWriter")
 @ModelWriter

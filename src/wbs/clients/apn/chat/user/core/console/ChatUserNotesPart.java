@@ -5,8 +5,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserNoteObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserNoteRec;
@@ -15,6 +13,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("chatUserNotesPart")
@@ -22,28 +21,28 @@ public
 class ChatUserNotesPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserNoteObjectHelper chatUserNoteHelper;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// state
 
 	ChatUserRec chatUser;
 
-	List<ChatUserNoteRec> chatUserNotes;
+	List <ChatUserNoteRec> chatUserNotes;
 
 	// implementation
 

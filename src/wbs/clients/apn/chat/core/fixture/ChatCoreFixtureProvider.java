@@ -5,8 +5,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.joda.time.Instant;
 
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
@@ -22,6 +20,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -53,74 +52,69 @@ public
 class ChatCoreFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatHelpTemplateObjectHelper chatHelpTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatSchemeObjectHelper chatSchemeHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	CurrencyObjectHelper currencyHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	GazetteerObjectHelper gazetteerHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuItemObjectHelper menuItemHelper;
 
-	@Inject
+	@SingletonDependency
 	NetworkObjectHelper networkHelper;
 
-	@Inject
+	@SingletonDependency
 	NumberObjectHelper numberHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	RouterObjectHelper routerHelper;
 
-	@Inject
+	@SingletonDependency
 	SenderObjectHelper senderHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	/*
-	@Inject
-	TicketManagerObjectHelper ticketManagerHelper;
-	*/
-
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// implementation

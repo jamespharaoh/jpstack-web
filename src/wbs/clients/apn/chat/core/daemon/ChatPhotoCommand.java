@@ -5,13 +5,12 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 import java.util.Collections;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
@@ -23,6 +22,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.object.ObjectManager;
@@ -44,42 +44,42 @@ public
 class ChatPhotoCommand
 	implements CommandHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpLogLogic chatHelpLogLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatInfoLogic chatInfoLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatSendLogic chatSendLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
 	// properties

@@ -2,11 +2,11 @@ package wbs.clients.apn.chat.contact.console;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -14,6 +14,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -26,23 +27,27 @@ public
 class ChatMonitorInboxAddNoteAction
 	extends ConsoleAction {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatContactNoteConsoleHelper chatContactNoteHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMonitorInboxObjectHelper chatMonitorInboxHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
+
+	// details
 
 	@Override
 	public

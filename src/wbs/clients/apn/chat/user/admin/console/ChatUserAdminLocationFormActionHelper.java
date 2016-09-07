@@ -1,18 +1,18 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+
 import wbs.clients.apn.chat.user.admin.console.ChatUserAdminLocationFormActionHelper.ChatUserAdminLocationForm;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleHelper;
@@ -22,23 +22,23 @@ import wbs.sms.message.core.model.MessageRec;
 @PrototypeComponent ("chatUserAdminLocationFormActionHelper")
 public
 class ChatUserAdminLocationFormActionHelper
-	extends AbstractConsoleFormActionHelper<ChatUserAdminLocationForm> {
+	extends AbstractConsoleFormActionHelper <ChatUserAdminLocationForm> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleHelper userHelper;
 
 	// implementation

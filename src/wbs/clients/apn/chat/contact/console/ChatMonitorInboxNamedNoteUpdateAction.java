@@ -6,10 +6,10 @@ import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.namednote.model.ChatNamedNoteLogObjectHelper;
@@ -21,6 +21,8 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.etc.Html;
@@ -37,42 +39,42 @@ public
 class ChatMonitorInboxNamedNoteUpdateAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatMonitorInboxObjectHelper chatMonitorInboxHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatNamedNoteObjectHelper chatNamedNoteHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatNamedNoteLogObjectHelper chatNamedNoteLogHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatNoteNameObjectHelper chatNoteNameHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<TextResponder> textResponder;
+	@PrototypeDependency
+	Provider <TextResponder> textResponder;
 
 	// misc
 

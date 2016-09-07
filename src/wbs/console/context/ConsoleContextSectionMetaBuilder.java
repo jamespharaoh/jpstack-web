@@ -1,20 +1,20 @@
 package wbs.console.context;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.experimental.Accessors;
-
 import com.google.common.collect.ImmutableList;
+
+import lombok.experimental.Accessors;
 
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
 import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -30,11 +30,11 @@ class ConsoleContextSectionMetaBuilder {
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleContextLink> contextLinkProvider;
+	@PrototypeDependency
+	Provider <ConsoleContextLink> contextLinkProvider;
 
-	@Inject
-	Provider<ConsoleContextRootExtensionPoint> rootExtensionPointProvider;
+	@PrototypeDependency
+	Provider <ConsoleContextRootExtensionPoint> rootExtensionPointProvider;
 
 	// builder
 

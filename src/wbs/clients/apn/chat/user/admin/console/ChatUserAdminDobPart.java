@@ -2,12 +2,11 @@ package wbs.clients.apn.chat.user.admin.console;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("chatUserAdminDobPart")
@@ -15,12 +14,12 @@ public
 class ChatUserAdminDobPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// state

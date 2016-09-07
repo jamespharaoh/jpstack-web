@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -27,7 +26,9 @@ import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.misc.MapStringSubstituter;
@@ -51,38 +52,42 @@ public
 class ChatSendLogicImplementation
 	implements ChatSendLogic {
 
-	@Inject
+	// singleton dependency
+
+	@SingletonDependency
 	ChatHelpLogLogic chatHelpLogLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpTemplateLogic chatTemplateLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	CommandLogic commandLogic;
 
-	@Inject
+	@SingletonDependency
 	KeywordLogic keywordLogic;
 
-	@Inject
+	@SingletonDependency
 	MagicNumberLogic magicNumberLogic;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
-	Provider<MessageSender> messageSender;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <MessageSender> messageSenderProvider;
 
 	/**
 	 * Sends a message to a user using the "free" reverse bill route.
@@ -129,7 +134,7 @@ class ChatSendLogicImplementation
 		AffiliateRec affiliate =
 			chatUserLogic.getAffiliate (chatUser);
 
-		return messageSender.get ()
+		return messageSenderProvider.get ()
 
 			.threadId (
 				threadId.orNull ())
@@ -256,7 +261,7 @@ class ChatSendLogicImplementation
 		// send the message
 
 		MessageRec message =
-			messageSender.get ()
+			messageSenderProvider.get ()
 
 			.threadId (
 				threadId.orNull ())
@@ -403,7 +408,7 @@ class ChatSendLogicImplementation
 				chatUser);
 
 		MessageRec ret =
-			messageSender.get ()
+			messageSenderProvider.get ()
 
 			.threadId (
 				threadId.orNull ())

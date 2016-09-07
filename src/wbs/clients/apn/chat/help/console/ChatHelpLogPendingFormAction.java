@@ -2,17 +2,17 @@ package wbs.clients.apn.chat.help.console;
 
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.help.logic.ChatHelpLogic;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -26,27 +26,27 @@ public
 class ChatHelpLogPendingFormAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatHelpLogConsoleHelper chatHelpLogHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpLogic chatHelpLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// details

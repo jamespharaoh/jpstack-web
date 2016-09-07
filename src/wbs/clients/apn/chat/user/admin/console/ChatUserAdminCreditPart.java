@@ -3,8 +3,6 @@ package wbs.clients.apn.chat.user.admin.console;
 import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
 import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -12,6 +10,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.platform.currency.logic.CurrencyLogic;
 
 @PrototypeComponent ("chatUserAdminCreditPart")
@@ -19,15 +18,15 @@ public
 class ChatUserAdminCreditPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
 
 	// state

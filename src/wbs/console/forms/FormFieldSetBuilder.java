@@ -1,9 +1,7 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
-
-import javax.inject.Inject;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleHelper;
@@ -12,6 +10,7 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -24,12 +23,12 @@ import wbs.framework.builder.annotations.BuilderTarget;
 public
 class FormFieldSetBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleHelperRegistry consoleHelperRegistry;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
 	// builder

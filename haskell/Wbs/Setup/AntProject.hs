@@ -863,7 +863,7 @@ writeBuildFile world = do
 					makeArgValue ("utils,config,data,entity,schema,sql," ++
 						"model,model-meta,hibernate,object,logic,fixture"),
 					makeArgValue "",
-					makeArgValue "wbs.framework.entity.meta.ModelFixtureCreator",
+					makeArgValue "wbs.framework.entity.fixtures.ModelFixtureCreator",
 					makeArgValue "runModelFixtureCreators"
 				],
 

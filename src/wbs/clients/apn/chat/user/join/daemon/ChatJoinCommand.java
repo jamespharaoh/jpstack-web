@@ -2,15 +2,14 @@ package wbs.clients.apn.chat.user.join.daemon;
 
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -19,6 +18,8 @@ import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.clients.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
 import wbs.sms.command.model.CommandObjectHelper;
@@ -34,24 +35,24 @@ public
 class ChatJoinCommand
 	implements CommandHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ChatJoiner> chatJoinerProvider;
+	@PrototypeDependency
+	Provider <ChatJoiner> chatJoinerProvider;
 
 	// properties
 

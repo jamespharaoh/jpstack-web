@@ -15,9 +15,9 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
-import wbs.framework.entity.meta.ComponentFieldSpec;
-import wbs.framework.entity.meta.ModelMetaLoader;
-import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.fields.ComponentFieldSpec;
+import wbs.framework.entity.meta.model.ModelMetaLoader;
+import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelFieldType;
 

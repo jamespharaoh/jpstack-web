@@ -3,14 +3,14 @@ package wbs.clients.apn.chat.user.core.console;
 import static wbs.framework.utils.etc.Misc.stringTrim;
 import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
-import javax.inject.Inject;
-
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.user.core.model.ChatUserNoteObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -25,30 +25,30 @@ public
 class ChatUserNotesAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserNoteObjectHelper chatUserNoteHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// details

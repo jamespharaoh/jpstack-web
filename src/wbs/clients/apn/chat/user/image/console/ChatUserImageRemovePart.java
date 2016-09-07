@@ -1,11 +1,10 @@
 package wbs.clients.apn.chat.user.image.console;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.platform.media.console.MediaConsoleLogic;
 
 @PrototypeComponent ("chatUserImageRemovePart")
@@ -13,13 +12,19 @@ public
 class ChatUserImageRemovePart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
 
+	// state
+
 	ChatUserRec chatUser;
+
+	// implementation
 
 	@Override
 	public

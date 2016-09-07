@@ -2,14 +2,13 @@ package wbs.clients.apn.chat.help.console;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.service.console.ServiceConsoleHelper;
@@ -26,19 +25,21 @@ public
 class ChatHelpLogPendingMessagesPart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatHelpLogConsoleHelper chatHelpLogHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
-	@Inject
+	@SingletonDependency
 	ServiceConsoleHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// state

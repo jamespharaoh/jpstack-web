@@ -17,8 +17,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -46,6 +44,7 @@ import wbs.console.param.TimestampFromParamChecker;
 import wbs.console.param.TimestampToParamChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.etc.NumberUtils;
@@ -56,18 +55,18 @@ public
 class ChatUserSearchOldAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// details

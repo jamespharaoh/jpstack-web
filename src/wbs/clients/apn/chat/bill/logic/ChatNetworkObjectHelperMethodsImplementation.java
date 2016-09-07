@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.bill.logic;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -9,13 +8,18 @@ import wbs.clients.apn.chat.bill.model.ChatNetworkObjectHelper;
 import wbs.clients.apn.chat.bill.model.ChatNetworkObjectHelperMethods;
 import wbs.clients.apn.chat.bill.model.ChatNetworkRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.framework.application.annotations.PrototypeDependency;
 
 public
 class ChatNetworkObjectHelperMethodsImplementation
 	implements ChatNetworkObjectHelperMethods {
 
-	@Inject
-	Provider<ChatNetworkObjectHelper> chatNetworkHelper;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <ChatNetworkObjectHelper> chatNetworkHelper;
+
+	// implementation
 
 	@Override
 	public

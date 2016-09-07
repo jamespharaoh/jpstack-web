@@ -1,15 +1,14 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableMap;
@@ -18,6 +17,8 @@ import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -31,54 +32,54 @@ import wbs.framework.utils.etc.CodeUtils;
 public
 class CodeFormFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<CodeFormFieldConstraintValidator>
+	@PrototypeDependency
+	Provider <CodeFormFieldConstraintValidator>
 	codeFormFieldValueConstraintValidatorProvider;
 
-	@Inject
-	Provider<CodeFormFieldValueValidator>
+	@PrototypeDependency
+	Provider <CodeFormFieldValueValidator>
 	codeFormFieldValueValidatorProvider;
 
-	@Inject
-	Provider<DelegateFormFieldAccessor>
+	@PrototypeDependency
+	Provider <DelegateFormFieldAccessor>
 	delegateFormFieldAccessorProvider;
 
-	@Inject
-	Provider<IdentityFormFieldInterfaceMapping>
+	@PrototypeDependency
+	Provider <IdentityFormFieldInterfaceMapping>
 	identityFormFieldInterfaceMappingProvider;
 
-	@Inject
-	Provider<IdentityFormFieldNativeMapping>
+	@PrototypeDependency
+	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
-	@Inject
-	Provider<ReadOnlyFormField>
+	@PrototypeDependency
+	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
-	@Inject
-	Provider<RequiredFormFieldValueValidator>
+	@PrototypeDependency
+	Provider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
-	@Inject
-	Provider<SpecialFormFieldAccessor>
+	@PrototypeDependency
+	Provider <SpecialFormFieldAccessor>
 	specialFormFieldAccessorProvider;
 
-	@Inject
-	Provider<TextFormFieldRenderer>
+	@PrototypeDependency
+	Provider <TextFormFieldRenderer>
 	textFormFieldRendererProvider;
 
-	@Inject
-	Provider<UpdatableFormField>
+	@PrototypeDependency
+	Provider <UpdatableFormField>
 	updatableFormFieldProvider;
 
 	// builder

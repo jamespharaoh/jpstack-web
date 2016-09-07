@@ -5,15 +5,14 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
-
-import org.joda.time.Duration;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeChargesRec;
@@ -21,6 +20,7 @@ import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -34,21 +34,21 @@ public
 class ChatSpendWarningDaemon
 	extends SleepingDaemonService {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatSendLogic chatSendLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
 	// details

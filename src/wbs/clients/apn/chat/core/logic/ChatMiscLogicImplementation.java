@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -43,7 +42,9 @@ import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.clients.apn.chat.user.info.model.ChatUserNameObjectHelper;
 import wbs.clients.apn.chat.user.info.model.ChatUserNameRec;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
@@ -71,88 +72,88 @@ public
 class ChatMiscLogicImplementation
 	implements ChatMiscLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatDateLogic chatDateLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpLogic chatHelpLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatNumberReportLogic chatNumberReportLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatSendLogic chatSendLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpTemplateLogic chatTemplateLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserNameObjectHelper chatUserNameHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserSessionObjectHelper chatUserSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogLogic exceptionLogic;
 
-	@Inject
+	@SingletonDependency
 	LocatorObjectHelper locatorHelper;
 
-	@Inject
+	@SingletonDependency
 	LocatorManager locatorManager;
 
-	@Inject
+	@SingletonDependency
 	MagicNumberLogic magicNumberLogic;
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaUtils;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MessageSender> messageSender;
+	@PrototypeDependency
+	Provider <MessageSender> messageSender;
 
 	// implementation
 
 	@Override
 	public
-	List<ChatUserRec> getOnlineMonitorsForOutbound (
-			ChatUserRec thisUser) {
+	List <ChatUserRec> getOnlineMonitorsForOutbound (
+			@NonNull ChatUserRec thisUser) {
 
 		ChatRec chat =
 			thisUser.getChat ();

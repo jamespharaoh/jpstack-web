@@ -4,11 +4,10 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.bill.model.ChatUserCreditObjectHelper;
 import wbs.clients.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -20,6 +19,7 @@ import wbs.console.param.ParamCheckerSet;
 import wbs.console.param.RegexpParamChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -31,24 +31,24 @@ public
 class ChatUserAdminCreditAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserCreditObjectHelper chatUserCreditHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// details

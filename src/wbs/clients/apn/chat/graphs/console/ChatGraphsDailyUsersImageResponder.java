@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
@@ -21,6 +19,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserSessionObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserSessionRec;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatGraphsDailyUsersImageResponder")
 public
@@ -29,16 +28,16 @@ class ChatGraphsDailyUsersImageResponder
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserSessionObjectHelper chatUserSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// state

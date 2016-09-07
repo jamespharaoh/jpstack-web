@@ -7,8 +7,6 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableSet;
 
 import wbs.clients.apn.chat.core.console.ChatConsoleLogic;
@@ -25,6 +23,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.TimeFormatter;
@@ -38,33 +37,33 @@ public
 class ChatUserOnlinePart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatConsoleLogic chatConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	GazetteerLogic gazetteerLogic;
 
-	@Inject
+	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// state

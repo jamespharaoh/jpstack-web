@@ -626,7 +626,7 @@
       <arg value="wbs.test"/>
       <arg value="utils,config,data,entity,schema,sql,model,model-meta,hibernate,object,logic,fixture"/>
       <arg value=""/>
-      <arg value="wbs.framework.entity.meta.ModelFixtureCreator"/>
+      <arg value="wbs.framework.entity.fixtures.ModelFixtureCreator"/>
       <arg value="runModelFixtureCreators"/>
     </java>
     <java classname="wbs.framework.application.tools.BeanRunner" classpathref="classpath" failonerror="true">

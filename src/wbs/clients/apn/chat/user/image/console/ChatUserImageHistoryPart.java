@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
@@ -16,6 +14,7 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.user.console.UserConsoleLogic;
 
@@ -24,21 +23,27 @@ public
 class ChatUserImageHistoryPart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
+
+	// state
 
 	ChatUserImageType type;
 	ChatUserRec chatUser;
 	Set <ChatUserImageRec> chatUserImages;
+
+	// implementation
 
 	@Override
 	public

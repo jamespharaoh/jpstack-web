@@ -15,7 +15,7 @@ import wbs.framework.application.scaffold.PluginModelSpec;
 import wbs.framework.application.scaffold.PluginSpec;
 import wbs.framework.codegen.JavaClassUnitWriter;
 import wbs.framework.codegen.JavaInterfaceWriter;
-import wbs.framework.entity.meta.ModelMetaSpec;
+import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.utils.formatwriter.AtomicFileWriter;
 import wbs.framework.utils.formatwriter.FormatWriter;
 

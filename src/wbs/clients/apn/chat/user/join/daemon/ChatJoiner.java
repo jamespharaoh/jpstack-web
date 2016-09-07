@@ -12,12 +12,6 @@ import static wbs.framework.utils.etc.StringUtils.stringLongerThan;
 
 import java.util.Collections;
 
-import javax.inject.Inject;
-
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -26,6 +20,11 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
@@ -54,6 +53,7 @@ import wbs.clients.apn.chat.user.core.model.Orient;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -84,90 +84,90 @@ import wbs.sms.message.inbox.model.InboxRec;
 public
 class ChatJoiner {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatAffiliateObjectHelper chatAffiliateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatDateLogic chatDateLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpLogLogic chatHelpLogLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatLogicHooks chatHooks;
 
-	@Inject
+	@SingletonDependency
 	ChatInfoLogic chatInfoLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageLogic chatMessageLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatSchemeObjectHelper chatSchemeHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatSendLogic chatSendLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserDobFailureObjectHelper chatUserDobFailureHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
-	@Inject
+	@SingletonDependency
 	EmailLogic emailLogic;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// properties

@@ -6,11 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
+import com.google.common.collect.ImmutableSet;
 
 import org.joda.time.Interval;
-
-import com.google.common.collect.ImmutableSet;
 
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
@@ -23,6 +21,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
@@ -33,42 +32,42 @@ public
 class ChatSupervisorMessagesPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatConsoleLogic chatConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// state
 
 	ChatRec chat;
 
-	List<ChatMessageRec> chatMessages;
+	List <ChatMessageRec> chatMessages;
 
 	// details
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())

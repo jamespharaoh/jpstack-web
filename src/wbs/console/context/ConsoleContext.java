@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
@@ -16,21 +15,25 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabList;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.web.PageNotFoundException;
 import wbs.framework.web.WebFile;
 
 @Accessors (fluent = true)
 public abstract
 class ConsoleContext
-	implements Comparable<ConsoleContext> {
+	implements Comparable <ConsoleContext> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
-	Provider<ConsoleManager> consoleManager;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <ConsoleManager> consoleManager;
 
 	// properties
 

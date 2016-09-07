@@ -4,25 +4,28 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeKeywordObjectHelper;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeKeywordRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatAffiliateKeywordsListPart")
 public
 class ChatAffiliateKeywordsListPart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatAffiliateObjectHelper chatAffiliateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatSchemeKeywordObjectHelper chatSchemeKeywordHelper;
+
+	// state
 
 	List<ChatSchemeKeywordRec> chatSchemeKeywords;
 

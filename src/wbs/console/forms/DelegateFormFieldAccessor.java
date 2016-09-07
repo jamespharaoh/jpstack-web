@@ -1,26 +1,25 @@
 package wbs.console.forms;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import com.google.common.base.Optional;
-
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("delegateFormFieldacessor")
 public
-class DelegateFormFieldAccessor<PrincipalContainer,DelegateContainer,Native>
-	implements FormFieldAccessor<PrincipalContainer,Native> {
+class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
+	implements FormFieldAccessor <PrincipalContainer, Native> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
 	// properties
@@ -29,13 +28,13 @@ class DelegateFormFieldAccessor<PrincipalContainer,DelegateContainer,Native>
 	String path;
 
 	@Getter @Setter
-	FormFieldAccessor<DelegateContainer,Native> delegateFormFieldAccessor;
+	FormFieldAccessor <DelegateContainer, Native> delegateFormFieldAccessor;
 
 	// implementation
 
 	@Override
 	public
-	Optional<Native> read (
+	Optional <Native> read (
 			PrincipalContainer principalContainer) {
 
 		@SuppressWarnings ("unchecked")

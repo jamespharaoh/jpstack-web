@@ -4,19 +4,19 @@ import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import lombok.Cleanup;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import lombok.Cleanup;
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageStatus;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.daemon.SleepingDaemonService;
@@ -26,15 +26,15 @@ public
 class ChatJoinTimeoutDaemon
 	extends SleepingDaemonService {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
 	// details

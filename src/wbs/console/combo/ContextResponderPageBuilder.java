@@ -1,10 +1,9 @@
 package wbs.console.combo;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
@@ -16,6 +15,8 @@ import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.responder.ConsoleFile;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -26,22 +27,24 @@ import wbs.framework.entity.record.Record;
 @PrototypeComponent ("contextResponderPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ContextResponderPageBuilder<
-	ObjectType extends Record<ObjectType>
+class ContextResponderPageBuilder <
+	ObjectType extends Record <ObjectType>
 > {
+
+	// singleton dependencies
+
+	@SingletonDependency
+	ConsoleMetaManager consoleMetaManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleFile> consoleFile;
-
-	@Inject
-	ConsoleMetaManager consoleMetaManager;
+	@PrototypeDependency
+	Provider <ConsoleFile> consoleFileProvider;
 
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer<ObjectType> container;
+	ConsoleContextBuilderContainer <ObjectType> container;
 
 	@BuilderSource
 	ContextResponderPageSpec spec;
@@ -86,7 +89,7 @@ class ContextResponderPageBuilder<
 
 		consoleModule.addContextFile (
 			fileName,
-			consoleFile.get ()
+			consoleFileProvider.get ()
 				.getResponderName (responderName),
 			resolvedExtensionPoint.contextTypeNames ());
 

@@ -6,8 +6,6 @@ import java.awt.Color;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
@@ -21,6 +19,7 @@ import wbs.clients.apn.chat.core.model.ChatStatsObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatStatsRec;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 import wbs.platform.graph.console.GraphScale;
 
@@ -29,28 +28,28 @@ public
 class ChatGraphsUsersImageResponder
 	extends GraphImageResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatStatsObjectHelper chatStatsHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// state
 
 	ChatRec chat;
 
-	List<ChatStatsRec> allChatStats;
+	List <ChatStatsRec> allChatStats;
 
 	LocalDate date;
 	DateTimeZone timezone;

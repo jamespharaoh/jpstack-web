@@ -2,9 +2,8 @@ package wbs.clients.apn.chat.supervisor.console;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import lombok.experimental.Accessors;
+
 import wbs.clients.apn.chat.contact.model.ChatContactNoteObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatContactNoteRec;
 import wbs.clients.apn.chat.core.console.ChatConsoleHelper;
@@ -14,6 +13,7 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.reporting.StatsPeriod;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 
 @Accessors (fluent = true)
@@ -22,21 +22,21 @@ public
 class ChatSupervisorNotesPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatConsoleHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatContactNoteObjectHelper chatContactNoteHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// state
@@ -45,7 +45,7 @@ class ChatSupervisorNotesPart
 
 	ChatRec chat;
 
-	List<ChatContactNoteRec> chatContactNotes;
+	List <ChatContactNoteRec> chatContactNotes;
 
 	// implementation
 

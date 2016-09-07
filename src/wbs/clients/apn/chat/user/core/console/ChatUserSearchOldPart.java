@@ -7,7 +7,6 @@ import static wbs.framework.utils.etc.StringUtils.objectToStringNullSafe;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.collect.ImmutableMap;
@@ -15,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import wbs.console.helper.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.etc.Html;
 
 @Deprecated
@@ -23,19 +23,21 @@ public
 class ChatUserSearchOldPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	EnumConsoleHelper <?> chatUserCreditModeConsoleHelper;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	EnumConsoleHelper <?> chatUserDateModeConsoleHelper;
 
-	@Inject
+	@SingletonDependency
 	@Named ("chatUserSearchItemsPerSubPage")
 	Integer itemsPerSubPage;
 
-	@Inject
+	@SingletonDependency
 	@Named ("chatUserSearchSubPagesPerPage")
 	Integer subPagesPerPage;
 

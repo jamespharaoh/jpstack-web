@@ -2,21 +2,21 @@ package wbs.clients.apn.chat.core.daemon;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.core.model.ChatStatsObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.daemon.AbstractDaemonService;
@@ -29,16 +29,16 @@ class ChatStatsDaemon
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatStatsObjectHelper chatStatsHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
 	// details

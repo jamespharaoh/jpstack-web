@@ -9,10 +9,10 @@ import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameObjectHelper;
@@ -20,6 +20,7 @@ import wbs.clients.apn.chat.namednote.model.ChatNoteNameRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -29,23 +30,29 @@ public
 class ChatNoteNamesAction
 	extends ConsoleAction {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatNoteNameObjectHelper chatNoteNameHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
+
+	// details
 
 	@Override
 	public
 	Responder backupResponder () {
 		return responder ("chatNoteNamesResponder");
 	}
+
+	// implementation
 
 	@Override
 	protected

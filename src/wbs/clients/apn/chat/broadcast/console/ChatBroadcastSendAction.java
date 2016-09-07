@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
@@ -52,6 +51,7 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -81,78 +81,79 @@ public
 class ChatBroadcastSendAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	BatchObjectHelper batchHelper;
 
-	@Inject
+	@SingletonDependency
 	BatchLogic batchLogic;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	ConsoleModule chatBroadcastConsoleModule;
 
-	@Inject
+	@SingletonDependency
 	ChatBroadcastObjectHelper chatBroadcastHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatBroadcastLogic chatBroadcastLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatBroadcastNumberObjectHelper chatBroadcastNumberHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserDao chatUserDao;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	MagicNumberLogic magicNumberLogic;
 
-	@Inject
+	@SingletonDependency
 	NumberFormatLogic numberFormatLogic;
 
-	@Inject
+	@SingletonDependency
 	NumberConsoleHelper numberHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeConsoleHelper objectTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	ServiceConsoleHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// details

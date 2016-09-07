@@ -26,6 +26,7 @@
 	<allow pkg="org.joda.time"/>
 	<allow pkg="org.junit"/>
 	<allow pkg="org.hibernate"/>
+	<allow pkg="org.postgresql"/>
 	<allow pkg="org.xml.sax"/>
 
 	<!-- framework -->

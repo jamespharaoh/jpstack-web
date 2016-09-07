@@ -7,12 +7,11 @@ import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
 import wbs.clients.apn.chat.infosite.model.ChatInfoSiteRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.web.AbstractResponder;
 import wbs.framework.web.RequestContext;
 import wbs.platform.media.model.MediaRec;
@@ -24,10 +23,10 @@ class ChatInfoSiteImageResponder
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatInfoSiteObjectHelper chatInfoSiteHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// state

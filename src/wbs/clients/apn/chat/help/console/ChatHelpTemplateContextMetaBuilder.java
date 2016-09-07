@@ -2,7 +2,6 @@ package wbs.clients.apn.chat.help.console;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
@@ -12,6 +11,7 @@ import wbs.console.context.ConsoleContextMetaBuilderContainer;
 import wbs.console.context.ConsoleContextRootExtensionPoint;
 import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -25,8 +25,8 @@ class ChatHelpTemplateContextMetaBuilder {
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleContextRootExtensionPoint> rootExtensionPointProvider;
+	@PrototypeDependency
+	Provider <ConsoleContextRootExtensionPoint> rootExtensionPointProvider;
 
 	// builder
 

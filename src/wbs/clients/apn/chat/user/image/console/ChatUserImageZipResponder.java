@@ -6,23 +6,28 @@ import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatUserImageZipResponder")
 public
 class ChatUserImageZipResponder
 	extends ConsoleResponder {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	List<ChatUserRec> chatUsers;
+	// state
+
+	List <ChatUserRec> chatUsers;
+
+	// implementation
 
 	@Override
 	@SuppressWarnings ("unchecked")

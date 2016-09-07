@@ -2,11 +2,9 @@ package wbs.clients.apn.chat.user.core.logic;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.logic.ChatNumberReportLogic;
@@ -15,6 +13,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelperMethods;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.RandomLogic;
@@ -27,27 +26,25 @@ public
 class ChatUserObjectHelperMethodsImplementation
 	implements ChatUserObjectHelperMethods {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
+	ChatNumberReportLogic chatNumberReportLogic;
+
+	@SingletonDependency
+	ChatUserObjectHelper chatUserHelper;
+
+	@SingletonDependency
+	ChatUserLogic chatUserLogic;
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
+	NumberLogic numberLogic;
+
+	@SingletonDependency
 	RandomLogic randomLogic;
-
-	// indirect dependencies
-
-	@Inject
-	Provider <ChatNumberReportLogic> chatNumberReportLogicProvider;
-
-	@Inject
-	Provider <ChatUserObjectHelper> chatUserHelperProvider;
-
-	@Inject
-	Provider <ChatUserLogic> chatUserLogicProvider;
-
-	@Inject
-	Provider <NumberLogic> numberLogicProvider;
 
 	// implementation
 
@@ -56,17 +53,6 @@ class ChatUserObjectHelperMethodsImplementation
 	ChatUserRec findOrCreate (
 			@NonNull ChatRec chat,
 			@NonNull MessageRec message) {
-
-		// resolve dependencies
-
-		ChatNumberReportLogic chatNumberReportLogic =
-			chatNumberReportLogicProvider.get ();
-
-		ChatUserObjectHelper chatUserHelper =
-			chatUserHelperProvider.get ();
-
-		NumberLogic numberLogic =
-			numberLogicProvider.get ();
 
 		// resolve stuff
 
@@ -121,11 +107,6 @@ class ChatUserObjectHelperMethodsImplementation
 			@NonNull ChatRec chat,
 			@NonNull NumberRec number) {
 
-		// resolve dependencies
-
-		ChatUserObjectHelper chatUserHelper =
-			chatUserHelperProvider.get ();
-
 		// check for an existing ChatUser
 
 		ChatUserRec chatUser =
@@ -150,12 +131,6 @@ class ChatUserObjectHelperMethodsImplementation
 
 		Transaction transaction =
 			database.currentTransaction ();
-
-		ChatUserObjectHelper chatUserHelper =
-			chatUserHelperProvider.get ();
-
-		ChatUserLogic chatUserLogic =
-			chatUserLogicProvider.get ();
 
 		// create him
 

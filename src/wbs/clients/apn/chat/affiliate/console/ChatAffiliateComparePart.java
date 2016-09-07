@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
@@ -23,6 +21,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.IntervalFormatter;
 import wbs.framework.utils.TextualInterval;
 
@@ -33,22 +32,22 @@ class ChatAffiliateComparePart
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	IntervalFormatter intervalFormatter;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// state
 
 	String timePeriodString;
-	List<ChatAffiliateWithNewUserCount> chatAffiliateWithNewUserCounts;
+	List <ChatAffiliateWithNewUserCount> chatAffiliateWithNewUserCounts;
 
 	// implementation
 

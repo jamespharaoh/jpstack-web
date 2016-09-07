@@ -26,7 +26,7 @@ import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
 import wbs.framework.entity.generate.fields.ModelFieldWriterTarget;
-import wbs.framework.entity.meta.ChildrenCollectionSpec;
+import wbs.framework.entity.meta.collections.ChildrenCollectionSpec;
 
 @PrototypeComponent ("childrenCollectionWriter")
 @ModelWriter

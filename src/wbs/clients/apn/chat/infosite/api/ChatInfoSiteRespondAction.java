@@ -2,12 +2,11 @@ package wbs.clients.apn.chat.infosite.api;
 
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.Cleanup;
+
 import wbs.api.mvc.ApiAction;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
@@ -16,6 +15,7 @@ import wbs.clients.apn.chat.infosite.model.ChatInfoSiteRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.RequestContext;
@@ -26,20 +26,24 @@ public
 class ChatInfoSiteRespondAction
 	extends ApiAction {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatInfoSiteObjectHelper chatInfoSiteHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageLogic chatMessageLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
+
+	// implementation
 
 	@Override
 	protected

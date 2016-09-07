@@ -1,6 +1,5 @@
 package wbs.console.combo;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -8,6 +7,7 @@ import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.console.responder.ConsoleFile;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -21,8 +21,8 @@ class SimpleFileBuilder {
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleFile> consoleFileProvider;
+	@PrototypeDependency
+	Provider <ConsoleFile> consoleFileProvider;
 
 	// builder
 

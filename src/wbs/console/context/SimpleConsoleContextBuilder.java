@@ -1,19 +1,18 @@
 package wbs.console.context;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import lombok.NonNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+
+import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleObjectManager;
@@ -25,6 +24,8 @@ import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.console.object.ObjectContext;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
@@ -37,34 +38,34 @@ import wbs.framework.entity.record.Record;
 @PrototypeComponent ("simpleConsoleContextBuilder")
 @ConsoleModuleBuilderHandler
 public
-class SimpleConsoleContextBuilder<
-	ObjectType extends Record<ObjectType>
+class SimpleConsoleContextBuilder <
+	ObjectType extends Record <ObjectType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ApplicationContext applicationContext;
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleContextTab> contextTab;
+	@PrototypeDependency
+	Provider <ConsoleContextTab> contextTab;
 
-	@Inject
-	Provider<ConsoleContextType> contextType;
+	@PrototypeDependency
+	Provider <ConsoleContextType> contextType;
 
-	@Inject
-	Provider<ObjectContext> objectContext;
+	@PrototypeDependency
+	Provider <ObjectContext> objectContext;
 
-	@Inject
-	Provider<SimpleConsoleContext> simpleContext;
+	@PrototypeDependency
+	Provider <SimpleConsoleContext> simpleContext;
 
 	// builder
 

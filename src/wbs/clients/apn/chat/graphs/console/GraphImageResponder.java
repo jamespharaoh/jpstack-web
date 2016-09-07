@@ -12,18 +12,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
-import javax.inject.Inject;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.platform.graph.console.GraphScale;
 
 public abstract
 class GraphImageResponder
 	extends ConsoleResponder {
 
-	@Inject
+	// singelton dependencies
+
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
+
+	// state
 
 	protected
 	int imageWidth, imageHeight;

@@ -1,9 +1,8 @@
 package wbs.clients.apn.chat.user.image.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.toEnum;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
@@ -16,18 +15,20 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatUserImageUploadPart")
 public
 class ChatUserImageUploadPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	ConsoleModule chatUserImageConsoleModule;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
 	// state

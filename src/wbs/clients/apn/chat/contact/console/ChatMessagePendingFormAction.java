@@ -5,11 +5,10 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
@@ -24,6 +23,7 @@ import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -39,42 +39,42 @@ public
 class ChatMessagePendingFormAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatContactObjectHelper chatContactHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpLogic chatHelpLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageLogic chatMessageLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogLogic exceptionLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// details

@@ -7,12 +7,12 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelperMethods;
 
 public
-interface ConsoleHelper<ObjectType extends Record<ObjectType>>
+interface ConsoleHelper <ObjectType extends Record <ObjectType>>
 	extends
-		ConsoleHelperMethods<ObjectType>,
-		EntityFinder<ObjectType>,
-		ObjectHelperMethods<ObjectType>,
-		ObjectLookup<ObjectType>,
+		ConsoleHelperMethods <ObjectType>,
+		EntityFinder <ObjectType>,
+		ObjectHelperMethods <ObjectType>,
+		ObjectLookup <ObjectType>,
 		ModelMethods {
 
 }

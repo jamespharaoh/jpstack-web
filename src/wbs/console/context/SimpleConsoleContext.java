@@ -7,15 +7,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.helper.PrivKeySpec;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
@@ -29,9 +29,9 @@ public
 class SimpleConsoleContext
 	extends ConsoleContext {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// properties

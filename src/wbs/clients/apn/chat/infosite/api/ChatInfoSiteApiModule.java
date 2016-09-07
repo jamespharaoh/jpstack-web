@@ -7,11 +7,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.api.mvc.ApiFile;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.RegexpPathHandler;
 import wbs.framework.web.RequestContext;
@@ -23,13 +24,15 @@ public
 class ChatInfoSiteApiModule
 	implements ServletModule {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
-	Provider<ApiFile> apiFile;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <ApiFile> apiFile;
 
 	// state
 

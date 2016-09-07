@@ -4,27 +4,32 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameObjectHelper;
 import wbs.clients.apn.chat.namednote.model.ChatNoteNameRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatNoteNamesPart")
 public
 class ChatNoteNamesPart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatNoteNameObjectHelper chatNoteNameHelper;
 
-	List<ChatNoteNameRec> noteNames;
+	// state
+
+	List <ChatNoteNameRec> noteNames;
+
+	// implementation
 
 	@Override
 	public

@@ -5,8 +5,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableSet;
 
 import wbs.clients.apn.chat.core.console.ChatConsoleLogic;
@@ -19,6 +17,7 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("chatUserAdminInfoPart")
@@ -26,21 +25,21 @@ public
 class ChatUserAdminInfoPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatConsoleLogic chatConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// state

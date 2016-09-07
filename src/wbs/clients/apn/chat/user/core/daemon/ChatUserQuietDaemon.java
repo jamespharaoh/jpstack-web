@@ -6,15 +6,14 @@ import static wbs.framework.utils.etc.TimeUtils.earlierThan;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
-import org.joda.time.Duration;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+
 import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
@@ -24,6 +23,7 @@ import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -37,26 +37,30 @@ public
 class ChatUserQuietDaemon
 	extends SleepingDaemonService {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatMiscLogic chatLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageLogic chatMessageLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserInitiationLogObjectHelper chatUserInitiationLogHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
+
+	// details
 
 	@Override
 	protected

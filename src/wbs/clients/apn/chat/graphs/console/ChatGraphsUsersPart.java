@@ -1,23 +1,26 @@
 package wbs.clients.apn.chat.graphs.console;
 
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
-
-import javax.inject.Inject;
 
 import org.joda.time.LocalDate;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 
 @PrototypeComponent ("chatGraphsUsersPart")
 public
 class ChatGraphsUsersPart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	TimeFormatter timeFormatter;
+
+	// implementation
 
 	@Override
 	public

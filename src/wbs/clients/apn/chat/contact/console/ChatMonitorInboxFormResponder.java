@@ -5,12 +5,11 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.extern.log4j.Log4j;
+
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
@@ -23,6 +22,7 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @Log4j
 @PrototypeComponent ("chatMonitorInboxFormResponder")
@@ -30,17 +30,21 @@ public
 class ChatMonitorInboxFormResponder
 	extends HtmlResponder {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatMonitorInboxObjectHelper chatMonitorInboxHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserAlarmObjectHelper chatUserAlarmHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
+
+	// state
 
 	ChatMonitorInboxRec chatMonitorInbox;
 	ChatUserRec userChatUser;

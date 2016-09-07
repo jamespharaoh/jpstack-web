@@ -6,7 +6,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import lombok.Cleanup;
@@ -22,6 +21,7 @@ import wbs.clients.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.misc.SymbolicLock;
@@ -39,20 +39,25 @@ public
 class ChatBillDeliveryHandler
 	implements DeliveryHandler {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
-	@Inject @Named
-	SymbolicLock<Long> chatUserDeliveryLocks;
+	@SingletonDependency
+	@Named
+	SymbolicLock <Long> chatUserDeliveryLocks;
+
+	// details
 
 	@Override
 	public
@@ -63,6 +68,8 @@ class ChatBillDeliveryHandler
 			"chat_bill_strict");
 
 	}
+
+	// implementation
 
 	private
 	void addCredit (

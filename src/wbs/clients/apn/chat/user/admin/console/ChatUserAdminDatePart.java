@@ -3,7 +3,6 @@ package wbs.clients.apn.chat.user.admin.console;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.objectToStringNullSafe;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -14,6 +13,7 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.helper.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 
 @PrototypeComponent ("chatUserAdminDatePart")
@@ -23,19 +23,20 @@ class ChatUserAdminDatePart
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	EnumConsoleHelper <?> chatUserDateModeConsoleHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// state

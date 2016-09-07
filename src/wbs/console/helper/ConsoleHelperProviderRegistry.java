@@ -16,20 +16,22 @@ import wbs.framework.entity.record.Record;
 public
 class ConsoleHelperProviderRegistry {
 
-	Map<String,ConsoleHelperProvider<?>> byObjectName =
-		new HashMap<String,ConsoleHelperProvider<?>> ();
+	Map <String, ConsoleHelperProvider <?>> byObjectName =
+		new HashMap<> ();
 
-	Map<Class<?>,ConsoleHelperProvider<?>> byObjectClass =
-		new HashMap<Class<?>,ConsoleHelperProvider<?>> ();
+	Map <Class <?>, ConsoleHelperProvider <?>> byObjectClass =
+		new HashMap<> ();
 
 	public
 	void register (
-			ConsoleHelperProvider<?> consoleHelperProvider) {
+			@NonNull ConsoleHelperProvider <?> consoleHelperProvider) {
 
 		// detect dupes
 
-		if (byObjectName.containsKey (
-				consoleHelperProvider.objectName ())) {
+		if (
+			byObjectName.containsKey (
+				consoleHelperProvider.objectName ())
+		) {
 
 			throw new RuntimeException (
 				stringFormat (
@@ -38,8 +40,10 @@ class ConsoleHelperProviderRegistry {
 
 		}
 
-		if (byObjectClass.containsKey (
-				consoleHelperProvider.objectClass ())) {
+		if (
+			byObjectClass.containsKey (
+				consoleHelperProvider.objectClass ())
+		) {
 
 			throw new RuntimeException (
 				stringFormat (

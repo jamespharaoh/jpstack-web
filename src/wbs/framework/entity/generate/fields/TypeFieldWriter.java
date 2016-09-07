@@ -19,7 +19,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.entity.generate.ModelWriter;
-import wbs.framework.entity.meta.TypeFieldSpec;
+import wbs.framework.entity.meta.identities.TypeFieldSpec;
 
 @PrototypeComponent ("typeFieldWriter")
 @ModelWriter

@@ -1,20 +1,19 @@
 package wbs.console.context;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-
 import com.google.common.collect.Iterables;
+
+import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleHelper;
@@ -22,6 +21,8 @@ import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -33,30 +34,30 @@ import wbs.framework.entity.record.Record;
 @PrototypeComponent ("consoleContextSectionBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ConsoleContextSectionBuilder<
-	ObjectType extends Record<ObjectType>
+class ConsoleContextSectionBuilder <
+	ObjectType extends Record <ObjectType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleContextTab> contextTabProvider;
+	@PrototypeDependency
+	Provider <ConsoleContextTab> contextTabProvider;
 
-	@Inject
-	Provider<ConsoleContextType> contextTypeProvider;
+	@PrototypeDependency
+	Provider <ConsoleContextType> contextTypeProvider;
 
-	@Inject
-	Provider<SimpleConsoleContext> simpleConsoleContextProvider;
+	@PrototypeDependency
+	Provider <SimpleConsoleContext> simpleConsoleContextProvider;
 
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer<ObjectType> container;
+	ConsoleContextBuilderContainer <ObjectType> container;
 
 	@BuilderSource
 	ConsoleContextSectionSpec spec;

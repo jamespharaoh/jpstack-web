@@ -1,24 +1,24 @@
 package wbs.clients.apn.chat.core.daemon;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
 
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.keyword.model.ChatKeywordObjectHelper;
 import wbs.clients.apn.chat.keyword.model.ChatKeywordRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.application.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.core.logic.KeywordFinder;
@@ -33,30 +33,28 @@ public
 class ChatMagicCommand
 	implements CommandHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatKeywordObjectHelper chatKeywordHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatLogic;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@WeakSingletonDependency
+	CommandManager commandManager;
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	KeywordFinder keywordFinder;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
-
-	// prototype dependencies
-
-	@Inject
-	Provider<CommandManager> commandManagerProvider;
 
 	// properties
 
@@ -91,7 +89,7 @@ class ChatMagicCommand
 	InboxAttemptRec handle () {
 
 		ChatRec chat =
-			(ChatRec) (Object)
+			(ChatRec)
 			objectManager.getParent (
 				command);
 
@@ -105,7 +103,7 @@ class ChatMagicCommand
 			if (! rest.isEmpty ())
 				continue;
 
-			Optional<ChatKeywordRec> chatKeywordOptional =
+			Optional <ChatKeywordRec> chatKeywordOptional =
 				chatKeywordHelper.findByCode (
 					chat,
 					match.simpleKeyword ());
@@ -122,10 +120,10 @@ class ChatMagicCommand
 
 			) {
 
-				return commandManagerProvider.get ().handle (
+				return commandManager.handle (
 					inbox,
 					chatKeywordOptional.get ().getCommand (),
-					Optional.<Long>absent (),
+					optionalAbsent (),
 					"");
 
 			}
@@ -138,10 +136,10 @@ class ChatMagicCommand
 			commandHelper.findRequired (
 				commandRef.get ());
 
-		return commandManagerProvider.get ().handle (
+		return commandManager.handle (
 			inbox,
 			defaultCommand,
-			Optional.<Long>absent (),
+			optionalAbsent (),
 			rest);
 
 	}

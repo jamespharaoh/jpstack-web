@@ -5,9 +5,8 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import lombok.extern.log4j.Log4j;
+
 import wbs.clients.apn.chat.core.model.ChatObjectHelper;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -17,6 +16,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserSearch;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @Log4j
 @PrototypeComponent ("chatSettingsMonitorsPart")
@@ -24,15 +24,15 @@ public
 class ChatSettingsMonitorsPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserDao chatUserDao;
 
 	// state

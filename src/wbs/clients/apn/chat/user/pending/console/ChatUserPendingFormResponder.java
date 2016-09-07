@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableSet;
 
 import wbs.clients.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
@@ -27,6 +25,7 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.utils.etc.Html;
 import wbs.platform.media.console.MediaConsoleLogic;
@@ -36,31 +35,31 @@ public
 class ChatUserPendingFormResponder
 	extends HtmlResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatHelpTemplateConsoleHelper chatHelpTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
 
 	// state
 
 	ChatUserRec chatUser;
 
-	List<ChatHelpTemplateRec> chatHelpTemplates =
+	List <ChatHelpTemplateRec> chatHelpTemplates =
 		Collections.emptyList ();
 
 	PendingMode mode;

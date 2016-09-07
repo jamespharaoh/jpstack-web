@@ -1,10 +1,9 @@
 package wbs.console.combo;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
@@ -16,6 +15,8 @@ import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.responder.ConsoleFile;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -26,19 +27,19 @@ import wbs.framework.entity.record.Record;
 @PrototypeComponent ("contextActionPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ContextActionPageBuilder<
-	ObjectType extends Record<ObjectType>
+class ContextActionPageBuilder <
+	ObjectType extends Record <ObjectType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleFile> consoleFile;
+	@PrototypeDependency
+	Provider <ConsoleFile> consoleFile;
 
 	// builder
 
@@ -46,7 +47,7 @@ class ContextActionPageBuilder<
 	ContextActionPageSpec contextActionPageSpec;
 
 	@BuilderParent
-	ConsoleContextBuilderContainer<ObjectType> container;
+	ConsoleContextBuilderContainer <ObjectType> container;
 
 	@BuilderTarget
 	ConsoleModuleImplementation consoleModule;

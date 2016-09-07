@@ -1,6 +1,5 @@
 package wbs.clients.apn.chat.user.image.api;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
@@ -9,6 +8,7 @@ import wbs.api.mvc.ApiAction;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.RequestContext;
@@ -19,15 +19,15 @@ public
 class ChatUserImageUploadViewAction
 	extends ApiAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserImageUploadTokenObjectHelper chatUserImageUploadTokenHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// implementation

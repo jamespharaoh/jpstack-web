@@ -6,7 +6,6 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalOf;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.sms.gsm.GsmUtils.gsmStringSimplifyAllowNonGsm;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -17,6 +16,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.model.ChatBlockObjectHelper;
@@ -35,6 +35,9 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.clients.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.application.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -61,68 +64,68 @@ public
 class ChatChatCommand
 	implements CommandHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatBlockObjectHelper chatBlockHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatKeywordObjectHelper chatKeywordHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageLogic chatMessageLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserDao chatUserDao;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatSendLogic chatSendLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	FailedMessageObjectHelper failedMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	KeywordFinder keywordFinder;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// indirect dependencies
 
-	@Inject
-	Provider<CommandManager> commandManagerProvider;
+	@WeakSingletonDependency
+	CommandManager commandManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ChatJoiner> chatJoinerProvider;
+	@PrototypeDependency
+	Provider <ChatJoiner> chatJoinerProvider;
 
 	// properties
 
@@ -362,7 +365,7 @@ class ChatChatCommand
 		) {
 
 			return optionalOf (
-				commandManagerProvider.get ().handle (
+				commandManager.handle (
 					inbox,
 					chatKeyword.getCommand (),
 					optionalAbsent (),

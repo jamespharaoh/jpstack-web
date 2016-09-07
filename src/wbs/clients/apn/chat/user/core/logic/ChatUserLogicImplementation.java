@@ -27,8 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
@@ -59,6 +57,7 @@ import wbs.clients.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -94,69 +93,69 @@ public
 class ChatUserLogicImplementation
 	implements ChatUserLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	AffiliateObjectHelper affiliateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatNumberReportLogic chatNumberReportLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserImageObjectHelper chatUserImageHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EmailLogic emailLogic;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	GazetteerEntryObjectHelper gazetteerEntryHelper;
 
-	@Inject
+	@SingletonDependency
 	KeywordFinder keywordFinder;
 
-	@Inject
+	@SingletonDependency
 	LocatorLogic locatorLogic;
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaLogic;
 
-	@Inject
+	@SingletonDependency
 	MediaTypeObjectHelper mediaTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	NumberLogic numberLogic;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// implementation

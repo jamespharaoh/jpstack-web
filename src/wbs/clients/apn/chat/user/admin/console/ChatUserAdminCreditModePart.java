@@ -12,17 +12,23 @@ import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.helper.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatUserAdminCreditModePart")
 public
 class ChatUserAdminCreditModePart
 	extends AbstractPagePart {
 
-	@Inject @Named
+	// singleton dependencies
+
+	@SingletonDependency
+	@Named
 	EnumConsoleHelper <?> chatUserCreditModeConsoleHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
+
+	// state
 
 	ChatUserRec chatUser;
 

@@ -1,19 +1,19 @@
 package wbs.clients.apn.chat.user.admin.console;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.combo.ConsoleFormActionHelper;
 import wbs.console.module.ConsoleManager;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.web.Responder;
 
 public abstract
-class AbstractConsoleFormActionHelper<FormState>
-	implements ConsoleFormActionHelper<FormState> {
+class AbstractConsoleFormActionHelper <FormState>
+	implements ConsoleFormActionHelper <FormState> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
 	// utility methods
@@ -22,7 +22,7 @@ class AbstractConsoleFormActionHelper<FormState>
 	Responder responder (
 			String responderName) {
 
-		Provider<Responder> responderProvider =
+		Provider <Responder> responderProvider =
 			consoleManager.responder (
 				responderName,
 				true);

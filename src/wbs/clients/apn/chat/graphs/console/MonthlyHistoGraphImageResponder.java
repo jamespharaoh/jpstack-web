@@ -9,8 +9,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
@@ -18,6 +16,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.YearMonth;
 
 import wbs.clients.apn.chat.core.logic.ChatMiscLogic;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.platform.graph.console.GraphScale;
 
 public abstract
@@ -26,14 +25,14 @@ class MonthlyHistoGraphImageResponder
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
 	// state
 
 	protected
-	List<Integer> values =
-		new ArrayList<Integer> ();
+	List <Integer> values =
+		new ArrayList<> ();
 
 	protected
 	DateTimeZone timezone;

@@ -7,7 +7,6 @@ import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import wbs.clients.apn.chat.core.console.ChatKeywordJoinTypeConsoleHelper;
@@ -19,35 +18,39 @@ import wbs.console.helper.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatAffiliateCreateOldPart")
 public
 class ChatAffiliateCreateOldPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	ChatKeywordJoinTypeConsoleHelper chatKeywordJoinTypeConsoleHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	EnumConsoleHelper <?> genderConsoleHelper;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	EnumConsoleHelper <?> orientConsoleHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// state
 
-	Map<String,Long> chatSchemes;
+	Map <String, Long> chatSchemes;
 
 	// implementation
 

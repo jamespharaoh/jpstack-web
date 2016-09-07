@@ -1,6 +1,5 @@
 package wbs.console.context;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.experimental.Accessors;
@@ -8,6 +7,7 @@ import lombok.experimental.Accessors;
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
 import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -22,8 +22,8 @@ class ConsoleContextExtensionPointMetaBuilder {
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleContextNestedExtensionPoint> nestedExtensionPointProvider;
+	@PrototypeDependency
+	Provider <ConsoleContextNestedExtensionPoint> nestedExtensionPointProvider;
 
 	// builder
 

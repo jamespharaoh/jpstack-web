@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableSet;
 
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
@@ -18,24 +16,25 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatHelpLogPendingFormResponder")
 public
 class ChatHelpLogPendingFormResponder
 	extends HtmlResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatHelpLogConsoleHelper chatHelpLogHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpTemplateConsoleHelper chatHelpTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// state

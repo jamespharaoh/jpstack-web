@@ -3,8 +3,6 @@ package wbs.clients.apn.chat.core.console;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableMap;
 
 import wbs.clients.apn.chat.user.core.model.ChatUserEditReason;
@@ -12,17 +10,11 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.utils.etc.Html;
-import wbs.platform.currency.logic.CurrencyLogic;
 
 @SingletonComponent ("chatConsoleLogic")
 public
 class ChatConsoleLogicImplementation
 	implements ChatConsoleLogic {
-
-	// dependencies
-
-	@Inject
-	CurrencyLogic currencyLogic;
 
 	// implementation
 

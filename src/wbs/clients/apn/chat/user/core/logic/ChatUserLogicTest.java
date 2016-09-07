@@ -4,33 +4,33 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
-import junit.framework.TestCase;
 import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.Gender;
 import wbs.clients.apn.chat.user.core.model.Orient;
+import wbs.framework.application.annotations.SingletonDependency;
+
+import junit.framework.TestCase;
 
 public
 class ChatUserLogicTest
 	extends TestCase {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogicImplementation chatUserLogic;
 
 	// data
 
-	List<Orient> compatibleOrients =
-		ImmutableList.<Orient>of (
+	List <Orient> compatibleOrients =
+		ImmutableList.of (
 			Orient.gay,
 			Orient.gay,
 			Orient.bi,
@@ -38,8 +38,8 @@ class ChatUserLogicTest
 			Orient.straight,
 			Orient.straight);
 
-	List<Gender> compatibleGenders =
-		ImmutableList.<Gender>of (
+	List <Gender> compatibleGenders =
+		ImmutableList.of (
 			Gender.male,
 			Gender.female,
 			Gender.male,
@@ -47,25 +47,25 @@ class ChatUserLogicTest
 			Gender.male,
 			Gender.female);
 
-	List<List<Boolean>> compatibleResults =
-		ImmutableList.<List<Boolean>>of (
+	List <List <Boolean>> compatibleResults =
+		ImmutableList.of (
 
-			ImmutableList.<Boolean>of (
+			ImmutableList.of (
 				true, false, true, false, false, false),
 
-			ImmutableList.<Boolean>of (
+			ImmutableList.of (
 				false, true, false, true, false, false),
 
-			ImmutableList.<Boolean>of (
+			ImmutableList.of (
 				true, false, true, true, false, true),
 
-			ImmutableList.<Boolean>of (
+			ImmutableList.of (
 				false, true, true, true, true, false),
 
-			ImmutableList.<Boolean>of (
+			ImmutableList.of (
 				false, false, false, true, false, true),
 
-			ImmutableList.<Boolean>of (
+			ImmutableList.of (
 				false, false, true, false, true, false));
 
 	public

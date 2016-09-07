@@ -4,9 +4,8 @@ import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
-import javax.inject.Inject;
-
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.clients.apn.chat.user.core.model.ChatUserEditReason;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -16,6 +15,7 @@ import wbs.clients.apn.chat.user.info.model.ChatUserNameRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -27,24 +27,24 @@ public
 class ChatUserAdminNameAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserNameObjectHelper chatUserNameHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// details

@@ -1,16 +1,16 @@
 package wbs.clients.apn.chat.user.core.console;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.help.logic.ChatHelpLogic;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -22,26 +22,32 @@ public
 class ChatUserHelpFormAction
 	extends ConsoleAction {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatHelpLogic chatHelpLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
+
+	// details
 
 	@Override
 	public
 	Responder backupResponder () {
 		return responder ("chatUserHelpFormResponder");
 	}
+
+	// implementation
 
 	@Override
 	protected

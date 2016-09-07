@@ -2,15 +2,14 @@ package wbs.clients.apn.chat.core.daemon;
 
 import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.framework.utils.etc.OptionalUtils.optionalOf;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.joda.time.LocalDate;
 
 import com.google.common.base.Optional;
 
@@ -19,6 +18,9 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.LocalDate;
+
 import wbs.clients.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.contact.logic.ChatMessageLogic;
@@ -27,7 +29,6 @@ import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.contact.model.ChatMessageMethod;
 import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.help.logic.ChatHelpLogLogic;
-import wbs.clients.apn.chat.help.logic.ChatHelpLogic;
 import wbs.clients.apn.chat.keyword.model.ChatKeywordJoinType;
 import wbs.clients.apn.chat.keyword.model.ChatKeywordObjectHelper;
 import wbs.clients.apn.chat.keyword.model.ChatKeywordRec;
@@ -41,16 +42,16 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.clients.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.database.Database;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.application.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.IdObject;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.sms.command.logic.CommandLogic;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.core.logic.DateFinder;
 import wbs.sms.core.logic.KeywordFinder;
-import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.CommandManager;
@@ -71,66 +72,52 @@ class ChatMainCommand
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
-	@Inject
-	ChatHelpLogic chatHelpLogic;
-
-	@Inject
+	@SingletonDependency
 	ChatHelpLogLogic chatHelpLogLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatKeywordObjectHelper chatKeywordHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageLogic chatMessageLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatSchemeKeywordObjectHelper chatSchemeKeywordHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatSchemeObjectHelper chatSchemeHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatSendLogic chatSendLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
-	CommandLogic commandLogic;
+	@WeakSingletonDependency
+	CommandManager commandManager;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
-	Database database;
-
-	@Inject
+	@SingletonDependency
 	KeywordFinder keywordFinder;
 
-	@Inject
-	MessageObjectHelper messageHelper;
-
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
-
-	// indirect dependencies
-
-	@Inject
-	Provider<CommandManager> commandManagerProvider;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ChatJoiner> chatJoinerProvider;
+	@PrototypeDependency
+	Provider <ChatJoiner> chatJoinerProvider;
 
 	// properties
 
@@ -383,10 +370,10 @@ class ChatMainCommand
 			}
 
 			return Optional.of (
-				commandManagerProvider.get ().handle (
+				commandManager.handle (
 					inbox,
 					chatSchemeKeyword.getCommand (),
-					Optional.<Long>absent (),
+					optionalAbsent (),
 					rest));
 
 		}
@@ -399,15 +386,15 @@ class ChatMainCommand
 				inbox.getId (),
 				keyword));
 
-		return Optional.<InboxAttemptRec>absent ();
+		return optionalAbsent ();
 
 	}
 
-	Optional<InboxAttemptRec> tryChatKeyword (
+	Optional <InboxAttemptRec> tryChatKeyword (
 			@NonNull String keyword,
 			@NonNull String rest) {
 
-		Optional<ChatKeywordRec> chatKeywordOptional =
+		Optional <ChatKeywordRec> chatKeywordOptional =
 			chatKeywordHelper.findByCode (
 				chat,
 				keyword);
@@ -500,11 +487,11 @@ class ChatMainCommand
 					keyword,
 					chatKeyword.getCommand ().getId ()));
 
-			return Optional.of (
-				commandManagerProvider.get ().handle (
+			return optionalOf (
+				commandManager.handle (
 					inbox,
 					chatKeyword.getCommand (),
-					Optional.<Long>absent (),
+					optionalAbsent (),
 					rest));
 
 		}
@@ -519,15 +506,15 @@ class ChatMainCommand
 				keyword,
 				"does nothing"));
 
-		return Optional.<InboxAttemptRec>absent ();
+		return optionalAbsent ();
 
 	}
 
-	Optional<InboxAttemptRec> tryKeyword (
+	Optional <InboxAttemptRec> tryKeyword (
 			@NonNull String keyword,
 			@NonNull String rest) {
 
-		Optional<InboxAttemptRec> schemeKeywordInboxAttempt =
+		Optional <InboxAttemptRec> schemeKeywordInboxAttempt =
 			trySchemeKeyword (
 				keyword,
 				rest);
@@ -535,7 +522,7 @@ class ChatMainCommand
 		if (schemeKeywordInboxAttempt.isPresent ())
 			return schemeKeywordInboxAttempt;
 
-		Optional<InboxAttemptRec> chatKeywordInboxAttempt =
+		Optional <InboxAttemptRec> chatKeywordInboxAttempt =
 			tryChatKeyword (
 				keyword,
 				rest);

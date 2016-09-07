@@ -2,13 +2,13 @@ package wbs.clients.apn.chat.infosite.api;
 
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
-import javax.inject.Inject;
-
 import lombok.Cleanup;
+
 import wbs.api.mvc.ApiAction;
 import wbs.clients.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
 import wbs.clients.apn.chat.infosite.model.ChatInfoSiteRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.RequestContext;
@@ -19,14 +19,18 @@ public
 class ChatInfoSiteViewAction
 	extends ApiAction {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatInfoSiteObjectHelper chatInfoSiteHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
+
+	// implementation
 
 	@Override
 	protected

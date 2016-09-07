@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -18,6 +16,7 @@ import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabList;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.AbstractStringSubstituter;
 
 /**
@@ -28,9 +27,9 @@ import wbs.framework.utils.AbstractStringSubstituter;
 public
 class ConsoleContextStuff {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
 	// properties
@@ -49,14 +48,14 @@ class ConsoleContextStuff {
 
 	// state
 
-	Map<ConsoleContext,Map<String,Tab>> tabsByNameByContext =
-		new HashMap<ConsoleContext,Map<String,Tab>> ();
+	Map <ConsoleContext, Map <String, Tab>> tabsByNameByContext =
+		new HashMap <> ();
 
-	Map<String,Object> attributes =
-		new HashMap<String,Object>();
+	Map <String, Object> attributes =
+		new HashMap<>();
 
-	Set<String> privs =
-		new HashSet<String> ();
+	Set <String> privs =
+		new HashSet<> ();
 
 	// implementation
 

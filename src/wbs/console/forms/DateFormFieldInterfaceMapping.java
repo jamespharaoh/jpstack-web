@@ -1,44 +1,43 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import java.util.Map;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
 import org.joda.time.LocalDate;
 
-import com.google.common.base.Optional;
+import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.utils.TimeFormatter;
 
 import fj.data.Either;
 
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.utils.TimeFormatter;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-
 @PrototypeComponent ("dateFormFieldInterfaceMapping")
 public
-class DateFormFieldInterfaceMapping<Container>
-	implements FormFieldInterfaceMapping<Container,LocalDate,String> {
+class DateFormFieldInterfaceMapping <Container>
+	implements FormFieldInterfaceMapping <Container, LocalDate, String> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// implementation
 
 	@Override
 	public
-	Either<Optional<String>,String> genericToInterface (
+	Either <Optional <String>, String> genericToInterface (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<LocalDate> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <LocalDate> genericValue) {
 
 		// handle not present
 

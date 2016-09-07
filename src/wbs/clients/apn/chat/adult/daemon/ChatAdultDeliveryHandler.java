@@ -5,7 +5,6 @@ import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import java.util.Collection;
 import java.util.Collections;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -13,6 +12,7 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.Cleanup;
 import lombok.NonNull;
+
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
@@ -21,6 +21,8 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.clients.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.sms.message.core.model.MessageRec;
@@ -36,25 +38,25 @@ class ChatAdultDeliveryHandler
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatSendLogic chatSendLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ChatJoiner> joinerProvider;
+	@PrototypeDependency
+	Provider <ChatJoiner> joinerProvider;
 
 	// implementation
 

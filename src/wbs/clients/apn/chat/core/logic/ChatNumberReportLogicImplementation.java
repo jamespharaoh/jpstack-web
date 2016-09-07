@@ -1,8 +1,10 @@
 package wbs.clients.apn.chat.core.logic;
 
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TimeUtils.laterThan;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
@@ -10,15 +12,10 @@ import lombok.extern.log4j.Log4j;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import com.google.common.base.Optional;
-
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.TimeUtils.laterThan;
-
 import wbs.sms.number.core.model.ChatUserNumberReportObjectHelper;
 import wbs.sms.number.core.model.ChatUserNumberReportRec;
 import wbs.sms.number.core.model.NumberRec;
@@ -29,12 +26,12 @@ public
 class ChatNumberReportLogicImplementation
 	implements ChatNumberReportLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserNumberReportObjectHelper chatUserNumberReportHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
 	// implementation

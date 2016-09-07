@@ -1,13 +1,12 @@
 package wbs.console.combo;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
@@ -21,6 +20,8 @@ import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -31,25 +32,25 @@ import wbs.framework.entity.record.Record;
 @PrototypeComponent ("contextTabPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ContextTabPageBuilder<
-	ObjectType extends Record<ObjectType>
+class ContextTabPageBuilder <
+	ObjectType extends Record <ObjectType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleFile> consoleFile;
+	@PrototypeDependency
+	Provider <ConsoleFile> consoleFile;
 
-	@Inject
-	Provider<ConsoleContextTab> contextTab;
+	@PrototypeDependency
+	Provider <ConsoleContextTab> contextTab;
 
-	@Inject
-	Provider<TabContextResponder> tabContextResponder;
+	@PrototypeDependency
+	Provider <TabContextResponder> tabContextResponder;
 
 	// state
 
@@ -65,7 +66,7 @@ class ContextTabPageBuilder<
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer<ObjectType> container;
+	ConsoleContextBuilderContainer <ObjectType> container;
 
 	@BuilderSource
 	ContextTabPageSpec spec;

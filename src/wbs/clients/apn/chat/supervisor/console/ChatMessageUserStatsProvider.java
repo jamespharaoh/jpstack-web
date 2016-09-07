@@ -9,11 +9,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.inject.Inject;
+import lombok.NonNull;
 
 import org.joda.time.Instant;
 
-import lombok.NonNull;
 import wbs.clients.apn.chat.contact.model.ChatContactRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
@@ -27,32 +26,37 @@ import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @SingletonComponent ("chatMessageUserStatsProvider")
 public
 class ChatMessageUserStatsProvider
 	implements StatsProvider {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	// implementation
 
 	@Override
 	public
 	StatsDataSet getStats (
 			@NonNull StatsPeriod period,
-			@NonNull Map<String,Object> conditions) {
+			@NonNull Map <String, Object> conditions) {
 
 		if (period.granularity () != StatsGranularity.hour)
 			throw new IllegalArgumentException ();
 
-		List<ChatRec> chats =
-			new ArrayList<ChatRec> ();
+		List <ChatRec> chats =
+			new ArrayList<> ();
 
 		if (conditions.containsKey ("chatId")) {
 

@@ -1,8 +1,10 @@
 package wbs.framework.application.context;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.framework.utils.etc.IterableUtils.iterableCount;
+import static wbs.framework.utils.etc.LogicUtils.booleanNotEqual;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
@@ -73,6 +75,7 @@ import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.annotations.UninitializedDependency;
+import wbs.framework.application.annotations.WeakSingletonDependency;
 import wbs.framework.application.context.EasyReadWriteLock.HeldLock;
 import wbs.framework.application.context.InjectedProperty.CollectionType;
 import wbs.framework.application.xml.ComponentPropertyValueSpec;
@@ -525,7 +528,8 @@ class ApplicationContextImplementation
 
 		setComponentInjectedProperties (
 			componentDefinition,
-			protoComponent);
+			protoComponent,
+			false);
 
 		// call factory
 
@@ -770,9 +774,9 @@ class ApplicationContextImplementation
 
 	private
 	void setComponentInjectedProperties (
-			ComponentDefinition componentDefinition,
-			Object component)
-		throws Exception {
+			@NonNull ComponentDefinition componentDefinition,
+			@NonNull Object component,
+			@NonNull Boolean weak) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -782,6 +786,14 @@ class ApplicationContextImplementation
 			InjectedProperty injectedProperty
 				: componentDefinition.injectedProperties ()
 		) {
+
+			if (
+				booleanNotEqual (
+					weak,
+					injectedProperty.weak ())
+			) {
+				continue;
+			}
 
 			log.debug (
 				stringFormat (
@@ -921,18 +933,32 @@ class ApplicationContextImplementation
 
 			// and inject it
 
-			Field field =
-				injectedProperty
-					.fieldDeclaringClass ()
-					.getDeclaredField (
-						injectedProperty.fieldName ());
+			try {
 
-			field.setAccessible (
-				true);
+				Field field =
+					injectedProperty
+						.fieldDeclaringClass ()
+						.getDeclaredField (
+							injectedProperty.fieldName ());
 
-			field.set (
-				component,
-				value);
+				field.setAccessible (
+					true);
+	
+				field.set (
+					component,
+					value);
+
+			} catch (NoSuchFieldException noSuchFieldException) {
+
+				throw new RuntimeException (
+					noSuchFieldException);
+
+			} catch (IllegalAccessException illegalAccessException) {
+
+				throw new RuntimeException (
+					illegalAccessException);
+
+			}
 
 		}
 
@@ -1289,7 +1315,7 @@ class ApplicationContextImplementation
 
 			for (
 				String dependency
-					: componentDefinition.orderedDependencies ()
+					: componentDefinition.strongDependencies ()
 			) {
 
 				if (
@@ -1318,14 +1344,18 @@ class ApplicationContextImplementation
 				componentDefinitions);
 
 		Map <String, ComponentDefinition> orderedComponentDefinitions =
-			new LinkedHashMap <> ();
+			new LinkedHashMap<> ();
 
-		while (! unorderedComponentDefinitions.isEmpty ()) {
+		while (
+			collectionIsNotEmpty (
+				unorderedComponentDefinitions)
+		) {
 
 			boolean madeProgress = false;
 
-			ListIterator <ComponentDefinition> unorderedComponentDefinitionIterator =
-				unorderedComponentDefinitions.listIterator ();
+			ListIterator <ComponentDefinition>
+				unorderedComponentDefinitionIterator =
+					unorderedComponentDefinitions.listIterator ();
 
 			OUTER: while (
 				unorderedComponentDefinitionIterator.hasNext ()
@@ -1336,12 +1366,15 @@ class ApplicationContextImplementation
 
 				for (
 					String targetComponentDefinitionName
-						: componentDefinition.orderedDependencies ()
+						: componentDefinition.strongDependencies ()
 				) {
 
-					if (! componentDefinitionsByName.containsKey (
-							targetComponentDefinitionName))
+					if (
+						! componentDefinitionsByName.containsKey (
+							targetComponentDefinitionName)
+					) {
 						continue OUTER;
+					}
 
 				}
 
@@ -1367,10 +1400,10 @@ class ApplicationContextImplementation
 						: unorderedComponentDefinitions
 				) {
 
-					List<String> unresolvedDependencyNames =
-						new ArrayList<String> (
+					List <String> unresolvedDependencyNames =
+						new ArrayList<> (
 							Sets.difference (
-								componentDefinition.orderedDependencies (),
+								componentDefinition.strongDependencies (),
 								orderedComponentDefinitions.keySet ()));
 
 					Collections.sort (
@@ -1436,6 +1469,33 @@ class ApplicationContextImplementation
 
 		}
 
+		// inject weak dependencies
+
+		for (
+			ComponentDefinition componentDefinition
+				: componentDefinitions
+		) {
+
+			if (
+				stringNotEqualSafe (
+					componentDefinition.scope (),
+					"singleton")
+			) {
+				continue;
+			}
+
+			Object component =
+				getComponentRequired (
+					componentDefinition.name (),
+					Object.class);
+
+			setComponentInjectedProperties (
+				componentDefinition,
+				component,
+				true);
+
+		}
+
 		return this;
 
 	}
@@ -1450,12 +1510,12 @@ class ApplicationContextImplementation
 
 		int errors = 0;
 
-		Class<?> instantiateClass =
+		Class <?> instantiateClass =
 			ifNull (
 				componentDefinition.factoryClass (),
 				componentDefinition.componentClass ());
 
-		componentDefinition.orderedDependencies ().addAll (
+		componentDefinition.strongDependencies ().addAll (
 			componentDefinition.referenceProperties ().values ());
 
 		for (
@@ -1476,6 +1536,10 @@ class ApplicationContextImplementation
 				field.getAnnotation (
 					SingletonDependency.class);
 
+			WeakSingletonDependency weakSingletonDependencyAnnotation =
+				field.getAnnotation (
+					WeakSingletonDependency.class);
+
 			UninitializedDependency uninitializedDependencyAnnotation =
 				field.getAnnotation (
 					UninitializedDependency.class);
@@ -1489,6 +1553,8 @@ class ApplicationContextImplementation
 							prototypeDependencyAnnotation),
 						optionalFromNullable (
 							singletonDependencyAnnotation),
+						optionalFromNullable (
+							weakSingletonDependencyAnnotation),
 						optionalFromNullable (
 							uninitializedDependencyAnnotation)));
 
@@ -1509,6 +1575,10 @@ class ApplicationContextImplementation
 
 			}
 
+			Boolean weak =
+				isNotNull (
+					weakSingletonDependencyAnnotation);
+
 			Named namedAnnotation =
 				field.getAnnotation (
 					Named.class);
@@ -1524,7 +1594,8 @@ class ApplicationContextImplementation
 						namedAnnotation,
 						field,
 						isNull (
-							uninitializedDependencyAnnotation));
+							uninitializedDependencyAnnotation),
+						weak);
 
 			} else {
 
@@ -1572,7 +1643,10 @@ class ApplicationContextImplementation
 
 					.initialized (
 						isNull (
-							uninitializedDependencyAnnotation));
+							uninitializedDependencyAnnotation))
+
+					.weak (
+						weak);
 
 				errors +=
 					initInjectedPropertyField (
@@ -1586,7 +1660,8 @@ class ApplicationContextImplementation
 						initInjectedPropertyTargetByQualifier (
 							componentDefinition,
 							qualifierAnnotations.get (0),
-							injectedProperty);
+							injectedProperty,
+							weak);
 
 				} else {
 
@@ -1594,7 +1669,8 @@ class ApplicationContextImplementation
 						initInjectedPropertyTargetByClass (
 							componentDefinition,
 							field,
-							injectedProperty);
+							injectedProperty,
+							weak);
 
 				}
 
@@ -1614,7 +1690,8 @@ class ApplicationContextImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Named namedAnnotation,
 			@NonNull Field field,
-			@NonNull Boolean initialized) {
+			@NonNull Boolean initialized,
+			@NonNull Boolean weak) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -1645,8 +1722,17 @@ class ApplicationContextImplementation
 
 		}
 
-		componentDefinition.orderedDependencies.add (
-			targetComponentDefinition.name ());
+		if (weak) {
+
+			componentDefinition.weakDependencies.add (
+				targetComponentDefinition.name ());
+
+		} else {
+
+			componentDefinition.strongDependencies.add (
+				targetComponentDefinition.name ());
+
+		}
 
 		componentDefinition.injectedProperties ().add (
 			new InjectedProperty ()
@@ -1668,7 +1754,12 @@ class ApplicationContextImplementation
 
 			.targetComponentNames (
 				Collections.singletonList (
-					targetComponentDefinitionName)));
+					targetComponentDefinitionName))
+
+			.weak (
+				weak)
+
+		);
 
 		return 0;
 
@@ -1692,10 +1783,10 @@ class ApplicationContextImplementation
 				? (ParameterizedType) field.getGenericType ()
 				: null;
 
-		Class<?> fieldClass =
+		Class <?> fieldClass =
 			parameterizedFieldType != null
-				? (Class<?>) parameterizedFieldType.getRawType ()
-				: (Class<?>) fieldType;
+				? (Class <?>) parameterizedFieldType.getRawType ()
+				: (Class <?>) fieldType;
 
 		// handle collections
 
@@ -1829,7 +1920,8 @@ class ApplicationContextImplementation
 	int initInjectedPropertyTargetByClass (
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Field field,
-			@NonNull InjectedProperty injectedProperty) {
+			@NonNull InjectedProperty injectedProperty,
+			@NonNull Boolean weak) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -1842,10 +1934,10 @@ class ApplicationContextImplementation
 				? (ParameterizedType) injectedProperty.targetType ()
 				: null;
 
-		Class<?> targetClass =
+		Class <?> targetClass =
 			parameterizedTargetType != null
-				? (Class<?>) parameterizedTargetType.getRawType ()
-				: (Class<?>) injectedProperty.targetType ();
+				? (Class <?>) parameterizedTargetType.getRawType ()
+				: (Class <?>) injectedProperty.targetType ();
 
 		Map <String, ComponentDefinition> targetComponentDefinitions =
 			ifNull (
@@ -1905,8 +1997,17 @@ class ApplicationContextImplementation
 					: targetComponentDefinitions.values ()
 			) {
 
-				componentDefinition.orderedDependencies ().add (
-					targetComponentDefinition.name ());
+				if (weak) {
+
+					componentDefinition.weakDependencies ().add (
+						targetComponentDefinition.name ());
+
+				} else {
+
+					componentDefinition.strongDependencies ().add (
+						targetComponentDefinition.name ());
+
+				}
 
 			}
 
@@ -1926,7 +2027,8 @@ class ApplicationContextImplementation
 	int initInjectedPropertyTargetByQualifier (
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Annotation qualifier,
-			@NonNull InjectedProperty injectedProperty) {
+			@NonNull InjectedProperty injectedProperty,
+			@NonNull Boolean weak) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -1986,8 +2088,17 @@ class ApplicationContextImplementation
 					: targetComponentDefinitions
 			) {
 
-				componentDefinition.orderedDependencies ().add (
-					targetComponentDefinition.name ());
+				if (weak) {
+
+					componentDefinition.weakDependencies ().add (
+						targetComponentDefinition.name ());
+
+				} else {
+
+					componentDefinition.strongDependencies ().add (
+						targetComponentDefinition.name ());
+
+				}
 
 			}
 
@@ -2246,7 +2357,7 @@ class ApplicationContextImplementation
 
 	@SneakyThrows (Exception.class)
 	public <ComponentType>
-	ComponentType injectDependencies (
+	ComponentType injectStrongDependencies (
 			@NonNull ComponentType component) {
 
 		@Cleanup
@@ -2285,7 +2396,8 @@ class ApplicationContextImplementation
 
 		setComponentInjectedProperties (
 			componentDefinition,
-			component);
+			component,
+			false);
 
 		return component;
 

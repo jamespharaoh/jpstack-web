@@ -5,8 +5,6 @@ import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
@@ -23,6 +21,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.TimeFormatter;
@@ -32,27 +31,27 @@ public
 class ChatUserAdminBillPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserBillLogObjectHelper chatUserBillLogHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// state
@@ -60,8 +59,8 @@ class ChatUserAdminBillPart
 	ChatUserRec chatUser;
 	ChatRec chat;
 
-	List<ChatUserBillLogRec> todayBillLogs;
-	List<ChatUserBillLogRec> allBillLogs;
+	List <ChatUserBillLogRec> todayBillLogs;
+	List <ChatUserBillLogRec> allBillLogs;
 	boolean billLimitReached;
 
 	// implementation

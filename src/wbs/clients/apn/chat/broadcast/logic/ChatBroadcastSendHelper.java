@@ -5,14 +5,13 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
+
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
 import org.joda.time.Instant;
-
-import com.google.common.base.Optional;
 
 import wbs.clients.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.clients.apn.chat.broadcast.model.ChatBroadcastNumberObjectHelper;
@@ -27,7 +26,9 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectHelper;
@@ -48,57 +49,57 @@ import wbs.sms.number.lookup.logic.NumberLookupManager;
 public
 class ChatBroadcastSendHelper
 	implements
-		GenericSendHelper<
+		GenericSendHelper <
 			ChatRec,
 			ChatBroadcastRec,
 			ChatBroadcastNumberRec
 		> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	BatchObjectHelper batchHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatBroadcastObjectHelper chatBroadcastHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatBroadcastLogic chatBroadcastLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatBroadcastNumberObjectHelper chatBroadcastNumberHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	MagicNumberLogic magicNumberLogic;
 
-	@Inject
+	@SingletonDependency
 	NumberLookupManager numberLookupManager;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MessageSender> messageSenderProvider;
+	@PrototypeDependency
+	Provider <MessageSender> messageSenderProvider;
 
 	// details
 

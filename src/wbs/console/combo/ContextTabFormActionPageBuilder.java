@@ -6,6 +6,7 @@ import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.mail.MailSessionDefinition;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -18,6 +19,8 @@ import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -33,30 +36,30 @@ import wbs.framework.web.Responder;
 public
 class ContextTabFormActionPageBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ApplicationContext applicationContext;
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleFile> consoleFile;
+	@PrototypeDependency
+	Provider <ConsoleFile> consoleFileProvider;
 
-	@Inject
-	Provider<ContextFormActionAction> contextFormActionActionProvider;
+	@PrototypeDependency
+	Provider <ContextFormActionAction> contextFormActionActionProvider;
 
-	@Inject
-	Provider<ContextFormActionPart> contextFormActionPartProvider;
+	@PrototypeDependency
+	Provider <ContextFormActionPart> contextFormActionPartProvider;
 
-	@Inject
-	Provider<ConsoleContextTab> contextTab;
+	@PrototypeDependency
+	Provider <ConsoleContextTab> contextTabProvider;
 
-	@Inject
-	Provider<TabContextResponder> tabContextResponder;
+	@PrototypeDependency
+	Provider <TabContextResponder> tabContextResponderProvider;
 
 	// builder
 
@@ -141,7 +144,7 @@ class ContextTabFormActionPageBuilder {
 
 		consoleModule.addContextTab (
 			container.tabLocation (),
-			contextTab.get ()
+			contextTabProvider.get ()
 				.name (tabName)
 				.defaultLabel (tabLabel)
 				.localFile (localFile),
@@ -215,7 +218,7 @@ class ContextTabFormActionPageBuilder {
 
 		consoleModule.addContextFile (
 			localFile,
-			consoleFile.get ()
+			consoleFileProvider.get ()
 
 				.getResponderName (
 					responderName)
@@ -231,7 +234,7 @@ class ContextTabFormActionPageBuilder {
 
 		consoleModule.addResponder (
 			responderName,
-			tabContextResponder.get ()
+			tabContextResponderProvider.get ()
 
 				.tab (
 					tabName)

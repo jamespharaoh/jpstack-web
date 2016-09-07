@@ -4,9 +4,6 @@ import static wbs.framework.utils.etc.Misc.doNothing;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
@@ -15,6 +12,8 @@ import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.console.helper.ConsoleHooks;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.application.annotations.WeakSingletonDependency;
 import wbs.framework.utils.RandomLogic;
 import wbs.platform.event.logic.EventLogic;
 import wbs.sms.gazetteer.model.GazetteerEntryObjectHelper;
@@ -25,21 +24,21 @@ public
 class ChatUserConsoleHooks
 	implements ConsoleHooks<ChatUserRec> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@WeakSingletonDependency
+	GazetteerEntryObjectHelper gazetteerEntryHelper;
+
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// indirect dependencies
-
-	@Inject
-	Provider<GazetteerEntryObjectHelper> gazetteerEntryHelperProvider;
 
 	// implementation
 
@@ -79,9 +78,6 @@ class ChatUserConsoleHooks
 	public
 	void beforeCreate (
 			@NonNull ChatUserRec chatUser) {
-
-		GazetteerEntryObjectHelper gazetteerEntryHelper =
-			gazetteerEntryHelperProvider.get ();
 
 		GazetteerEntryRec gazetteerEntry =
 			gazetteerEntryHelper.findByCodeRequired (

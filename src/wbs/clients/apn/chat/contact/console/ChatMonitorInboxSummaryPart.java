@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -59,6 +57,7 @@ import wbs.console.misc.JqueryEditableScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.TimeFormatter;
@@ -71,45 +70,45 @@ public
 class ChatMonitorInboxSummaryPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleont dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatContactNoteObjectHelper chatContactNoteHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatMonitorInboxObjectHelper chatMonitorInboxHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatNamedNoteObjectHelper chatNamedNoteHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatNoteNameObjectHelper chatNoteNameHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserAlarmObjectHelper chatUserAlarmHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	GazetteerLogic gazetteerLogic;
 
-	@Inject
+	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// state

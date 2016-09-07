@@ -1,10 +1,9 @@
 package wbs.console.combo;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
@@ -14,6 +13,7 @@ import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.tab.TabContextResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -24,19 +24,19 @@ import wbs.framework.entity.record.Record;
 @PrototypeComponent ("contextTabResponderBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ContextTabResponderBuilder<
-	ObjectType extends Record<ObjectType>
+class ContextTabResponderBuilder <
+	ObjectType extends Record <ObjectType>
 > {
 
 	// prototype dependencies
 
-	@Inject
-	Provider<TabContextResponder> tabContextResponder;
+	@PrototypeDependency
+	Provider <TabContextResponder> tabContextResponder;
 
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer<ObjectType> container;
+	ConsoleContextBuilderContainer <ObjectType> container;
 
 	@BuilderSource
 	ContextTabResponderSpec spec;

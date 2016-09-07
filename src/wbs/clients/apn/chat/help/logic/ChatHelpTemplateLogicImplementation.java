@@ -4,8 +4,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import lombok.NonNull;
 
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -14,6 +12,7 @@ import wbs.clients.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.platform.misc.MapStringSubstituter;
 import wbs.sms.gsm.MessageSplitter;
 
@@ -22,15 +21,19 @@ public
 class ChatHelpTemplateLogicImplementation
 	implements ChatHelpTemplateLogic {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatHelpTemplateObjectHelper chatHelpTemplateHelper;
+
+	// implementation
 
 	@Override
 	public
 	ChatHelpTemplateRec findChatHelpTemplate (
-			ChatUserRec chatUser,
-			String type,
-			String code) {
+			@NonNull ChatUserRec chatUser,
+			@NonNull String type,
+			@NonNull String code) {
 
 		ChatRec chat =
 			chatUser.getChat ();

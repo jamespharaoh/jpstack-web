@@ -3,11 +3,10 @@ package wbs.clients.apn.chat.supervisor.console;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+import lombok.NonNull;
 
 import org.joda.time.Instant;
 
-import lombok.NonNull;
 import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.contact.model.ChatMessageSearch;
@@ -18,14 +17,19 @@ import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @SingletonComponent ("chatMessageStatsProvider")
 public
 class ChatMessageStatsProvider
 	implements StatsProvider {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
+
+	// implementation
 
 	@Override
 	public

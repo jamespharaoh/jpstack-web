@@ -3,11 +3,10 @@ package wbs.clients.apn.chat.affiliate.console;
 import static wbs.framework.utils.etc.Misc.toEnum;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
+
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.keyword.console.ChatKeywordConsoleHelper;
 import wbs.clients.apn.chat.keyword.model.ChatKeywordJoinType;
@@ -21,6 +20,7 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -33,25 +33,25 @@ class ChatAffiliateKeywordsCreateAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatAffiliateConsoleHelper chatAffiliateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatKeywordConsoleHelper chatKeywordHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatSchemeKeywordConsoleHelper chatSchemeKeywordHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	KeywordLogic keywordLogic;
 
 	// details

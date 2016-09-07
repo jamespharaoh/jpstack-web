@@ -35,7 +35,6 @@ import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
@@ -91,7 +90,9 @@ import wbs.clients.apn.chat.user.info.model.ChatProfileFieldValueRec;
 import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.clients.apn.chat.user.info.model.ChatUserProfileFieldObjectHelper;
 import wbs.clients.apn.chat.user.info.model.ChatUserProfileFieldRec;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
@@ -140,92 +141,94 @@ public
 class ChatApiServletModule
 	implements ServletModule {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatAffiliateObjectHelper chatAffiliateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatDateLogic chatDateLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatInfoLogic chatInfoLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageLogic chatMessageLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatSchemeObjectHelper chatSchemeHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserCreditObjectHelper chatUserCreditHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserProfileFieldObjectHelper chatUserProfileFieldHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserImageObjectHelper chatUserImageHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	LocatorLogic locatorLogic;
 
-	@Inject
+	@SingletonDependency
 	MediaObjectHelper mediaHelper;
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaLogic;
 
-	@Inject
+	@SingletonDependency
 	NumberObjectHelper numberHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	WebApiManager webApiManager;
 
-	@Inject
+	@SingletonDependency
 	@Named
 	MercatorProjection ukNationalGrid;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ApiFile> apiFile;
+	@PrototypeDependency
+	Provider <ApiFile> apiFile;
 
-	@Inject
-	Provider<PhpRpcAction> phpRpcAction;
+	@PrototypeDependency
+	Provider <PhpRpcAction> phpRpcAction;
 
-	@Inject
-	Provider<XmlRpcAction> xmlRpcAction;
+	@PrototypeDependency
+	Provider <XmlRpcAction> xmlRpcAction;
 
-	@Inject
-	Provider<XmlRpcFile> xmlRpcFile;
+	@PrototypeDependency
+	Provider <XmlRpcFile> xmlRpcFile;
 
 	// ================================= servlet module
 

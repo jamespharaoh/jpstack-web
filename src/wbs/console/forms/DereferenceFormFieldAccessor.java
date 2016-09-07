@@ -4,27 +4,27 @@ import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringInSafe;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.etc.BeanLogic;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("dereferenceFormFieldacessor")
 public
-class DereferenceFormFieldAccessor<Container,Native>
-	implements FormFieldAccessor<Container,Native> {
+class DereferenceFormFieldAccessor <Container, Native>
+	implements FormFieldAccessor <Container, Native> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
 	// properties
@@ -39,7 +39,7 @@ class DereferenceFormFieldAccessor<Container,Native>
 
 	@Override
 	public
-	Optional<Native> read (
+	Optional <Native> read (
 			@NonNull Container container) {
 
 		@SuppressWarnings ("unchecked")

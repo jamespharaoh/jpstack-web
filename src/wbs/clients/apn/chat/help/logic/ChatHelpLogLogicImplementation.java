@@ -1,10 +1,8 @@
 package wbs.clients.apn.chat.help.logic;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
-
-import com.google.common.base.Optional;
 
 import wbs.clients.apn.chat.contact.model.ChatMessageRec;
 import wbs.clients.apn.chat.core.model.ChatRec;
@@ -12,6 +10,7 @@ import wbs.clients.apn.chat.help.model.ChatHelpLogObjectHelper;
 import wbs.clients.apn.chat.help.model.ChatHelpLogRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.queue.logic.QueueLogic;
@@ -26,15 +25,15 @@ public
 class ChatHelpLogLogicImplementation
 	implements ChatHelpLogLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatHelpLogObjectHelper chatHelpLogHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
 	// implementation

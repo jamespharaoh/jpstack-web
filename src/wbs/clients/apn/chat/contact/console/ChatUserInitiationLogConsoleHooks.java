@@ -1,7 +1,5 @@
 package wbs.clients.apn.chat.contact.console;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableList;
 
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogRec;
@@ -11,18 +9,19 @@ import wbs.clients.apn.chat.core.model.ChatRec;
 import wbs.console.helper.ConsoleHooks;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @SingletonComponent ("chatUserInitiationLogConsoleHooks")
 public
 class ChatUserInitiationLogConsoleHooks
-	implements ConsoleHooks<ChatUserInitiationLogRec> {
+	implements ConsoleHooks <ChatUserInitiationLogRec> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatConsoleHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// implementation

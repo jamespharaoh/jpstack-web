@@ -2,8 +2,6 @@ package wbs.clients.apn.chat.user.image.api;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableMap;
 
 import wbs.clients.apn.chat.contact.logic.ChatSendLogic;
@@ -12,6 +10,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.web.PrintResponder;
 import wbs.framework.web.RequestContext;
 
@@ -20,18 +19,18 @@ public
 class ChatUserImageUploadSuccessPage
 	extends PrintResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatSendLogic chatSendLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserImageUploadTokenObjectHelper chatUserImageUploadTokenHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// state

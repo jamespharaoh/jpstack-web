@@ -15,20 +15,22 @@ import wbs.framework.application.annotations.SingletonComponent;
 public
 class ConsoleHelperRegistry {
 
-	Map<String,ConsoleHelper<?>> byObjectName =
-		new HashMap<String,ConsoleHelper<?>> ();
+	Map <String, ConsoleHelper <?>> byObjectName =
+		new HashMap<> ();
 
-	Map<Class<?>,ConsoleHelper<?>> byObjectClass =
-		new HashMap<Class<?>,ConsoleHelper<?>> ();
+	Map <Class <?>, ConsoleHelper <?>> byObjectClass =
+		new HashMap<> ();
 
 	public synchronized
 	void register (
-			@NonNull ConsoleHelper<?> consoleHelper) {
+			@NonNull ConsoleHelper <?> consoleHelper) {
 
 		// detect dupes
 
-		if (byObjectName.containsKey (
-				consoleHelper.objectName ())) {
+		if (
+			byObjectName.containsKey (
+				consoleHelper.objectName ())
+		) {
 
 			log.warn (
 				stringFormat (
@@ -39,8 +41,10 @@ class ConsoleHelperRegistry {
 
 		}
 
-		if (byObjectClass.containsKey (
-				consoleHelper.objectClass ())) {
+		if (
+			byObjectClass.containsKey (
+				consoleHelper.objectClass ())
+		) {
 
 			log.warn (
 				stringFormat (
@@ -69,8 +73,8 @@ class ConsoleHelperRegistry {
 	}
 
 	public synchronized
-	ConsoleHelper<?> findByObjectClass (
-			@NonNull Class<?> objectClass) {
+	ConsoleHelper <?> findByObjectClass (
+			@NonNull Class <?> objectClass) {
 
 		return byObjectClass.get (
 			objectClass);
@@ -78,10 +82,10 @@ class ConsoleHelperRegistry {
 	}
 
 	public synchronized
-	ConsoleHelper<?> findByObjectName (
+	ConsoleHelper <?> findByObjectName (
 			@NonNull String objectName) {
 
-		ConsoleHelper<?> consoleHelper =
+		ConsoleHelper <?> consoleHelper =
 			byObjectName.get (
 				objectName);
 

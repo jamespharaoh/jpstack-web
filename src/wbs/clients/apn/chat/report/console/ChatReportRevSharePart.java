@@ -9,17 +9,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.joda.time.Interval;
-import org.joda.time.LocalDate;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
+
+import org.joda.time.Interval;
+import org.joda.time.LocalDate;
+
 import wbs.clients.apn.chat.affiliate.console.ChatAffiliateConsoleHelper;
 import wbs.clients.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.clients.apn.chat.bill.console.ChatRouteConsoleHelper;
@@ -47,6 +47,7 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.hibernate.HibernateDatabase;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.TextualInterval;
@@ -67,60 +68,58 @@ public
 class ChatReportRevSharePart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	AffiliateConsoleHelper affiliateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatAffiliateConsoleHelper chatAffiliateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMonthCostConsoleHelper chatMonthCostHelper;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	ConsoleModule chatReportConsoleModule;
 
-	@Inject
+	@SingletonDependency
 	ChatRouteConsoleHelper chatRouteHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserCreditConsoleHelper chatUserCreditHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext consoleRequestContext;
 
-	@Inject
+	@SingletonDependency
 	HibernateDatabase database;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	MessageStatsConsoleHelper messageStatsHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	//@Inject
-	//TimeFormatter timeFormatter;
-
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// state
@@ -135,10 +134,10 @@ class ChatReportRevSharePart
 
 	ChatRec chat;
 
-	Map<AffiliateRec,ChatReportRevShareItem> chatReportsByAffiliate;
+	Map <AffiliateRec, ChatReportRevShareItem> chatReportsByAffiliate;
 	ChatReportRevShareItem totalReport;
 
-	List<ChatReportRevShareItem> chatReportsSorted;
+	List <ChatReportRevShareItem> chatReportsSorted;
 
 	String outputTypeParam;
 

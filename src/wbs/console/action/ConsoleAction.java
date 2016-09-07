@@ -2,7 +2,6 @@ package wbs.console.action;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 import javax.validation.ConstraintViolationException;
@@ -16,6 +15,7 @@ import wbs.console.misc.ConsoleExceptionHandler;
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
@@ -27,29 +27,29 @@ public abstract
 class ConsoleAction
 	implements Action {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	protected
 	ApplicationContext applicationContext;
 
-	@Inject
+	@SingletonDependency
 	protected
 	ConsoleExceptionHandler consoleExceptionHandler;
 
-	@Inject
+	@SingletonDependency
 	protected
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	protected
 	ConsoleUserHelper consoleUserHelper;
 
-	@Inject
+	@SingletonDependency
 	protected
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	protected
 	ConsoleRequestContext requestContext;
 

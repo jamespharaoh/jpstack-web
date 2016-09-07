@@ -6,22 +6,23 @@ import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 import java.io.FileOutputStream;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.io.IOUtils;
 
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.IOUtils;
+
 import wbs.api.mvc.ApiAction;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageType;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
 import wbs.clients.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -37,24 +38,24 @@ public
 class ChatUserImageUploadPostAction
 	extends ApiAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatUserImageUploadTokenObjectHelper chatUserImageUploadTokenHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// implementation

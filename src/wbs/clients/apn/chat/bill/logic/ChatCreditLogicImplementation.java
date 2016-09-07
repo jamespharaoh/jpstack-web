@@ -15,7 +15,6 @@ import static wbs.framework.utils.etc.TimeUtils.laterThan;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -46,7 +45,9 @@ import wbs.clients.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.clients.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
@@ -65,45 +66,45 @@ public
 class ChatCreditLogicImplementation
 	implements ChatCreditLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ChatNumberReportLogic chatNumberReportLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatSendLogic chatSendLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpTemplateLogic chatTemplateLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatNetworkObjectHelper chatNetworkHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserCreditLimitLogObjectHelper chatUserCreditLimitLogHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserSpendObjectHelper chatUserSpendHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MessageSender> messageSender;
+	@PrototypeDependency
+	Provider <MessageSender> messageSender;
 
 	// implementation
 

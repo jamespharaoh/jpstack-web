@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -43,7 +42,9 @@ import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.clients.apn.chat.user.info.model.ChatUserInfoObjectHelper;
 import wbs.clients.apn.chat.user.info.model.ChatUserInfoRec;
 import wbs.clients.apn.chat.user.info.model.ChatUserInfoStatus;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
@@ -73,68 +74,74 @@ public
 class ChatInfoLogicImplementation
 	implements ChatInfoLogic {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatContactObjectHelper chatContactHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpTemplateObjectHelper chatHelpTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatInfoSiteObjectHelper chatInfoSiteHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatSendLogic chatSendLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatHelpTemplateLogic chatTemplateLogic;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserInfoObjectHelper chatUserInfoHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	ExceptionUtils exceptionLogic;
 
-	@Inject
+	@SingletonDependency
 	LocatorLogic locatorLogic;
 
-	@Inject
+	@SingletonDependency
 	MagicNumberLogic magicNumberLogic;
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaLogic;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
-	Provider<MessageSender> messageSender;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <MessageSender> messageSender;
+
+	// implementation
 
 	@Override
 	public

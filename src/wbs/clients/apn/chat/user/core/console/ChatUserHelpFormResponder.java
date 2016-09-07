@@ -2,25 +2,30 @@ package wbs.clients.apn.chat.user.core.console;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
-
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatUserHelpFormResponder")
 public
 class ChatUserHelpFormResponder
 	extends HtmlResponder {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
+	// state
+
 	ChatUserRec chatUser;
+
+	// implementation
 
 	@Override
 	public

@@ -6,11 +6,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.inject.Inject;
+import lombok.NonNull;
 
 import org.joda.time.Instant;
 
-import lombok.NonNull;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationLogRec;
 import wbs.clients.apn.chat.contact.model.ChatUserInitiationReason;
@@ -22,23 +21,28 @@ import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @SingletonComponent ("chatUserInitiationStatsProvider")
 public
 class ChatUserInitiationStatsProvider
 	implements StatsProvider {
 
-	@Inject
+	// singleton depenencies
+
+	@SingletonDependency
 	ChatObjectHelper chatHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserInitiationLogObjectHelper chatUserInitiationLogHelper;
+
+	// implementation
 
 	@Override
 	public
 	StatsDataSet getStats (
 			@NonNull StatsPeriod period,
-			@NonNull Map<String,Object> conditions) {
+			@NonNull Map <String, Object> conditions) {
 
 		if (period.granularity () != StatsGranularity.hour)
 			throw new IllegalArgumentException ();

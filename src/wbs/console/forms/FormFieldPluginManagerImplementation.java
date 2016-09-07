@@ -1,43 +1,44 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @SingletonComponent ("formFieldPluginManager")
 public
 class FormFieldPluginManagerImplementation
 	implements FormFieldPluginManager {
 
+	// singleton dependencies
+
+	@SingletonDependency
+	List <FormFieldPluginProvider> formFieldPluginProviders;
+
 	// prototype dependencies
 
-	@Inject
-	Provider<NullFormFieldUpdateHook<?,?,?>>
+	@PrototypeDependency
+	Provider <NullFormFieldUpdateHook <?,?,?>>
 	nullFormFieldUpdateHookProvider;
-
-	// collection dependencies
-
-	@Inject
-	List<FormFieldPluginProvider> formFieldPluginProviders;
 
 	// implementation
 
 	@Override
 	public
-	Optional<FormFieldNativeMapping<?,?,?>> getNativeMapping (
+	Optional <FormFieldNativeMapping <?,?,?>> getNativeMapping (
 			FormFieldBuilderContext context,
-			Class<?> containerClass,
+			Class <?> containerClass,
 			String fieldName,
-			Class<?> genericClass,
-			Class<?> nativeClass) {
+			Class <?> genericClass,
+			Class <?> nativeClass) {
 
 		for (
 			FormFieldPluginProvider pluginProvider

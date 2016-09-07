@@ -4,8 +4,6 @@ import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableSet;
 
 import wbs.clients.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -15,20 +13,27 @@ import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("chatUserAdminBarringPart")
 public
 class ChatUserAdminBarringPart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
+
+	// state
 
 	ChatUserRec chatUser;
 
+	// details
+
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
 		return ImmutableSet.<ScriptRef>builder ()
 
