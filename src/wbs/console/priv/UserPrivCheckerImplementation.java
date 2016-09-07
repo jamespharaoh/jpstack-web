@@ -4,14 +4,16 @@ import java.util.Collection;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.ProxiedRequestComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 
@@ -23,20 +25,20 @@ public
 class UserPrivCheckerImplementation
 	implements UserPrivChecker {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleUserHelper consoleUserHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivDataLoader privDataLoader;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <UserPrivCheckerBuilder> privCheckerBuilderProvider;
 
 	// state

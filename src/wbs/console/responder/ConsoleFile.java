@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
@@ -18,6 +17,9 @@ import wbs.console.lookup.BooleanLookup;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.application.annotations.WeakSingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
@@ -35,23 +37,21 @@ public
 class ConsoleFile
 	extends AbstractFile {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@WeakSingletonDependency
+	ConsoleManager consoleManager;
+
+	@SingletonDependency
 	ConsoleRequestContext consoleRequestContext;
-
-	// indirect dependencies
-
-	@Inject
-	Provider<ConsoleManager> consoleManagerProvider;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ActionRequestHandler> actionRequestHandlerProvider;
+	@PrototypeDependency
+	Provider <ActionRequestHandler> actionRequestHandlerProvider;
 
-	@Inject
-	Provider<ConsoleContextPrivLookup> contextPrivLookup;
+	@PrototypeDependency
+	Provider <ConsoleContextPrivLookup> contextPrivLookupProvider;
 
 	// properties
 
@@ -120,10 +120,7 @@ class ConsoleFile
 			public
 			Responder get () {
 
-				ConsoleManager consoleManager =
-					consoleManagerProvider.get ();
-
-				Provider<Responder> responderProvider =
+				Provider <Responder> responderProvider =
 					consoleManager.responder (
 						responderName,
 						true);
@@ -197,7 +194,7 @@ class ConsoleFile
 			List<String> privKeys) {
 
 		return privLookup (
-			contextPrivLookup.get ()
+			contextPrivLookupProvider.get ()
 				.privKeys (privKeys));
 
 	}
@@ -207,7 +204,7 @@ class ConsoleFile
 			String privName) {
 
 		return privLookup (
-			contextPrivLookup.get ()
+			contextPrivLookupProvider.get ()
 				.addPrivKey (privName));
 
 	}

@@ -539,4 +539,26 @@ class TypeUtils {
 
 	}
 
+	public static <ClassType>
+	ClassType classInstantiate (
+			@NonNull Class <ClassType> classToInstantiate) {
+
+		try {
+
+			return classToInstantiate.newInstance ();
+
+		} catch (IllegalAccessException illegalAccessException) {
+
+			throw new RuntimeException (
+				illegalAccessException);
+
+		} catch (InstantiationException instantiationException) {
+
+			throw new RuntimeException (
+				instantiationException);
+
+		}
+
+	}
+
 }

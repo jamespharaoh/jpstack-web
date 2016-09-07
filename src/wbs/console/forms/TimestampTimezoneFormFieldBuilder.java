@@ -1,19 +1,20 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.joda.time.Instant;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -26,47 +27,47 @@ import wbs.framework.builder.annotations.BuilderTarget;
 public
 class TimestampTimezoneFormFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<TimestampTimezonePairFormFieldNativeMapping>
+	@PrototypeDependency
+	Provider <TimestampTimezonePairFormFieldNativeMapping>
 	timestampTimezonPairFormFieldNativeMappingProvider;
 
-	@Inject
-	Provider<NullFormFieldConstraintValidator>
+	@PrototypeDependency
+	Provider <NullFormFieldConstraintValidator>
 	nullFormFieldConstraintValidatorProvider;
 
-	@Inject
-	Provider<PairFormFieldAccessor>
+	@PrototypeDependency
+	Provider <PairFormFieldAccessor>
 	pairFormFieldAccessorProvider;
 
-	@Inject
-	Provider<ReadOnlyFormField>
+	@PrototypeDependency
+	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
-	@Inject
-	Provider<RequiredFormFieldValueValidator>
+	@PrototypeDependency
+	Provider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
-	@Inject
-	Provider<SimpleFormFieldAccessor>
+	@PrototypeDependency
+	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
-	@Inject
-	Provider<TextFormFieldRenderer>
+	@PrototypeDependency
+	Provider <TextFormFieldRenderer>
 	textFormFieldRendererProvider;
 
-	@Inject
-	Provider<TimestampTimezoneFormFieldInterfaceMapping>
+	@PrototypeDependency
+	Provider <TimestampTimezoneFormFieldInterfaceMapping>
 	timestampTimezoneFormFieldInterfaceMappingProvider;
 
-	@Inject
-	Provider<UpdatableFormField>
+	@PrototypeDependency
+	Provider <UpdatableFormField>
 	updatableFormFieldProvider;
 
 	// builder

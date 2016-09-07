@@ -4,13 +4,13 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.reporting.AdditionStatsResolver;
 import wbs.console.reporting.StatsResolver;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -22,8 +22,10 @@ import wbs.framework.builder.annotations.BuilderTarget;
 public
 class SupervisorAdditionStatsResolverBuilder {
 
-	@Inject
-	Provider<AdditionStatsResolver> additionStatsResolver;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <AdditionStatsResolver> additionStatsResolverProvider;
 
 	// builder
 
@@ -50,7 +52,7 @@ class SupervisorAdditionStatsResolverBuilder {
 			spec.operandSpecs ();
 
 		AdditionStatsResolver additionStatsResolver =
-			this.additionStatsResolver.get ();
+			this.additionStatsResolverProvider.get ();
 
 		for (
 			SupervisorAdditionOperandSpec operandSpec

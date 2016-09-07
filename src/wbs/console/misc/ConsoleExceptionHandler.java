@@ -9,16 +9,18 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ErrorResponder;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
@@ -32,28 +34,30 @@ public
 class ConsoleExceptionHandler
 	implements WebExceptionHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	ExceptionUtils exceptionLogic;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
-	Provider<ErrorResponder> errorPage;
-
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext consoleRequestContext;
 
-	@Inject
+	@SingletonDependency
 	ConsoleUserHelper consoleUserHelper;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <ErrorResponder> errorPageProvider;
 
 	// state
 
@@ -118,7 +122,7 @@ class ConsoleExceptionHandler
 
 				requestContext.reset ();
 
-				errorPage.get ()
+				errorPageProvider.get ()
 					.exception (throwable)
 					.execute ();
 

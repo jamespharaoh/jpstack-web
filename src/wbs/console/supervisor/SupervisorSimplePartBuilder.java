@@ -1,6 +1,5 @@
 package wbs.console.supervisor;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.experimental.Accessors;
@@ -8,6 +7,7 @@ import lombok.experimental.Accessors;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.part.PagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -21,9 +21,9 @@ import wbs.framework.builder.annotations.BuilderTarget;
 public
 class SupervisorSimplePartBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ApplicationContext applicationContext;
 
 	// builder

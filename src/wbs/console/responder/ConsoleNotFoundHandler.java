@@ -4,7 +4,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
@@ -16,7 +15,9 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;
 import wbs.console.tab.TabbedResponder;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.web.WebNotFoundHandler;
@@ -27,27 +28,27 @@ public
 class ConsoleNotFoundHandler
 	implements WebNotFoundHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleUserHelper consoleUserHelper;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
-	Provider<NotFoundResponder> notFoundPage;
-
-	@Inject
-	Provider<NotFoundPart> notFoundPart;
-
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<TabbedResponder> tabbedPage;
+	@PrototypeDependency
+	Provider <TabbedResponder> tabbedPageProvider;
+
+	@PrototypeDependency
+	Provider <NotFoundResponder> notFoundPageProvider;
+
+	@PrototypeDependency
+	Provider <NotFoundPart> notFoundPartProvider;
 
 	// implementation
 
@@ -111,15 +112,15 @@ class ConsoleNotFoundHandler
 
 		if (tabContext != null) {
 
-			tabbedPage.get ()
+			tabbedPageProvider.get ()
 				.tab (notFoundTab)
 				.title ("Page not found")
-				.pagePart (notFoundPart.get ())
+				.pagePart (notFoundPartProvider.get ())
 				.execute ();
 
 		} else {
 
-			notFoundPage.get ()
+			notFoundPageProvider.get ()
 				.execute ();
 
 		}

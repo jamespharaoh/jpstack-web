@@ -17,8 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
@@ -27,12 +25,14 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.forms.EntityFinder;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.application.context.NoSuchComponentException;
 import wbs.framework.entity.model.ModelMethods;
@@ -48,24 +48,24 @@ import wbs.framework.utils.etc.Html;
 public
 class ConsoleHelperBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ApplicationContext applicationContext;
 
-	@Inject
+	@SingletonDependency
 	ConsoleHelperProviderManager consoleHelperPoviderManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleHelperRegistry consoleHelperRegistry;
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// required parameters

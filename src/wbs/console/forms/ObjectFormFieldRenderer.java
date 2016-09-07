@@ -15,32 +15,33 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
-import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FormField.FormType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.utils.etc.OptionalUtils;
 import wbs.framework.utils.formatwriter.FormatWriter;
 
+import fj.data.Either;
+
 @Accessors (fluent = true)
 @PrototypeComponent ("objectFormFieldRenderer")
 public
-class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
-	implements FormFieldRenderer<Container,Interface> {
+class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
+	implements FormFieldRenderer <Container, Interface> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
 	// properties
@@ -58,7 +59,7 @@ class ObjectFormFieldRenderer<Container,Interface extends Record<Interface>>
 	String rootFieldName;
 
 	@Getter @Setter
-	EntityFinder<Interface> entityFinder;
+	EntityFinder <Interface> entityFinder;
 
 	@Getter @Setter
 	Boolean mini;

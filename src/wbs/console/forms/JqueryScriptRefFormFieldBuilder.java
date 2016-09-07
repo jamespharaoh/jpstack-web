@@ -2,13 +2,13 @@ package wbs.console.forms;
 
 import java.util.Collections;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -22,8 +22,8 @@ class JqueryScriptRefFormFieldBuilder {
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ScriptRefFormField>
+	@PrototypeDependency
+	Provider <ScriptRefFormField>
 	scriptRefFormFieldProvider;
 
 	// builder

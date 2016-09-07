@@ -3,22 +3,25 @@ package wbs.console.responder;
 import java.io.IOException;
 import java.util.Set;
 
-import javax.inject.Inject;
+import com.google.common.collect.ImmutableSet;
 
 import org.joda.time.Instant;
 
-import com.google.common.collect.ImmutableSet;
-
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.TimeFormatter;
 
 public abstract
 class HtmlResponder
 	extends ConsolePrintResponder {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	TimeFormatter timeFormatter;
+
+	// details
 
 	protected
 	String getTitle () {

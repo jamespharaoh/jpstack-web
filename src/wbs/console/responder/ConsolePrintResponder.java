@@ -3,9 +3,8 @@ package wbs.console.responder;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.inject.Inject;
-
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.formatwriter.FormatWriter;
 import wbs.framework.utils.formatwriter.WriterFormatWriter;
 
@@ -15,7 +14,7 @@ class ConsolePrintResponder
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	protected
 	ConsoleRequestContext requestContext;
 

@@ -1,11 +1,10 @@
 package wbs.console.supervisor;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
@@ -23,6 +22,9 @@ import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.application.annotations.WeakSingletonDependency;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -35,35 +37,30 @@ import wbs.framework.entity.record.Record;
 @PrototypeComponent ("supervisorPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class SupervisorPageBuilder<
+class SupervisorPageBuilder <
 	ObjectType extends Record <ObjectType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ApplicationContext applicationContext;
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
-
-	// indirect dependencies
-
-	@Inject
-	Provider <ConsoleManager> consoleManagerProvider;
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <ConsoleFile> consoleFile;
 
-	@Inject
+	@PrototypeDependency
 	Provider <ConsoleContextTab> contextTab;
 
-	@Inject
+	@PrototypeDependency
 	Provider <SupervisorPart> supervisorPart;
 
-	@Inject
+	@PrototypeDependency
 	Provider <TabContextResponder> tabContextResponder;
 
 	// builder

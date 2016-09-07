@@ -3,36 +3,37 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.framework.utils.etc.Misc.errorResult;
 import static wbs.framework.utils.etc.Misc.successResult;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
-import org.joda.time.Instant;
-
 import com.google.common.base.Optional;
 
-import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.joda.time.Instant;
+
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
+
+import fj.data.Either;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("timestampFormFieldInterfaceMapping")
 public
-class TimestampFormFieldInterfaceMapping<Container>
-	implements FormFieldInterfaceMapping<Container,Instant,String> {
+class TimestampFormFieldInterfaceMapping <Container>
+	implements FormFieldInterfaceMapping <Container, Instant, String> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleUserHelper preferences;
 
 	// properties

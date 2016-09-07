@@ -1,10 +1,10 @@
 package wbs.console.module;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
@@ -22,11 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.base.Optional;
 
@@ -34,6 +30,10 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.tuple.Pair;
+
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContext.PathSupply;
 import wbs.console.context.ConsoleContextStuff;
@@ -45,7 +45,9 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.supervisor.SupervisorConfig;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.ContextTabPlacement;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -64,45 +66,48 @@ class ConsoleManagerImplementation
 		ConsoleManager,
 		ServletModule {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleHelperProviderRegistry consoleHelperProviderRegistry;
 
-	@Inject
+	@SingletonDependency
+	@Getter
+	Map <String, ConsoleModule> consoleModules;
+
+	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
 
-	@Inject
-	ConsoleRequestContext requestContext;
-
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
-	Provider<ConsoleContextStuff> contextStuffProvider;
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
-	@Inject @Getter
-	Map<String,ConsoleModule> consoleModules;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <ConsoleContextStuff> contextStuffProvider;
 
 	// state
 
-	Map<String,ConsoleContextType> contextTypesByName =
-		new HashMap<String,ConsoleContextType> ();
+	Map <String, ConsoleContextType> contextTypesByName =
+		new HashMap<> ();
 
-	Map<String,ConsoleContext> consoleContextsByName =
-		new HashMap<String,ConsoleContext> ();
+	Map <String, ConsoleContext> consoleContextsByName =
+		new HashMap<> ();
 
-	List<ConsoleContext> consoleContexts =
-		new ArrayList<ConsoleContext> ();
+	List <ConsoleContext> consoleContexts =
+		new ArrayList<> ();
 
-	Map<String,ConsoleContextTab> contextTabs =
-		new HashMap<String,ConsoleContextTab> ();
+	Map <String, ConsoleContextTab> contextTabs =
+		new HashMap<> ();
 
-	Map<String,WebFile> contextFiles =
-		new HashMap<String,WebFile> ();
+	Map <String, WebFile> contextFiles =
+		new HashMap<> ();
 
-	Map<String,Provider<Responder>> responders =
-		new HashMap<String,Provider<Responder>> ();
+	Map <String, Provider <Responder>> responders =
+		new HashMap <String, Provider <Responder>> ();
 
 	Map<Pair<String,String>,List<ConsoleContext>> contextsByParentAndType =
 		new HashMap<Pair<String,String>,List<ConsoleContext>> ();

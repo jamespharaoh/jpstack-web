@@ -9,18 +9,18 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
-
-import org.joda.time.Instant;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.joda.time.Instant;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.StringSubstituter;
 import wbs.framework.utils.TimeFormatter;
 import wbs.framework.utils.etc.Html;
@@ -32,12 +32,12 @@ public
 class IntegerStatsFormatter
 	implements StatsFormatter {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// properties

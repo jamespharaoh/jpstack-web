@@ -1,13 +1,14 @@
 package wbs.console.module;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.context.ConsoleContextMetaBuilderContainer;
 import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ComponentFactory;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.BuilderFactory;
@@ -17,9 +18,9 @@ public
 class ConsoleMetaModuleFactory
 	implements ComponentFactory {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaModuleBuilder consoleMetaModuleBuilder;
 
 	// prototype dependencies

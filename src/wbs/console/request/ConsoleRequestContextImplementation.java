@@ -1,9 +1,9 @@
 package wbs.console.request;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.orNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.OptionalUtils.ifNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualSafe;
@@ -28,12 +28,9 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.fileupload.FileItem;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
@@ -44,6 +41,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.fileupload.FileItem;
+
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.helper.ConsoleObjectManager;
@@ -52,6 +52,7 @@ import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;
 import wbs.console.tab.TabList;
 import wbs.framework.application.annotations.ProxiedRequestComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.utils.etc.Html;
 import wbs.framework.utils.etc.OptionalUtils;
@@ -76,15 +77,15 @@ public
 class ConsoleRequestContextImplementation
 	implements ConsoleRequestContext {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	UserPrivDataLoader privChecker;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// properties

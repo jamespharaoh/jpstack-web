@@ -2,34 +2,35 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.errorResult;
 import static wbs.framework.utils.etc.Misc.successResult;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
-import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.IntervalFormatter;
+
+import fj.data.Either;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("secondsFormFieldInterfaceMapping")
 public
-class SecondsFormFieldInterfaceMapping<Container>
-	implements FormFieldInterfaceMapping<Container,Long,String> {
+class SecondsFormFieldInterfaceMapping <Container>
+	implements FormFieldInterfaceMapping <Container, Long, String> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	IntervalFormatter intervalFormatter;
 
 	// properties

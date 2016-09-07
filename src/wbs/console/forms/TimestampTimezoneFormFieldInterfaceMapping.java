@@ -1,13 +1,15 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import java.util.Map;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -16,24 +18,21 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.DateTime;
 
-import com.google.common.base.Optional;
+import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.utils.TimeFormatter;
 
 import fj.data.Either;
-
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.utils.TimeFormatter;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("timestampTimezoneFormFieldInterfaceMapping")
 public
-class TimestampTimezoneFormFieldInterfaceMapping<Container>
-	implements FormFieldInterfaceMapping<Container,DateTime,String> {
+class TimestampTimezoneFormFieldInterfaceMapping <Container>
+	implements FormFieldInterfaceMapping <Container, DateTime, String> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// properties

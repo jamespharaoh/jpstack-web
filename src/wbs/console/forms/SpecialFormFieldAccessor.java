@@ -2,18 +2,17 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import com.google.common.base.Optional;
-
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
@@ -21,12 +20,12 @@ import wbs.framework.utils.etc.BeanLogic;
 @Accessors (fluent = true)
 @PrototypeComponent ("specialFormFieldAccessor")
 public
-class SpecialFormFieldAccessor<Container extends Record<?>,Native>
-	implements FormFieldAccessor<Container,Native> {
+class SpecialFormFieldAccessor <Container extends Record <?>, Native>
+	implements FormFieldAccessor <Container, Native> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
 	// properties

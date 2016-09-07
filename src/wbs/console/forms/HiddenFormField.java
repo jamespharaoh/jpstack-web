@@ -16,37 +16,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
-import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.Record;
 import wbs.framework.utils.formatwriter.FormatWriter;
 
+import fj.data.Either;
+
 @Accessors (fluent = true)
 @PrototypeComponent ("hiddenFormField")
 @DataClass ("hidden-form-field")
 public
-class HiddenFormField<Container,Generic,Native>
-	implements FormField<Container,Generic,Native,String> {
+class HiddenFormField <Container, Generic, Native>
+	implements FormField <Container, Generic, Native, String> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// properties
@@ -68,24 +69,24 @@ class HiddenFormField<Container,Generic,Native>
 
 	@DataAttribute
 	@Getter @Setter
-	Optional<Optional<Generic>> implicitValue;
+	Optional <Optional <Generic>> implicitValue;
 
 	@DataAttribute
 	@Getter @Setter
 	String viewPriv;
 
 	@Getter @Setter
-	Set<ScriptRef> scriptRefs =
-		new LinkedHashSet<ScriptRef> ();
+	Set <ScriptRef> scriptRefs =
+		new LinkedHashSet<> ();
 
 	@Getter @Setter
-	FormFieldAccessor<Container,Native> accessor;
+	FormFieldAccessor <Container, Native> accessor;
 
 	@Getter @Setter
-	FormFieldNativeMapping<Container,Generic,Native> nativeMapping;
+	FormFieldNativeMapping <Container, Generic, Native> nativeMapping;
 
 	@Getter @Setter
-	FormFieldInterfaceMapping<Container,Generic,String> csvMapping;
+	FormFieldInterfaceMapping <Container, Generic, String> csvMapping;
 
 	// implementation
 
@@ -93,7 +94,7 @@ class HiddenFormField<Container,Generic,Native>
 	public
 	boolean canView (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map <String, Object> hints) {
 
 		if (
 			isNull (
@@ -115,7 +116,7 @@ class HiddenFormField<Container,Generic,Native>
 				privParts.get (0);
 
 			return privChecker.canRecursive (
-				(Record<?>)
+				(Record <?>)
 				container,
 				privCode);
 
@@ -130,8 +131,8 @@ class HiddenFormField<Container,Generic,Native>
 			String privCode =
 				privParts.get (1);
 
-			Record<?> delegate =
-				(Record<?>)
+			Record <?> delegate =
+				(Record <?>)
 				objectManager.dereference (
 					container,
 					delegatePath,
@@ -155,22 +156,22 @@ class HiddenFormField<Container,Generic,Native>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		Optional<Native> nativeValue =
+		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
 					container));
 
-		Optional<Generic> genericValue =
+		Optional <Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
 					nativeValue));
 
-		Optional<String> interfaceValue =
+		Optional <String> interfaceValue =
 			requiredValue (
 				eitherGetLeft (
 					csvMapping.genericToInterface (
@@ -216,7 +217,7 @@ class HiddenFormField<Container,Generic,Native>
 			return;
 		}
 
-		Optional<Native> nativeValue =
+		Optional <Native> nativeValue =
 			requiredValue (
 				nativeMapping.genericToNative (
 					container,

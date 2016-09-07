@@ -8,11 +8,12 @@ import static wbs.framework.utils.etc.TypeUtils.classEqualSafe;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -28,50 +29,50 @@ import wbs.framework.utils.etc.BeanLogic;
 public
 class TextAreaFormFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ApplicationContext applicationContext;
 
-	@Inject
+	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<DynamicFormFieldAccessor>
+	@PrototypeDependency
+	Provider <DynamicFormFieldAccessor>
 	dynamicFormFieldAccessorProvider;
 
-	@Inject
-	Provider<IdentityFormFieldInterfaceMapping>
+	@PrototypeDependency
+	Provider <IdentityFormFieldInterfaceMapping>
 	identityFormFieldInterfaceMappingProvider;
 
-	@Inject
-	Provider<NullFormFieldConstraintValidator>
+	@PrototypeDependency
+	Provider <NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
 
-	@Inject
-	Provider<ReadOnlyFormField>
+	@PrototypeDependency
+	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
-	@Inject
-	Provider<RequiredFormFieldValueValidator>
+	@PrototypeDependency
+	Provider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
-	@Inject
-	Provider<SimpleFormFieldAccessor>
+	@PrototypeDependency
+	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
-	@Inject
-	Provider<TextAreaFormFieldRenderer>
+	@PrototypeDependency
+	Provider <TextAreaFormFieldRenderer>
 	textAreaFormFieldRendererProvider;
 
-	@Inject
-	Provider<UpdatableFormField>
+	@PrototypeDependency
+	Provider <UpdatableFormField>
 	updatableFormFieldProvider;
 
-	@Inject
-	Provider<Utf8StringFormFieldNativeMapping>
+	@PrototypeDependency
+	Provider <Utf8StringFormFieldNativeMapping>
 	utf8StringFormFieldNativeMappingProvider;
 
 	// builder

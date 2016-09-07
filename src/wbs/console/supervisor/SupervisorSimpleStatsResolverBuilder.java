@@ -2,13 +2,13 @@ package wbs.console.supervisor;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.reporting.SimpleStatsResolver;
 import wbs.console.reporting.StatsAggregator;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -20,8 +20,10 @@ import wbs.framework.builder.annotations.BuilderTarget;
 public
 class SupervisorSimpleStatsResolverBuilder {
 
-	@Inject
-	Provider<SimpleStatsResolver> simpleStatsResolver;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <SimpleStatsResolver> simpleStatsResolverProvider;
 
 	// builder
 
@@ -87,7 +89,7 @@ class SupervisorSimpleStatsResolverBuilder {
 
 			name,
 
-			simpleStatsResolver.get ()
+			simpleStatsResolverProvider.get ()
 
 				.indexName (
 					indexName)

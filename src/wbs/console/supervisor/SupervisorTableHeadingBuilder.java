@@ -1,11 +1,11 @@
 package wbs.console.supervisor;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.part.PagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -17,8 +17,10 @@ import wbs.framework.builder.annotations.BuilderTarget;
 public
 class SupervisorTableHeadingBuilder {
 
-	@Inject
-	Provider<SupervisorTableHeadingPart> supervisorTableHeadingPart;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <SupervisorTableHeadingPart> supervisorTableHeadingPartProvider;
 
 	// builder
 
@@ -38,15 +40,17 @@ class SupervisorTableHeadingBuilder {
 	void build (
 			Builder builder) {
 
-		Provider<PagePart> pagePartFactory =
-			new Provider<PagePart> () {
+		Provider <PagePart> pagePartFactory =
+			new Provider <PagePart> () {
 
 			@Override
 			public
 			PagePart get () {
 
-				return supervisorTableHeadingPart.get ()
-					.supervisorTableHeadingSpec (supervisorTableHeadingSpec);
+				return supervisorTableHeadingPartProvider.get ()
+
+					.supervisorTableHeadingSpec (
+						supervisorTableHeadingSpec);
 
 			}
 

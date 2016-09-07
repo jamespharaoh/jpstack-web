@@ -1,42 +1,41 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import com.google.common.base.Optional;
+import wbs.console.misc.ConsoleUserHelper;
+import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.utils.TextualInterval;
 
 import fj.data.Either;
 
-import wbs.console.misc.ConsoleUserHelper;
-import wbs.framework.application.annotations.PrototypeComponent;
-import wbs.framework.utils.TextualInterval;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-
 @PrototypeComponent ("intervalFormFieldInterfaceMapping")
 public
-class IntervalFormFieldInterfaceMapping<Container>
-	implements FormFieldInterfaceMapping<Container,TextualInterval,String> {
+class IntervalFormFieldInterfaceMapping <Container>
+	implements FormFieldInterfaceMapping <Container, TextualInterval, String> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleUserHelper formFieldPreferences;
 
 	// implementation
 
 	@Override
 	public
-	Either<Optional<String>,String> genericToInterface (
+	Either <Optional <String>, String> genericToInterface (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<TextualInterval> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <TextualInterval> genericValue) {
 
 		// allow null
 

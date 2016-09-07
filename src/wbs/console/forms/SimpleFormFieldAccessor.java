@@ -2,24 +2,28 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import com.google.common.base.Optional;
-
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.etc.BeanLogic;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("simpleFormFieldAccessor")
 public
-class SimpleFormFieldAccessor<Container,Native>
-	implements FormFieldAccessor<Container,Native> {
+class SimpleFormFieldAccessor <Container, Native>
+	implements FormFieldAccessor <Container, Native> {
+
+	// singleton dependencies
+
+	@SingletonDependency
+	ConsoleObjectManager consoleObjectManager;
 
 	// properties
 
@@ -28,9 +32,6 @@ class SimpleFormFieldAccessor<Container,Native>
 
 	@Getter @Setter
 	Class<? extends Native> nativeClass;
-
-	@Inject
-	ConsoleObjectManager consoleObjectManager;
 
 	// implementation
 

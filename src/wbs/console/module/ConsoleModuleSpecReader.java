@@ -3,11 +3,12 @@ package wbs.console.module;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
@@ -17,11 +18,17 @@ import wbs.framework.data.tools.DataFromXmlBuilder;
 public
 class ConsoleModuleSpecReader {
 
-	@Inject
+	// prototype dependencies
+
+	@PrototypeDependency
 	@ConsoleModuleData
 	Map <Class <?>, Provider <ConsoleModuleSpec>> consoleModuleSpecProviders;
 
+	// state
+
 	DataFromXml dataFromXml;
+
+	// life cycle
 
 	@PostConstruct
 	public

@@ -9,14 +9,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
@@ -35,31 +35,31 @@ public
 class ConsoleObjectManagerImplementation
 	implements ConsoleObjectManager {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleHelperRegistry consoleHelperRegistry;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// collection dependencies
 
 	// (force instantiation)
-	@Inject
-	List<ConsoleHelper<?>> consoleHelpers;
+	@SingletonDependency
+	List <ConsoleHelper <?>> consoleHelpers;
 
 	// implementation
 
 	@Override
 	public
-	ConsoleHelper<?> findConsoleHelper (
-			@NonNull Record<?> dataObject) {
+	ConsoleHelper <?> findConsoleHelper (
+			@NonNull Record <?> dataObject) {
 
-		ConsoleHelper<?> objectHelper =
+		ConsoleHelper <?> objectHelper =
 			findConsoleHelper (
 				dataObject.getClass ());
 

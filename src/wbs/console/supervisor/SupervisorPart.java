@@ -11,11 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -24,6 +20,10 @@ import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+
 import wbs.console.html.ObsoleteDateField;
 import wbs.console.html.ObsoleteDateLinks;
 import wbs.console.misc.ConsoleUserHelper;
@@ -37,6 +37,7 @@ import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ApplicationContext;
 
 @Accessors (fluent = true)
@@ -45,24 +46,24 @@ public
 class SupervisorPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ApplicationContext applicationContext;
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	StatsConsoleLogic statsConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	SupervisorHelper supervisorHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleUserHelper consoleUserHelper;
 
 	// properties

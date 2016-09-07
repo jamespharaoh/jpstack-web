@@ -2,7 +2,6 @@ package wbs.console.supervisor;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -11,6 +10,7 @@ import wbs.console.reporting.StatsFormatter;
 import wbs.console.reporting.StatsGrouper;
 import wbs.console.reporting.StatsResolver;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -22,8 +22,11 @@ import wbs.framework.builder.annotations.BuilderTarget;
 public
 class SupervisorTableStatsGroupBuilder {
 
-	@Inject
-	Provider<SupervisorTableStatsGroupPart> supervisorTableStatsGroupPart;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <SupervisorTableStatsGroupPart>
+	supervisorTableStatsGroupPartProvider;
 
 	// builder
 
@@ -91,17 +94,23 @@ class SupervisorTableStatsGroupBuilder {
 
 		}
 
-		Provider<PagePart> pagePartFactory =
-			new Provider<PagePart> () {
+		Provider <PagePart> pagePartFactory =
+			new Provider <PagePart> () {
 
 			@Override
 			public
 			PagePart get () {
 
-				return supervisorTableStatsGroupPart.get ()
-					.statsGrouper (statsGrouper)
-					.statsResolver (statsResolver)
-					.statsFormatter (statsFormatter);
+				return supervisorTableStatsGroupPartProvider.get ()
+
+					.statsGrouper (
+						statsGrouper)
+
+					.statsResolver (
+						statsResolver)
+
+					.statsFormatter (
+						statsFormatter);
 
 			}
 

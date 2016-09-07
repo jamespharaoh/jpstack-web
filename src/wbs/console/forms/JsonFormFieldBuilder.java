@@ -6,12 +6,14 @@ import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.TypeUtils.classEqualSafe;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -25,39 +27,39 @@ import wbs.framework.utils.etc.BeanLogic;
 public
 class JsonFormFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ChainedFormFieldNativeMapping>
+	@PrototypeDependency
+	Provider <ChainedFormFieldNativeMapping>
 	chainedFormFieldNativeMappingProvider;
 
-	@Inject
-	Provider<HtmlFormFieldRenderer>
+	@PrototypeDependency
+	Provider <HtmlFormFieldRenderer>
 	htmlFormFieldRendererProvider;
 
-	@Inject
-	Provider<JsonFormFieldNativeMapping>
+	@PrototypeDependency
+	Provider <JsonFormFieldNativeMapping>
 	jsonFormFieldNativeMappingProvider;
 
-	@Inject
-	Provider<JsonFormFieldInterfaceMapping>
+	@PrototypeDependency
+	Provider <JsonFormFieldInterfaceMapping>
 	jsonFormFieldInterfaceMappingProvider;
 
-	@Inject
-	Provider<ReadOnlyFormField>
+	@PrototypeDependency
+	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
-	@Inject
-	Provider<SimpleFormFieldAccessor>
+	@PrototypeDependency
+	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
-	@Inject
-	Provider<Utf8StringFormFieldNativeMapping>
+	@PrototypeDependency
+	Provider <Utf8StringFormFieldNativeMapping>
 	utf8StringFormFieldNativeMappingProvider;
 
 	// builder

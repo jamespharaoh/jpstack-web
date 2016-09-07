@@ -1,39 +1,39 @@
 package wbs.console.forms;
 
-import javax.inject.Inject;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
 import org.joda.time.Interval;
 
-import com.google.common.base.Optional;
-
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.config.WbsConfig;
 import wbs.framework.utils.TextualInterval;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 @PrototypeComponent ("intervalFormFieldNativeMapping")
 public
-class IntervalFormFieldNativeMapping<Container>
-	implements FormFieldNativeMapping<Container,TextualInterval,Interval> {
+class IntervalFormFieldNativeMapping <Container>
+	implements FormFieldNativeMapping <Container, TextualInterval, Interval> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleUserHelper formFieldPreferences;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// implementation
 
 	@Override
 	public
-	Optional<Interval> genericToNative (
+	Optional <Interval> genericToNative (
 			@NonNull Container container,
-			@NonNull Optional<TextualInterval> genericValue) {
+			@NonNull Optional <TextualInterval> genericValue) {
 
 		// handle not present
 
@@ -53,7 +53,7 @@ class IntervalFormFieldNativeMapping<Container>
 
 	@Override
 	public
-	Optional<TextualInterval> nativeToGeneric (
+	Optional <TextualInterval> nativeToGeneric (
 			@NonNull Container container,
 			@NonNull Optional<Interval> nativeValue) {
 

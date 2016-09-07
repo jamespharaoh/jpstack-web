@@ -2,10 +2,10 @@ package wbs.console.responder;
 
 import java.util.regex.Matcher;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.web.RegexpPathHandler;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.WebFile;
@@ -14,7 +14,9 @@ public abstract
 class ConsoleRegexpPathHandlerEntry
 	extends RegexpPathHandler.Entry {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ConsoleRequestContext consoleRequestContext;
 
 	public

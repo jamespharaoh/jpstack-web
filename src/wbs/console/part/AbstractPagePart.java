@@ -6,14 +6,14 @@ import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
+
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.formatwriter.FormatWriter;
@@ -23,20 +23,20 @@ public
 class AbstractPagePart
 	implements PagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	protected
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	protected
 	ConsoleRequestContext requestContext;
 
 	// state
 
 	protected
-	Map<String,Object> parameters;
+	Map <String, Object> parameters;
 
 	protected
 	PrintWriter printWriter;

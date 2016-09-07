@@ -2,7 +2,6 @@ package wbs.console.supervisor;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.experimental.Accessors;
@@ -11,6 +10,7 @@ import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.part.PagePart;
 import wbs.console.part.TextPart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -25,8 +25,8 @@ class SupervisorTableSeparatorBuilder {
 
 	// prototype dependencies
 
-	@Inject
-	Provider<TextPart> textPart;
+	@PrototypeDependency
+	Provider <TextPart> textPartProvider;
 
 	// builder
 
@@ -53,7 +53,7 @@ class SupervisorTableSeparatorBuilder {
 			public
 			PagePart get () {
 
-				return textPart.get ()
+				return textPartProvider.get ()
 
 					.text (
 						stringFormat (

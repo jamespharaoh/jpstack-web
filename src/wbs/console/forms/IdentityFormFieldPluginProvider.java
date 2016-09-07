@@ -2,11 +2,11 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.LogicUtils.equalSafe;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
 
 @SingletonComponent ("identityFormFieldPluginProvider")
@@ -17,8 +17,8 @@ class IdentityFormFieldPluginProvider
 
 	// prototype dependencies
 
-	@Inject
-	Provider<IdentityFormFieldNativeMapping>
+	@PrototypeDependency
+	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
 	// implementation

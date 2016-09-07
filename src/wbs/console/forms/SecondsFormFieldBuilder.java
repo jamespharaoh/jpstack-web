@@ -7,11 +7,12 @@ import static wbs.framework.utils.etc.StringUtils.capitalise;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -25,42 +26,42 @@ import wbs.framework.utils.etc.BeanLogic;
 public
 class SecondsFormFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <NullFormFieldConstraintValidator>
 	nullFormFieldConstraintValidatorProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <SecondsFormFieldInterfaceMapping>
 	secondsFormFieldInterfaceMapping;
 
-	@Inject
+	@PrototypeDependency
 	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <TextFormFieldRenderer>
 	textFormFieldRendererProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <UpdatableFormField>
 	updatableFormFieldProvider;
 

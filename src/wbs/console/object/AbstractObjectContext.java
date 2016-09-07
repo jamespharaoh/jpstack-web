@@ -4,10 +4,8 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.extern.log4j.Log4j;
+
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.helper.ConsoleObjectManager;
@@ -16,6 +14,8 @@ import wbs.console.lookup.StringLookup;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.request.Cryptor;
+import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.application.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.web.PageNotFoundException;
 
@@ -24,15 +24,13 @@ public abstract
 class AbstractObjectContext
 	extends ConsoleContext {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@WeakSingletonDependency
+	ConsoleManager consoleManager;
+
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
-
-	// indirect dependencies
-
-	@Inject
-	Provider<ConsoleManager> consoleManager;
 
 	// abstract getters
 
@@ -175,8 +173,7 @@ class AbstractObjectContext
 
 		if (postProcessorName () != null) {
 
-			consoleManager.get ()
-				.runPostProcessors (
+			consoleManager.runPostProcessors (
 					postProcessorName (),
 					contextStuff);
 

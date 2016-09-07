@@ -2,35 +2,36 @@ package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 import java.util.Map;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import com.google.common.base.Optional;
-
-import fj.data.Either;
-
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import fj.data.Either;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCsvFormFieldInterfaceMapping")
 public
-class ObjectCsvFormFieldInterfaceMapping<Container,Generic extends Record<Generic>>
-	implements FormFieldInterfaceMapping<Container,Generic,String> {
+class ObjectCsvFormFieldInterfaceMapping <
+	Container,
+	Generic extends Record <Generic>
+>
+	implements FormFieldInterfaceMapping <Container, Generic, String> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
 	// properties

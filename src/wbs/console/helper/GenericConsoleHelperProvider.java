@@ -1,7 +1,7 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
 import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
@@ -14,7 +14,6 @@ import static wbs.framework.utils.etc.StringUtils.underscoreToCamel;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
@@ -22,6 +21,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.context.ConsoleContextStuffSpec;
 import wbs.console.module.ConsoleManager;
@@ -29,6 +29,8 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.request.Cryptor;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
@@ -44,29 +46,29 @@ public
 class GenericConsoleHelperProvider
 	implements ConsoleHelperProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ApplicationContext applicationContext;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
 	// indirect dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <ConsoleHelperProviderRegistry> consoleHelperProviderRegistry;
 
-	@Inject
+	@PrototypeDependency
 	Provider <ConsoleManager> consoleManager;
 
-	@Inject
+	@PrototypeDependency
 	Provider <ConsoleObjectManager> consoleObjectManager;
 
-	@Inject
+	@PrototypeDependency
 	Provider <ConsoleRequestContext> requestContext;
 
-	@Inject
+	@PrototypeDependency
 	Provider <UserPrivChecker> privChecker;
 
 	// required properties

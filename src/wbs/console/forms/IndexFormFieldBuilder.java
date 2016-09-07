@@ -3,12 +3,12 @@ package wbs.console.forms;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -23,23 +23,23 @@ class IndexFormFieldBuilder {
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <IntegerFormFieldInterfaceMapping>
 	integerFormFieldInterfaceMappingProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <TextFormFieldRenderer>
 	textFormFieldRendererProvider;
 

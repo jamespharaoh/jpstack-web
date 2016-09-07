@@ -2,14 +2,16 @@ package wbs.console.helper;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
 import wbs.console.module.ConsoleMetaManager;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ComponentFactory;
 import wbs.framework.object.ObjectHelper;
 
@@ -21,30 +23,31 @@ class ConsoleHelperFactory
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleHelperProviderRegistry consoleHelperProviderRegistry;
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@SingletonDependency
+	ConsoleHelperRegistry consoleHelperRegistry;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleHelperBuilder> consoleHelperBuilder;
+	@PrototypeDependency
+	Provider <ConsoleHelperBuilder> consoleHelperBuilder;
 
-	@Inject
-	Provider<ConsoleHelperRegistry> consoleHelperRegistry;
-
-	@Inject
-	Provider<GenericConsoleHelperProvider> genericConsoleHelperProviderProvider;
+	@PrototypeDependency
+	Provider <GenericConsoleHelperProvider>
+	genericConsoleHelperProviderProvider;
 
 	// required properties
 
 	@Getter @Setter
-	ObjectHelper<?> objectHelper;
+	ObjectHelper <?> objectHelper;
 
 	@Getter @Setter
-	Class<? extends ConsoleHelper<?>> consoleHelperClass;
+	Class <? extends ConsoleHelper <?>> consoleHelperClass;
 
 	// implementation
 
@@ -55,7 +58,7 @@ class ConsoleHelperFactory
 		if (consoleHelperClass == null)
 			throw new NullPointerException ("consoleHelperClass");
 
-		ConsoleHelperProvider<?> consoleHelperProvider =
+		ConsoleHelperProvider <?> consoleHelperProvider =
 			consoleHelperProviderRegistry.findByObjectName (
 				objectHelper.objectName ());
 
@@ -88,7 +91,7 @@ class ConsoleHelperFactory
 				consoleHelperProvider.objectName (),
 				consoleHelperProvider.objectClass ().getSimpleName ()));
 
-		ConsoleHelper<?> consoleHelper =
+		ConsoleHelper <?> consoleHelper =
 			consoleHelperBuilder.get ()
 
 			.objectHelper (
@@ -102,7 +105,7 @@ class ConsoleHelperFactory
 
 			.build ();
 
-		consoleHelperRegistry.get ().register (
+		consoleHelperRegistry.register (
 			consoleHelper);
 
 		return consoleHelper;

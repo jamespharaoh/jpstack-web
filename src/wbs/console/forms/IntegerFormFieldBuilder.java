@@ -8,11 +8,12 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -28,48 +29,48 @@ class IntegerFormFieldBuilder {
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldPluginManager formFieldPluginManager;
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <DynamicFormFieldAccessor>
 	dynamicFormFieldAccessorProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <IntegerFormFieldInterfaceMapping>
 	integerFormFieldInterfaceMappingProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <IntegerFormFieldValueValidator>
 	integerFormFieldValueValidatorProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <TextFormFieldRenderer>
 	textFormFieldRendererProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <UpdatableFormField>
 	updatableFormFieldProvider;
 

@@ -12,13 +12,13 @@ import static wbs.framework.utils.etc.StringUtils.stringStartsWithSimple;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ConsoleContextBuilderContainerImplementation;
@@ -34,6 +34,8 @@ import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.console.request.Cryptor;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
@@ -46,40 +48,40 @@ import wbs.framework.entity.record.Record;
 @PrototypeComponent ("objectContextBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectContextBuilder<
-	ObjectType extends Record<ObjectType>
+class ObjectContextBuilder <
+	ObjectType extends Record <ObjectType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ApplicationContext applicationContext;
 
-	@Inject
+	@SingletonDependency
 	ConsoleHelperRegistry consoleHelperRegistry;
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<SimpleConsoleContext> simpleConsoleContextProvider;
+	@PrototypeDependency
+	Provider <SimpleConsoleContext> simpleConsoleContextProvider;
 
-	@Inject
-	Provider<ConsoleContextTab> contextTab;
+	@PrototypeDependency
+	Provider <ConsoleContextTab> contextTabProvider;
 
-	@Inject
-	Provider<ConsoleContextType> contextType;
+	@PrototypeDependency
+	Provider <ConsoleContextType> contextTypeProvider;
 
-	@Inject
-	Provider<ObjectContext> objectContext;
+	@PrototypeDependency
+	Provider <ObjectContext> objectContextProvider;
 
-	@Inject
-	Provider<SimpleConsoleContext> simpleContext;
+	@PrototypeDependency
+	Provider <SimpleConsoleContext> simpleContextProvider;
 
 	// builder
 
@@ -214,7 +216,7 @@ class ObjectContextBuilder<
 	void buildContextTypes () {
 
 		consoleModule.addContextType (
-			contextType.get ()
+			contextTypeProvider.get ()
 
 			.name (
 				name + ":list")
@@ -223,7 +225,7 @@ class ObjectContextBuilder<
 				defaultFileName.orNull ()));
 
 		consoleModule.addContextType (
-			contextType.get ()
+			contextTypeProvider.get ()
 
 			.name (
 				name + ":combo")
@@ -232,7 +234,7 @@ class ObjectContextBuilder<
 				defaultFileName.orNull ()));
 
 		consoleModule.addContextType (
-			contextType.get ()
+			contextTypeProvider.get ()
 
 			.name (
 				name + ":object")
@@ -245,7 +247,7 @@ class ObjectContextBuilder<
 	void buildSimpleContexts () {
 
 		consoleModule.addContext (
-			simpleContext.get ()
+			simpleContextProvider.get ()
 
 			.name (
 				naivePluralise (
@@ -266,7 +268,7 @@ class ObjectContextBuilder<
 					consoleHelper.shortNamePlural ())));
 
 		consoleModule.addContext (
-			objectContext.get ()
+			objectContextProvider.get ()
 
 			.name (
 				name)
@@ -299,7 +301,7 @@ class ObjectContextBuilder<
 				cryptor));
 
 		consoleModule.addContext (
-			objectContext.get ()
+			objectContextProvider.get ()
 
 			.name (
 				"link:" + name)
@@ -341,7 +343,7 @@ class ObjectContextBuilder<
 		consoleModule.addContextTab (
 			"link",
 
-			contextTab.get ()
+			contextTabProvider.get ()
 
 				.name (
 					"link:" + name)
@@ -354,7 +356,7 @@ class ObjectContextBuilder<
 		consoleModule.addContextTab (
 			"end",
 
-			contextTab.get ()
+			contextTabProvider.get ()
 
 				.name (
 					stringFormat (
@@ -424,7 +426,7 @@ class ObjectContextBuilder<
 					resolvedContextLink.tabName ()));
 
 			consoleModule.addContext (
-				objectContext.get ()
+				objectContextProvider.get ()
 
 				.name (
 					resolvedContextName)
@@ -469,7 +471,7 @@ class ObjectContextBuilder<
 		consoleModule.addContextTab (
 			resolvedConsoleContextLink.tabLocation (),
 
-			contextTab.get ()
+			contextTabProvider.get ()
 
 				.name (
 					resolvedConsoleContextLink.tabName ())

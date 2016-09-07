@@ -1,11 +1,10 @@
 package wbs.console.helper;
 
-import javax.inject.Inject;
-
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -18,7 +17,9 @@ import wbs.framework.object.ObjectManager;
 public
 class ConsoleHelperProviderBuilder {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ObjectManager objectManager;
 
 	// builder

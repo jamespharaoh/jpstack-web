@@ -1,12 +1,11 @@
 package wbs.console.object;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
@@ -17,6 +16,7 @@ import wbs.console.context.ConsoleContextMetaBuilderContainer;
 import wbs.console.context.ConsoleContextRootExtensionPoint;
 import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -29,6 +29,11 @@ import wbs.framework.builder.annotations.BuilderTarget;
 public
 class ObjectContextMetaBuilder {
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <ConsoleContextRootExtensionPoint> rootExtensionPointProvider;
+
 	// builder
 
 	@BuilderParent
@@ -39,11 +44,6 @@ class ObjectContextMetaBuilder {
 
 	@BuilderTarget
 	ConsoleMetaModuleImplementation metaModule;
-
-	// prototype dependencies
-
-	@Inject
-	Provider<ConsoleContextRootExtensionPoint> rootExtensionPointProvider;
 
 	// state
 

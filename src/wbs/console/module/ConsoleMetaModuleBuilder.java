@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
@@ -19,12 +19,12 @@ class ConsoleMetaModuleBuilder
 
 	// prototype dependencies
 
-	@Inject
-	Provider<BuilderFactory> builderFactoryProvider;
+	@PrototypeDependency
+	Provider <BuilderFactory> builderFactoryProvider;
 
-	@Inject
+	@PrototypeDependency
 	@ConsoleMetaModuleBuilderHandler
-	Map<Class<?>,Provider<Object>> consoleMetaModuleBuilders;
+	Map <Class <?>, Provider <Object>> consoleMetaModuleBuilders;
 
 	// state
 

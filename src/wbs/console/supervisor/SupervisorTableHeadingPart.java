@@ -2,8 +2,6 @@ package wbs.console.supervisor;
 
 import java.text.SimpleDateFormat;
 
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -14,6 +12,7 @@ import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.reporting.StatsPeriod;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTableHeadingPart")
@@ -21,9 +20,9 @@ public
 class SupervisorTableHeadingPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleUserHelper consoleUserHelper;
 
 	// properties

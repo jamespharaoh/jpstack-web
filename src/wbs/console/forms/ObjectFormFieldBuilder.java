@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
@@ -11,7 +11,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -20,6 +19,8 @@ import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleHelperRegistry;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -33,61 +34,61 @@ import wbs.framework.object.ObjectManager;
 public
 class ObjectFormFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleHelperRegistry consoleHelperRegistry;
 
-	@Inject
+	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<DereferenceFormFieldAccessor>
+	@PrototypeDependency
+	Provider <DereferenceFormFieldAccessor>
 	dereferenceFormFieldAccessorProvider;
 
-	@Inject
-	Provider<IdentityFormFieldInterfaceMapping>
+	@PrototypeDependency
+	Provider <IdentityFormFieldInterfaceMapping>
 	identityFormFieldInterfaceMappingProvider;
 
-	@Inject
-	Provider<IdentityFormFieldNativeMapping>
+	@PrototypeDependency
+	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
-	@Inject
-	Provider<ObjectCsvFormFieldInterfaceMapping>
+	@PrototypeDependency
+	Provider <ObjectCsvFormFieldInterfaceMapping>
 	objectCsvFormFieldInterfaceMappingProvider;
 
-	@Inject
-	Provider<ObjectFormFieldRenderer>
+	@PrototypeDependency
+	Provider <ObjectFormFieldRenderer>
 	objectFormFieldRendererProvider;
 
-	@Inject
-	Provider<ObjectIdFormFieldNativeMapping>
+	@PrototypeDependency
+	Provider <ObjectIdFormFieldNativeMapping>
 	objectIdFormFieldNativeMappingProvider;
 
-	@Inject
-	Provider<ReadOnlyFormField>
+	@PrototypeDependency
+	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
-	@Inject
-	Provider<RequiredFormFieldValueValidator>
+	@PrototypeDependency
+	Provider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
-	@Inject
-	Provider<SimpleFormFieldAccessor>
+	@PrototypeDependency
+	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
-	@Inject
-	Provider<ObjectFormFieldConstraintValidator>
+	@PrototypeDependency
+	Provider <ObjectFormFieldConstraintValidator>
 	objectFormFieldConstraintValidatorProvider;
 
-	@Inject
-	Provider<UpdatableFormField>
+	@PrototypeDependency
+	Provider <UpdatableFormField>
 	updatableFormFieldProvider;
 
 	// builder

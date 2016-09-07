@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
@@ -18,7 +17,9 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormFieldSetSpec;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleHelperRegistry;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
 
@@ -27,21 +28,19 @@ public
 class ConsoleModuleBuilder
 	implements Builder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleHelperRegistry consoleHelperRegistry;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<BuilderFactory> builderFactoryProvider;
+	@PrototypeDependency
+	Provider <BuilderFactory> builderFactoryProvider;
 
-	// collection dependencies
-
-	@Inject
+	@PrototypeDependency
 	@ConsoleModuleBuilderHandler
-	Map<Class<?>,Provider<Object>> consoleModuleBuilders;
+	Map <Class <?>, Provider <Object>> consoleModuleBuilders;
 
 	// state
 

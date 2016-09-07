@@ -2,13 +2,15 @@ package wbs.console.module;
 
 import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ComponentFactory;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
@@ -18,16 +20,16 @@ public
 class ConsoleModuleFactory
 	implements ComponentFactory {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	@Named
 	Builder consoleModuleBuilder;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleModuleImplementation> consoleModuleProvider;
+	@PrototypeDependency
+	Provider <ConsoleModuleImplementation> consoleModuleProvider;
 
 	// properties
 

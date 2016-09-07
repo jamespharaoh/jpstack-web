@@ -1,13 +1,15 @@
 package wbs.console.forms;
 
 import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
 
 import java.util.Map;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -16,25 +18,22 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
 
-import com.google.common.base.Optional;
-
-import fj.data.Either;
-
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.utils.TextualInterval;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+
+import fj.data.Either;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("timestampFromFormFieldInterfaceMapping")
 public
-class TimestampFromFormFieldInterfaceMapping<Container>
-	implements FormFieldInterfaceMapping<Container,Instant,String> {
+class TimestampFromFormFieldInterfaceMapping <Container>
+	implements FormFieldInterfaceMapping <Container, Instant, String> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleUserHelper preferences;
 
 	// properties
@@ -46,10 +45,10 @@ class TimestampFromFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Either<Optional<Instant>,String> interfaceToGeneric (
+	Either <Optional <Instant>, String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue) {
 
 		if (
 

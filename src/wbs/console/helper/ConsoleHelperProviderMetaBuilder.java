@@ -7,13 +7,14 @@ import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
 import wbs.console.context.ConsoleContextMetaBuilderContainer;
 import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -27,13 +28,16 @@ import wbs.framework.object.ObjectManager;
 public
 class ConsoleHelperProviderMetaBuilder {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ObjectManager objectManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<GenericConsoleHelperProvider> genericConsoleHelperProviderProvider;
+	@PrototypeDependency
+	Provider <GenericConsoleHelperProvider>
+	genericConsoleHelperProviderProvider;
 
 	// builder
 

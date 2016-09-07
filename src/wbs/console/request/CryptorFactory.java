@@ -7,27 +7,28 @@ import java.security.SecureRandom;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
 
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.config.WbsConfig;
 
 @SingletonComponent ("cryptorFactory")
 public
 class CryptorFactory {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<CryptorImplementation> cryptorProvider;
+	@PrototypeDependency
+	Provider <CryptorImplementation> cryptorProvider;
 
 	// implementation
 

@@ -3,7 +3,6 @@ package wbs.console.supervisor;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
@@ -13,6 +12,7 @@ import lombok.experimental.Accessors;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.part.PagePart;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -26,8 +26,10 @@ import wbs.framework.builder.annotations.BuilderTarget;
 public
 class SupervisorTablePartBuilder {
 
-	@Inject
-	Provider<SupervisorTablePart> supervisorTablePart;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <SupervisorTablePart> supervisorTablePartProvider;
 
 	// builder
 
@@ -60,7 +62,8 @@ class SupervisorTablePartBuilder {
 			public
 			PagePart get () {
 
-				return supervisorTablePart.get ()
+				return supervisorTablePartProvider.get ()
+
 					.supervisorTablePartBuilder (
 						SupervisorTablePartBuilder.this);
 

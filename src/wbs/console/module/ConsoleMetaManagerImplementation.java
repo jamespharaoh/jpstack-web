@@ -1,8 +1,8 @@
 package wbs.console.module;
 
 import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
 import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
@@ -17,20 +17,22 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.apache.commons.io.FileUtils;
 
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.apache.commons.io.FileUtils;
+
 import wbs.console.context.ConsoleContextExtensionPoint;
 import wbs.console.context.ConsoleContextHint;
 import wbs.console.context.ConsoleContextLink;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
+import wbs.framework.application.annotations.PrototypeDependency;
 import wbs.framework.application.annotations.SingletonComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataToXml;
 
 @Log4j
@@ -39,25 +41,25 @@ public
 class ConsoleMetaManagerImplementation
 	implements ConsoleMetaManager {
 
+	// singleton dependencies
+
+	@SingletonDependency
+	Map <String, ConsoleMetaModule> consoleMetaModules;
+
 	// prototype dependencies
 
-	@Inject
-	Provider<ResolvedConsoleContextLink> resolvedContextLinkProvider;
-
-	// collection dependencies
-
-	@Inject
-	Map<String,ConsoleMetaModule> consoleMetaModules;
+	@PrototypeDependency
+	Provider <ResolvedConsoleContextLink> resolvedContextLinkProvider;
 
 	// state
 
-	Map<String,List<ConsoleContextLink>> contextLinks =
+	Map <String, List <ConsoleContextLink>> contextLinks =
 		new HashMap<> ();
 
-	Map<String,List<ConsoleContextExtensionPoint>> extensionPoints =
+	Map <String, List <ConsoleContextExtensionPoint>> extensionPoints =
 		new HashMap<> ();
 
-	Map<String,ConsoleContextHint> contextHints =
+	Map <String, ConsoleContextHint> contextHints =
 		new HashMap<> ();
 
 	// init

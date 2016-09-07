@@ -2,8 +2,6 @@ package wbs.console.supervisor;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -16,6 +14,7 @@ import wbs.console.reporting.StatsGrouper;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsResolver;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTableStatsGroupPart")
@@ -23,9 +22,9 @@ public
 class SupervisorTableStatsGroupPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	StatsConsoleLogic statsConsoleLogic;
 
 	// properties
@@ -41,8 +40,11 @@ class SupervisorTableStatsGroupPart
 
 	// state
 
-	Map<String,StatsDataSet> statsDataSetsByName;
+	Map <String, StatsDataSet> statsDataSetsByName;
+
 	StatsPeriod statsPeriod;
+
+	// implementation
 
 	@Override
 	@SuppressWarnings ("unchecked")

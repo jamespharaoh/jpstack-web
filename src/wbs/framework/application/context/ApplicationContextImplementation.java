@@ -1,10 +1,12 @@
 package wbs.framework.application.context;
 
+import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
 import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.framework.utils.etc.IterableUtils.iterableCount;
-import static wbs.framework.utils.etc.LogicUtils.booleanNotEqual;
+import static wbs.framework.utils.etc.IterableUtils.iterableMapToList;
+import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
@@ -19,12 +21,14 @@ import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringNotInSafe;
+import static wbs.framework.utils.etc.TypeUtils.classInstantiate;
 import static wbs.framework.utils.etc.TypeUtils.classNotInSafe;
 import static wbs.framework.utils.etc.TypeUtils.isNotSubclassOf;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -41,6 +45,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -52,6 +57,7 @@ import javax.inject.Qualifier;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Sets;
 
@@ -91,10 +97,10 @@ import wbs.framework.utils.etc.BeanLogic;
 
 /**
  * My not-quite-drop-in replacement for spring's ApplicationContext. This
- * provides all of the features we need, misses out what we don't need, and
+ * provides all of the feat and
  * gives much more helpful error messages.
  *
- * It also is much more deterministic, which means it can work out dependencies
+ * It also in work out dependencies
  * at runtime, which is extremely helpful. It will also dump out its bean
  * definitions in XML format to help diagnostics.
  *
@@ -116,6 +122,18 @@ class ApplicationContextImplementation
 
 	@Getter @Setter
 	ActivityManager activityManager;
+
+	private static
+	enum State {
+		definition,
+		initialization,
+		running,
+		closing,
+		closed;
+	}
+
+	State state =
+		State.definition;
 
 	List <ComponentDefinition> componentDefinitions =
 		new ArrayList <> ();
@@ -145,24 +163,28 @@ class ApplicationContextImplementation
 
 	Map <Annotation, List <ComponentDefinition>>
 	prototypeComponentDefinitionsByQualifier =
-		new HashMap <Annotation, List <ComponentDefinition>> ();
+		new HashMap<> ();
 
 	Map <String, Object> singletonComponents =
-		new HashMap <> ();
+		new HashMap<> ();
 
 	Set <String> singletonComponentsInCreation =
-		new LinkedHashSet <> ();
+		new LinkedHashSet<> ();
 
 	Set <String> singletonComponentsFailed =
-		new HashSet <> ();
+		new HashSet<> ();
 
 	Map <Object, ComponentMetaData> componentMetaDatas =
 		new MapMaker ()
 			.weakKeys ()
 			.makeMap ();
 
+	Map <String, List <Injection>> pendingInjections =
+		new HashMap<> ();
+
 	// TODO not pretty
-	@Getter
+
+	@Getter	
 	List <String> requestComponentNames =
 		new ArrayList<> ();
 
@@ -269,7 +291,7 @@ class ApplicationContextImplementation
 				componentDefinition,
 				true));
 
-	}
+	} 
 
 	@Override
 	public <ComponentType>
@@ -460,9 +482,12 @@ class ApplicationContextImplementation
 				singletonComponentsInCreation.remove (
 					componentDefinition.name ());
 
-				if (component == null)
+				if (component == null) {
+
 					singletonComponentsFailed.add (
 						componentDefinition.name ());
+
+				}
 
 			}
 
@@ -481,8 +506,7 @@ class ApplicationContextImplementation
 
 	}
 
-	@SneakyThrows (Exception.class)
-	public
+	private
 	Object instantiateComponent (
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialize) {
@@ -508,13 +532,11 @@ class ApplicationContextImplementation
 
 		// instantiate
 
-		Class <?> instantiateClass =
-			ifNull (
-				componentDefinition.factoryClass (),
-				componentDefinition.componentClass ());
-
 		Object protoComponent =
-			instantiateClass.newInstance ();
+			classInstantiate (
+				ifNull (
+					componentDefinition.factoryClass (),
+					componentDefinition.componentClass ()));
 
 		// set properties
 
@@ -528,8 +550,7 @@ class ApplicationContextImplementation
 
 		setComponentInjectedProperties (
 			componentDefinition,
-			protoComponent,
-			false);
+			protoComponent);
 
 		// call factory
 
@@ -698,6 +719,10 @@ class ApplicationContextImplementation
 			newComponentMetaData.definition =
 				componentDefinition;
 
+			newComponentMetaData.component =
+				new WeakReference <Object> (
+					component);
+
 			newComponentMetaData.state =
 				componentDefinition.owned ()
 					? ComponentState.uninitialized
@@ -775,8 +800,7 @@ class ApplicationContextImplementation
 	private
 	void setComponentInjectedProperties (
 			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Object component,
-			@NonNull Boolean weak) {
+			@NonNull Object component) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -787,128 +811,165 @@ class ApplicationContextImplementation
 				: componentDefinition.injectedProperties ()
 		) {
 
-			if (
-				booleanNotEqual (
-					weak,
-					injectedProperty.weak ())
-			) {
-				continue;
-			}
+			injectProperty (
+				componentDefinition,
+				component,
+				injectedProperty);
 
-			log.debug (
-				stringFormat (
-					"Setting injected property %s.%s",
-					componentDefinition.name (),
-					injectedProperty.fieldName ()));
+		}
 
-			// lookup target components
+	}
 
-			List <Pair <ComponentDefinition, Object>> targetComponents =
-				new ArrayList<> ();
+	private static
+	class Injection {
 
-			for (
-				String targetComponentDefinitionName
-					: injectedProperty.targetComponentNames ()
-			) {
+		Object component;
 
-				ComponentDefinition targetComponentDefinition =
-					componentDefinitionsByName.get (
-						targetComponentDefinitionName);
+		InjectedProperty injectedProperty;
 
-				Object injectValue;
+		List <ComponentDefinition> targetComponents;
 
-				if (injectedProperty.provider ()) {
+		Function <Provider <?>, Object> transformer;
 
-					injectValue =
-						getComponentProvider (
-							targetComponentDefinition,
-							injectedProperty.initialized ());
+		Function <List <Pair <ComponentDefinition, Object>>, Object> aggregator;
 
-				} else {
+		Set <String> missingComponents;
 
-					injectValue =
-						getComponent (
-							targetComponentDefinition,
-							injectedProperty.initialized ());
+	}
 
-				}
+	private
+	void injectProperty (
+			@NonNull ComponentDefinition componentDefinition,
+			@NonNull Object component,
+			@NonNull InjectedProperty injectedProperty) {
 
-				targetComponents.add (
-					Pair.of (
-						targetComponentDefinition,
-						injectValue));
+		log.debug (
+			stringFormat (
+				"Setting injected property %s.%s",
+				componentDefinition.name (),
+				injectedProperty.fieldName ()));
 
-			}
+		Injection injection =
+				new Injection ();
 
-			// package appropriately
+		injection.component =
+			component;
 
-			Object value;
+		injection.injectedProperty =
+			injectedProperty;
 
-			switch (injectedProperty.collectionType ()) {
+		injection.targetComponents =
+			iterableMapToList (
+				componentDefinitionsByName::get,
+				injectedProperty.targetComponentNames ());
 
-			case componentClassMap:
+		// define transformer
+
+		if (injectedProperty.provider ()) {
+
+			injection.transformer =
+				provider -> provider;
+
+		} else {
+
+			injection.transformer =
+				provider -> provider.get ();
+
+		}
+
+		// define aggregator
+
+		if (
+			enumEqualSafe (
+				injectedProperty.collectionType (),
+				CollectionType.componentClassMap)
+		) {
+
+			injection.aggregator =
+				targetComponents -> {
 
 				Map <Class <?>, Object> componentClassMap =
 					new LinkedHashMap<> ();
-
+	
 				for (
-					Pair <ComponentDefinition,Object> pair
+					Pair <ComponentDefinition, Object> pair
 						: targetComponents
 				) {
-
+	
 					componentClassMap.put (
 						pair.getLeft ().componentClass (),
 						pair.getRight ());
-
+	
 				}
 
-				value = componentClassMap;
+				return componentClassMap;
 
-				break;
+			};
 
-			case componentNameMap:
+		} else if (
+			enumEqualSafe (
+				injectedProperty.collectionType (),
+				CollectionType.componentNameMap)
+		) {
+
+			injection.aggregator =
+				targetComponents -> {
 
 				Map <String, Object> componentNameMap =
 					new LinkedHashMap<> ();
-
+	
 				for (
 					Pair <ComponentDefinition, Object> pair
 						: targetComponents
 				) {
-
+	
 					componentNameMap.put (
 						pair.getLeft ().name (),
 						pair.getRight ());
-
+	
 				}
+	
+				return componentNameMap;
 
-				value = componentNameMap;
+			};
 
-				break;
+		} else if (
+			enumEqualSafe (
+				injectedProperty.collectionType (),
+				CollectionType.list)
+		) {
 
-			case list:
+			injection.aggregator =
+				targetComponents -> {
 
-				List<Object> componentsList =
+				List <Object> componentsList =
 					new ArrayList <> ();
-
+	
 				for (
 					Pair <ComponentDefinition, Object> pair
 						: targetComponents
 				) {
-
+	
 					componentsList.add (
 						pair.getRight ());
-
+	
 				}
 
-				value = componentsList;
+				return componentsList;
 
-				break;
+			};
 
-			case single:
+		} else if (
+			enumEqualSafe (
+				injectedProperty.collectionType (),
+				CollectionType.single)
+		) {
+
+			injection.aggregator =
+				targetComponents -> {
 
 				if (targetComponents.size () != 1) {
-
+	
 					throw new RuntimeExceptionWithTask (
 						activityManager.currentTask (),
 						stringFormat (
@@ -916,49 +977,117 @@ class ApplicationContextImplementation
 							targetComponents.size (),
 							componentDefinition.name (),
 							injectedProperty.fieldName ()));
-
-				}
-
-				value =
-					targetComponents.get (0).getRight ();
-
-				break;
-
-			default:
-
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask ());
-
-			}
-
-			// and inject it
-
-			try {
-
-				Field field =
-					injectedProperty
-						.fieldDeclaringClass ()
-						.getDeclaredField (
-							injectedProperty.fieldName ());
-
-				field.setAccessible (
-					true);
 	
-				field.set (
-					component,
-					value);
+				}
+	
+				return targetComponents.get (0).getRight ();
 
-			} catch (NoSuchFieldException noSuchFieldException) {
+			};
 
-				throw new RuntimeException (
-					noSuchFieldException);
+		} else {
 
-			} catch (IllegalAccessException illegalAccessException) {
+			throw new RuntimeExceptionWithTask (
+				activityManager.currentTask ());
 
-				throw new RuntimeException (
-					illegalAccessException);
+		}
+
+		if (injectedProperty.weak ()) {
+
+			injection.missingComponents =
+				injection.targetComponents.stream ()
+	
+				.filter (
+					definition ->
+						doesNotContain (
+							singletonComponents.keySet (),
+							definition.name ()))
+	
+				.map (
+					definition ->
+						definition.name ())
+	
+				.collect (
+					Collectors.toSet ());
+
+		} else {
+
+			injection.missingComponents =
+				ImmutableSet.of ();
+
+		}
+
+		if (
+			collectionIsEmpty (
+				injection.missingComponents)
+		) {
+
+			performInjection (
+				injection);
+
+		} else {
+
+			for (
+				String missingComponentName
+					: injection.missingComponents
+			) {
+
+				List <Injection> injectionsByDependency =
+					pendingInjections.computeIfAbsent (
+						missingComponentName,
+						name -> new ArrayList<> ());
+
+				injectionsByDependency.add (
+					injection);
 
 			}
+
+		}
+
+	}
+
+	private
+	void performInjection (
+			@NonNull Injection injection) {
+
+		List <Pair <ComponentDefinition, Object>> unaggregatedValues =
+			iterableMapToList (
+				targetComponentDefinition ->
+					Pair.of (
+						targetComponentDefinition,
+						injection.transformer.apply (
+							getComponentProvider (
+								targetComponentDefinition,
+								injection.injectedProperty.initialized ()))),
+				injection.targetComponents);
+
+		Object aggregatedValue =
+			injection.aggregator.apply (
+				unaggregatedValues);
+
+		try {
+
+			Field field =
+				injection.injectedProperty
+					.fieldDeclaringClass ()
+					.getDeclaredField (
+						injection.injectedProperty.fieldName ());
+
+			field.setAccessible (
+				true);
+
+			field.set (
+				injection.component,
+				aggregatedValue);
+
+		} catch (NoSuchFieldException noSuchFieldException) {
+
+			throw new RuntimeException (
+				noSuchFieldException);
+
+		} catch (IllegalAccessException illegalAccessException) {
+
+			throw new RuntimeException (
+				illegalAccessException);
 
 		}
 
@@ -1281,6 +1410,17 @@ class ApplicationContextImplementation
 		HeldLock heldlock =
 			lock.write ();
 
+		if (
+			enumNotEqualSafe (
+				state,
+				State.definition)
+		) {
+			throw new IllegalStateException ();
+		}
+
+		state =
+			State.initialization;
+
 		int errors = 0;
 
 		// automatic components
@@ -1413,8 +1553,7 @@ class ApplicationContextImplementation
 						stringFormat (
 							"Unable to resolve dependencies for %s (%s)",
 							componentDefinition.name (),
-							joinWithSeparator (
-								", ",
+							joinWithCommaAndSpace (
 								unresolvedDependencyNames)));
 
 					errors ++;
@@ -1469,32 +1608,8 @@ class ApplicationContextImplementation
 
 		}
 
-		// inject weak dependencies
-
-		for (
-			ComponentDefinition componentDefinition
-				: componentDefinitions
-		) {
-
-			if (
-				stringNotEqualSafe (
-					componentDefinition.scope (),
-					"singleton")
-			) {
-				continue;
-			}
-
-			Object component =
-				getComponentRequired (
-					componentDefinition.name (),
-					Object.class);
-
-			setComponentInjectedProperties (
-				componentDefinition,
-				component,
-				true);
-
-		}
+		state =
+			State.running;
 
 		return this;
 
@@ -2357,7 +2472,7 @@ class ApplicationContextImplementation
 
 	@SneakyThrows (Exception.class)
 	public <ComponentType>
-	ComponentType injectStrongDependencies (
+	ComponentType injectDependencies (
 			@NonNull ComponentType component) {
 
 		@Cleanup
@@ -2396,8 +2511,7 @@ class ApplicationContextImplementation
 
 		setComponentInjectedProperties (
 			componentDefinition,
-			component,
-			false);
+			component);
 
 		return component;
 
@@ -2406,6 +2520,7 @@ class ApplicationContextImplementation
 	public static
 	class ComponentMetaData {
 		ComponentDefinition definition;
+		WeakReference <Object> component;
 		ComponentState state;
 	}
 

@@ -21,38 +21,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
-import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.utils.formatwriter.FormatWriter;
 
+import fj.data.Either;
+
 @Accessors (fluent = true)
 @PrototypeComponent ("updatableFormField")
 @DataClass ("updatable-form-field")
 public
-class UpdatableFormField<Container,Generic,Native,Interface>
-	implements FormField<Container,Generic,Native,Interface> {
+class UpdatableFormField <Container, Generic, Native, Interface>
+	implements FormField <Container, Generic, Native, Interface> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// properties

@@ -8,13 +8,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 
@@ -23,9 +23,9 @@ import wbs.framework.entity.record.Record;
 public
 class UserPrivCheckerBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	UserPrivDataLoader privDataLoader;
 
 	// properties

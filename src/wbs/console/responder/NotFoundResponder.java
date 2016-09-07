@@ -1,17 +1,20 @@
 package wbs.console.responder;
 
-import javax.inject.Inject;
-
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.SingletonDependency;
 
 @PrototypeComponent ("notFoundResponder")
 public
 class NotFoundResponder
 	extends HtmlResponder {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
+
+	// implementation
 
 	@Override
 	public

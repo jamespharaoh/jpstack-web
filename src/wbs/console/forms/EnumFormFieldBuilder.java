@@ -13,7 +13,6 @@ import static wbs.framework.utils.etc.StringUtils.uncapitalise;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -21,6 +20,8 @@ import com.google.common.base.Optional;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.EnumConsoleHelper;
 import wbs.framework.application.annotations.PrototypeComponent;
+import wbs.framework.application.annotations.PrototypeDependency;
+import wbs.framework.application.annotations.SingletonDependency;
 import wbs.framework.application.context.ApplicationContext;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -35,53 +36,53 @@ import wbs.framework.utils.etc.BeanLogic;
 public
 class EnumFormFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ApplicationContext applicationContext;
 
-	@Inject
+	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <EnumCsvFormFieldInterfaceMapping>
 	enumCsvFormFieldInterfaceMappingProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <EnumFormFieldRenderer>
 	enumFormFieldRendererProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <HiddenFormField>
 	hiddenFormFieldProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <IdentityFormFieldInterfaceMapping>
 	identityFormFieldInterfaceMappingProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <UpdatableFormField>
 	updatableFormFieldProvider;
 

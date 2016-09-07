@@ -14,6 +14,7 @@ import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelperMethods;
 import wbs.clients.apn.chat.user.core.model.ChatUserRec;
 import wbs.clients.apn.chat.user.core.model.ChatUserType;
 import wbs.framework.application.annotations.SingletonDependency;
+import wbs.framework.application.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.utils.RandomLogic;
@@ -28,19 +29,19 @@ class ChatUserObjectHelperMethodsImplementation
 
 	// singleton dependencies
 
-	@SingletonDependency
+	@WeakSingletonDependency
 	ChatNumberReportLogic chatNumberReportLogic;
 
-	@SingletonDependency
+	@WeakSingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@SingletonDependency
+	@WeakSingletonDependency
 	ChatUserLogic chatUserLogic;
 
 	@SingletonDependency
 	Database database;
 
-	@SingletonDependency
+	@WeakSingletonDependency
 	NumberLogic numberLogic;
 
 	@SingletonDependency
