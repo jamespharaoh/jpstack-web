@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
+
+import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.Getter;
@@ -15,11 +16,11 @@ import lombok.Setter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import com.google.common.collect.ImmutableMap;
-
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.database.TransactionView;
@@ -29,18 +30,18 @@ public
 class HibernateDatabase
 	implements Database {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ActivityManager activityManager;
 
-	@Inject
+	@SingletonDependency
 	SessionFactory sessionFactory;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<HibernateInterceptor> hibernateInterceptorProvider;
+	@PrototypeDependency
+	Provider <HibernateInterceptor> hibernateInterceptorProvider;
 
 	// properties
 

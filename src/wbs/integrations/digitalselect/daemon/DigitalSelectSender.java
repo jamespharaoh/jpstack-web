@@ -7,9 +7,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+
+import lombok.Data;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.IOUtils;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
@@ -19,15 +26,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-
-import lombok.Data;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
-
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.integrations.digitalselect.daemon.DigitalSelectSender.State;
@@ -44,11 +44,15 @@ public
 class DigitalSelectSender
 	extends AbstractSmsSender1<State> {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DigitalSelectRouteOutObjectHelper digitalSelectRouteOutHelper;
+
+	// details
 
 	@Override
 	protected
@@ -62,6 +66,8 @@ class DigitalSelectSender
 	String getSenderCode () {
 		return "digital_select";
 	}
+
+	// implementation
 
 	@Override
 	protected

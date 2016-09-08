@@ -5,7 +5,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
@@ -13,6 +12,7 @@ import com.google.common.base.Optional;
 import lombok.Cleanup;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.AbstractWebFile;
@@ -30,24 +30,24 @@ public
 class Oxygen8ReportFile
 	extends AbstractWebFile {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	Oxygen8ReportCodeObjectHelper oxygen8ReportCodeHelper;
 
-	@Inject
+	@SingletonDependency
 	Oxygen8RouteOutObjectHelper oxygen8RouteOutCodeHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsDeliveryReportLogic reportLogic;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
 	// implementation

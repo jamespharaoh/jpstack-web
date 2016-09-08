@@ -1,17 +1,19 @@
 package wbs.framework.fixtures;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginFixtureSpec;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginSpec;
@@ -23,27 +25,27 @@ import wbs.framework.database.Transaction;
 public
 class FixturesTool {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
+	List <BackgroundProcess> backgroundProcesses;
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	PluginManager pluginManager;
 
-	// collection dependencies
+	// prototype dependencies
 
-	@Inject
-	Map<Class<?>,Provider<FixtureProvider>> fixtureProviderProvidersByClass;
-
-	@Inject
-	List<BackgroundProcess> backgroundProcesses;
+	@PrototypeDependency
+	Map <Class <?>, Provider <FixtureProvider>> fixtureProviderProvidersByClass;
 
 	// implementation
 
 	public
 	void runFixtureProviders (
-			List<String> arguments) {
+			@NonNull List <String> arguments) {
 
 		log.info (
 			stringFormat (

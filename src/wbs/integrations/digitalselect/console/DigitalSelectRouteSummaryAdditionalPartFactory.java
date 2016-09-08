@@ -1,9 +1,9 @@
 package wbs.integrations.digitalselect.console;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.part.PagePart;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.sms.route.core.console.RouteSummaryAdditionalPartFactory;
 
@@ -12,9 +12,13 @@ public
 class DigitalSelectRouteSummaryAdditionalPartFactory
 	implements RouteSummaryAdditionalPartFactory {
 
-	@Inject
-	Provider<DigitalSelectRouteSummaryAdditionalPart>
-		digitalSelectRouteSummaryAdditionalPart;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <DigitalSelectRouteSummaryAdditionalPart>
+		digitalSelectRouteSummaryAdditionalPartProvider;
+
+	// details
 
 	@Override
 	public
@@ -26,12 +30,14 @@ class DigitalSelectRouteSummaryAdditionalPartFactory
 
 	}
 
+	// simplementation
+
 	@Override
 	public
 	PagePart getPagePart (
 			String senderCode) {
 
-		return digitalSelectRouteSummaryAdditionalPart.get ();
+		return digitalSelectRouteSummaryAdditionalPartProvider.get ();
 
 	}
 

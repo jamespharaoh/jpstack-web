@@ -49,7 +49,7 @@ class GenericConsoleHelperProvider
 	// singleton dependencies
 
 	@SingletonDependency
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -183,7 +183,7 @@ class GenericConsoleHelperProvider
 		if (consoleHelperProviderSpec.cryptorBeanName () != null) {
 
 			cryptor (
-				applicationContext.getComponentRequired (
+				componentManager.getComponentRequired (
 					consoleHelperProviderSpec.cryptorBeanName (),
 					Cryptor.class));
 

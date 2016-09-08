@@ -5,11 +5,13 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 
@@ -17,14 +19,14 @@ import wbs.framework.entity.model.Model;
 public
 class ObjectHelperGeneratorTool {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	EntityHelper entityHelper;
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <ObjectHelperGenerator> objectHelperGeneratorProvider;
 
 	// implementation

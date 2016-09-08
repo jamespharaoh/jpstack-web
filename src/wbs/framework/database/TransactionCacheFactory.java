@@ -3,17 +3,20 @@ package wbs.framework.database;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @SingletonComponent ("transactionCacheFactory")
 // TODO get rid of this abomination
 public
 class TransactionCacheFactory {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	Database database;
+
+	// implementation
 
 	public <T>
 	TransactionCache<T> create (

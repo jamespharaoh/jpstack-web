@@ -4,8 +4,6 @@ import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
-
 import lombok.NonNull;
 
 import wbs.framework.builder.Builder;
@@ -15,6 +13,7 @@ import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
@@ -26,9 +25,9 @@ import wbs.framework.entity.meta.identities.ParentFieldSpec;
 public
 class ParentFieldWriter {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	PluginManager pluginManager;
 
 	// builder

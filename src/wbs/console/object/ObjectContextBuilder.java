@@ -55,7 +55,7 @@ class ObjectContextBuilder <
 	// singleton dependencies
 
 	@SingletonDependency
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	ConsoleHelperRegistry consoleHelperRegistry;
@@ -539,7 +539,7 @@ class ObjectContextBuilder <
 
 		cryptor =
 			spec.cryptorBeanName () != null
-				? applicationContext.getComponentRequired (
+				? componentManager.getComponentRequired (
 					spec.cryptorBeanName (),
 					Cryptor.class)
 				: null;

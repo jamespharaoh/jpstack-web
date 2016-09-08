@@ -3,7 +3,6 @@ package wbs.framework.schema.builder;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
@@ -11,6 +10,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.entity.model.Model;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.schema.model.Schema;
@@ -21,8 +21,12 @@ import wbs.framework.schema.model.SchemaTable;
 public
 class SchemaFromModel {
 
-	@Inject
-	Provider<SchemaTableFromModel> schemaTableFromModel;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <SchemaTableFromModel> schemaTableFromModel;
+
+	// properties
 
 	@Getter @Setter
 	TaskLogger taskLog;

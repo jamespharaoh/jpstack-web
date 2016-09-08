@@ -6,14 +6,13 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.AbstractWebFile;
@@ -33,21 +32,21 @@ public
 class UnwiredPlazaApiServletModule
 	implements ServletModule {
 
-	// ============================================================ properties
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogLogic exceptionLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsDeliveryReportLogic reportLogic;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
 	// ============================================================ report file

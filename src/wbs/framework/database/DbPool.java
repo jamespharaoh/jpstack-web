@@ -20,7 +20,6 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.sql.DataSource;
 
 import lombok.Cleanup;
@@ -28,9 +27,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 /**
  * TODO a maximum connection life would be nice
@@ -50,16 +51,18 @@ public
 class DbPool
 	implements DataSource {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ActivityManager activityManager;
 
 	// state
 
-	Class<?> proxyClass;
+	Class <?> proxyClass;
 
-	Constructor<?> proxyConstructor;
+	Constructor <?> proxyConstructor;
+
+	// life cycle
 
 	@PostConstruct
 	public

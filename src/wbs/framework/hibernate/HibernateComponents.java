@@ -5,28 +5,31 @@ import static wbs.framework.utils.etc.Misc.booleanToYesNo;
 
 import java.util.Properties;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
+
+import com.google.common.collect.ImmutableMap;
 
 import org.hibernate.SessionFactory;
 
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-
-import com.google.common.collect.ImmutableMap;
 
 @SingletonComponent ("hibernateComponents")
 public
 class HibernateComponents {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
+	WbsConfig wbsConfig;
+
+	// prototype dependencies
+
+	@PrototypeDependency
 	Provider <HibernateSessionFactoryBuilder>
 		hibernateSessionFactoryBuilderProvider;
-
-	@Inject
-	WbsConfig wbsConfig;
 
 	// components
 

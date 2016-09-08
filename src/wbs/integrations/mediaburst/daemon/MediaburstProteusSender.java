@@ -11,21 +11,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-import nu.xom.Builder;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Nodes;
-import nu.xom.ParsingException;
-import nu.xom.Serializer;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Xom;
@@ -42,6 +35,13 @@ import wbs.sms.network.logic.NetworkPrefixCache;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteRec;
 
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Nodes;
+import nu.xom.ParsingException;
+import nu.xom.Serializer;
+
 /**
  * Daemon service to process outbox items for mediaburst proteus routes.
  */
@@ -49,25 +49,29 @@ import wbs.sms.route.core.model.RouteRec;
 @SingletonComponent ("mediaburstProteusSender")
 public
 class MediaburstProteusSender
-	extends AbstractSmsSender1<MediaburstProteusSender.State> {
+	extends AbstractSmsSender1 <MediaburstProteusSender.State> {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	MediaburstNetworkObjectHelper mediaburstNetworkHelper;
 
-	@Inject
+	@SingletonDependency
 	MediaburstProteusRouteOutObjectHelper mediaburstProteusRouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	NetworkPrefixCache networkPrefixCache;
 
-	@Inject
+	@SingletonDependency
 	WapPushMessageObjectHelper wapPushMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
+
+	// sdetails
 
 	@Override
 	protected

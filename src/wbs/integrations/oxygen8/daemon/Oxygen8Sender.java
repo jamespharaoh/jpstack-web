@@ -16,11 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import javax.inject.Inject;
-
-import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONObject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -29,7 +24,12 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
+import org.apache.commons.io.IOUtils;
+
+import org.json.simple.JSONObject;
+
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Html;
@@ -49,18 +49,18 @@ public
 class Oxygen8Sender
 	extends AbstractSmsSender2 {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	Oxygen8NetworkObjectHelper oxygen8NetworkHelper;
 
-	@Inject
+	@SingletonDependency
 	Oxygen8RouteOutObjectHelper oxygen8RouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// details

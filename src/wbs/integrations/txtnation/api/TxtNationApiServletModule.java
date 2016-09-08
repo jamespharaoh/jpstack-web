@@ -3,11 +3,11 @@ package wbs.integrations.txtnation.api;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.RegexpPathHandler;
 import wbs.framework.web.ServletModule;
@@ -18,10 +18,16 @@ public
 class TxtNationApiServletModule
 	implements ServletModule {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	TxtNationRoutePathHandlerEntry txtNationRoutePathHandlerEntry;
 
+	// state
+
 	PathHandler pathHandler;
+
+	// life cycle
 
 	@PostConstruct
 	public

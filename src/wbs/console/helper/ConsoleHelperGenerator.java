@@ -45,9 +45,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -58,6 +55,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -424,7 +424,7 @@ class ConsoleHelperGenerator {
 			"\t@SingletonDependency\n");
 
 		javaWriter.writeFormat (
-			"\tApplicationContext applicationContext;\n");
+			"\tComponentManager componentManager;\n");
 
 		javaWriter.writeFormat (
 			"\n");
@@ -708,7 +708,7 @@ class ConsoleHelperGenerator {
 			"\t\t\t\t\tOptionalUtils.optionalOrNull (\n");
 
 		javaWriter.writeFormat (
-			"\t\t\t\t\t\tapplicationContext.getComponent (\n");
+			"\t\t\t\t\t\tcomponentManager.getComponent (\n");
 
 		javaWriter.writeFormat (
 			"\t\t\t\t\t\t\t\"%s\",\n",

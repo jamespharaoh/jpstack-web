@@ -1,8 +1,8 @@
 package wbs.console.tab;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
+import com.google.common.collect.ImmutableSet;
 
 import lombok.Data;
 import lombok.Getter;
@@ -18,8 +18,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import org.apache.log4j.Logger;
-
-import com.google.common.collect.ImmutableSet;
 
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
@@ -29,6 +27,7 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
@@ -40,21 +39,21 @@ public
 class TabbedResponder
 	extends HtmlResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	ExceptionUtils exceptionLogic;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	ConsoleUserHelper consoleUserHelper;
 
 	// properties

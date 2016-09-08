@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
@@ -22,7 +21,9 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.FileUtils;
 
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataToXml;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
@@ -37,14 +38,14 @@ public
 class EntityHelperImplementation
 	implements EntityHelper {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ModelMetaLoader modelMetaLoader;
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <ModelBuilder> modelBuilder;
 
 	// properties

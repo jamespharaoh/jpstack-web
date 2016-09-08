@@ -21,7 +21,7 @@ class SimplePathBuilder {
 	// singleton dependencies
 
 	@SingletonDependency
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	// builder
 
@@ -55,7 +55,7 @@ class SimplePathBuilder {
 	void buildPath () {
 
 		PathHandler pathHandler =
-			applicationContext.getComponentRequired (
+			componentManager.getComponentRequired (
 				pathHandlerName,
 				PathHandler.class);
 

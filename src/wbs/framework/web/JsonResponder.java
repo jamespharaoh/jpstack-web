@@ -3,7 +3,6 @@ package wbs.framework.web;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
@@ -13,6 +12,7 @@ import lombok.experimental.Accessors;
 import org.json.simple.JSONValue;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataToJson;
 
 @Accessors (fluent = true)
@@ -20,12 +20,12 @@ import wbs.framework.data.tools.DataToJson;
 public
 class JsonResponder
 	implements
-		Provider<Responder>,
+		Provider <Responder>,
 		Responder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// properties

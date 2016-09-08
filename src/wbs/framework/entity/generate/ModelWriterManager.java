@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
-import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
 import wbs.framework.entity.generate.fields.ModelFieldWriterTarget;
 
@@ -20,12 +20,10 @@ class ModelWriterManager {
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <BuilderFactory> builderFactoryProvider;
 
-	// collection dependencies
-
-	@Inject
+	@PrototypeDependency
 	@ModelWriter
 	Map <Class <?>, Provider <Object>> modelWriterProviders;
 

@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -21,14 +20,17 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import lombok.Cleanup;
+
 import org.joda.time.Instant;
 
-import lombok.Cleanup;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -43,26 +45,30 @@ public
 class CoreAuthFilter
 	implements Filter {
 
-	@Inject
-	Provider<ConsoleManager> consoleManagerProvider;
+	// singleton dependencies
 
-	@Inject
+	@WeakSingletonDependency
+	ConsoleManager consoleManager;
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserLogic userLogic;
 
-	@Inject
+	@SingletonDependency
 	UserOnlineObjectHelper userOnlineHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker userPrivChecker;
+
+	// constants
 
 	final static
 	int reloadTime = 10 * 1000;
@@ -276,7 +282,7 @@ class CoreAuthFilter
 				} else {
 
 					Provider <Responder> logonResponder =
-						consoleManagerProvider.get ().responder (
+						consoleManager.responder (
 							"coreLogonResponder",
 							true);
 

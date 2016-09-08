@@ -1,13 +1,11 @@
 package wbs.framework.object;
 
 import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TypeUtils.dynamicCast;
 import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
-
-import javax.inject.Inject;
 
 import com.google.common.base.Optional;
 
@@ -16,6 +14,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.utils.etc.BeanLogic;
@@ -23,26 +22,28 @@ import wbs.framework.utils.etc.BeanLogic;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperPropertyImplementation")
 public
-class ObjectHelperPropertyImplementation<RecordType extends Record<RecordType>>
+class ObjectHelperPropertyImplementation <
+	RecordType extends Record <RecordType>
+>
 	implements
-		ObjectHelperComponent<RecordType>,
-		ObjectHelperPropertyMethods<RecordType> {
+		ObjectHelperComponent <RecordType>,
+		ObjectHelperPropertyMethods <RecordType> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeRegistry objectTypeRegistry;
 
 	// properties
 
 	@Setter
-	ObjectModel<RecordType> model;
+	ObjectModel <RecordType> model;
 
 	@Setter
-	ObjectHelper<RecordType> objectHelper;
+	ObjectHelper <RecordType> objectHelper;
 
 	@Setter
-	ObjectDatabaseHelper<RecordType> objectDatabaseHelper;
+	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
 
 	@Setter
 	ObjectManager objectManager;

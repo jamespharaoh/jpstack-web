@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
-import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonComponent;
 
 @SingletonComponent ("modelBuilderManager")
 public
@@ -18,14 +18,12 @@ class ModelBuilderManager {
 
 	// prototype dependencies
 
-	@Inject
-	Provider<BuilderFactory> builderFactoryProvider;
+	@PrototypeDependency
+	Provider <BuilderFactory> builderFactoryProvider;
 
-	// collection dependencies
-
-	@Inject
+	@PrototypeDependency
 	@ModelBuilder
-	Map<Class<?>,Provider<Object>> modelBuilderProviders;
+	Map <Class <?>, Provider <Object>> modelBuilderProviders;
 
 	// state
 
@@ -52,7 +50,7 @@ class ModelBuilderManager {
 	public
 	void build (
 			ModelFieldBuilderContext context,
-			List<?> sourceItems,
+			List <?> sourceItems,
 			ModelFieldBuilderTarget target) {
 
 		modelBuilder.descend (

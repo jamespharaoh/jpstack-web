@@ -4,13 +4,15 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.collect.Iterables;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
@@ -19,24 +21,24 @@ import wbs.framework.entity.meta.model.ModelMetaSpec;
 public
 class ModelGeneratorTool {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ModelMetaLoader modelMetaLoader;
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <ModelRecordGenerator> modelRecordGeneratorProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <ModelInterfacesGenerator> modelInterfacesGeneratorProvider;
 
 	// implementation
 
 	public
 	void generateModels (
-			List<String> params) {
+			@NonNull List <String> params) {
 
 		log.info (
 			stringFormat (

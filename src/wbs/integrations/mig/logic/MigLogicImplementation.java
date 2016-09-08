@@ -4,11 +4,11 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
+
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.integrations.mig.model.MigNetworkObjectHelper;
 import wbs.integrations.mig.model.MigNetworkRec;
 import wbs.sms.network.model.NetworkRec;
@@ -19,12 +19,12 @@ public
 class MigLogicImplementation
 	implements MigLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	MigNetworkObjectHelper migNetworkHelper;
 
-	@Inject
+	@SingletonDependency
 	NumberLogic numberLogic;
 
 	// implementation

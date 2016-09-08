@@ -4,16 +4,16 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collections;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
-
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 
+import org.joda.time.Instant;
+
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.RequestContext;
@@ -31,23 +31,27 @@ public
 class G8waveInFile
 	implements WebFile {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	NetworkObjectHelper networkHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
+
+	// implementation
 
 	@Override
 	public

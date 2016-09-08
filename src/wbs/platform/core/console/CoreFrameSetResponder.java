@@ -2,13 +2,12 @@ package wbs.platform.core.console;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
-
 import org.joda.time.Instant;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsolePrintResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.utils.TimeFormatter;
 
@@ -17,15 +16,15 @@ public
 class CoreFrameSetResponder
 	extends ConsolePrintResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
 	// implementation

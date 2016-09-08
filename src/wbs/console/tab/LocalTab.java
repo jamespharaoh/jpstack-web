@@ -1,22 +1,27 @@
 package wbs.console.tab;
 
-import javax.inject.Inject;
-
 import wbs.console.lookup.BooleanLookup;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.SingletonDependency;
 
 public
 class LocalTab
 	extends Tab {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
+
+	// state
 
 	private final
 	String localUrl;
 
 	private final
 	BooleanLookup[] lookups;
+
+	// constructors
 
 	public
 	LocalTab (

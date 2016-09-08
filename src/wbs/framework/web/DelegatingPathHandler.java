@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Getter;
@@ -16,6 +15,7 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 /**
  * Implementation of PathHandler which delegates to other PathHandlers or
@@ -27,6 +27,13 @@ public
 class DelegatingPathHandler
 	implements PathHandler {
 
+	// singleton dependencies
+
+	@SingletonDependency
+	Map <String, ServletModule> servletModules;
+
+	// properties
+
 	@Getter @Setter
 	Map <String, PathHandler> paths =
 		new HashMap<> ();
@@ -34,9 +41,6 @@ class DelegatingPathHandler
 	@Getter @Setter
 	Map <String, WebFile> files =
 		new HashMap<> ();
-
-	@Inject
-	Map <String, ServletModule> servletModules;
 
 	/**
 	 * Populates paths and files properties with values obtained from any

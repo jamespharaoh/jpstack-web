@@ -11,12 +11,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.sql.DataSource;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.logging.TaskLogger;
@@ -29,30 +31,30 @@ import wbs.framework.utils.formatwriter.AtomicFileWriter;
 public
 class SchemaTool {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	DataSource dataSource;
 
-	@Inject
+	@SingletonDependency
 	EntityHelper entityHelper;
 
-	@Inject
+	@SingletonDependency
 	SchemaToSql schemaToSql;
 
-	@Inject
+	@SingletonDependency
 	SchemaTypesHelper schemaTypesHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<SchemaFromModel> schemaFromModel;
+	@PrototypeDependency
+	Provider <SchemaFromModel> schemaFromModel;
 
 	// state
 
 	TaskLogger taskLog;
 	Schema schema;
-	List<String> sqlStatements;
+	List <String> sqlStatements;
 
 	// implementation
 

@@ -8,8 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.helper.ConsoleObjectManager;
@@ -19,6 +17,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.utils.etc.ABSwap;
 import wbs.platform.menu.console.MenuGroupConsoleHelper;
@@ -35,29 +34,29 @@ public
 class CoreSidebarMenuResponder
 	extends HtmlResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	MenuGroupConsoleHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// state
 
-	List<MenuGroupRec> menuGroups;
+	List <MenuGroupRec> menuGroups;
 
 	// details
 

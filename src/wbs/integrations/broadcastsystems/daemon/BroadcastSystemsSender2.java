@@ -12,14 +12,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import javax.inject.Inject;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.json.simple.parser.ParseException;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -27,7 +19,15 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
+
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
+
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Html;
@@ -45,18 +45,18 @@ public
 class BroadcastSystemsSender2
 	extends AbstractSmsSender2 {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	BroadcastSystemsRouteOutObjectHelper broadcastSystemsRouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogLogic exceptionLogic;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// details

@@ -13,12 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.hibernate.type.Type;
-import org.hibernate.usertype.CompositeUserType;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -28,9 +22,16 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import org.hibernate.type.Type;
+import org.hibernate.usertype.CompositeUserType;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginCustomTypeSpec;
 import wbs.framework.component.scaffold.PluginEnumTypeSpec;
 import wbs.framework.component.scaffold.PluginManager;
@@ -45,15 +46,15 @@ public
 class SchemaTypesHelperImplementation
 	implements SchemaTypesHelper {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ActivityManager activityManager;
 
-	@Inject
+	@SingletonDependency
 	SchemaNamesHelper schemaNamesHelper;
 
-	@Inject
+	@SingletonDependency
 	PluginManager pluginManager;
 
 	// properties

@@ -3,10 +3,11 @@ package wbs.framework.web;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 
 /**
@@ -19,18 +20,18 @@ public abstract
 class AbstractFile
 	implements WebFile {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
-	ComponentManager applicationContext;
+	@SingletonDependency
+	ComponentManager componentManager;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ActionRequestHandler> actionRequestHandlerProvider;
+	@PrototypeDependency
+	Provider <ActionRequestHandler> actionRequestHandlerProvider;
 
 	// extension points
 
@@ -41,13 +42,15 @@ class AbstractFile
 	RequestHandler postHandler ();
 
 	public abstract
-	Map<String,Object> requestParams ();
+	Map <String, Object> requestParams ();
 
 	public
 	void setRequestParams () {
 
-		for (Map.Entry<String,Object> ent
-				: requestParams ().entrySet ()) {
+		for (
+			Map.Entry <String, Object> ent
+				: requestParams ().entrySet ()
+		) {
 
 			requestContext.request (
 				ent.getKey (),
@@ -122,7 +125,7 @@ class AbstractFile
 					IOException {
 
 				RequestHandler handler =
-					applicationContext.getComponentRequired (
+					componentManager.getComponentRequired (
 						handlerName,
 						RequestHandler.class);
 
@@ -172,7 +175,7 @@ class AbstractFile
 					IOException {
 
 				Responder responder =
-					applicationContext.getComponentRequired (
+					componentManager.getComponentRequired (
 						responderName,
 						Responder.class);
 

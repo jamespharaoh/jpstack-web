@@ -5,12 +5,12 @@ import static wbs.framework.utils.etc.Misc.runFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.inject.Inject;
-
 import lombok.extern.log4j.Log4j;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.media.model.MediaRec;
 
 @Log4j
@@ -19,11 +19,15 @@ public
 class MediaVideoResponder
 	extends ConsoleResponder {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	MediaConsoleHelper mediaHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
+
+	// state
 
 	OutputStream out;
 	byte[] data;

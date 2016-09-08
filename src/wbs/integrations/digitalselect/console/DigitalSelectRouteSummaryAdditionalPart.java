@@ -2,10 +2,9 @@ package wbs.integrations.digitalselect.console;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
-
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.integrations.digitalselect.model.DigitalSelectRouteOutRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
@@ -16,15 +15,15 @@ public
 class DigitalSelectRouteSummaryAdditionalPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	DigitalSelectRouteOutConsoleHelper digitalSelectRouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	RouteConsoleHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// state

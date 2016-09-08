@@ -4,9 +4,8 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.integrations.smsarena.model.SmsArenaConfigObjectHelper;
@@ -27,33 +26,33 @@ public
 class SmsArenaFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuItemObjectHelper menuItemHelper;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsArenaRouteOutObjectHelper smsArenaRouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsArenaRouteInObjectHelper smsArenaRouteInHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsArenaConfigObjectHelper smsArenaConfigHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsArenaReportCodeObjectHelper smsArenaReportCodeHelper;
 
-	@Inject
+	@SingletonDependency
 	SenderObjectHelper senderHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
 	// implementation

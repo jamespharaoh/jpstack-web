@@ -24,7 +24,7 @@ class SupervisorSimplePartBuilder {
 	// singleton dependencies
 
 	@SingletonDependency
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	// builder
 
@@ -48,7 +48,7 @@ class SupervisorSimplePartBuilder {
 			spec.beanName ();
 
 		Provider<PagePart> pagePartFactory =
-			applicationContext.getComponentProviderRequired (
+			componentManager.getComponentProviderRequired (
 				beanName,
 				PagePart.class);
 

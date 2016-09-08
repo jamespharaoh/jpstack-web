@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
@@ -20,12 +19,9 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
-import nu.xom.Builder;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Nodes;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.AbstractWebFile;
@@ -39,24 +35,29 @@ import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Nodes;
+
 @Log4j
 @SingletonComponent ("mediaburstProteusApiServletModule")
 public
 class MediaburstProteusApiServletModule
 	implements ServletModule {
 
-	// ============================================================ properties
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	SmsDeliveryReportLogic reportLogic;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
 	// ============================================================ inFile

@@ -3,9 +3,6 @@ package wbs.console.tab;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -15,6 +12,8 @@ import wbs.console.context.ConsoleContextStuff;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
@@ -25,15 +24,13 @@ import wbs.framework.data.annotations.DataClass;
 public
 class ConsoleContextTab {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	// indirect dependencies
-
-	@Inject
-	Provider<ConsoleManager> consoleManagerProvider;
+	@WeakSingletonDependency
+	ConsoleManager consoleManager;
 
 	// attributes
 
@@ -131,12 +128,10 @@ class ConsoleContextTab {
 		public
 		String getUrl () {
 
-			return consoleManagerProvider
-				.get ()
-				.resolveLocalFile (
-					contextStuff,
-					consoleContext,
-					localFile);
+			return consoleManager.resolveLocalFile (
+				contextStuff,
+				consoleContext,
+				localFile);
 
 		}
 

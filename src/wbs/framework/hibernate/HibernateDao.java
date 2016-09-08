@@ -12,29 +12,33 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.inject.Inject;
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 
 import org.hibernate.Criteria;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.IdObject;
 
 @Log4j
 public abstract
 class HibernateDao {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ActivityManager activityManager;
 
-	@Inject
+	@SingletonDependency
 	HibernateDatabase database;
+
+	// implementation
 
 	protected
 	Session session () {

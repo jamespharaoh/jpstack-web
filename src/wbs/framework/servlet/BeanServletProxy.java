@@ -46,13 +46,13 @@ class BeanServletProxy
 		ServletContext servletContext =
 			servletConfig.getServletContext ();
 
-		ComponentManager applicationContext =
+		ComponentManager componentManager =
 			(ComponentManager)
 			servletContext.getAttribute (
 				"wbs-application-context");
 
 		target =
-			applicationContext.getComponentRequired (
+			componentManager.getComponentRequired (
 				servletConfig.getServletName (),
 				Servlet.class);
 

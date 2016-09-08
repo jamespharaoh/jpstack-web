@@ -1,8 +1,7 @@
 package wbs.platform.menu.fixture;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
@@ -12,12 +11,12 @@ public
 class MenuFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuItemObjectHelper menuItemHelper;
 
 	// implementation

@@ -5,19 +5,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.utils.etc.Html;
 
 public
 class TabList {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	List<TabRef> tabRefs =
-		new ArrayList<TabRef> ();
+	// static
+
+	List <TabRef> tabRefs =
+		new ArrayList<> ();
+
+	// constructors
 
 	static
 	class PreparedTab {

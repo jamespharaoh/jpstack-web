@@ -5,11 +5,12 @@ import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualSafe;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.Action;
 import wbs.framework.web.RequestContext;
@@ -20,16 +21,18 @@ public
 class Oxygen8InboundFile
 	extends AbstractWebFile {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
-	Provider <Oxygen8InboundMmsAction> oxygen8InboundMmsAction;
-
-	@Inject
-	Provider <Oxygen8InboundSmsAction> oxygen8InboundSmsAction;
-
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <Oxygen8InboundMmsAction> oxygen8InboundMmsActionPrototype;
+
+	@PrototypeDependency
+	Provider <Oxygen8InboundSmsAction> oxygen8InboundSmsActionPrototype;
 
 	// implementation
 
@@ -53,12 +56,12 @@ class Oxygen8InboundFile
 		) {
 
 			action =
-				oxygen8InboundMmsAction.get ();
+				oxygen8InboundMmsActionPrototype.get ();
 
 		} else {
 
 			action =
-				oxygen8InboundSmsAction.get ();
+				oxygen8InboundSmsActionPrototype.get ();
 
 		}
 

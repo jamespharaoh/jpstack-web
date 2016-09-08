@@ -5,8 +5,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.WbsServlet;
 import wbs.framework.web.WebFile;
@@ -15,19 +14,21 @@ public
 class G8waveApiServlet
 	extends WbsServlet {
 
-	private static final
-	long serialVersionUID =
-		-6263296001265277885L;
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	G8waveInFile g8waveInFile;
 
+	// state
+
 	private final static
-	Map<String,WebFile> routeFiles =
-		new HashMap<String,WebFile> ();
+	Map <String, WebFile> routeFiles =
+		new HashMap<> ();
+
+	// implementation
 
 	@Override
 	public

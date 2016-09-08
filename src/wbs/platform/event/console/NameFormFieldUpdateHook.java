@@ -3,15 +3,15 @@ package wbs.platform.event.console;
 import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
+
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.forms.FormFieldUpdateHook;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -19,17 +19,17 @@ import wbs.platform.user.console.UserConsoleLogic;
 @PrototypeComponent ("createNameEventFormFieldUpdateHook")
 public
 class NameFormFieldUpdateHook
-	implements FormFieldUpdateHook<Record<?>,String,String> {
+	implements FormFieldUpdateHook <Record <?>, String, String> {
 
-	// dependencies
+	// singeton dependencies
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// implementation

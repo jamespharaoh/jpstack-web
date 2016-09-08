@@ -2,10 +2,9 @@ package wbs.integrations.oxygen8.console;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
-
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutRec;
@@ -17,15 +16,15 @@ public
 class Oxygen8RouteSummaryAdditionalPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Oxygen8RouteOutObjectHelper oxygen8RouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	RouteConsoleHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// state

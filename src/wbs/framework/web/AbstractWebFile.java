@@ -2,21 +2,21 @@ package wbs.framework.web;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * Simple base class for WebFile implementations.
- *
- * Sends a METHOD_NOT_ALLOWED error for all requests.
- */
+import wbs.framework.component.annotations.SingletonDependency;
+
 public
 class AbstractWebFile
 	implements WebFile {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	RequestContext requestContext;
+
+	// implementation
 
 	@Override
 	public

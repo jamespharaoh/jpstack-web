@@ -8,18 +8,21 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.apache.commons.fileupload.FileItem;
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import org.apache.commons.fileupload.FileItem;
+
+import org.joda.time.Instant;
+
 import wbs.api.mvc.ApiAction;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -47,42 +50,42 @@ public
 class Oxygen8InboundMmsAction
 	extends ApiAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaLogic;
 
-	@Inject
+	@SingletonDependency
 	MessageTypeObjectHelper messageTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	NetworkObjectHelper networkHelper;
 
-	@Inject
+	@SingletonDependency
 	Oxygen8NetworkObjectHelper oxygen8NetworkHelper;
 
-	@Inject
+	@SingletonDependency
 	Oxygen8RouteInObjectHelper oxygen8RouteInHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<TextResponder> textResponderProvider;
+	@PrototypeDependency
+	Provider <TextResponder> textResponderProvider;
 
 	// state
 

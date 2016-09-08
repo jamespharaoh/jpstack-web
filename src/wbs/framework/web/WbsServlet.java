@@ -4,7 +4,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,6 +16,7 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 
 @Log4j
@@ -25,11 +25,15 @@ public abstract
 class WbsServlet
 	extends HttpServlet {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ActivityManager activityManager;
 
+	// state
+
 	protected
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	protected
 	RequestContext requestContext;
@@ -315,12 +319,12 @@ class WbsServlet
 		ServletContext servletContext =
 			getServletContext ();
 
-		applicationContext =
+		componentManager =
 			(ComponentManager)
 			servletContext.getAttribute (
 				"wbs-application-context");
 
-		if (applicationContext == null) {
+		if (componentManager == null) {
 
 			throw new ServletException (
 				"Application context not found");
@@ -328,7 +332,7 @@ class WbsServlet
 		}
 
 		requestContext =
-			applicationContext.getComponentRequired (
+			componentManager.getComponentRequired (
 				"requestContext",
 				RequestContext.class);
 

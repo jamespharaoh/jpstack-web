@@ -2,10 +2,9 @@ package wbs.framework.web;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
-
 import lombok.Cleanup;
 
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 
@@ -13,12 +12,12 @@ public
 class AbstractResponder
 	implements Responder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	// implementation

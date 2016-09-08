@@ -49,7 +49,7 @@ class SupervisorPart
 	// singleton dependencies
 
 	@SingletonDependency
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	ConsoleManager consoleManager;
@@ -324,7 +324,7 @@ class SupervisorPart
 				object;
 
 			StatsProvider statsProvider =
-				applicationContext.getComponentRequired (
+				componentManager.getComponentRequired (
 					supervisorDataSetSpec.providerBeanName (),
 					StatsProvider.class);
 

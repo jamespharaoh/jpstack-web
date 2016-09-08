@@ -12,7 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+import com.google.common.collect.ImmutableList;
+
+import lombok.Cleanup;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import org.hibernate.Criteria;
 import org.hibernate.FlushMode;
@@ -22,16 +28,10 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-import com.google.common.collect.ImmutableList;
-
-import lombok.Cleanup;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
@@ -42,18 +42,18 @@ import wbs.framework.object.ObjectTypeRegistry;
 @Accessors (fluent = true)
 @PrototypeComponent ("hibernateObjectDatabaseHelper")
 public
-class HibernateObjectDatabaseHelper<RecordType extends Record<RecordType>>
-	implements ObjectDatabaseHelper<RecordType> {
+class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
+	implements ObjectDatabaseHelper <RecordType> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ActivityManager activityManager;
 
-	@Inject
+	@SingletonDependency
 	HibernateDatabase hibernateDatabase;
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeRegistry objectTypeRegistry;
 
 	// properties

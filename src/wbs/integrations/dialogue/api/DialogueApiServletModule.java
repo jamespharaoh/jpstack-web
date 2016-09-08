@@ -12,21 +12,24 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
-
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
+
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+
+import org.joda.time.Instant;
+
 import wbs.api.mvc.ApiFile;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.AbstractWebFile;
@@ -57,39 +60,39 @@ public
 class DialogueApiServletModule
 	implements ServletModule {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxMultipartLogic inboxMultipartLogic;
 
-	@Inject
+	@SingletonDependency
 	NetworkObjectHelper networkHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsDeliveryReportLogic reportLogic;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ApiFile> apiFile;
+	@PrototypeDependency
+	Provider <ApiFile> apiFileProvider;
 
-	@Inject
-	Provider<DialogueResponder> dialogueResponderProvider;
+	@PrototypeDependency
+	Provider <DialogueResponder> dialogueResponderProvider;
 
 	// =============================================================== networks
 
@@ -492,7 +495,7 @@ class DialogueApiServletModule
 	void init () {
 
 		reportFile =
-			apiFile.get ()
+			apiFileProvider.get ()
 				.postAction (reportAction);
 
 		routeFiles =

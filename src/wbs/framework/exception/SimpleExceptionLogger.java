@@ -2,14 +2,13 @@ package wbs.framework.exception;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 
 @Log4j
@@ -18,9 +17,9 @@ public
 class SimpleExceptionLogger
 	implements ExceptionLogger {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ExceptionUtils exceptionLogic;
 
 	// implementation

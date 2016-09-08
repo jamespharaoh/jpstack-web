@@ -10,9 +10,9 @@ import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.framework.utils.etc.NumberUtils.moreThan;
 import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringToBytes;
 
@@ -33,7 +33,6 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageInputStreamImpl;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
-import javax.inject.Inject;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -44,6 +43,7 @@ import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.platform.media.model.ContentObjectHelper;
 import wbs.platform.media.model.ContentRec;
@@ -58,15 +58,15 @@ public
 class MediaLogicImplementation
 	implements MediaLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ContentObjectHelper contentHelper;
 
-	@Inject
+	@SingletonDependency
 	MediaObjectHelper mediaHelper;
 
-	@Inject
+	@SingletonDependency
 	MediaTypeObjectHelper mediaTypeHelper;
 
 	// ffmpeg profiles

@@ -4,11 +4,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.RegexpPathHandler;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.WebFile;
@@ -18,11 +18,15 @@ public
 class TxtNationRoutePathHandlerEntry
 	extends RegexpPathHandler.Entry {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	TxtNationRouteInFile txtNationRouteInFile;
+
+	// constructors
 
 	public
 	TxtNationRoutePathHandlerEntry () {

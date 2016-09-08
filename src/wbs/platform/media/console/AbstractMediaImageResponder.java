@@ -4,10 +4,9 @@ import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
-
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
@@ -16,15 +15,15 @@ public abstract
 class AbstractMediaImageResponder
 	extends ConsoleResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	MediaObjectHelper mediaHelper;
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaLogic;
 
 	// state

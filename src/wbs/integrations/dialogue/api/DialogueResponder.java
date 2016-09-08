@@ -3,9 +3,8 @@ package wbs.integrations.dialogue.api;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 
@@ -14,8 +13,12 @@ public
 class DialogueResponder
 	implements Responder {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	RequestContext requestContext;
+
+	// implementation
 
 	@Override
 	public

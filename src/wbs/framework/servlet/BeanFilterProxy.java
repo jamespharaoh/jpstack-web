@@ -50,12 +50,13 @@ class BeanFilterProxy
 		ServletContext servletContext =
 			filterConfig.getServletContext ();
 
-		ComponentManager applicationContext =
+		ComponentManager componentManager =
 			(ComponentManager)
-			servletContext.getAttribute ("wbs-application-context");
+			servletContext.getAttribute (
+				"wbs-application-context");
 
 		target =
-			applicationContext.getComponentRequired (
+			componentManager.getComponentRequired (
 				filterConfig.getFilterName (),
 				Filter.class);
 

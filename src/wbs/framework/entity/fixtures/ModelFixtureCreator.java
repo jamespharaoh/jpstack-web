@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
@@ -15,6 +14,8 @@ import lombok.extern.log4j.Log4j;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
@@ -24,22 +25,20 @@ import wbs.framework.entity.model.Model;
 public
 class ModelFixtureCreator {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ModelMetaLoader modelMetaLoader;
 
-	@Inject
+	@SingletonDependency
 	EntityHelper entityHelper;
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <BuilderFactory> builderFactoryProvider;
 
-	// collection dependencies
-
-	@Inject
+	@PrototypeDependency
 	@ModelMetaBuilderHandler
 	Map <Class <?>, Provider <Object>> modelMetaBuilderProviders;
 

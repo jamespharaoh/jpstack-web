@@ -45,7 +45,7 @@ class SimpleConsoleContextBuilder <
 	// singleton dependencies
 
 	@SingletonDependency
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;

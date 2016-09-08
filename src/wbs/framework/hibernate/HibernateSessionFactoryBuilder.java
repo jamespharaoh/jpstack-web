@@ -23,10 +23,20 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.sql.DataSource;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
+
 import org.apache.commons.io.FileUtils;
+
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -41,17 +51,8 @@ import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.Seconds;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
-
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.component.scaffold.PluginCustomTypeSpec;
 import wbs.framework.component.scaffold.PluginEnumTypeSpec;
@@ -69,24 +70,24 @@ import wbs.framework.sql.SqlLogicImplementation;
 public
 class HibernateSessionFactoryBuilder {
 
-	// implementation
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	DataSource dataSource;
 
-	@Inject
+	@SingletonDependency
 	EntityHelper entityHelper;
 
-	@Inject
-	SqlLogicImplementation sqlLogic;
-
-	@Inject
-	SchemaNamesHelperImplementation sqlEntityNames;
-
-	@Inject
+	@SingletonDependency
 	PluginManager pluginManager;
 
-	@Inject
+	@SingletonDependency
+	SqlLogicImplementation sqlLogic;
+
+	@SingletonDependency
+	SchemaNamesHelperImplementation sqlEntityNames;
+
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// properties

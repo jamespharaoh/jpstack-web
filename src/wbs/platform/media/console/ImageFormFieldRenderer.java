@@ -8,39 +8,40 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.inject.Inject;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.io.IOUtils;
-
 import com.google.common.base.Optional;
 
-import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.IOUtils;
+
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldRenderer;
 import wbs.console.forms.FormFieldSubmission;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.utils.etc.RuntimeIoException;
 import wbs.framework.utils.formatwriter.FormatWriter;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 
+import fj.data.Either;
+
 @PrototypeComponent ("imageFormFieldRenderer")
 @Accessors (fluent = true)
 public
-class ImageFormFieldRenderer<Container>
-	implements FormFieldRenderer<Container,MediaRec> {
+class ImageFormFieldRenderer <Container>
+	implements FormFieldRenderer <Container, MediaRec> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaLogic;
 
 	// properties

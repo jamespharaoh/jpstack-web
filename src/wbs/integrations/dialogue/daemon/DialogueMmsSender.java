@@ -1,7 +1,7 @@
 package wbs.integrations.dialogue.daemon;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
 
@@ -11,10 +11,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -27,14 +33,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-
-import lombok.Cleanup;
-import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
-
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.integrations.dialogue.model.DialogueMmsRouteObjectHelper;
 import wbs.integrations.dialogue.model.DialogueMmsRouteRec;
@@ -47,14 +47,14 @@ import wbs.sms.message.outbox.model.OutboxRec;
 @SingletonComponent ("dialogueMmsSender")
 public
 class DialogueMmsSender
-	extends AbstractSmsSender1<DialogueMmsSender.DialogueMmsOutbox> {
+	extends AbstractSmsSender1 <DialogueMmsSender.DialogueMmsOutbox> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	DialogueMmsRouteObjectHelper dialogueMmsRouteHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// details

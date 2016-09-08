@@ -5,7 +5,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -13,6 +12,8 @@ import com.google.common.base.Optional;
 import lombok.Cleanup;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionUtils;
@@ -36,39 +37,39 @@ public
 class SmsArenaDlrDispatchAction
 	implements Action {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionUtils exceptionLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsDeliveryReportLogic reportLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsArenaDlrReportLogObjectHelper smsArenaDlrReportLogHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsArenaRouteInObjectHelper smsArenaRouteInHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsArenaReportCodeObjectHelper smsArenaReportCodeHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<TextResponder> textResponderProvider;
+	@PrototypeDependency
+	Provider <TextResponder> textResponderProvider;
 
 	// state
 

@@ -3,8 +3,6 @@ package wbs.framework.utils;
 import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -14,6 +12,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 
@@ -24,9 +23,9 @@ public
 class ThreadManagerImplementation
 	implements ThreadManager {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
 	// properties

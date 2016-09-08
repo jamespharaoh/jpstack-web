@@ -11,8 +11,13 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -22,13 +27,8 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.joda.time.Instant;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
-
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -63,42 +63,42 @@ public
 class HybyteApiServletModule
 	implements ServletModule {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	ExceptionUtils exceptionLogic;
 
-	@Inject
+	@SingletonDependency
 	HybyteNetworkObjectHelper hybyteNetworkHelper;
 
-	@Inject
+	@SingletonDependency
 	HybyteRouteObjectHelper hybyteRouteHelper;
 
-	@Inject
+	@SingletonDependency
 	HybyteRouteOutObjectHelper hybyteRouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxMultipartLogic inboxMultipartLogic;
 
-	@Inject
+	@SingletonDependency
 	NumberFormatLogic numberFormatLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsDeliveryReportLogic reportLogic;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// in file

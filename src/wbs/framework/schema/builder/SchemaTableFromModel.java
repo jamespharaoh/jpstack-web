@@ -10,8 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
@@ -20,6 +18,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.logging.TaskLogger;
@@ -38,15 +37,15 @@ import wbs.framework.sql.SqlLogicImplementation;
 public
 class SchemaTableFromModel {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	SchemaNamesHelper schemaNamesHelper;
 
-	@Inject
+	@SingletonDependency
 	SchemaTypesHelper schemaTypesHelper;
 
-	@Inject
+	@SingletonDependency
 	SqlLogicImplementation sqlLogic;
 
 	// properties

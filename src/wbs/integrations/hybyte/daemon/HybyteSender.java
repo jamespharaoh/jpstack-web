@@ -11,21 +11,15 @@ import java.net.URL;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-
-import org.apache.commons.codec.binary.Base64;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.extern.log4j.Log4j;
-import nu.xom.Builder;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Nodes;
-import nu.xom.ParsingException;
+
+import org.apache.commons.codec.binary.Base64;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.utils.etc.Xom;
@@ -42,6 +36,12 @@ import wbs.sms.network.logic.NetworkPrefixCache;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteRec;
 
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Nodes;
+import nu.xom.ParsingException;
+
 /**
  * Daemon service to process outbox items for hybyte routes.
  */
@@ -49,25 +49,29 @@ import wbs.sms.route.core.model.RouteRec;
 @SingletonComponent ("hybyteSender")
 public
 class HybyteSender
-	extends AbstractSmsSender1<HybyteSender.HybyteOutbox> {
+	extends AbstractSmsSender1 <HybyteSender.HybyteOutbox> {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	HybyteNetworkObjectHelper hybyteNetworkHelper;
 
-	@Inject
+	@SingletonDependency
 	HybyteRouteOutObjectHelper hybyteRouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	NetworkPrefixCache networkPrefixCache;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	WapPushMessageObjectHelper wapPushMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
+
+	// details
 
 	@Override
 	protected

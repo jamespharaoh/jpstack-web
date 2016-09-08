@@ -1,8 +1,7 @@
 package wbs.platform.exception.console;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.exception.model.ExceptionLogObjectHelper;
 import wbs.platform.misc.CachedGetter;
 
@@ -11,8 +10,12 @@ public
 class NumExceptionsCache
 	extends CachedGetter <Long> {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ExceptionLogObjectHelper exceptionLogHelper;
+
+	// constructors
 
 	public
 	NumExceptionsCache () {

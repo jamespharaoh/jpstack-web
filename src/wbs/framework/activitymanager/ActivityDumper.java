@@ -1,20 +1,20 @@
 package wbs.framework.activitymanager;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @Log4j
 @SingletonComponent ("activityDumper")
 public
 class ActivityDumper {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ActivityManagerImplementation activityManager;
 
 	// implementation

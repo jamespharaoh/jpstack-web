@@ -5,8 +5,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -14,6 +12,7 @@ import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.AbstractWebFile;
@@ -32,24 +31,24 @@ public
 class DigitalSelectRouteReportFile
 	extends AbstractWebFile {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DigitalSelectRouteOutObjectHelper digitalSelectRouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsDeliveryReportLogic reportLogic;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// implementation

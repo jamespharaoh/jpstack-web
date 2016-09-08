@@ -2,27 +2,27 @@ package wbs.framework.web;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletException;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @SingletonComponent ("pathHandlerServlet")
 public
 class PathHandlerServlet
 	extends WbsServlet {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	@Named ("rootPathHandler")
 	PathHandler pathHandler;
 
-	@Inject
+	@SingletonDependency
 	WebExceptionHandler exceptionHandler;
 
-	@Inject
+	@SingletonDependency
 	WebNotFoundHandler notFoundHandler;
 
 	// implementation

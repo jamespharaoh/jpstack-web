@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -20,6 +19,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 
 @SingletonComponent ("emailLogic")
@@ -28,9 +28,9 @@ public
 class EmailLogicImplementation
 	implements EmailLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// state

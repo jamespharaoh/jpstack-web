@@ -6,11 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.schema.model.Schema;
 import wbs.framework.schema.model.SchemaColumn;
 import wbs.framework.schema.model.SchemaForeignKey;
@@ -25,8 +24,12 @@ public
 class SchemaToSqlImplementation
 	implements SchemaToSql {
 
-	@Inject
+	// singleton implementation
+
+	@SingletonDependency
 	SqlLogic sqlLogic;
+
+	// constants
 
 	public final static
 	String statementIndent = "";

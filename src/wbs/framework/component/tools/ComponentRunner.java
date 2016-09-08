@@ -44,9 +44,9 @@ class ComponentRunner {
 	String methodName;
 
 	@Getter @Setter
-	List<String> runnerArgs;
+	List <String> runnerArgs;
 
-	Class<?> runnerClass;
+	Class <?> runnerClass;
 
 	ComponentManager componentManager;
 
@@ -55,9 +55,10 @@ class ComponentRunner {
 		throws Exception {
 
 		runnerClass =
-			Class.forName (runnerName);
+			Class.forName (
+				runnerName);
 
-		initApplicationContext ();
+		initComponentManager ();
 
 		invokeTarget ();
 
@@ -65,7 +66,7 @@ class ComponentRunner {
 
 	}
 
-	void initApplicationContext ()
+	void initComponentManager ()
 		throws Exception {
 
 		componentManager =

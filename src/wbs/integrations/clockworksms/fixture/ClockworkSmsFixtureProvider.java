@@ -9,8 +9,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.Data;
@@ -18,6 +16,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
@@ -40,40 +39,40 @@ public
 class ClockworkSmsFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ClockworkSmsConfigObjectHelper clockworkSmsConfigHelper;
 
-	@Inject
+	@SingletonDependency
 	ClockworkSmsDeliveryStatusDetailCodeObjectHelper
 	clockworkSmsDeliveryStatusDetailCodeHelper;
 
-	@Inject
+	@SingletonDependency
 	ClockworkSmsDeliveryStatusObjectHelper clockworkSmsDeliveryStatusHelper;
 
-	@Inject
+	@SingletonDependency
 	ClockworkSmsRouteInObjectHelper clockworkSmsRouteInHelper;
 
-	@Inject
+	@SingletonDependency
 	ClockworkSmsRouteOutObjectHelper clockworkSmsRouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuItemObjectHelper menuItemHelper;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper smsRouteHelper;
 
-	@Inject
+	@SingletonDependency
 	SenderObjectHelper senderHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	TestAccounts testAccounts;
 
 	// implementation

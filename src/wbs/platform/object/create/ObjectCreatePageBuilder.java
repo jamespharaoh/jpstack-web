@@ -1,7 +1,7 @@
 package wbs.platform.object.create;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -43,15 +43,15 @@ import wbs.framework.web.Responder;
 @PrototypeComponent ("objectCreatePageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectCreatePageBuilder<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectCreatePageBuilder <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 > {
 
 	// dependences
 
 	@Inject
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	@Inject
 	ConsoleMetaManager consoleMetaManager;
@@ -354,7 +354,7 @@ class ObjectCreatePageBuilder<
 			@SuppressWarnings ("unchecked")
 			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
 				(FieldsProvider<ObjectType,ParentType>)
-				applicationContext.getComponentRequired (
+				componentManager.getComponentRequired (
 					spec.fieldsProviderName (),
 					FieldsProvider.class);
 

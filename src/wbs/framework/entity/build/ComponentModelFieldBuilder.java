@@ -7,14 +7,13 @@ import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
 
-import javax.inject.Inject;
-
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.meta.fields.ComponentFieldSpec;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
@@ -26,12 +25,12 @@ import wbs.framework.entity.model.ModelFieldType;
 public
 class ComponentModelFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ModelBuilderManager modelBuilderManager;
 
-	@Inject
+	@SingletonDependency
 	ModelMetaLoader modelMetaLoader;
 
 	// builder

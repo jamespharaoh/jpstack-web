@@ -2,10 +2,9 @@ package wbs.integrations.clockworksms.api;
 
 import static wbs.framework.utils.etc.LogicUtils.not;
 import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -13,8 +12,11 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.Cleanup;
 import lombok.NonNull;
+
 import wbs.api.mvc.ApiLoggingAction;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.Database;
@@ -39,36 +41,36 @@ public
 class ClockworkSmsRouteInAction
 	extends ApiLoggingAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ClockworkSmsInboundLogObjectHelper clockworkSmsInboundLogHelper;
 
-	@Inject
+	@SingletonDependency
 	ClockworkSmsRouteInObjectHelper clockworkSmsRouteInHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper smsRouteHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<TextResponder> textResponderProvider;
+	@PrototypeDependency
+	Provider <TextResponder> textResponderProvider;
 
 	// state
 

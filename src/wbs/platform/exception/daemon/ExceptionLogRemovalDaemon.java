@@ -5,15 +5,14 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import lombok.Cleanup;
+import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
-
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -27,15 +26,15 @@ public
 class ExceptionLogRemovalDaemon
 	extends SleepingDaemonService {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogObjectHelper exceptionLogHelper;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
 	// details

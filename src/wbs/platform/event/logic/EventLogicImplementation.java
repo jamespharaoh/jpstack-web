@@ -3,14 +3,13 @@ package wbs.platform.event.logic;
 import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
+import lombok.NonNull;
 
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
-import lombok.NonNull;
-
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -29,24 +28,24 @@ public
 class EventLogicImplementation
 	implements EventLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventObjectHelper eventHelper;
 
-	@Inject
+	@SingletonDependency
 	EventLinkObjectHelper eventLinkHelper;
 
-	@Inject
+	@SingletonDependency
 	EventTypeObjectHelper eventTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// implementation

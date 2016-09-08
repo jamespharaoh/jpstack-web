@@ -37,7 +37,7 @@ class ContextTabFormActionPageBuilder {
 	// singleton dependencies
 
 	@SingletonDependency
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
@@ -131,7 +131,7 @@ class ContextTabFormActionPageBuilder {
 	void initFormActionHelper () {
 
 		formActionHelperProvider =
-			applicationContext.getComponentProviderRequired (
+			componentManager.getComponentProviderRequired (
 				helperBeanName,
 				ConsoleFormActionHelper.class);
 

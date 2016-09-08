@@ -51,7 +51,7 @@ class ConsoleHelperBuilder {
 	// singleton dependencies
 
 	@SingletonDependency
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	ConsoleHelperProviderManager consoleHelperPoviderManager;
@@ -148,7 +148,7 @@ class ConsoleHelperBuilder {
 			ifThenElse (
 				isNotNull (
 					extraInterface),
-				() -> applicationContext.getComponentRequired (
+				() -> componentManager.getComponentRequired (
 					extraImplementationBeanName,
 					Object.class),
 				() -> null);
@@ -176,7 +176,7 @@ class ConsoleHelperBuilder {
 			ifThenElse (
 				isNotNull (
 					daoMethodsInterface),
-				() -> applicationContext.getComponentRequired (
+				() -> componentManager.getComponentRequired (
 					daoImplementationBeanName,
 					Object.class),
 				() -> null);
@@ -191,7 +191,7 @@ class ConsoleHelperBuilder {
 		try {
 
 			consoleHooks =
-				applicationContext.getComponentRequired (
+				componentManager.getComponentRequired (
 					consoleHooksBeanName,
 					ConsoleHooks.class);
 

@@ -1,8 +1,7 @@
 package wbs.platform.group.fixture;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.platform.group.model.GroupObjectHelper;
@@ -15,18 +14,18 @@ public
 class GroupFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	GroupObjectHelper groupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuItemObjectHelper menuItemHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
 	// implementation

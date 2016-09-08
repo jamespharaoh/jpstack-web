@@ -4,7 +4,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
@@ -14,6 +13,8 @@ import lombok.experimental.Accessors;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
@@ -25,19 +26,21 @@ import wbs.framework.web.Responder;
 public
 class TabContextResponder
 	implements
-		Provider<Responder>,
+		Provider <Responder>,
 		Responder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
+	ComponentManager componentManager;
+
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
-	ComponentManager applicationContext;
+	// prototype dependencies
 
-	@Inject
-	Provider<TabbedResponder> tabbedPage;
+	@PrototypeDependency
+	Provider <TabbedResponder> tabbedPageProvider;
 
 	// properties
 
@@ -67,7 +70,7 @@ class TabContextResponder
 			PagePart get () {
 
 				Object bean =
-					applicationContext.getComponentRequired (
+					componentManager.getComponentRequired (
 						pagePartName,
 						Object.class);
 
@@ -127,7 +130,7 @@ class TabContextResponder
 
 		}
 
-		tabbedPage.get ()
+		tabbedPageProvider.get ()
 
 			.tab (
 				requestContext.contextStuff ().getTab (

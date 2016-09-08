@@ -1,15 +1,13 @@
 package wbs.framework.entity.build;
 
 import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
 
 import java.util.Set;
-
-import javax.inject.Inject;
 
 import org.apache.commons.lang3.reflect.TypeUtils;
 
@@ -19,6 +17,7 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
@@ -31,9 +30,9 @@ import wbs.framework.entity.model.ModelFieldType;
 public
 class ChildrenCollectionModelFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	PluginManager pluginManager;
 
 	// builder

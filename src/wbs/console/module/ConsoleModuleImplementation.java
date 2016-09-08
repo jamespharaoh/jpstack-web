@@ -44,7 +44,7 @@ class ConsoleModuleImplementation
 	// singleton dependencies
 
 	@SingletonDependency
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	// prototype dependencies
 
@@ -120,7 +120,7 @@ class ConsoleModuleImplementation
 	Provider<Responder> beanResponder (
 			@NonNull String name) {
 
-		return applicationContext.getComponentProviderRequired (
+		return componentManager.getComponentProviderRequired (
 			name,
 			Responder.class);
 

@@ -166,7 +166,7 @@ class StringUtils {
 
 	public static
 	String joinWithNewline (
-			@NonNull String... parts) {
+			@NonNull String ... parts) {
 
 		return joinWithSeparator (
 			"\n",
@@ -179,7 +179,7 @@ class StringUtils {
 
 	public static
 	String joinWithSpace (
-			@NonNull Iterable<String> parts) {
+			@NonNull Iterable <String> parts) {
 
 		return joinWithSeparator (
 			" ",
@@ -191,7 +191,7 @@ class StringUtils {
 
 	public static
 	String joinWithSpace (
-			String... parts) {
+			String ... parts) {
 
 		return joinWithSeparator (
 			" ",
@@ -204,7 +204,7 @@ class StringUtils {
 
 	public static
 	String joinWithFullStop (
-			@NonNull Iterable<String> parts) {
+			@NonNull Iterable <String> parts) {
 
 		return joinWithSeparator (
 			".",
@@ -216,7 +216,7 @@ class StringUtils {
 
 	public static
 	String joinWithFullStop (
-			@NonNull String... parts) {
+			@NonNull String ... parts) {
 
 		return joinWithSeparator (
 			".",
@@ -229,7 +229,7 @@ class StringUtils {
 
 	public static
 	String joinWithSlash (
-			@NonNull Iterable<String> parts) {
+			@NonNull Iterable <String> parts) {
 
 		return joinWithSeparator (
 			"/",
@@ -241,7 +241,7 @@ class StringUtils {
 
 	public static
 	String joinWithSlash (
-			@NonNull String... parts) {
+			@NonNull String ... parts) {
 
 		return joinWithSeparator (
 			"/",
@@ -254,7 +254,7 @@ class StringUtils {
 
 	public static
 	String joinWithPipe (
-			@NonNull Iterable<String> parts) {
+			@NonNull Iterable <String> parts) {
 
 		return joinWithSeparator (
 			"|",
@@ -266,7 +266,7 @@ class StringUtils {
 
 	public static
 	String joinWithPipe (
-			@NonNull String... parts) {
+			@NonNull String ... parts) {
 
 		return joinWithSeparator (
 			"|",
@@ -279,7 +279,7 @@ class StringUtils {
 
 	public static
 	String joinWithCommaAndSpace (
-			@NonNull Iterable<String> parts) {
+			@NonNull Iterable <String> parts) {
 
 		return joinWithSeparator (
 			", ",
@@ -291,7 +291,7 @@ class StringUtils {
 
 	public static
 	String joinWithCommaAndSpace (
-			@NonNull String... parts) {
+			@NonNull String ... parts) {
 
 		return joinWithSeparator (
 			", ",
@@ -304,7 +304,7 @@ class StringUtils {
 
 	public static
 	String joinWithSemicolonAndSpace (
-			@NonNull Iterable<String> parts) {
+			@NonNull Iterable <String> parts) {
 
 		return joinWithSeparator (
 			"; ",

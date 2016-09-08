@@ -39,7 +39,7 @@ class EnumFormFieldBuilder {
 	// singleton dependencies
 
 	@SingletonDependency
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
@@ -159,7 +159,7 @@ class EnumFormFieldBuilder {
 		);
 
 		EnumConsoleHelper enumConsoleHelper =
-			applicationContext.getComponentRequired (
+			componentManager.getComponentRequired (
 				enumConsoleHelperName,
 				EnumConsoleHelper.class);
 

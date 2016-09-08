@@ -5,11 +5,10 @@ import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
@@ -23,21 +22,21 @@ public
 class PaypalFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuItemObjectHelper menuItemHelper;
 
-	@Inject
+	@SingletonDependency
 	PaypalAccountObjectHelper paypalAccountHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	TestAccounts testAccounts;
 
 	// implementation

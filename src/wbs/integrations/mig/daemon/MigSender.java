@@ -15,14 +15,13 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.integrations.mig.model.MigRouteOutObjectHelper;
@@ -41,18 +40,20 @@ import wbs.sms.route.core.model.RouteRec;
 @Log4j
 public
 class MigSender
-	extends AbstractSmsSender1<MigSender.MIGOutbox> {
+	extends AbstractSmsSender1 <MigSender.MIGOutbox> {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	MigRouteOutObjectHelper migRouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	WapPushMessageObjectHelper wapPushMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	/**

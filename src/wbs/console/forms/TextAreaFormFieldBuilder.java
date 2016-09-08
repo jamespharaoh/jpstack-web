@@ -32,7 +32,7 @@ class TextAreaFormFieldBuilder {
 	// singleton dependencies
 
 	@SingletonDependency
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
@@ -149,7 +149,7 @@ class TextAreaFormFieldBuilder {
 				String.class;
 
 			dataProvider =
-				applicationContext.getComponentRequired (
+				componentManager.getComponentRequired (
 					spec.dataProvider (),
 					FormFieldDataProvider.class);
 
@@ -285,7 +285,7 @@ class TextAreaFormFieldBuilder {
 		FormFieldUpdateHook formFieldUpdateHook =
 			updateHookBeanName != null
 
-			? applicationContext.getComponentRequired (
+			? componentManager.getComponentRequired (
 				updateHookBeanName,
 				FormFieldUpdateHook.class)
 

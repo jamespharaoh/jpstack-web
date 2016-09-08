@@ -1,8 +1,7 @@
 package wbs.integrations.clockworksms.daemon;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.sms.message.outbox.daemon.GenericSmsSenderService;
 
 @SingletonComponent ("clockworkSmsSenderService")
@@ -10,9 +9,9 @@ public
 class ClockworkSmsSenderService
 	extends GenericSmsSenderService {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ClockworkSmsSenderHelper clockworkSmsSenderHelper;
 
 	// implementation

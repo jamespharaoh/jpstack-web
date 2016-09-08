@@ -2,41 +2,40 @@ package wbs.platform.currency.console;
 
 import static wbs.framework.utils.etc.Misc.errorResult;
 import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import com.google.common.base.Optional;
-
-import fj.data.Either;
-
 import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.object.ObjectManager;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.currency.model.CurrencyRec;
+
+import fj.data.Either;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("currencyFormFieldInterfaceMapping")
 public
-class CurrencyFormFieldInterfaceMapping<Container>
-	implements FormFieldInterfaceMapping<Container,Long,String> {
+class CurrencyFormFieldInterfaceMapping <Container>
+	implements FormFieldInterfaceMapping <Container, Long, String> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
 	// properties

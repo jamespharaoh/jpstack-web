@@ -58,7 +58,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.activitymanager.RuntimeExceptionWithTask;
-import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.component.registry.ComponentRegistry;
 import wbs.framework.component.registry.InjectedProperty;
@@ -69,24 +68,8 @@ import wbs.framework.component.tools.EasyReadWriteLock.HeldLock;
 import wbs.framework.component.tools.NoSuchComponentException;
 import wbs.framework.utils.etc.BeanLogic;
 
-/**
- * My not-quite-drop-in replacement for spring's ApplicationContext. This
- * provides all of the feat and
- * gives much more helpful error messages.
- *
- * It also in work out dependencies
- * at runtime, which is extremely helpful. It will also dump out its bean
- * definitions in XML format to help diagnostics.
- *
- * TODO output ordering, indexes in xml
- * TODO split this into registry and runtime
- * TODO handle qualifiers better
- * TODO handle request scope more elegantly, other scopes
- * TODO cache fields, methods, etc for speed, runtime code gen
- */
 @Accessors (fluent = true)
 @Log4j
-@SingletonComponent ("applicationContext")
 public
 class ComponentManagerImplementation
 	implements ComponentManager {
@@ -743,14 +726,13 @@ class ComponentManagerImplementation
 	private static
 	class Injection {
 
+		String componentName;
 		Object component;
 
 		InjectedProperty injectedProperty;
-
 		List <ComponentDefinition> targetComponents;
 
 		Function <Provider <?>, Object> transformer;
-
 		Function <List <Pair <ComponentDefinition, Object>>, Object> aggregator;
 
 		Set <String> missingComponents;
@@ -770,7 +752,10 @@ class ComponentManagerImplementation
 				injectedProperty.fieldName ()));
 
 		Injection injection =
-				new Injection ();
+			new Injection ();
+
+		injection.componentName =
+			componentDefinition.name ();
 
 		injection.component =
 			component;
@@ -1087,6 +1072,9 @@ class ComponentManagerImplementation
 
 				}
 
+				pendingInjectionsByDependencyName.remove (
+					componentDefinition.name ());
+
 			}
 
 		}
@@ -1097,7 +1085,13 @@ class ComponentManagerImplementation
 			mapIsNotEmpty (
 				pendingInjectionsByDependencyName)
 		) {
-			throw new RuntimeException ();
+
+			throw new RuntimeException (
+				stringFormat (
+					"Pending injections not satisfied: %s",
+					joinWithCommaAndSpace (
+						pendingInjectionsByDependencyName.keySet ())));
+
 		}
 
 		// return

@@ -4,8 +4,6 @@ import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableList;
 
 import wbs.framework.builder.Builder;
@@ -14,6 +12,7 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.entity.meta.identities.IdentityStringFieldSpec;
 import wbs.framework.entity.model.ModelField;
@@ -24,9 +23,9 @@ import wbs.framework.entity.model.ModelFieldType;
 public
 class IdentityStringModelFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	PluginManager pluginManager;
 
 	// builder

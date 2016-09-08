@@ -42,7 +42,7 @@ class SupervisorPageBuilder <
 	// singleton dependencies
 
 	@SingletonDependency
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;

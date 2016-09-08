@@ -12,15 +12,17 @@ import static wbs.framework.utils.etc.StringUtils.utf8ToString;
 
 import java.io.ByteArrayInputStream;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
+
 import wbs.api.mvc.ApiLoggingAction;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.data.tools.DataToXml;
@@ -53,49 +55,49 @@ public
 class ClockworkSmsRouteReportAction
 	extends ApiLoggingAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ClockworkSmsDeliveryStatusObjectHelper clockworkSmsDeliveryStatusHelper;
 
-	@Inject
+	@SingletonDependency
 	ClockworkSmsDeliveryStatusDetailCodeObjectHelper
 	clockworkSmsDeliveryStatusDetailCodeHelper;
 
-	@Inject
+	@SingletonDependency
 	ClockworkSmsInboundLogObjectHelper clockworkSmsInboundLogHelper;
 
-	@Inject
+	@SingletonDependency
 	ClockworkSmsRouteOutObjectHelper clockworkSmsRouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper rootHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsDeliveryReportLogic smsDeliveryReportLogic;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper smsMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsMessageLogic smsMessageLogic;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper smsRouteHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<TextResponder> textResponderProvider;
+	@PrototypeDependency
+	Provider <TextResponder> textResponderProvider;
 
 	// state
 

@@ -7,7 +7,6 @@ import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import static wbs.sms.gsm.GsmUtils.gsmStringIsNotValid;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -15,7 +14,9 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
 import wbs.integrations.clockworksms.foreignapi.ClockworkSmsMessageRequest;
@@ -37,26 +38,26 @@ public
 class ClockworkSmsSenderHelper
 	implements SmsSenderHelper <ClockworkSmsMessageSender> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ClockworkSmsRouteOutObjectHelper clockworkSmsRouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	RootObjectHelper rootHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsMessageLogic smsMessageLogic;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <ClockworkSmsMessageSender> clockworkSmsMessageSenderProvider;
 
 	// details

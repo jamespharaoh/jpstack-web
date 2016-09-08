@@ -10,8 +10,6 @@ import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
 
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.reflect.TypeUtils;
 
 import wbs.framework.builder.Builder;
@@ -20,6 +18,7 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
@@ -32,9 +31,9 @@ import wbs.framework.entity.model.ModelFieldType;
 public
 class AssociativeCollectionModelFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	PluginManager pluginManager;
 
 	// builder

@@ -16,10 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
-
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -28,7 +25,10 @@ import com.google.common.collect.ImmutableSet;
 import lombok.Cleanup;
 import lombok.extern.log4j.Log4j;
 
+import org.joda.time.Instant;
+
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.AbstractWebFile;
@@ -59,30 +59,30 @@ public
 class MediaburstApiServletModule
 	implements ServletModule {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxMultipartLogic inboxMultipartLogic;
 
-	@Inject
+	@SingletonDependency
 	NetworkObjectHelper networkHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsDeliveryReportLogic reportLogic;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// implementation

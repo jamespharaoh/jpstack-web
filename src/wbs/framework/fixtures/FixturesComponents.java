@@ -1,9 +1,10 @@
 package wbs.framework.fixtures;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.GenericConfigLoader;
 import wbs.framework.utils.ThreadManager;
 import wbs.framework.utils.ThreadManagerImplementation;
@@ -12,14 +13,14 @@ import wbs.framework.utils.ThreadManagerImplementation;
 public
 class FixturesComponents {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	GenericConfigLoader genericConfigLoader;
 
 	// prototype components
 
-	@Inject
+	@PrototypeDependency
 	Provider <ThreadManagerImplementation> threadManagerImplemetationProvider;
 
 	// components

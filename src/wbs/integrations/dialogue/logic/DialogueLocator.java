@@ -11,7 +11,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Inject;
+import lombok.Cleanup;
+import lombok.NonNull;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -20,10 +21,8 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -40,17 +39,21 @@ public
 class DialogueLocator
 	implements Locator {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	LocatorObjectHelper locatorHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
+
+	// details
 
 	@Override
 	public

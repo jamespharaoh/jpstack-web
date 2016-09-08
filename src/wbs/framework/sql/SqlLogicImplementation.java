@@ -7,27 +7,33 @@ import java.sql.SQLException;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.sql.DataSource;
+
+import com.google.common.collect.ImmutableSet;
 
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonComponent;
-
-import com.google.common.collect.ImmutableSet;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @SingletonComponent ("sqlLogic")
 public
 class SqlLogicImplementation
 	implements SqlLogic {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	DataSource dataSource;
 
+	// properties
+
 	@Getter
-	Set<String> sqlKeywords;
+	Set <String> sqlKeywords;
+
+	// life cycle
 
 	@PostConstruct
 	public

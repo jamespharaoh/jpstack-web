@@ -2,7 +2,6 @@ package wbs.framework.web;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
@@ -11,6 +10,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 
 @Accessors (fluent = true)
@@ -19,15 +19,15 @@ public
 class ActionRequestHandler
 	implements RequestHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
-	ComponentManager applicationContext;
+	@SingletonDependency
+	ComponentManager componentManager;
 
 	// properties
 
 	@Getter @Setter
-	Provider<Action> actionProvider;
+	Provider <Action> actionProvider;
 
 	// utils
 
@@ -55,7 +55,7 @@ class ActionRequestHandler
 			String actionName) {
 
 		return actionProvider (
-			applicationContext.getComponentProviderRequired (
+			componentManager.getComponentProviderRequired (
 				actionName,
 				Action.class));
 

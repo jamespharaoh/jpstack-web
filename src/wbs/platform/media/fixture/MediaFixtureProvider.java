@@ -1,10 +1,9 @@
 package wbs.platform.media.fixture;
 
-import javax.inject.Inject;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.platform.media.model.MediaTypeObjectHelper;
 
@@ -13,9 +12,9 @@ public
 class MediaFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	MediaTypeObjectHelper mediaTypeHelper;
 
 	// implementation

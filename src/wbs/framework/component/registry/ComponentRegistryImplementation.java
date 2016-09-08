@@ -2,13 +2,13 @@ package wbs.framework.component.registry;
 
 import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
 import static wbs.framework.utils.etc.IterableUtils.iterableCount;
+import static wbs.framework.utils.etc.Misc.doesNotContain;
 import static wbs.framework.utils.etc.Misc.isNotNull;
 import static wbs.framework.utils.etc.Misc.isNull;
 import static wbs.framework.utils.etc.Misc.requiredValue;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.NumberUtils.equalToZero;
 import static wbs.framework.utils.etc.NumberUtils.moreThanOne;
-import static wbs.framework.utils.etc.NumberUtils.moreThanZero;
 import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -80,6 +79,7 @@ import wbs.framework.component.xml.ComponentsValuePropertySpec;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.data.tools.DataToXml;
+import wbs.framework.logging.TaskLogger;
 
 @Log4j
 @Accessors (fluent = true)
@@ -101,6 +101,12 @@ class ComponentRegistryImplementation
 		EasyReadWriteLock.instantiate ();
 
 	List <ComponentDefinition> definitions =
+		new ArrayList<> ();
+
+	List <ComponentDefinition> singletons =
+		new ArrayList<> ();
+
+	List <ComponentDefinition> prototypes =
 		new ArrayList<> ();
 
 	Map <String, ComponentDefinition> byName =
@@ -362,6 +368,30 @@ class ComponentRegistryImplementation
 
 		definitions.add (
 			componentDefinition);
+
+		if (
+			stringEqualSafe (
+				componentDefinition.scope (),
+				"singleton")
+		) {
+
+			singletons.add (
+				componentDefinition);
+
+		}
+
+		if (
+			stringEqualSafe (
+				componentDefinition.scope (),
+				"prototype")
+		) {
+
+			prototypes.add (
+				componentDefinition);
+
+		}
+
+		// index by name
 
 		byName.put (
 			componentDefinition.name (),
@@ -666,7 +696,8 @@ class ComponentRegistryImplementation
 	}
 
 	private
-	int initInjectedPropertyTargetByQualifier (
+	void initInjectedPropertyTargetByQualifier (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Annotation qualifier,
 			@NonNull InjectedProperty injectedProperty,
@@ -694,28 +725,26 @@ class ComponentRegistryImplementation
 
 			if (targetComponentDefinitions.isEmpty ()) {
 
-				log.error (
-					stringFormat (
-						"Unable to find component of type %s for %s.%s",
-						injectedProperty.targetType (),
-						componentDefinition.name (),
-						injectedProperty.fieldName ()));
+				taskLogger.errorFormat (
+					"Unable to find component of type %s for %s.%s",
+					injectedProperty.targetType (),
+					componentDefinition.name (),
+					injectedProperty.fieldName ());
 
-				return 1;
+				return;
 
 			}
 
 			if (targetComponentDefinitions.size () > 1) {
 
-				log.error (
-					stringFormat (
-						"Found %s candidate components of type %s for %s.%s",
-						targetComponentDefinitions.size (),
-						injectedProperty.targetType (),
-						componentDefinition.name (),
-						injectedProperty.fieldName ()));
+				taskLogger.errorFormat (
+					"Found %s candidate components of type %s for %s.%s",
+					targetComponentDefinitions.size (),
+					injectedProperty.targetType (),
+					componentDefinition.name (),
+					injectedProperty.fieldName ());
 
-				return 1;
+				return;
 
 			}
 
@@ -765,7 +794,7 @@ class ComponentRegistryImplementation
 			ImmutableList.copyOf (
 				targetComponentDefinitionNames));
 
-		return 0;
+		return;
 
 	}
 
@@ -829,17 +858,37 @@ class ComponentRegistryImplementation
 
 		}
 
+		String orderedSingletonsFile =
+			stringFormat (
+				"%s/singleton-component-list.xml",
+				outputPath);
+
+		try {
+
+			new DataToXml ().writeToFile (
+				orderedSingletonsFile,
+				singletons);
+
+		} catch (IOException exception) {
+
+			log.warn (
+				stringFormat (
+					"Error writing %s",
+					orderedSingletonsFile),
+				exception);
+
+		}
+
 	}
 
 	public
-	int initComponentDefinition (
+	void initComponentDefinition (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition) {
 
 		@Cleanup
 		HeldLock heldlock =
 			lock.read ();
-
-		int errors = 0;
 
 		Class <?> instantiateClass =
 			ifNull (
@@ -919,14 +968,14 @@ class ComponentRegistryImplementation
 					namedAnnotation)
 			) {
 
-				errors +=
-					initInjectedFieldByName (
-						componentDefinition,
-						namedAnnotation,
-						field,
-						isNull (
-							uninitializedDependencyAnnotation),
-						weak);
+				initInjectedFieldByName (
+					taskLogger,
+					componentDefinition,
+					namedAnnotation,
+					field,
+					isNull (
+						uninitializedDependencyAnnotation),
+					weak);
 
 			} else {
 
@@ -979,29 +1028,29 @@ class ComponentRegistryImplementation
 					.weak (
 						weak);
 
-				errors +=
-					initInjectedPropertyField (
-						componentDefinition,
-						field,
-						injectedProperty);
+				initInjectedPropertyField (
+					taskLogger,
+					componentDefinition,
+					field,
+					injectedProperty);
 
 				if (qualifierAnnotations.size () == 1) {
 
-					errors +=
-						initInjectedPropertyTargetByQualifier (
-							componentDefinition,
-							qualifierAnnotations.get (0),
-							injectedProperty,
-							weak);
+					initInjectedPropertyTargetByQualifier (
+						taskLogger,
+						componentDefinition,
+						qualifierAnnotations.get (0),
+						injectedProperty,
+						weak);
 
 				} else {
 
-					errors +=
-						initInjectedPropertyTargetByClass (
-							componentDefinition,
-							field,
-							injectedProperty,
-							weak);
+					initInjectedPropertyTargetByClass (
+						taskLogger,
+						componentDefinition,
+						field,
+						injectedProperty,
+						weak);
 
 				}
 
@@ -1012,12 +1061,13 @@ class ComponentRegistryImplementation
 
 		}
 
-		return errors;
+		return;
 
 	}
 
 	private
-	int initInjectedFieldByName (
+	void initInjectedFieldByName (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Named namedAnnotation,
 			@NonNull Field field,
@@ -1046,14 +1096,13 @@ class ComponentRegistryImplementation
 				targetComponentDefinitionOptional)
 		) {
 
-			log.error (
-				stringFormat (
-					"Named component %s does not exist for %s.%s",
-					targetComponentDefinitionName,
-					componentDefinition.name (),
-					field.getName ()));
+			taskLogger.errorFormat (
+				"Named component %s does not exist for %s.%s",
+				targetComponentDefinitionName,
+				componentDefinition.name (),
+				field.getName ());
 
-			return 1;
+			return;
 
 		}
 
@@ -1100,12 +1149,13 @@ class ComponentRegistryImplementation
 
 		);
 
-		return 0;
+		return;
 
 	}
 
 	private
-	int initInjectedPropertyField (
+	void initInjectedPropertyField (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Field field,
 			@NonNull InjectedProperty injectedProperty) {
@@ -1166,14 +1216,13 @@ class ComponentRegistryImplementation
 					Class.class)
 			) {
 
-				log.error (
-					stringFormat (
-						"Don't know how to inject map with key type %s for %s.%s",
-						keyType.toString (),
-						componentDefinition.name (),
-						field.getName ()));
+				taskLogger.errorFormat (
+					"Don't know how to inject map with key type %s for %s.%s",
+					keyType.toString (),
+					componentDefinition.name (),
+					field.getName ());
 
-				return 1;
+				return;
 
 			}
 
@@ -1216,14 +1265,13 @@ class ComponentRegistryImplementation
 
 			if (parameterizedInjectType == null) {
 
-				log.error (
-					stringFormat (
-						"No type information for provider %s at %s.%s",
-						injectType,
-						componentDefinition.name (),
-						field.getName ()));
+				taskLogger.errorFormat (
+					"No type information for provider %s at %s.%s",
+					injectType,
+					componentDefinition.name (),
+					field.getName ());
 
-				return 1;
+				return;
 
 			}
 
@@ -1251,12 +1299,13 @@ class ComponentRegistryImplementation
 			.injectType (injectType)
 			.targetType (valueType);
 
-		return 0;
+		return;
 
 	}
 
 	private
-	int initInjectedPropertyTargetByClass (
+	void initInjectedPropertyTargetByClass (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Field field,
 			@NonNull InjectedProperty injectedProperty,
@@ -1294,33 +1343,31 @@ class ComponentRegistryImplementation
 
 			if (targetComponentDefinitions.isEmpty ()) {
 
-				log.error (
-					stringFormat (
-						"Unable to find component of type %s for %s.%s",
-						injectedProperty.targetType (),
-						componentDefinition.name (),
-						field.getName ()));
+				taskLogger.errorFormat (
+					"Unable to find component of type %s for %s.%s",
+					injectedProperty.targetType (),
+					componentDefinition.name (),
+					field.getName ());
 
-				return 1;
+				return;
 
 			}
 
 			if (targetComponentDefinitions.size () > 1) {
 
-				log.error (
-					stringFormat (
-						"Found %s ",
-						targetComponentDefinitions.size (),
-						"candidate components of type %s ",
-						injectedProperty.targetType (),
-						"for %s.%s: ",
-						componentDefinition.name (),
-						field.getName (),
-						"%s",
-						joinWithCommaAndSpace (
-							targetComponentDefinitions.keySet ())));
+				taskLogger.errorFormat (
+					"Found %s ",
+					targetComponentDefinitions.size (),
+					"candidate components of type %s ",
+					injectedProperty.targetType (),
+					"for %s.%s: ",
+					componentDefinition.name (),
+					field.getName (),
+					"%s",
+					joinWithCommaAndSpace (
+						targetComponentDefinitions.keySet ()));
 
-				return 1;
+				return;
 
 			}
 
@@ -1357,7 +1404,7 @@ class ComponentRegistryImplementation
 			ImmutableList.copyOf (
 				targetComponentDefinitions.keySet ()));
 
-		return 0;
+		return;
 
 	}
 
@@ -1365,7 +1412,9 @@ class ComponentRegistryImplementation
 	public
 	ComponentManager build () {
 
-		long errorCount = 0;
+		TaskLogger taskLogger =
+			new TaskLogger (
+				log);
 
 		@Cleanup
 		ActiveTask activeTask =
@@ -1403,9 +1452,9 @@ class ComponentRegistryImplementation
 				: definitions
 		) {
 
-			errorCount +=
-				initComponentDefinition (
-					componentDefinition);
+			initComponentDefinition (
+				taskLogger,
+				componentDefinition);
 
 		}
 
@@ -1426,13 +1475,10 @@ class ComponentRegistryImplementation
 						dependency)
 				) {
 
-					log.error (
-						stringFormat (
-							"Can't provide dependency %s for %s",
-							dependency,
-							componentDefinition.name ()));
-
-					errorCount ++;
+					taskLogger.errorFormat (
+						"Can't provide dependency %s for %s",
+						dependency,
+						componentDefinition.name ());
 
 				}
 
@@ -1442,92 +1488,11 @@ class ComponentRegistryImplementation
 
 		// order component definitions
 
-		List <ComponentDefinition> unorderedComponentDefinitions =
-			new ArrayList<> (
-				definitions);
-
-		Map <String, ComponentDefinition> orderedComponentDefinitions =
-			new LinkedHashMap<> ();
-
-		while (
-			collectionIsNotEmpty (
-				unorderedComponentDefinitions)
-		) {
-
-			boolean madeProgress = false;
-
-			ListIterator <ComponentDefinition>
-				unorderedComponentDefinitionIterator =
-					unorderedComponentDefinitions.listIterator ();
-
-			OUTER: while (
-				unorderedComponentDefinitionIterator.hasNext ()
-			) {
-
-				ComponentDefinition componentDefinition =
-					unorderedComponentDefinitionIterator.next ();
-
-				for (
-					String targetComponentDefinitionName
-						: componentDefinition.strongDependencies ()
-				) {
-
-					if (
-						! orderedComponentDefinitions.containsKey (
-							targetComponentDefinitionName)
-					) {
-						continue OUTER;
-					}
-
-				}
-
-				log.debug (
-					stringFormat (
-						"Ordered component definition %s",
-						componentDefinition.name ()));
-
-				orderedComponentDefinitions.put (
-					componentDefinition.name (),
-					componentDefinition);
-
-				unorderedComponentDefinitionIterator.remove ();
-
-				madeProgress = true;
-
-			}
-
-			if (! madeProgress) {
-
-				for (
-					ComponentDefinition componentDefinition
-						: unorderedComponentDefinitions
-				) {
-
-					List <String> unresolvedDependencyNames =
-						new ArrayList<> (
-							Sets.difference (
-								componentDefinition.strongDependencies (),
-								orderedComponentDefinitions.keySet ()));
-
-					Collections.sort (
-						unresolvedDependencyNames);
-
-					log.error (
-						stringFormat (
-							"Unable to resolve dependencies for %s (%s)",
-							componentDefinition.name (),
-							joinWithCommaAndSpace (
-								unresolvedDependencyNames)));
-
-					errorCount ++;
-
-				}
-
-				break;
-
-			}
-
-		}
+		singletons =
+			ImmutableList.copyOf (
+				orderByStrongDepedendencies (
+					taskLogger,
+					singletons));
 
 		// output component definitions
 
@@ -1540,16 +1505,13 @@ class ComponentRegistryImplementation
 
 		// check for errors
 
-		if (
-			moreThanZero (
-				errorCount)
-		) {
+		if (taskLogger.errors ()) {
 
 			throw new RuntimeExceptionWithTask (
 				activityManager.currentTask (),
 				stringFormat (
 					"Aborting due to %s errors",
-					errorCount));
+					taskLogger.errorCount ()));
 
 		}
 
@@ -1560,6 +1522,105 @@ class ComponentRegistryImplementation
 		// and return
 
 		return componentManager;
+
+	}
+
+	private
+	List <ComponentDefinition> orderByStrongDepedendencies (
+			@NonNull TaskLogger taskLogger,
+			@NonNull List <ComponentDefinition> definitions) {
+
+		List <ComponentDefinition> unorderedDefinitions =
+			new ArrayList<> (
+				definitions);
+
+		List <ComponentDefinition> orderedDefinitions =
+			new ArrayList<> ();
+
+		Set <String> orderedDefinitionNames =
+			new HashSet<> ();
+
+		while (
+			collectionIsNotEmpty (
+				unorderedDefinitions)
+		) {
+
+			boolean madeProgress = false;
+
+			ListIterator <ComponentDefinition>
+				unorderedDefinitionIterator =
+					unorderedDefinitions.listIterator ();
+
+			OUTER: while (
+				unorderedDefinitionIterator.hasNext ()
+			) {
+
+				ComponentDefinition definition =
+					unorderedDefinitionIterator.next ();
+
+				for (
+					String targetDefinitionName
+						: definition.strongDependencies ()
+				) {
+
+					if (
+						doesNotContain (
+							orderedDefinitionNames,
+							targetDefinitionName)
+					) {
+						continue OUTER;
+					}
+
+				}
+
+				log.debug (
+					stringFormat (
+						"Ordered component definition %s",
+						definition.name ()));
+
+				orderedDefinitions.add (
+					definition);
+
+				orderedDefinitionNames.add (
+					definition.name ());
+
+				unorderedDefinitionIterator.remove ();
+
+				madeProgress = true;
+
+			}
+
+			if (! madeProgress) {
+
+				for (
+					ComponentDefinition definition
+						: unorderedDefinitions
+				) {
+
+					List <String> unresolvedDependencyNames =
+						new ArrayList<> (
+							Sets.difference (
+								definition.strongDependencies (),
+								orderedDefinitionNames));
+
+					Collections.sort (
+						unresolvedDependencyNames);
+
+					taskLogger.errorFormat (
+						"Unable to resolve dependencies for %s (%s)",
+						definition.name (),
+						joinWithCommaAndSpace (
+							unresolvedDependencyNames));
+
+				}
+
+				break;
+
+			}
+
+		}
+
+		return orderedDefinitions;
 
 	}
 

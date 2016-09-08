@@ -10,17 +10,16 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-
-import org.apache.commons.io.IOUtils;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import org.apache.commons.io.IOUtils;
+
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
@@ -37,18 +36,20 @@ import wbs.sms.route.core.model.RouteRec;
 @SingletonComponent ("broadcastSystemsSender1")
 public
 class BroadcastSystemsSender1
-	extends AbstractSmsSender1<BroadcastSystemsSender1.State> {
+	extends AbstractSmsSender1 <BroadcastSystemsSender1.State> {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	BroadcastSystemsRouteOutObjectHelper broadcastSystemsRouteOutHelper;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// details

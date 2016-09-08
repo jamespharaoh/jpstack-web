@@ -10,13 +10,12 @@ import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.build.ModelBuilderManager;
@@ -33,15 +32,15 @@ import wbs.framework.schema.helper.SchemaTypesHelper;
 public
 class ModelBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ModelBuilderManager modelBuilderManager;
 
-	@Inject
+	@SingletonDependency
 	SchemaNamesHelper schemaNamesHelper;
 
-	@Inject
+	@SingletonDependency
 	SchemaTypesHelper schemaTypesHelper;
 
 	// properties

@@ -4,12 +4,11 @@ import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.naivePluralise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
-
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.CommonRecord;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.EventRecord;
@@ -26,9 +25,9 @@ class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 		ObjectHelperComponent <RecordType>,
 		ObjectHelperModelMethods <RecordType> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeRegistry objectTypeRegistry;
 
 	// properties
