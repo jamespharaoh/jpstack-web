@@ -1,13 +1,12 @@
 package wbs.services.ticket.create;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
@@ -31,6 +30,8 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 import wbs.framework.web.Action;
@@ -38,63 +39,58 @@ import wbs.framework.web.Responder;
 import wbs.platform.object.criteria.WhereDeletedCriteriaSpec;
 import wbs.platform.object.criteria.WhereICanManageCriteriaSpec;
 import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
-import wbs.services.ticket.core.model.TicketManagerObjectHelper;
 import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketRec;
 
 @PrototypeComponent ("objectTicketCreatePageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectTicketCreatePageBuilder<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectTicketCreatePageBuilder <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
-	ComponentManager applicationContext;
+	@SingletonDependency
+	ComponentManager componentManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleFile> consoleFileProvider;
+	@PrototypeDependency
+	Provider <ConsoleFile> consoleFileProvider;
 
-	@Inject
-	Provider<ConsoleContextTab> contextTabProvider;
+	@PrototypeDependency
+	Provider <ConsoleContextTab> contextTabProvider;
 
-	@Inject
-	Provider<ObjectTicketCreateSetFieldSpec> ticketCreateSetFieldSpecProvider;
+	@PrototypeDependency
+	Provider <ObjectTicketCreateSetFieldSpec> ticketCreateSetFieldSpecProvider;
 
-	@Inject
-	Provider<ObjectTicketCreatePart<ObjectType,ParentType>>
+	@PrototypeDependency
+	Provider <ObjectTicketCreatePart <ObjectType, ParentType>>
 	objectTicketCreatePartProvider;
 
-	@Inject
-	Provider<ObjectTicketCreateAction<ObjectType,ParentType>>
+	@PrototypeDependency
+	Provider <ObjectTicketCreateAction <ObjectType, ParentType>>
 	objectTicketCreateActionProvider;
 
-	@Inject
-	Provider<TabContextResponder> tabContextResponderProvider;
+	@PrototypeDependency
+	Provider <TabContextResponder> tabContextResponderProvider;
 
-	Provider<WhereDeletedCriteriaSpec> whereDeletedCriteriaSpecProvider;
+	@PrototypeDependency
+	Provider <WhereDeletedCriteriaSpec> whereDeletedCriteriaSpecProvider;
 
-	@Inject
-	Provider<WhereICanManageCriteriaSpec> whereICanManageCriteriaSpecProvider;
+	@PrototypeDependency
+	Provider <WhereICanManageCriteriaSpec> whereICanManageCriteriaSpecProvider;
 
-	@Inject
-	Provider<WhereNotDeletedCriteriaSpec> whereNotDeletedCriteriaSpecProvider;
-
-	// indirect dependencies
-
-	@Inject
-	Provider<TicketManagerObjectHelper> ticketManagerHelperProvider;
+	@PrototypeDependency
+	Provider <WhereNotDeletedCriteriaSpec> whereNotDeletedCriteriaSpecProvider;
 
 	// builder
 
@@ -370,9 +366,9 @@ class ObjectTicketCreatePageBuilder<
 		if (spec.fieldsProviderName () != null) {
 
 			@SuppressWarnings ("unchecked")
-			FieldsProvider<TicketRec,TicketManagerRec> fieldsProviderTemp =
-				(FieldsProvider<TicketRec,TicketManagerRec>)
-				applicationContext.getComponentRequired (
+			FieldsProvider <TicketRec, TicketManagerRec> fieldsProviderTemp =
+				(FieldsProvider <TicketRec, TicketManagerRec>)
+				componentManager.getComponentRequired (
 					spec.fieldsProviderName (),
 					FieldsProvider.class);
 
