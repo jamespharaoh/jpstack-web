@@ -5,8 +5,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.sql.SQLException;
 
-import javax.inject.Inject;
-
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
@@ -17,6 +15,7 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.fixtures.ModelMetaBuilderHandler;
@@ -32,15 +31,15 @@ import wbs.platform.event.model.EventTypeObjectHelper;
 public
 class EventTypeBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EntityHelper entityHelper;
 
-	@Inject
+	@SingletonDependency
 	EventTypeObjectHelper eventTypeHelper;
 
 	// builder

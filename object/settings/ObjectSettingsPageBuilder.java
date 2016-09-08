@@ -55,7 +55,7 @@ class ObjectSettingsPageBuilder <
 	// singleton dependencies
 
 	@SingletonDependency
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
@@ -491,7 +491,7 @@ class ObjectSettingsPageBuilder <
 			@SuppressWarnings ("unchecked")
 			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
 				(FieldsProvider<ObjectType,ParentType>)
-				applicationContext.getComponentRequired (
+				componentManager.getComponentRequired (
 					spec.fieldsProviderName (),
 					FieldsProvider.class);
 

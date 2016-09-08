@@ -1,13 +1,12 @@
 package wbs.platform.object.browse;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -31,42 +30,44 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.platform.scaffold.model.SliceRec;
 
 @PrototypeComponent ("objectBrowsePageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectBrowsePageBuilder<
-	ObjectType extends Record<ObjectType>
+class ObjectBrowsePageBuilder <
+	ObjectType extends Record <ObjectType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleFile> consoleFile;
+	@PrototypeDependency
+	Provider <ConsoleFile> consoleFile;
 
-	@Inject
-	Provider<ConsoleContextTab> contextTab;
+	@PrototypeDependency
+	Provider <ConsoleContextTab> contextTab;
 
-	@Inject
-	Provider<ObjectBrowsePart> objectBrowsePart;
+	@PrototypeDependency
+	Provider <ObjectBrowsePart> objectBrowsePart;
 
-	@Inject
-	Provider<TabContextResponder> tabContextResponder;
+	@PrototypeDependency
+	Provider <TabContextResponder> tabContextResponder;
 
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer<ObjectType> container;
+	ConsoleContextBuilderContainer <ObjectType> container;
 
 	@BuilderSource
 	ObjectBrowsePageSpec spec;

@@ -10,8 +10,6 @@ import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
@@ -21,6 +19,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.entity.record.GlobalId;
 import wbs.platform.scaffold.console.SliceConsoleHelper;
@@ -33,18 +32,18 @@ public
 class CoreLogonResponder
 	extends HtmlResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	SliceConsoleHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleHelper userHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// state

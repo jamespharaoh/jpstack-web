@@ -31,21 +31,21 @@ class WbsServletListener
 
 	ServletContext servletContext;
 
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	@Override
 	public
 	void contextDestroyed (
 			@NonNull ServletContextEvent event) {
 
-		if (applicationContext == null)
+		if (componentManager == null)
 			return;
 
 		log.info (
 			stringFormat (
 				"Destroying application context"));
 
-		applicationContext.close ();
+		componentManager.close ();
 
 	}
 
@@ -78,7 +78,7 @@ class WbsServletListener
 				servletContext.getInitParameter (
 					"layerNames"));
 
-		applicationContext =
+		componentManager =
 			new ComponentManagerBuilder ()
 
 			.primaryProjectName (
@@ -104,7 +104,7 @@ class WbsServletListener
 
 		servletContext.setAttribute (
 			"wbs-application-context",
-			applicationContext);
+			componentManager);
 
 	}
 
@@ -115,12 +115,12 @@ class WbsServletListener
 
 		for (
 			String requestBeanName
-				: applicationContext.requestComponentNames ()
+				: componentManager.requestComponentNames ()
 		) {
 
 			ThreadLocalProxyComponentFactory.Control control =
 				(ThreadLocalProxyComponentFactory.Control)
-				applicationContext.getComponentRequired (
+				componentManager.getComponentRequired (
 					requestBeanName,
 					Object.class);
 
@@ -162,12 +162,12 @@ class WbsServletListener
 
 			for (
 				String requestBeanName
-					: applicationContext.requestComponentNames ()
+					: componentManager.requestComponentNames ()
 			) {
 
 				ThreadLocalProxyComponentFactory.Control control =
 					(ThreadLocalProxyComponentFactory.Control)
-					applicationContext.getComponentRequired (
+					componentManager.getComponentRequired (
 						requestBeanName,
 						Object.class);
 
@@ -177,7 +177,7 @@ class WbsServletListener
 						requestBeanName);
 
 				Object targetBean =
-					applicationContext.getComponentRequired (
+					componentManager.getComponentRequired (
 						targetBeanName,
 						Object.class);
 
@@ -202,7 +202,7 @@ class WbsServletListener
 
 					ThreadLocalProxyComponentFactory.Control control =
 						(ThreadLocalProxyComponentFactory.Control)
-						applicationContext.getComponentRequired (
+						componentManager.getComponentRequired (
 							requestBeanName,
 							Object.class);
 

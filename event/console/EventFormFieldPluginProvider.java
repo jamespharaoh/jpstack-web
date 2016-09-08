@@ -3,15 +3,16 @@ package wbs.platform.event.console;
 import static wbs.framework.utils.etc.Misc.doesNotImplement;
 import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
+
 import wbs.console.forms.FormFieldBuilderContext;
 import wbs.console.forms.FormFieldPluginProvider;
 import wbs.console.helper.ConsoleHelper;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.entity.record.Record;
 
@@ -23,11 +24,11 @@ class EventFormFieldPluginProvider
 
 	// prototype dependencies
 
-	@Inject
-	Provider<NameFormFieldUpdateHook> nameFormFieldUpdateHookProvider;
+	@PrototypeDependency
+	Provider <NameFormFieldUpdateHook> nameFormFieldUpdateHookProvider;
 
-	@Inject
-	Provider<SimpleFormFieldUpdateHook> simpleFormFieldUpdateHookProvider;
+	@PrototypeDependency
+	Provider <SimpleFormFieldUpdateHook> simpleFormFieldUpdateHookProvider;
 
 	// implementation
 

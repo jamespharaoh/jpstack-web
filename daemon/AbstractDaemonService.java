@@ -7,10 +7,10 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.inject.Inject;
 
 import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.utils.ThreadManager;
 
 /**
@@ -20,16 +20,20 @@ import wbs.framework.utils.ThreadManager;
 public abstract
 class AbstractDaemonService {
 
+	// singleton dependencies
+
+	@SingletonDependency
+	protected
+	ThreadManager threadManager;
+
+	// state
+
 	private
-	List<Thread> threads;
+	List <Thread> threads;
 
 	protected
 	AbstractDaemonService () {
 	}
-
-	@Inject
-	protected
-	ThreadManager threadManager;
 
 	/**
 	 * Override this if your service only need a single-thread.

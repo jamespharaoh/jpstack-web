@@ -5,13 +5,14 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.concurrent.Future;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.part.PagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.platform.status.console.StatusLine;
 
@@ -20,22 +21,24 @@ public
 class ExceptionStatusLine
 	implements StatusLine {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	NumExceptionsCache numExceptionsCache;
 
-	@Inject
+	@SingletonDependency
 	NumFatalExceptionsCache numFatalExceptionsCache;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
-	Provider<ExceptionStatusLinePart> exceptionStatusLinePart;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <ExceptionStatusLinePart> exceptionStatusLinePart;
 
 	// details
 

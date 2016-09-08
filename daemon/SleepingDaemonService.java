@@ -1,12 +1,11 @@
 package wbs.platform.daemon;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
 import org.joda.time.Duration;
 
-import com.google.common.base.Optional;
-
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.utils.RandomLogic;
@@ -15,12 +14,12 @@ public abstract
 class SleepingDaemonService
 	extends AbstractDaemonService {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
 	// hooks to override

@@ -14,24 +14,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.joda.time.LocalDate;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-import nu.xom.Builder;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Elements;
-import nu.xom.ParsingException;
-import nu.xom.Serializer;
-import nu.xom.ValidityException;
+
+import org.joda.time.LocalDate;
+
 import wbs.api.mvc.WebApiAction;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
@@ -43,6 +38,14 @@ import wbs.platform.rpc.core.RpcResult;
 import wbs.platform.rpc.core.RpcSource;
 import wbs.platform.rpc.web.ReusableRpcHandler;
 
+import nu.xom.Builder;
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Elements;
+import nu.xom.ParsingException;
+import nu.xom.Serializer;
+import nu.xom.ValidityException;
+
 @Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("xmlRpcAction")
@@ -50,14 +53,20 @@ public
 class XmlRpcAction
 	implements WebApiAction {
 
-	@Inject
-	ComponentManager applicationContext;
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
+	ComponentManager componentManager;
+
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
-	Provider<XmlResponder> xmlResponder;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <XmlResponder> xmlResponder;
+
+	// properties
 
 	@Getter @Setter
 	ReusableRpcHandler rpcHandler;
@@ -75,7 +84,7 @@ class XmlRpcAction
 					RpcSource source) {
 
 				RpcHandler delegate =
-					applicationContext.getComponentRequired (
+					componentManager.getComponentRequired (
 						name,
 						RpcHandler.class);
 

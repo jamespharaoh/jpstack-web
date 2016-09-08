@@ -7,13 +7,13 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeRec;
@@ -23,16 +23,18 @@ public
 class MediaConsoleLogicImplementation
 	implements MediaConsoleLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	MediaConsoleHelper mediaHelper;
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
+
+	// constants
 
 	public final static
 	String PLAYER_COUNT_KEY =

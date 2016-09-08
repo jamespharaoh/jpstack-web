@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
@@ -41,6 +40,8 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 
@@ -48,44 +49,45 @@ import wbs.framework.entity.record.Record;
 @PrototypeComponent ("objectSummaryPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectSummaryPageBuilder<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectSummaryPageBuilder <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
-	ComponentManager applicationContext;
+	@SingletonDependency
+	ComponentManager componentManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleFile> consoleFile;
+	@PrototypeDependency
+	Provider <ConsoleFile> consoleFileProvider;
 
-	@Inject
-	Provider<ConsoleContextTab> contextTab;
+	@PrototypeDependency
+	Provider <ConsoleContextTab> contextTabProvider;
 
-	@Inject
-	Provider<ObjectSummaryPart> objectSummaryPart;
+	@PrototypeDependency
+	Provider <ObjectSummaryPart> objectSummaryPartProvider;
 
-	@Inject
-	Provider<ParentFormFieldSpec> parentField;
+	@PrototypeDependency
+	Provider <ParentFormFieldSpec> parentFieldProvider;
 
-	@Inject
-	Provider<ObjectSummaryFieldsPart<ObjectType,ParentType>> summaryFieldsPart;
+	@PrototypeDependency
+	Provider <ObjectSummaryFieldsPart <ObjectType, ParentType>>
+	summaryFieldsPartProvider;
 
-	@Inject
-	Provider<TabContextResponder> tabContextResponder;
+	@PrototypeDependency
+	Provider <TabContextResponder> tabContextResponder;
 
-	@Inject
-	Provider<TextPart> textPart;
+	@PrototypeDependency
+	Provider <TextPart> textPart;
 
 	// builder
 
@@ -160,7 +162,7 @@ class ObjectSummaryPageBuilder<
 
 			"end",
 
-			contextTab.get ()
+			contextTabProvider.get ()
 
 				.name (
 					stringFormat (
@@ -191,7 +193,7 @@ class ObjectSummaryPageBuilder<
 				"%s.summary",
 				container.pathPrefix ()),
 
-			consoleFile.get ()
+			consoleFileProvider.get ()
 
 				.getResponderName (
 					stringFormat (
@@ -216,7 +218,7 @@ class ObjectSummaryPageBuilder<
 			public
 			PagePart get () {
 
-				return objectSummaryPart.get ()
+				return objectSummaryPartProvider.get ()
 					.partFactories (pagePartFactories);
 
 			}
@@ -258,7 +260,7 @@ class ObjectSummaryPageBuilder<
 			public
 			PagePart get () {
 
-				return summaryFieldsPart.get ()
+				return summaryFieldsPartProvider.get ()
 
 					.consoleHelper (
 						consoleHelper)
@@ -326,7 +328,7 @@ class ObjectSummaryPageBuilder<
 			PagePart get () {
 
 				Object object =
-					applicationContext.getComponentRequired (
+					componentManager.getComponentRequired (
 						beanName,
 						Object.class);
 
@@ -385,7 +387,7 @@ class ObjectSummaryPageBuilder<
 			@SuppressWarnings ("unchecked")
 			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
 				(FieldsProvider<ObjectType,ParentType>)
-				applicationContext.getComponentRequired (
+				componentManager.getComponentRequired (
 					spec.fieldsProviderName (),
 					FieldsProvider.class);
 

@@ -2,13 +2,13 @@ package wbs.platform.core.console;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.experimental.Accessors;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.Responder;
 
 @Accessors (fluent = true)
@@ -16,12 +16,12 @@ import wbs.framework.web.Responder;
 public
 class CoreRedirectResponder
 	implements
-		Provider<Responder>,
+		Provider <Responder>,
 		Responder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// implementation

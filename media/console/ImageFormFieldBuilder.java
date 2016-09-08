@@ -1,14 +1,13 @@
 package wbs.platform.media.console;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.framework.utils.etc.NullUtils.ifNull;
 import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
 import static wbs.framework.utils.etc.StringUtils.capitalise;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -36,6 +35,8 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.media.model.MediaRec;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -44,51 +45,51 @@ import wbs.platform.media.model.MediaRec;
 public
 class ImageFormFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<DereferenceFormFieldAccessor>
+	@PrototypeDependency
+	Provider <DereferenceFormFieldAccessor>
 	dereferenceFormFieldAccessorProvider;
 
-	@Inject
-	Provider<IdentityFormFieldInterfaceMapping>
+	@PrototypeDependency
+	Provider <IdentityFormFieldInterfaceMapping>
 	identityFormFieldInterfaceMappingProvider;
 
-	@Inject
-	Provider<IdentityFormFieldNativeMapping>
+	@PrototypeDependency
+	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
-	@Inject
-	Provider<ImageCsvFormFieldInterfaceMapping>
+	@PrototypeDependency
+	Provider <ImageCsvFormFieldInterfaceMapping>
 	imageCsvFormFieldInterfaceMappingProvider;
 
-	@Inject
-	Provider<NullFormFieldConstraintValidator>
+	@PrototypeDependency
+	Provider <NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
 
-	@Inject
-	Provider<ReadOnlyFormField>
+	@PrototypeDependency
+	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
-	@Inject
-	Provider<RequiredFormFieldValueValidator>
+	@PrototypeDependency
+	Provider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
-	@Inject
-	Provider<SimpleFormFieldAccessor>
+	@PrototypeDependency
+	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
-	@Inject
-	Provider<ImageFormFieldRenderer>
+	@PrototypeDependency
+	Provider <ImageFormFieldRenderer>
 	imageFormFieldRendererProvider;
 
-	@Inject
-	Provider<UpdatableFormField>
+	@PrototypeDependency
+	Provider <UpdatableFormField>
 	updatableFormFieldProvider;
 
 	// builder

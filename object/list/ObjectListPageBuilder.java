@@ -1,7 +1,7 @@
 package wbs.platform.object.list;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.framework.utils.etc.StringUtils.capitalise;
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -12,9 +12,9 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import lombok.NonNull;
-
 import com.google.common.collect.ImmutableMap;
+
+import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -49,15 +49,15 @@ import wbs.platform.scaffold.model.SliceRec;
 @PrototypeComponent ("objectListPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectListPageBuilder<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectListPageBuilder <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 > {
 
 	// dependencies
 
 	@Inject
-	ComponentManager applicationContext;
+	ComponentManager componentManager;
 
 	@Inject
 	ConsoleModuleBuilder consoleModuleBuilder;
@@ -252,7 +252,7 @@ class ObjectListPageBuilder<
 			@SuppressWarnings ("unchecked")
 			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
 				(FieldsProvider<ObjectType,ParentType>)
-				applicationContext.getComponentRequired (
+				componentManager.getComponentRequired (
 					spec.fieldsProviderName (),
 					FieldsProvider.class);
 

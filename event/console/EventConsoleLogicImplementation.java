@@ -9,17 +9,19 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -42,27 +44,27 @@ public
 class EventConsoleLogicImplementation
 	implements EventConsoleLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ObjectEventsPart> objectEventsPart;
+	@PrototypeDependency
+	Provider <ObjectEventsPart> objectEventsPart;
 
 	// implementation
 

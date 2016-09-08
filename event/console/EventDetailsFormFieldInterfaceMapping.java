@@ -4,36 +4,35 @@ import static wbs.framework.utils.etc.Misc.successResult;
 
 import java.util.Map;
 
-import javax.inject.Inject;
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import com.google.common.base.Optional;
-
-import fj.data.Either;
-
 import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.event.model.EventRec;
+
+import fj.data.Either;
 
 @PrototypeComponent ("eventDetailsFormFieldInterfaceMapping")
 public
 class EventDetailsFormFieldInterfaceMapping
-	implements FormFieldInterfaceMapping<EventRec,EventRec,String> {
+	implements FormFieldInterfaceMapping <EventRec, EventRec, String> {
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	EventConsoleLogic eventConsoleLogic;
 
 	// implementation
 
 	@Override
 	public
-	Either<Optional<EventRec>,String> interfaceToGeneric (
+	Either <Optional <EventRec>, String> interfaceToGeneric (
 			@NonNull EventRec container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue) {
 
 		throw new UnsupportedOperationException ();
 
@@ -41,10 +40,10 @@ class EventDetailsFormFieldInterfaceMapping
 
 	@Override
 	public
-	Either<Optional<String>,String> genericToInterface (
+	Either <Optional <String>, String> genericToInterface (
 			@NonNull EventRec container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<EventRec> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <EventRec> genericValue) {
 
 		return successResult (
 			Optional.of (

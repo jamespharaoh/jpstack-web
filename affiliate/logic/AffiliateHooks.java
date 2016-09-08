@@ -8,10 +8,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.NonNull;
+
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
@@ -25,22 +26,22 @@ import wbs.platform.object.core.model.ObjectTypeRec;
 
 public
 class AffiliateHooks
-	implements ObjectHooks<AffiliateRec> {
+	implements ObjectHooks <AffiliateRec> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	AffiliateTypeDao affiliateTypeDao;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeDao objectTypeDao;
 
 	// state
 
-	Map<Long,List<Long>> affiliateTypeIdsByParentTypeId =
+	Map <Long, List <Long>> affiliateTypeIdsByParentTypeId =
 		new HashMap<> ();
 
 	// lifecycle

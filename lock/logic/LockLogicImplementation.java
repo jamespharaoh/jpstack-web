@@ -4,11 +4,10 @@ import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
 
 import java.util.Arrays;
 
-import javax.inject.Inject;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.lock.model.LockObjectHelper;
 import wbs.platform.lock.model.LockRec;
 
@@ -17,8 +16,12 @@ public
 class LockLogicImplementation
 	implements LockLogic {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	LockObjectHelper lockHelper;
+
+	// implementation
 
 	@Override
 	public

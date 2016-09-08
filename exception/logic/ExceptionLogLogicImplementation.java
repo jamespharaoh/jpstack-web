@@ -4,14 +4,13 @@ import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
 
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -30,18 +29,18 @@ public
 class ExceptionLogLogicImplementation
 	implements ExceptionLogLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogObjectHelper exceptionLogHelper;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogTypeObjectHelper exceptionLogTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// implementation

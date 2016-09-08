@@ -2,9 +2,8 @@ package wbs.platform.media.console;
 
 import java.awt.image.BufferedImage;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaRec;
@@ -15,9 +14,9 @@ public
 class MediaImageScaleResponder
 	extends AbstractMediaImageResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaLogic;
 
 	// implementation

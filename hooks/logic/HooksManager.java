@@ -12,27 +12,31 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.SingletonComponent;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @Log4j
 @SingletonComponent ("hooksManager")
 public
 class HooksManager {
 
-	@Inject
-	List<HooksProxy> proxies =
+	// singleton dependencies
+
+	@SingletonDependency
+	List <HooksProxy> proxies =
 		Collections.emptyList ();
 
-	@Inject
-	List<HooksTarget> targets =
+	@SingletonDependency
+	List <HooksTarget> targets =
 		Collections.emptyList ();
+
+	// life cycle
 
 	@PostConstruct
 	public

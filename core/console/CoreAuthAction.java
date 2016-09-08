@@ -1,6 +1,5 @@
 package wbs.platform.core.console;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
@@ -11,6 +10,7 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.lookup.BooleanLookup;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.Responder;
 
 @Accessors (fluent = true)
@@ -19,8 +19,12 @@ public
 class CoreAuthAction
 	extends ConsoleAction {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
+
+	// properties
 
 	@Getter @Setter
 	BooleanLookup lookup;

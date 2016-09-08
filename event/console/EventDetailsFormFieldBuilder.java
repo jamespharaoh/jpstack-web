@@ -1,6 +1,5 @@
 package wbs.platform.event.console;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -21,6 +20,8 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("eventDetailsFormFieldBuilder")
@@ -28,31 +29,31 @@ import wbs.framework.component.annotations.PrototypeComponent;
 public
 class EventDetailsFormFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<EventDetailsFormFieldInterfaceMapping>
+	@PrototypeDependency
+	Provider <EventDetailsFormFieldInterfaceMapping>
 	eventDetailsFormFieldInterfaceMappingProvider;
 
-	@Inject
-	Provider<HtmlFormFieldRenderer>
+	@PrototypeDependency
+	Provider <HtmlFormFieldRenderer>
 	htmlFormFieldRendererProvider;
 
-	@Inject
-	Provider<IdentityFormFieldAccessor>
+	@PrototypeDependency
+	Provider <IdentityFormFieldAccessor>
 	identityFormFieldAccessorProvider;
 
-	@Inject
-	Provider<IdentityFormFieldNativeMapping>
+	@PrototypeDependency
+	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
-	@Inject
-	Provider<ReadOnlyFormField>
+	@PrototypeDependency
+	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
 	// builder

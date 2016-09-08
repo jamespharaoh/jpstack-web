@@ -8,7 +8,6 @@ import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.Range;
@@ -42,6 +41,8 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.utils.etc.BeanLogic;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -50,59 +51,59 @@ import wbs.framework.utils.etc.BeanLogic;
 public
 class CurrencyFormFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <CurrencyFormFieldInterfaceMapping>
 	currencyFormFieldInterfaceMappingProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <IdentityFormFieldNativeMapping>
 	identityFormFieldNativeMappingProvider;
 
-	@Inject
+	@PrototypeDependency
 	Provider <IntegerFormFieldInterfaceMapping>
 	integerFormFieldInterfaceMappingProvider;
 
-	@Inject
-	Provider<IntegerFormFieldValueValidator>
+	@PrototypeDependency
+	Provider <IntegerFormFieldValueValidator>
 	integerFormFieldValueValidatorProvider;
 
-	@Inject
-	Provider<NullFormFieldConstraintValidator>
+	@PrototypeDependency
+	Provider <NullFormFieldConstraintValidator>
 	nullFormFieldValueConstraintValidatorProvider;
 
-	@Inject
-	Provider<RangeFormFieldInterfaceMapping>
+	@PrototypeDependency
+	Provider <RangeFormFieldInterfaceMapping>
 	rangeFormFieldInterfaceMappingProvider;
 
-	@Inject
-	Provider<RangeFormFieldRenderer>
+	@PrototypeDependency
+	Provider <RangeFormFieldRenderer>
 	rangeFormFieldInterfaceRendererProvider;
 
-	@Inject
-	Provider<ReadOnlyFormField>
+	@PrototypeDependency
+	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
-	@Inject
-	Provider<RequiredFormFieldValueValidator>
+	@PrototypeDependency
+	Provider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
 
-	@Inject
-	Provider<SimpleFormFieldAccessor>
+	@PrototypeDependency
+	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
 
-	@Inject
-	Provider<TextFormFieldRenderer>
+	@PrototypeDependency
+	Provider <TextFormFieldRenderer>
 	textFormFieldRendererProvider;
 
-	@Inject
-	Provider<UpdatableFormField>
+	@PrototypeDependency
+	Provider <UpdatableFormField>
 	updatableFormFieldProvider;
 
 	// builder

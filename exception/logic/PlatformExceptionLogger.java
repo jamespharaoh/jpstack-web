@@ -2,7 +2,6 @@ package wbs.platform.exception.logic;
 
 import static wbs.framework.utils.etc.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -12,6 +11,7 @@ import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -25,15 +25,15 @@ public
 class PlatformExceptionLogger
 	implements ExceptionLogger {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogLogic exceptionLogLogic;
 
-	@Inject
+	@SingletonDependency
 	ExceptionUtils exceptionLogic;
 
 	// implementation

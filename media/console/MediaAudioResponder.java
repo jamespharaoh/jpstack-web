@@ -3,11 +3,10 @@ package wbs.platform.media.console;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.inject.Inject;
-
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
 
@@ -16,10 +15,12 @@ public
 class MediaAudioResponder
 	extends ConsoleResponder {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	MediaObjectHelper mediaHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	OutputStream out;

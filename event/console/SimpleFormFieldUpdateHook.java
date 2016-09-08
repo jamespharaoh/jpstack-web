@@ -1,17 +1,17 @@
 package wbs.platform.event.console;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.forms.FormFieldUpdateHook;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.CommonRecord;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.EventRecord;
@@ -25,18 +25,18 @@ import wbs.platform.user.console.UserConsoleLogic;
 @Accessors (fluent = true)
 @PrototypeComponent ("createUpdateEventFormFieldUpdateHook")
 public
-class SimpleFormFieldUpdateHook<Container extends Record<?>,Generic,Native>
-	implements FormFieldUpdateHook<Container,Generic,Native> {
+class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
+	implements FormFieldUpdateHook <Container, Generic, Native> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// properties

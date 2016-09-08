@@ -12,17 +12,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.joda.time.LocalDate;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.LocalDate;
+
 import wbs.api.mvc.WebApiAction;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
@@ -45,14 +47,20 @@ public
 class PhpRpcAction
 	implements WebApiAction {
 
-	@Inject
-	ComponentManager applicationContext;
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
+	ComponentManager componentManager;
+
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
-	Provider<PhpMapResponder> phpMapResponder;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <PhpMapResponder> phpMapResponderProvider;
+
+	// properties
 
 	@Getter @Setter
 	ReusableRpcHandler rpcHandler;
@@ -70,7 +78,7 @@ class PhpRpcAction
 					RpcSource source) {
 
 				RpcHandler delegate =
-					applicationContext.getComponentRequired (
+					componentManager.getComponentRequired (
 						name,
 						RpcHandler.class);
 
@@ -103,7 +111,7 @@ class PhpRpcAction
 			realGo ();
 
 		return ret != null
-			? phpMapResponder.get ()
+			? phpMapResponderProvider.get ()
 				.map (ret.getStruct ().getNative ())
 				.status (ret.getHttpStatus ())
 			: null;
@@ -203,7 +211,7 @@ class PhpRpcAction
 			public
 			Responder get () {
 
-				return phpMapResponder.get ()
+				return phpMapResponderProvider.get ()
 					.map (result.getStruct ().getNative ())
 					.status (result.getHttpStatus ());
 
