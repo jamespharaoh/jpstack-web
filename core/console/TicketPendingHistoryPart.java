@@ -1,6 +1,5 @@
 package wbs.services.ticket.core.console;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.collect.ImmutableMap;
@@ -12,6 +11,7 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.services.ticket.core.model.TicketNoteRec;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
@@ -22,24 +22,25 @@ public
 class TicketPendingHistoryPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	ConsoleModule ticketPendingConsoleModule;
 
-	@Inject
+	@SingletonDependency
 	TicketStateObjectHelper ticketStateHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketObjectHelper ticketHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// state

@@ -1,11 +1,9 @@
 package wbs.services.ticket.create;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -14,6 +12,7 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldLogic;
@@ -25,11 +24,11 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
@@ -44,61 +43,62 @@ import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketFieldValueRec;
 import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketRec;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectTicketCreateAction")
 public
-class ObjectTicketCreateAction<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectTicketCreateAction <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 >
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeObjectHelper objectTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	RootObjectHelper rootHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketFieldTypeObjectHelper ticketFieldTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketFieldValueConsoleHelper ticketFieldValueHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketConsoleHelper ticketHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// properties
@@ -317,7 +317,7 @@ class ObjectTicketCreateAction<
 
 		if (consoleHelper.typeCodeExists ()) {
 
-			BeanLogic.setProperty (
+			PropertyUtils.setProperty (
 				ticket,
 				consoleHelper.typeCodeFieldName (),
 				typeCode);
@@ -353,7 +353,7 @@ class ObjectTicketCreateAction<
 
 		if (createTimeFieldName != null) {
 
-			BeanLogic.setProperty (
+			PropertyUtils.setProperty (
 				ticket,
 				createTimeFieldName,
 				transaction.now ());
@@ -364,7 +364,7 @@ class ObjectTicketCreateAction<
 
 		if (createUserFieldName != null) {
 
-			BeanLogic.setProperty (
+			PropertyUtils.setProperty (
 				ticket,
 				createUserFieldName,
 				userConsoleLogic.userRequired ());

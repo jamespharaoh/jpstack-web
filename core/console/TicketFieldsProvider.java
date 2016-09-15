@@ -1,13 +1,12 @@
 package wbs.services.ticket.core.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.underscoreToCamel;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.underscoreToCamel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -23,6 +22,7 @@ import wbs.console.module.ConsoleModuleBuilder;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketManagerRec;
@@ -31,20 +31,20 @@ import wbs.services.ticket.core.model.TicketRec;
 @PrototypeComponent ("ticketFieldsProvider")
 public
 class TicketFieldsProvider
-	implements FieldsProvider<TicketRec,TicketManagerRec> {
+	implements FieldsProvider <TicketRec, TicketManagerRec> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
-	@Inject
+	@SingletonDependency
 	TicketFieldTypeObjectHelper ticketFieldTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketFieldTypeConsoleHelper ticketFieldTypeConsoleHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketConsoleHelper ticketConsoleHelper;
 
 	// state
