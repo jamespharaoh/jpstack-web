@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
@@ -17,30 +15,31 @@ import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @PrototypeComponent ("statusResponder")
 public
 class StatusResponder
 	extends HtmlResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	StatusLineManager statusLineManager;
 
 	// state
 
-	List<PagePart> pageParts =
-		new ArrayList<PagePart> ();
+	List <PagePart> pageParts =
+		new ArrayList<> ();
 
 	// details
 
 	@Override
 	protected
-	Set<ScriptRef> myScriptRefs () {
+	Set <ScriptRef> myScriptRefs () {
 
 		return ImmutableSet.<ScriptRef>builder ()
 

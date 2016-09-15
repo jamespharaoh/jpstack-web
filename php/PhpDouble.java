@@ -1,7 +1,7 @@
 package wbs.platform.php;
 
-import static wbs.framework.utils.etc.NumberUtils.roundToIntegerRequired;
-import static wbs.framework.utils.etc.StringUtils.stringToBytes;
+import static wbs.utils.etc.NumberUtils.roundToIntegerRequired;
+import static wbs.utils.string.StringUtils.stringToBytes;
 
 import java.util.ArrayList;
 import java.util.List;

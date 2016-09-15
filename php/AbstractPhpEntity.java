@@ -1,6 +1,6 @@
 package wbs.platform.php;
 
-import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
+import static wbs.utils.etc.EnumUtils.enumInSafe;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;

@@ -1,16 +1,12 @@
 package wbs.platform.object.create;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TimeUtils.instantToDateNullSafe;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.time.TimeUtils.instantToDateNullSafe;
 
 import java.util.Date;
-
-import javax.inject.Inject;
-
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -19,6 +15,9 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.joda.time.Instant;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
@@ -32,66 +31,67 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.console.UserConsoleLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCreateAction")
 public
-class ObjectCreateAction<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectCreateAction <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 >
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeObjectHelper objectTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	RootObjectHelper rootHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
 	String typeCode;
@@ -228,7 +228,7 @@ class ObjectCreateAction<
 
 		if (consoleHelper.typeCodeExists ()) {
 
-			BeanLogic.setProperty (
+			PropertyUtils.setProperty (
 				object,
 				consoleHelper.typeCodeFieldName (),
 				typeCode);
@@ -269,20 +269,20 @@ class ObjectCreateAction<
 		if (createTimeFieldName != null) {
 
 			Class<?> createTimeFieldClass =
-				BeanLogic.propertyClassForObject (
+				PropertyUtils.propertyClassForObject (
 					object,
 					createTimeFieldName);
 
 			if (createTimeFieldClass == Instant.class) {
 
-				BeanLogic.setProperty (
+				PropertyUtils.setProperty (
 					object,
 					createTimeFieldName,
 					transaction.now ());
 
 			} else if (createTimeFieldClass == Date.class) {
 
-				BeanLogic.setProperty (
+				PropertyUtils.setProperty (
 					object,
 					createTimeFieldName,
 					instantToDateNullSafe (
@@ -300,7 +300,7 @@ class ObjectCreateAction<
 
 		if (createUserFieldName != null) {
 
-			BeanLogic.setProperty (
+			PropertyUtils.setProperty (
 				object,
 				createUserFieldName,
 				userConsoleLogic.userRequired ());

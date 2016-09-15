@@ -1,12 +1,19 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableSet;
@@ -20,42 +27,44 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.TimeFormatter;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
 import wbs.platform.queue.logic.DummyQueueCache;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.user.console.UserConsoleLogic;
+import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("queueListActivePart")
 public
 class QueueListActivePart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	DummyQueueCache dummyQueueCache;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<QueueSubjectSorter> queueSubjectSorterProvider;
+	@PrototypeDependency
+	Provider <QueueSubjectSorter> queueSubjectSorterProvider;
 
 	// state
 
-	List<QueueInfo> queueInfos;
+	List <QueueInfo> queueInfos;
 
 	// details
 
@@ -123,8 +132,7 @@ class QueueListActivePart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlTableOpenList ();
 
 		ConsoleContextType queueContextType =
 			consoleManager.contextType (
@@ -155,35 +163,31 @@ class QueueListActivePart
 			QueueRec queue =
 				queueInfo.queue ();
 
-			printFormat (
-				"<tr",
-				" class=\"magic-table-row\"",
+			htmlTableRowOpen (
+				htmlClassAttribute (
+					"magic-table-row"),
+				htmlDataAttribute (
+					"target-href",
+					requestContext.resolveContextUrl (
+						stringFormat (
+							"%s",
+							queueContext.pathPrefix (),
+							"/%u",
+							queue.getId ()))));
 
-				" data-target-href=\"%h\"",
-				requestContext.resolveContextUrl (
-					stringFormat (
-						"%s",
-						queueContext.pathPrefix (),
-						"/%u",
-						queue.getId ())),
-
-				">\n");
-
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				objectManager.objectPath (
 					objectManager.getParent (
 						queue)));
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				queue.getCode ());
 
 			// available
 
-			printFormat (
-				"<td>%h</td>\n",
-				queueInfo.availableItems ());
+			htmlTableCellWrite (
+				integerToDecimalString (
+					queueInfo.availableItems ()));
 
 			printFormat (
 				"<td>%h</td>\n",
@@ -195,9 +199,9 @@ class QueueListActivePart
 
 			// claimed
 
-			printFormat (
-				"<td>%h</td>\n",
-				queueInfo.claimedItems ());
+			htmlTableCellWrite (
+				integerToDecimalString (
+					queueInfo.claimedItems ()));
 
 			printFormat (
 				"<td>%h</td>\n",
@@ -209,9 +213,9 @@ class QueueListActivePart
 
 			// preferred
 
-			printFormat (
-				"<td>%h</td>\n",
-				queueInfo.totalUnavailableItems ());
+			htmlTableCellWrite (
+				integerToDecimalString (
+					queueInfo.totalUnavailableItems ()));
 
 			printFormat (
 				"<td>%h</td>\n",
@@ -223,9 +227,9 @@ class QueueListActivePart
 
 			// waiting
 
-			printFormat (
-				"<td>%h</td>\n",
-				queueInfo.waitingItems ());
+			htmlTableCellWrite (
+				integerToDecimalString (
+					queueInfo.waitingItems ()));
 
 			printFormat (
 				"<td>%h</td>\n",
@@ -237,9 +241,9 @@ class QueueListActivePart
 
 			// total
 
-			printFormat (
-				"<td>%h</td>\n",
-				queueInfo.totalItems ());
+			htmlTableCellWrite (
+				integerToDecimalString (
+					queueInfo.totalItems ()));
 
 			printFormat (
 				"<td>%h</td>\n",
@@ -249,13 +253,11 @@ class QueueListActivePart
 						transaction.now ())
 					: "-");
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

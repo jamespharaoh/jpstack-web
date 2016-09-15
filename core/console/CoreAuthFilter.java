@@ -1,12 +1,12 @@
 package wbs.platform.core.console;
 
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.framework.utils.etc.OptionalUtils.optionalValueNotEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringInSafe;
-import static wbs.framework.utils.etc.TimeUtils.earlierThan;
-import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalValueNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringInSafe;
+import static wbs.utils.time.TimeUtils.earlierThan;
+import static wbs.utils.time.TimeUtils.millisToInstant;
 
 import java.io.IOException;
 import java.util.HashMap;

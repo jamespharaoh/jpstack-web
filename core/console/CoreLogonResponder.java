@@ -1,11 +1,11 @@
 package wbs.platform.core.console;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionDoesNotHaveTwoElements;
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
-import static wbs.framework.utils.etc.CollectionUtils.listItemAtIndexRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
+import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveTwoElements;
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.string.StringUtils.stringSplitFullStop;
 
 import java.util.List;
 import java.util.Set;

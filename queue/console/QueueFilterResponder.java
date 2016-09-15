@@ -1,11 +1,9 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.joinWithNewline;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.joinWithNewline;
 
 import java.io.IOException;
-
-import javax.inject.Inject;
 
 import lombok.Cleanup;
 
@@ -13,29 +11,30 @@ import org.joda.time.Instant;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.utils.TimeFormatter;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
+import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("queueFilterResponder")
 public
 class QueueFilterResponder
 	implements Responder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// implementation

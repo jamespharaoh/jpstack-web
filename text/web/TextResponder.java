@@ -1,10 +1,9 @@
 package wbs.platform.text.web;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.PrintWriter;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
@@ -12,6 +11,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 
@@ -22,10 +22,10 @@ import wbs.framework.web.Responder;
 public
 class TextResponder
 	implements
-		Provider<Responder>,
+		Provider <Responder>,
 		Responder {
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	@Getter @Setter

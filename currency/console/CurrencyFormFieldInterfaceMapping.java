@@ -1,10 +1,10 @@
 package wbs.platform.currency.console;
 
-import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.successResult;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.errorResult;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
 

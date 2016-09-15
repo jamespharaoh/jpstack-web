@@ -84,7 +84,7 @@ class ObjectEventsPart
 	public
 	void renderHtmlBodyContent () {
 
-		eventConsoleLogic.renderEventsTable (
+		eventConsoleLogic.writeEventsTable (
 			formatWriter,
 			events);
 

@@ -1,6 +1,6 @@
 package wbs.platform.lock.logic;
 
-import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 
 import java.util.Arrays;
 

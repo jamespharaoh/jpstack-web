@@ -1,17 +1,16 @@
 package wbs.platform.affiliate.logic;
 
-import static wbs.framework.utils.etc.Misc.doesNotContain;
+import static wbs.utils.etc.Misc.doesNotContain;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
 import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -46,7 +45,7 @@ class AffiliateHooks
 
 	// lifecycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 

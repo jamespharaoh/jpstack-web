@@ -1,14 +1,13 @@
 package wbs.platform.object.summary;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-
-import javax.inject.Inject;
+import static wbs.utils.etc.Misc.isNotNull;
 
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
@@ -16,39 +15,40 @@ import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.platform.scaffold.model.RootObjectHelper;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSummaryFieldsPart")
 public
-class ObjectSummaryFieldsPart<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectSummaryFieldsPart <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 >
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	RootObjectHelper rootHelper;
 
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
 	FormFieldSet formFieldSet;
 
 	@Getter @Setter
-	FieldsProvider<ObjectType,ParentType> formFieldsProvider;
+	FieldsProvider <ObjectType, ParentType> formFieldsProvider;
 
 	// state
 

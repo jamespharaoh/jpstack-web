@@ -1,17 +1,16 @@
 package wbs.platform.object.search;
 
-import static wbs.framework.utils.etc.Misc.getMethodRequired;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.methodInvoke;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.getMethodRequired;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.methodInvoke;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
@@ -24,6 +23,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
@@ -35,11 +35,13 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.RedirectResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchAction")
@@ -47,35 +49,35 @@ public
 class ObjectSearchPostAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic fieldsLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<RedirectResponder> redirectResponderProvider;
+	@PrototypeDependency
+	Provider <RedirectResponder> redirectResponderProvider;
 
-	@Inject
-	Provider<ObjectSearchCsvResponder> objectSearchCsvResponderProvider;
+	@PrototypeDependency
+	Provider <ObjectSearchCsvResponder> objectSearchCsvResponderProvider;
 
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper <?> consoleHelper;
 
 	@Getter @Setter
-	Class<?> searchClass;
+	Class <?> searchClass;
 
 	@Getter @Setter
 	String searchDaoMethodName;
@@ -228,7 +230,7 @@ class ObjectSearchPostAction
 				throw new RuntimeException ();
 			}
 
-			BeanLogic.setProperty (
+			PropertyUtils.setProperty (
 				search,
 				parentIdName,
 				parentId);

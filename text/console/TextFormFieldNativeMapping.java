@@ -1,38 +1,39 @@
 package wbs.platform.text.console;
 
-import javax.inject.Inject;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import com.google.common.base.Optional;
-
 import wbs.console.forms.FormFieldNativeMapping;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("textFormFieldNativeMapping")
 public
-class TextFormFieldNativeMapping<Container>
-	implements FormFieldNativeMapping<Container,String,TextRec> {
+class TextFormFieldNativeMapping <Container>
+	implements FormFieldNativeMapping <Container, String, TextRec> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// implementation
 
 	@Override
 	public
-	Optional<TextRec> genericToNative (
+	Optional <TextRec> genericToNative (
 			@NonNull Container container,
-			@NonNull Optional<String> genericValue) {
+			@NonNull Optional <String> genericValue) {
 
 		if (! genericValue.isPresent ()) {
-			return Optional.<TextRec>absent ();
+			return optionalAbsent ();
 		}
 
 		return Optional.of (

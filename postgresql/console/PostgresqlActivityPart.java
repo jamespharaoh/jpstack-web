@@ -1,14 +1,13 @@
 package wbs.platform.postgresql.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.postgresql.model.PostgresqlStatActivityObjectHelper;
 import wbs.platform.postgresql.model.PostgresqlStatActivityRec;
 
@@ -17,12 +16,18 @@ public
 class PostgresqlActivityPart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	PostgresqlStatActivityObjectHelper postgresqlStatActivityHelper;
 
-	List<PostgresqlStatActivityRec> activeStatActivities;
+	// state
 
-	List<PostgresqlStatActivityRec> idleStatActivities;
+	List <PostgresqlStatActivityRec> activeStatActivities;
+
+	List <PostgresqlStatActivityRec> idleStatActivities;
+
+	// implementation
 
 	@Override
 	public

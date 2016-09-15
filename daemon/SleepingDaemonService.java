@@ -8,7 +8,7 @@ import org.joda.time.Duration;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
-import wbs.framework.utils.RandomLogic;
+import wbs.utils.random.RandomLogic;
 
 public abstract
 class SleepingDaemonService

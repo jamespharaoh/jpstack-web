@@ -1,13 +1,13 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
-
-import javax.inject.Inject;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 
 import lombok.Cleanup;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -22,19 +22,19 @@ class QueueUnclaimAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	QueueItemConsoleHelper queueItemHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueConsoleLogic queueConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// details

@@ -7,7 +7,7 @@ import wbs.console.module.ConsoleModuleData;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @DataClass ("where-not-deleted")
@@ -25,7 +25,7 @@ class WhereNotDeletedCriteriaSpec
 
 		Boolean deleted =
 			(Boolean)
-			BeanLogic.getProperty (
+			PropertyUtils.getProperty (
 				object,
 				"deleted");
 

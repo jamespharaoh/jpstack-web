@@ -1,19 +1,19 @@
 package wbs.platform.send;
 
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
 
 import org.apache.log4j.Logger;
 import org.joda.time.Duration;
 
-import lombok.Cleanup;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
@@ -21,16 +21,16 @@ import wbs.platform.daemon.SleepingDaemonService;
 
 @Accessors (fluent = true)
 public abstract
-class GenericSendDaemon<
-	Service extends Record<Service>,
-	Job extends Record<Job>,
-	Item extends Record<Item>
+class GenericSendDaemon <
+	Service extends Record <Service>,
+	Job extends Record <Job>,
+	Item extends Record <Item>
 >
 	extends SleepingDaemonService {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
 	// hooks

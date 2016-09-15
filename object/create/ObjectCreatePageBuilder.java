@@ -1,13 +1,12 @@
 package wbs.platform.object.create;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
@@ -35,6 +34,8 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 import wbs.framework.web.Action;
@@ -48,33 +49,35 @@ class ObjectCreatePageBuilder <
 	ParentType extends Record <ParentType>
 > {
 
-	// dependences
+	// singleton dependences
 
-	@Inject
+	@SingletonDependency
 	ComponentManager componentManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleFile> consoleFile;
+	@PrototypeDependency
+	Provider <ConsoleFile> consoleFileProvider;
 
-	@Inject
-	Provider<ConsoleContextTab> contextTab;
+	@PrototypeDependency
+	Provider <ConsoleContextTab> contextTabProvider;
 
-	@Inject
-	Provider<ObjectCreateAction<ObjectType,ParentType>> objectCreateAction;
+	@PrototypeDependency
+	Provider <ObjectCreateAction <ObjectType, ParentType>>
+	objectCreateActionProvider;
 
-	@Inject
-	Provider<ObjectCreatePart<ObjectType,ParentType>> objectCreatePart;
+	@PrototypeDependency
+	Provider <ObjectCreatePart <ObjectType, ParentType>>
+	objectCreatePartProvider;
 
-	@Inject
-	Provider<TabContextResponder> tabContextResponder;
+	@PrototypeDependency
+	Provider <TabContextResponder> tabContextResponderProvider;
 
 	// builder
 
@@ -141,7 +144,7 @@ class ObjectCreatePageBuilder <
 
 			"end",
 
-			contextTab.get ()
+			contextTabProvider.get ()
 
 				.name (
 					tabName)
@@ -169,7 +172,7 @@ class ObjectCreatePageBuilder <
 			public
 			Responder handle () {
 
-				return objectCreateAction.get ()
+				return objectCreateActionProvider.get ()
 
 					.consoleHelper (
 						consoleHelper)
@@ -214,7 +217,7 @@ class ObjectCreatePageBuilder <
 
 			localFile,
 
-			consoleFile.get ()
+			consoleFileProvider.get ()
 
 				.getResponderName (
 					responderName)
@@ -238,7 +241,7 @@ class ObjectCreatePageBuilder <
 			public
 			PagePart get () {
 
-				return objectCreatePart.get ()
+				return objectCreatePartProvider.get ()
 
 					.consoleHelper (
 						consoleHelper)
@@ -263,7 +266,7 @@ class ObjectCreatePageBuilder <
 
 			responderName,
 
-			tabContextResponder.get ()
+			tabContextResponderProvider.get ()
 
 				.tab (
 					tabName)

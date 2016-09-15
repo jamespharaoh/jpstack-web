@@ -1,9 +1,9 @@
 package wbs.platform.object.settings;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,6 +12,7 @@ import java.util.List;
 import javax.inject.Provider;
 
 import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
@@ -39,6 +40,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 import wbs.framework.web.Action;
@@ -57,19 +59,17 @@ class ObjectSettingsPageBuilder <
 	@SingletonDependency
 	ComponentManager componentManager;
 
+	@WeakSingletonDependency
+	ConsoleHelperRegistry consoleHelperRegistry;
+
 	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
+	@WeakSingletonDependency
+	ConsoleManager consoleManager;
+
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
-
-	// indirect dependencies
-
-	@SingletonDependency
-	Provider <ConsoleHelperRegistry> consoleHelperRegistry;
-
-	@SingletonDependency
-	Provider <ConsoleManager> consoleManager;
 
 	// prototype dependencies
 
@@ -191,12 +191,12 @@ class ObjectSettingsPageBuilder <
 						objectSettingsActionProvider.get ()
 
 						.detailsResponder (
-							consoleManager.get ().responder (
+							consoleManager.responder (
 								responderName,
 								true))
 
 						.accessDeniedResponder (
-							consoleManager.get ().responder (
+							consoleManager.responder (
 								responderName,
 								true))
 
@@ -229,12 +229,12 @@ class ObjectSettingsPageBuilder <
 						objectSettingsActionProvider.get ()
 
 						.detailsResponder (
-							consoleManager.get ().responder (
+							consoleManager.responder (
 								responderName,
 								true))
 
 						.accessDeniedResponder (
-							consoleManager.get ().responder (
+							consoleManager.responder (
 								responderName,
 								true))
 
@@ -301,12 +301,12 @@ class ObjectSettingsPageBuilder <
 							consoleHelper)
 
 						.settingsResponder (
-							consoleManager.get ().responder (
+							consoleManager.responder (
 								responderName,
 								true))
 
 						.listResponder (
-							consoleManager.get ().responder (
+							consoleManager.responder (
 								stringFormat (
 									"%sListResponder",
 									container.newBeanNamePrefix ()),
@@ -410,8 +410,7 @@ class ObjectSettingsPageBuilder <
 		ConsoleHelper<ObjectType> consoleHelperTemp =
 			spec.objectName () != null
 				? (ConsoleHelper<ObjectType>)
-				consoleHelperRegistry.get ()
-					.findByObjectName (
+					consoleHelperRegistry.findByObjectName (
 						spec.objectName ())
 				: container.consoleHelper ();
 

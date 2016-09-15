@@ -1,6 +1,6 @@
 package wbs.platform.media.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.io.IOException;
 

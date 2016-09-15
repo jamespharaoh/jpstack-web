@@ -1,12 +1,10 @@
 package wbs.platform.object.settings;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalCast;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import javax.inject.Inject;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -14,6 +12,7 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
@@ -25,36 +24,37 @@ import wbs.console.html.ScriptRef;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.platform.scaffold.model.RootObjectHelper;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSettingsPart")
 public
-class ObjectSettingsPart<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectSettingsPart <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 >
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	RootObjectHelper rootHelper;
 
 	// properties
 
 	@Getter @Setter
-	ObjectLookup<ObjectType> objectLookup;
+	ObjectLookup <ObjectType> objectLookup;
 
 	@Getter @Setter
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
 	String editPrivKey;
@@ -69,11 +69,11 @@ class ObjectSettingsPart<
 	String removeLocalName;
 
 	@Getter @Setter
-	FieldsProvider<ObjectType,ParentType> formFieldsProvider;
+	FieldsProvider <ObjectType, ParentType> formFieldsProvider;
 
 	// state
 
-	Optional<UpdateResultSet> updateResultSet;
+	Optional <UpdateResultSet> updateResultSet;
 	ObjectType object;
 	ParentType parent;
 	boolean canEdit;

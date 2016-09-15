@@ -11,22 +11,22 @@ class QueueSubjectActionsPart
 	// dependencies
 
 	/*
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeConsoleHelper objectTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	PrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	QueueConsoleLogic queueConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	QueueItemConsoleHelper queueItemHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleHelper userHelper;
 	*/
 

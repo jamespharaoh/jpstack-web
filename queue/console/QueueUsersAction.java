@@ -1,19 +1,18 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 import lombok.Cleanup;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimRec;
@@ -29,22 +28,22 @@ class QueueUsersAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	QueueItemClaimObjectHelper queueItemClaimHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueConsoleLogic queueConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// details

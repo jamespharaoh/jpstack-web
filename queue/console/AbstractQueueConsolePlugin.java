@@ -1,11 +1,10 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Getter;
@@ -13,6 +12,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleManager;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.Responder;
 
 @Accessors (fluent = true)
@@ -20,12 +20,18 @@ public abstract
 class AbstractQueueConsolePlugin
 	implements QueueConsolePlugin {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
+	// properties
+
 	@Getter @Setter
-	List<String> queueTypeCodes =
-		new ArrayList<String> ();
+	List <String> queueTypeCodes =
+		new ArrayList<> ();
+
+	// implementation
 
 	protected
 	void queueTypeCode (

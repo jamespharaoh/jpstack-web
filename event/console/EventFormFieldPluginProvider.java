@@ -1,7 +1,7 @@
 package wbs.platform.event.console;
 
-import static wbs.framework.utils.etc.Misc.doesNotImplement;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
+import static wbs.utils.etc.Misc.doesNotImplement;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import javax.inject.Provider;
 

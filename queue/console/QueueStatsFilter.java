@@ -6,14 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueObjectHelper;
@@ -25,15 +24,15 @@ import wbs.platform.scaffold.model.SliceRec;
 public
 class QueueStatsFilter {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	QueueObjectHelper queueHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
 	// state

@@ -1,6 +1,6 @@
 package wbs.platform.rpc.core;
 
-import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.ArrayList;
 import java.util.Collection;

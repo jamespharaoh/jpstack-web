@@ -1,6 +1,6 @@
 package wbs.platform.php;
 
-import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;

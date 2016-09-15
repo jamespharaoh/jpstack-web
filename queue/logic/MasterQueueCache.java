@@ -1,22 +1,21 @@
 package wbs.platform.queue.logic;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNotNull;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
+import org.apache.commons.lang3.tuple.Pair;
+
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemState;
@@ -29,25 +28,27 @@ public
 class MasterQueueCache
 	implements QueueCache {
 
+	// TODO this is probably not needed with generic caching layer
+
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	QueueItemObjectHelper queueItemHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueSubjectObjectHelper queueSubjectHelper;
 
 	// state
 
-	Map<Pair<Long,Long>,QueueItemRec> queueItemsBySubjectAndIndex;
+	Map <Pair <Long, Long>, QueueItemRec> queueItemsBySubjectAndIndex;
 
-	List<QueueSubjectRec> queueSubjects;
+	List <QueueSubjectRec> queueSubjects;
 
-	Map<Long,List<QueueSubjectRec>> queueSubjectsByQueue;
+	Map <Long, List <QueueSubjectRec>> queueSubjectsByQueue;
 
 	// lifecycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void setup () {
 

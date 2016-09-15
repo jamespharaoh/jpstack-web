@@ -1,21 +1,21 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
-import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
-import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
-import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalEqualAndPresentWithClass;
-import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.framework.utils.etc.OptionalUtils.optionalNotEqualAndPresentWithClass;
-import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TimeUtils.earlierThan;
-import static wbs.framework.utils.etc.TimeUtils.laterThan;
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.EnumUtils.enumNotInSafe;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.lessThan;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalEqualAndPresentWithClass;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalNotEqualAndPresentWithClass;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.time.TimeUtils.earlierThan;
+import static wbs.utils.time.TimeUtils.laterThan;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,23 +27,26 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.joda.time.Duration;
-import org.joda.time.Instant;
 
 import lombok.Cleanup;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.priv.UserPrivCheckerBuilder;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
@@ -63,30 +66,30 @@ import wbs.platform.user.model.UserRec;
 public
 class QueueSubjectSorter {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ActivityManager activityManager;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	QueueObjectHelper queueHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
-	@Inject
+	@SingletonDependency
 	QueueManager queueManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<UserPrivCheckerBuilder> userPrivCheckerBuilderProvider;
+	@PrototypeDependency
+	Provider <UserPrivCheckerBuilder> userPrivCheckerBuilderProvider;
 
 	// inputs
 

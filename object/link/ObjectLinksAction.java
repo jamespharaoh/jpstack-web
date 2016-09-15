@@ -1,10 +1,10 @@
 package wbs.platform.object.link;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
-import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.Misc.doesNotContain;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.Misc.doesNotContain;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,25 +12,25 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.updatelog.logic.UpdateManager;
 import wbs.platform.user.console.UserConsoleLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectLinksAction")
@@ -38,24 +38,24 @@ public
 class ObjectLinksAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	UpdateManager updateManager;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// properties
@@ -124,7 +124,7 @@ class ObjectLinksAction
 		@SuppressWarnings ("unchecked")
 		Set<Record<?>> contextLinks =
 			(Set<Record<?>>)
-			BeanLogic.getProperty (
+			PropertyUtils.getProperty (
 				contextObject,
 				contextLinkField);
 
@@ -175,7 +175,7 @@ class ObjectLinksAction
 			@SuppressWarnings ("unchecked")
 			Set<Record<?>> targetLinks =
 				(Set<Record<?>>)
-				BeanLogic.getProperty (
+				PropertyUtils.getProperty (
 					targetObject,
 					targetLinkField);
 

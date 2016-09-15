@@ -1,9 +1,9 @@
 package wbs.platform.affiliate.fixture;
 
-import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
+import static wbs.utils.string.StringUtils.camelToUnderscore;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.sql.SQLException;
 

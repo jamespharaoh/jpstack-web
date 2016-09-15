@@ -1,6 +1,6 @@
 package wbs.platform.object.criteria;
 
-import static wbs.framework.utils.etc.StringUtils.stringInSafe;
+import static wbs.utils.string.StringUtils.stringInSafe;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @DataClass ("where-in")
@@ -44,7 +44,7 @@ class WhereInCriteriaSpec
 			Record<?> object) {
 
 		Object fieldValue =
-			BeanLogic.getProperty (
+			PropertyUtils.getProperty (
 				object,
 				fieldName);
 

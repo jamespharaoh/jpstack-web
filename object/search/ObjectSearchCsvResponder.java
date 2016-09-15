@@ -1,17 +1,15 @@
 package wbs.platform.object.search;
 
-import static wbs.framework.utils.etc.Misc.getMethodRequired;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.methodInvoke;
-import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.getMethodRequired;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.methodInvoke;
+import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.string.StringUtils.camelToHyphen;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -20,17 +18,19 @@ import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
-import wbs.framework.utils.formatwriter.FormatWriter;
-import wbs.framework.utils.formatwriter.WriterFormatWriter;
+import wbs.utils.string.FormatWriter;
+import wbs.utils.string.WriterFormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchCsvResponder")
@@ -38,24 +38,24 @@ public
 class ObjectSearchCsvResponder
 	extends ConsoleResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper <?> consoleHelper;
 
 	@Getter @Setter
-	List<FormFieldSet> formFieldSets;
+	List <FormFieldSet> formFieldSets;
 
 	@Getter @Setter
 	String resultsDaoMethodName;
@@ -68,7 +68,7 @@ class ObjectSearchCsvResponder
 	FormatWriter formatWriter;
 
 	Object searchObject;
-	List<Long> objectIds;
+	List <Long> objectIds;
 
 	// implementation
 

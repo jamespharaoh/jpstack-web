@@ -1,8 +1,8 @@
 package wbs.platform.status.console;
 
-import static wbs.framework.utils.etc.ConcurrentUtils.futureGet;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.thread.ConcurrentUtils.futureGet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -10,8 +10,6 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -22,6 +20,7 @@ import org.joda.time.Instant;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.model.RootRec;
@@ -35,24 +34,24 @@ public
 class StatusUpdateResponder
 	extends ConsoleResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	RootConsoleHelper rootHelper;
 
-	@Inject
+	@SingletonDependency
 	StatusLineManager statusLineManager;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// state

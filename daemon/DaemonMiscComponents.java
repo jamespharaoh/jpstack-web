@@ -4,8 +4,8 @@ import javax.inject.Provider;
 
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.UninitializedDependency;
-import wbs.framework.utils.ThreadManager;
-import wbs.framework.utils.ThreadManagerImplementation;
+import wbs.utils.thread.ThreadManager;
+import wbs.utils.thread.ThreadManagerImplementation;
 
 @SingletonComponent ("daemonMiscComponents")
 public

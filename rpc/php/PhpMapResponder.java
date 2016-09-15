@@ -1,6 +1,6 @@
 package wbs.platform.rpc.php;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
 import lombok.Getter;
@@ -17,6 +16,7 @@ import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.php.PhpEntity;
@@ -31,15 +31,21 @@ public
 class PhpMapResponder
 	implements Responder {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	RequestContext requestContext;
 
+	// properties
+
 	@Getter @Setter
-	Map<?,?> map;
+	Map <?,?> map;
 
 	@Getter @Setter
 	int status =
 		HttpServletResponse.SC_OK;
+
+	// implementation
 
 	@Override
 	public

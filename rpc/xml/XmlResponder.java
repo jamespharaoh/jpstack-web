@@ -1,23 +1,20 @@
 package wbs.platform.rpc.xml;
 
-import static wbs.framework.utils.etc.Misc.toHex;
+import static wbs.utils.etc.Misc.toHex;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-import nu.xom.Document;
-import nu.xom.Element;
-import nu.xom.Serializer;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.platform.rpc.core.RpcElem;
@@ -26,6 +23,10 @@ import wbs.platform.rpc.core.RpcPrimitive;
 import wbs.platform.rpc.core.RpcStructure;
 import wbs.platform.rpc.core.RpcType;
 
+import nu.xom.Document;
+import nu.xom.Element;
+import nu.xom.Serializer;
+
 @Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("xmlResponder")
@@ -33,7 +34,7 @@ public
 class XmlResponder
 	implements Responder {
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	@Getter @Setter

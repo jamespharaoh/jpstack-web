@@ -1,12 +1,11 @@
 package wbs.platform.updatelog.logic;
 
-import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
@@ -16,13 +15,14 @@ import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.updatelog.model.UpdateLogObjectHelper;
 import wbs.platform.updatelog.model.UpdateLogRec;
 
 /**
- * Provides an efficient signalling system which works using the database.
+s * Provides an efficient signalling system which works using the database.
  * Signals are categorised according to a name, and a reference integer (eg a
  * hash code). To cause a signal use signalUpdate (...). To receive signals
  * create a Watcher using makeWatcher (...) then call isUpdated (...) to check
@@ -45,10 +45,10 @@ import wbs.platform.updatelog.model.UpdateLogRec;
 public
 class UpdateManager {
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	UpdateLogObjectHelper updateLogHelper;
 
 	@Getter @Setter

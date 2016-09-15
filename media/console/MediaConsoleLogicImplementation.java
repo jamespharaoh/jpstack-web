@@ -1,9 +1,12 @@
 package wbs.platform.media.console;
 
-import static wbs.framework.utils.etc.StringUtils.bytesToString;
-import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.string.StringUtils.bytesToString;
+import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringIsEmpty;
+import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 
 import java.util.Map;
 
@@ -17,6 +20,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeRec;
+import wbs.utils.string.FormatWriter;
 
 @SingletonComponent ("mediaConsoleLogic")
 public
@@ -71,12 +75,10 @@ class MediaConsoleLogicImplementation
 
 	@Override
 	public
-	String mediaContent (
-			MediaRec media,
-			String rotate) {
-
-		if (media == null)
-			return "(none)";
+	void writeMediaContent (
+			@NonNull FormatWriter formatWriter,
+			@NonNull MediaRec media,
+			@NonNull String rotate) {
 
 		String mimeType =
 			media.getMediaType ().getMimeType ();
@@ -86,13 +88,11 @@ class MediaConsoleLogicImplementation
 				mimeType)
 		) {
 
-			return
-
-				stringFormat (
-					"%h",
-					bytesToString (
-						media.getContent ().getData (),
-						media.getEncoding ()));
+			formatWriter.writeFormat (
+				"%h",
+				bytesToString (
+					media.getContent ().getData (),
+					media.getEncoding ()));
 
 		} else if (
 			mediaLogic.isVideo (
@@ -103,60 +103,52 @@ class MediaConsoleLogicImplementation
 				requestContext.requestIntegerRequired (
 					PLAYER_COUNT_KEY);
 
-			StringBuilder stringBuilder =
-				new StringBuilder ();
-
 			if (playerCount == null) {
 
-				stringBuilder.append (
-					stringFormat (
-						"<script",
-						" src=\"/flowplayer-3.1.2.min.js\"",
-						"></script>\n"));
+				formatWriter.writeLineFormat (
+					"<script",
+					" src=\"/flowplayer-3.1.2.min.js\"",
+					"></script>");
 
 				playerCount =
 					0l;
 
 			}
 
-			stringBuilder.append (
+			formatWriter.writeLineFormat (
+				"<a",
+
+				" href=\"%h\"",
 				stringFormat (
-					"<a",
+					"%s",
+					mediaHelper.getDefaultContextPath (media),
+					"/media.video"),
 
-					" href=\"%h\"",
-					stringFormat (
-						"%s",
-						mediaHelper.getDefaultContextPath (media),
-						"/media.video"),
+				" style=\"%h\"",
+				joinWithSemicolonAndSpace (
+					"display: block",
+					"width: 300px",
+					"height: 225px;"),
 
-					" style=\"%h\"",
-					joinWithSemicolonAndSpace (
-						"display: block",
-						"width: 300px",
-						"height: 225px;"),
+				" id=\"player%d\"",
+				playerCount,
 
-					" id=\"player%d\"",
-					playerCount,
+				"></a>");
 
-					"></a>\n"));
-
-			stringBuilder.append (
+			formatWriter.writeLineFormat (
+				"<script",
+				" type=\"text/javascript\"",
+				">%s</script>\n",
 				stringFormat (
-					"<script",
-					" type=\"text/javascript\"",
-					">%s</script>\n",
+					"flowplayer ('%j', '%j', {});\n",
 					stringFormat (
-						"flowplayer ('%j', '%j', {});\n",
-						stringFormat (
-							"player%d'",
-							playerCount),
-						"/flowplayer-3.1.2.swf")));
+						"player%d'",
+						playerCount),
+					"/flowplayer-3.1.2.swf"));
 
 			requestContext.request (
 				PLAYER_COUNT_KEY,
 				playerCount + 1);
-
-			return stringBuilder.toString ();
 
 		} else if (
 			mediaLogic.isAudio (mimeType)
@@ -166,74 +158,65 @@ class MediaConsoleLogicImplementation
 				requestContext.requestIntegerRequired (
 					PLAYER_COUNT_KEY);
 
-			StringBuilder stringBuilder =
-				new StringBuilder ();
-
 			if (playerCount == null) {
 
-				stringBuilder.append (
-					stringFormat (
-						"<script",
-						" src=\"/flowplayer-3.1.2.min.js\"",
-						"></script>\n"));
+				formatWriter.writeLineFormat (
+					"<script",
+					" src=\"/flowplayer-3.1.2.min.js\"",
+					"></script>\n");
 
 				playerCount = 0l;
 
 			}
 
-			stringBuilder.append (
+			formatWriter.writeLineFormat (
+				"<a",
+
+				" href=\"%h\"",
 				stringFormat (
+					"%s",
+					mediaHelper.getDefaultContextPath (media),
+					"/media.audio.mp3"),
 
-					"<a",
+				" style=\"%h\"",
+				joinWithSemicolonAndSpace (
+					"display: block",
+					"width: 300px",
+					"height: 60px;"),
 
-					" href=\"%h\"",
-					stringFormat (
-						"%s",
-						mediaHelper.getDefaultContextPath (media),
-						"/media.audio.mp3"),
-
-					" style=\"%h\"",
-					joinWithSemicolonAndSpace (
-						"display: block",
-						"width: 300px",
-						"height: 60px;"),
-
-					" id=\"player%d\"",
-						playerCount,
-
-					"></a>\n"));
-
-			stringBuilder.append (
-				stringFormat (
-					"<script type=\"text/javascript\">\n",
-					"  flowplayer ('player%d', '/flowplayer-3.1.2.swf', {\n",
+				" id=\"player%d\"",
 					playerCount,
-					"    plugins: {\n",
-					"      audio: {\n",
-					"        url: '/flowplayer.audio-3.1.2.swf'\n",
-					"      },\n",
-					"      controls: {\n",
-					"        autoHide: false,\n",
-					"      },\n",
-					"    },\n",
-					"    clip: {\n",
-					"      type: 'audio',\n",
-					"    }\n,",
-					"  });\n",
-					"</script>\n"));
+
+				"></a>");
+
+			formatWriter.writeFormat (
+				"<script type=\"text/javascript\">\n",
+				"  flowplayer ('player%d', '/flowplayer-3.1.2.swf', {\n",
+				playerCount,
+				"    plugins: {\n",
+				"      audio: {\n",
+				"        url: '/flowplayer.audio-3.1.2.swf'\n",
+				"      },\n",
+				"      controls: {\n",
+				"        autoHide: false,\n",
+				"      },\n",
+				"    },\n",
+				"    clip: {\n",
+				"      type: 'audio',\n",
+				"    }\n,",
+				"  });\n",
+				"</script>\n");
 
 			requestContext.request (
 				PLAYER_COUNT_KEY,
 				playerCount + 1);
-
-			return stringBuilder.toString ();
 
 		} else if (
 			mediaLogic.isImage (
 				mimeType)
 		) {
 
-			return stringFormat (
+			formatWriter.writeLineFormat (
 				"<img",
 
 				" src=\"%h\"",
@@ -241,9 +224,11 @@ class MediaConsoleLogicImplementation
 					"%s",
 					mediaHelper.getDefaultContextPath (media),
 					"/media.image",
-					rotate != null
-						? "?rotate=" + rotate
-						: ""),
+					ifThenElse (
+						stringIsEmpty (
+							rotate),
+						() -> "?rotate=" + rotate,
+						() -> "")),
 
 				" alt=\"%h\"",
 				media.getFilename (),
@@ -252,24 +237,11 @@ class MediaConsoleLogicImplementation
 
 		} else {
 
-			return
-
-				stringFormat (
-					"(unable to display %h)",
-					mimeType);
+			formatWriter.writeLineFormat (
+				"(unable to display %h)",
+				mimeType);
 
 		}
-
-	}
-
-	@Override
-	public
-	String mediaContent (
-			MediaRec media) {
-
-		return mediaContent (
-			media,
-			null);
 
 	}
 
@@ -306,7 +278,8 @@ class MediaConsoleLogicImplementation
 
 	@Override
 	public
-	String mediaContentScaled (
+	void writeMediaContentScaled (
+			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media,
 			@NonNull Integer width,
 			@NonNull Integer height) {
@@ -316,70 +289,70 @@ class MediaConsoleLogicImplementation
 
 		if (! mediaLogic.isImage (media)) {
 
-			return stringFormat (
+			formatWriter.writeLineFormat (
 				"(unable to display %s)",
 				mediaType.getMimeType ());
 
-		}
+		} else {
 
-		return stringFormat (
-			"<img src=\"%h\">",
-			mediaUrlScaled (
-				media,
-				width,
-				height));
+			formatWriter.writeLineFormat (
+				"<img src=\"%h\">",
+				mediaUrlScaled (
+					media,
+					width,
+					height));
+
+		}
 
 	}
 
 	@Override
 	public
-	String mediaThumb100 (
-			MediaRec media,
-			String rotate) {
+	void writeMediaThumb100 (
+			@NonNull FormatWriter formatWriter,
+			@NonNull MediaRec media,
+			@NonNull String rotate) {
 
 		if (
 			mediaLogic.isText (
 				media)
 		) {
 
-			return
-
-				stringFormat (
-					"%h",
-					bytesToString (
-						media.getContent ().getData (),
-						media.getEncoding ()));
+			formatWriter.writeFormat (
+				"%h",
+				bytesToString (
+					media.getContent ().getData (),
+					media.getEncoding ()));
 
 		} else if (
 			media.getThumb100Content () == null
 		) {
 
-			return
-
-				stringFormat (
-					"[%h]",
-					media.getMediaType ().getMimeType ());
+			formatWriter.writeFormat (
+				"[%h]",
+				media.getMediaType ().getMimeType ());
 
 		} else {
 
-			return
+			formatWriter.writeFormat (
+				"<img",
 
+				" src=\"%h\"",
 				stringFormat (
-					"<img",
+					"%s",
+					mediaHelper.getDefaultContextPath (
+						media),
+					"/media.thumb100",
+					ifThenElse (
+						stringIsNotEmpty (
+							rotate),
+						() -> "?rotate=" + rotate,
+						() -> "")),
 
-					" src=\"%h\"",
-					stringFormat (
-						"%s",
-						mediaHelper.getDefaultContextPath (media),
-						"/media.thumb100",
-						rotate != null
-							? "?rotate=" + rotate
-							: ""),
+				" alt=\"%h\"",
+				media.getFilename (),
 
-					" alt=\"%h\"",
-					media.getFilename (),
-
-					">\n");
+				">");
 
 		}
 
@@ -387,19 +360,9 @@ class MediaConsoleLogicImplementation
 
 	@Override
 	public
-	String mediaThumb100 (
-			MediaRec media) {
-
-		return mediaThumb100 (
-			media,
-			null);
-
-	}
-
-	@Override
-	public
-	String mediaThumb100OrText (
-			MediaRec media) {
+	void writeMediaThumb100OrText (
+			@NonNull FormatWriter formatWriter,
+			@NonNull MediaRec media) {
 
 		if (
 			stringEqualSafe (
@@ -407,18 +370,18 @@ class MediaConsoleLogicImplementation
 				"text/plain")
 		) {
 
-			return
-
-				stringFormat (
-					"%h",
-					bytesToString (
-						media.getContent ().getData (),
-						media.getEncoding ()));
+			formatWriter.writeLineFormat (
+				"%h",
+				bytesToString (
+					media.getContent ().getData (),
+					media.getEncoding ()));
 
 		} else {
 
-			return mediaThumb100 (
-				media);
+			writeMediaThumb100 (
+				formatWriter,
+				media,
+				"");
 
 		}
 
@@ -426,20 +389,19 @@ class MediaConsoleLogicImplementation
 
 	@Override
 	public
-	String mediaThumb100Rot90 (
-			MediaRec media) {
+	void writeMediaThumb100Rot90 (
+			@NonNull FormatWriter formatWriter,
+			@NonNull MediaRec media) {
 
 		if (media.getThumb100Content () == null) {
 
-			return stringFormat (
-
+			formatWriter.writeLineFormat (
 				"[%h]",
 				media.getMediaType ().getMimeType ());
 
 		} else {
 
-			return stringFormat (
-
+			formatWriter.writeLineFormat (
 				"<img",
 
 				" src=\"%h\"",
@@ -459,19 +421,19 @@ class MediaConsoleLogicImplementation
 
 	@Override
 	public
-	String mediaThumb32Url (
-			MediaRec media) {
+	void writeMediaThumb32 (
+			@NonNull FormatWriter formatWriter,
+			@NonNull MediaRec media) {
 
 		if (media.getThumb32Content () == null) {
 
-			return stringFormat (
+			formatWriter.writeLineFormat (
 				"[%h]",
 				media.getMediaType ().getMimeType ());
 
 		} else {
 
-			return stringFormat (
-
+			formatWriter.writeLineFormat (
 				"<img",
 
 				" src=\"%h\"",
@@ -491,18 +453,9 @@ class MediaConsoleLogicImplementation
 
 	@Override
 	public
-	String mediaThumb32 (
-			MediaRec media) {
-
-		return mediaThumb32Url (
-			media);
-
-	}
-
-	@Override
-	public
-	String mediaThumb32OrText (
-			MediaRec media) {
+	void writeMediaThumb32OrText (
+			@NonNull FormatWriter formatWriter,
+			@NonNull MediaRec media) {
 
 		if (
 			stringEqualSafe (
@@ -510,7 +463,7 @@ class MediaConsoleLogicImplementation
 				"text/plain")
 		) {
 
-			return stringFormat (
+			formatWriter.writeFormat (
 				"%h",
 				bytesToString (
 					media.getContent ().getData (),
@@ -518,7 +471,8 @@ class MediaConsoleLogicImplementation
 
 		} else {
 
-			return mediaThumb32 (
+			writeMediaThumb32 (
+				formatWriter,
 				media);
 
 		}

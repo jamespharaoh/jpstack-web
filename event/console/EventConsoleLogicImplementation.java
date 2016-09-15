@@ -1,9 +1,10 @@
 package wbs.platform.event.console;
 
-import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TimeUtils.instantToDateNullSafe;
-import static wbs.framework.utils.etc.TimeUtils.millisToInstant;
+import static wbs.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.time.TimeUtils.instantToDateNullSafe;
+import static wbs.utils.time.TimeUtils.millisToInstant;
+import static wbs.utils.web.HtmlUtils.htmlLinkWriteHtml;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,8 +28,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.Html;
-import wbs.framework.utils.formatwriter.FormatWriter;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.event.model.EventLinkRec;
 import wbs.platform.event.model.EventRec;
@@ -37,6 +36,9 @@ import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.user.console.UserConsoleLogic;
+import wbs.utils.string.FormatWriter;
+import wbs.utils.string.StringFormatWriter;
+import wbs.utils.web.HtmlUtils;
 
 @Log4j
 @SingletonComponent ("eventConsoleLogic")
@@ -135,14 +137,15 @@ class EventConsoleLogicImplementation
 
 	@Override
 	public
-	String eventText (
-			EventRec event) {
+	void writeEventHtml (
+			@NonNull FormatWriter formatWriter,
+			@NonNull EventRec event) {
 
 		EventTypeRec eventType =
 			event.getEventType ();
 
 		String text =
-			Html.encode (
+			HtmlUtils.htmlEncode (
 				eventType.getDescription ());
 
 		// TODO this is not correct and will not handle text matching "%#" in
@@ -164,7 +167,7 @@ class EventConsoleLogicImplementation
 				text =
 					text.replaceAll (
 						"%" + eventLink.getIndex (),
-						Html.encode (
+						HtmlUtils.htmlEncode (
 							eventLink.getRefId ().toString ()));
 
 			} else if (
@@ -207,9 +210,15 @@ class EventConsoleLogicImplementation
 
 				// escape replacement text, what a mess ;-)
 
+				StringFormatWriter objectFormatWriter =
+					new StringFormatWriter ();
+
+				writeObjectAsHtml (
+					objectFormatWriter,
+					object);
+
 				String replacement =
-					objectToHtml (
-						object)
+					objectFormatWriter.toString ()
 
 					.replaceAll (
 						"\\\\",
@@ -230,69 +239,68 @@ class EventConsoleLogicImplementation
 
 		}
 
-		return text;
+		formatWriter.writeString (
+			text);
 
 	}
 
 	@Override
 	public
-	String objectToHtml (
-			Object object) {
+	void writeObjectAsHtml (
+			@NonNull FormatWriter formatWriter,
+			@NonNull Object object) {
 
 		if (object instanceof Integer) {
 
-			return Html.encode (
+			formatWriter.writeString (
 				object.toString ());
 
-		}
+		} else if (object instanceof TextRec) {
 
-		if (object instanceof TextRec) {
+			TextRec text =
+				(TextRec)
+				object;
 
-			return Html.encode (
-				stringFormat (
-					"\"%s\"",
-					((TextRec) object).getText ()));
+			formatWriter.writeFormat (
+				"\"%s\"",
+				text.getText ());
 
-		}
-
-		if (object instanceof MediaRec) {
+		} else if (object instanceof MediaRec) {
 
 			MediaRec media =
-				(MediaRec) object;
+				(MediaRec)
+				object;
 
-			return stringFormat (
-				"<a ",
-				"href=\"%h\"",
+			htmlLinkWriteHtml (
 				objectManager.localLink (
 					media),
-				">%s</a>",
-				mediaConsoleLogic.mediaThumb32 (
+				() -> mediaConsoleLogic.writeMediaThumb32 (
+					formatWriter,
 					media));
 
-		}
+		} else if (object instanceof Record) {
 
-		if (object instanceof Record) {
+			Record <?> dataObject =
+				(Record <?>)
+				object;
 
-			Record<?> dataObject =
-				(Record<?>) object;
-
-			return objectManager.htmlForObject (
+			objectManager.writeHtmlForObject (
+				formatWriter,
 				dataObject,
 				null,
 				false);
 
+		} else {
+
+			throw new IllegalArgumentException ();
+
 		}
-
-		if (object == null)
-			return "NULL";
-
-		throw new IllegalArgumentException ();
 
 	}
 
 	@Override
 	public
-	void renderEventsTable (
+	void writeEventsTable (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Iterable<EventRec> events) {
 
@@ -342,7 +350,7 @@ class EventConsoleLogicImplementation
 
 			}
 
-			renderEventRow (
+			writeEventRow (
 				htmlWriter,
 				event);
 
@@ -355,19 +363,35 @@ class EventConsoleLogicImplementation
 
 	@Override
 	public
-	void renderEventRow (
-			@NonNull FormatWriter htmlWriter,
+	void writeEventRow (
+			@NonNull FormatWriter formatWriter,
 			@NonNull EventRec event) {
 
-		String text;
+		formatWriter.writeFormat (
+			"<tr>\n");
+
+		formatWriter.writeFormat (
+			"<td>%h</td>\n",
+			userConsoleLogic.timeString (
+				event.getTimestamp ()));
+
+		formatWriter.writeFormat (
+			"<td>");
 
 		try {
 
-			text =
-				eventText (
-					event);
+			StringFormatWriter eventFormatWriter =
+				new StringFormatWriter ();
 
-		} catch (Exception exception) {
+			writeEventHtml (
+				eventFormatWriter,
+				event);
+
+			formatWriter.writeFormat (
+				"<td>%s</td>\n",
+				eventFormatWriter.toString ());
+
+		} catch (RuntimeException exception) {
 
 			log.error (
 				stringFormat (
@@ -375,25 +399,12 @@ class EventConsoleLogicImplementation
 					event.getId ()),
 				exception);
 
-			text =
-				"(error displaying this event)";
+			formatWriter.writeFormat (
+				"<td>(error displaying this event)</td>\n");
 
 		}
 
-		htmlWriter.writeFormat (
-			"<tr>\n");
-
-		htmlWriter.writeFormat (
-			"<td>%s</td>\n",
-			Html.encodeNonBreakingWhitespace (
-				userConsoleLogic.timeString (
-					event.getTimestamp ())));
-
-		htmlWriter.writeFormat (
-			"<td>%s</td>\n",
-			text);
-
-		htmlWriter.writeFormat (
+		formatWriter.writeFormat (
 			"</tr>\n");
 
 	}

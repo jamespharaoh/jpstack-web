@@ -1,13 +1,13 @@
 package wbs.platform.postgresql.daemon;
 
-import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
-import static wbs.framework.utils.etc.NumberUtils.notLessThan;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TimeUtils.earlierThan;
-import static wbs.framework.utils.etc.TimeUtils.localTime;
-import static wbs.framework.utils.etc.TimeUtils.notEarlierThan;
-import static wbs.framework.utils.etc.TimeUtils.sleepUntil;
-import static wbs.framework.utils.etc.TimeUtils.toInstant;
+import static wbs.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.utils.etc.NumberUtils.notLessThan;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.time.TimeUtils.earlierThan;
+import static wbs.utils.time.TimeUtils.localTime;
+import static wbs.utils.time.TimeUtils.notEarlierThan;
+import static wbs.utils.time.TimeUtils.sleepUntil;
+import static wbs.utils.time.TimeUtils.toInstant;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,12 +19,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.sql.DataSource;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
@@ -32,11 +27,16 @@ import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
+import org.joda.time.Instant;
+
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
-import wbs.framework.utils.ThreadManager;
 import wbs.platform.daemon.AbstractDaemonService;
+import wbs.utils.thread.ThreadManager;
 
 @Log4j
 @SingletonComponent ("pgMaint")
@@ -44,15 +44,15 @@ public
 class PostgresqlMaintenanceDaemon
 	extends AbstractDaemonService {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	DataSource dataSource;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	ThreadManager threadManager;
 
 	// details

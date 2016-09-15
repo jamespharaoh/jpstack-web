@@ -2,7 +2,6 @@ package wbs.platform.rpc.xml;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Getter;
@@ -11,6 +10,7 @@ import lombok.experimental.Accessors;
 
 import wbs.api.mvc.WebApiAction;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
 import wbs.framework.web.WebFile;
@@ -21,7 +21,7 @@ public
 class XmlRpcFile
 	implements WebFile {
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
 	@Getter @Setter

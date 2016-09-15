@@ -1,8 +1,8 @@
 package wbs.platform.core.console;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.string.StringUtils.joinWithSpace;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +19,6 @@ import wbs.console.responder.HtmlResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
-import wbs.framework.utils.etc.ABSwap;
 import wbs.platform.menu.console.MenuGroupConsoleHelper;
 import wbs.platform.menu.model.MenuGroupRec;
 import wbs.platform.menu.model.MenuItemRec;
@@ -28,6 +27,7 @@ import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+import wbs.utils.web.ABSwap;
 
 @PrototypeComponent ("coreSidebarMenuResponder")
 public

@@ -1,18 +1,13 @@
 package wbs.platform.scaffold.logic;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.Misc.orNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.TimeUtils.laterThan;
+import static wbs.utils.etc.Misc.orNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.time.TimeUtils.laterThan;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
@@ -22,15 +17,19 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.joda.time.Instant;
+
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.tools.BackgroundProcess;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
-import wbs.framework.utils.ThreadManager;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
+import wbs.utils.thread.ThreadManager;
 
 @Accessors (fluent = true)
 @SingletonComponent ("sliceLogic")
@@ -40,18 +39,18 @@ class SliceLogicImplementation
 		BackgroundProcess,
 		SliceLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	ThreadManager threadManager;
 
 	// properties
@@ -61,15 +60,15 @@ class SliceLogicImplementation
 
 	// state
 
-	Map<Long,Optional<Instant>> nextTimestampBySlice =
+	Map <Long, Optional <Instant>> nextTimestampBySlice =
 		new HashMap<> ();
 
-	Map<Long,Optional<Instant>> nextUpdateTimestampBySlice =
+	Map <Long, Optional <Instant>> nextUpdateTimestampBySlice =
 		new HashMap<> ();
 
 	// lifecycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void setup () {
 

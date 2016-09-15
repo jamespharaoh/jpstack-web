@@ -1,12 +1,12 @@
 package wbs.platform.queue.console;
 
-import javax.inject.Inject;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
 
 import wbs.console.action.ConsoleAction;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -18,35 +18,8 @@ class QueueSubjectActionsAction
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
-
-	/*
-	@Inject
-	EventLogic eventLogic;
-
-	@Inject
-	MessageConsoleHelper messageHelper;
-
-	@Inject
-	MessageLogic messageLogic;
-
-	@Inject
-	OutboxLogic outboxLogic;
-
-	@Inject
-	ConsoleRequestContext requestContext;
-
-	@Inject
-	UserConsoleHelper userHelper;
-	*/
-
-	// state
-
-	/*
-	MessageRec message;
-	UserRec myUser;
-	*/
 
 	// details
 

@@ -1,9 +1,9 @@
 package wbs.platform.object.browse;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
-import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
-import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.OptionalUtils.optionalIf;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.string.StringUtils.joinWithSpace;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;

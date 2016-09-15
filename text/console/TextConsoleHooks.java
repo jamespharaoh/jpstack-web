@@ -5,8 +5,8 @@ import lombok.NonNull;
 import com.google.common.base.Optional;
 
 import wbs.console.helper.ConsoleHooks;
-import wbs.framework.utils.etc.Html;
 import wbs.platform.text.model.TextRec;
+import wbs.utils.web.HtmlUtils;
 
 public
 class TextConsoleHooks
@@ -19,7 +19,7 @@ class TextConsoleHooks
 			@NonNull Boolean mini) {
 
 		return Optional.of (
-			Html.encode (
+			HtmlUtils.htmlEncode (
 				"\"" + text.getText () + "\""));
 
 	}

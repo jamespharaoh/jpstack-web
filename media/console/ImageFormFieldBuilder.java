@@ -1,9 +1,9 @@
 package wbs.platform.media.console;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.string.StringUtils.capitalise;
 
 import java.util.ArrayList;
 import java.util.List;

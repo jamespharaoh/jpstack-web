@@ -9,7 +9,7 @@ import wbs.console.responder.ConsolePrintResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.utils.TimeFormatter;
+import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("coreFrameSetResponder")
 public

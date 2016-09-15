@@ -2,7 +2,7 @@ package wbs.platform.misc;
 
 import java.util.Map;
 
-import wbs.framework.utils.AbstractStringSubstituter;
+import wbs.utils.string.AbstractStringSubstituter;
 
 public
 class MapStringSubstituter

@@ -1,24 +1,24 @@
 package wbs.platform.user.console;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.requiredValue;
-
-import javax.inject.Inject;
-
-import org.joda.time.DateTimeZone;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.NullUtils.ifNull;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
+
+import org.joda.time.DateTimeZone;
+
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.utils.TimeFormatter;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserRec;
+import wbs.utils.time.TimeFormatter;
 
 @SingletonComponent ("userConsoleLogic")
 public
@@ -27,18 +27,18 @@ class UserConsoleLogicImplementation
 		ConsoleUserHelper,
 		UserConsoleLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleHelper userHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// implementation

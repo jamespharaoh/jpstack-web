@@ -1,15 +1,14 @@
 package wbs.platform.object.list;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableMap;
@@ -39,6 +38,8 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 import wbs.platform.object.criteria.WhereDeletedCriteriaSpec;
@@ -54,47 +55,47 @@ class ObjectListPageBuilder <
 	ParentType extends Record <ParentType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ComponentManager componentManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleFile> consoleFile;
+	@PrototypeDependency
+	Provider <ConsoleFile> consoleFile;
 
-	@Inject
-	Provider<ConsoleContextTab> contextTab;
+	@PrototypeDependency
+	Provider <ConsoleContextTab> contextTab;
 
-	@Inject
-	Provider<ObjectListTabSpec> listTabSpec;
+	@PrototypeDependency
+	Provider <ObjectListTabSpec> listTabSpec;
 
-	@Inject
-	Provider<ObjectListPart<ObjectType,ParentType>> objectListPart;
+	@PrototypeDependency
+	Provider <ObjectListPart <ObjectType, ParentType>> objectListPart;
 
-	@Inject
-	Provider<TabContextResponder> tabContextResponder;
+	@PrototypeDependency
+	Provider <TabContextResponder> tabContextResponder;
 
-	@Inject
-	Provider<WhereDeletedCriteriaSpec> whereDeletedCriteriaSpec;
+	@PrototypeDependency
+	Provider <WhereDeletedCriteriaSpec> whereDeletedCriteriaSpec;
 
-	@Inject
-	Provider<WhereICanManageCriteriaSpec> whereICanManageCriteriaSpec;
+	@PrototypeDependency
+	Provider <WhereICanManageCriteriaSpec> whereICanManageCriteriaSpec;
 
-	@Inject
-	Provider<WhereNotDeletedCriteriaSpec> whereNotDeletedCriteriaSpec;
+	@PrototypeDependency
+	Provider <WhereNotDeletedCriteriaSpec> whereNotDeletedCriteriaSpec;
 
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer<ObjectType> container;
+	ConsoleContextBuilderContainer <ObjectType> container;
 
 	@BuilderSource
 	ObjectListPageSpec spec;

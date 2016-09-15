@@ -1,10 +1,10 @@
 package wbs.platform.rpc.xml;
 
-import static wbs.framework.utils.etc.Misc.fromHex;
-import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.etc.Misc.fromHex;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
 import java.io.InputStream;

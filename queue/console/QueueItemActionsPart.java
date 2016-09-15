@@ -1,14 +1,13 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-
-import javax.inject.Inject;
+import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
+import static wbs.utils.etc.Misc.isNotNull;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -19,24 +18,24 @@ public
 class QueueItemActionsPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeConsoleHelper objectTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	QueueConsoleLogic queueConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	QueueItemConsoleHelper queueItemHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// state

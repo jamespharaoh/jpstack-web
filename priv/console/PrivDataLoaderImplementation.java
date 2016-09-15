@@ -1,7 +1,7 @@
 package wbs.platform.priv.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,24 +11,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.sql.DataSource;
-
-import org.joda.time.Instant;
 
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Instant;
+
 import wbs.console.priv.UserPrivData;
 import wbs.console.priv.UserPrivData.ObjectData;
 import wbs.console.priv.UserPrivData.PrivPair;
 import wbs.console.priv.UserPrivData.SharedData;
 import wbs.console.priv.UserPrivData.UserData;
 import wbs.console.priv.UserPrivDataLoader;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -51,27 +52,27 @@ public
 class PrivDataLoaderImplementation
 	implements UserPrivDataLoader {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeObjectHelper objectTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	PrivObjectHelper privHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DataSource dataSource;
 
-	@Inject
+	@SingletonDependency
 	UpdateManager updateManager;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// properties
@@ -81,14 +82,14 @@ class PrivDataLoaderImplementation
 
 	// state
 
-	UpdateGetter<SharedData> privDataCache;
+	UpdateGetter <SharedData> privDataCache;
 
-	Map<Long,UpdateGetter<UserData>> userDataCachesByUserId =
-		new HashMap<Long,UpdateGetter<UserData>>();
+	Map <Long, UpdateGetter <UserData>> userDataCachesByUserId =
+		new HashMap<>();
 
 	// lifecycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 

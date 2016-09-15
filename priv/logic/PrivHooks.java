@@ -1,17 +1,17 @@
 package wbs.platform.priv.logic;
 
-import static wbs.framework.utils.etc.Misc.doesNotContain;
+import static wbs.utils.etc.Misc.doesNotContain;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
 import lombok.Cleanup;
 import lombok.NonNull;
+
+import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
@@ -25,17 +25,17 @@ import wbs.platform.priv.model.PrivTypeRec;
 
 public
 class PrivHooks
-	implements ObjectHooks<PrivRec> {
+	implements ObjectHooks <PrivRec> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeDao objectTypeDao;
 
-	@Inject
+	@SingletonDependency
 	PrivTypeDao privTypeDao;
 
 	// state
@@ -45,7 +45,7 @@ class PrivHooks
 
 	// lifecycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 

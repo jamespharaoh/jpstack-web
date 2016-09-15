@@ -1,16 +1,16 @@
 package wbs.platform.currency.logic;
 
-import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
-import static wbs.framework.utils.etc.StringUtils.joinWithPipe;
-import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
-import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
+import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.string.StringUtils.joinWithPipe;
+import static wbs.utils.string.StringUtils.joinWithoutSeparator;
+import static wbs.utils.string.StringUtils.nullIfEmptyString;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

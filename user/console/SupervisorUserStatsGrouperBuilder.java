@@ -1,8 +1,5 @@
 package wbs.platform.user.console;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.supervisor.SupervisorConfigBuilder;
 import wbs.console.supervisor.SupervisorConfigSpec;
@@ -12,14 +9,17 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @PrototypeComponent ("supervisorUserStatsGrouperBuilder")
 @ConsoleModuleBuilderHandler
 public
 class SupervisorUserStatsGrouperBuilder {
 
-	@Inject
-	Provider<UserStatsGrouper> userStatsGrouper;
+	// prototype dependencies
+
+	@SingletonDependency
+	UserStatsGrouper userStatsGrouper;
 
 	// builder
 
@@ -44,7 +44,7 @@ class SupervisorUserStatsGrouperBuilder {
 
 		supervisorConfigBuilder.statsGroupersByName ().put (
 			name,
-			userStatsGrouper.get ());
+			userStatsGrouper);
 
 	}
 

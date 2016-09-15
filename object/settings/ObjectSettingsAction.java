@@ -1,6 +1,6 @@
 package wbs.platform.object.settings;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
 import javax.inject.Provider;
 
@@ -26,8 +26,8 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
 import wbs.framework.web.Responder;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSettingsAction")
@@ -187,7 +187,7 @@ class ObjectSettingsAction <
 					object);
 
 			Object objectRef =
-				BeanLogic.getProperty (
+				PropertyUtils.getProperty (
 					object,
 					objectRefName);
 

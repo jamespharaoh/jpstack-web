@@ -1,14 +1,14 @@
 package wbs.platform.text.console;
 
-import static wbs.framework.utils.etc.TypeUtils.classEqualSafe;
+import static wbs.utils.etc.TypeUtils.classEqualSafe;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
 import wbs.console.forms.FormFieldBuilderContext;
 import wbs.console.forms.FormFieldPluginProvider;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.platform.text.model.TextRec;
 
@@ -20,8 +20,8 @@ class TextFormFieldPluginProvider
 
 	// prototype dependencies
 
-	@Inject
-	Provider<TextFormFieldNativeMapping>
+	@PrototypeDependency
+	Provider <TextFormFieldNativeMapping>
 	textFormFieldNativeMappingProvider;
 
 	// implementation
