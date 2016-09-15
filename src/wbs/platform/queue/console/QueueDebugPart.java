@@ -1,23 +1,22 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
-
-import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+
+import org.joda.time.Duration;
 
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
@@ -27,6 +26,8 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
@@ -41,36 +42,37 @@ public
 class QueueDebugPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeConsoleHelper objectTypeHelper;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	ConsoleModule queueConsoleModule;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleHelper userHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker userPrivChecker;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MasterQueueCache> masterQueueCacheProvider;
+	@PrototypeDependency
+	Provider <MasterQueueCache> masterQueueCacheProvider;
 
-	@Inject
-	Provider<QueueSubjectSorter> queueSubjectSorterProvider;
+	@PrototypeDependency
+	Provider <QueueSubjectSorter> queueSubjectSorterProvider;
 
 	// state
 

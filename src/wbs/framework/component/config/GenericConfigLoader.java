@@ -1,9 +1,8 @@
 package wbs.framework.component.config;
 
-import javax.annotation.PostConstruct;
-
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
@@ -18,7 +17,7 @@ class GenericConfigLoader {
 
 	// lifecycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void setup () {
 

@@ -1,6 +1,6 @@
 package wbs.console.reporting;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,9 +62,9 @@ class SimpleStatsResolver
 	@Override
 	public
 	ResolvedStats resolve (
-			Map<String,StatsDataSet> dataSetsByName,
+			Map <String, StatsDataSet> dataSetsByName,
 			StatsPeriod period,
-			Set<Object> groups) {
+			Set <Object> groups) {
 
 		StatsDataSet dataSet =
 			dataSetsByName.get (dataSetName);
@@ -83,7 +83,7 @@ class SimpleStatsResolver
 			for (Instant step : period.steps ()) {
 
 				unaggregatedSteps.put (
- 					new ImmutablePair<Object,Instant> (
+					new ImmutablePair <Object, Instant> (
 						group,
 						step),
 					new ArrayList<Object> ());

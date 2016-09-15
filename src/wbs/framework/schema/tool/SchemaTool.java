@@ -1,7 +1,7 @@
 package wbs.framework.schema.tool;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,7 +25,7 @@ import wbs.framework.logging.TaskLogger;
 import wbs.framework.schema.builder.SchemaFromModel;
 import wbs.framework.schema.helper.SchemaTypesHelper;
 import wbs.framework.schema.model.Schema;
-import wbs.framework.utils.formatwriter.AtomicFileWriter;
+import wbs.utils.string.AtomicFileWriter;
 
 @Log4j
 public

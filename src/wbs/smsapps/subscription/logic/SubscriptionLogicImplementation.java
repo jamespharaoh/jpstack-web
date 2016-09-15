@@ -1,15 +1,16 @@
 package wbs.smsapps.subscription.logic;
 
-import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
-import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.utils.etc.EnumUtils.enumNotInSafe;
+import static wbs.utils.etc.NullUtils.ifNull;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
@@ -17,7 +18,7 @@ import wbs.platform.event.logic.EventLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.smsapps.subscription.model.SubscriptionAffiliateRec;
 import wbs.smsapps.subscription.model.SubscriptionBillObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionBillRec;
@@ -39,33 +40,33 @@ public
 class SubscriptionLogicImplementation
 	implements SubscriptionLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	AffiliateObjectHelper affiliateHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionBillObjectHelper subscriptionBillHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionNumberObjectHelper subscriptionNumberHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionSendPartObjectHelper subscriptionSendPartHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MessageSender> messageSenderProvider;
+	@PrototypeDependency
+	Provider <SmsMessageSender> messageSenderProvider;
 
 	// implementation
 

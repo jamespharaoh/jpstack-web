@@ -1,14 +1,13 @@
 package wbs.framework.entity.meta.model;
 
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.string.StringUtils.camelToHyphen;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.InputStream;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
@@ -19,6 +18,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -59,7 +59,7 @@ class ModelMetaLoader {
 
 	// lifecycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void setup () {
 

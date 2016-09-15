@@ -1,6 +1,6 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.TypeUtils.classNotEqual;
+import static wbs.utils.etc.TypeUtils.classNotEqual;
 
 import java.util.ArrayList;
 import java.util.List;

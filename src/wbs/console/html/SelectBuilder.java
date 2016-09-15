@@ -1,8 +1,8 @@
 package wbs.console.html;
 
-import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

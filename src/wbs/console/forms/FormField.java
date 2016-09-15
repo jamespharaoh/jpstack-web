@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.Misc.doNothing;
 
 import java.util.Map;
 import java.util.Set;
@@ -10,9 +10,10 @@ import com.google.common.base.Optional;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+
 import wbs.console.html.ScriptRef;
 import wbs.framework.entity.record.PermanentRecord;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.FormatWriter;
 
 public
 interface FormField <Container, Generic, Native, Interface> {
@@ -62,8 +63,8 @@ interface FormField <Container, Generic, Native, Interface> {
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
-			boolean link,
-			int colspan) {
+			@NonNull Boolean link,
+			@NonNull Long columnSpan) {
 
 		doNothing ();
 

@@ -1,6 +1,6 @@
 package wbs.console.context;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,7 +17,7 @@ import wbs.console.tab.Tab;
 import wbs.console.tab.TabList;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.utils.AbstractStringSubstituter;
+import wbs.utils.string.AbstractStringSubstituter;
 
 /**
  * Holds local variables and path info during a request.

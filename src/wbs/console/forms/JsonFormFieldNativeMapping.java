@@ -7,9 +7,9 @@ import org.json.simple.JSONValue;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 
-import com.google.common.base.Optional;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("jsonFormFieldNativeMapping")

@@ -1,9 +1,9 @@
 package wbs.integrations.mediaburst.api;
 
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.string.StringUtils.joinWithSpace;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -2,14 +2,13 @@ package wbs.services.ticket.create;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
@@ -19,6 +18,7 @@ import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.services.ticket.core.console.TicketConsoleHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
@@ -31,36 +31,36 @@ import wbs.services.ticket.core.model.TicketRec;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectTicketCreatePart")
 public
-class ObjectTicketCreatePart<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectTicketCreatePart <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 >
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	TicketFieldTypeObjectHelper ticketFieldTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketFieldValueObjectHelper ticketFieldValueHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketConsoleHelper ticketHelper;
 
 	// properties
 
 	@Getter @Setter
-	List<ObjectTicketCreateSetFieldSpec> ticketFieldSpecs;
+	List <ObjectTicketCreateSetFieldSpec> ticketFieldSpecs;
 
 	@Getter @Setter
 	ConsoleHelper<?> consoleHelper;

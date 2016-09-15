@@ -1,6 +1,14 @@
 package wbs.platform.priv.console;
 
-import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlInputUtils.htmlOption;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlUtils.htmlFormClose;
+import static wbs.utils.web.HtmlUtils.htmlHeadingTwoWrite;
 
 import java.util.List;
 import java.util.Map;
@@ -8,17 +16,16 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.Html;
 import wbs.platform.group.console.GroupConsoleHelper;
 import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.model.PrivRec;
@@ -31,31 +38,35 @@ public
 class ObjectSummaryPrivPart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	GroupConsoleHelper groupHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;;
 
-	Record<?> object;
+	// state
 
-	Map<String,UserPrivSets> userPrivs =
-		new TreeMap<String,UserPrivSets> ();
+	Record <?> object;
 
-	Map<String,Set<String>> groupPrivs =
-		new TreeMap<String,Set<String>> ();
+	Map <String, UserPrivSets> userPrivs =
+		new TreeMap<> ();
 
-	Map<String,UserRec> users =
-		new TreeMap<String,UserRec> ();
+	Map <String, Set <String>> groupPrivs =
+		new TreeMap<> ();
 
-	Map<String,GroupRec> groups =
-		new TreeMap<String,GroupRec> ();
+	Map <String, UserRec> users =
+		new TreeMap<> ();
+
+	Map <String, GroupRec> groups =
+		new TreeMap<> ();
 
 	@Override
 	public
@@ -186,28 +197,28 @@ class ObjectSummaryPrivPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<h2>Users</h2>\n");
+		htmlHeadingTwoWrite (
+			"Users");
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlTableOpenList ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>User</th>\n",
-			"<th>Privs</th>\n",
-			"<th>Grant privs</th>\n",
-			"</tr>\n");
+		htmlTableHeaderRowWrite (
+			"User",
+			"Privs",
+			"Grant privs");
 
 		if (userPrivs.size () == 0) {
 
-			printFormat (
-				"<td colspan=\"3\">No user privs to show</td>\n");
+			htmlTableCellWrite (
+				"No user privs to show",
+				htmlColumnSpanAttribute (3l));
 
 		}
 
-		for (Map.Entry<String,UserPrivSets> entry
-				: userPrivs.entrySet ()) {
+		for (
+			Map.Entry<String,UserPrivSets> entry
+				: userPrivs.entrySet ()
+		) {
 
 			String userPath =
 				entry.getKey ();
@@ -233,8 +244,7 @@ class ObjectSummaryPrivPart
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 		printFormat (
 			"<form",
@@ -247,15 +257,15 @@ class ObjectSummaryPrivPart
 
 			"<select name=\"userId\">\n");
 
-		for (Map.Entry<String, UserRec> entry :
-				users.entrySet ()) {
+		for (
+			Map.Entry<String, UserRec> entry :
+				users.entrySet ()
+		) {
 
-			printFormat (
-				"%s\n",
-				Html.option (
-					entry.getValue ().getId ().toString (),
-					entry.getKey (),
-					null));
+			htmlOption (
+				entry.getValue ().getId ().toString (),
+				entry.getKey (),
+				null);
 
 		}
 
@@ -267,11 +277,10 @@ class ObjectSummaryPrivPart
 			" value=\"go\"",
 			"></p>\n");
 
-		printFormat (
-			"</form>\n");
+		htmlFormClose ();
 
-		printFormat (
-			"<h2>Groups</h2>\n");
+		htmlHeadingTwoWrite (
+			"Groups");
 
 		printFormat (
 			"<table class=\"list\">");

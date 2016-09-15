@@ -1,11 +1,11 @@
 package wbs.integrations.dialogue.api;
 
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
-import static wbs.framework.utils.etc.TimeUtils.dateToInstantNullSafe;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.string.StringUtils.nullIfEmptyString;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
+import static wbs.utils.time.TimeUtils.dateToInstantNullSafe;
 
 import java.io.IOException;
 import java.io.PrintWriter;

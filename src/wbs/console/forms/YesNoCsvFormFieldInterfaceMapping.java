@@ -1,11 +1,11 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.LogicUtils.booleanEqual;
-import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.Misc.successResult;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
+import static wbs.utils.etc.LogicUtils.booleanEqual;
+import static wbs.utils.etc.Misc.errorResult;
+import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.util.Map;
 

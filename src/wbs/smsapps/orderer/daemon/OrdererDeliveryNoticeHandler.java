@@ -2,8 +2,6 @@ package wbs.smsapps.orderer.daemon;
 
 import java.util.Collection;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -11,10 +9,10 @@ import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.utils.EmailLogic;
 import wbs.platform.misc.MapStringSubstituter;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
@@ -22,27 +20,28 @@ import wbs.sms.message.delivery.model.DeliveryRec;
 import wbs.smsapps.orderer.model.OrdererOrderObjectHelper;
 import wbs.smsapps.orderer.model.OrdererOrderRec;
 import wbs.smsapps.orderer.model.OrdererRec;
+import wbs.utils.email.EmailLogic;
 
 @SingletonComponent ("ordererDeliveryNoticeHandler")
 public
 class OrdererDeliveryNoticeHandler
 	implements DeliveryHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
-	@Inject
+	@SingletonDependency
 	EmailLogic emailLogic;
 
-	@Inject
+	@SingletonDependency
 	OrdererOrderObjectHelper ordererOrderHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// details

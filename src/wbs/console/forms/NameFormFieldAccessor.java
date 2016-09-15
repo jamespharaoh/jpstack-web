@@ -1,16 +1,17 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
+
 import com.google.common.base.Optional;
 
 import wbs.console.helper.ConsoleHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("nameFormFieldAccessor")
@@ -32,7 +33,7 @@ class NameFormFieldAccessor<Container>
 
 		return Optional.fromNullable (
 			(String)
-			BeanLogic.getProperty (
+			PropertyUtils.getProperty (
 				container,
 				consoleHelper.nameFieldName ()));
 
@@ -44,7 +45,7 @@ class NameFormFieldAccessor<Container>
 			@NonNull Container container,
 			@NonNull Optional<String> nativeValue) {
 
-		BeanLogic.setProperty (
+		PropertyUtils.setProperty (
 			container,
 			consoleHelper.nameFieldName (),
 			nativeValue.get ());
@@ -55,7 +56,7 @@ class NameFormFieldAccessor<Container>
 				simplifyToCodeRequired (
 					nativeValue.get ());
 
-			BeanLogic.setProperty (
+			PropertyUtils.setProperty (
 				container,
 				consoleHelper.codeFieldName (),
 				codeValue);

@@ -2,17 +2,21 @@ package wbs.console.reporting;
 
 import com.google.common.base.Optional;
 
+import wbs.utils.string.FormatWriter;
+
 public
 interface StatsFormatter {
 
-	String format (
+	void format (
+			FormatWriter formatWriter,
 			Object group,
 			StatsPeriod period,
 			Integer step,
-			Optional<Object> value);
+			Optional <Object> value);
 
-	String formatTotal (
+	void formatTotal (
+			FormatWriter formatWriter,
 			Object group,
-			Optional<Object> value);
+			Optional <Object> value);
 
 }

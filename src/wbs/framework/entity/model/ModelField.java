@@ -1,7 +1,7 @@
 package wbs.framework.entity.model;
 
-import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.EnumUtils.enumInSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;

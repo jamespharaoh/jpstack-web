@@ -1,26 +1,27 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.stringTrim;
-import static wbs.framework.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
-import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.stringTrim;
+import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.NonNull;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.utils.etc.Html;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.text.model.TextObjectHelper;
@@ -32,45 +33,48 @@ import wbs.sms.number.core.console.NumberConsoleHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
+import wbs.utils.web.HtmlUtils;
 
 @PrototypeComponent ("manualResponderRequestPendingNumberNoteUpdateAction")
 public
 class ManualResponderRequestPendingNumberNoteUpdateAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderConsoleHelper manualResponderHelper;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderNumberConsoleHelper manualResponderNumberHelper;
 
-	@Inject
+	@SingletonDependency
 	NumberConsoleHelper numberHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<TextResponder> textResponder;
+	@PrototypeDependency
+	Provider <TextResponder> textResponderProvider;
+
+	// constants
 
 	static
 	Pattern idPattern =
@@ -196,11 +200,11 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 					newValue))
 		) {
 
-			return textResponder.get ()
+			return textResponderProvider.get ()
 
 				.text (
 					newValue != null
-						? Html.encodeNewlineToBr (
+						? HtmlUtils.encodeNewlineToBr (
 							newValue.getText ())
 						: "");
 
@@ -238,11 +242,11 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 		transaction.commit ();
 
-		return textResponder.get ()
+		return textResponderProvider.get ()
 
 			.text (
 				newValue != null
-					? Html.encodeNewlineToBr (
+					? HtmlUtils.encodeNewlineToBr (
 						newValue.getText ())
 					: "");
 
@@ -271,11 +275,11 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 					newValue))
 		) {
 
-			return textResponder.get ()
+			return textResponderProvider.get ()
 
 				.text (
 					newValue != null
-						? Html.encodeNewlineToBr (
+						? HtmlUtils.encodeNewlineToBr (
 							newValue.getText ())
 						: "");
 
@@ -313,11 +317,11 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 		transaction.commit ();
 
-		return textResponder.get ()
+		return textResponderProvider.get ()
 
 			.text (
 				newValue != null
-					? Html.encodeNewlineToBr (
+					? HtmlUtils.encodeNewlineToBr (
 						newValue.getText ())
 					: "");
 

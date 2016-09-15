@@ -2,14 +2,13 @@ package wbs.smsapps.forwarder.daemon;
 
 import java.util.Collection;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.sms.message.core.model.MessageStatus;
@@ -27,20 +26,24 @@ public
 class ForwarderDelivery
 	implements DeliveryHandler {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
-	@Inject
+	@SingletonDependency
 	ForwarderMessageOutObjectHelper forwarderMessageOutHelper;
 
-	@Inject
+	@SingletonDependency
 	ForwarderMessageOutReportObjectHelper forwarderMessageOutReportHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsOutboxLogic outboxLogic;
+
+	// details
 
 	@Override
 	public

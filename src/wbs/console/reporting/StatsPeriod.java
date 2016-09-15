@@ -1,15 +1,15 @@
 package wbs.console.reporting;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joda.time.Instant;
-import org.joda.time.Interval;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import org.joda.time.Instant;
+import org.joda.time.Interval;
 
 @Accessors (fluent = true)
 @Data
@@ -53,7 +53,7 @@ class StatsPeriod {
 	}
 
 	public
-	int size () {
+	long size () {
 		return steps.size ();
 	}
 

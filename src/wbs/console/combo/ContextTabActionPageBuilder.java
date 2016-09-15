@@ -1,10 +1,10 @@
 package wbs.console.combo;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collections;
 import java.util.List;
@@ -109,7 +109,8 @@ class ContextTabActionPageBuilder <
 	}
 
 	void buildTab (
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint
+				resolvedExtensionPoint) {
 
 		consoleModule.addContextTab (
 			container.tabLocation (),
@@ -129,13 +130,14 @@ class ContextTabActionPageBuilder <
 					privKeys),
 
 			hideTab
-				? Collections.<String>emptyList ()
+				? Collections.emptyList ()
 				: resolvedExtensionPoint.contextTypeNames ());
 
 	}
 
 	void buildFile (
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint
+				resolvedExtensionPoint) {
 
 		consoleModule.addContextFile (
 			localFile,

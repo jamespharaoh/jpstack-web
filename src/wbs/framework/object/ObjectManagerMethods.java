@@ -1,5 +1,7 @@
 package wbs.framework.object;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +12,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
+
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
@@ -19,44 +22,44 @@ interface ObjectManagerMethods {
 
 	// navigation
 
-	Record<?> getParent (
-			Record<?> dataObject);
+	Record <?> getParent (
+			Record <?> dataObject);
 
 	GlobalId getGlobalId (
-			Record<?> object);
+			Record <?> object);
 
 	GlobalId getParentGlobalId (
-			Record<?> object);
+			Record <?> object);
 
-	public abstract <ObjectType extends Record<ObjectType>>
-	List<ObjectType> getChildren (
-			Record<?> object,
-			Class<ObjectType> childClass);
+	public abstract <ObjectType extends Record <ObjectType>>
+	List <ObjectType> getChildren (
+			Record <?> object,
+			Class <ObjectType> childClass);
 
 	Long getObjectTypeId (
-			Record<?> object);
+			Record <?> object);
 
 	String getCode (
-			Record<?> object);
+			Record <?> object);
 
 	List<Record<?>> getMinorChildren (
-			Record<?> object);
+			Record <?> object);
 
 	String getObjectTypeCode (
-			Record<?> object);
+			Record <?> object);
 
 	public
-	abstract <ObjectType extends Record<ObjectType>>
-	Optional<ObjectType> getAncestor (
-			Class<ObjectType> ancestorClass,
-			Record<?> object);
+	abstract <ObjectType extends Record <ObjectType>>
+	Optional <ObjectType> getAncestor (
+			Class <ObjectType> ancestorClass,
+			Record <?> object);
 
 	// data access
 
-	Record<?> findObject (
+	Record <?> findObject (
 			GlobalId objectGlobalId);
 
-	<ObjectType extends Record<?>>
+	<ObjectType extends Record <?>>
 	ObjectType update (
 			ObjectType object);
 
@@ -97,11 +100,11 @@ interface ObjectManagerMethods {
 
 	default
 	String objectPath (
-			@NonNull Record<?> dataObject) {
+			@NonNull Record <?> dataObject) {
 
 		return objectPath (
 			dataObject,
-			Optional.<Record<?>>absent (),
+			optionalAbsent (),
 			false,
 			false);
 
@@ -109,11 +112,11 @@ interface ObjectManagerMethods {
 
 	default
 	String objectPathMini (
-			@NonNull Record<?> dataObject) {
+			@NonNull Record <?> dataObject) {
 
 		return objectPath (
 			dataObject,
-			Optional.<Record<?>>absent (),
+			optionalAbsent (),
 			true,
 			false);
 

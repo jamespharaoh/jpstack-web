@@ -1,23 +1,32 @@
 package wbs.smsapps.autoresponder.console;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.simplify;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.simplify;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenLayout;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlUtils.htmlFormClose;
+import static wbs.utils.web.HtmlUtils.htmlFormOpenMethod;
+import static wbs.utils.web.HtmlUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
 
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.inject.Inject;
+import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import lombok.extern.log4j.Log4j;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.IntervalFormatter;
-import wbs.framework.utils.TextualInterval;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -27,6 +36,8 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageSearch;
 import wbs.smsapps.autoresponder.model.AutoResponderObjectHelper;
 import wbs.smsapps.autoresponder.model.AutoResponderRec;
+import wbs.utils.time.IntervalFormatter;
+import wbs.utils.time.TextualInterval;
 
 @Log4j
 @PrototypeComponent ("autoResponderVotesPart")
@@ -34,27 +45,27 @@ public
 class AutoResponderVotesPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	AutoResponderObjectHelper autoResponderHelper;
 
-	@Inject
+	@SingletonDependency
 	IntervalFormatter intervalFormatter;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// state
 
 	String timePeriodString;
-	Map<String,Integer> votes;
+	Map <String, Long> votes;
 
 	// implementation
 
@@ -122,14 +133,14 @@ class AutoResponderVotesPart
 			.direction (
 				MessageDirection.in);
 
-		List<MessageRec> messages =
+		List <MessageRec> messages =
 			messageHelper.search (
 				messageSearch);
 
 		// now aggregate them
 
 		votes =
-			new TreeMap<String,Integer> ();
+			new TreeMap <String, Long> ();
 
 		for (
 			MessageRec message
@@ -140,8 +151,10 @@ class AutoResponderVotesPart
 				simplify (
 					message.getText ().getText ());
 
-			Integer oldVal =
-				ifNull (votes.get (body), 0);
+			Long oldVal =
+				ifNull (
+					votes.get (body),
+					0l);
 
 			votes.put (
 				body,
@@ -155,64 +168,65 @@ class AutoResponderVotesPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<form",
-			" method=\"get\"",
-			" action=\"\">\n");
+		htmlFormOpenMethod (
+			"get");
 
-		printFormat (
-			"<p>Time period<br>\n",
+		// time period
 
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"Time period<br>");
+
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"text\"",
 			" name=\"timePeriod\"",
 			" value=\"%h\"",
 			timePeriodString,
-			"\">",
+			">");
 
+		formatWriter.writeLineFormat ( 
 			"<input",
 			" type=\"submit\"",
 			" value=\"ok\"",
-			">",
+			">");
 
-			"</p>\n");
+		htmlParagraphClose ();
 
-		printFormat (
-			"</form>\n");
+		htmlFormClose ();
+
+		// votes
 
 		if (votes == null)
 			return;
 
-		printFormat (
-			"<h2>Vote summary</h2>\n");
+		htmlHeadingTwoWrite (
+			"Vote summary");
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlTableOpenLayout ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Content</th>\n",
-			"<th>Votes</th>\n",
-			"</tr>");
+		htmlTableHeaderRowWrite (
+			"Content",
+			"Votes");
 
-		for (Map.Entry<String,Integer> entry
-				: votes.entrySet ()) {
+		for (
+			Map.Entry <String, Long> entry
+				: votes.entrySet ()
+		) {
 
-			printFormat (
-				"<tr>\n",
+			htmlTableRowOpen ();
 
-				"<td>%h</td>\n",
-				entry.getKey (),
+			htmlTableCellWrite (
+				entry.getKey ());
 
-				"<td>%h</td>\n",
-				entry.getValue (),
-
-				"</tr>\n");
+			htmlTableCellWrite (
+				integerToDecimalString (
+					entry.getValue ()));
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

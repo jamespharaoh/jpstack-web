@@ -1,7 +1,7 @@
 package wbs.integrations.hybyte.daemon;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +22,6 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.etc.Xom;
 import wbs.integrations.hybyte.model.HybyteNetworkObjectHelper;
 import wbs.integrations.hybyte.model.HybyteNetworkRec;
 import wbs.integrations.hybyte.model.HybyteRouteOutObjectHelper;
@@ -35,6 +34,7 @@ import wbs.sms.message.wap.model.WapPushMessageRec;
 import wbs.sms.network.logic.NetworkPrefixCache;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.utils.etc.Xom;
 
 import nu.xom.Builder;
 import nu.xom.Document;

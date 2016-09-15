@@ -1,7 +1,5 @@
 package wbs.smsapps.subscription.console;
 
-import javax.inject.Inject;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -10,6 +8,7 @@ import org.joda.time.Instant;
 
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.sms.number.core.console.NumberPlugin;
 import wbs.sms.number.core.model.NumberRec;
@@ -21,8 +20,12 @@ public
 class SubscriptionNumberAdvice
 	implements NumberPlugin.Link {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	// properties
 
 	@Getter @Setter
 	SubscriptionNumberLinkProvider provider;

@@ -1,18 +1,17 @@
 package wbs.platform.user.logic;
 
-import static wbs.framework.utils.etc.Misc.hashSha1;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
-
-import javax.inject.Inject;
+import static wbs.utils.etc.Misc.hashSha1;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.joinWithFullStop;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -31,27 +30,27 @@ public
 class UserLogicImplementation
 	implements UserLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
-	@Inject
+	@SingletonDependency
 	UserOnlineObjectHelper userOnlineHelper;
 
-	@Inject
+	@SingletonDependency
 	UserSessionObjectHelper userSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// implementation
@@ -61,7 +60,7 @@ class UserLogicImplementation
 	void userLogon (
 			@NonNull UserRec user,
 			@NonNull String sessionId,
-			@NonNull Optional<String> userAgent) {
+			@NonNull Optional <String> userAgent) {
 
 		Transaction transaction =
 			database.currentTransaction ();

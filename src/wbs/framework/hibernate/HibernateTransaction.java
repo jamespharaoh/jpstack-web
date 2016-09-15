@@ -1,8 +1,8 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.sql.Connection;
 import java.sql.SQLException;

@@ -1,16 +1,16 @@
 package wbs.framework.codegen;
 
-import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.lang.reflect.Method;
 import java.util.function.Function;
 
 import lombok.NonNull;
 
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.FormatWriter;
 
 public
 class JavaPropertyWriter

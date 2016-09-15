@@ -1,26 +1,28 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
-import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
+import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
+import static wbs.utils.string.StringUtils.camelToUnderscore;
+import static wbs.utils.string.StringUtils.joinWithFullStop;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
+
+import org.joda.time.Instant;
+
 import wbs.console.priv.UserPrivChecker;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
@@ -47,38 +49,38 @@ import wbs.platform.user.model.UserRec;
 public
 class QueueConsoleLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DummyQueueCache dummyQueueCache;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ModelMetaLoader modelMetaLoader;
 
-	@Inject
+	@SingletonDependency
 	QueueItemClaimObjectHelper queueItemClaimHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueItemObjectHelper queueItemHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceLogic sliceLogic;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// prototype dependencies
 
-	@Inject
+	@PrototypeDependency
 	Provider <QueueSubjectSorter> queueSubjectSorterProvider;
 
 	// state
@@ -87,14 +89,14 @@ class QueueConsoleLogic {
 
 	// lifecycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void setup () {
 
 		// collect queue type definitions
 
-		ImmutableMap.Builder<String,QueueTypeSpec> queueTypeSpecsBuilder =
-			ImmutableMap.<String,QueueTypeSpec>builder ();
+		ImmutableMap.Builder <String, QueueTypeSpec> queueTypeSpecsBuilder =
+			ImmutableMap.builder ();
 
 		for (
 			ModelMetaSpec modelMeta

@@ -1,9 +1,9 @@
 package wbs.console.combo;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collections;
 
@@ -106,7 +106,7 @@ class ContextTabResponderPageBuilder <
 	// private implementation
 
 	void buildTab (
-			@Nonnull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@Nonnull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
 
@@ -124,13 +124,13 @@ class ContextTabResponderPageBuilder <
 					fileName),
 
 			hideTab
-				? Collections.<String>emptyList ()
-				: resolvedExtensionPoint.contextTypeNames ());
+				? Collections.emptyList ()
+				: extensionPoint.contextTypeNames ());
 
 	}
 
 	void buildFile (
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextFile (
 
@@ -141,7 +141,7 @@ class ContextTabResponderPageBuilder <
 				.getResponderName (
 					responderName),
 
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 

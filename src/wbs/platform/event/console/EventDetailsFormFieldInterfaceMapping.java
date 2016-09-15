@@ -1,6 +1,6 @@
 package wbs.platform.event.console;
 
-import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.utils.etc.Misc.successResult;
 
 import java.util.Map;
 
@@ -12,6 +12,7 @@ import wbs.console.forms.FormFieldInterfaceMapping;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.event.model.EventRec;
+import wbs.utils.string.StringFormatWriter;
 
 import fj.data.Either;
 
@@ -45,10 +46,16 @@ class EventDetailsFormFieldInterfaceMapping
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <EventRec> genericValue) {
 
+		StringFormatWriter formatWriter =
+			new StringFormatWriter ();
+
+		eventConsoleLogic.writeEventHtml (
+			formatWriter,
+			genericValue.get ());
+
 		return successResult (
 			Optional.of (
-				eventConsoleLogic.eventText (
-					genericValue.get ())));
+				formatWriter.toString ()));
 
 	}
 

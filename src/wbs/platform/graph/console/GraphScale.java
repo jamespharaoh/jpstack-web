@@ -1,7 +1,7 @@
 package wbs.platform.graph.console;
 
-import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.string.StringUtils.joinWithFullStop;
 
 import java.util.Arrays;
 import java.util.Collections;

@@ -1,16 +1,11 @@
 package wbs.services.ticket.core.daemon;
 
-import static wbs.framework.utils.etc.LogicUtils.booleanEqual;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NumberUtils.notLessThanZero;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.LogicUtils.booleanEqual;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.notLessThanZero;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
-
-import javax.inject.Inject;
-
-import org.joda.time.Duration;
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
@@ -18,13 +13,16 @@ import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.RandomLogic;
 import wbs.platform.daemon.SleepingDaemonService;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -32,6 +30,7 @@ import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
+import wbs.utils.random.RandomLogic;
 
 @Log4j
 @SingletonComponent ("ticketStateTimeDaemon")
@@ -39,30 +38,30 @@ public
 class TicketStateTimeDaemon
 	extends SleepingDaemonService {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	TicketObjectHelper ticketHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
 	// details

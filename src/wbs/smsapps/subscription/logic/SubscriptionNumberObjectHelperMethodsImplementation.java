@@ -1,10 +1,8 @@
 package wbs.smsapps.subscription.logic;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.subscription.model.SubscriptionNumberObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionNumberObjectHelperMethods;
@@ -15,11 +13,10 @@ public
 class SubscriptionNumberObjectHelperMethodsImplementation
 	implements SubscriptionNumberObjectHelperMethods {
 
-	// indirect dependencies
+	// singleton dependencies
 
-	@Inject
-	Provider<SubscriptionNumberObjectHelper>
-	subscriptionNumberHelperProvider;
+	@WeakSingletonDependency
+	SubscriptionNumberObjectHelper subscriptionNumberHelper;
 
 	// implementation
 
@@ -28,9 +25,6 @@ class SubscriptionNumberObjectHelperMethodsImplementation
 	SubscriptionNumberRec findOrCreate (
 			@NonNull SubscriptionRec subscription,
 			@NonNull NumberRec number) {
-
-		SubscriptionNumberObjectHelper subscriptionNumberHelper =
-			subscriptionNumberHelperProvider.get ();
 
 		// find existing
 

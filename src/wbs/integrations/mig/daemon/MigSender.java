@@ -1,8 +1,8 @@
 package wbs.integrations.mig.daemon;
 
-import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

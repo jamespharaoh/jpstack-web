@@ -1,12 +1,34 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
-import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.EnumUtils.enumInSafe;
+import static wbs.utils.etc.EnumUtils.enumNotInSafe;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
+import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteRaw;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenLayout;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
+import static wbs.utils.web.HtmlUtils.htmlDivClose;
+import static wbs.utils.web.HtmlUtils.htmlDivOpen;
+import static wbs.utils.web.HtmlUtils.htmlHeadingThreeWrite;
+import static wbs.utils.web.HtmlUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlUtils.htmlLinkWriteHtml;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,12 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-
-import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -27,6 +44,12 @@ import com.google.common.collect.ImmutableSet;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
@@ -38,8 +61,7 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.TextualInterval;
-import wbs.framework.utils.etc.Html;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.media.logic.MediaLogic;
@@ -66,6 +88,8 @@ import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
+import wbs.utils.time.TextualInterval;
+import wbs.utils.web.HtmlUtils;
 
 @Log4j
 @PrototypeComponent ("manualResponderRequestPendingSummaryPart")
@@ -74,50 +98,51 @@ class ManualResponderRequestPendingSummaryPart
 	extends AbstractPagePart {
 
 	final
-	long maxResults = 1000;
+	long maxResults = 1000l;
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderNumberObjectHelper manualResponderNumberHelper;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderRequestObjectHelper manualResponderRequestHelper;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	ConsoleModule manualResponderRequestPendingConsoleModule;
 
-	@Inject
+	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaLogic;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	RouterLogic routerLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsCustomerSessionObjectHelper smsCustomerSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// state
@@ -246,15 +271,15 @@ class ManualResponderRequestPendingSummaryPart
 				"default");
 
 		routeBillInfos =
-			new ArrayList<RouteBillInfo> ();
+			new ArrayList <RouteBillInfo> ();
 
 		for (
 			RouteRec route
 				: routes
 		) {
 
-			int total = 0;
-			int thisService = 0;
+			long total = 0l;
+			long thisService = 0l;
 
 			MessageSearch messageSearch =
 				new MessageSearch ()
@@ -273,7 +298,7 @@ class ManualResponderRequestPendingSummaryPart
 				.direction (
 					MessageDirection.out);
 
-			List<MessageRec> messages =
+			List <MessageRec> messages =
 				messageHelper.search (
 					messageSearch);
 
@@ -365,38 +390,45 @@ class ManualResponderRequestPendingSummaryPart
 
 		if (manualResponderRequest == null) {
 
-			printFormat (
-				"<p>Not found</p>\n");
+			formatWriter.writeLineFormat (
+				"<p>Not found</p>");
 
 			return;
 
 		}
 
-		printFormat (
-			"<div class=\"manual-responder-request-pending-summary\">\n");
+		htmlDivOpen (
+			htmlClassAttribute ( 
+				"manual-responder-request-pending-summary"));
 
-		printFormat (
-			"<div class=\"layout-container\">\n",
-			"<table class=\"layout\">\n",
-			"<tbody>\n",
-			"<tr>\n",
-			"<td style=\"width: 50%%\">\n");
+		htmlDivOpen (
+			htmlClassAttribute (
+				"layout-container"));
 
-		goRequestDetails ();
+		htmlTableOpenLayout ();
 
-		printFormat (
-			"</td>\n",
-			"<td style=\"width: 50%%\">\n");
+		htmlTableRowOpen ();
 
-		goCustomerDetails ();
-		goNotes ();
+		htmlTableCellWriteHtml (
+			this::goRequestDetails,
+			htmlAttribute (
+				"style",
+				"width: 50%"));
 
-		printFormat (
-			"</td>\n",
-			"</tr>\n",
-			"</tbody>\n",
-			"</table>\n",
-			"</div>\n");
+		htmlTableCellWriteHtml (
+			() -> {
+				goCustomerDetails ();
+				goNotes ();
+			},
+			htmlAttribute (
+				"style",
+				"width: 50%"));
+
+		htmlTableRowClose ();
+
+		htmlTableClose ();
+
+		htmlDivClose ();
 
 		goBillHistory ();
 
@@ -406,30 +438,22 @@ class ManualResponderRequestPendingSummaryPart
 
 		goRequestHistory ();
 
-		printFormat (
-			"</div>\n");
+		htmlDivClose ();
 
 	}
 
 	void goRequestDetails () {
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Manual responder</th>\n",
-			"%s\n",
-			objectManager.tdForObjectMiniLink (
-				manualResponder),
-			"</tr>\n");
+		htmlTableDetailsRowWriteRaw (
+			"Manual responder",
+			() -> objectManager.writeTdForObjectMiniLink (
+				manualResponder));
 
-		printFormat (
-			"<tr>\n",
-			"<th>Description</th>\n",
-			"<td>%h</td>\n",
-			manualResponder.getDescription (),
-			"</tr>\n");
+		htmlTableDetailsRowWrite (
+			"Description",
+			manualResponder.getDescription ());
 
 		if (
 			privChecker.canRecursive (
@@ -437,38 +461,28 @@ class ManualResponderRequestPendingSummaryPart
 				"number")
 		) {
 
-			printFormat (
-				"<tr>\n",
-				"<th>Number</th>\n",
-				"%s\n",
-				objectManager.tdForObjectMiniLink (
-					number),
-				"</tr>\n");
+			htmlTableDetailsRowWriteRaw (
+				"Number",
+				() -> objectManager.writeTdForObjectMiniLink (
+					number));
 
 		}
 
-		printFormat (
-			"<tr>\n",
-			"<th>Network</th>\n",
-			"%s\n",
-			objectManager.tdForObjectMiniLink (
-				network),
-			"</tr>\n");
+		htmlTableDetailsRowWriteRaw (
+			"Network",
+			() -> objectManager.writeTdForObjectMiniLink (
+				network));
 
-		printFormat (
-			"<tr>\n",
-			"<th>Message</th>\n",
-			"%s\n",
-			objectManager.tdForObjectMiniLink (
-				message),
-			"</tr>\n");
+		htmlTableDetailsRowWriteRaw (
+			"Message",
+			() -> objectManager.writeTdForObjectMiniLink (
+				message));
 
-		printFormat (
-			"<tr>\n",
-			"<th>Message text</th>\n",
-			"<td class=\"bigger\">%h</td>\n",
+		htmlTableDetailsRowWrite (
+			"Message text",
 			message.getText ().getText (),
-			"</tr>\n");
+			htmlClassAttribute (
+				"bigger"));
 
 		for (
 			MediaRec media
@@ -480,61 +494,53 @@ class ManualResponderRequestPendingSummaryPart
 					media)
 			) {
 
-				printFormat (
-					"<tr>\n",
-					"<th>Text media</th>\n",
-					"<td>%h</td>\n",
-					mediaConsoleLogic.mediaContent (
-						media),
-					"</tr>\n");
+				htmlTableDetailsRowWriteHtml (
+					"Text media",
+					() -> mediaConsoleLogic.writeMediaContent (
+						media));
 
 			} else if (
 				mediaLogic.isImage (
 					media)
 			) {
 
-				printFormat (
-					"<tr>\n",
-					"<th>Image media</th>\n",
-					"<td><a href=\"%h\">%s</a></td>\n",
-					mediaConsoleLogic.mediaUrlScaled (
-						media,
-						600,
-						600),
-					mediaConsoleLogic.mediaThumb100 (
-						media),
-					"</tr>\n");
+				htmlTableDetailsRowWriteRaw (
+					"Image media",
+					() -> htmlLinkWriteHtml (
+						mediaConsoleLogic.mediaUrlScaled (
+							media,
+							600,
+							600),
+						() -> mediaConsoleLogic.writeMediaThumb100 (
+							media)));
 
 			} else {
 
-				printFormat (
-					"<tr>\n",
-					"<th>Media</th>\n",
-					"<td>(unsupported media type)</td>\n",
-					"</tr>\n");
+				htmlTableDetailsRowWrite (
+					"Media",
+					"(unsupported media type)");
 
 			}
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
 	void goCustomerDetails () {
 
-		printFormat (
-			"<h3>Customer details</h3>\n");
+		htmlHeadingThreeWrite (
+			"Customer details");
 
 		if (
 			isNull (
 				smsCustomer)
 		) {
 
-			printFormat (
-				"<p>Customer management is not configured for this ",
-				"manual responder service.</p>\n");
+			formatWriter.writeLineFormat (
+				"<p>Customer management is not configured for this manual ",
+				"responder service.</p>");
 
 			return;
 
@@ -544,14 +550,14 @@ class ManualResponderRequestPendingSummaryPart
 			formatWriter,
 			customerDetailsFields,
 			smsCustomer,
-			ImmutableMap.<String,Object>of ());
+			ImmutableMap.of ());
 
 	}
 
 	void goNotes () {
 
-		printFormat (
-			"<h3>Notes</h3>\n");
+		htmlHeadingThreeWrite (
+			"Notes");
 
 		String notes;
 
@@ -587,16 +593,16 @@ class ManualResponderRequestPendingSummaryPart
 
 		}
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<p",
 			" id=\"%h\"",
 			stringFormat (
 				"manualResponderNumberNote%d",
 				manualResponderRequest.getNumber ().getId ()),
 			" class=\"mrNumberNoteEditable\"",
-			">%s</p>\n",
-			Html.newlineToBr (
-				Html.encode (
+			">%s</p>",
+			HtmlUtils.newlineToBr (
+				HtmlUtils.htmlEncode (
 					notes)));
 
 	}
@@ -609,44 +615,41 @@ class ManualResponderRequestPendingSummaryPart
 		if (routeBillInfos.isEmpty ())
 			return;
 
-		printFormat (
-			"<h2>Bill history for today</h2>\n");
+		htmlHeadingTwoWrite (
+			"Bill history for today");
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlTableOpenList ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Route</th>\n",
-			"<th>All services</th>\n",
-			"<th>This service</th>\n",
-			"</tr>\n");
+		htmlTableHeaderRowWrite (
+			"Route",
+			"All services",
+			"This service");
 
-		for (RouteBillInfo routeBillInfo
-				: routeBillInfos) {
+		for (
+			RouteBillInfo routeBillInfo
+				: routeBillInfos
+		) {
 
-			printFormat (
-				"<tr>\n",
+			htmlTableRowOpen ();
 
-				"<td>%h</td>\n",
-				routeBillInfo.route ().getCode (),
+			htmlTableCellWrite (
+				routeBillInfo.route ().getCode ());
 
-				"<td>%s</td>\n",
+			htmlTableCellWriteHtml (
 				currencyLogic.formatHtml (
 					manualResponder.getCurrency (),
-					Long.valueOf(routeBillInfo.total ())),
+					routeBillInfo.total ()));
 
-				"<td>%s</td>\n",
+			htmlTableCellWriteHtml (
 				currencyLogic.formatHtml (
 					manualResponder.getCurrency (),
-					Long.valueOf(routeBillInfo.thisService ())),
+					routeBillInfo.thisService ()));
 
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
@@ -660,11 +663,10 @@ class ManualResponderRequestPendingSummaryPart
 		if (manualResponder.getInfoText ().getText ().length () == 0)
 			return;
 
-		printFormat (
-			"<h2>Operator info</h2>\n");
+		htmlHeadingTwoWrite (
+			"Operator info");
 
-		printFormat (
-			"%s\n",
+		formatWriter.writeString (
 			manualResponder.getInfoText ().getText ());
 
 	}
@@ -681,70 +683,63 @@ class ManualResponderRequestPendingSummaryPart
 			return;
 		}
 
-		printFormat (
-			"<h2>Customer session</h2>\n");
+		htmlHeadingTwoWrite (
+			"Customer session");
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Start time</th>\n",
-			"<td>%h</td>\n",
+		htmlTableDetailsRowWrite (
+			"Start time",
 			userConsoleLogic.timestampWithTimezoneString (
-				smsCustomerSession.getStartTime ()),
-			"</tr>\n");
+				smsCustomerSession.getStartTime ()));
 
-		if (smsCustomerSession.getEndTime () != null) {
+		if (
+			isNotNull (
+				smsCustomerSession.getEndTime ())
+		) {
 
-			printFormat (
-				"<tr>\n",
-				"<th>End time</th>\n",
-				"<td>%h</td>\n",
+			htmlTableDetailsRowWrite (
+				"End time",
 				userConsoleLogic.timestampWithTimezoneString (
-					smsCustomerSession.getStartTime ()),
-				"</tr>\n");
+					smsCustomerSession.getStartTime ()));
 
 		}
 
 		if (smsCustomerSession.getWelcomeMessage () != null) {
 
-			printFormat (
-				"<tr>\n",
-				"<th>Welcome message</th>\n",
-				"<td>%h (sent %h)</td>\n",
-				smsCustomerSession
-					.getWelcomeMessage ()
-					.getText ()
-					.getText (),
-				userConsoleLogic.timestampWithTimezoneString (
+			htmlTableDetailsRowWrite (
+				"Welcome message",
+				stringFormat (
+					"%s (sent %s)",
 					smsCustomerSession
 						.getWelcomeMessage ()
-						.getCreatedTime ()),
-				"</tr>\n");
+						.getText ()
+						.getText (),
+					userConsoleLogic.timestampWithTimezoneString (
+						smsCustomerSession
+							.getWelcomeMessage ()
+							.getCreatedTime ())));
 
 		}
 
 		if (smsCustomerSession.getWarningMessage () != null) {
 
-			printFormat (
-				"<tr>\n",
-				"<th>Warning message</th>\n",
-				"<td>%h (sent %h)</td>\n",
-				smsCustomerSession
-					.getWarningMessage ()
-					.getText ()
-					.getText (),
-				userConsoleLogic.timestampWithTimezoneString (
+			htmlTableDetailsRowWrite (
+				"Warning message",
+				stringFormat (
+					"%s (sent %s)",
 					smsCustomerSession
 						.getWarningMessage ()
-						.getCreatedTime ()),
-				"</tr>\n");
+						.getText ()
+						.getText (),
+					userConsoleLogic.timestampWithTimezoneString (
+						smsCustomerSession
+							.getWarningMessage ()
+							.getCreatedTime ())));
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
@@ -755,15 +750,15 @@ class ManualResponderRequestPendingSummaryPart
 
 		// title
 
-		printFormat (
-			"<h2>Request history</h2>\n");
+		htmlHeadingTwoWrite (
+			"Request history");
 
 		// warning if we have omitted old requests
 
 		if (oldRequests.size () > maxResults) {
 
-			printFormat (
-				"<p class=\"warning\">%h</p>\n",
+			formatWriter.writeLineFormat (
+				"<p class=\"warning\">%h</p>",
 				stringFormat (
 					"Only showing the first %s results.",
 					maxResults));
@@ -772,16 +767,14 @@ class ManualResponderRequestPendingSummaryPart
 
 		// begin table
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlTableOpenList ();
 
-		printFormat (
-			"<tr>\n",
-			"<th colspan=\"2\">Timestamp</th>\n",
-			"<th>Message</th>\n",
-			"<th>Media</th>\n",
-			"<th>User</th>\n",
-			"</tr>\n");
+		htmlTableHeaderRowWrite (
+			"Timestamp",
+			null,
+			"Message",
+			"Media",
+			"User");
 
 		// iterate requests
 
@@ -790,8 +783,7 @@ class ManualResponderRequestPendingSummaryPart
 				: oldRequests
 		) {
 
-			printFormat (
-				"<tr class=\"sep\">\n");
+			htmlTableRowSeparatorWrite ();
 
 			// iterate replies, which are shown before their requests
 
@@ -802,99 +794,76 @@ class ManualResponderRequestPendingSummaryPart
 
 				// print reply
 
-				printFormat (
-					"<tr",
-					" class=\"message-out\"",
-					">\n");
+				htmlTableRowOpen (
+					htmlClassAttribute (
+						"message-out"));
 
-				printFormat (
-					"<td>&nbsp;</td>\n");
+				htmlTableCellWriteHtml (
+					"&nbsp;");
 
-				printFormat (
-					"<td>%s</td>\n",
-					ifNull (
-						userConsoleLogic.timestampWithTimezoneString (
-							oldReply.getTimestamp ()),
-						"-"));
+				htmlTableCellWriteHtml (
+					userConsoleLogic.timestampWithTimezoneString (
+						oldReply.getTimestamp ()));
 
-				printFormat (
-					"<td>%h</td>\n",
+				htmlTableCellWriteHtml (
 					oldReply.getText ().getText ());
 
-				printFormat (
-					"<td></td>\n");
+				htmlTableCellWrite (
+					"");
 
-				printFormat (
-					"<td>%h</td>\n",
-					oldReply.getUser () != null
-						? oldReply.getUser ().getUsername ()
-						: "-");
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						oldReply.getUser (),
+						() -> oldReply.getUser ().getUsername ()));
 
-				printFormat (
-					"</tr>\n");
+				htmlTableCellClose ();
 
 			}
 
 			// print request
 
-			printFormat (
-				"<tr",
-				" class=\"message-in\"",
-				">\n");
+			htmlTableRowOpen (
+				htmlClassAttribute (
+					"message-in"));
 
-			printFormat (
-				"<td colspan=\"2\">%h</td>\n",
+			htmlTableCellWrite (
 				userConsoleLogic.timestampWithTimezoneString (
-					oldRequest.getTimestamp ()));
+					oldRequest.getTimestamp ()),
+				htmlColumnSpanAttribute (2l));
 
-			printFormat (
-				"<td>%h</td>\n",
-				oldRequest
-					.getMessage ()
-					.getText ()
-					.getText ());
+			htmlTableCellWrite (
+				oldRequest.getMessage ().getText ().getText ());
 
 			// print request medias
 
-			printFormat (
-				"<td>\n");
-
-			for (
-				MediaRec media
-					: oldRequest.getMessage ().getMedias ()
-			) {
+			htmlTableCellWriteHtml (
+				() -> oldRequest.getMessage ().getMedias ().forEach (
+					media -> {
 
 				if (
 					mediaLogic.isImage (
 						media)
 				) {
 
-					printFormat (
-						"%s\n",
-						mediaConsoleLogic.mediaThumb32 (
-							media));
+					mediaConsoleLogic.writeMediaThumb32 (
+						media);
 
 				}
 
-			}
-
-			printFormat (
-				"</td>\n");
+			}));
 
 			// leave request user blank
 
-			printFormat (
-				"<td></td>\n");
+			htmlTableCellWrite (
+				"");
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
 		// close table
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
@@ -902,12 +871,12 @@ class ManualResponderRequestPendingSummaryPart
 	@Data
 	static
 	class RouteBillInfo
-		implements Comparable<RouteBillInfo> {
+		implements Comparable <RouteBillInfo> {
 
 		RouteRec route;
 
-		Integer total = 0;
-		Integer thisService = 0;
+		Long total = 0l;
+		Long thisService = 0l;
 
 		@Override
 		public

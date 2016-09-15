@@ -1,7 +1,7 @@
 package wbs.platform.servlet;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringSplitComma;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringSplitComma;
 
 import java.util.ArrayList;
 import java.util.Collections;

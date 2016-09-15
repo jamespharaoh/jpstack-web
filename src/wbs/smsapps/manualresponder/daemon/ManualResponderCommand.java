@@ -1,23 +1,16 @@
 package wbs.smsapps.manualresponder.daemon;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TimeUtils.calculateAgeInYears;
-import static wbs.framework.utils.etc.TimeUtils.earlierThan;
-
-import javax.inject.Inject;
-
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.lessThan;
+import static wbs.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.time.TimeUtils.calculateAgeInYears;
+import static wbs.utils.time.TimeUtils.earlierThan;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -26,14 +19,18 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.joda.time.DateTimeZone;
+import org.joda.time.Days;
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.EmailLogic;
-import wbs.framework.utils.TimeFormatter;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -59,6 +56,8 @@ import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
+import wbs.utils.email.EmailLogic;
+import wbs.utils.time.TimeFormatter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("manualResponderCommand")
@@ -66,54 +65,54 @@ public
 class ManualResponderCommand
 	implements CommandHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EmailLogic emailLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderLogic manualResponderLogic;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderNumberObjectHelper manualResponderNumberHelper;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderRequestObjectHelper manualResponderRequestHelper;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
-	@Inject
+	@SingletonDependency
 	NumberListLogic numberListLogic;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsCustomerObjectHelper smsCustomerHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsCustomerLogic smsCustomerLogic;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// properties

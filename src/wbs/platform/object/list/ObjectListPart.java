@@ -1,13 +1,13 @@
 package wbs.platform.object.list;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
-import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalIf;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.joinWithSpace;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -17,10 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-
-import org.joda.time.Interval;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -29,6 +25,9 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.joda.time.Interval;
+
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.forms.FieldsProvider;
@@ -45,6 +44,7 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.platform.object.criteria.CriteriaSpec;
@@ -52,30 +52,30 @@ import wbs.platform.object.criteria.CriteriaSpec;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectListPart")
 public
-class ObjectListPart<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectListPart <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 >
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
 	String typeCode;
@@ -84,13 +84,13 @@ class ObjectListPart<
 	String localName;
 
 	@Getter @Setter
-	Map<String,ObjectListBrowserSpec> listBrowserSpecs;
+	Map <String, ObjectListBrowserSpec> listBrowserSpecs;
 
 	@Getter @Setter
-	Map<String,ObjectListTabSpec> listTabSpecs;
+	Map <String, ObjectListTabSpec> listTabSpecs;
 
 	@Getter @Setter
-	FieldsProvider<ObjectType,ParentType> formFieldsProvider;
+	FieldsProvider <ObjectType, ParentType> formFieldsProvider;
 
 	@Getter @Setter
 	String targetContextTypeName;
@@ -101,10 +101,10 @@ class ObjectListPart<
 
 	ObsoleteDateField dateField;
 
-	Optional<ObjectListBrowserSpec> currentListBrowserSpec;
+	Optional <ObjectListBrowserSpec> currentListBrowserSpec;
 
 	ObjectListTabSpec currentListTabSpec;
-	Record<?> currentObject;
+	Record <?> currentObject;
 
 	List<? extends Record<?>> allObjects;
 	List<Record<?>> selectedObjects;

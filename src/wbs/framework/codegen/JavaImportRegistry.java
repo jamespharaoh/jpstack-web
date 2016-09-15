@@ -1,7 +1,7 @@
 package wbs.framework.codegen;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
-import static wbs.framework.utils.etc.TypeUtils.classNameFull;
+import static wbs.utils.etc.TypeUtils.classNameFull;
+import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import lombok.NonNull;
 

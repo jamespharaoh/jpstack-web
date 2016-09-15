@@ -1,0 +1,31 @@
+<plugin
+	name="utils"
+	package="wbs.utils">
+
+	<layer name="console">
+
+		<component class="web.HtmlTableCellWriter"/> 
+		<component class="web.HtmlTableCheckWriter"/> 
+
+	</layer>
+
+	<layer name="utils">
+
+		<component class="cache.IdCacheBuilder"/>
+
+		<component class="random.RandomLogicImplementation"/>
+
+		<component class="thread.ThreadManagerImplementation"/>
+
+		<component class="time.TimeFormatterImplementation"/>
+		<component class="time.IntervalFormatterImplementation"/>
+
+	</layer>
+
+	<layer name="logic">
+
+		<component class="email.EmailLogicImplementation"/>
+
+	</layer>
+
+</plugin>

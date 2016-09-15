@@ -1,9 +1,9 @@
 package wbs.framework.schema.builder;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionSize;
-import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Collections;

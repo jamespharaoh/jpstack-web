@@ -1,15 +1,15 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionHasOneElement;
-import static wbs.framework.utils.etc.CollectionUtils.collectionHasTwoElements;
-import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.eitherGetLeft;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.requiredSuccess;
-import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringSplitColon;
+import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.Misc.eitherGetLeft;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.requiredSuccess;
+import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringSplitColon;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,7 +32,7 @@ import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("readOnlyFormField")
@@ -208,9 +208,9 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	void renderTableCellList (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			boolean link,
-			int colspan) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Boolean link,
+			@NonNull Long columnSpan) {
 
 		Optional<Native> nativeValue =
 			requiredValue (
@@ -237,7 +237,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			hints,
 			interfaceValue,
 			link,
-			colspan);
+			columnSpan);
 
 	}
 
@@ -273,7 +273,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			hints,
 			interfaceValue,
 			true,
-			1);
+			1l);
 
 	}
 

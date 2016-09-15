@@ -1,7 +1,7 @@
 package wbs.platform.event.console;
 
-import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import com.google.common.base.Optional;
 

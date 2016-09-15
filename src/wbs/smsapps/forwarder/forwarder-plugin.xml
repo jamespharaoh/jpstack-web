@@ -27,11 +27,11 @@
 		<component class="api.ForwarderApiModule"/>
 		<component class="api.ForwarderInAction"/>
 		<component class="api.ForwarderOutAction"/>
-		<component class="api.ForwarderPeekExRequestDefConfig"/>
-		<component class="api.ForwarderQueryExRequestDefConfig"/>
+		<component class="api.ForwarderPeekExRequestDefComponents"/>
+		<component class="api.ForwarderQueryExRequestDefComponents"/>
 		<component class="api.ForwarderQueryExMessageChecker"/>
 		<component class="api.ForwarderUnqueueExRpcHandler"/>
-		<component class="api.ForwarderUnqueueExRequestDefConfig"/>
+		<component class="api.ForwarderUnqueueExRequestDefComponents"/>
 	</layer>
 
 	<layer name="daemon">

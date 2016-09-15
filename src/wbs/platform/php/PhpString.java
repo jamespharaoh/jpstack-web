@@ -1,8 +1,8 @@
 package wbs.platform.php;
 
-import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.framework.utils.etc.StringUtils.bytesToString;
-import static wbs.framework.utils.etc.StringUtils.stringToBytes;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.string.StringUtils.bytesToString;
+import static wbs.utils.string.StringUtils.stringToBytes;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;

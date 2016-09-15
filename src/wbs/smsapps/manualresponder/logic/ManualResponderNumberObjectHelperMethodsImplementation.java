@@ -1,10 +1,8 @@
 package wbs.smsapps.manualresponder.logic;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberObjectHelperMethods;
@@ -15,11 +13,10 @@ public
 class ManualResponderNumberObjectHelperMethodsImplementation
 	implements ManualResponderNumberObjectHelperMethods {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
-	Provider<ManualResponderNumberObjectHelper>
-	manualResponderNumberHelperProvider;
+	@WeakSingletonDependency
+	ManualResponderNumberObjectHelper manualResponderNumberHelper;
 
 	// implementation
 
@@ -28,9 +25,6 @@ class ManualResponderNumberObjectHelperMethodsImplementation
 	ManualResponderNumberRec findOrCreate (
 			@NonNull ManualResponderRec manualResponder,
 			@NonNull NumberRec number) {
-
-		ManualResponderNumberObjectHelper manualResponderNumberHelper =
-			manualResponderNumberHelperProvider.get ();
 
 		// find or create number
 

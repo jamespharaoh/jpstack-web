@@ -1,11 +1,10 @@
 package wbs.smsapps.subscription.console;
 
-import javax.inject.Inject;
-
 import org.joda.time.Instant;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.smsapps.subscription.model.SubscriptionSendRec;
 
@@ -14,12 +13,12 @@ public
 class SubscriptionSendControlPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	SubscriptionSendConsoleHelper subscriptionSendHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// state

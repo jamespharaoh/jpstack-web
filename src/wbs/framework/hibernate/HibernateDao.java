@@ -1,12 +1,12 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionDoesNotHaveOneElement;
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
+import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveOneElement;
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.HashMap;

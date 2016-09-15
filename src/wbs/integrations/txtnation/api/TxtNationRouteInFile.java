@@ -1,7 +1,7 @@
 package wbs.integrations.txtnation.api;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.PrintWriter;
 import java.util.Collections;
@@ -17,7 +17,6 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.utils.etc.StringFormatter;
 import wbs.framework.web.AbstractWebFile;
 import wbs.framework.web.RequestContext;
 import wbs.integrations.txtnation.model.TxtNationRouteInObjectHelper;
@@ -28,6 +27,7 @@ import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
+import wbs.utils.string.StringFormatter;
 
 @Log4j
 @SingletonComponent ("txtNationRouteInFile")

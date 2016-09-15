@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 
 import com.google.common.base.Optional;
 

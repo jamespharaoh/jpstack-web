@@ -49,7 +49,7 @@ class InjectedProperty {
 
 	@DataAttribute
 	@Getter @Setter
-	Boolean provider;
+	Boolean prototype;
 
 	@DataAttribute
 	@Getter @Setter

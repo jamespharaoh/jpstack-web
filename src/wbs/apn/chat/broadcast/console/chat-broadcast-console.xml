@@ -1,0 +1,162 @@
+<console-module
+	name="chat-broadcast">
+
+	<extend-context
+		name="chat.broadcast"
+		base-name="chat"
+		extension-point="chat.broadcast"
+		object-name="chat">
+
+		<section
+			name="broadcast"
+			label="Broadcast">
+
+			<context-tab-responder-page
+				name="list"/>
+
+			<context-tab-action-page
+				name="send"/>
+
+			<context-tab-responder
+				name="verify"
+				tab="chat.broadcast.send"/>
+
+		</section>
+
+	</extend-context>
+
+	<field-set
+		name="send-search"
+		class="wbs.apn.chat.broadcast.console.ChatBroadcastSendForm">
+
+		<yes-no-field
+			name="search"
+			hidden="yes"/>
+
+		<interval-field
+			name="lastAction"
+			nullable="yes"/>
+
+		<enum-field
+			name="gender"
+			nullable="yes"/>
+
+		<enum-field
+			name="orient"
+			nullable="yes"/>
+
+		<object-field
+			name="categoryId"
+			object-type="chatCategory"
+			root-field="chat"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="hasPicture"
+			label="Picture"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="isAdult"
+			label="Adult"
+			nullable="yes"/>
+
+		<currency-field
+			name="minimumSpend"
+			label="Search spend minimum"
+			currency="chat.currency"
+			nullable="yes"/>
+
+		<currency-field
+			name="maximumSpend"
+			label="Search spend maximum"
+			currency="chat.currency"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="send-numbers"
+		class="wbs.apn.chat.broadcast.console.ChatBroadcastSendForm">
+
+		<text-area-field
+			name="numbers"/>
+
+	</field-set>
+
+	<field-set
+		name="send-common"
+		class="wbs.apn.chat.broadcast.console.ChatBroadcastSendForm">
+
+		<yes-no-field
+			name="includeBlocked"
+			view-priv="chat:supervisor"/>
+
+		<yes-no-field
+			name="includeOptedOut"
+			view-priv="chat:supervisor"/>
+
+	</field-set>
+
+	<field-set
+		name="send-message-user"
+		class="wbs.apn.chat.broadcast.console.ChatBroadcastSendForm">
+
+		<text-field
+			name="fromUser"/>
+
+	</field-set>
+
+	<field-set
+		name="send-message-message"
+		class="wbs.apn.chat.broadcast.console.ChatBroadcastSendForm">
+
+		<text-field
+			name="prefix"
+			read-only="yes"/>
+
+		<text-area-field
+			name="message"
+			char-count-function="gsmCharCountNew"
+			char-count-data="{ maxReduceField: 'send-prefix' }"/>
+
+	</field-set>
+
+	<field-set
+		name="verify-user"
+		object-name="chatUser">
+
+		<object-field
+			name="number"
+			object-type="number"/>
+
+		<code-field/>
+
+		<text-field
+			name="name"/>
+
+		<timestamp-field
+			name="lastAction"/>
+
+		<enum-field
+			name="gender"/>
+
+		<enum-field
+			name="orient"/>
+
+		<object-field
+			name="category"
+			root-field="chat"/>
+
+		<image-field
+			name="picture"
+			field="mainChatUserImage.media"
+			label="Pic"/>
+
+		<yes-no-field
+			name="adultVerified"
+			label="Adult"/>
+
+	</field-set>
+
+</console-module>

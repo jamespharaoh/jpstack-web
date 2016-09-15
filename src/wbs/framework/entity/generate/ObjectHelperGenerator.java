@@ -1,26 +1,24 @@
 package wbs.framework.entity.generate;
 
-import static wbs.framework.utils.etc.CollectionUtils.listSliceAllButLastItemRequired;
-import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
-import static wbs.framework.utils.etc.StringUtils.uncapitalise;
-import static wbs.framework.utils.etc.TypeUtils.classForName;
-import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
-import static wbs.framework.utils.etc.TypeUtils.classPackageName;
+import static wbs.utils.collection.CollectionUtils.listSliceAllButLastItemRequired;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.TypeUtils.classForName;
+import static wbs.utils.etc.TypeUtils.classForNameRequired;
+import static wbs.utils.etc.TypeUtils.classPackageName;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.joinWithFullStop;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringSplitFullStop;
+import static wbs.utils.string.StringUtils.uncapitalise;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -38,6 +36,7 @@ import wbs.framework.codegen.JavaAnnotationWriter;
 import wbs.framework.codegen.JavaClassUnitWriter;
 import wbs.framework.codegen.JavaClassWriter;
 import wbs.framework.codegen.JavaImportRegistry;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
@@ -55,10 +54,10 @@ import wbs.framework.object.ObjectModelImplementation;
 import wbs.framework.object.ObjectModelMethods;
 import wbs.framework.object.ObjectTypeEntry;
 import wbs.framework.object.ObjectTypeRegistry;
-import wbs.framework.utils.etc.OptionalUtils;
-import wbs.framework.utils.etc.RuntimeIoException;
-import wbs.framework.utils.formatwriter.AtomicFileWriter;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.etc.OptionalUtils;
+import wbs.utils.io.RuntimeIoException;
+import wbs.utils.string.AtomicFileWriter;
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperGenerator")
@@ -461,7 +460,7 @@ class ObjectHelperGenerator {
 		formatWriter.writeLineFormat (
 			"@%s",
 			imports.register (
-				PostConstruct.class));
+				NormalLifecycleSetup.class));
 
 		formatWriter.writeLineFormat (
 			"public");
@@ -487,7 +486,8 @@ class ObjectHelperGenerator {
 			"\t\tdatabase.beginReadOnly (");
 
 		formatWriter.writeLineFormat (
-			"\t\t\t\"setup\",");
+			"\t\t\t\"%sObjectHelper.setup\",",
+			model.objectName ());
 
 		formatWriter.writeLineFormat (
 			"\t\t\tthis);");

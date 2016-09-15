@@ -1,7 +1,7 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
 

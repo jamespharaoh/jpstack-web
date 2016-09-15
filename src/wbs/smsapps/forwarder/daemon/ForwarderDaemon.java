@@ -1,8 +1,8 @@
 package wbs.smsapps.forwarder.daemon;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
-import static wbs.framework.utils.etc.TimeUtils.earlierThan;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringIsEmpty;
+import static wbs.utils.time.TimeUtils.earlierThan;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,8 +19,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
@@ -28,6 +26,7 @@ import lombok.extern.log4j.Log4j;
 import org.joda.time.Duration;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -47,15 +46,15 @@ class ForwarderDaemon
 	public final static
 	int bufferSize = 100;
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ForwarderMessageInObjectHelper forwarderMessageInHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// state

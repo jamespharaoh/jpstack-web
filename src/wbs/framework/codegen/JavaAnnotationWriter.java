@@ -1,10 +1,10 @@
 package wbs.framework.codegen;
 
-import static wbs.framework.utils.etc.ArrayUtils.arrayIsEmpty;
-import static wbs.framework.utils.etc.CollectionUtils.collectionHasOneElement;
-import static wbs.framework.utils.etc.CollectionUtils.iterableFirstElementRequired;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
+import static wbs.utils.collection.ArrayUtils.arrayIsEmpty;
+import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
+import static wbs.utils.collection.CollectionUtils.iterableFirstElementRequired;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,7 +13,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.framework.utils.formatwriter.FormatWriter;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 public

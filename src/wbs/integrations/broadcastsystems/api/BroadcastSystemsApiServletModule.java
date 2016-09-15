@@ -3,11 +3,11 @@ package wbs.integrations.broadcastsystems.api;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Named;
 
 import com.google.common.collect.ImmutableMap;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.PathHandler;
@@ -62,15 +62,15 @@ class BroadcastSystemsApiServletModule
 
 	// ================================================================== files
 
-	Map<String,WebFile> defaultFiles;
+	Map <String, WebFile> defaultFiles;
 
 	// ========================================================= servlet module
 
 	@Override
 	public
-	Map<String,PathHandler> paths () {
+	Map <String, PathHandler> paths () {
 
-		return ImmutableMap.<String,PathHandler>builder ()
+		return ImmutableMap.<String, PathHandler> builder ()
 
 			.put (
 				"/broadcastsystems",
@@ -88,7 +88,7 @@ class BroadcastSystemsApiServletModule
 
 	// ========================================================= servlet module
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void afterPropertiesSet () {
 

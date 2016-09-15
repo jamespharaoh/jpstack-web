@@ -3,12 +3,13 @@ package wbs.smsapps.subscription.console;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.sms.number.core.console.NumberPlugin;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.subscription.model.SubscriptionSubObjectHelper;
@@ -18,23 +19,31 @@ public
 class SubscriptionNumberLinkProvider
 	implements NumberPlugin {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionSubObjectHelper subscriptionSubHelper;
 
-	@Inject
-	Provider<SubscriptionNumberAdvice> subscriptionNumberAdvice;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <SubscriptionNumberAdvice> subscriptionNumberAdviceProvider;
+
+	// details
 
 	@Override
 	public
 	String getName () {
 		return "subscription";
 	}
+
+	// implementation
 
 	@Override
 	public

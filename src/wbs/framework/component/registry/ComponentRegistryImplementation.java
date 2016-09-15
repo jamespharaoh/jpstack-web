@@ -1,24 +1,24 @@
 package wbs.framework.component.registry;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
-import static wbs.framework.utils.etc.IterableUtils.iterableCount;
-import static wbs.framework.utils.etc.Misc.doesNotContain;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.NumberUtils.equalToZero;
-import static wbs.framework.utils.etc.NumberUtils.moreThanOne;
-import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
-import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
-import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotInSafe;
-import static wbs.framework.utils.etc.TypeUtils.classNotInSafe;
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.collection.IterableUtils.iterableCount;
+import static wbs.utils.etc.Misc.doesNotContain;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.equalToZero;
+import static wbs.utils.etc.NumberUtils.moreThanOne;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.etc.TypeUtils.classNotInSafe;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.nullIfEmptyString;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotInSafe;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +37,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Qualifier;
@@ -711,12 +710,9 @@ class ComponentRegistryImplementation
 
 		List <ComponentDefinition> targetComponentDefinitions =
 			ifNull (
-				injectedProperty.provider ()
-					? ifNull (
-						prototypesByQualifier.get (
-							qualifier),
-						singletonsByQualifier.get (
-							qualifier))
+				injectedProperty.prototype ()
+					? prototypesByQualifier.get (
+						qualifier)
 					: singletonsByQualifier.get (
 						qualifier),
 				Collections.emptyList ());
@@ -726,7 +722,10 @@ class ComponentRegistryImplementation
 			if (targetComponentDefinitions.isEmpty ()) {
 
 				taskLogger.errorFormat (
-					"Unable to find component of type %s for %s.%s",
+					"Unable to find %s component of type %s for %s.%s",
+					injectedProperty.prototype ()
+						? "prototype"
+						: "singleton",
 					injectedProperty.targetType (),
 					componentDefinition.name (),
 					injectedProperty.fieldName ());
@@ -752,7 +751,7 @@ class ComponentRegistryImplementation
 
 		// register dependencies
 
-		if (! injectedProperty.provider ()) {
+		if (! injectedProperty.prototype ()) {
 
 			for (
 				ComponentDefinition targetComponentDefinition
@@ -904,10 +903,6 @@ class ComponentRegistryImplementation
 					instantiateClass)
 		) {
 
-			Inject injectAnnotation =
-				field.getAnnotation (
-					Inject.class);
-
 			PrototypeDependency prototypeDependencyAnnotation =
 				field.getAnnotation (
 					PrototypeDependency.class);
@@ -927,8 +922,6 @@ class ComponentRegistryImplementation
 			long numAnnotations =
 				iterableCount (
 					presentInstances (
-						optionalFromNullable (
-							injectAnnotation),
 						optionalFromNullable (
 							prototypeDependencyAnnotation),
 						optionalFromNullable (
@@ -955,6 +948,16 @@ class ComponentRegistryImplementation
 
 			}
 
+			Boolean prototype =
+				isNotNull (
+					prototypeDependencyAnnotation)
+				|| isNotNull (
+					uninitializedDependencyAnnotation);
+
+			Boolean initialized =
+				isNull (
+					uninitializedDependencyAnnotation);
+
 			Boolean weak =
 				isNotNull (
 					weakSingletonDependencyAnnotation);
@@ -973,8 +976,8 @@ class ComponentRegistryImplementation
 					componentDefinition,
 					namedAnnotation,
 					field,
-					isNull (
-						uninitializedDependencyAnnotation),
+					prototype,
+					initialized,
 					weak);
 
 			} else {
@@ -1071,6 +1074,7 @@ class ComponentRegistryImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Named namedAnnotation,
 			@NonNull Field field,
+			@NonNull Boolean prototype,
 			@NonNull Boolean initialized,
 			@NonNull Boolean weak) {
 
@@ -1134,8 +1138,8 @@ class ComponentRegistryImplementation
 			.fieldName (
 				field.getName ())
 
-			.provider (
-				field.getType () == Provider.class)
+			.prototype (
+				prototype)
 
 			.initialized (
 				initialized)
@@ -1294,7 +1298,7 @@ class ComponentRegistryImplementation
 
 		injectedProperty
 			.collectionType (collectionType)
-			.provider (isProvider)
+			.prototype (isProvider)
 			.finalType (fieldType)
 			.injectType (injectType)
 			.targetType (valueType);
@@ -1329,12 +1333,9 @@ class ComponentRegistryImplementation
 
 		Map <String, ComponentDefinition> targetComponentDefinitions =
 			ifNull (
-				injectedProperty.provider ()
-					? ifNull (
-						prototypesByClass.get (
-							targetClass),
-						singletonsByClass.get (
-							targetClass))
+				injectedProperty.prototype ()
+					? prototypesByClass.get (
+						targetClass)
 					: singletonsByClass.get (
 						targetClass),
 				Collections.emptyMap ());
@@ -1344,7 +1345,10 @@ class ComponentRegistryImplementation
 			if (targetComponentDefinitions.isEmpty ()) {
 
 				taskLogger.errorFormat (
-					"Unable to find component of type %s for %s.%s",
+					"Unable to find %s component of type %s for %s.%s",
+					injectedProperty.prototype ()
+						? "prototype"
+						: "singleton",
 					injectedProperty.targetType (),
 					componentDefinition.name (),
 					field.getName ());
@@ -1375,7 +1379,7 @@ class ComponentRegistryImplementation
 
 		// register dependencies
 
-		if (! injectedProperty.provider ()) {
+		if (! injectedProperty.prototype ()) {
 
 			for (
 				ComponentDefinition targetComponentDefinition
@@ -1416,112 +1420,117 @@ class ComponentRegistryImplementation
 			new TaskLogger (
 				log);
 
-		@Cleanup
-		ActiveTask activeTask =
-			activityManager.start (
-				"component-registry",
-				"build ()",
-				this);
+		try (
 
-		// create component manager
+			ActiveTask activeTask =
+				activityManager.start (
+					"component-registry",
+					"build ()",
+					this);
 
-		@SuppressWarnings ("resource")
-		ComponentManagerImplementation componentManager =
-			new ComponentManagerImplementation ()
+		) {
 
-			.registry (
-				this)
+			// create component manager
 
-			.activityManager (
+			@SuppressWarnings ("resource")
+			ComponentManagerImplementation componentManager =
+				new ComponentManagerImplementation ()
+
+				.registry (
+					this)
+
+				.activityManager (
+					activityManager);
+
+			// automatic components
+
+			registerUnmanagedSingleton (
+				"componentManager",
+				componentManager);
+
+			registerUnmanagedSingleton (
+				"activityManager",
 				activityManager);
 
-		// automatic components
-
-		registerUnmanagedSingleton (
-			"componentManager",
-			componentManager);
-
-		registerUnmanagedSingleton (
-			"activityManager",
-			activityManager);
-
-		// work out dependencies
-
-		for (
-			ComponentDefinition componentDefinition
-				: definitions
-		) {
-
-			initComponentDefinition (
-				taskLogger,
-				componentDefinition);
-
-		}
-
-		// check dependencies exist
-
-		for (
-			ComponentDefinition componentDefinition
-				: definitions
-		) {
+			// work out dependencies
 
 			for (
-				String dependency
-					: componentDefinition.strongDependencies ()
+				ComponentDefinition componentDefinition
+					: definitions
 			) {
 
-				if (
-					! byName.containsKey (
-						dependency)
+				initComponentDefinition (
+					taskLogger,
+					componentDefinition);
+
+			}
+
+			// check dependencies exist
+
+			for (
+				ComponentDefinition componentDefinition
+					: definitions
+			) {
+
+				for (
+					String dependency
+						: componentDefinition.strongDependencies ()
 				) {
 
-					taskLogger.errorFormat (
-						"Can't provide dependency %s for %s",
-						dependency,
-						componentDefinition.name ());
+					if (
+						! byName.containsKey (
+							dependency)
+					) {
+
+						taskLogger.errorFormat (
+							"Can't provide dependency %s for %s",
+							dependency,
+							componentDefinition.name ());
+
+					}
 
 				}
 
 			}
 
+			// order component definitions
+
+			singletons =
+				ImmutableList.copyOf (
+					orderByStrongDepedendencies (
+						taskLogger,
+						singletons));
+
+			// output component definitions
+
+			if (outputPath != null) {
+
+				outputComponentDefinitions (
+					outputPath);
+
+			}
+
+			// check for errors
+
+			if (taskLogger.errors ()) {
+
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
+					stringFormat (
+						"Aborting due to %s errors",
+						taskLogger.errorCount ()));
+
+			}
+
+			// initialise
+
+			componentManager.init ();
+
+			// and return
+
+			return componentManager;
+
 		}
-
-		// order component definitions
-
-		singletons =
-			ImmutableList.copyOf (
-				orderByStrongDepedendencies (
-					taskLogger,
-					singletons));
-
-		// output component definitions
-
-		if (outputPath != null) {
-
-			outputComponentDefinitions (
-				outputPath);
-
-		}
-
-		// check for errors
-
-		if (taskLogger.errors ()) {
-
-			throw new RuntimeExceptionWithTask (
-				activityManager.currentTask (),
-				stringFormat (
-					"Aborting due to %s errors",
-					taskLogger.errorCount ()));
-
-		}
-
-		// initialise
-
-		componentManager.init ();
-
-		// and return
-
-		return componentManager;
 
 	}
 

@@ -1,23 +1,20 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
-import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.NumberUtils.equalToOne;
-import static wbs.framework.utils.etc.NumberUtils.equalToThree;
-import static wbs.framework.utils.etc.NumberUtils.equalToTwo;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.equalToOne;
+import static wbs.utils.etc.NumberUtils.equalToThree;
+import static wbs.utils.etc.NumberUtils.equalToTwo;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
-
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -27,12 +24,16 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang3.tuple.Pair;
+
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.entity.record.PermanentRecord;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.FormatWriter;
 
 @Log4j
 @SingletonComponent ("fieldsLogic")
@@ -867,8 +868,8 @@ class FormFieldLogic {
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object object,
-			@NonNull Map<String,Object> hints,
-			boolean links) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Boolean links) {
 
 		for (
 			FormField formField
@@ -883,7 +884,7 @@ class FormFieldLogic {
 				object,
 				hints,
 				links,
-				1);
+				1l);
 
 		}
 
@@ -894,8 +895,8 @@ class FormFieldLogic {
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object object,
-			boolean links,
-			int colspan) {
+			@NonNull Boolean links,
+			@NonNull Long columnSpan) {
 
 		for (
 			FormField formField
@@ -910,7 +911,7 @@ class FormFieldLogic {
 				object,
 				ImmutableMap.of (),
 				links,
-				colspan);
+				columnSpan);
 
 		}
 

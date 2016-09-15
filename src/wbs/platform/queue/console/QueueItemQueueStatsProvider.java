@@ -1,15 +1,17 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
+
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
@@ -17,7 +19,9 @@ import wbs.console.reporting.StatsDatum;
 import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
@@ -29,21 +33,21 @@ public
 class QueueItemQueueStatsProvider
 	implements StatsProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	QueueItemObjectHelper queueItemHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<QueueStatsFilter> queueStatsFilterProvider;
+	@PrototypeDependency
+	Provider <QueueStatsFilter> queueStatsFilterProvider;
 
 	// implementation
 
@@ -51,7 +55,7 @@ class QueueItemQueueStatsProvider
 	public
 	StatsDataSet getStats (
 			@NonNull StatsPeriod statsPeriod,
-			@NonNull Map<String,Object> conditions) {
+			@NonNull Map <String, Object> conditions) {
 
 		if (statsPeriod.granularity () != StatsGranularity.hour)
 			throw new IllegalArgumentException ();
@@ -128,22 +132,26 @@ class QueueItemQueueStatsProvider
 				numCreatedPerQueue.put (
 					queue.getId (),
 					new long [
-						statsPeriod.size ()]);
+						toJavaIntegerRequired (
+							statsPeriod.size ())]);
 
 				numProcessedPerQueue.put (
 					queue.getId (),
 					new long [
-						statsPeriod.size ()]);
+						toJavaIntegerRequired (
+							statsPeriod.size ())]);
 
 				numPreferredPerQueue.put (
 					queue.getId (),
 					new long [
-						statsPeriod.size ()]);
+						toJavaIntegerRequired (
+							statsPeriod.size ())]);
 
 				numNotPreferredPerQueue.put (
 					queue.getId (),
 					new long [
-						statsPeriod.size ()]);
+						toJavaIntegerRequired (
+							statsPeriod.size ())]);
 
 			}
 
@@ -192,22 +200,26 @@ class QueueItemQueueStatsProvider
 				numCreatedPerQueue.put (
 					queue.getId (),
 					new long [
-						statsPeriod.size ()]);
+						toJavaIntegerRequired (
+							statsPeriod.size ())]);
 
 				numProcessedPerQueue.put (
 					queue.getId (),
 					new long [
-						statsPeriod.size ()]);
+						toJavaIntegerRequired (
+							statsPeriod.size ())]);
 
 				numPreferredPerQueue.put (
 					queue.getId (),
 					new long [
-						statsPeriod.size ()]);
+						toJavaIntegerRequired (
+							statsPeriod.size ())]);
 
 				numNotPreferredPerQueue.put (
 					queue.getId (),
 					new long [
-						statsPeriod.size ()]);
+						toJavaIntegerRequired (
+							statsPeriod.size ())]);
 
 			}
 

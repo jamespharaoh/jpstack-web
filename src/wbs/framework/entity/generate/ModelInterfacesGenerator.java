@@ -1,9 +1,9 @@
 package wbs.framework.entity.generate;
 
-import static wbs.framework.utils.etc.FileUtils.directoryCreateWithParents;
-import static wbs.framework.utils.etc.FileUtils.fileExistsFormat;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.io.FileUtils.directoryCreateWithParents;
+import static wbs.utils.io.FileUtils.fileExistsFormat;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.Cleanup;
 import lombok.Getter;
@@ -16,8 +16,8 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.scaffold.PluginModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
-import wbs.framework.utils.formatwriter.AtomicFileWriter;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.AtomicFileWriter;
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("modelInterfacesGenerator")

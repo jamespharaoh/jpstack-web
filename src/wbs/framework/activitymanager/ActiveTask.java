@@ -1,10 +1,12 @@
 package wbs.framework.activitymanager;
 
 public
-interface ActiveTask {
+interface ActiveTask
+	extends AutoCloseable {
 
 	void success ();
 
+	@Override
 	void close ();
 
 	<ExceptionType extends Throwable>

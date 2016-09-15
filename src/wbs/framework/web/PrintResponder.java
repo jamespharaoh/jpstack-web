@@ -3,7 +3,7 @@ package wbs.framework.web;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import wbs.framework.utils.etc.StringFormatter;
+import wbs.utils.string.StringFormatter;
 
 public abstract
 class PrintResponder

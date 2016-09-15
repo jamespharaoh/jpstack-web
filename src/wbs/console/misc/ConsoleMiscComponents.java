@@ -5,10 +5,11 @@ import javax.inject.Provider;
 
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.UninitializedDependency;
-import wbs.framework.utils.ThreadManager;
-import wbs.framework.utils.ThreadManagerImplementation;
+import wbs.framework.component.config.WbsSpecialConfig;
 import wbs.framework.web.DelegatingPathHandler;
 import wbs.framework.web.PathHandler;
+import wbs.utils.thread.ThreadManager;
+import wbs.utils.thread.ThreadManagerImplementation;
 
 @SingletonComponent ("consoleMiscComponents")
 public
@@ -41,6 +42,17 @@ class ConsoleMiscComponents {
 	PathHandler rootPathHandler () {
 
 		return delegatingPathHandlerProvider.get ();
+
+	}
+
+	@SingletonComponent ("wbsSpecialConfig")
+	public
+	WbsSpecialConfig wbsSpecialConfig () {
+
+		return new WbsSpecialConfig ()
+
+			.assumeNegativeCache (
+				false);
 
 	}
 

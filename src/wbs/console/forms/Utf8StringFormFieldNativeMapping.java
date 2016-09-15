@@ -1,11 +1,12 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
-import static wbs.framework.utils.etc.StringUtils.utf8ToString;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringToUtf8;
+import static wbs.utils.string.StringUtils.utf8ToString;
 
 import com.google.common.base.Optional;
 

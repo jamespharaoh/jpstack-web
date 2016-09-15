@@ -1,13 +1,13 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalMapRequired;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.NumberUtils;
+import wbs.utils.etc.NumberUtils;
 
 @PrototypeComponent ("javaIintegerFormFieldNativeMapping")
 public

@@ -1,18 +1,18 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.LogicUtils.allOf;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.LogicUtils.allOf;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.string.StringUtils.joinWithFullStop;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Arrays;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.tuple.Pair;
+import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
@@ -20,29 +20,39 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.cache.AdvancedCache;
+import wbs.utils.cache.AdvancedCache;
+import wbs.utils.cache.IdCacheBuilder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperCodeImplementation")
 public
-class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
+class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 	implements
-		ObjectHelperCodeMethods<RecordType>,
-		ObjectHelperComponent<RecordType> {
+		ObjectHelperCodeMethods <RecordType>,
+		ObjectHelperComponent <RecordType> {
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <IdCacheBuilder <Pair <Long, String>, Long, RecordType>>
+	idCacheBuilderProvider;
 
 	// properties
 
 	@Setter
-	ObjectModel<RecordType> model;
+	ObjectModel <RecordType> model;
 
 	@Setter
-	ObjectHelper<RecordType> objectHelper;
+	ObjectHelper <RecordType> objectHelper;
 
 	@Setter
-	ObjectDatabaseHelper<RecordType> objectDatabaseHelper;
+	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
 
 	@Setter
 	ObjectManager objectManager;
@@ -65,11 +75,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 		)) {
 
 			parentIdAndCodeCache =
-				new AdvancedCache.IdBuilder <
-					Pair <Long, String>,
-					Long,
-					RecordType
-				> ()
+				idCacheBuilderProvider.get ()
 
 				.dummy (! allOf (
 					() -> model.parentField ().cacheable (),
@@ -79,13 +85,13 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 				.cacheNegatives (
 					false)
 
-				.lookupById (
+				.lookupByIdFunction (
 					objectId ->
 						Optional.fromNullable (
 							objectDatabaseHelper.find (
 								objectId)))
 
-				.lookupByKey (
+				.lookupByKeyFunction (
 					key ->
 						Optional.fromNullable (
 							objectDatabaseHelper.findByParentAndCode (
@@ -94,7 +100,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 									key.getLeft ()),
 								key.getRight ())))
 
-				.getId (
+				.getIdFunction (
 					record ->
 						record.getId ())
 
@@ -112,9 +118,9 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	Optional<RecordType> findByCode (
+	Optional <RecordType> findByCode (
 			@NonNull GlobalId ancestorGlobalId,
-			@NonNull String... codes) {
+			@NonNull String ... codes) {
 
 		if (codes.length == 1) {
 
@@ -127,11 +133,11 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 
 		if (codes.length > 1) {
 
-			ObjectHelper<?> parentHelper =
+			ObjectHelper <?> parentHelper =
 				objectManager.objectHelperForClassRequired (
 					model.parentClass ());
 
-			Record<?> parent =
+			Record <?> parent =
 				parentHelper.findByCodeRequired (
 					ancestorGlobalId,
 					Arrays.copyOfRange (
@@ -160,9 +166,9 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 	public
 	RecordType findByCodeRequired (
 			@NonNull GlobalId ancestorGlobalId,
-			@NonNull String... codes) {
+			@NonNull String ... codes) {
 
-		Optional<RecordType> recordOptional =
+		Optional <RecordType> recordOptional =
 			findByCode (
 				ancestorGlobalId,
 				codes);
@@ -193,7 +199,7 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 	public
 	RecordType findByCodeOrNull (
 			@NonNull GlobalId ancestorGlobalId,
-			@NonNull String... codes) {
+			@NonNull String ... codes) {
 
 		return optionalOrNull (
 			findByCode (
@@ -207,9 +213,9 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 	RecordType findByCodeOrThrow (
 			@NonNull GlobalId ancestorGlobalId,
 			@NonNull String code,
-			@NonNull Supplier<? extends RuntimeException> orThrow) {
+			@NonNull Supplier <? extends RuntimeException> orThrow) {
 
-		Optional<RecordType> recordOptional =
+		Optional <RecordType> recordOptional =
 			findByCode (
 				ancestorGlobalId,
 				code);
@@ -233,9 +239,9 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	RecordType findByCodeOrThrow (
-			@NonNull Record<?> ancestor,
+			@NonNull Record <?> ancestor,
 			@NonNull String code,
-			@NonNull Supplier<? extends RuntimeException> orThrow) {
+			@NonNull Supplier <? extends RuntimeException> orThrow) {
 
 		Optional<RecordType> recordOptional =
 			findByCode (
@@ -263,9 +269,9 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 			@NonNull GlobalId ancestorGlobalId,
 			@NonNull String code0,
 			@NonNull String code1,
-			@NonNull Supplier<? extends RuntimeException> orThrow) {
+			@NonNull Supplier <? extends RuntimeException> orThrow) {
 
-		Optional<RecordType> recordOptional =
+		Optional <RecordType> recordOptional =
 			findByCode (
 				ancestorGlobalId,
 				code0,
@@ -289,12 +295,12 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	RecordType findByCodeOrThrow (
-			@NonNull Record<?> ancestor,
+			@NonNull Record <?> ancestor,
 			@NonNull String code0,
 			@NonNull String code1,
-			@NonNull Supplier<? extends RuntimeException> orThrow) {
+			@NonNull Supplier <? extends RuntimeException> orThrow) {
 
-		Optional<RecordType> recordOptional =
+		Optional <RecordType> recordOptional =
 			findByCode (
 				ancestor,
 				code0,
@@ -317,11 +323,11 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	Optional<RecordType> findByCode (
-			@NonNull Record<?> parent,
-			@NonNull String... codes) {
+	Optional <RecordType> findByCode (
+			@NonNull Record <?> parent,
+			@NonNull String ... codes) {
 
-		ObjectHelper<?> parentHelper =
+		ObjectHelper <?> parentHelper =
 			objectManager.objectHelperForClassRequired (
 				parent.getClass ());
 
@@ -339,8 +345,8 @@ class ObjectHelperCodeImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	RecordType findByCodeRequired (
-			@NonNull Record<?> parent,
-			@NonNull String... codes) {
+			@NonNull Record <?> parent,
+			@NonNull String ... codes) {
 
 		ObjectHelper <?> parentHelper =
 			objectManager.objectHelperForClassRequired (

@@ -3,12 +3,12 @@ package wbs.console.module;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 
@@ -32,7 +32,7 @@ class ConsoleMetaModuleBuilder
 
 	// init
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 
@@ -40,7 +40,7 @@ class ConsoleMetaModuleBuilder
 			builderFactoryProvider.get ();
 
 		for (
-			Map.Entry<Class<?>,Provider<Object>> entry
+			Map.Entry <Class <?>, Provider <Object>> entry
 				: consoleMetaModuleBuilders.entrySet ()
 		) {
 

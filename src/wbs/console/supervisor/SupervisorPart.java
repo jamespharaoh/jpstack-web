@@ -1,11 +1,16 @@
 package wbs.console.supervisor;
 
-import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TimeUtils.localTime;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.time.TimeUtils.localTime;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlUtils.htmlFormClose;
+import static wbs.utils.web.HtmlUtils.htmlFormOpenMethodAction;
+import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
 
 import java.util.Collections;
 import java.util.List;
@@ -412,10 +417,9 @@ class SupervisorPart
 
 		if (supervisorConfigNames.size () > 1) {
 
-			printFormat (
-				"<p",
-				" class=\"links\"",
-				">\n");
+			htmlParagraphOpen (
+				htmlClassAttribute (
+					"links"));
 
 			for (
 				SupervisorConfig oneSupervisorConfig
@@ -444,40 +448,39 @@ class SupervisorPart
 
 			}
 
-			printFormat (
-				"</p>\n");
+			htmlParagraphClose ();
 
 		}
 
-		printFormat (
-			"<form",
-			" method=\"get\"",
-			" action=\"%h\"",
-			localUrl,
-			">\n");
+		htmlFormOpenMethodAction (
+			"get",
+			localUrl);
 
-		printFormat (
-			"<p>Date<br>\n");
+		htmlParagraphOpen ();
 
-		printFormat (
+		formatWriter.writeLineFormat (
+			"Date<br>");
+
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"text\"",
 			" name=\"date\"",
 			" value=\"%h\"",
 			dateField.text,
-			">\n");
+			">");
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" value=\"ok\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		htmlFormClose ();
 
 		ObsoleteDateLinks.dailyBrowserParagraph (
-			printWriter,
+			formatWriter,
 			localUrl,
 			requestContext.getFormData (),
 			dateField.date);
@@ -496,15 +499,21 @@ class SupervisorPart
 				24l)
 		) {
 
-			printFormat (
-				"<p class=\"warning\">This day contains %h ",
+			htmlParagraphOpen (
+				htmlClassAttribute (
+					"warning"));
+
+			formatWriter.writeLineFormat (
+				"This day contains %h ",
 				hoursInDay,
 				"hours due to a time change from %h ",
 				consoleUserHelper.timezoneString (
 					startTime),
-				"to %h</p>\n",
+				"to %h",
 				consoleUserHelper.timezoneString (
 					endTime));
+
+			htmlParagraphClose ();
 
 		}
 

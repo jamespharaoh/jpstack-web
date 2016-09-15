@@ -2,12 +2,13 @@ package wbs.smsapps.broadcast.logic;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectHelper;
@@ -18,7 +19,7 @@ import wbs.platform.service.model.ServiceRec;
 import wbs.sms.message.batch.model.BatchObjectHelper;
 import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.number.lookup.logic.NumberLookupManager;
 import wbs.smsapps.broadcast.model.BroadcastConfigRec;
 import wbs.smsapps.broadcast.model.BroadcastNumberObjectHelper;
@@ -32,39 +33,39 @@ import wbs.smsapps.broadcast.model.BroadcastState;
 public
 class BroadcastSendHelper
 	implements
-		GenericSendHelper<
+		GenericSendHelper <
 			BroadcastConfigRec,
 			BroadcastRec,
 			BroadcastNumberRec
 		> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	BroadcastObjectHelper broadcastHelper;
 
-	@Inject
+	@SingletonDependency
 	BroadcastNumberObjectHelper broadcastNumberHelper;
 
-	@Inject
+	@SingletonDependency
 	BatchObjectHelper batchHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	NumberLookupManager numberLookupManager;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MessageSender> messageSenderProvider;
+	@PrototypeDependency
+	Provider <SmsMessageSender> smsMessageSenderProvider;
 
 	// details
 
@@ -309,7 +310,7 @@ class BroadcastSendHelper
 				"broadcast");
 
 		MessageRec message =
-			messageSenderProvider.get ()
+			smsMessageSenderProvider.get ()
 
 			.batch (
 				broadcastBatch)

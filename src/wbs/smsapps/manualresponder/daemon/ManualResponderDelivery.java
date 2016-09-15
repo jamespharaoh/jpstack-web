@@ -1,17 +1,16 @@
 package wbs.smsapps.manualresponder.daemon;
 
-import static wbs.framework.utils.etc.CollectionUtils.listIndexOfRequired;
-import static wbs.framework.utils.etc.CollectionUtils.listItemAtIndexRequired;
+import static wbs.utils.collection.CollectionUtils.listIndexOfRequired;
+import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
 
 import java.util.Arrays;
 import java.util.Collection;
-
-import javax.inject.Inject;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -30,31 +29,31 @@ public
 class ManualResponderDelivery
 	implements DeliveryHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderReplyObjectHelper manualResponderReplyHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsMessageLogic messageLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsOutboxLogic outboxLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
 	// details
 
 	@Override
 	public
-	Collection<String> getDeliveryTypeCodes () {
+	Collection <String> getDeliveryTypeCodes () {
 
 		return Arrays.<String>asList (
 			"manual_responder");

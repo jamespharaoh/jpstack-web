@@ -1,25 +1,24 @@
 package wbs.services.messagetemplate.api;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.hyphenToUnderscore;
+import static wbs.utils.string.StringUtils.joinWithFullStop;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.underscoreToHyphen;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import lombok.Cleanup;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.Cleanup;
+
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
-
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.hyphenToUnderscore;
-import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
-import static wbs.framework.utils.etc.StringUtils.underscoreToHyphen;
-
 import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
@@ -39,27 +38,27 @@ public
 class MessageTemplateMessagesGetAction
 	implements Action {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	MessageTemplateDatabaseObjectHelper messageTemplateDatabaseHelper;
 
-	@Inject
+	@SingletonDependency
 	MessageTemplateSetObjectHelper messageTemplateSetHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<JsonResponder> jsonResponderProvider;
+	@PrototypeDependency
+	Provider <JsonResponder> jsonResponderProvider;
 
 	// implementation
 

@@ -1,9 +1,9 @@
 package wbs.framework.entity.build;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.Misc.orNull;
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
-import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
+import static wbs.utils.etc.Misc.orNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.string.StringUtils.camelToUnderscore;
 
 import java.util.Date;
 import java.util.Map;

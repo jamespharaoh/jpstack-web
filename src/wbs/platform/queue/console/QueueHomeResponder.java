@@ -1,10 +1,10 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.string.StringUtils.joinWithSpace;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -26,9 +25,10 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.etc.Html;
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
 import wbs.platform.queue.logic.DummyQueueCache;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
@@ -39,46 +39,47 @@ import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
+import wbs.utils.web.HtmlUtils;
 
 @PrototypeComponent ("queueHomeResponder")
 public
 class QueueHomeResponder
 	extends HtmlResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	DummyQueueCache dummyQueueCache;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	QueueItemClaimObjectHelper queueItemClaimHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<QueueSubjectSorter> queueSubjectSorterProvider;
+	@PrototypeDependency
+	Provider <QueueSubjectSorter> queueSubjectSorterProvider;
 
 	// state
 
 	boolean queueOptionsEnabled = true;
 
-	List<QueueItemClaimRec> myClaimedItems;
-	List<QueueInfo> queueInfos;
+	List <QueueItemClaimRec> myClaimedItems;
+	List <QueueInfo> queueInfos;
 
 	// details
 
@@ -520,7 +521,7 @@ class QueueHomeResponder
 				"<td",
 				" class=\"queueItemOldest\"",
 				">%s</td>\n",
-				Html.encodeNonBreakingWhitespace (
+				HtmlUtils.htmlEncodeNonBreakingWhitespace (
 					userConsoleLogic.prettyDuration (
 						queueInfo.oldestAvailable (),
 						transaction.now ())));
@@ -674,7 +675,7 @@ class QueueHomeResponder
 			"</p>\n");
 
 		requestContext.flushNotices (
-			printWriter);
+			formatWriter);
 
 		goQueues ();
 

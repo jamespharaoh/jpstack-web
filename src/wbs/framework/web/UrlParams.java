@@ -1,8 +1,5 @@
 package wbs.framework.web;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -11,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.NonNull;
+
+import wbs.utils.string.FormatWriter;
 
 public
 class UrlParams {
@@ -260,7 +259,7 @@ class UrlParams {
 
 	public
 	void printHidden (
-			@NonNull PrintWriter out) {
+			@NonNull FormatWriter formatWriter) {
 
 		for (
 			Map.Entry<String,List<String>> entry
@@ -273,17 +272,19 @@ class UrlParams {
 			List<String> values =
 				entry.getValue ();
 
-			for (String value : values) {
+			for (
+				String value
+					: values
+			) {
 
-				out.print (
-					stringFormat (
-						"<input",
-						" type=\"hidden\"",
-						" name=\"%h\"",
-						name,
-						" value=\"%h\"",
-						value,
-						">\n"));
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"hidden\"",
+					" name=\"%h\"",
+					name,
+					" value=\"%h\"",
+					value,
+					">");
 
 			}
 

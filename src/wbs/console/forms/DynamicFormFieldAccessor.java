@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TypeUtils.objectClassNameSimple;
+import static wbs.utils.etc.TypeUtils.objectClassNameSimple;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
 

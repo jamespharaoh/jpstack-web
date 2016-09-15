@@ -1,12 +1,13 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
 

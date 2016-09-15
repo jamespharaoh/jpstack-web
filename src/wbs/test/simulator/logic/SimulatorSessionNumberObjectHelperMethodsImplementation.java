@@ -1,13 +1,12 @@
 package wbs.test.simulator.logic;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-import lombok.NonNull;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
 import com.google.common.base.Optional;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.test.simulator.model.SimulatorSessionNumberObjectHelper;
 import wbs.test.simulator.model.SimulatorSessionNumberObjectHelperMethods;
@@ -17,11 +16,10 @@ public
 class SimulatorSessionNumberObjectHelperMethodsImplementation
 	implements SimulatorSessionNumberObjectHelperMethods {
 
-	// indirect dependencies
+	// singleton dependencies
 
-	@Inject
-	Provider <SimulatorSessionNumberObjectHelper>
-	simulatorSessionNumberHelperProvider;
+	@WeakSingletonDependency
+	SimulatorSessionNumberObjectHelper simulatorSessionNumberHelper;
 
 	// implementation
 
@@ -30,12 +28,9 @@ class SimulatorSessionNumberObjectHelperMethodsImplementation
 	SimulatorSessionNumberRec findOrCreate (
 			@NonNull NumberRec number) {
 
-		SimulatorSessionNumberObjectHelper simulatorSessionNumberHelper =
-			simulatorSessionNumberHelperProvider.get ();
-
 		// find existing
 
-		Optional<SimulatorSessionNumberRec> existingSimulatorSessionNumber =
+		Optional <SimulatorSessionNumberRec> existingSimulatorSessionNumber =
 			simulatorSessionNumberHelper.find (
 				number.getId ());
 

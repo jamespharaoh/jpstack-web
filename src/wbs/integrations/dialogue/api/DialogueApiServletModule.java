@@ -1,6 +1,6 @@
 package wbs.integrations.dialogue.api;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
@@ -27,6 +26,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.joda.time.Instant;
 
 import wbs.api.mvc.ApiFile;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -99,8 +99,8 @@ class DialogueApiServletModule
 	// TODO this belongs in the database
 
 	private final static
-	Map<String,Long> networks =
-		ImmutableMap.<String,Long>builder ()
+	Map <String, Long> networks =
+		ImmutableMap.<String, Long> builder ()
 			.put ("Orange", 1l)
 			.put ("Vodafone", 2l)
 			.put ("One2One", 3l)
@@ -119,7 +119,8 @@ class DialogueApiServletModule
 	 * latin1 but leaves the data header at the front intact, which makes for
 	 * some interesting decoding.
 	 */
-	private WebFile inFile =
+	private
+	WebFile inFile =
 		new AbstractWebFile () {
 
 		@Override
@@ -488,9 +489,9 @@ class DialogueApiServletModule
 
 	WebFile reportFile;
 
-	Map<String,WebFile> routeFiles;
+	Map <String, WebFile> routeFiles;
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 

@@ -1,7 +1,10 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrDefault;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +25,8 @@ import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.etc.Html;
+import wbs.utils.string.FormatWriter;
+import wbs.utils.web.HtmlTableCellWriter;
 
 /**
  * Performs console-relevant operations on DataObjects such as resolving names
@@ -120,28 +124,22 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	String tdForObject (
-			Record<?> object,
-			Record<?> assumedRoot,
-			boolean mini,
-			boolean link,
-			int colspan) {
+	void writeTdForObject (
+			@NonNull FormatWriter formatWriter,
+			@NonNull Record <?> object,
+			@NonNull Optional <Record <?>> assumedRootOptional,
+			@NonNull Boolean mini,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
 
-		if (object == null)
-			return "<td>&mdash;</td>";
-
-		ConsoleHelper<?> objectHelper =
+		ConsoleHelper <?> objectHelper =
 			findConsoleHelper (
 				object);
 
 		String path =
 			objectManager.objectPathMini (
 				object,
-				Optional.<Record<?>>fromNullable (
-					assumedRoot));
-
-		StringBuilder stringBuilder =
-			new StringBuilder ();
+				assumedRootOptional);
 
 		if (
 
@@ -152,157 +150,43 @@ class ConsoleObjectManagerImplementation
 
 		) {
 
-			stringBuilder.append (
-				stringFormat (
-					"%s",
-					Html.magicTd (
-						requestContext.resolveLocalUrl (
-							objectHelper.getDefaultLocalPath (
-								object)),
-						"main",
-						colspan),
-					"%h</td>",
-					path));
+			new HtmlTableCellWriter ()
+
+				.href (
+					requestContext.resolveLocalUrl (
+						objectHelper.getDefaultLocalPath (
+							object)))
+
+				.target (
+					"main")
+
+				.columnSpan (
+					colspan)
+
+				.write (
+					formatWriter);
+
+			formatWriter.writeFormat (
+				"%h</td>",
+				path);
 
 		} else {
 
-			stringBuilder.append (
-				stringFormat (
-					"<td>%h</td>\n",
-					path));
+			formatWriter.writeFormat (
+				"<td>%h</td>\n",
+				path);
 
 		}
 
-		return stringBuilder.toString ();
-
 	}
 
 	@Override
 	public
-	String tdForObjectMiniLink (
-			Record<?> object) {
-
-		return tdForObject (
-			object,
-			null,
-			true,
-			true,
-			1);
-
-	}
-
-	@Override
-	public
-	String tdForObjectMiniLink (
-			Record<?> object,
-			Record<?> assumedRoot) {
-
-		return tdForObject (
-			object,
-			assumedRoot,
-			true,
-			true,
-			1);
-
-	}
-
-	@Override
-	public
-	String tdForObjectMiniLink (
-			Record<?> object,
-			int colspan) {
-
-		return tdForObject (
-			object,
-			null,
-			true,
-			true,
-			colspan);
-
-	}
-
-	@Override
-	public
-	String tdForObjectMiniLink (
-			Record<?> object,
-			Record<?> assumedRoot,
-			int colspan) {
-
-		return tdForObject (
-			object,
-			assumedRoot,
-			true,
-			true,
-			colspan);
-
-	}
-
-	@Override
-	public
-	String tdForObjectLink (
-			Record<?> object) {
-
-		return tdForObject (
-			object,
-			null,
-			false,
-			true,
-			1);
-
-	}
-
-	@Override
-	public
-	String tdForObjectLink (
-			Record<?> object,
-			Record<?> assumedRoot) {
-
-		return tdForObject (
-			object,
-			assumedRoot,
-			false,
-			true,
-			1);
-
-	}
-
-	@Override
-	public
-	String tdForObjectLink (
-			Record<?> object,
-			int colspan) {
-
-		return tdForObject (
-			object,
-			null,
-			false,
-			true,
-			colspan);
-
-	}
-
-	@Override
-	public
-	String tdForObjectLink (
-			Record<?> object,
-			Record<?> assumedRoot,
-			int colspan) {
-
-		return tdForObject (
-			object,
-			assumedRoot,
-			false,
-			true,
-			colspan);
-
-	}
-
-	@Override
-	public
-	String htmlForObject (
-			Record<?> object,
-			Record<?> assumedRoot,
-			boolean mini) {
+	void writeHtmlForObject (
+			@NonNull FormatWriter formatWriter,
+			@NonNull Record <?> object,
+			@NonNull Optional <Record <?>> assumedRootOptional,
+			@NonNull Boolean mini) {
 
 		if (log.isDebugEnabled ()) {
 
@@ -312,60 +196,73 @@ class ConsoleObjectManagerImplementation
 					getClass ().getName (),
 					objectManager.objectPath (
 						object),
-					objectManager.objectPath (
-						assumedRoot),
+					optionalMapRequiredOrDefault (
+						objectManager::objectPath,
+						assumedRootOptional,
+						"—"),
 					Boolean.toString (
 						mini)));
 
 		}
 
-		if (object == null) {
-			return "NULL";
-		}
-
-		ConsoleHelper<?> objectHelper =
+		ConsoleHelper <?> objectHelper =
 			findConsoleHelper (
 				object);
 
-		return objectHelper.getHtml (
+		objectHelper.writeHtml (
+			formatWriter,
 			object,
-			Optional.<Record<?>>fromNullable (
-				assumedRoot),
+			assumedRootOptional,
 			mini);
 
 	}
 
 	@Override
 	public
-	String objectToSimpleHtml (
+	void objectToSimpleHtml (
+			@NonNull FormatWriter formatWriter,
 			Object object,
-			Record<?> assumedRoot,
+			Record <?> assumedRoot,
 			boolean mini) {
 
-		if (object instanceof Integer) {
+		if (
+			object instanceof Integer
+			|| object instanceof Long
+		) {
 
-			return Html.encode (
+			formatWriter.writeFormat (
+				"%s",
 				object.toString ());
 
-		}
+		} else if (object instanceof Record) {
 
-		if (object instanceof Record) {
+			Record <?> dataObject =
+				(Record <?>) object;
 
-			Record<?> dataObject =
-				(Record<?>) object;
-
-			return htmlForObject (
+			writeHtmlForObject (
+				formatWriter,
 				dataObject,
-				assumedRoot,
+				optionalFromNullable (
+					assumedRoot),
 				mini);
 
+		} else if (
+			isNull (
+				object)
+		) {
+
+			log.warn (
+				new RuntimeException (
+					"Null object is deprecated"));
+
+			formatWriter.writeFormat (
+				"NULL");
+
+		} else {
+
+			throw new IllegalArgumentException ();
+
 		}
-
-		// TODO don't like this
-		if (object == null)
-			return "NULL";
-
-		throw new IllegalArgumentException ();
 
 	}
 

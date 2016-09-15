@@ -1,61 +1,60 @@
 package wbs.platform.postgresql.console;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
+import com.google.common.collect.ImmutableSet;
 
 import org.joda.time.Duration;
-
-import com.google.common.collect.ImmutableSet;
 
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.Misc;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.postgresql.model.PostgresqlMaintenanceFrequency;
 import wbs.platform.postgresql.model.PostgresqlMaintenanceRec;
 import wbs.platform.user.console.UserConsoleLogic;
+import wbs.utils.etc.Misc;
 
 @PrototypeComponent ("postgresqlMaintenanceListPart")
 public
 class PostgresqlMaintenanceListPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	PostgresqlMaintenanceConsoleHelper postgresqlMaintenanceHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// state
 
-	Map<
+	Map <
 		PostgresqlMaintenanceFrequency,
-		Set<PostgresqlMaintenanceRec>
+		Set <PostgresqlMaintenanceRec>
 	>
 	maintenancesByFrequency =
-		new TreeMap<
+		new TreeMap <
 			PostgresqlMaintenanceFrequency,
-			Set<PostgresqlMaintenanceRec>
+			Set <PostgresqlMaintenanceRec>
 		> ();
 
 	// details
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())

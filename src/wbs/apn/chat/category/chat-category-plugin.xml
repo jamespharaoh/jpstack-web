@@ -1,0 +1,13 @@
+<plugin
+	name="category"
+	package="wbs.apn.chat.category">
+
+	<models>
+		<model name="chatCategory"/>
+	</models>
+
+	<console-modules>
+		<console-module name="chat-category"/>
+	</console-modules>
+
+</plugin>

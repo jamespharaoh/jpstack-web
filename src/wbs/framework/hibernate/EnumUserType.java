@@ -1,8 +1,8 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
-import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.utils.string.StringUtils.camelToUnderscore;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;
@@ -14,11 +14,12 @@ import java.util.Set;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.usertype.UserType;
 
+import wbs.utils.collection.ReversableMap;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.framework.utils.ReversableMap;
 
 @Accessors (fluent = true)
 public

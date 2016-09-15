@@ -1,15 +1,15 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.LogicUtils.equalSafe;
-import static wbs.framework.utils.etc.Misc.eitherGetLeft;
-import static wbs.framework.utils.etc.Misc.isError;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.NumberUtils.equalToOne;
-import static wbs.framework.utils.etc.NumberUtils.equalToTwo;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringSplitColon;
+import static wbs.utils.etc.LogicUtils.equalSafe;
+import static wbs.utils.etc.Misc.eitherGetLeft;
+import static wbs.utils.etc.Misc.isError;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.NumberUtils.equalToOne;
+import static wbs.utils.etc.NumberUtils.equalToTwo;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringSplitColon;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -31,7 +31,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.FormatWriter;
 
 import fj.data.Either;
 

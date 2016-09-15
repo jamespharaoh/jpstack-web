@@ -1,0 +1,14 @@
+<plugin
+	name="chat-keyword"
+	package="wbs.apn.chat.keyword">
+
+	<models>
+		<custom-type name="chatKeywordJoinType"/>
+		<model name="chatKeyword"/>
+	</models>
+
+	<console-modules>
+		<console-module name="chat-keyword"/>
+	</console-modules>
+
+</plugin>

@@ -1,28 +1,31 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.Misc.doNothing;
-import lombok.NonNull;
-import wbs.framework.entity.record.Record;
+import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+
+import wbs.framework.entity.record.Record;
+
 public
-interface ConsoleHooks<RecordType extends Record<RecordType>> {
+interface ConsoleHooks <RecordType extends Record <RecordType>> {
 
 	default
-	Optional<String> getHtml (
+	Optional <String> getHtml (
 			@NonNull RecordType object,
 			@NonNull Boolean mini) {
 
-		return Optional.<String>absent ();
+		return optionalAbsent ();
 
 	}
 
 	default
-	Optional<String> getListClass (
+	Optional <String> getListClass (
 			@NonNull RecordType object) {
 
-		return Optional.<String>absent ();
+		return optionalAbsent ();
 
 	}
 

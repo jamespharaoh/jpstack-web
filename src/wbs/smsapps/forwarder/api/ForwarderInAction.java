@@ -3,7 +3,6 @@ package wbs.smsapps.forwarder.api;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
@@ -11,6 +10,8 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.api.mvc.ApiAction;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.RequestContext;
@@ -27,17 +28,23 @@ public
 class ForwarderInAction
 	extends ApiAction {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ForwarderApiLogic forwarderApiLogic;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
-	Provider<TextResponder> textResponder;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <TextResponder> textResponderProvider;
+
+	// implementation
 
 	@Override
 	protected
@@ -142,7 +149,7 @@ class ForwarderInAction
 
 			}
 
-			return textResponder.get ()
+			return textResponderProvider.get ()
 				.text ("ERROR\n" + exception.getMessage () + "\n");
 
 		}

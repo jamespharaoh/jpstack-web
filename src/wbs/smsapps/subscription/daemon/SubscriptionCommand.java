@@ -1,13 +1,12 @@
 package wbs.smsapps.subscription.daemon;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalFromJava;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalFromJava;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -17,6 +16,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
@@ -33,7 +34,7 @@ import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
-import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.subscription.logic.SubscriptionLogic;
 import wbs.smsapps.subscription.model.SubscriptionAffiliateRec;
@@ -53,54 +54,54 @@ public
 class SubscriptionCommand
 	implements CommandHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	AffiliateObjectHelper affiliateHelper;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	KeywordFinder keywordFinder;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionKeywordObjectHelper subscriptionKeywordHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionObjectHelper subscriptionHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionNumberObjectHelper subscriptionNumberHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionSubObjectHelper subscriptionSubHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionLogic subscriptionLogic;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MessageSender> messageSenderProvider;
+	@PrototypeDependency
+	Provider <SmsMessageSender> messageSenderProvider;
 
 	// properties
 

@@ -1,7 +1,7 @@
 package wbs.console.html;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormatter;
+
+import wbs.utils.string.FormatWriter;
 
 /**
  * Useful stuff for making sets of links to different dates in html.
@@ -213,16 +215,18 @@ class ObsoleteDateLinks {
 
 	public static
 	void browserParagraph (
-			final PrintWriter out,
-			final String url,
-			final Map<String,String> formData,
-			final LocalDate date,
-			final String dateFieldName,
-			final LinkMaker linkMaker,
-			final DateTimeFormatter dateFormatter) {
+			FormatWriter formatWriter,
+			String url,
+			Map <String, String> formData,
+			LocalDate date,
+			String dateFieldName,
+			LinkMaker linkMaker,
+			DateTimeFormatter dateFormatter) {
 
-		out.println (
+		formatWriter.writeLineFormat (
 			"<p class=\"links\">");
+
+		formatWriter.increaseIndent ();
 
 		LinkWriter linkWriter =
 			new LinkWriter () {
@@ -233,17 +237,16 @@ class ObsoleteDateLinks {
 					LocalDate date,
 					String title) {
 
-				out.println (
-					stringFormat (
-						"<a",
-						" href=\"%h\"",
-						makeLink (
-							url,
-							formData,
-							dateFieldName,
+				formatWriter.writeLineFormat (
+					"<a",
+					" href=\"%h\"",
+					makeLink (
+						url,
+						formData,
+						dateFieldName,
 							dateFormatter.print (date)),
-						">%h</a>\n",
-						title));
+					">%h</a>",
+					title);
 
 			}
 
@@ -253,7 +256,11 @@ class ObsoleteDateLinks {
 			linkWriter,
 			date);
 
-		out.println("</p>");
+		formatWriter.decreaseIndent ();
+
+		formatWriter.writeLineFormat (
+			"</p>");
+
 	}
 
 	/**
@@ -262,13 +269,13 @@ class ObsoleteDateLinks {
 	 */
 	public static
 	void monthlyBrowserParagraph (
-			PrintWriter out,
+			FormatWriter formatWriter,
 			String url,
 			Map<String,String> formData,
 			LocalDate date) {
 
 		browserParagraph (
-			out,
+			formatWriter,
 			url,
 			formData,
 			date,
@@ -284,13 +291,13 @@ class ObsoleteDateLinks {
 	 */
 	public static
 	void dailyBrowserParagraph (
-			PrintWriter out,
+			FormatWriter formatWriter,
 			String url,
 			Map<String,String> formData,
 			LocalDate date) {
 
 		browserParagraph (
-			out,
+			formatWriter,
 			url,
 			formData,
 			date,

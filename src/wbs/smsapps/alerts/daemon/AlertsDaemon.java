@@ -1,22 +1,18 @@
 package wbs.smsapps.alerts.daemon;
 
-import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TimeUtils.earlierThan;
+import static wbs.utils.etc.EnumUtils.enumNotInSafe;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.time.TimeUtils.earlierThan;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.joda.time.Duration;
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
@@ -24,7 +20,12 @@ import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -32,7 +33,6 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.StringSubstituter;
 import wbs.platform.daemon.SleepingDaemonService;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -43,7 +43,7 @@ import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
-import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
 import wbs.smsapps.alerts.model.AlertsAlertObjectHelper;
@@ -52,6 +52,7 @@ import wbs.smsapps.alerts.model.AlertsSettingsObjectHelper;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
 import wbs.smsapps.alerts.model.AlertsStatusCheckObjectHelper;
 import wbs.smsapps.alerts.model.AlertsSubjectRec;
+import wbs.utils.string.StringSubstituter;
 
 @Log4j
 @SingletonComponent ("alertsDaemon")
@@ -59,41 +60,45 @@ public
 class AlertsDaemon
 	extends SleepingDaemonService {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	AlertsAlertObjectHelper alertsAlertHelper;
 
-	@Inject
+	@SingletonDependency
 	AlertsSettingsObjectHelper alertsSettingsHelper;
 
-	@Inject
+	@SingletonDependency
 	AlertsStatusCheckObjectHelper alertsStatusCheckHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
-	@Inject
+	@SingletonDependency
 	QueueSubjectObjectHelper queueSubjectHelper;
 
-	@Inject
+	@SingletonDependency
 	RouterLogic routerLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
-	Provider<MessageSender> messageSender;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <SmsMessageSender> messageSenderProvider;
 
 	// details
 
@@ -696,7 +701,7 @@ class AlertsDaemon
 				routerLogic.resolveRouter (
 					alertsSettings.getRouter ());
 
-			messageSender.get ()
+			messageSenderProvider.get ()
 
 				.number (
 					alertsNumber.getNumber ())

@@ -1,6 +1,6 @@
 package wbs.console.responder;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 

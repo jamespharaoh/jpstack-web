@@ -1,9 +1,18 @@
 package wbs.smsapps.broadcast.console;
 
-import javax.inject.Inject;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.utils.web.HtmlUtils.htmlFormClose;
+import static wbs.utils.web.HtmlUtils.htmlFormOpenMethod;
+import static wbs.utils.web.HtmlUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.smsapps.broadcast.model.BroadcastRec;
 
@@ -12,12 +21,12 @@ public
 class BroadcastSendPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	BroadcastConsoleHelper broadcastHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// state
@@ -45,162 +54,221 @@ class BroadcastSendPart
 
 		case cancelled:
 
-			printFormat (
+			formatWriter.writeLineFormat (
 				"<p>This broadcast has been cancelled and can no longer be ",
-				"sent.</p>\n");
+				"sent.</p>");
 
 			break;
 
 		case partiallySent:
 
-			printFormat (
+			formatWriter.writeLineFormat (
 				"<p>This broadcast was partially sent and then cancelled. It ",
-				"can no longer be sent.</p>\n");
+				"can no longer be sent.</p>");
 
 			break;
 
 		case scheduled:
 
-			printFormat (
+			formatWriter.writeLineFormat (
 				"<p>This broadcast has been scheduled but not yet sent. It ",
-				"can be unscheduled or cancelled.</p>\n");
+				"can be unscheduled or cancelled.</p>");
 
 			goDetails ();
 
-			printFormat (
-				"<h2>Unschedule</h2>\n");
+			// unschedule
 
-			printFormat (
+			htmlHeadingTwoWrite (
+				"Unschedule");
+
+			formatWriter.writeLineFormat (
 				"<p>Unscheduling a broadcast will prevent it from being sent. ",
 				"You will be able to add and remove numbers and send or ",
-				"schedule it again.</p>\n");
+				"schedule it again.</p>");
 
-			printFormat (
-				"<form method=\"post\">\n",
-				"<p><input",
+			htmlFormOpenMethod (
+				"post");
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeFormat (
+				"<input",
 				" type=\"submit\"",
 				" name=\"unschedule\"",
 				" value=\"unschedule\"",
-				"></p>\n",
-				"</form>\n");
+				">");
 
-			printFormat (
-				"<h2>Cancel</h2>\n");
+			htmlParagraphClose ();
 
-			printFormat (
+			htmlFormClose ();
+
+			// cancel
+
+			htmlHeadingTwoWrite (
+				"Cancel");
+
+			formatWriter.writeLineFormat (
 				"<p>Cancelling a broadcast will stop it from being sent, now ",
-				"or in the future.</p>\n");
+				"or in the future.</p>");
 
-			printFormat (
-				"<form method=\"post\">\n",
-				"<p><input",
+			htmlFormOpenMethod (
+				"post");
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
 				" type=\"submit\"",
 				" name=\"cancel\"",
 				" value=\"cancel\"",
-				"></p>\n",
-				"</form>\n");
+				">");
+
+			htmlParagraphClose ();
+
+			htmlFormClose ();
 
 			break;
 
 		case sending:
 
-			printFormat (
-				"<p>This broadcast is being sent. It can be cancelled.</p>\n");
+			formatWriter.writeLineFormat (
+				"<p>This broadcast is being sent. It can be cancelled.</p>");
 
 			goDetails ();
 
-			printFormat (
-				"<h2>Cancel</h2>\n");
+			htmlHeadingTwoWrite (
+				"Cancel");
 
-			printFormat (
+			formatWriter.writeFormat (
 				"<p>Cancelling a broadcast will stop the current send and ",
-				"prevent it from being sent in the future.</p>\n");
+				"prevent it from being sent in the future.</p>");
 
-			printFormat (
-				"<form method=\"post\">\n",
-				"<p><input",
+			htmlFormOpenMethod (
+				"post");
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeFormat (
+				"<input",
 				" type=\"submit\"",
 				" name=\"cancel\"",
 				" value=\"cancel\"",
-				"></p>\n",
-				"</form>\n");
+				">");
+
+			htmlParagraphClose ();
+
+			htmlFormClose ();
 
 			break;
 
 		case sent:
 
-			printFormat (
-				"<p>This broadcast has already been sent.</p>\n");
+			formatWriter.writeLineFormat (
+				"<p>This broadcast has already been sent.</p>");
 
 			break;
 
 		case unsent:
 
-			printFormat (
+			formatWriter.writeLineFormat (
 				"<p>This broadcast has not yet been sent. It can be sent now ",
 				"or scheduled to automatically sent at a specific time in the ",
-				"future. Alternatively, it can be cancelled.</p>\n");
+				"future. Alternatively, it can be cancelled.</p>");
 
 			goDetails ();
 
-			printFormat (
-				"<h2>Send now</h2>\n");
+			// send broadcast
 
-			printFormat (
+			htmlHeadingTwoWrite (
+				"Send now");
+
+			formatWriter.writeFormat (
 				"<p>Sending a broadcast will begin sending messages ",
-				"immediately.</p>\n");
+				"immediately.</p>");
 
-			printFormat (
-				"<form method=\"post\">\n",
-				"<p><input",
+			htmlFormOpenMethod (
+				"post");
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
 				" type=\"submit\"",
 				" name=\"send\"",
 				" value=\"send\"",
-				"></p>\n",
-				"</form>\n");
+				">");
 
-			printFormat (
-				"<h2>Schedule</h2>\n");
+			htmlParagraphClose ();
 
-			printFormat (
+			htmlFormClose ();
+
+			// schedule broadcast
+
+			htmlHeadingTwoWrite (
+				"Schedule");
+
+			formatWriter.writeLineFormat (
 				"<p>Scheduling this broadcast will cause it to be sent ",
-				"automatically at the specified time in the future.</p>\n");
+				"automatically at the specified time in the future.</p>");
 
-			printFormat (
-				"<form method=\"post\">\n",
+			htmlFormOpenMethod (
+				"post");
 
-				"<p>Time and date<br>\n",
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"Time and date<br>");
+
+			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"text\"",
 				" name=\"timestamp\"",
 				" value=\"%h\"",
 				userConsoleLogic.timestampWithTimezoneString (
 					transaction.now ()),
-				"></p>\n",
+				">");
 
-				"<p><input",
+			htmlParagraphClose ();
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeFormat (
+				"<input",
 				" type=\"submit\"",
 				" name=\"schedule\"",
 				" value=\"schedule\"",
-				"></p>\n",
+				">");
 
-				"</form>\n");
+			htmlParagraphClose ();
 
-			printFormat (
-				"<h2>Cancel</h2>\n");
+			htmlFormClose ();
 
-			printFormat (
+			// cancel broadcast
+
+			htmlHeadingTwoWrite (
+				"Cancel");
+
+			formatWriter.writeLineFormat (
 				"<p>Cancelling a broadcast will prevent it from being sent in ",
-				"the future.</p>\n");
+				"the future.</p>");
 
-			printFormat (
-				"<form method=\"post\">\n",
-				"<p><input",
+			htmlFormOpenMethod (
+				"post");
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeFormat (
+				"<input",
 				" type=\"submit\"",
 				" name=\"cancel\"",
 				" value=\"cancel\"",
-				"></p>\n",
-				"</form>\n");
+				">");
+
+			htmlParagraphClose ();
+
+			// close form
+
+			htmlFormClose ();
 
 			break;
 
@@ -214,32 +282,22 @@ class BroadcastSendPart
 
 	void goDetails () {
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Message originator</th>\n",
-			"<td>%h</td>\n",
-			broadcast.getMessageOriginator (),
-			"</tr>\n");
+		htmlTableDetailsRowWrite (
+			"Message originator",
+			broadcast.getMessageOriginator ());
 
-		printFormat (
-			"<tr>\n",
-			"<th>Message text</th>\n",
-			"<td>%h</td>\n",
-			broadcast.getMessageText (),
-			"</tr>\n");
+		htmlTableDetailsRowWrite (
+			"Message text",
+			broadcast.getMessageText ());
 
-		printFormat (
-			"<tr>\n",
-			"<th>Number count</th>\n",
-			"<td>%h</td>\n",
-			broadcast.getNumAccepted (),
-			"</tr>\n");
+		htmlTableDetailsRowWrite (
+			"Number count",
+			integerToDecimalString (
+				broadcast.getNumAccepted ()));
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

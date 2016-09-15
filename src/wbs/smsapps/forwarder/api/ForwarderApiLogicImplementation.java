@@ -1,8 +1,8 @@
 package wbs.smsapps.forwarder.api;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -19,7 +18,9 @@ import lombok.NonNull;
 
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -46,24 +47,24 @@ public
 class ForwarderApiLogicImplementation
 	implements ForwarderApiLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ForwarderMessageInObjectHelper forwarderMessageInHelper;
 
-	@Inject
+	@SingletonDependency
 	ForwarderObjectHelper forwarderHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<TextResponder> textResponder;
+	@PrototypeDependency
+	Provider <TextResponder> textResponderProvider;
 
 	// implementation
 
@@ -156,7 +157,7 @@ class ForwarderApiLogicImplementation
 
 		if (forwarderMessageIn == null) {
 
-			return textResponder.get ()
+			return textResponderProvider.get ()
 
 				.text (
 					"NONE\n");
@@ -177,7 +178,7 @@ class ForwarderApiLogicImplementation
 			.setProcessedTime (
 				transaction.now ());
 
-		return textResponder.get ()
+		return textResponderProvider.get ()
 
 			.text (
 				printMessageIn (
@@ -208,7 +209,7 @@ class ForwarderApiLogicImplementation
 
 		if (forwarderMessageIn == null) {
 
-			return textResponder.get ()
+			return textResponderProvider.get ()
 				.text ("NONE\n");
 
 		}
@@ -219,7 +220,7 @@ class ForwarderApiLogicImplementation
 				transaction.now ().plus (
 					Duration.standardMinutes (10)));
 
-		return textResponder.get ()
+		return textResponderProvider.get ()
 			.text (
 				printMessageIn (
 					requestContext,
@@ -248,7 +249,7 @@ class ForwarderApiLogicImplementation
 
 		if (tempString == null) {
 
-			return textResponder.get ()
+			return textResponderProvider.get ()
 
 				.text (
 					"ERROR\nNo id supplied\n");
@@ -305,7 +306,7 @@ class ForwarderApiLogicImplementation
 
 		}
 
-		return textResponder.get ()
+		return textResponderProvider.get ()
 			.text ("OK\n");
 
 	}

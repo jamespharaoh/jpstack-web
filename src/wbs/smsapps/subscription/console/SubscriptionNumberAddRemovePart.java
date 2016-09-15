@@ -1,6 +1,5 @@
 package wbs.smsapps.subscription.console;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
@@ -12,18 +11,20 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @PrototypeComponent ("subscriptionNumberAddRemovePart")
 public
 class SubscriptionNumberAddRemovePart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	ConsoleModule subscriptionNumberConsoleModule;
 
 	// state

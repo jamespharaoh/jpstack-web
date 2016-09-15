@@ -1,6 +1,6 @@
 package wbs.integrations.clockworksms.hibernate;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNotNull;
 
 import java.util.List;
 

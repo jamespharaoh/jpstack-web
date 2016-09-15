@@ -1,7 +1,7 @@
 package wbs.console.param;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 @Deprecated
 public

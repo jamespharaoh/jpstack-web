@@ -2,11 +2,10 @@ package wbs.smsapps.broadcast.logic;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.user.model.UserRec;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
@@ -22,15 +21,15 @@ public
 class BroadcastLogicImplementation
 	implements BroadcastLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	BroadcastNumberObjectHelper broadcastNumberHelper;
 
-	@Inject
+	@SingletonDependency
 	NumberObjectHelper numberHelper;
 
-	@Inject
+	@SingletonDependency
 	NumberLookupManager numberLookupManager;
 
 	// implementation

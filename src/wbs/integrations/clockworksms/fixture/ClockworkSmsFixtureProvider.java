@@ -1,10 +1,10 @@
 package wbs.integrations.clockworksms.fixture;
 
-import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
-import static wbs.framework.utils.etc.StringUtils.joinWithNewline;
-import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
-import static wbs.framework.utils.etc.StringUtils.lowercase;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
+import static wbs.utils.string.StringUtils.joinWithNewline;
+import static wbs.utils.string.StringUtils.joinWithSpace;
+import static wbs.utils.string.StringUtils.lowercase;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 import java.util.Map;

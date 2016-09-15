@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.LogicUtils.equalSafe;
+import static wbs.utils.etc.LogicUtils.equalSafe;
 
 import javax.inject.Provider;
 

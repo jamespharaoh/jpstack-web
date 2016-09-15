@@ -1,27 +1,27 @@
 package wbs.framework.codegen;
 
-import static wbs.framework.utils.etc.ArrayUtils.arrayIsNotEmpty;
-import static wbs.framework.utils.etc.CollectionUtils.collectionHasOneElement;
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
-import static wbs.framework.utils.etc.CollectionUtils.listFirstElementRequired;
-import static wbs.framework.utils.etc.CollectionUtils.listLastElementRequired;
-import static wbs.framework.utils.etc.CollectionUtils.listSlice;
-import static wbs.framework.utils.etc.CollectionUtils.listSliceAllButLastItemRequired;
-import static wbs.framework.utils.etc.IterableUtils.iterableMap;
-import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
-import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
-import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
-import static wbs.framework.utils.etc.StringUtils.uncapitalise;
-import static wbs.framework.utils.etc.TypeUtils.parameterSourceTypeName;
-import static wbs.framework.utils.etc.TypeUtils.typeSourceName;
-import static wbs.framework.utils.etc.TypeUtils.typeVariableSourceDeclaration;
+import static wbs.utils.collection.ArrayUtils.arrayIsNotEmpty;
+import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.CollectionUtils.listLastElementRequired;
+import static wbs.utils.collection.CollectionUtils.listSlice;
+import static wbs.utils.collection.CollectionUtils.listSliceAllButLastItemRequired;
+import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.TypeUtils.parameterSourceTypeName;
+import static wbs.utils.etc.TypeUtils.typeSourceName;
+import static wbs.utils.etc.TypeUtils.typeVariableSourceDeclaration;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.joinWithSpace;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormatArray;
+import static wbs.utils.string.StringUtils.uncapitalise;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -50,7 +50,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 public

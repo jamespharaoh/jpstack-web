@@ -5,29 +5,31 @@ import javax.inject.Provider;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.PagePart;
 import wbs.framework.entity.record.PermanentRecord;
-import wbs.framework.utils.formatwriter.FormatWriter;
 import wbs.platform.event.model.EventRec;
+import wbs.utils.string.FormatWriter;
 
 public
 interface EventConsoleLogic {
 
 	PagePart makeEventsPart (
-			PermanentRecord<?> object);
+			PermanentRecord <?> object);
 
-	Provider<PagePart> makeEventsPartFactory (
-			ObjectLookup<?> objectLookup);
+	Provider <PagePart> makeEventsPartFactory (
+			ObjectLookup <?> objectLookup);
 
-	String eventText (
+	void writeEventHtml (
+			FormatWriter formatWriter,
 			EventRec event);
 
-	String objectToHtml (
+	void writeObjectAsHtml (
+			FormatWriter formatWriter,
 			Object object);
 
-	void renderEventsTable (
+	void writeEventsTable (
 			FormatWriter htmlWriter,
-			Iterable<EventRec> events);
+			Iterable <EventRec> events);
 
-	void renderEventRow (
+	void writeEventRow (
 			FormatWriter htmlWriter,
 			EventRec event);
 

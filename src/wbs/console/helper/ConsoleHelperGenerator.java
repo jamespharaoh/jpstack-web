@@ -1,34 +1,34 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.ArrayUtils.arrayIsEmpty;
-import static wbs.framework.utils.etc.ArrayUtils.arrayIsNotEmpty;
-import static wbs.framework.utils.etc.ArrayUtils.arrayMap;
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
-import static wbs.framework.utils.etc.CollectionUtils.collectionSize;
-import static wbs.framework.utils.etc.CollectionUtils.listLastElementRequired;
-import static wbs.framework.utils.etc.CollectionUtils.listSlice;
-import static wbs.framework.utils.etc.IterableUtils.iterableMap;
-import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualUnsafe;
-import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
-import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringReplaceAllRegex;
-import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
-import static wbs.framework.utils.etc.StringUtils.stringStartsWithSimple;
-import static wbs.framework.utils.etc.StringUtils.uncapitalise;
-import static wbs.framework.utils.etc.TypeUtils.classEqualSafe;
-import static wbs.framework.utils.etc.TypeUtils.classForName;
-import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
-import static wbs.framework.utils.etc.TypeUtils.classNameFull;
-import static wbs.framework.utils.etc.TypeUtils.classPackageName;
-import static wbs.framework.utils.etc.TypeUtils.isInstanceOf;
+import static wbs.utils.collection.ArrayUtils.arrayIsEmpty;
+import static wbs.utils.collection.ArrayUtils.arrayIsNotEmpty;
+import static wbs.utils.collection.ArrayUtils.arrayMap;
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.collection.CollectionUtils.listLastElementRequired;
+import static wbs.utils.collection.CollectionUtils.listSlice;
+import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualUnsafe;
+import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.TypeUtils.classEqualSafe;
+import static wbs.utils.etc.TypeUtils.classForName;
+import static wbs.utils.etc.TypeUtils.classForNameRequired;
+import static wbs.utils.etc.TypeUtils.classNameFull;
+import static wbs.utils.etc.TypeUtils.classPackageName;
+import static wbs.utils.etc.TypeUtils.isInstanceOf;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.joinWithFullStop;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringReplaceAllRegex;
+import static wbs.utils.string.StringUtils.stringSplitFullStop;
+import static wbs.utils.string.StringUtils.stringStartsWithSimple;
+import static wbs.utils.string.StringUtils.uncapitalise;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,9 +65,9 @@ import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelMethods;
 import wbs.framework.object.ObjectModelMethods;
-import wbs.framework.utils.etc.RuntimeIoException;
-import wbs.framework.utils.formatwriter.AtomicFileWriter;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.io.RuntimeIoException;
+import wbs.utils.string.AtomicFileWriter;
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleHelperGenerator")
@@ -1461,10 +1461,10 @@ class ConsoleHelperGenerator {
 		java.util.Map.class,
 		java.util.Set.class,
 
-		javax.annotation.PostConstruct.class,
 		javax.inject.Named.class,
 		javax.inject.Provider.class,
 
+		wbs.framework.component.annotations.NormalLifecycleSetup.class,
 		wbs.framework.component.annotations.PrototypeDependency.class,
 		wbs.framework.component.annotations.SingletonDependency.class,
 		wbs.framework.component.manager.ComponentManager.class,
@@ -1486,7 +1486,7 @@ class ConsoleHelperGenerator {
 		wbs.framework.object.ObjectTypeEntry.class,
 		wbs.framework.object.ObjectTypeRegistry.class,
 
-		wbs.framework.utils.etc.OptionalUtils.class,
+		wbs.utils.etc.OptionalUtils.class,
 
 		com.google.common.base.Optional.class,
 

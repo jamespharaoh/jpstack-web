@@ -1,12 +1,11 @@
 package wbs.test.simulator.console;
 
-import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
+import static wbs.utils.string.StringUtils.emptyStringIfNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableSet;
@@ -17,6 +16,8 @@ import wbs.console.html.SelectBuilder;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.sms.network.console.NetworkConsoleHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
@@ -27,24 +28,26 @@ public
 class SimulatorSessionConsolePart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	NetworkConsoleHelper networkHelper;
 
-	@Inject
+	@SingletonDependency
 	RouteConsoleHelper routeHelper;
 
-	@Inject
-	Provider<SelectBuilder> selectBuilder;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <SelectBuilder> selectBuilderProvider;
 
 	// state
 
-	Map<String,String> routeOptions =
-		new LinkedHashMap<String,String> ();
+	Map <String, String> routeOptions =
+		new LinkedHashMap<> ();
 
-	Map<String,String> networkOptions =
-		new LinkedHashMap<String,String> ();
+	Map <String, String> networkOptions =
+		new LinkedHashMap<> ();
 
 	// details
 
@@ -160,7 +163,7 @@ class SimulatorSessionConsolePart
 			"<th>Network</th>\n",
 
 			"<td>%s</td>\n",
-			selectBuilder.get ()
+			selectBuilderProvider.get ()
 				.htmlClass ("networkSelect")
 				.options (networkOptions)
 				.selectedValue ((String)

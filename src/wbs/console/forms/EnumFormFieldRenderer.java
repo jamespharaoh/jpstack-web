@@ -1,15 +1,15 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
-import static wbs.framework.utils.etc.Misc.requiredSuccess;
-import static wbs.framework.utils.etc.Misc.successResult;
-import static wbs.framework.utils.etc.Misc.toEnum;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalMapOptional;
-import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
-import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.EnumUtils.enumInSafe;
+import static wbs.utils.etc.Misc.requiredSuccess;
+import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.Misc.toEnum;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
+import static wbs.utils.string.StringUtils.camelToHyphen;
+import static wbs.utils.string.StringUtils.hyphenToCamel;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
 
@@ -23,7 +23,7 @@ import lombok.experimental.Accessors;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.helper.EnumConsoleHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("enumFormFieldRenderer")

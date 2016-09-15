@@ -1,7 +1,7 @@
 package wbs.platform.rpc.core;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
+import static wbs.utils.string.StringUtils.hyphenToCamel;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;

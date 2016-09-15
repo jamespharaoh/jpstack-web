@@ -1,7 +1,7 @@
 package wbs.framework.exception;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.string.StringUtils.emptyStringIfNull;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

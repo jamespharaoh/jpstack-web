@@ -1,30 +1,31 @@
 package wbs.smsapps.forwarder.logic;
 
-import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
-import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import org.joda.time.Instant;
+
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -32,7 +33,7 @@ import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.delivery.model.DeliveryTypeObjectHelper;
-import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.message.wap.logic.WapPushLogic;
 import wbs.sms.message.wap.model.WapPushMessageObjectHelper;
 import wbs.sms.message.wap.model.WapPushMessageRec;
@@ -57,48 +58,48 @@ public
 class ForwarderLogicImplementation
 	implements ForwarderLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	DeliveryTypeObjectHelper deliveryTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	ForwarderMessageInObjectHelper forwarderMessageInHelper;
 
-	@Inject
+	@SingletonDependency
 	ForwarderMessageOutObjectHelper forwarderMessageOutHelper;
 
-	@Inject
+	@SingletonDependency
 	ForwarderRouteObjectHelper forwarderRouteHelper;
 
-	@Inject
+	@SingletonDependency
 	NetworkObjectHelper networkHelper;
 
-	@Inject
+	@SingletonDependency
 	NumberObjectHelper numberHelper;
 
-	@Inject
+	@SingletonDependency
 	RouterLogic routerLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsTrackerManager smsTrackerManager;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	WapPushMessageObjectHelper wapPushMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	WapPushLogic wapPushLogic;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MessageSender> messageSender;
+	@PrototypeDependency
+	Provider <SmsMessageSender> messageSenderProvider;
 
 	// implementation
 
@@ -1016,7 +1017,7 @@ class ForwarderLogicImplementation
 		if (url == null) {
 
 			messageOut =
-				messageSender.get ()
+				messageSenderProvider.get ()
 
 				.threadId (
 					threadId)

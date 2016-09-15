@@ -1,15 +1,15 @@
 package wbs.integrations.oxygen8.api;
 
-import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Named;
 
 import com.google.common.collect.ImmutableMap;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.PathHandler;
@@ -68,13 +68,13 @@ class Oxygen8ApiServletModule
 
 	// ================================================================== files
 
-	Map<String,WebFile> defaultFiles;
+	Map <String, WebFile> defaultFiles;
 
 	// ========================================================= servlet module
 
 	@Override
 	public
-	Map<String,PathHandler> paths () {
+	Map <String, PathHandler> paths () {
 
 		return ImmutableMap.<String,PathHandler>builder ()
 
@@ -94,7 +94,7 @@ class Oxygen8ApiServletModule
 
 	// ========================================================= servlet module
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void afterPropertiesSet () {
 

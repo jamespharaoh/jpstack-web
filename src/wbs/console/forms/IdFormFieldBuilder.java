@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.ifNull;
 
 import javax.inject.Provider;
 

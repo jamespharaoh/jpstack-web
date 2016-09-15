@@ -1,12 +1,14 @@
 package wbs.console.request;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletRequest;
 
-import wbs.framework.utils.etc.Html;
+import lombok.NonNull;
+
+import wbs.utils.string.FormatWriter;
+import wbs.utils.web.HtmlUtils;
 
 public
 class Notices {
@@ -31,14 +33,14 @@ class Notices {
 		public
 		String toString () {
 
-			return "<p class=\"" + Html.encode(type) + "\">" + html + "</p>\n";
+			return "<p class=\"" + HtmlUtils.htmlEncode(type) + "\">" + html + "</p>\n";
 
 		}
 
 	}
 
-	List<Notice> notices =
-		new ArrayList<Notice> ();
+	List <Notice> notices =
+		new ArrayList<> ();
 
 	public
 	void add (
@@ -67,10 +69,17 @@ class Notices {
 
 	public
 	void flush (
-			PrintWriter out) {
+			@NonNull FormatWriter formatWriter) {
 
-		for (Notice notice : notices)
-			out.println(notice.toString ());
+		for (
+			Notice notice
+				: notices
+		) {
+
+			formatWriter.writeString (
+				notice.toString ());
+
+		}
 
 		notices.clear ();
 
@@ -120,8 +129,8 @@ class Notices {
 
 	public static
 	void addNotice (
-			ServletRequest request,
-			String notice) {
+			@NonNull ServletRequest request,
+			@NonNull String notice) {
 
 		add (
 			request,
@@ -132,8 +141,8 @@ class Notices {
 
 	public static
 	void addError (
-			ServletRequest request,
-			String notice) {
+			@NonNull ServletRequest request,
+			@NonNull String notice) {
 
 		add (
 			request,
@@ -142,7 +151,15 @@ class Notices {
 
 	}
 
-	public static void addWarning(ServletRequest request, String notice) {
-		add(request, notice, "warning");
+	public static
+	void addWarning (
+			@NonNull ServletRequest request,
+			@NonNull String notice) {
+
+		add (
+			request,
+			notice,
+			"warning");
+
 	}
 }

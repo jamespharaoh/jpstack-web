@@ -1,10 +1,10 @@
 package wbs.framework.entity.generate;
 
-import static wbs.framework.utils.etc.FileUtils.directoryCreateWithParents;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.io.FileUtils.directoryCreateWithParents;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,8 +55,8 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.entity.record.RecordComponent;
 import wbs.framework.entity.record.RootRecord;
 import wbs.framework.entity.record.TypeRecord;
-import wbs.framework.utils.formatwriter.AtomicFileWriter;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.AtomicFileWriter;
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("modelRecordGenerator")

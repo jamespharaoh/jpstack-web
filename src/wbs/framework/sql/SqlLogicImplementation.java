@@ -1,12 +1,11 @@
 package wbs.framework.sql;
 
-import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import com.google.common.collect.ImmutableSet;
@@ -15,6 +14,7 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 
@@ -35,7 +35,7 @@ class SqlLogicImplementation
 
 	// life cycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 

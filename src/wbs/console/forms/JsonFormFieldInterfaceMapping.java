@@ -1,7 +1,8 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.StringWriter;
 import java.util.Map;
@@ -13,11 +14,9 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.JsonToHtml;
-import wbs.framework.utils.formatwriter.FormatWriter;
-import wbs.framework.utils.formatwriter.WriterFormatWriter;
-
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import wbs.utils.string.FormatWriter;
+import wbs.utils.string.WriterFormatWriter;
+import wbs.utils.web.JsonToHtml;
 
 @PrototypeComponent ("jsonFormFieldInterfaceMapping")
 public

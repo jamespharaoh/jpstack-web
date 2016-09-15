@@ -1,10 +1,10 @@
 package wbs.framework.component.tools;
 
-import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringSplitComma;
-import static wbs.framework.utils.etc.StringUtils.uncapitalise;
+import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringSplitComma;
+import static wbs.utils.string.StringUtils.uncapitalise;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

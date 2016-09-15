@@ -1,11 +1,11 @@
 package wbs.platform.queue.console;
 
-import javax.inject.Inject;
-
 import lombok.Cleanup;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -16,17 +16,21 @@ public
 class QueueItemAction
 	extends ConsoleAction {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	QueueItemConsoleHelper queueItemHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueManager queuePageFactoryManager;
+
+	// details
 
 	@Override
 	public

@@ -1,19 +1,17 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.framework.utils.etc.LogicUtils.allOf;
-import static wbs.framework.utils.etc.LogicUtils.not;
-import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
-import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
-import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.LogicUtils.allOf;
+import static wbs.utils.etc.LogicUtils.not;
+import static wbs.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.inject.Inject;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
@@ -26,7 +24,7 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.Html;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
@@ -37,30 +35,31 @@ import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
+import wbs.utils.web.HtmlUtils;
 
 @PrototypeComponent ("manualResponderRequestPendingFormResponder")
 public
 class ManualResponderRequestPendingFormResponder
 	extends HtmlResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderNumberObjectHelper manualResponderNumberHelper;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderRequestObjectHelper manualResponderRequestHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	RouterLogic routerLogic;
 
 	// state
@@ -277,7 +276,7 @@ class ManualResponderRequestPendingFormResponder
 	void renderHtmlBodyContents () {
 
 		requestContext.flushNotices (
-			printWriter);
+			formatWriter);
 
 		goLinks ();
 
@@ -467,8 +466,8 @@ class ManualResponderRequestPendingFormResponder
 
 		printFormat (
 			"<td>%s</td>\n",
-			Html.nonBreakingWhitespace (
-				Html.encode (
+			HtmlUtils.htmlNonBreakingWhitespace (
+				HtmlUtils.htmlEncode (
 					template.getName ())));
 
 		RouteRec route =
@@ -477,8 +476,8 @@ class ManualResponderRequestPendingFormResponder
 
 		printFormat (
 			"<td>%s</td>\n",
-			Html.nonBreakingWhitespace (
-				Html.encode (
+			HtmlUtils.htmlNonBreakingWhitespace (
+				HtmlUtils.htmlEncode (
 					route.getOutCharge () > 0
 						? currencyLogic.formatText (
 							route.getCurrency (),

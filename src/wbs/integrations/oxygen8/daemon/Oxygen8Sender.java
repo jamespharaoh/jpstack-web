@@ -1,11 +1,11 @@
 package wbs.integrations.oxygen8.daemon;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,7 +32,6 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.etc.Html;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutObjectHelper;
@@ -42,6 +41,7 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender2;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.utils.web.HtmlUtils;
 
 @Log4j
 @SingletonComponent ("oxygen8Sender")
@@ -446,7 +446,7 @@ class Oxygen8Sender
 					'=');
 
 				paramsString.append (
-					Html.urlQueryParameterEncode (
+					HtmlUtils.urlQueryParameterEncode (
 						paramEntry.getValue ()));
 
 			}

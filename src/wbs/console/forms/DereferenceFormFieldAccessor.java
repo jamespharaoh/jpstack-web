@@ -1,8 +1,8 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringInSafe;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringInSafe;
 
 import com.google.common.base.Optional;
 
@@ -14,7 +14,7 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("dereferenceFormFieldacessor")
@@ -106,7 +106,7 @@ class DereferenceFormFieldAccessor <Container, Native>
 
 		// set property
 
-		BeanLogic.setProperty (
+		PropertyUtils.setProperty (
 			container,
 			path,
 			nativeValue.orNull ());

@@ -1,11 +1,11 @@
 package wbs.framework.entity.record;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.Misc.doesNotContain;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.Misc.doesNotContain;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Set;
 

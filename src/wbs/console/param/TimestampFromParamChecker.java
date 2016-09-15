@@ -3,15 +3,15 @@
  */
 package wbs.console.param;
 
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
-import static wbs.framework.utils.etc.TimeUtils.instantToDateNullSafe;
+import static wbs.utils.string.StringUtils.stringIsEmpty;
+import static wbs.utils.time.TimeUtils.instantToDateNullSafe;
 
 import java.util.Date;
 
 import org.joda.time.DateTimeZone;
 
-import wbs.framework.utils.TextualInterval;
-import wbs.framework.utils.etc.TimeFormatException;
+import wbs.utils.time.TextualInterval;
+import wbs.utils.time.TimeFormatException;
 
 @Deprecated
 public

@@ -1,12 +1,12 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TypeUtils.classForName;
-import static wbs.framework.utils.etc.TypeUtils.classInSafe;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.TypeUtils.classForName;
+import static wbs.utils.etc.TypeUtils.classInSafe;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -40,7 +40,7 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHelperMethods;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.etc.Html;
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleHelperBuilder")
@@ -427,56 +427,47 @@ class ConsoleHelperBuilder {
 
 		@Override
 		public
-		String getHtml (
-				@NonNull Record object,
-				@NonNull Optional assumedRoot,
-				@NonNull Boolean mini) {
+		void writeHtml (
+				@NonNull FormatWriter formatWriter,
+				Record object,
+				Optional assumedRoot,
+				Boolean mini) {
 
-			Optional<String> optionalHtml =
+			Optional <String> optionalHtml =
 				consoleHooks.getHtml (
 					object,
 					mini);
 
 			if (optionalHtml.isPresent ()) {
-				return optionalHtml.get ();
-			}
 
-			String path =
-				objectManager.objectPath (
-					object,
-					assumedRoot,
-					false,
-					mini);
-
-			StringBuilder stringBuilder =
-				new StringBuilder ();
-
-			if (objectHelper != null) {
-
-				stringBuilder.append (
-					stringFormat (
-						"<a href=\"%h\">%h</a>",
-						requestContext.resolveLocalUrl (
-							getDefaultLocalPath (
-								object)),
-						path));
+				formatWriter.writeString (
+					optionalHtml.get ());
 
 			} else {
 
-				stringBuilder.append (
-					Html.encode (path));
+				String path =
+					objectManager.objectPath (
+						object,
+						assumedRoot,
+						false,
+						mini);
+
+				formatWriter.writeFormat (
+					"<a href=\"%h\">%h</a>",
+					requestContext.resolveLocalUrl (
+						getDefaultLocalPath (
+							object)),
+					path);
 
 			}
-
-			return stringBuilder.toString ();
 
 		}
 
 	}
 
 	public final static
-	Set<Class<?>> objectHelperInterfaces =
-		ImmutableSet.<Class<?>>builder ()
+	Set <Class <?>> objectHelperInterfaces =
+		ImmutableSet.<Class <?>> builder ()
 
 		.add (
 			ModelMethods.class)

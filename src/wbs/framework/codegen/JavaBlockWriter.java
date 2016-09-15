@@ -1,6 +1,6 @@
 package wbs.framework.codegen;
 
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.FormatWriter;
 
 @FunctionalInterface
 public

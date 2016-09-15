@@ -1,8 +1,7 @@
 package wbs.test.simulator.daemon;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.sms.message.outbox.daemon.GenericSmsSenderService;
 
 @SingletonComponent ("simulatorSenderService")
@@ -10,9 +9,9 @@ public
 class SimulatorSenderService
 	extends GenericSmsSenderService {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	SimulatorSenderHelper simulatorSenderHelper;
 
 	// implementation

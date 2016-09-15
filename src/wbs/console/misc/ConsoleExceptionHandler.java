@@ -1,14 +1,13 @@
 package wbs.console.misc;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
@@ -18,6 +17,7 @@ import lombok.extern.log4j.Log4j;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ErrorResponder;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -25,8 +25,8 @@ import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
-import wbs.framework.utils.etc.StringFormatter;
 import wbs.framework.web.WebExceptionHandler;
+import wbs.utils.string.StringFormatter;
 
 @Log4j
 @SingletonComponent ("exceptionHandler")
@@ -65,7 +65,7 @@ class ConsoleExceptionHandler
 
 	// implementation
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 

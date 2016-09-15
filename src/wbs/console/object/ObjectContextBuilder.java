@@ -1,13 +1,13 @@
 package wbs.console.object;
 
-import static wbs.framework.utils.etc.Misc.maybeList;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
-import static wbs.framework.utils.etc.StringUtils.naivePluralise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringStartsWithSimple;
+import static wbs.utils.etc.Misc.maybeList;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.joinWithoutSeparator;
+import static wbs.utils.string.StringUtils.naivePluralise;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringStartsWithSimple;
 
 import java.util.Collections;
 import java.util.List;

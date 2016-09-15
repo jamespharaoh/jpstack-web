@@ -2,10 +2,9 @@ package wbs.integrations.txtnation.api;
 
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import com.google.common.collect.ImmutableMap;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.PathHandler;
@@ -29,7 +28,7 @@ class TxtNationApiServletModule
 
 	// life cycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 
@@ -39,11 +38,13 @@ class TxtNationApiServletModule
 
 	}
 
+	// implementation
+
 	@Override
 	public
-	Map<String,PathHandler> paths () {
+	Map <String, PathHandler> paths () {
 
-		return ImmutableMap.<String,PathHandler>builder ()
+		return ImmutableMap.<String, PathHandler> builder ()
 
 			.put (
 				"/txtnation",

@@ -1,7 +1,7 @@
 package wbs.integrations.broadcastsystems.daemon;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -24,13 +24,13 @@ import wbs.framework.component.config.WbsConfig;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.etc.Html;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutRec;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.utils.web.HtmlUtils;
 
 @Log4j
 @SingletonComponent ("broadcastSystemsSender1")
@@ -175,7 +175,7 @@ class BroadcastSystemsSender1
 				state.bsRouteOut.getToken (),
 				state.message.getNumFrom (),
 				state.message.getNumTo (),
-				Html.urlQueryParameterEncode (state.message.getText ().getText ())
+				HtmlUtils.urlQueryParameterEncode (state.message.getText ().getText ())
 					.replace ("+", "%20"));
 
 		URL url =

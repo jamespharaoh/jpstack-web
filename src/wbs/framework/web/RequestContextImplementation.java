@@ -1,14 +1,14 @@
 package wbs.framework.web;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
+import static wbs.utils.string.StringUtils.joinWithoutSeparator;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +45,7 @@ import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.ProxiedRequestComponent;
-import wbs.framework.utils.etc.RuntimeIoException;
+import wbs.utils.io.RuntimeIoException;
 
 @Accessors (fluent = true)
 @ProxiedRequestComponent (

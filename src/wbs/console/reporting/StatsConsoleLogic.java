@@ -1,34 +1,34 @@
 package wbs.console.reporting;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Optional;
+
+import lombok.NonNull;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
+
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.ReadableInstant;
 
 import wbs.framework.component.annotations.SingletonComponent;
-
-import com.google.common.base.Optional;
-
-import lombok.NonNull;
-import lombok.SneakyThrows;
+import wbs.utils.string.FormatWriter;
 
 @SingletonComponent ("statsConsoleLogic")
 public
 class StatsConsoleLogic {
 
-	@SneakyThrows (IOException.class)
 	public
-	void outputGroup (
-			@NonNull Writer out,
-			@NonNull Map<String,StatsDataSet> dataSetsByName,
+	void writeGroup (
+			@NonNull FormatWriter formatWriter,
+			@NonNull Map <String, StatsDataSet> dataSetsByName,
 			@NonNull StatsPeriod period,
 			@NonNull StatsGrouper grouper,
 			@NonNull StatsResolver resolver,
@@ -36,7 +36,7 @@ class StatsConsoleLogic {
 
 		// aggregate stats via resolver
 
-		Set<Object> groups =
+		Set <Object> groups =
 			resolver.getGroups (
 				dataSetsByName,
 				grouper);
@@ -47,7 +47,7 @@ class StatsConsoleLogic {
 				period,
 				groups);
 
-		List<Object> sortedGroups =
+		List <Object> sortedGroups =
 			grouper.sortGroups (groups);
 
 		// output
@@ -57,14 +57,11 @@ class StatsConsoleLogic {
 				: sortedGroups
 		) {
 
-			out.write (
-				stringFormat (
-					"<tr>\n"));
+			htmlTableRowOpen ();
 
-			out.write (
-				stringFormat (
-					"%s\n",
-					grouper.tdForGroup (group)));
+			grouper.writeTdForGroup (
+				formatWriter,
+				group);
 
 			for (
 				int step = 0;
@@ -78,13 +75,13 @@ class StatsConsoleLogic {
 							group,
 							period.step (step)));
 
-				out.write (
-					formatter.format (
-						group,
-						period,
-						step,
-						Optional.fromNullable (
-							combinedValue)));
+				formatter.format (
+					formatWriter,
+					group,
+					period,
+					step,
+					optionalFromNullable (
+						combinedValue));
 
 			}
 
@@ -92,15 +89,13 @@ class StatsConsoleLogic {
 				resolved.totals ().get (
 					group);
 
-			out.write (
-				formatter.formatTotal (
-					group,
-					Optional.fromNullable (
-						totalValue)));
+			formatter.formatTotal (
+				formatWriter,
+				group,
+				Optional.fromNullable (
+					totalValue));
 
-			out.write (
-				stringFormat (
-					"</tr>\n"));
+			htmlTableRowClose ();
 
 		}
 

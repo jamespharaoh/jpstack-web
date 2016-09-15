@@ -3,12 +3,12 @@ package wbs.framework.entity.generate;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Provider;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
@@ -33,7 +33,7 @@ class ModelWriterManager {
 
 	// lifecycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void setup () {
 
@@ -41,7 +41,7 @@ class ModelWriterManager {
 			builderFactoryProvider.get ();
 
 		for (
-			Map.Entry<Class<?>,Provider<Object>> modelWriterEntry
+			Map.Entry <Class <?>, Provider <Object>> modelWriterEntry
 				: modelWriterProviders.entrySet ()
 		) {
 

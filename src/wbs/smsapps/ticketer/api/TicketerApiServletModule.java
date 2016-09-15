@@ -1,24 +1,26 @@
 package wbs.smsapps.ticketer.api;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
-import static wbs.framework.utils.etc.TimeUtils.earlierThan;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.emptyStringIfNull;
+import static wbs.utils.string.StringUtils.stringIsEmpty;
+import static wbs.utils.time.TimeUtils.earlierThan;
 
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.joda.time.Duration;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
+
+import org.joda.time.Duration;
+
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.StringMapResponderFactory;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -45,31 +47,33 @@ public
 class TicketerApiServletModule
 	implements ServletModule {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	NumberObjectHelper numberHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketerObjectHelper ticketerHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketerTicketObjectHelper ticketerTicketHelper;
 
-	@Inject
-	Provider<ApiFile> apiFile;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <ApiFile> apiFileProvider;
 
 	// ================================= servlet module
 
@@ -86,7 +90,7 @@ class TicketerApiServletModule
 		return ImmutableMap.<String,WebFile>builder ()
 
 			.put ("/ticketer/query/php",
-				apiFile.get ()
+				apiFileProvider.get ()
 					.getAction (queryPhpAction)
 					.postAction (queryPhpAction))
 

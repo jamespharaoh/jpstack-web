@@ -1,6 +1,6 @@
 package wbs.framework.component.config;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.util.List;
 import java.util.Map;

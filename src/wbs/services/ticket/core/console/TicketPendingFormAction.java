@@ -1,15 +1,15 @@
 package wbs.services.ticket.core.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Inject;
+import lombok.Cleanup;
 
 import org.joda.time.Instant;
 
-import lombok.Cleanup;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -24,30 +24,30 @@ public
 class TicketPendingFormAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	TicketConsoleHelper ticketHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketNoteConsoleHelper ticketNoteHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketTemplateConsoleHelper ticketTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// details

@@ -1,6 +1,5 @@
 package wbs.platform.object.summary;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.NonNull;
@@ -13,25 +12,28 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 
 @PrototypeComponent ("objectSummaryHeadingBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectSummaryHeadingBuilder<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectSummaryHeadingBuilder <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ObjectSummaryFieldsPart<ObjectType,ParentType>> summaryFieldsPart;
+	@PrototypeDependency
+	Provider <ObjectSummaryFieldsPart <ObjectType, ParentType>>
+	summaryFieldsPartProvider;
 
 	// builder
 
@@ -42,7 +44,7 @@ class ObjectSummaryHeadingBuilder<
 	ObjectSummaryHeadingSpec objectSummaryHeadingSpec;
 
 	@BuilderTarget
-	ObjectSummaryPageBuilder<ObjectType,ParentType> objectSummaryPageBuilder;
+	ObjectSummaryPageBuilder <ObjectType, ParentType> objectSummaryPageBuilder;
 
 	// build
 

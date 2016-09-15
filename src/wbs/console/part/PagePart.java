@@ -10,13 +10,13 @@ public
 interface PagePart {
 
 	void setup (
-			Map<String,Object> parameters);
+			Map <String, Object> parameters);
 
 	void prepare ();
 
-	Set<ScriptRef> scriptRefs ();
+	Set <ScriptRef> scriptRefs ();
 
-	Set<HtmlLink> links ();
+	Set <HtmlLink> links ();
 
 	void renderHtmlHeadContent ();
 
@@ -24,5 +24,7 @@ interface PagePart {
 
 	void setWithMarkup (
 			boolean markup);
+
+	void cleanup ();
 
 }

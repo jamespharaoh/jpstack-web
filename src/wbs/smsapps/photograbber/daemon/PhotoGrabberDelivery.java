@@ -3,7 +3,6 @@ package wbs.smsapps.photograbber.daemon;
 import java.util.Collection;
 import java.util.Collections;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
@@ -11,7 +10,9 @@ import com.google.common.collect.ImmutableList;
 import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -20,7 +21,7 @@ import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
-import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.smsapps.photograbber.model.PhotoGrabberRec;
 import wbs.smsapps.photograbber.model.PhotoGrabberRequestObjectHelper;
 import wbs.smsapps.photograbber.model.PhotoGrabberRequestRec;
@@ -30,20 +31,26 @@ public
 class PhotoGrabberDelivery
 	implements DeliveryHandler {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
-	@Inject
+	@SingletonDependency
 	PhotoGrabberRequestObjectHelper photoGrabberRequestHelper;
 
-	@Inject
-	Provider<MessageSender> messageSender;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <SmsMessageSender> messageSender;
+
+	// details
 
 	@Override
 	public

@@ -1,6 +1,6 @@
 package wbs.platform.php;
 
-import static wbs.framework.utils.etc.StringUtils.stringToBytes;
+import static wbs.utils.string.StringUtils.stringToBytes;
 
 import java.io.IOException;
 import java.io.OutputStream;

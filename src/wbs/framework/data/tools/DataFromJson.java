@@ -1,8 +1,8 @@
 package wbs.framework.data.tools;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;

@@ -1,7 +1,7 @@
 package wbs.platform.object.create;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -9,13 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
@@ -27,6 +26,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.platform.scaffold.model.RootObjectHelper;
@@ -34,30 +34,30 @@ import wbs.platform.scaffold.model.RootObjectHelper;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCreatePart")
 public
-class ObjectCreatePart<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectCreatePart <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 >
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	RootObjectHelper rootHelper;
 
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
 	FormFieldSet formFieldSet;
@@ -69,29 +69,29 @@ class ObjectCreatePart<
 	String localFile;
 
 	@Getter @Setter
-	FieldsProvider<ObjectType,ParentType> formFieldsProvider;
+	FieldsProvider <ObjectType, ParentType> formFieldsProvider;
 
 	// state
 
-	Optional<UpdateResultSet> updateResultSet;
+	Optional <UpdateResultSet> updateResultSet;
 
-	ConsoleHelper<ParentType> parentHelper;
-	List<ParentType> parents;
+	ConsoleHelper <ParentType> parentHelper;
+	List <ParentType> parents;
 	ParentType parent;
 
 	ObjectType object;
 
-	Map<String,Object> hints =
+	Map <String, Object> hints =
 		new LinkedHashMap<> ();
 
 	// implementation
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		Set<ScriptRef> scriptRefs =
-			new LinkedHashSet<ScriptRef> ();
+		Set <ScriptRef> scriptRefs =
+			new LinkedHashSet<> ();
 
 		scriptRefs.addAll (
 			formFieldSet.scriptRefs ());

@@ -355,6 +355,9 @@ writeBuildFile world = do
 					mkelem "include" [
 						sattr "name" "wbs/framework/**"
 					] [],
+					mkelem "include" [
+						sattr "name" "wbs/utils/**"
+					] [],
 
 					mkelem "src" [
 						sattr "path" "src"
@@ -373,10 +376,13 @@ writeBuildFile world = do
 						sattr "name" "wbs/api/**"
 					] [],
 					mkelem "include" [
+						sattr "name" "wbs/console/**"
+					] [],
+					mkelem "include" [
 						sattr "name" "wbs/framework/**"
 					] [],
 					mkelem "include" [
-						sattr "name" "wbs/console/**"
+						sattr "name" "wbs/utils/**"
 					] [],
 
 					mkelem "service" [
@@ -406,6 +412,9 @@ writeBuildFile world = do
 					] [],
 					mkelem "include" [
 						sattr "name" "wbs/framework/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/utils/**"
 					] [],
 
 					mkelem "include" [
@@ -446,6 +455,9 @@ writeBuildFile world = do
 					] [],
 					mkelem "include" [
 						sattr "name" "wbs/framework/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/utils/**"
 					] [],
 
 					mkelem "include" [
@@ -761,7 +773,7 @@ writeBuildFile world = do
 
 			mkelem "taskdef" [
 				sattr "name" "database-init",
-				sattr "classname" "wbs.framework.utils.ant.DatabaseInitTask",
+				sattr "classname" "wbs.utils.ant.DatabaseInitTask",
 				sattr "classpathref" "classpath"
 			] [],
 

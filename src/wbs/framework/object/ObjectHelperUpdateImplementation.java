@@ -1,8 +1,8 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TypeUtils.dynamicCast;
-import static wbs.framework.utils.etc.TypeUtils.isInstanceOf;
+import static wbs.utils.etc.TypeUtils.dynamicCast;
+import static wbs.utils.etc.TypeUtils.isInstanceOf;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

@@ -3,8 +3,8 @@
  */
 package wbs.console.param;
 
-import static wbs.framework.utils.etc.Misc.stringTrim;
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
+import static wbs.utils.etc.Misc.stringTrim;
+import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -1,6 +1,6 @@
 package wbs.framework.exception;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
 

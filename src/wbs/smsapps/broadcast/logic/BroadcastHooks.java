@@ -2,10 +2,10 @@ package wbs.smsapps.broadcast.logic;
 
 import java.util.List;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.NonNull;
+
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectHooks;
 import wbs.platform.object.core.model.ObjectTypeDao;
@@ -20,29 +20,27 @@ import wbs.smsapps.broadcast.model.BroadcastRec;
 
 public
 class BroadcastHooks
-	implements ObjectHooks<BroadcastRec> {
+	implements ObjectHooks <BroadcastRec> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@WeakSingletonDependency
+	BatchObjectHelper batchHelper;
+
+	@WeakSingletonDependency
+	BatchLogic batchLogic;
+
+	@WeakSingletonDependency
+	BroadcastLogic broadcastLogicProvider;
+
+	@SingletonDependency
 	Database database;
 
-	// indirect dependencies
+	@WeakSingletonDependency
+	NumberFormatLogic numberFormatLogicProvider;
 
-	@Inject
-	Provider<BatchObjectHelper> batchHelper;
-
-	@Inject
-	Provider<BatchLogic> batchLogic;
-
-	@Inject
-	Provider<BroadcastLogic> broadcastLogicProvider;
-
-	@Inject
-	Provider<NumberFormatLogic> numberFormatLogicProvider;
-
-	@Inject
-	Provider<ObjectTypeDao> objectTypeDao;
+	@WeakSingletonDependency
+	ObjectTypeDao objectTypeDao;
 
 	// implementation
 
@@ -80,19 +78,19 @@ class BroadcastHooks
 		// create batch
 
 		BatchSubjectRec batchSubject =
-			batchLogic.get ().batchSubject (
+			batchLogic.batchSubject (
 				broadcastConfig,
 				"broadcast");
 
 		ObjectTypeRec broadcastObjectType =
-			objectTypeDao.get ().findByCode (
+			objectTypeDao.findByCode (
 				"broadcast");
 
 		if (broadcastObjectType == null)
 			throw new NullPointerException ();
 
-		batchHelper.get ().insert (
-			batchHelper.get ().createInstance ()
+		batchHelper.insert (
+			batchHelper.createInstance ()
 
 			.setParentType (
 				broadcastObjectType)
@@ -117,7 +115,7 @@ class BroadcastHooks
 			try {
 
 				numbers =
-					numberFormatLogicProvider.get ().parseLines (
+					numberFormatLogicProvider.parseLines (
 						broadcastConfig.getNumberFormat (),
 						broadcastConfig.getDefaultNumbers ());
 
@@ -129,7 +127,7 @@ class BroadcastHooks
 
 			}
 
-			broadcastLogicProvider.get ().addNumbers (
+			broadcastLogicProvider.addNumbers (
 				broadcast,
 				numbers,
 				null);

@@ -1,26 +1,28 @@
 package wbs.test.simulator.console;
 
-import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.LogicUtils.parseBooleanTrueFalseRequired;
-import static wbs.framework.utils.etc.StringUtils.doesNotStartWithSimple;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.LogicUtils.parseBooleanTrueFalseRequired;
+import static wbs.utils.string.StringUtils.doesNotStartWithSimple;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collections;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.joda.time.Instant;
-import org.json.simple.JSONValue;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
+
+import org.joda.time.Instant;
+import org.json.simple.JSONValue;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -56,60 +58,60 @@ public
 class SimulatorSessionCreateEventAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	NetworkConsoleHelper networkHelper;
 
-	@Inject
+	@SingletonDependency
 	NumberConsoleHelper numberHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	SmsDeliveryReportLogic reportLogic;
 
-	@Inject
+	@SingletonDependency
 	RootConsoleHelper rootHelper;
 
-	@Inject
+	@SingletonDependency
 	RouteConsoleHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	SimulatorEventObjectHelper simulatorEventHelper;
 
-	@Inject
+	@SingletonDependency
 	SimulatorSessionObjectHelper simulatorSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	SimulatorSessionNumberObjectHelper simulatorSessionNumberHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceConsoleHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<JsonResponder> jsonResponder;
+	@PrototypeDependency
+	Provider <JsonResponder> jsonResponderProvider;
 
 	// details
 
@@ -151,7 +153,7 @@ class SimulatorSessionCreateEventAction
 
 		} catch (AjaxException error) {
 
-			return jsonResponder.get ()
+			return jsonResponderProvider.get ()
 
 				.value (
 					ImmutableMap.<Object,Object>builder ()
@@ -178,7 +180,7 @@ class SimulatorSessionCreateEventAction
 					userConsoleLogic.userIdRequired ()),
 				GenericExceptionResolution.ignoreWithUserWarning);
 
-			return jsonResponder.get ()
+			return jsonResponderProvider.get ()
 
 				.value (
 					ImmutableMap.<Object,Object>builder ()
@@ -341,7 +343,7 @@ class SimulatorSessionCreateEventAction
 
 		transaction.commit ();
 
-		return jsonResponder.get ()
+		return jsonResponderProvider.get ()
 			.value (
 				ImmutableMap.<Object,Object>builder ()
 					.put ("success", true)
@@ -429,7 +431,7 @@ class SimulatorSessionCreateEventAction
 
 		transaction.commit ();
 
-		return jsonResponder.get ()
+		return jsonResponderProvider.get ()
 
 			.value (
 				ImmutableMap.<Object,Object>builder ()

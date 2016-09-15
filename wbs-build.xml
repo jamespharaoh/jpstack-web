@@ -3,6 +3,12 @@
 
 	<plugins>
 
+		<!-- utils -->
+
+		<plugin
+			name="utils"
+			package="wbs.utils"/>
+
 		<!-- framework -->
 
 		<plugin
@@ -44,10 +50,6 @@
 		<plugin
 			name="sql"
 			package="wbs.framework.sql"/>
-
-		<plugin
-			name="utils"
-			package="wbs.framework.utils"/>
 
 		<plugin
 			name="web"
@@ -460,123 +462,123 @@
 
 		<plugin
 			name="apn-misc"
-			package="wbs.clients.apn.misc"/>
+			package="wbs.apn.misc"/>
 
 		<plugin
 			name="chat-core"
-			package="wbs.clients.apn.chat.core"/>
+			package="wbs.apn.chat.core"/>
 
 		<plugin
 			name="chat-ad"
-			package="wbs.clients.apn.chat.ad"/>
+			package="wbs.apn.chat.ad"/>
 
 		<plugin
 			name="chat-adult"
-			package="wbs.clients.apn.chat.adult"/>
+			package="wbs.apn.chat.adult"/>
 
 		<plugin
 			name="chat-affiliate"
-			package="wbs.clients.apn.chat.affiliate"/>
+			package="wbs.apn.chat.affiliate"/>
 
 		<plugin
 			name="chat-api"
-			package="wbs.clients.apn.chat.api"/>
+			package="wbs.apn.chat.api"/>
 
 		<plugin
 			name="chat-approval"
-			package="wbs.clients.apn.chat.approval"/>
+			package="wbs.apn.chat.approval"/>
 
 		<plugin
 			name="chat-bill"
-			package="wbs.clients.apn.chat.bill"/>
+			package="wbs.apn.chat.bill"/>
 
 		<plugin
 			name="chat-broadcast"
-			package="wbs.clients.apn.chat.broadcast"/>
+			package="wbs.apn.chat.broadcast"/>
 
 		<plugin
 			name="chat-category"
-			package="wbs.clients.apn.chat.category"/>
+			package="wbs.apn.chat.category"/>
 
 		<plugin
 			name="chat-contact"
-			package="wbs.clients.apn.chat.contact"/>
+			package="wbs.apn.chat.contact"/>
 
 		<plugin
 			name="chat-date"
-			package="wbs.clients.apn.chat.date"/>
+			package="wbs.apn.chat.date"/>
 
 		<plugin
 			name="chat-graphs"
-			package="wbs.clients.apn.chat.graphs"/>
+			package="wbs.apn.chat.graphs"/>
 
 		<plugin
 			name="chat-help"
-			package="wbs.clients.apn.chat.help"/>
+			package="wbs.apn.chat.help"/>
 
 		<plugin
 			name="chat-info-site"
-			package="wbs.clients.apn.chat.infosite"/>
+			package="wbs.apn.chat.infosite"/>
 
 		<plugin
 			name="chat-keyword"
-			package="wbs.clients.apn.chat.keyword"/>
+			package="wbs.apn.chat.keyword"/>
 
 		<plugin
 			name="chat-named-note"
-			package="wbs.clients.apn.chat.namednote"/>
+			package="wbs.apn.chat.namednote"/>
 
 		<plugin
 			name="chat-report"
-			package="wbs.clients.apn.chat.report"/>
+			package="wbs.apn.chat.report"/>
 
 		<plugin
 			name="chat-scheme"
-			package="wbs.clients.apn.chat.scheme"/>
+			package="wbs.apn.chat.scheme"/>
 
 		<plugin
 			name="chat-settings"
-			package="wbs.clients.apn.chat.settings"/>
+			package="wbs.apn.chat.settings"/>
 
 		<plugin
 			name="chat-supervisor"
-			package="wbs.clients.apn.chat.supervisor"/>
+			package="wbs.apn.chat.supervisor"/>
 
 		<plugin
 			name="chat-user-admin"
-			package="wbs.clients.apn.chat.user.admin"/>
+			package="wbs.apn.chat.user.admin"/>
 
 		<plugin
 			name="chat-user-core"
-			package="wbs.clients.apn.chat.user.core"/>
+			package="wbs.apn.chat.user.core"/>
 
 		<plugin
 			name="chat-user-image"
-			package="wbs.clients.apn.chat.user.image"/>
+			package="wbs.apn.chat.user.image"/>
 
 		<plugin
 			name="chat-user-info"
-			package="wbs.clients.apn.chat.user.info"/>
+			package="wbs.apn.chat.user.info"/>
 
 		<plugin
 			name="chat-user-join"
-			package="wbs.clients.apn.chat.user.join"/>
+			package="wbs.apn.chat.user.join"/>
 
 		<plugin
 			name="chat-user-pending"
-			package="wbs.clients.apn.chat.user.pending"/>
+			package="wbs.apn.chat.user.pending"/>
 
 		<!-- all star psychic -->
 
 		<plugin
 			name="all-star-misc"
-			package="wbs.clients.allstar.misc"/>
+			package="wbs.allstar.misc"/>
 
 		<!-- im chat -->
 
 		<plugin
 			name="im-chat"
-			package="wbs.applications.imchat"/>
+			package="wbs.imchat"/>
 
 		<!-- services -->
 

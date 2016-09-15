@@ -1,41 +1,40 @@
 package wbs.services.wallet.fixture;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
-import wbs.framework.utils.RandomLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.services.wallet.model.WalletObjectHelper;
 import wbs.services.wallet.model.WalletServiceObjectHelper;
 import wbs.services.wallet.model.WalletServiceRec;
+import wbs.utils.random.RandomLogic;
 
 @PrototypeComponent ("walletFixtureProvider")
 public
 class WalletFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuItemObjectHelper menuItemHelper;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	WalletObjectHelper walletHelper;
 
-	@Inject
+	@SingletonDependency
 	WalletServiceObjectHelper walletServiceHelper;
 
 	// implementation

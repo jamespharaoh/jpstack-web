@@ -1,14 +1,12 @@
 package wbs.services.ticket.core.fixture;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.RandomLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
@@ -25,54 +23,55 @@ import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketStateObjectHelper;
 import wbs.services.ticket.core.model.TicketStateRec;
 import wbs.services.ticket.core.model.TicketTemplateObjectHelper;
+import wbs.utils.random.RandomLogic;
 
 @PrototypeComponent ("ticketFixtureProvider")
 public
 class TicketFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuItemObjectHelper menuHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketManagerObjectHelper ticketManagerHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketObjectHelper ticketHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketFieldTypeObjectHelper ticketFieldTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketFieldValueObjectHelper ticketFieldValueHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketNoteObjectHelper ticketNoteHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketStateObjectHelper ticketStateHelper;
 
-	@Inject
+	@SingletonDependency
 	TicketTemplateObjectHelper ticketTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeObjectHelper objectTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
 	// implementation

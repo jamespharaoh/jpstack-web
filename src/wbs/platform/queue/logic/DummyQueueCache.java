@@ -2,11 +2,10 @@ package wbs.platform.queue.logic;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
@@ -18,12 +17,14 @@ public
 class DummyQueueCache
 	implements QueueCache {
 
-	// dependencies
+	// TODO this is probably not needed with generic caching layer
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	QueueItemObjectHelper queueItemHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueSubjectObjectHelper queueSubjectHelper;
 
 	// implementation

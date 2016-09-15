@@ -1,9 +1,9 @@
 package wbs.integrations.dialogue.daemon;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringToUtf8;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

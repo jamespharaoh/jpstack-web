@@ -1,8 +1,8 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.util.Map;
@@ -21,8 +21,8 @@ import fj.data.Either;
 
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.RuntimeIoException;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.io.RuntimeIoException;
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("uploadFormFieldRenderer")
 @Accessors (fluent = true)

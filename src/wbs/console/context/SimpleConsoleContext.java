@@ -1,6 +1,6 @@
 package wbs.console.context;
 
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -186,7 +186,7 @@ class SimpleConsoleContext
 
 		if (postProcessorName () != null) {
 
-			consoleManager.get ().runPostProcessors (
+			consoleManager.runPostProcessors (
 				postProcessorName (),
 				contextStuff);
 

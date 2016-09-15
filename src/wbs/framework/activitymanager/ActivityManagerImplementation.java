@@ -1,14 +1,14 @@
 package wbs.framework.activitymanager;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualSafe;
-import static wbs.framework.utils.etc.MapUtils.mapIsEmpty;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.max;
-import static wbs.framework.utils.etc.NumberUtils.roundToIntegerRequired;
-import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TimeUtils.notShorterThan;
+import static wbs.utils.collection.MapUtils.mapIsEmpty;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualSafe;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.max;
+import static wbs.utils.etc.NumberUtils.roundToIntegerRequired;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.time.TimeUtils.notShorterThan;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,12 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 
-import javax.annotation.PostConstruct;
-
-import org.apache.commons.io.IOUtils;
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
@@ -32,8 +26,16 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
-import wbs.framework.utils.formatwriter.FormatWriter;
-import wbs.framework.utils.formatwriter.WriterFormatWriter;
+
+import org.apache.commons.io.IOUtils;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
+import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.utils.string.FormatWriter;
+import wbs.utils.string.StringFormatWriter;
+import wbs.utils.string.WriterFormatWriter;
 
 @Log4j
 public
@@ -50,7 +52,7 @@ class ActivityManagerImplementation
 	@Getter @Setter
 	Duration showTaskDuration =
 		Duration.millis (
-			2);
+			1);
 
 	// state
 
@@ -66,7 +68,7 @@ class ActivityManagerImplementation
 
 	// implementation
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 		throw new RuntimeException ();
@@ -231,7 +233,20 @@ class ActivityManagerImplementation
 				task,
 				currentTask.get ())
 		) {
-			throw new RuntimeException ();
+
+			logActiveTasks ();
+
+			throw new RuntimeException (
+				stringFormat (
+					"End task %s (%s, %s) ",
+					task.taskId (),
+					task.taskType (),
+					task.summary (),
+					"but current task is %s (%s, %s)",
+					currentTask.get ().taskId (),
+					currentTask.get ().taskType (),
+					currentTask.get ().summary ()));
+
 		}
 
 		Duration taskDuration =
@@ -293,12 +308,8 @@ class ActivityManagerImplementation
 	public synchronized
 	void logActiveTasks () {
 
-		StringWriter stringWriter =
-			new StringWriter ();
-
-		FormatWriter formatWriter =
-			new WriterFormatWriter (
-				stringWriter);
+		StringFormatWriter formatWriter =
+			new StringFormatWriter ();
 
 		if (
 			mapIsEmpty (
@@ -318,7 +329,7 @@ class ActivityManagerImplementation
 				"  ");
 
 			log.info (
-				stringWriter.toString ());
+				formatWriter.toString ());
 
 		}
 

@@ -1,21 +1,20 @@
 package wbs.services.ticket.core.logic;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-import org.hibernate.TransientObjectException;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
+
+import org.hibernate.TransientObjectException;
+
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHooks;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.RandomLogic;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -25,31 +24,36 @@ import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldValueRec;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
+import wbs.utils.random.RandomLogic;
 
 public
 class TicketHooks
 	implements ObjectHooks <TicketRec> {
 
-	@Inject
-	Provider <TicketObjectHelper> ticketHelper;
+	// singleton dependencies
 
-	@Inject
-	Provider <TicketFieldTypeObjectHelper> ticketFieldTypeHelper;
-
-	@Inject
-	Provider <TicketFieldValueObjectHelper> ticketFieldValueHelper;
-
-	@Inject
-	Provider <ObjectManager> objectManager;
-
-	@Inject
-	Provider <QueueLogic> queueLogic;
-
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@WeakSingletonDependency
+	ObjectManager objectManager;
+
+	@WeakSingletonDependency
+	QueueLogic queueLogic;
+
+	@SingletonDependency
 	RandomLogic randomLogic;
+
+	@WeakSingletonDependency
+	TicketFieldTypeObjectHelper ticketFieldTypeHelper;
+
+	@WeakSingletonDependency
+	TicketFieldValueObjectHelper ticketFieldValueHelper;
+
+	@WeakSingletonDependency
+	TicketObjectHelper ticketHelper;
+
+	// implementation
 
 	@Override
 	public
@@ -63,8 +67,8 @@ class TicketHooks
 			// create queue item
 
 			QueueItemRec queueItem =
-				queueLogic.get ().createQueueItem (
-					queueLogic.get ().findQueue (
+				queueLogic.createQueueItem (
+					queueLogic.findQueue (
 						ticket.getTicketState (),
 						"default"),
 					ticket,
@@ -92,7 +96,7 @@ class TicketHooks
 		// find the ticket field type
 
 		TicketFieldTypeRec ticketFieldType =
-			ticketFieldTypeHelper.get ().findByCodeRequired (
+			ticketFieldTypeHelper.findByCodeRequired (
 				ticket.getTicketManager (),
 				name);
 
@@ -131,7 +135,7 @@ class TicketHooks
 					ticketFieldValue.getIntegerValue ();
 
 				ObjectHelper <?> objectHelper =
-					objectManager.get ().objectHelperForTypeId (
+					objectManager.objectHelperForTypeId (
 						objectType.getId ());
 
 				Object object =
@@ -166,7 +170,7 @@ class TicketHooks
 		// find the ticket field type
 
 		TicketFieldTypeRec ticketFieldType =
-			ticketFieldTypeHelper.get ().findByCodeRequired (
+			ticketFieldTypeHelper.findByCodeRequired (
 				ticket.getTicketManager (),
 				name);
 
@@ -190,7 +194,7 @@ class TicketHooks
 		if (ticketFieldValue == null) {
 
 			ticketFieldValue =
-				ticketFieldValueHelper.get ().createInstance ()
+				ticketFieldValueHelper.createInstance ()
 
 				.setTicket (
 					ticket)

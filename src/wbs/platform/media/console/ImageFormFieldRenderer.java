@@ -1,9 +1,9 @@
 package wbs.platform.media.console;
 
-import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.successResult;
-import static wbs.framework.utils.etc.NumberUtils.moreThanZero;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.NumberUtils.moreThanZero;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.util.Map;
@@ -23,10 +23,10 @@ import wbs.console.forms.FormFieldRenderer;
 import wbs.console.forms.FormFieldSubmission;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.utils.etc.RuntimeIoException;
-import wbs.framework.utils.formatwriter.FormatWriter;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
+import wbs.utils.io.RuntimeIoException;
+import wbs.utils.string.FormatWriter;
 
 import fj.data.Either;
 
@@ -258,15 +258,14 @@ class ImageFormFieldRenderer <Container>
 			return;
 		}
 
-		htmlWriter.writeFormat (
-			"%s",
-			mediaConsoleLogic.mediaThumb32 (
-				interfaceValue.get ()));
+		mediaConsoleLogic.writeMediaThumb32 (
+			htmlWriter,
+			interfaceValue.get ());
 
 		if (showFilename) {
 
-			htmlWriter.writeFormat (
-				"\n%h",
+			htmlWriter.writeLineFormat (
+				"%h",
 				interfaceValue.get ().getFilename ());
 
 		}
@@ -285,15 +284,17 @@ class ImageFormFieldRenderer <Container>
 			return;
 		}
 
-		htmlWriter.writeFormat (
-			"%s",
-			mediaConsoleLogic.mediaThumb100 (
-				interfaceValue.get ()));
+		mediaConsoleLogic.writeMediaThumb100 (
+			htmlWriter,
+			interfaceValue.get ());
 
 		if (showFilename) {
 
-			htmlWriter.writeFormat (
-				"<br>\n%h (%h bytes)",
+			htmlWriter.writeLineFormat (
+				"<br>");
+
+			htmlWriter.writeLineFormat (
+				"%h (%h bytes)",
 				interfaceValue.get ().getFilename (),
 				interfaceValue.get ().getContent ().getData ().length);
 

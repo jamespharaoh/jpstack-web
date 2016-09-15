@@ -1,12 +1,11 @@
 package wbs.smsapps.subscription.daemon;
 
-import javax.inject.Inject;
-
 import lombok.extern.log4j.Log4j;
 
 import org.apache.log4j.Logger;
 
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.send.GenericSendDaemon;
 import wbs.platform.send.GenericSendHelper;
 import wbs.smsapps.subscription.logic.SubscriptionSendHelper;
@@ -19,15 +18,15 @@ import wbs.smsapps.subscription.model.SubscriptionSendRec;
 public
 class SubscriptionSendDaemon
 	extends
-		GenericSendDaemon<
+		GenericSendDaemon <
 			SubscriptionRec,
 			SubscriptionSendRec,
 			SubscriptionSendNumberRec
 		> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	SubscriptionSendHelper subscriptionSendHelper;
 
 	// implementation

@@ -1,6 +1,8 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
+import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.web.HtmlInputUtils.htmlSelect;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -11,7 +13,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.framework.utils.etc.Html;
+
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 public
@@ -86,27 +89,56 @@ class EnumConsoleHelper <E extends Enum <E>> {
 
 	}
 
-	@Deprecated
 	public
-	String select (
-			String name,
-			String value) {
+	void writeSelect (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String name,
+			@NonNull String value) {
 
-		return Html.select (
+		htmlSelect (
+			formatWriter,
 			name,
 			optionsMap,
 			value);
 
 	}
 
-	@Deprecated
 	public
-	String selectNull (
-			String name,
-			String value,
-			String nullName) {
+	void writeSelect (
+			@NonNull String name,
+			@NonNull String value) {
 
-		return Html.select (
+		htmlSelect (
+			currentFormatWriter (),
+			name,
+			optionsMap,
+			value);
+
+	}
+
+	public
+	void writeSelectOptional (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String name,
+			@NonNull String value,
+			@NonNull String noneName) {
+
+		htmlSelect (
+			formatWriter,
+			name,
+			nullOptionsMap,
+			value);
+
+	}
+
+	public
+	void writeSelectOptional (
+			@NonNull String name,
+			@NonNull String value,
+			@NonNull String noneName) {
+
+		htmlSelect (
+			currentFormatWriter (),
 			name,
 			nullOptionsMap,
 			value);

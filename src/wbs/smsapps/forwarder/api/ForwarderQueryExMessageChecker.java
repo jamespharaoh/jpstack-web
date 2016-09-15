@@ -3,9 +3,8 @@ package wbs.smsapps.forwarder.api;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.rpc.core.RpcChecker;
 import wbs.platform.rpc.core.RpcDefinition;
 
@@ -14,8 +13,12 @@ public
 class ForwarderQueryExMessageChecker
 	implements RpcChecker {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ForwarderApiLogic forwarderApiLogic;
+
+	// implementation
 
 	@Override
 	public

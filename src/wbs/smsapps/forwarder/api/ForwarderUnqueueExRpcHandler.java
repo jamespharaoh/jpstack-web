@@ -1,20 +1,20 @@
 package wbs.smsapps.forwarder.api;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NumberUtils.moreThan;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.moreThan;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import lombok.Cleanup;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.rpc.core.Rpc;
@@ -36,20 +36,25 @@ public
 class ForwarderUnqueueExRpcHandler
 	implements RpcHandler {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ForwarderApiLogic forwarderApiLogic;
 
-	@Inject
+	@SingletonDependency
 	ForwarderMessageInObjectHelper forwarderMessageInHelper;
 
-	@Inject
+	@SingletonDependency
 	ForwarderMessageOutReportObjectHelper forwarderMessageOutReportHelper;
 
-	@Inject @Named
+	@SingletonDependency
+	@Named
 	RpcDefinition forwarderUnqueueExRequestDef;
+
+	// state
 
 	ForwarderRec forwarder;
 	Boolean allowPartial;

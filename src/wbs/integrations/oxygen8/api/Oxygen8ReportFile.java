@@ -1,6 +1,6 @@
 package wbs.integrations.oxygen8.api;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,7 +11,7 @@ import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 
-import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -25,7 +25,7 @@ import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
-@PrototypeComponent ("oxygen8ReportFile")
+@SingletonComponent ("oxygen8ReportFile")
 public
 class Oxygen8ReportFile
 	extends AbstractWebFile {

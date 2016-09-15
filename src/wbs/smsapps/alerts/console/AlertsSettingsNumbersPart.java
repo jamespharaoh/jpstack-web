@@ -1,12 +1,22 @@
 package wbs.smsapps.alerts.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-
-import javax.inject.Inject;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlInputUtils.htmlSelectYesNo;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlUtils.htmlFormClose;
+import static wbs.utils.web.HtmlUtils.htmlFormOpenMethod;
+import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.Html;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.smsapps.alerts.model.AlertsNumberRec;
 import wbs.smsapps.alerts.model.AlertsSettingsObjectHelper;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
@@ -16,7 +26,9 @@ public
 class AlertsSettingsNumbersPart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	AlertsSettingsObjectHelper alertsSettingsHelper;
 
 	// state
@@ -42,33 +54,35 @@ class AlertsSettingsNumbersPart
 
 		// top
 
-		printFormat (
-			"<form method=\"post\">\n");
+		htmlFormOpenMethod (
+			"post");
 
 		if (
 			requestContext.canContext (
 				"super")
 		) {
 
-			printFormat (
-				"<p>",
-				"<input " +
-					"type=\"submit\" " +
-					"value=\"save changes\">",
-				"</p>\n");
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"save changes\"",
+				">");
+
+			htmlParagraphClose ();
 
 		}
 
-		printFormat (
-			"<table class=\"list\">\n");
+		// entries
 
-		printFormat (
-			"<tr>\n",
-			"<th>Name</th>\n",
-			"<th>Number</th>\n",
-			"<th>Enabled</th>\n",
-			"<th></th>\n",
-			"</tr>\n");
+		htmlTableOpenList ();
+
+		htmlTableHeaderRowWrite (
+			"Name",
+			"Number",
+			"Enabled",
+			"");
 
 		// rows
 
@@ -77,11 +91,14 @@ class AlertsSettingsNumbersPart
 				: alertsSettings.getAlertsNumbers ()
 		) {
 
-			printFormat (
-				"<tr>\n");
+			htmlTableRowOpen ();
 
-			printFormat (
-				"<td><input",
+			// name
+
+			htmlTableCellOpen ();
+
+			formatWriter.writeFormat (
+				"<input",
 				" type=\"text\"",
 				" name=\"%h\"",
 				stringFormat (
@@ -93,10 +110,16 @@ class AlertsSettingsNumbersPart
 						"name_%s",
 						alertsNumber.getId ()),
 					alertsNumber.getName ()),
-				"></td>\n");
+				">");
 
-			printFormat (
-				"<td><input",
+			htmlTableCellClose ();
+
+			// number
+
+			htmlTableCellOpen ();
+
+			formatWriter.writeFormat (
+				"<input",
 				" type=\"text\"",
 				" name=\"%h\"",
 				stringFormat (
@@ -110,97 +133,121 @@ class AlertsSettingsNumbersPart
 					alertsNumber.getNumber ().getNumber ()),
 				"></td>\n");
 
-			printFormat (
-				"<td>%s</td>\n",
-				Html.selectYesNo (
+			htmlTableCellOpen ();
+
+			// enabled
+
+			htmlSelectYesNo (
+				stringFormat (
+					"enabled_%s",
+					alertsNumber.getId ()),
+				requestContext.getForm (
 					stringFormat (
 						"enabled_%s",
-						alertsNumber.getId ()),
-					requestContext.getForm (
-						stringFormat (
-							"enabled_%s",
-							alertsNumber.getId ())),
-					alertsNumber.getEnabled ()));
+						alertsNumber.getId ())),
+				alertsNumber.getEnabled ());
 
-			printFormat (
-				"<td><input",
+			htmlTableCellClose ();
+
+			// submit
+
+			htmlTableCellOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
 				" type=\"submit\"",
 				" name=\"%h\"",
 				stringFormat (
 					"delete_%s",
 					alertsNumber.getId ()),
 				" value=\"delete\"",
-				"></td>\n");
+				">");
 
-			printFormat (
-				"</tr>\n");
+			htmlTableCellClose ();
+
+			// close row
+
+			htmlTableRowClose ();
 
 		}
 
 		// add new
 
-		printFormat (
-			"<tr>\n");
+		htmlTableRowOpen ();
 
-		printFormat (
-			"<td><input",
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"text\"",
 			" name=\"name_new\"",
 			" value=\"%h\"",
 			requestContext.getForm (
 				"name_new",
 				""),
-			"></td>\n");
+			">");
 
-		printFormat (
-			"<td><input",
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"text\"",
 			" name=\"number_new\"",
 			" value=\"%h\"",
 			requestContext.getForm (
 				"number_new",
 				""),
-			"></td>\n");
+			">");
 
-		printFormat (
-			"<td>%s</td>\n",
-			Html.selectYesNo (
-				"enabled_new",
-				requestContext.getForm (
-					"enabled_new"),
-				true));
+		htmlTableCellClose ();
 
-		printFormat (
-			"<td><input",
+		htmlTableCellOpen ();
+
+		htmlSelectYesNo (
+			"enabled_new",
+			requestContext.getForm (
+				"enabled_new"),
+			true);
+
+		htmlTableCellClose ();
+
+		// submit
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"add_new\"",
 			" value=\"add new\"",
-			"></td>\n");
+			">");
 
-		printFormat (
-			"</tr>\n");
+		htmlTableCellClose ();
+
+		// close row
+
+		htmlTableRowClose ();
 
 		// bottom
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 		if (
 			requestContext.canContext (
 				"alertsSettings.manage")
 		) {
 
-			printFormat (
-				"<p>",
+			htmlParagraphOpen ();
+
+			formatWriter.writeFormat (
 				"<input",
 				" type=\"submit\"",
 				" value=\"save changes\"",
-				"></p>\n");
+				">");
+
+			htmlParagraphClose ();
 
 		}
 
-		printFormat (
-			"</form>\n");
+		htmlFormClose ();
 
 	}
 

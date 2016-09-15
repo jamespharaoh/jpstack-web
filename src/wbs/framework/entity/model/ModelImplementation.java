@@ -1,6 +1,6 @@
 package wbs.framework.entity.model;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -19,7 +19,7 @@ import wbs.framework.data.annotations.DataReference;
 import wbs.framework.entity.record.Record;
 import wbs.framework.entity.record.RootRecord;
 import wbs.framework.object.ObjectHelper;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @Data
@@ -120,7 +120,7 @@ class ModelImplementation
 			@NonNull Record<?> object) {
 
 		return (String)
-			BeanLogic.getProperty (
+			PropertyUtils.getProperty (
 				object,
 				typeCodeField.name ());
 
@@ -134,7 +134,7 @@ class ModelImplementation
 		if (codeField != null) {
 
 			return (String)
-				BeanLogic.getProperty (
+				PropertyUtils.getProperty (
 					object,
 					codeField.name ());
 
@@ -152,7 +152,7 @@ class ModelImplementation
 			@NonNull Record<?> object) {
 
 		return (String)
-			BeanLogic.getProperty (
+			PropertyUtils.getProperty (
 				object,
 				nameField.name ());
 
@@ -164,7 +164,7 @@ class ModelImplementation
 			@NonNull Record<?> object) {
 
 		return (String)
-			BeanLogic.getProperty (
+			PropertyUtils.getProperty (
 				object,
 				descriptionField.name ());
 
@@ -220,7 +220,7 @@ class ModelImplementation
 		}
 
 		return (Record<?>)
-			BeanLogic.getProperty (
+			PropertyUtils.getProperty (
 				object,
 				parentField.name ());
 
@@ -241,7 +241,7 @@ class ModelImplementation
 		}
 
 		return (Long)
-			BeanLogic.getProperty (
+			PropertyUtils.getProperty (
 				object,
 				parentIdField.name ());
 
@@ -262,7 +262,7 @@ class ModelImplementation
 		}
 
 		return (Record <?>)
-			BeanLogic.getProperty (
+			PropertyUtils.getProperty (
 				object,
 				parentTypeField.name ());
 

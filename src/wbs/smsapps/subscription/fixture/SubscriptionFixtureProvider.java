@@ -1,14 +1,13 @@
 package wbs.smsapps.subscription.fixture;
 
-import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
+import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 
 import java.util.Map;
-
-import javax.inject.Inject;
 
 import com.google.common.collect.ImmutableMap;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
@@ -35,48 +34,48 @@ public
 class SubscriptionFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	KeywordObjectHelper keywordHelper;
 
-	@Inject
+	@SingletonDependency
 	KeywordSetObjectHelper keywordSetHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuItemObjectHelper menuItemHelper;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	RouterObjectHelper routerHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionAffiliateObjectHelper subscriptionAffiliateHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionObjectHelper subscriptionHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionKeywordObjectHelper subscriptionKeywordHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionListObjectHelper subscriptionListHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// implementation

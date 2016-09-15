@@ -1,0 +1,120 @@
+<console-module
+	name="chat-user-admin">
+
+	<extend-context
+		name="chatUser.admin"
+		base-name="chatUser"
+		extension-point="chatUser.admin"
+		object-name="chatUser">
+
+		<section
+			name="admin"
+			label="Admin">
+
+			<context-tab-action-page
+				name="info"/>
+
+			<context-tab-action-page
+				name="name"/>
+
+			<context-tab-action-page
+				name="prefs"/>
+
+			<context-tab-action-page
+				name="dob"/>
+
+			<context-tab-action-page
+				name="barring"/>
+
+			<context-tab-action-page
+				name="credit"/>
+
+			<context-tab-action-page
+				name="creditMode"/>
+
+			<context-tab-action-page
+				name="date"/>
+
+			<context-tab-action-page
+				name="online"/>
+
+			<context-tab-action-page
+				name="bill"/>
+
+			<context-tab-form-action-page
+				name="location"
+				fields="location-form"
+				help-text="Set a new location for this chat user"
+				submit-label="set location"/>
+
+			<object-settings-page
+				short-name="other"
+				fields="settings"
+				priv-key="chat.userAdmin"/>
+
+			<context-tab-action-page
+				name="delete"/>
+
+			<!--
+			<object-ticket-create-page
+				ticket-manager="chat.ticketManager"
+				fields-provider="ticketCreateFieldsProvider">
+
+				<set-field
+					field-type-code="chat_user"
+					value-path="this"/>
+
+			</object-ticket-create-page>
+			-->
+
+		</section>
+
+	</extend-context>
+
+	<field-set
+		name="location-form"
+		class="wbs.apn.chat.user.admin.console.ChatUserAdminLocationFormActionHelper$ChatUserAdminLocationForm">
+
+		<text-field
+			name="currentLocationName"
+			read-only="yes"/>
+
+		<floating-point-field
+			name="currentLocationLatitude"
+			read-only="yes"/>
+
+		<floating-point-field
+			name="currentLocationLongitude"
+			read-only="yes"/>
+
+		<text-field
+			name="newLocationName"
+			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="chatUser">
+
+		<yes-no-field
+			name="hiddenFromChatTube"/>
+
+		<yes-no-field
+			name="stealthMonitor"/>
+
+		<enum-field
+			name="imageMode"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="broadcastOptOut"/>
+
+		<object-field
+			name="category"
+			object-type="chatCategory"
+			nullable="yes"/>
+
+	</field-set>
+
+</console-module>

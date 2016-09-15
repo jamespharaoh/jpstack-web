@@ -1,7 +1,5 @@
 package wbs.console.supervisor;
 
-import javax.inject.Provider;
-
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.reporting.SumStatsAggregator;
 import wbs.framework.builder.Builder;
@@ -10,17 +8,17 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @PrototypeComponent ("supervisorSumStatsAggregatorBuilder")
 @ConsoleModuleBuilderHandler
 public
 class SupervisorSumStatsAggregatorBuilder {
 
-	// prototype dependencies
+	// singleton dependencies
 
-	@PrototypeDependency
-	Provider <SumStatsAggregator> sumStatsAggregatorProvider;
+	@SingletonDependency
+	SumStatsAggregator sumStatsAggregator;
 
 	// builder
 
@@ -45,7 +43,7 @@ class SupervisorSumStatsAggregatorBuilder {
 
 		supervisorConfigBuilder.statsAggregatorsByName.put (
 			name,
-			sumStatsAggregatorProvider.get ());
+			sumStatsAggregator);
 
 	}
 

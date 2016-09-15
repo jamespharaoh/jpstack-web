@@ -1,6 +1,5 @@
 package wbs.platform.object.summary;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
@@ -11,25 +10,28 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 
 @PrototypeComponent ("objectSummaryFieldsBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectSummaryFieldsBuilder<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+class ObjectSummaryFieldsBuilder <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ObjectSummaryFieldsPart<ObjectType,ParentType>> summaryFieldsPart;
+	@PrototypeDependency
+	Provider <ObjectSummaryFieldsPart <ObjectType, ParentType>>
+	summaryFieldsPartProvider;
 
 	// builder
 
@@ -40,7 +42,7 @@ class ObjectSummaryFieldsBuilder<
 	ObjectSummaryFieldsSpec objectSummaryFieldsSpec;
 
 	@BuilderTarget
-	ObjectSummaryPageBuilder<ObjectType,ParentType> objectSummaryPageBuilder;
+	ObjectSummaryPageBuilder <ObjectType, ParentType> objectSummaryPageBuilder;
 
 	// build
 

@@ -1,12 +1,12 @@
 package wbs.smsapps.forwarder.api;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
-import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -34,7 +32,10 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.WebApiAction;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.PathHandler;
@@ -74,43 +75,47 @@ public
 class ForwarderApiModule
 	implements ServletModule {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ForwarderApiLogic forwarderApiLogic;
 
-	@Inject
+	@SingletonDependency
 	ForwarderMessageInObjectHelper forwarderMessageInHelper;
 
-	@Inject
+	@SingletonDependency
 	ForwarderMessageOutObjectHelper forwarderMessageOutHelper;
 
-	@Inject
+	@SingletonDependency
 	ForwarderLogic forwarderLogic;
 
-	@Inject
+	@SingletonDependency
 	ForwarderQueryExMessageChecker forwarderQueryExMessageChecker;
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaLogic;
 
-	@Inject
+	@SingletonDependency
 	@Named ("forwarderPeekExRequestDef")
 	RpcDefinition forwarderPeekExRequestDef;
 
-	@Inject
+	@SingletonDependency
 	@Named ("forwarderQueryExRequestDef")
 	RpcDefinition forwarderQueryExRequestDef;
 
-	@Inject
-	Provider<ApiFile> apiFile;
+	// prototype dependencies
 
-	@Inject
-	Provider<PhpRpcAction> phpRpcAction;
+	@PrototypeDependency
+	Provider <ApiFile> apiFile;
 
-	@Inject
-	Provider<XmlRpcAction> xmlRpcAction;
+	@PrototypeDependency
+	Provider <PhpRpcAction> phpRpcAction;
+
+	@PrototypeDependency
+	Provider <XmlRpcAction> xmlRpcAction;
 
 	// ========================================================= servlet module
 
@@ -204,9 +209,9 @@ class ForwarderApiModule
 
 	}
 
-	// =================================================== after properties set
+	// life cycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void afterPropertiesSet () {
 		initRpcHandlers ();

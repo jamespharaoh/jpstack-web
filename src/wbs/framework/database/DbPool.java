@@ -1,6 +1,6 @@
 package wbs.framework.database;
 
-import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.etc.Misc.shouldNeverHappen;
 
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import lombok.Cleanup;
@@ -30,6 +29,7 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 
@@ -64,7 +64,7 @@ class DbPool
 
 	// life cycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init ()
 		throws

@@ -1,11 +1,11 @@
 package wbs.framework.entity.model;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.uncapitalise;
-import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.TypeUtils.classForNameRequired;
+import static wbs.utils.string.StringUtils.camelToUnderscore;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.uncapitalise;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;

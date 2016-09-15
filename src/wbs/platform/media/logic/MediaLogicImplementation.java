@@ -1,20 +1,20 @@
 package wbs.platform.media.logic;
 
-import static wbs.framework.utils.etc.LogicUtils.allOf;
-import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.Misc.iterable;
-import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.Misc.runFilter;
-import static wbs.framework.utils.etc.Misc.runFilterAdvanced;
-import static wbs.framework.utils.etc.NumberUtils.fromJavaInteger;
-import static wbs.framework.utils.etc.NumberUtils.integerEqualSafe;
-import static wbs.framework.utils.etc.NumberUtils.moreThan;
-import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringToBytes;
+import static wbs.utils.etc.LogicUtils.allOf;
+import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.Misc.iterable;
+import static wbs.utils.etc.Misc.lessThan;
+import static wbs.utils.etc.Misc.runFilter;
+import static wbs.utils.etc.Misc.runFilterAdvanced;
+import static wbs.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.utils.etc.NumberUtils.moreThan;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringToBytes;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

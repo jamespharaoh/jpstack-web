@@ -1,15 +1,15 @@
 package wbs.framework.codegen;
 
-import static wbs.framework.utils.etc.CollectionUtils.listLastElementRequired;
-import static wbs.framework.utils.etc.MapUtils.mapItemForKeyOrThrow;
-import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.Misc.doesNotContain;
-import static wbs.framework.utils.etc.Misc.shouldNeverHappen;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
+import static wbs.utils.collection.CollectionUtils.listLastElementRequired;
+import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
+import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.Misc.doesNotContain;
+import static wbs.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatArray;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringSplitFullStop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,8 +26,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.framework.utils.formatwriter.FormatWriter;
-import wbs.framework.utils.formatwriter.NullFormatWriter;
+import wbs.utils.string.FormatWriter;
+import wbs.utils.string.NullFormatWriter;
 
 @Accessors (fluent = true)
 public

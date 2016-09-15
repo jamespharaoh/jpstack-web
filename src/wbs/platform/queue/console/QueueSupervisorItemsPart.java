@@ -1,23 +1,32 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteRaw;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+
 import java.util.Set;
 import java.util.TreeSet;
-
-import javax.inject.Inject;
 
 import org.joda.time.Interval;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.TimeFormatter;
 import wbs.platform.queue.model.QueueItemProcessedTimeComparator;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
+import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("queueSupervisorItemsPart")
 public
@@ -26,19 +35,19 @@ class QueueSupervisorItemsPart
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	QueueItemConsoleHelper queueItemHelper;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleHelper userHelper;
 
 	// state
@@ -78,32 +87,50 @@ class QueueSupervisorItemsPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"details\">\n");
+		renderParameterTable ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>User</th>\n",
-			"%s\n",
-			objectManager.tdForObjectMiniLink (
-				user),
-			"</tr>\n");
+		renderContentTable ();
+	}
 
-		printFormat (
-			"</table>\n");
+	private
+	void renderParameterTable () {
 
-		printFormat (
-			"<table class=\"list\">\n");
+		// open table
 
-		printFormat (
-			"<tr>\n",
-			"<th>Object</th>\n",
-			"<th>Queue</th>\n",
-			"<th>Item</th>\n",
-			"<th>Created</th>\n",
-			"<th>Pending</th>\n",
-			"<th>Processed</th>\n",
-			"</tr>\n");
+		htmlTableOpenDetails ();
+
+		// write user table row
+
+		htmlTableDetailsRowWriteRaw (
+			"User",
+			() -> 
+				objectManager.writeTdForObjectMiniLink (
+					user));
+
+		// close table
+
+		htmlTableClose ();
+
+	}
+
+	private
+	void renderContentTable () {
+
+		// open table
+
+		htmlTableOpenList ();
+
+		// write table header
+
+		htmlTableHeaderRowWrite (
+			"Object",
+			"Queue",
+			"Item",
+			"Created",
+			"Pending",
+			"Processed");
+
+		// write table contents
 
 		for (
 			QueueItemRec queueItem
@@ -111,56 +138,47 @@ class QueueSupervisorItemsPart
 		) {
 
 			QueueRec queue =
-				queueItem.getQueueSubject () != null
-					? queueItem.getQueueSubject ().getQueue ()
-					: queueItem.getQueue ();
+				ifNotNullThenElse (
+					queueItem.getQueueSubject (),
+					() -> queueItem.getQueueSubject ().getQueue (),
+					() -> queueItem.getQueue ());
 
-			Record<?> parent =
+			Record <?> parent =
 				objectManager.getParent (
 					queue);
 
-			printFormat (
-				"<tr>\n");
+			// open table row
 
-			printFormat (
-				"%s\n",
-				objectManager.tdForObjectLink (
-					parent));
+			htmlTableRowOpen ();
 
-			printFormat (
-				"%s\n",
-				objectManager.tdForObjectMiniLink (
-					queue,
-					parent));
+			objectManager.writeTdForObjectLink (
+				parent);
 
-			printFormat (
-				"%s\n",
-				objectManager.tdForObjectMiniLink (
-					queueItem,
-					queue));
+			objectManager.writeTdForObjectMiniLink (
+				queue,
+				parent);
 
-			printFormat (
-				"<td>%h</td>\n",
+			objectManager.writeTdForObjectMiniLink (
+				queueItem,
+				queue);
+
+			htmlTableCellWrite (
 				userConsoleLogic.timestampWithTimezoneString (
 					queueItem.getCreatedTime ()));
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				userConsoleLogic.timestampWithTimezoneString (
 					queueItem.getPendingTime ()));
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				userConsoleLogic.timestampWithTimezoneString (
 					queueItem.getProcessedTime ()));
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

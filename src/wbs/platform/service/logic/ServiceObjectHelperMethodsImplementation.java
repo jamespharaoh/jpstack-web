@@ -1,16 +1,14 @@
 package wbs.platform.service.logic;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
-import lombok.NonNull;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectManager;
-
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.scaffold.model.SliceRec;
@@ -24,19 +22,19 @@ public
 class ServiceObjectHelperMethodsImplementation
 	implements ServiceObjectHelperMethods {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
-	Provider<ObjectManager> objectManagerProvider;
+	@WeakSingletonDependency
+	ObjectManager objectManager;
 
-	@Inject
-	Provider<ServiceObjectHelper> serviceHelperProvider;
+	@WeakSingletonDependency
+	ServiceObjectHelper serviceHelper;
 
-	@Inject
-	Provider<ServiceTypeObjectHelper> serviceTypeHelperProvider;
+	@WeakSingletonDependency
+	ServiceTypeObjectHelper serviceTypeHelper;
 
-	@Inject
-	Provider<ObjectTypeObjectHelper> objectTypeHelperProvider;
+	@WeakSingletonDependency
+	ObjectTypeObjectHelper objectTypeHelper;
 
 	// implementation
 
@@ -46,18 +44,6 @@ class ServiceObjectHelperMethodsImplementation
 			@NonNull Record<?> parent,
 			@NonNull String typeCode,
 			@NonNull String code) {
-
-		ObjectManager objectManager =
-			objectManagerProvider.get ();
-
-		ObjectTypeObjectHelper objectTypeHelper =
-			objectTypeHelperProvider.get ();
-
-		ServiceObjectHelper serviceHelper =
-			serviceHelperProvider.get ();
-
-		ServiceTypeObjectHelper serviceTypeHelper =
-			serviceTypeHelperProvider.get ();
 
 		// lookup existing service
 

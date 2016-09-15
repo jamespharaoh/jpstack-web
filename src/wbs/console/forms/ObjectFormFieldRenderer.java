@@ -1,13 +1,15 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.requiredSuccess;
-import static wbs.framework.utils.etc.Misc.successResult;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.EnumUtils.enumInSafe;
+import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.requiredSuccess;
+import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,8 +30,8 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
-import wbs.framework.utils.etc.OptionalUtils;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.etc.OptionalUtils;
+import wbs.utils.string.FormatWriter;
 
 import fj.data.Either;
 
@@ -438,20 +440,20 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	@Override
 	public
 	void renderHtmlTableCell (
-			@NonNull FormatWriter htmlWriter,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Interface> interfaceValue,
-			boolean link,
-			int colspan) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Interface> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
 
 		// work out root
 
-		Optional<Record<?>> root;
+		Optional <Record <?>> rootOptional;
 
 		if (
 
-			OptionalUtils.optionalIsPresent (
+			optionalIsPresent (
 				interfaceValue)
 
 			&& isNotNull (
@@ -459,30 +461,29 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		) {
 
-			root =
-				Optional.of (
-					(Record<?>)
+			rootOptional =
+				optionalOf (
+					(Record <?>)
 					objectManager.dereference (
 						container,
 						rootFieldName));
 
 		} else {
 
-			root =
-				Optional.absent ();
+			rootOptional =
+				optionalAbsent ();
 
 		}
 
 		// render table cell
 
-		htmlWriter.writeFormat (
-			"%s",
-			objectManager.tdForObject (
-				interfaceValue.orNull (),
-				root.orNull (),
-				mini,
-				link,
-				colspan));
+		objectManager.writeTdForObject (
+			formatWriter,
+			interfaceValue.orNull (),
+			rootOptional,
+			mini,
+			link,
+			colspan);
 
 	}
 

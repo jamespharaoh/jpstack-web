@@ -1,7 +1,7 @@
 package wbs.console.request;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringToUtf8;
 
 import java.security.SecureRandom;
 

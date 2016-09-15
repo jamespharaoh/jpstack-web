@@ -1,10 +1,9 @@
 package wbs.console.reporting;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.mapEntry;
-import static wbs.framework.utils.etc.NumberUtils.equalToZero;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.mapEntry;
+import static wbs.utils.etc.NumberUtils.equalToZero;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,10 +20,11 @@ import org.joda.time.Instant;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.utils.StringSubstituter;
-import wbs.framework.utils.TimeFormatter;
-import wbs.framework.utils.etc.Html;
 import wbs.framework.web.UrlParams;
+import wbs.utils.string.FormatWriter;
+import wbs.utils.string.StringSubstituter;
+import wbs.utils.time.TimeFormatter;
+import wbs.utils.web.HtmlTableCellWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("intStatsFormatter")
@@ -46,8 +46,8 @@ class IntegerStatsFormatter
 	String targetBase;
 
 	@Getter @Setter
-	Map<String,String> targetParams =
-		new LinkedHashMap<String,String> ();
+	Map <String, String> targetParams =
+		new LinkedHashMap<> ();
 
 	// implementation
 
@@ -66,7 +66,8 @@ class IntegerStatsFormatter
 
 	@Override
 	public
-	String format (
+	void format (
+			@NonNull FormatWriter formatWriter,
 			@NonNull Object group,
 			@NonNull StatsPeriod period,
 			@NonNull Integer step,
@@ -88,7 +89,8 @@ class IntegerStatsFormatter
 				value)
 		) {
 
-			return "<td></td>\n";
+			formatWriter.writeFormat (
+				"<td></td>\n");
 
 		}
 
@@ -99,7 +101,7 @@ class IntegerStatsFormatter
 				targetBase)
 		) {
 
-			return stringFormat (
+			formatWriter.writeFormat (
 				"<td style=\"text-align: right\">%h</td>\n",
 				value);
 
@@ -129,37 +131,43 @@ class IntegerStatsFormatter
 
 			targetParams.entrySet ().stream ()
 
-				.map (paramEntry ->
-					mapEntry (
-						paramEntry.getKey (),
-						substituter.substitute (
-							paramEntry.getValue ())))
+				.map (
+					paramEntry ->
+						mapEntry (
+							paramEntry.getKey (),
+							substituter.substitute (
+								paramEntry.getValue ())))
 
-				.forEach (paramEntry ->
-					urlParams.add (
-						paramEntry.getKey (),
-						paramEntry.getValue ()));
+				.forEach (
+					paramEntry ->
+						urlParams.add (
+							paramEntry.getKey (),
+							paramEntry.getValue ()));
 
 		}
 
-		return stringFormat (
-			"%s%h</td>\n",
+		new HtmlTableCellWriter ()
 
-			Html.magicTd (
+			.href (
 				urlParams.toUrl (
-					targetBase),
-				null,
-				1,
-				" text-align: right;",
-				""),
+					targetBase))
 
+			.style (
+				"text-align: right")
+
+			.write (
+				formatWriter);
+
+		formatWriter.writeFormat (
+			"%h</td>\n",
 			value);
 
 	}
 
 	@Override
 	public
-	String formatTotal (
+	void formatTotal (
+			@NonNull FormatWriter formatWriter,
 			@NonNull Object group,
 			@NonNull Optional <Object> objectValueOptional) {
 
@@ -172,14 +180,19 @@ class IntegerStatsFormatter
 			equalToZero (
 				value)
 		) {
-			return "<td></td>";
-		}
 
-		return stringFormat (
-			"<td",
-			" style=\"text-align: right\"",
-			">%h</td>\n",
-			value);
+			formatWriter.writeFormat (
+				"<td></td>\n");
+
+		} else {
+
+			formatWriter.writeFormat (
+				"<td",
+				" style=\"text-align: right\"",
+				">%h</td>\n",
+				value);
+
+		}
 
 	}
 

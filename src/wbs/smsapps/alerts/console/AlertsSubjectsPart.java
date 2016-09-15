@@ -1,14 +1,21 @@
 package wbs.smsapps.alerts.console;
 
+import static wbs.utils.etc.Misc.booleanToYesNo;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
@@ -19,13 +26,19 @@ public
 class AlertsSubjectsPart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	AlertsSettingsConsoleHelper alertsSettingsHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	List<AlertsSubjectRec> alertsSubjects;
+	// state
+
+	List <AlertsSubjectRec> alertsSubjects;
+
+	// implementation
 
 	@Override
 	public
@@ -37,7 +50,7 @@ class AlertsSubjectsPart
 					"alertsSettingsId"));
 
 		alertsSubjects =
-			new ArrayList<AlertsSubjectRec> (
+			new ArrayList<> (
 				alertsSettings.getAlertsSubjects ());
 
 		Collections.sort (
@@ -49,44 +62,41 @@ class AlertsSubjectsPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Type</th>\n",
-			"<th>Object</th>\n",
-			"<th>Include</th>\n",
-			"<tr>\n");
+		htmlTableHeaderRowWrite (
+			"Type",
+			"Object",
+			"Include");
 
-		for (AlertsSubjectRec alertsSubject
-				: alertsSubjects) {
+		for (
+			AlertsSubjectRec alertsSubject
+				: alertsSubjects
+		) {
 
-			Record<?> object =
+			Record <?> object =
 				objectManager.findObject (
 					new GlobalId (
 						alertsSubject.getObjectType ().getId (),
 						alertsSubject.getObjectId ()));
 
-			printFormat (
-				"<tr>\n",
+			htmlTableRowOpen ();
 
-				"<td>%h</td>\n",
-				alertsSubject.getObjectType ().getCode (),
+			htmlTableCellWrite (
+				alertsSubject.getObjectType ().getCode ());
 
-				"%s\n",
-				objectManager.tdForObjectMiniLink (
-					object),
+			objectManager.writeTdForObjectMiniLink (
+				object);
 
-				"<td>%h</td>\n",
-				alertsSubject.getInclude () ? "yes" : "no",
+			htmlTableCellWrite (
+				booleanToYesNo (
+					alertsSubject.getInclude ()));
 
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

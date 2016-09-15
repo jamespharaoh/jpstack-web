@@ -1,20 +1,18 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.naivePluralise;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringSplitColon;
-import static wbs.framework.utils.etc.StringUtils.underscoreToCamel;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.string.StringUtils.naivePluralise;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringSplitColon;
+import static wbs.utils.string.StringUtils.underscoreToCamel;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Provider;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -29,14 +27,14 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.request.Cryptor;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.StringSubstituter;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
+import wbs.utils.string.StringSubstituter;
 
 @Accessors (fluent = true)
 @Log4j
@@ -51,25 +49,23 @@ class GenericConsoleHelperProvider
 	@SingletonDependency
 	ComponentManager componentManager;
 
+	@WeakSingletonDependency
+	ConsoleHelperProviderRegistry consoleHelperProviderRegistry;
+
+	@WeakSingletonDependency
+	ConsoleManager consoleManager;
+
+	@WeakSingletonDependency
+	ConsoleObjectManager consoleObjectManager;
+
 	@SingletonDependency
 	ObjectManager objectManager;
 
-	// indirect dependencies
+	@WeakSingletonDependency
+	ConsoleRequestContext requestContext;
 
-	@PrototypeDependency
-	Provider <ConsoleHelperProviderRegistry> consoleHelperProviderRegistry;
-
-	@PrototypeDependency
-	Provider <ConsoleManager> consoleManager;
-
-	@PrototypeDependency
-	Provider <ConsoleObjectManager> consoleObjectManager;
-
-	@PrototypeDependency
-	Provider <ConsoleRequestContext> requestContext;
-
-	@PrototypeDependency
-	Provider <UserPrivChecker> privChecker;
+	@WeakSingletonDependency
+	UserPrivChecker privChecker;
 
 	// required properties
 
@@ -223,7 +219,7 @@ class GenericConsoleHelperProvider
 
 		// register
 
-		consoleHelperProviderRegistry.get ().register (
+		consoleHelperProviderRegistry.register (
 			this);
 
 		// and return
@@ -292,7 +288,7 @@ class GenericConsoleHelperProvider
 
 				contextStuff.set (
 					contextStuffSpec.name (),
-					BeanLogic.getProperty (
+					PropertyUtils.getProperty (
 						target,
 						contextStuffSpec.fieldName ()));
 
@@ -304,7 +300,7 @@ class GenericConsoleHelperProvider
 
 		UserPrivChecker privChecker =
 			(UserPrivChecker)
-			this.privChecker.get ();
+			this.privChecker;
 
 		for (
 			PrivKeySpec privKeySpec
@@ -338,7 +334,7 @@ class GenericConsoleHelperProvider
 				: consoleHelperProviderSpec.runPostProcessors ()
 		) {
 
-			consoleManager.get ().runPostProcessors (
+			consoleManager.runPostProcessors (
 				runPostProcessorSpec.name (),
 				contextStuff);
 
@@ -368,7 +364,7 @@ class GenericConsoleHelperProvider
 	@Override
 	public
 	String getDefaultContextPath (
-			Record object) {
+			@NonNull Record object) {
 
 		StringSubstituter stringSubstituter =
 			new StringSubstituter ();
@@ -408,7 +404,7 @@ class GenericConsoleHelperProvider
 	@Override
 	public
 	String localPath (
-			Record object) {
+			@NonNull Record object) {
 
 		String urlTemplate =
 
@@ -440,7 +436,7 @@ class GenericConsoleHelperProvider
 	@Override
 	public
 	boolean canView (
-			Record object) {
+			@NonNull Record object) {
 
 		// types are always visible
 
@@ -474,7 +470,7 @@ class GenericConsoleHelperProvider
 						: object;
 
 				if (
-					privChecker.get ().canRecursive (
+					privChecker.canRecursive (
 						privObject,
 						privKeySpec.privName ())
 				) {
@@ -500,7 +496,7 @@ class GenericConsoleHelperProvider
 				return true;
 			}
 
-			Record<?> delegate =
+			Record <?> delegate =
 				(Record)
 				objectManager.dereference (
 					object,
@@ -508,14 +504,14 @@ class GenericConsoleHelperProvider
 
 			if (viewDelegatePrivCode != null) {
 
-				return privChecker.get ().canRecursive (
+				return privChecker.canRecursive (
 					delegate,
 					viewDelegatePrivCode);
 
 			} else {
 
-				ConsoleHelper<?> delegateHelper =
-					consoleObjectManager.get ().findConsoleHelper (
+				ConsoleHelper <?> delegateHelper =
+					consoleObjectManager.findConsoleHelper (
 						delegate);
 
 				return delegateHelper.canView (
@@ -527,13 +523,14 @@ class GenericConsoleHelperProvider
 
 		// default
 
-		return privChecker.get ().canRecursive (object);
+		return privChecker.canRecursive (
+			object);
 
 	}
 
 	@Override
 	public
-	Record<?> lookupObject (
+	Record <?> lookupObject (
 			@NonNull ConsoleContextStuff contextStuff) {
 
 		Long objectId =
@@ -541,7 +538,7 @@ class GenericConsoleHelperProvider
 			contextStuff.get (
 				idKey);
 
-		Record<?> object =
+		Record <?> object =
 			optionalOrNull (
 				optionalCast (
 					Record.class,

@@ -1,12 +1,11 @@
 package wbs.framework.web;
 
-import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.joinWithoutSeparator;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.ServletException;
 
 import lombok.Getter;
@@ -14,6 +13,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 
@@ -42,11 +42,9 @@ class DelegatingPathHandler
 	Map <String, WebFile> files =
 		new HashMap<> ();
 
-	/**
-	 * Populates paths and files properties with values obtained from any
-	 * ServletModules in the application context.
-	 */
-	@PostConstruct
+	// life cycle
+
+	@NormalLifecycleSetup
 	public
 	void afterPropertiesSet () {
 

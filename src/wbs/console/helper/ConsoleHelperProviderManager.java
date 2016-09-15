@@ -1,14 +1,13 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 
@@ -30,7 +29,7 @@ class ConsoleHelperProviderManager {
 
 	// life cycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 
@@ -38,9 +37,6 @@ class ConsoleHelperProviderManager {
 			Map.Entry <String, ConsoleHelperProvider <?>> entry
 				: consoleHelperProvidersByBeanName.entrySet ()
 		) {
-
-//			String beanName =
-//				entry.getKey ();
 
 			ConsoleHelperProvider <?> consoleHelperProvider =
 				entry.getValue ();

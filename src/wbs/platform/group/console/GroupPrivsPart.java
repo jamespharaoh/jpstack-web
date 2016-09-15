@@ -1,6 +1,6 @@
 package wbs.platform.group.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.HashMap;
 import java.util.HashSet;

@@ -1,8 +1,9 @@
 package wbs.console.part;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
+import static wbs.utils.string.StringUtils.stringFormat;
 
-import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,8 +17,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.utils.formatwriter.FormatWriter;
-import wbs.framework.utils.formatwriter.WriterFormatWriter;
+import wbs.utils.string.FormatWriter;
 
 public
 class AbstractPagePart
@@ -38,8 +38,8 @@ class AbstractPagePart
 	protected
 	Map <String, Object> parameters;
 
-	protected
-	PrintWriter printWriter;
+	//protected
+	//PrintWriter printWriter;
 
 	protected
 	FormatWriter formatWriter;
@@ -71,24 +71,24 @@ class AbstractPagePart
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>of ();
+		return ImmutableSet.of ();
 
 	}
 
 	@Override
 	public
-	Set<HtmlLink> links () {
+	Set <HtmlLink> links () {
 
-		return ImmutableSet.<HtmlLink>of ();
+		return ImmutableSet.of ();
 
 	}
 
 	@Override
 	public
 	void setup (
-			@NonNull Map<String,Object> parameters) {
+			@NonNull Map <String, Object> parameters) {
 
 		if (requestContext == null) {
 
@@ -102,12 +102,8 @@ class AbstractPagePart
 		this.parameters =
 			parameters;
 
-		printWriter =
-			requestContext.writer ();
-
 		formatWriter =
-			new WriterFormatWriter (
-				printWriter);
+			currentFormatWriter ();
 
 		transaction =
 			database.currentTransaction ();
@@ -129,12 +125,21 @@ class AbstractPagePart
 	void renderHtmlBodyContent () {
 	}
 
+	@Deprecated
 	public
 	void printFormat (
-			@NonNull Object... arguments) {
+			@NonNull Object ... arguments) {
 
 		formatWriter.writeFormatArray (
 			arguments);
+
+	}
+
+	@Override
+	public
+	void cleanup () {
+
+		doNothing ();
 
 	}
 

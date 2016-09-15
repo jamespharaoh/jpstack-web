@@ -1,16 +1,16 @@
 package wbs.console.request;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.orNull;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.ifNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
-import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.orNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.ifNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalValueEqualSafe;
+import static wbs.utils.string.StringUtils.emptyStringIfNull;
+import static wbs.utils.string.StringUtils.joinWithoutSeparator;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,9 +54,10 @@ import wbs.console.tab.TabList;
 import wbs.framework.component.annotations.ProxiedRequestComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.Html;
-import wbs.framework.utils.etc.OptionalUtils;
 import wbs.framework.web.RequestContext;
+import wbs.utils.etc.OptionalUtils;
+import wbs.utils.string.FormatWriter;
+import wbs.utils.string.WriterFormatWriter;
 
 /**
  * Extends RequestContext to provide loads of extra functionality useful in all
@@ -334,23 +335,30 @@ class ConsoleRequestContextImplementation
 	public
 	void flushNotices () {
 
+		// TODO this is messy
+
 		flushNotices (
-			writer ());
+			new WriterFormatWriter (
+				writer ()));
 
 	}
 
 	@Override
 	public
 	void flushNotices (
-			@NonNull PrintWriter out) {
+			@NonNull FormatWriter formatWriter) {
 
 		Notices notices =
 			(Notices)
 			requestContext.request ().getAttribute (
 				"wbs.notices");
 
-		if (notices != null)
-			notices.flush (out);
+		if (notices != null) {
+
+			notices.flush (
+				formatWriter);
+
+		}
 
 	}
 
@@ -445,215 +453,6 @@ class ConsoleRequestContextImplementation
 					Map.Entry::getValue))
 
 		));
-
-	}
-
-	@Override
-	public
-	String magicTdCheck (
-			@NonNull String name,
-			@NonNull String label,
-			boolean value,
-			int colspan) {
-
-		StringBuilder stringBuilder =
-			new StringBuilder ();
-
-		// open the td
-
-		stringBuilder.append (
-			stringFormat (
-
-				"<td",
-
-				" id=\"%h_td\"",
-				name,
-
-				" class=\"%h\"",
-				value
-					? "selected"
-					: "unselected",
-
-				" style=\"cursor: pointer;\"",
-
-				" onclick=\"%h\"",
-				stringFormat (
-					"tdcheck_td ('%j');",
-					name),
-
-				" onmouseover=\"%h\"",
-				stringFormat (
-					"tdcheck_focus ('%j');",
-					name),
-
-				" onmouseout=\"%h\"",
-				stringFormat (
-					"tdcheck_update ('%j');",
-					name),
-
-				">"));
-
-		stringBuilder.append (
-			stringFormat (
-				"<table class=\"layout\">",
-				"<tr>"));
-
-		stringBuilder.append (
-			stringFormat (
-
-				"<td><input",
-				" type=\"checkbox\"",
-
-				" id=\"%h\"",
-				name,
-
-				" name=\"%h\"",
-				name,
-
-				" onfocus=\"%h\"",
-				stringFormat (
-					"tdcheck_focus ('%j');",
-					name),
-
-				" onblur=\"%h\"",
-				stringFormat (
-					"tdcheck_update ('%j');",
-					name),
-
-				" onclick=\"%h\"",
-				stringFormat (
-					"tdcheck_checkbox ('%j', event);",
-					name),
-
-				"%s",
-				value
-					? " checked"
-					: "",
-
-				">",
-
-				"</td>"));
-
-		stringBuilder.append (
-			stringFormat (
-				"<td>&nbsp;</td>"));
-
-		stringBuilder.append (
-			stringFormat (
-				"<td>%h</td>",
-				label));
-
-		stringBuilder.append (
-			stringFormat (
-				"</tr>",
-				"</table>"));
-
-		stringBuilder.append (
-			stringFormat (
-				"</td>"));
-
-		// add this to the list of script bits still to do
-
-		addScript (
-			stringFormat (
-				"tdcheck_update ('%j');",
-				name));
-
-		// and return
-
-		return stringBuilder.toString ();
-
-	}
-
-	@Override
-	public
-	String magicTdCheck (
-			@NonNull String name,
-			@NonNull String label,
-			boolean value) {
-
-		return magicTdCheck (
-			name,
-			label,
-			value,
-			1);
-
-	}
-
-	@Override
-	public
-	void magicTdRadio (
-			@NonNull String name,
-			String value,
-			@NonNull String label,
-			boolean selected,
-			@NonNull Map<String,Object> options) {
-
-		PrintWriter out =
-			writer();
-
-		String nameValue = name + "_" + value;
-
-		String onChangeStr =
-			(String)
-			options.get ("onChange");
-
-		out.print("<td");
-		out.print(" id=\"" + Html.encode(nameValue + "_td") + "\"");
-		out.print(" class=\"" + (selected ? "selected" : "unselected") + "\"");
-		out.print(" style=\"cursor: pointer;\"");
-		out.print(" onclick=\"tdcheck_td ('" + Html.jsqe(nameValue) + "');");
-		if (onChangeStr != null)
-			out.print(" " + Html.encode(onChangeStr));
-		out.print("\"");
-		out.print(" onmouseover=\"tdcheck_focus ('" + Html.jsqe(nameValue)
-				+ "');\"");
-		out.print(" onmouseout=\"tdcheck_update ('" + Html.jsqe(nameValue)
-				+ "');\"");
-		out
-				.print("><table class=\"layout\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\"><tr>");
-
-		out.print("<td>");
-		out.print("<input type=\"radio\"");
-		out.print(" id=\"" + Html.encode(nameValue) + "\"");
-		out.print(" name=\"" + Html.encode(name) + "\"");
-		out.print(" onfocus=\"tdcheck_focus ('" + Html.jsqe(nameValue)
-				+ "');\"");
-		out.print(" onblur=\"tdcheck_update ('" + Html.jsqe(nameValue)
-				+ "');\"");
-
-		out.print(" onclick=\"tdcheck_checkbox ('" + Html.jsqe(nameValue)
-				+ "', event);");
-		if (onChangeStr != null)
-			out.print(" " + Html.encode(onChangeStr));
-		out.print("\"");
-
-		out.print(" value=\"" + Html.encode(value) + "\"");
-		if (selected)
-			out.print(" selected");
-		out.print("></td><td>&nbsp;</td><td>" + Html.encode(label) + "</td>");
-
-		out.println("</tr></table></td>");
-
-		// add this to the list of script bits still to do
-		addScript("tdcheck_update ('" + Html.jsqe(nameValue) + "');");
-
-	}
-
-	@Override
-	public
-	void magicTdRadio (
-			@NonNull String name,
-			String value,
-			@NonNull String label,
-			boolean selected) {
-
-		magicTdRadio (
-			name,
-			value,
-			label,
-			selected,
-			null);
 
 	}
 

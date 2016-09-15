@@ -1,6 +1,6 @@
 package wbs.integrations.dialogue.logic;
 
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.utils.etc.Misc.successResult;
 
 import java.util.Map;
 

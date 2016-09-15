@@ -1,7 +1,7 @@
 package wbs.integrations.paypal.fixture;
 
-import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
-import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
+import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
+import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 
 import java.util.Map;
 

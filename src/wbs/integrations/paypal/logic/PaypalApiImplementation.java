@@ -1,8 +1,8 @@
 package wbs.integrations.paypal.logic;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.equalIgnoreCase;
-import static wbs.framework.utils.etc.StringUtils.replaceAll;
+import static wbs.utils.string.StringUtils.equalIgnoreCase;
+import static wbs.utils.string.StringUtils.replaceAll;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;

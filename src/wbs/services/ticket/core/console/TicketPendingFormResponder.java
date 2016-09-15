@@ -1,11 +1,9 @@
 package wbs.services.ticket.core.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 import java.util.Set;
-
-import javax.inject.Inject;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -16,27 +14,28 @@ import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.Html;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketStateRec;
 import wbs.services.ticket.core.model.TicketTemplateRec;
+import wbs.utils.web.HtmlUtils;
 
 @PrototypeComponent ("ticketPendingFormResponder")
 public
 class TicketPendingFormResponder
 	extends HtmlResponder {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@Inject
+	@SingletonDependency
 	TicketObjectHelper ticketHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	// state
@@ -44,7 +43,7 @@ class TicketPendingFormResponder
 	TicketRec ticket;
 	TicketStateRec ticketState;
 
-	List<TicketTemplateRec> templates;
+	List <TicketTemplateRec> templates;
 
 	String summaryUrl;
 
@@ -54,9 +53,9 @@ class TicketPendingFormResponder
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>of (
+		return ImmutableSet.<ScriptRef> of (
 
 			ConsoleContextScriptRef.javascript (
 				"/js/jquery-1.11.2.js"),
@@ -146,7 +145,7 @@ class TicketPendingFormResponder
 	void renderHtmlBodyContents () {
 
 		requestContext.flushNotices (
-			printWriter);
+			formatWriter);
 
 		printFormat (
 			"<p",
@@ -313,7 +312,7 @@ class TicketPendingFormResponder
 
 		printFormat (
 			"<td>%s</td>\n",
-			Html.nonBreakingWhitespace (Html.encode (template.getName ())));
+			HtmlUtils.htmlNonBreakingWhitespace (HtmlUtils.htmlEncode (template.getName ())));
 
 		/*
 		printFormat (

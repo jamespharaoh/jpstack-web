@@ -9,7 +9,7 @@ interface ActivityManager {
 			String taskType,
 			String summary,
 			Object owner,
-			Map<String,String> parameters);
+			Map <String, String> parameters);
 
 	ActiveTask start (
 			String taskType,

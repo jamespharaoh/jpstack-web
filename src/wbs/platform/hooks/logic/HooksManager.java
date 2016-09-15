@@ -1,6 +1,6 @@
 package wbs.platform.hooks.logic;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
@@ -11,13 +11,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
 import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 
@@ -38,7 +37,7 @@ class HooksManager {
 
 	// life cycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void afterPropertiesSet ()
 		throws Exception {

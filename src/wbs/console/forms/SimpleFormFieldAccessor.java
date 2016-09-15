@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
 
@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("simpleFormFieldAccessor")
@@ -45,7 +45,7 @@ class SimpleFormFieldAccessor <Container, Native>
 		Object nativeObject;
 
 		nativeObject =
-			BeanLogic.getProperty (
+			PropertyUtils.getProperty (
 				container,
 				name);
 
@@ -110,7 +110,7 @@ class SimpleFormFieldAccessor <Container, Native>
 
 		// set property
 
-		BeanLogic.setProperty (
+		PropertyUtils.setProperty (
 			container,
 			name,
 			nativeValue.orNull ());

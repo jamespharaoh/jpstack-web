@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
 
@@ -9,7 +9,7 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 import lombok.NonNull;
 import wbs.console.forms.FormField.FormType;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.FormatWriter;
 
 public
 interface FormFieldRenderer <Container, Interface> {
@@ -57,12 +57,12 @@ interface FormFieldRenderer <Container, Interface> {
 
 	default
 	void renderHtmlTableCell (
-			FormatWriter htmlWriter,
-			Container container,
-			Map <String, Object> hints,
-			Optional <Interface> interfaceValue,
-			boolean link,
-			int colspan) {
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Interface> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
 
 		htmlWriter.writeFormat (
 			"<td",

@@ -1,29 +1,31 @@
 package wbs.framework.component.manager;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
-import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
-import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
-import static wbs.framework.utils.etc.IterableUtils.iterableMapToList;
-import static wbs.framework.utils.etc.MapUtils.mapIsNotEmpty;
-import static wbs.framework.utils.etc.MapUtils.mapItemForKey;
-import static wbs.framework.utils.etc.Misc.doesNotContain;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOf;
-import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
-import static wbs.framework.utils.etc.TypeUtils.classInstantiate;
-import static wbs.framework.utils.etc.TypeUtils.isNotSubclassOf;
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
+import static wbs.utils.collection.MapUtils.mapItemForKey;
+import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.utils.etc.Misc.doesNotContain;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.TypeUtils.classInstantiate;
+import static wbs.utils.etc.TypeUtils.isInstanceOf;
+import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +40,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -58,6 +59,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.activitymanager.RuntimeExceptionWithTask;
+import wbs.framework.component.annotations.LateLifecycleSetup;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.component.registry.ComponentRegistry;
 import wbs.framework.component.registry.InjectedProperty;
@@ -65,8 +68,8 @@ import wbs.framework.component.registry.InjectedProperty.CollectionType;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.component.tools.EasyReadWriteLock;
 import wbs.framework.component.tools.EasyReadWriteLock.HeldLock;
+import wbs.utils.etc.PropertyUtils;
 import wbs.framework.component.tools.NoSuchComponentException;
-import wbs.framework.utils.etc.BeanLogic;
 
 @Accessors (fluent = true)
 @Log4j
@@ -558,23 +561,27 @@ class ComponentManagerImplementation
 
 			try {
 
-				// run post construct
+				// run eager lifecycle setup
 
 				for (
 					Method method
 						: component.getClass ().getMethods ()
 				) {
 
-					PostConstruct postConstructAnnotation =
+					NormalLifecycleSetup eagerLifecycleSetupAnnotation =
 						method.getAnnotation (
-							PostConstruct.class);
+							NormalLifecycleSetup.class);
 
-					if (postConstructAnnotation == null)
+					if (
+						isNull (
+							eagerLifecycleSetupAnnotation)
+					) {
 						continue;
+					}
 
 					log.debug (
 						stringFormat (
-							"Running post construct method %s.%s",
+							"Running eager lifecycle setup method %s.%s",
 							componentDefinition.name (),
 							method.getName ()));
 
@@ -657,7 +664,7 @@ class ComponentManagerImplementation
 					componentDefinition.name (),
 					valuePropertyEntry.getKey ()));
 
-			BeanLogic.set (
+			PropertyUtils.set (
 				component,
 				valuePropertyEntry.getKey (),
 				valuePropertyEntry.getValue ());
@@ -691,7 +698,7 @@ class ComponentManagerImplementation
 					entry.getValue (),
 					Object.class);
 
-			BeanLogic.set (
+			PropertyUtils.set (
 				component,
 				entry.getKey (),
 				target);
@@ -770,7 +777,7 @@ class ComponentManagerImplementation
 
 		// define transformer
 
-		if (injectedProperty.provider ()) {
+		if (injectedProperty.prototype ()) {
 
 			injection.transformer =
 				provider -> provider;
@@ -1091,6 +1098,63 @@ class ComponentManagerImplementation
 					"Pending injections not satisfied: %s",
 					joinWithCommaAndSpace (
 						pendingInjectionsByDependencyName.keySet ())));
+
+		}
+
+		// run late setup
+
+		for (
+			Object component
+				: singletonComponents.values ()
+		) {
+
+			for (
+				Method method
+					: component.getClass ().getMethods ()
+			) {
+
+				LateLifecycleSetup lateLifecycleSetupAnnotation =
+					method.getDeclaredAnnotation (
+						LateLifecycleSetup.class);
+
+				if (
+					isNull (
+						lateLifecycleSetupAnnotation)
+				) {
+					continue;
+				}
+
+				try {
+
+					method.invoke (
+						component);
+
+				} catch (InvocationTargetException invocationTargetException) {
+
+					if (
+						isInstanceOf (
+							RuntimeException.class,
+							invocationTargetException.getTargetException ())
+					) {
+
+						throw (RuntimeException)
+							invocationTargetException.getTargetException ();
+
+					} else {
+
+						throw new RuntimeException (
+							invocationTargetException.getTargetException ());
+
+					}
+
+				} catch (IllegalAccessException illegalAccessException) {
+
+					throw new RuntimeException (
+						illegalAccessException);
+
+				}
+
+			}
 
 		}
 

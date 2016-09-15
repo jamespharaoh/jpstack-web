@@ -1,8 +1,8 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
-import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.framework.utils.etc.TimeUtils.toInstant;
+import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.time.TimeUtils.toInstant;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;

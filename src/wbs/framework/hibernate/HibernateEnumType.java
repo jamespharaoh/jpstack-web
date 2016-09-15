@@ -1,7 +1,7 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
+import static wbs.utils.string.StringUtils.camelToUnderscore;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;
@@ -15,7 +15,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.usertype.ParameterizedType;
 import org.hibernate.usertype.UserType;
 
-import wbs.framework.utils.ReversableMap;
+import wbs.utils.collection.ReversableMap;
 
 public
 class HibernateEnumType<EnumType extends Enum<?>>

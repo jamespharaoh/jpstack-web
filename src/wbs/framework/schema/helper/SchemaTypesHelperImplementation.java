@@ -1,18 +1,16 @@
 package wbs.framework.schema.helper;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.camelToUnderscore;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TypeUtils.classForName;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.TypeUtils.classForName;
+import static wbs.utils.string.StringUtils.camelToUnderscore;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.sql.Types;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.PostConstruct;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -30,6 +28,7 @@ import org.joda.time.LocalDate;
 
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginCustomTypeSpec;
@@ -67,7 +66,7 @@ class SchemaTypesHelperImplementation
 
 	// implementation
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 

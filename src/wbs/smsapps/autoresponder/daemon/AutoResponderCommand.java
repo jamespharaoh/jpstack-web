@@ -1,8 +1,7 @@
 package wbs.smsapps.autoresponder.daemon;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNotNull;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -13,10 +12,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.utils.EmailLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -28,7 +28,7 @@ import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
-import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.messageset.model.MessageSetMessageRec;
 import wbs.sms.messageset.model.MessageSetObjectHelper;
 import wbs.sms.messageset.model.MessageSetRec;
@@ -37,6 +37,7 @@ import wbs.smsapps.autoresponder.model.AutoResponderObjectHelper;
 import wbs.smsapps.autoresponder.model.AutoResponderRec;
 import wbs.smsapps.autoresponder.model.AutoResponderRequestObjectHelper;
 import wbs.smsapps.autoresponder.model.AutoResponderRequestRec;
+import wbs.utils.email.EmailLogic;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("autoResponderCommand")
@@ -44,45 +45,45 @@ public
 class AutoResponderCommand
 	implements CommandHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	AutoResponderObjectHelper autoResponderHelper;
 
-	@Inject
+	@SingletonDependency
 	AutoResponderRequestObjectHelper autoResponderRequestHelper;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	EmailLogic emailLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
-	@Inject
+	@SingletonDependency
 	MessageSetObjectHelper messageSetHelper;
 
-	@Inject
+	@SingletonDependency
 	NumberListLogic numberListLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	WbsConfig wbsConfig;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MessageSender> messageSenderProvider;
+	@PrototypeDependency
+	Provider <SmsMessageSender> messageSenderProvider;
 
 	// properties
 

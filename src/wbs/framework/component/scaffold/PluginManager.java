@@ -1,6 +1,6 @@
 package wbs.framework.component.scaffold;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collections;
 import java.util.HashSet;

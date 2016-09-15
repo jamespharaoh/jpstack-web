@@ -1,8 +1,8 @@
 package wbs.smsapps.manualresponder.hibernate;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,10 +2,6 @@
 	name="database"
 	package="wbs.framework.database">
 
-	<layer name="hibernate">
-		<component class="TransactionCacheFactory"/>
-	</layer>
-
 	<layer name="utils">
 		<component class="DbPool"/>
 	</layer>

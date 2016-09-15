@@ -1,21 +1,21 @@
 package wbs.framework.data.tools;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsNotEmpty;
-import static wbs.framework.utils.etc.LogicUtils.parseBooleanYesNo;
-import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.toEnumGeneric;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.NumberUtils.moreThanZero;
-import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
-import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
-import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
-import static wbs.framework.utils.etc.StringUtils.joinWithFullStop;
-import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.uncapitalise;
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.etc.LogicUtils.parseBooleanYesNo;
+import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.toEnumGeneric;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.moreThanZero;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.string.StringUtils.camelToHyphen;
+import static wbs.utils.string.StringUtils.hyphenToCamel;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.joinWithFullStop;
+import static wbs.utils.string.StringUtils.nullIfEmptyString;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.uncapitalise;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -65,7 +65,7 @@ import wbs.framework.data.annotations.DataIgnore;
 import wbs.framework.data.annotations.DataInitMethod;
 import wbs.framework.data.annotations.DataParent;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
 
 /**
  * Automatically builds data objects from XML guided by annotations.
@@ -508,7 +508,7 @@ class DataFromXmlImplementation
 					if (! parents.iterator ().hasNext ())
 						throw new RuntimeException ();
 
-					BeanLogic.set (
+					PropertyUtils.set (
 						object,
 						field.getName (),
 						parents.iterator ().next ());
@@ -522,7 +522,7 @@ class DataFromXmlImplementation
 						if (! field.getType ().isInstance (ancestor))
 							continue;
 
-						BeanLogic.set (
+						PropertyUtils.set (
 							object,
 							field.getName (),
 							ancestor);
@@ -617,7 +617,7 @@ class DataFromXmlImplementation
 
 				}
 
-				BeanLogic.set (
+				PropertyUtils.set (
 					object,
 					field.getName (),
 					namedObject);
@@ -640,7 +640,7 @@ class DataFromXmlImplementation
 
 			if (field.getType () == String.class) {
 
-				BeanLogic.set (
+				PropertyUtils.set (
 					object,
 					field.getName (),
 					stringValue);
@@ -649,7 +649,7 @@ class DataFromXmlImplementation
 
 			} else if (field.getType () == Integer.class) {
 
-				BeanLogic.set (
+				PropertyUtils.set (
 					object,
 					field.getName (),
 					Integer.parseInt (
@@ -659,7 +659,7 @@ class DataFromXmlImplementation
 
 			} else if (field.getType () == Long.class) {
 
-				BeanLogic.set (
+				PropertyUtils.set (
 					object,
 					field.getName (),
 					Long.parseLong (
@@ -669,7 +669,7 @@ class DataFromXmlImplementation
 
 			} else if (field.getType () == Boolean.class) {
 
-				BeanLogic.set (
+				PropertyUtils.set (
 					object,
 					field.getName (),
 					optionalOrNull (
@@ -686,7 +686,7 @@ class DataFromXmlImplementation
 						hyphenToCamel (
 							stringValue));
 
-				BeanLogic.set (
+				PropertyUtils.set (
 					object,
 					field.getName (),
 					enumValue);
@@ -736,7 +736,7 @@ class DataFromXmlImplementation
 
 			if (field.getType () == String.class) {
 
-				BeanLogic.set (
+				PropertyUtils.set (
 					object,
 					field.getName (),
 					stringValue);
@@ -825,7 +825,7 @@ class DataFromXmlImplementation
 
 				if (child != null) {
 
-					BeanLogic.set (
+					PropertyUtils.set (
 						object,
 						field.getName (),
 						child);
@@ -917,7 +917,7 @@ class DataFromXmlImplementation
 				nextParents =
 					Iterables.concat (
 						ImmutableList.<Object> of (
-							BeanLogic.get (
+							PropertyUtils.get (
 								object,
 								dataChildrenAnnotation.surrogateParent ()),
 							object),
@@ -1160,14 +1160,14 @@ class DataFromXmlImplementation
 
 				}
 
-				BeanLogic.set (
+				PropertyUtils.set (
 					object,
 					field.getName (),
 					mapBuilder.build ());
 
 			} else {
 
-				BeanLogic.set (
+				PropertyUtils.set (
 					object,
 					field.getName (),
 					children);
@@ -1198,14 +1198,14 @@ class DataFromXmlImplementation
 
 			List<?> children =
 				(List<?>)
-				BeanLogic.get (
+				PropertyUtils.get (
 					object,
 					childrenFieldName);
 
 			for (Object child : children) {
 
 				Object index =
-					BeanLogic.get (
+					PropertyUtils.get (
 						child,
 						indexFieldName);
 
@@ -1218,7 +1218,7 @@ class DataFromXmlImplementation
 
 			}
 
-			BeanLogic.set (
+			PropertyUtils.set (
 				object,
 				field.getName (),
 				childrenIndex);

@@ -1,8 +1,8 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
-import static wbs.framework.utils.etc.StringUtils.naivePluralise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.string.StringUtils.naivePluralise;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.Setter;
 import lombok.experimental.Accessors;

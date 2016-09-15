@@ -1,23 +1,24 @@
 package wbs.smsapps.manualresponder.logic;
 
-import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import org.apache.commons.lang3.tuple.Pair;
+
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -29,7 +30,7 @@ import wbs.sms.customer.logic.SmsCustomerLogic;
 import wbs.sms.gsm.GsmUtils;
 import wbs.sms.gsm.MessageSplitter;
 import wbs.sms.keyword.logic.KeywordLogic;
-import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
@@ -44,33 +45,33 @@ public
 class ManualResponderLogicImplementation
 	implements ManualResponderLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	KeywordLogic keywordLogic;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderReplyObjectHelper manualResponderReplyHelper;
 
-	@Inject
+	@SingletonDependency
 	RouterLogic routerLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsCustomerLogic smsCustomerLogic;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MessageSender> messageSenderProvider;
+	@PrototypeDependency
+	Provider <SmsMessageSender> messageSenderProvider;
 
 	// implementation
 

@@ -1,7 +1,7 @@
 package wbs.framework.hibernate;
 
-import static wbs.framework.utils.etc.MapUtils.mapToProperties;
-import static wbs.framework.utils.etc.Misc.booleanToYesNo;
+import static wbs.utils.collection.MapUtils.mapToProperties;
+import static wbs.utils.etc.Misc.booleanToYesNo;
 
 import java.util.Properties;
 

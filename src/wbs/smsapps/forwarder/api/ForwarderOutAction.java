@@ -1,15 +1,14 @@
 package wbs.smsapps.forwarder.api;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.framework.utils.etc.Misc.isInt;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.utils.etc.Misc.isInt;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -19,6 +18,8 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.api.mvc.ApiAction;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.RequestContext;
@@ -40,25 +41,27 @@ public
 class ForwarderOutAction
 	extends ApiAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ForwarderApiLogic forwarderApiLogic;
 
-	@Inject
+	@SingletonDependency
 	ForwarderLogic forwarderLogic;
 
-	@Inject
+	@SingletonDependency
 	ForwarderMessageInObjectHelper forwarderMessageInHelper;
 
-	@Inject
+	@SingletonDependency
 	RequestContext requestContext;
 
-	@Inject
-	Provider<TextResponder> textResponder;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <TextResponder> textResponderProvider;
 
 	// implementation
 
@@ -302,7 +305,7 @@ class ForwarderOutAction
 
 				// TODO log this, not an exception
 
-				return textResponder.get ()
+				return textResponderProvider.get ()
 					.text (
 						stringFormat (
 							"FAIL\n",
@@ -316,7 +319,7 @@ class ForwarderOutAction
 
 			if (forwarderMessageOut == null) {
 
-				return textResponder.get ()
+				return textResponderProvider.get ()
 					.text (
 						stringFormat (
 							"FAIL\n",
@@ -326,7 +329,7 @@ class ForwarderOutAction
 
 			}
 
-			return textResponder.get ()
+			return textResponderProvider.get ()
 				.text (
 					stringFormat (
 						"OK\n",
@@ -352,7 +355,7 @@ class ForwarderOutAction
 
 			}
 
-			return textResponder.get ()
+			return textResponderProvider.get ()
 				.text (
 					"ERROR\n" + exception.getMessage () + "\n");
 

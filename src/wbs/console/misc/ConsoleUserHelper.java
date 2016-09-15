@@ -2,7 +2,7 @@ package wbs.console.misc;
 
 import com.google.common.base.Optional;
 
-import wbs.framework.utils.TimezoneTimeFormatter;
+import wbs.utils.time.TimezoneTimeFormatter;
 
 public
 interface ConsoleUserHelper

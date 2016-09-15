@@ -1,16 +1,15 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.lessThan;
-import static wbs.framework.utils.etc.NumberUtils.moreThan;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.lessThan;
+import static wbs.utils.etc.NumberUtils.moreThan;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
@@ -22,6 +21,8 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
@@ -34,7 +35,7 @@ import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.gsm.GsmUtils;
 import wbs.sms.keyword.logic.KeywordLogic;
-import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
 import wbs.smsapps.manualresponder.logic.ManualResponderLogic;
@@ -52,54 +53,54 @@ public
 class ManualResponderRequestPendingFormAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	KeywordLogic keywordLogic;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderLogic manualResponderLogic;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderReplyObjectHelper manualResponderReplyHelper;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderRequestObjectHelper manualResponderRequestHelper;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderTemplateObjectHelper manualResponderTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueLogic queueLogic;
 
-	@Inject
+	@SingletonDependency
 	RouterLogic routerLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MessageSender> messageSender;
+	@PrototypeDependency
+	Provider <SmsMessageSender> messageSenderProvider;
 
 	// details
 
@@ -401,7 +402,7 @@ class ManualResponderRequestPendingFormAction
 		) {
 
 			reply.getMessages ().add (
-				messageSender.get ()
+				messageSenderProvider.get ()
 
 				.threadId (
 					request.getMessage ().getThreadId ())

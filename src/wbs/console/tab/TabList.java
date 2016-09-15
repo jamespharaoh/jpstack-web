@@ -7,7 +7,7 @@ import java.util.List;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.utils.etc.Html;
+import wbs.utils.web.HtmlUtils;
 
 public
 class TabList {
@@ -64,8 +64,8 @@ class TabList {
 				out.print("<a");
 				if (preparedTab.selected)
 					out.print(" class=\"selected\"");
-				out.println(" href=\"" + Html.encode(preparedTab.url) + "\">"
-						+ Html.encode(preparedTab.label) + "</a>");
+				out.println(" href=\"" + HtmlUtils.htmlEncode(preparedTab.url) + "\">"
+						+ HtmlUtils.htmlEncode(preparedTab.label) + "</a>");
 			}
 			out.println("</p>");
 

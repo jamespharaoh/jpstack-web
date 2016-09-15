@@ -1,12 +1,11 @@
 package wbs.test.fixtures;
 
-import javax.inject.Inject;
-
 import lombok.extern.log4j.Log4j;
 
-import wbs.clients.apn.chat.contact.model.ChatContactObjectHelper;
-import wbs.clients.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.clients.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.contact.model.ChatContactObjectHelper;
+import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.currency.model.CurrencyObjectHelper;
@@ -34,78 +33,78 @@ import wbs.smsapps.manualresponder.model.ManualResponderTemplateObjectHelper;
 public
 class TestFixtures {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	AutoResponderObjectHelper autoResponderHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatContactObjectHelper chatContactHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
-	@Inject
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	CommandLogic commandLogic;
 
-	@Inject
+	@SingletonDependency
 	CurrencyObjectHelper currencyHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	KeywordObjectHelper keywordHelper;
 
-	@Inject
+	@SingletonDependency
 	KeywordSetObjectHelper keywordSetHelper;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderObjectHelper manualResponderHelper;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderTemplateObjectHelper manualResponderTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	NetworkObjectHelper networkHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	PrivObjectHelper privHelper;
 
-	@Inject
+	@SingletonDependency
 	RootObjectHelper rootHelper;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	RouterObjectHelper routerHelper;
 
-	@Inject
+	@SingletonDependency
 	SenderObjectHelper senderHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
-	@Inject
+	@SingletonDependency
 	UserPrivObjectHelper userPrivHelper;
 
 	/*

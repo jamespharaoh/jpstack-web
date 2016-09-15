@@ -1,12 +1,12 @@
 package wbs.integrations.mediaburst.api;
 
-import static wbs.framework.utils.etc.Misc.fromHex;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
-import static wbs.framework.utils.etc.StringUtils.lowercase;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringIsNotEmpty;
+import static wbs.utils.etc.Misc.fromHex;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.string.StringUtils.joinWithSpace;
+import static wbs.utils.string.StringUtils.lowercase;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 
 import java.io.IOException;
 import java.io.PrintWriter;

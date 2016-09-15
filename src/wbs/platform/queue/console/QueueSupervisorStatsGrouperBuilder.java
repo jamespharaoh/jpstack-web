@@ -1,8 +1,5 @@
 package wbs.platform.queue.console;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.supervisor.SupervisorConfigBuilder;
 import wbs.console.supervisor.SupervisorConfigSpec;
@@ -12,16 +9,17 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 @PrototypeComponent ("queueSupervisorStatsGrouperBuilder")
 @ConsoleModuleBuilderHandler
 public
 class QueueSupervisorStatsGrouperBuilder {
 
-	// prototype dependencies
+	// singleton dependencies
 
-	@Inject
-	Provider<QueueStatsGrouper> queueStatsGrouper;
+	@SingletonDependency
+	QueueStatsGrouper queueStatsGrouper;
 
 	// builder
 
@@ -46,7 +44,7 @@ class QueueSupervisorStatsGrouperBuilder {
 
 		supervisorConfigBuilder.statsGroupersByName ().put (
 			name,
-			queueStatsGrouper.get ());
+			queueStatsGrouper);
 
 	}
 

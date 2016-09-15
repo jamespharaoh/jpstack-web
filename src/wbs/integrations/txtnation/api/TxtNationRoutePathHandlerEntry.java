@@ -3,10 +3,9 @@ package wbs.integrations.txtnation.api;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import javax.annotation.PostConstruct;
-
 import com.google.common.collect.ImmutableMap;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.RegexpPathHandler;
@@ -50,9 +49,9 @@ class TxtNationRoutePathHandlerEntry
 
 	}
 
-	Map<String,WebFile> files;
+	Map <String, WebFile> files;
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 

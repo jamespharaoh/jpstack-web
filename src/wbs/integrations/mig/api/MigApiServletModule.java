@@ -1,8 +1,8 @@
 package wbs.integrations.mig.api;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.framework.utils.etc.StringUtils.joinWithNewline;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.string.StringUtils.joinWithNewline;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.io.PrintWriter;

@@ -1,11 +1,11 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TypeUtils.dynamicCast;
-import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
+import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.TypeUtils.dynamicCast;
+import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
 
@@ -17,7 +17,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperPropertyImplementation")
@@ -199,7 +199,7 @@ class ObjectHelperPropertyImplementation <
 		} else {
 
 			return (Long)
-				BeanLogic.getProperty (
+				PropertyUtils.getProperty (
 					object,
 					model.parentIdField ().name ());
 
@@ -220,7 +220,7 @@ class ObjectHelperPropertyImplementation <
 				model.objectClass (),
 				objectUncast);
 
-		BeanLogic.setProperty (
+		PropertyUtils.setProperty (
 			object,
 			model.parentField ().name (),
 			parent);
@@ -384,7 +384,7 @@ class ObjectHelperPropertyImplementation <
 
 				boolean deletedProperty =
 					(Boolean)
-					BeanLogic.getProperty (
+					PropertyUtils.getProperty (
 						object,
 						"deleted");
 

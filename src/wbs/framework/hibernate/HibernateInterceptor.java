@@ -1,9 +1,10 @@
 package wbs.framework.hibernate;
 
-import javax.annotation.PostConstruct;
+import static wbs.utils.etc.Misc.doNothing;
 
 import org.hibernate.EmptyInterceptor;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 
 @PrototypeComponent ("hibernateInterceptor")
@@ -17,22 +18,11 @@ class HibernateInterceptor
 
 	// life cycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void setup () {
 
-		try {
-
-			chatUserClass =
-				Class.forName (
-					"wbs.clients.apn.chat.user.core.model.ChatUserRec");
-
-		} catch (ClassNotFoundException exception) {
-
-			throw new RuntimeException (
-				exception);
-
-		}
+		doNothing ();
 
 	}
 

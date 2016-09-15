@@ -1,7 +1,7 @@
 package wbs.console.combo;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
 

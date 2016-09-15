@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 import com.google.common.base.Optional;
 
@@ -12,7 +12,7 @@ import wbs.console.misc.ConsoleUserHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
-import wbs.framework.utils.TextualInterval;
+import wbs.utils.time.TextualInterval;
 
 @PrototypeComponent ("intervalFormFieldNativeMapping")
 public

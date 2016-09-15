@@ -3,6 +3,7 @@ package wbs.console.helper;
 import com.google.common.base.Optional;
 
 import wbs.framework.entity.record.Record;
+import wbs.utils.string.FormatWriter;
 
 public
 interface ConsoleHelperMethods <ObjectType extends Record <ObjectType>> {
@@ -24,7 +25,8 @@ interface ConsoleHelperMethods <ObjectType extends Record <ObjectType>> {
 	boolean canView (
 			Record <?> object);
 
-	String getHtml (
+	void writeHtml (
+			FormatWriter formatWriter,
 			Record <?> object,
 			Optional <Record <?>> assumedRoot,
 			Boolean mini);

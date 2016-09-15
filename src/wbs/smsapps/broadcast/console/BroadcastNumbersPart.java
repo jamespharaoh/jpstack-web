@@ -1,10 +1,19 @@
 package wbs.smsapps.broadcast.console;
 
-import javax.inject.Inject;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.utils.web.HtmlUtils.htmlFormClose;
+import static wbs.utils.web.HtmlUtils.htmlFormOpenMethod;
+import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
 
 import lombok.experimental.Accessors;
+
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.smsapps.broadcast.model.BroadcastRec;
 
 @Accessors (fluent = true)
@@ -13,10 +22,16 @@ public
 class BroadcastNumbersPart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	BroadcastConsoleHelper broadcastHelper;
 
+	// state
+
 	BroadcastRec broadcast;
+
+	// implementation
 
 	@Override
 	public
@@ -41,59 +56,70 @@ class BroadcastNumbersPart
 
 	void goDetails () {
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Total accepted</th>\n",
-			"<td>%s</td>\n",
-			broadcast.getNumAccepted (),
-			"</tr>\n");
+		htmlTableDetailsRowWrite (
+			"Total accepted",
+			integerToDecimalString (
+				broadcast.getNumAccepted ()));
 
-		printFormat (
-			"<tr>\n",
-			"<th>Total rejected</th>\n",
-			"<td>%s</td>\n",
-			broadcast.getNumRejected (),
-			"</tr>\n");
+		htmlTableDetailsRowWrite (
+			"Total rejected",
+			integerToDecimalString (
+				broadcast.getNumRejected ()));
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
 	void goForm () {
 
-		printFormat (
-			"<form method=\"post\">\n");
+		// open form
 
-		printFormat (
-			"<p>Numbers<br>\n",
+		htmlFormOpenMethod (
+			"post");
 
+		// write numbers
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"Numbers<br>");
+
+		formatWriter.writeLineFormat (
 			"<textarea",
 			" name=\"numbers\"",
 			" rows=\"8\"",
 			" cols=\"60\"",
-			">%h</textarea></p>\n",
+			">%h</textarea>",
 			requestContext.parameterOrEmptyString (
 				"numbers"));
 
-		printFormat (
-			"<p><input",
+		htmlParagraphClose ();
+
+		// write submit buttons
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"add\"",
 			" value=\"add numbers\"",
-			">\n",
+			">");
 
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" name=\"remove\"",
 			" value=\"remove numbers\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		// close form
+
+		htmlFormClose ();
 
 	}
 

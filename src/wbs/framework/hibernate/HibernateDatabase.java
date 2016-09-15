@@ -8,7 +8,6 @@ import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -50,8 +49,8 @@ class HibernateDatabase
 
 	// state
 
-	ThreadLocal<List<HibernateTransaction>> currentTransactionStackLocal =
-		new ThreadLocal<List<HibernateTransaction>> () {
+	ThreadLocal <List <HibernateTransaction>> currentTransactionStackLocal =
+		new ThreadLocal <List <HibernateTransaction>> () {
 
 		@Override
 		protected
@@ -81,7 +80,7 @@ class HibernateDatabase
 				"database",
 				summary,
 				owner,
-				ImmutableMap.<String,String>of ());
+				ImmutableMap.of ());
 
 		try {
 
@@ -105,6 +104,17 @@ class HibernateDatabase
 			throw activeTask.fail (
 				exception);
 
+		} catch (Error exception) {
+
+			throw activeTask.fail (
+				exception);
+
+		} catch (Throwable exception) {
+
+			throw activeTask.fail (
+				new RuntimeException (
+					exception));
+
 		}
 
 	}
@@ -116,13 +126,6 @@ class HibernateDatabase
 			boolean canCreateNew,
 			boolean makeCurrent) {
 
-		@Cleanup
-		ActiveTask beginTask =
-			activityManager.start (
-				"database",
-				"beginTransactionReal (...)",
-				this);
-
 		// check args
 
 		if (! canCreateNew && ! canJoin) {
@@ -132,71 +135,84 @@ class HibernateDatabase
 
 		}
 
-		// get current transaction & stack
+		try (
 
-		List<HibernateTransaction> currentTransactionStack =
-			currentTransactionStackLocal.get ();
+			ActiveTask beginTask =
+				activityManager.start (
+					"database",
+					"beginTransactCionReal (...)",
+					this);
 
-		HibernateTransaction currentTransaction =
-			currentTransactionStack.size () > 0
-				? currentTransactionStack.get (
-					currentTransactionStack.size () - 1)
-				: null;
-
-		// join an existing transaction
-
-		if (
-			currentTransaction != null
-			&& canJoin
-			&& (
-				! readWrite
-				|| ! currentTransaction.isReadWrite
-			)
 		) {
 
-			HibernateTransaction newTransaction =
-				new HibernateTransaction (
-					this,
-					readWrite,
-					currentTransaction,
-					currentTransactionStack,
-					transactionTask);
+			// get current transaction & stack
 
-			newTransaction.begin ();
+			List <HibernateTransaction> currentTransactionStack =
+				currentTransactionStackLocal.get ();
 
-			if (makeCurrent) {
+			@SuppressWarnings ("resource")
+			HibernateTransaction currentTransaction =
+				currentTransactionStack.size () > 0
+					? currentTransactionStack.get (
+						currentTransactionStack.size () - 1)
+					: null;
 
-				currentTransactionStack.add (
-					newTransaction);
+			// join an existing transaction
+
+			if (
+				currentTransaction != null
+				&& canJoin
+				&& (
+					! readWrite
+					|| ! currentTransaction.isReadWrite
+				)
+			) {
+
+				HibernateTransaction newTransaction =
+					new HibernateTransaction (
+						this,
+						readWrite,
+						currentTransaction,
+						currentTransactionStack,
+						transactionTask);
+
+				newTransaction.begin ();
+
+				if (makeCurrent) {
+
+					currentTransactionStack.add (
+						newTransaction);
+
+				}
+
+				return newTransaction;
 
 			}
 
-			return newTransaction;
+			// create a new transaction
 
-		}
+			if (canCreateNew) {
 
-		// create a new transaction
+				HibernateTransaction newTransaction =
+					new HibernateTransaction (
+						this,
+						readWrite,
+						null,
+						currentTransactionStack,
+						transactionTask);
 
-		if (canCreateNew) {
+				newTransaction.begin ();
 
-			HibernateTransaction newTransaction =
-				new HibernateTransaction (
-					this,
-					readWrite,
-					null,
-					currentTransactionStack,
-					transactionTask);
+				if (makeCurrent) {
 
-			newTransaction.begin ();
+					currentTransactionStack.add (
+						newTransaction);
 
-			if (makeCurrent) {
+				}
 
-				currentTransactionStack.add (
-					newTransaction);
+				return newTransaction;
 
 			}
-
-			return newTransaction;
 
 		}
 

@@ -1,16 +1,17 @@
 package wbs.smsapps.subscription.logic;
 
-import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
-import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.Misc.isNull;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectHelper;
@@ -24,7 +25,7 @@ import wbs.sms.message.batch.model.BatchObjectHelper;
 import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.batch.model.BatchSubjectObjectHelper;
 import wbs.sms.message.batch.model.BatchSubjectRec;
-import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.smsapps.subscription.model.SubscriptionBillObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionListRec;
 import wbs.smsapps.subscription.model.SubscriptionNumberObjectHelper;
@@ -46,66 +47,66 @@ import wbs.smsapps.subscription.model.SubscriptionSubRec;
 public
 class SubscriptionSendHelper
 	implements
-		GenericSendHelper<
+		GenericSendHelper <
 			SubscriptionRec,
 			SubscriptionSendRec,
 			SubscriptionSendNumberRec
 		> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	AffiliateObjectHelper affiliateHelper;
 
-	@Inject
+	@SingletonDependency
 	BatchObjectHelper batchHelper;
 
-	@Inject
+	@SingletonDependency
 	BatchLogic batchLogic;
 
-	@Inject
+	@SingletonDependency
 	BatchSubjectObjectHelper batchSubjectHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeObjectHelper objectTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionBillObjectHelper subscriptionBillHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionLogic subscriptionLogic;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionObjectHelper subscriptionHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionNumberObjectHelper subscriptionNumberHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionSendObjectHelper subscriptionSendHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionSendNumberObjectHelper subscriptionSendNumberHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionSendPartObjectHelper subscriptionSendPartHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionSubObjectHelper subscriptionSubHelper;
 
-	@Inject
+	@SingletonDependency
 	TextObjectHelper textHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MessageSender> messageSenderProvider;
+	@PrototypeDependency
+	Provider <SmsMessageSender> messageSenderProvider;
 
 	// details
 

@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -72,9 +72,9 @@ class FormFieldSet {
 	}
 
 	public
-	int columns () {
+	long columns () {
 
-		int ret = 0;
+		long ret = 0;
 
 		for (
 			FormField formField

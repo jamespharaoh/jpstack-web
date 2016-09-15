@@ -1,15 +1,14 @@
 package wbs.framework.entity.helper;
 
-import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.camelToHyphen;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
@@ -21,6 +20,7 @@ import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.FileUtils;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -65,7 +65,9 @@ class EntityHelperImplementation
 	@Getter
 	Map <String, Model> modelsByName;
 
-	@PostConstruct
+	// life cycle
+
+	@NormalLifecycleSetup
 	public
 	void init () {
 

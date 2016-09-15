@@ -1,17 +1,17 @@
 package wbs.smsapps.autoresponder.daemon;
 
-import static wbs.framework.utils.etc.CollectionUtils.listIndexOfRequired;
-import static wbs.framework.utils.etc.CollectionUtils.listItemAtIndexRequired;
+import static wbs.utils.collection.CollectionUtils.listIndexOfRequired;
+import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
 
-import java.util.Arrays;
 import java.util.Collection;
 
-import javax.inject.Inject;
+import com.google.common.collect.ImmutableList;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -30,33 +30,33 @@ public
 class AutoResponderDelivery
 	implements DeliveryHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
-	@Inject
+	@SingletonDependency
 	AutoResponderRequestObjectHelper autoResponderRequestHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsMessageLogic messageLogic;
 
-	@Inject
+	@SingletonDependency
 	SmsOutboxLogic outboxLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
 	// details
 
 	@Override
 	public
-	Collection<String> getDeliveryTypeCodes () {
+	Collection <String> getDeliveryTypeCodes () {
 
-		return Arrays.<String>asList (
+		return ImmutableList.of (
 			"auto_responder");
 
 	}

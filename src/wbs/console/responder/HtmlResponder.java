@@ -10,7 +10,7 @@ import org.joda.time.Instant;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.utils.TimeFormatter;
+import wbs.utils.time.TimeFormatter;
 
 public abstract
 class HtmlResponder
@@ -29,9 +29,9 @@ class HtmlResponder
 	}
 
 	protected
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				myScriptRefs ())
@@ -41,16 +41,16 @@ class HtmlResponder
 	}
 
 	protected
-	Set<ScriptRef> myScriptRefs () {
+	Set <ScriptRef> myScriptRefs () {
 
-		return ImmutableSet.<ScriptRef>of ();
+		return ImmutableSet.of ();
 
 	}
 
 	protected
-	Set<HtmlLink> htmlLinks () {
+	Set <HtmlLink> htmlLinks () {
 
-		return ImmutableSet.<HtmlLink>builder ()
+		return ImmutableSet.<HtmlLink> builder ()
 
 			.add (
 				HtmlLink.applicationCssStyle (
@@ -72,9 +72,9 @@ class HtmlResponder
 	}
 
 	protected
-	Set<HtmlLink> myHtmlLinks () {
+	Set <HtmlLink> myHtmlLinks () {
 
-		return ImmutableSet.<HtmlLink>of ();
+		return ImmutableSet.of ();
 
 	}
 
@@ -103,15 +103,15 @@ class HtmlResponder
 	protected
 	void renderHtmlDoctype () {
 
-		printFormat (
-			"<!DOCTYPE html>\n");
+		formatWriter.writeLineFormat (
+			"<!DOCTYPE html>");
 
 	}
 
 	protected
 	void renderHtmlStyleSheets () {
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<link",
 			" rel=\"stylesheet\"",
 			" href=\"%h\"",
@@ -133,8 +133,8 @@ class HtmlResponder
 	protected
 	void renderHtmlTitle () {
 
-		printFormat (
-			"<title>%h</title>\n",
+		formatWriter.writeLineFormat (
+			"<title>%h</title>",
 			getTitle ());
 
 	}
@@ -142,17 +142,19 @@ class HtmlResponder
 	protected
 	void renderHtmlScriptRefs () {
 
-		for (ScriptRef scriptRef
-				: scriptRefs ()) {
+		for (
+			ScriptRef scriptRef
+				: scriptRefs ()
+		) {
 
-			printFormat (
+			formatWriter.writeLineFormat (
 				"<script",
 				" type=\"%h\"",
 				scriptRef.getType (),
 				" src=\"%h\"",
 				scriptRef.getUrl (
 					requestContext),
-				"></script>\n");
+				"></script>");
 
 		}
 
@@ -166,11 +168,13 @@ class HtmlResponder
 
 		if (links != null) {
 
-			for (HtmlLink link
-					: htmlLinks ()) {
+			for (
+				HtmlLink link
+					: htmlLinks ()
+			) {
 
-				printFormat (
-					"%s\n",
+				formatWriter.writeLineFormat (
+					"%s",
 					link.render (
 						requestContext));
 
@@ -193,13 +197,17 @@ class HtmlResponder
 	protected
 	void renderHtmlHead () {
 
-		printFormat (
-			"<head>\n");
+		formatWriter.writeLineFormat (
+			"<head>");
+
+		formatWriter.increaseIndent ();
 
 		renderHtmlHeadContents ();
 
-		printFormat (
-			"</head>\n");
+		formatWriter.decreaseIndent ();
+
+		formatWriter.writeLineFormat (
+			"</head>");
 
 	}
 
@@ -210,13 +218,17 @@ class HtmlResponder
 	protected
 	void renderHtmlBody () {
 
-		printFormat (
-			"<body>\n");
+		formatWriter.writeLineFormat (
+			"<body>");
+
+		formatWriter.increaseIndent ();
 
 		renderHtmlBodyContents ();
 
-		printFormat (
-			"</body>\n");
+		formatWriter.decreaseIndent ();
+
+		formatWriter.writeLineFormat (
+			"</body>");
 
 	}
 
@@ -226,14 +238,14 @@ class HtmlResponder
 
 		renderHtmlDoctype ();
 
-		printFormat (
-			"<html>\n");
+		formatWriter.writeLineFormat (
+			"<html>");
 
 		renderHtmlHead ();
 		renderHtmlBody ();
 
-		printFormat (
-			"</html>\n");
+		formatWriter.writeLineFormat (
+			"</html>");
 
 	}
 

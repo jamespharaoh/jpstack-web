@@ -1,10 +1,8 @@
 package wbs.smsapps.broadcast.logic;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.broadcast.model.BroadcastNumberObjectHelper;
 import wbs.smsapps.broadcast.model.BroadcastNumberObjectHelperMethods;
@@ -16,8 +14,12 @@ public
 class BroadcastNumberObjectHelperMethodsImplementation
 	implements BroadcastNumberObjectHelperMethods {
 
-	@Inject
-	Provider<BroadcastNumberObjectHelper> broadcastNumberHelper;
+	// singleton dependencies
+
+	@WeakSingletonDependency
+	BroadcastNumberObjectHelper broadcastNumberHelper;
+
+	// implementation
 
 	@Override
 	public
@@ -28,7 +30,7 @@ class BroadcastNumberObjectHelperMethodsImplementation
 		// find existing
 
 		BroadcastNumberRec broadcastNumber =
-			broadcastNumberHelper.get ().find (
+			broadcastNumberHelper.find (
 				broadcast,
 				number);
 
@@ -38,8 +40,8 @@ class BroadcastNumberObjectHelperMethodsImplementation
 		// create new
 
 		broadcastNumber =
-			broadcastNumberHelper.get ().insert (
-				broadcastNumberHelper.get ().createInstance ()
+			broadcastNumberHelper.insert (
+				broadcastNumberHelper.createInstance ()
 
 			.setBroadcast (
 				broadcast)

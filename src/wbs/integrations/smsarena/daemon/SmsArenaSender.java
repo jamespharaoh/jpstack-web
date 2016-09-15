@@ -1,10 +1,10 @@
 package wbs.integrations.smsarena.daemon;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.stringToUrl;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.stringToUrl;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -28,7 +28,6 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.etc.Html;
 import wbs.integrations.smsarena.model.SmsArenaRouteOutObjectHelper;
 import wbs.integrations.smsarena.model.SmsArenaRouteOutRec;
 import wbs.platform.exception.logic.ExceptionLogLogic;
@@ -37,6 +36,7 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender2;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.utils.web.HtmlUtils;
 
 @Log4j
 @SingletonComponent ("smsArenaSender")
@@ -271,7 +271,7 @@ class SmsArenaSender
 				'=');
 
 			paramsString.append (
-				Html.urlQueryParameterEncode (
+				HtmlUtils.urlQueryParameterEncode (
 					paramEntry.getValue ()));
 
 		}

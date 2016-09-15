@@ -1,16 +1,16 @@
 package wbs.console.module;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
-import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
-import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
-import static wbs.framework.utils.etc.StringUtils.pluralise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.string.StringUtils.camelToHyphen;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.joinWithoutSeparator;
+import static wbs.utils.string.StringUtils.pluralise;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -45,6 +44,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.supervisor.SupervisorConfig;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.ContextTabPlacement;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -179,7 +179,7 @@ class ConsoleManagerImplementation
 	 * Queries the application context for console modules and sets up their
 	 * contexts, tabs and files automatically.
 	 */
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 
@@ -688,16 +688,18 @@ class ConsoleManagerImplementation
 					consoleContext);
 
 				ConsoleContextType contextType =
-					contextTypesByName.get (consoleContext.typeName ());
+					contextTypesByName.get (
+						consoleContext.typeName ());
 
 				if (contextType == null) {
 
 					log.error (
 						stringFormat (
-							"Unknown context type %s referenced from context %s",
+							"Unknown context type %s ",
 							consoleContext.typeName (),
+							"referenced from context %s ",
 							consoleContext.name (),
-							" in %s",
+							"in %s",
 							consoleModuleName));
 
 					errors ++;

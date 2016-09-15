@@ -1,9 +1,8 @@
 package wbs.framework.activitymanager;
 
-import javax.annotation.PostConstruct;
-
 import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 
@@ -19,7 +18,7 @@ class ActivityDumper {
 
 	// implementation
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 

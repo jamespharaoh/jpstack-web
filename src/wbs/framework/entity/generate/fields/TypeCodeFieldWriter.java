@@ -1,6 +1,6 @@
 package wbs.framework.entity.generate.fields;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.ifNull;
 
 import lombok.NonNull;
 

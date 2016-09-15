@@ -1,14 +1,14 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.LogicUtils.allOf;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.LogicUtils.allOf;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.Pair;
+import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
@@ -16,10 +16,14 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.cache.AdvancedCache;
+import wbs.utils.cache.AdvancedCache;
+import wbs.utils.cache.IdCacheBuilder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperIndexImplementation")
@@ -28,6 +32,16 @@ class ObjectHelperIndexImplementation <RecordType extends Record <RecordType>>
 	implements
 		ObjectHelperComponent <RecordType>,
 		ObjectHelperIndexMethods <RecordType> {
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <IdCacheBuilder <Pair <Long, Long>, Long, RecordType>>
+	parentIdAndIndexCacheBuilderProvider;
+
+	@PrototypeDependency
+	Provider <IdCacheBuilder <Pair <GlobalId, Long>, Long, RecordType>>
+	parentGlobalIdAndIndexCacheBuilderProvider;
 
 	// properties
 
@@ -46,7 +60,9 @@ class ObjectHelperIndexImplementation <RecordType extends Record <RecordType>>
 	// state
 
 	AdvancedCache <Pair <Long ,Long>, RecordType> parentIdAndIndexCache;
-	AdvancedCache <Pair <GlobalId, Long>, RecordType> parentGlobalIdAndIndexCache;
+
+	AdvancedCache <Pair <GlobalId, Long>, RecordType>
+	parentGlobalIdAndIndexCache;
 
 	// life cycle
 
@@ -62,7 +78,7 @@ class ObjectHelperIndexImplementation <RecordType extends Record <RecordType>>
 		)) {
 
 			parentIdAndIndexCache =
-				new AdvancedCache.IdBuilder<Pair<Long,Long>,Long,RecordType> ()
+				parentIdAndIndexCacheBuilderProvider.get ()
 
 				.dummy (! allOf (
 					() -> model.parentField ().cacheable (),
@@ -72,13 +88,13 @@ class ObjectHelperIndexImplementation <RecordType extends Record <RecordType>>
 				.cacheNegatives (
 					false)
 
-				.lookupById (
+				.lookupByIdFunction (
 					objectId ->
 						Optional.fromNullable (
 							objectDatabaseHelper.find (
 								objectId)))
 
-				.lookupByKey (
+				.lookupByKeyFunction (
 					key ->
 						Optional.fromNullable (
 							objectDatabaseHelper.findByParentAndIndex (
@@ -87,7 +103,7 @@ class ObjectHelperIndexImplementation <RecordType extends Record <RecordType>>
 									key.getLeft ()),
 								key.getRight ())))
 
-				.getId (
+				.getIdFunction (
 					record ->
 						record.getId ())
 
@@ -104,7 +120,7 @@ class ObjectHelperIndexImplementation <RecordType extends Record <RecordType>>
 		)) {
 
 			parentGlobalIdAndIndexCache =
-				new AdvancedCache.IdBuilder<Pair<GlobalId,Long>,Long,RecordType> ()
+				parentGlobalIdAndIndexCacheBuilderProvider.get ()
 
 				.dummy (! allOf (
 					() -> model.parentTypeField ().cacheable (),
@@ -115,20 +131,20 @@ class ObjectHelperIndexImplementation <RecordType extends Record <RecordType>>
 				.cacheNegatives (
 					false)
 
-				.lookupById (
+				.lookupByIdFunction (
 					objectId ->
 						Optional.fromNullable (
 							objectDatabaseHelper.find (
 								objectId)))
 
-				.lookupByKey (
+				.lookupByKeyFunction (
 					key ->
 						Optional.fromNullable (
 							objectDatabaseHelper.findByParentAndIndex (
 								key.getLeft (),
 								key.getRight ())))
 
-				.getId (
+				.getIdFunction (
 					record ->
 						record.getId ())
 
@@ -152,7 +168,7 @@ class ObjectHelperIndexImplementation <RecordType extends Record <RecordType>>
 
 		if (model.canGetParent ()) {
 
-			return parentIdAndIndexCache.get (
+			return parentIdAndIndexCache.find (
 				Pair.of (
 					parent.getId (),
 					index));
@@ -163,7 +179,7 @@ class ObjectHelperIndexImplementation <RecordType extends Record <RecordType>>
 				objectManager.objectHelperForClassRequired (
 					parent.getClass ());
 
-			return parentGlobalIdAndIndexCache.get (
+			return parentGlobalIdAndIndexCache.find (
 				Pair.of (
 					GlobalId.of (
 						parentHelper.objectTypeId (),

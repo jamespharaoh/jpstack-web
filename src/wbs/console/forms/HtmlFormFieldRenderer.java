@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.Misc.doNothing;
 
 import java.util.Map;
 
@@ -13,7 +13,7 @@ import com.google.common.base.Optional;
 
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("htmlFormFieldRenderer")
 @Accessors (fluent = true)

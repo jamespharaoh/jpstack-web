@@ -1,6 +1,6 @@
 package wbs.framework.activitymanager;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNotNull;
 
 import java.util.ArrayList;
 import java.util.List;

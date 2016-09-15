@@ -1,8 +1,7 @@
 package wbs.test.simulator.fixture;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
@@ -24,36 +23,36 @@ public
 class SimulatorFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuItemObjectHelper menuItemHelper;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	SenderObjectHelper senderHelper;
 
-	@Inject
+	@SingletonDependency
 	SimulatorObjectHelper simulatorHelper;
 
-	@Inject
+	@SingletonDependency
 	SimulatorRouteObjectHelper simulatorRouteHelper;
 
-	@Inject
+	@SingletonDependency
 	SimulatorSessionObjectHelper simulatorSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// implementation

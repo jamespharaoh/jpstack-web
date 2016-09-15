@@ -1,6 +1,6 @@
 package wbs.platform.media.console;
 
-import static wbs.framework.utils.etc.Misc.runFilter;
+import static wbs.utils.etc.Misc.runFilter;
 
 import java.io.IOException;
 import java.io.OutputStream;

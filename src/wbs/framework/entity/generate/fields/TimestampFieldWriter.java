@@ -1,6 +1,6 @@
 package wbs.framework.entity.generate.fields;
 
-import static wbs.framework.utils.etc.Misc.getStaticMethodRequired;
+import static wbs.utils.etc.Misc.getStaticMethodRequired;
 
 import com.google.common.collect.ImmutableList;
 
@@ -18,7 +18,7 @@ import wbs.framework.codegen.JavaPropertyWriter;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.fields.TimestampFieldSpec;
-import wbs.framework.utils.etc.TimeUtils;
+import wbs.utils.time.TimeUtils;
 
 @PrototypeComponent ("timestampFieldWriter")
 @ModelWriter

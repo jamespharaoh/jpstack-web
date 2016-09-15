@@ -1,6 +1,6 @@
 package wbs.console.helper;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
 

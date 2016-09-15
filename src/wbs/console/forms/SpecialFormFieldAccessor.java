@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
 
@@ -15,7 +15,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("specialFormFieldAccessor")
@@ -51,7 +51,7 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 
 		ModelField modelField =
 			(ModelField)
-			BeanLogic.get (
+			PropertyUtils.get (
 				consoleHelper,
 				stringFormat (
 					"%sField",
@@ -63,7 +63,7 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 		// get native object
 
 		Object nativeObject =
-			BeanLogic.getProperty (
+			PropertyUtils.getProperty (
 				container,
 				name);
 
@@ -113,7 +113,7 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 
 		ModelField modelField =
 			(ModelField)
-			BeanLogic.get (
+			PropertyUtils.get (
 				consoleHelper,
 				stringFormat (
 					"%sField",
@@ -144,7 +144,7 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 
 		// set property
 
-		BeanLogic.setProperty (
+		PropertyUtils.setProperty (
 			container,
 			name,
 			nativeValue.orNull ());

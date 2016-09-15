@@ -1,13 +1,15 @@
 package wbs.console.misc;
 
-import java.io.PrintWriter;
+
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import wbs.framework.utils.etc.Html;
-import wbs.framework.utils.formatwriter.FormatWriter;
-import wbs.framework.utils.formatwriter.WriterFormatWriter;
+import lombok.NonNull;
+
+import wbs.utils.string.FormatWriter;
+import wbs.utils.string.WriterFormatWriter;
+import wbs.utils.web.HtmlUtils;
 
 public
 class PageBuilder {
@@ -51,7 +53,7 @@ class PageBuilder {
 
 	public
 	void goPages (
-			PrintWriter out) {
+			@NonNull FormatWriter formatWriter) {
 
 		String pageHeaderString =
 			headStringWriter.toString ();
@@ -64,27 +66,27 @@ class PageBuilder {
 		for (String pageBodyString
 				: pages) {
 
-			out.print (
+			formatWriter.writeString (
 				"'");
 
-			out.print (
-				Html.javascriptStringEscape (
+			formatWriter.writeString (
+				HtmlUtils.javascriptStringEscape (
 					pageHeaderString));
 
-			out.print (
-				Html.javascriptStringEscape (
+			formatWriter.writeString (
+				HtmlUtils.javascriptStringEscape (
 					pageBodyString));
 
-			out.print (
-				Html.javascriptStringEscape (
+			formatWriter.writeString (
+				HtmlUtils.javascriptStringEscape (
 					pageFooterString));
 
-			out.print (
+			formatWriter.writeString (
 				"',\n");
 
 		}
 
-		out.print (
+		formatWriter.writeString (
 			"''");
 
 	}

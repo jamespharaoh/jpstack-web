@@ -1,8 +1,8 @@
 package wbs.smsapps.photograbber.daemon;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,15 +11,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 import com.google.common.base.Optional;
 
@@ -30,11 +25,16 @@ import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.RandomLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
@@ -48,12 +48,13 @@ import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
-import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.sms.messageset.model.MessageSetObjectHelper;
 import wbs.smsapps.photograbber.model.PhotoGrabberRec;
 import wbs.smsapps.photograbber.model.PhotoGrabberRequestObjectHelper;
 import wbs.smsapps.photograbber.model.PhotoGrabberRequestRec;
+import wbs.utils.random.RandomLogic;
 
 @Accessors (fluent = true)
 @Log4j
@@ -62,43 +63,45 @@ public
 class PhotoGrabberCommand
 	implements CommandHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	MediaLogic mediaLogic;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
-	@Inject
-	Provider<MessageSender> messageSender;
-
-	@Inject
+	@SingletonDependency
 	MessageSetObjectHelper messageSetHelper;
 
-	@Inject
+	@SingletonDependency
 	MessageSetLogic messageSetLogic;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	PhotoGrabberRequestObjectHelper photoGrabberRequestHelper;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <SmsMessageSender> messageSenderProvider;
 
 	// properties
 
@@ -268,7 +271,7 @@ class PhotoGrabberCommand
 				photoGrabberRequest.getCode ());
 
 		MessageRec billedMessage =
-			messageSender.get ()
+			messageSenderProvider.get ()
 
 			.threadId (
 				message.getThreadId ())

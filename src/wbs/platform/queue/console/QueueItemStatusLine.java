@@ -1,31 +1,32 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.ConcurrentUtils.futureValue;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TimeUtils.laterThan;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.thread.ConcurrentUtils.futureValue;
+import static wbs.utils.time.TimeUtils.laterThan;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.joda.time.Duration;
-import org.joda.time.Instant;
 
 import lombok.Cleanup;
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.tools.EasyReadWriteLock;
 import wbs.framework.component.tools.EasyReadWriteLock.HeldLock;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.utils.ThreadManager;
 import wbs.platform.queue.logic.DummyQueueCache;
 import wbs.platform.queue.logic.MasterQueueCache;
 import wbs.platform.queue.logic.QueueCache;
@@ -33,6 +34,7 @@ import wbs.platform.status.console.StatusLine;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
+import wbs.utils.thread.ThreadManager;
 
 @SingletonComponent ("queueItemStatusLine")
 public
@@ -58,34 +60,34 @@ class QueueItemStatusLine
 
 	// dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DummyQueueCache dummyQueueCache;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	ThreadManager threadManager;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleHelper userHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MasterQueueCache> masterQueueCacheProvider;
+	@PrototypeDependency
+	Provider <MasterQueueCache> masterQueueCacheProvider;
 
-	@Inject
-	Provider<QueueItemsStatusLinePart> queueItemsStatusLinePart;
+	@PrototypeDependency
+	Provider <QueueItemsStatusLinePart> queueItemsStatusLinePart;
 
-	@Inject
-	Provider<QueueSubjectSorter> queueSubjectSorterProvider;
+	@PrototypeDependency
+	Provider <QueueSubjectSorter> queueSubjectSorterProvider;
 
 	// state
 
@@ -94,7 +96,7 @@ class QueueItemStatusLine
 
 	Thread backgroundThread;
 
-	ConcurrentMap<Long,UserData> userDatas =
+	ConcurrentMap <Long, UserData> userDatas =
 		new ConcurrentHashMap<> ();
 
 	Instant lastUpdate;
@@ -119,7 +121,7 @@ class QueueItemStatusLine
 
 	// life cycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void setup () {
 

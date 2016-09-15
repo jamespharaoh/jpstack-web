@@ -1,23 +1,23 @@
 package wbs.platform.object.search;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TypeUtils.classForName;
-import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.etc.TypeUtils.classForName;
+import static wbs.utils.etc.TypeUtils.classForNameRequired;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collections;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
@@ -37,6 +37,8 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
@@ -44,43 +46,43 @@ import wbs.framework.web.Responder;
 @PrototypeComponent ("objectSearchPageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectSearchPageBuilder<
-	ObjectType extends Record<ObjectType>
+class ObjectSearchPageBuilder <
+	ObjectType extends Record <ObjectType>
 > {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
 
-	@Inject
+	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ConsoleFile> consoleFile;
+	@PrototypeDependency
+	Provider <ConsoleFile> consoleFile;
 
-	@Inject
-	Provider<ConsoleContextTab> contextTab;
+	@PrototypeDependency
+	Provider <ConsoleContextTab> contextTab;
 
-	@Inject
-	Provider<TabContextResponder> tabContextResponder;
+	@PrototypeDependency
+	Provider <TabContextResponder> tabContextResponder;
 
-	@Inject
-	Provider<ObjectSearchGetAction> objectSearchGetAction;
+	@PrototypeDependency
+	Provider <ObjectSearchGetAction> objectSearchGetAction;
 
-	@Inject
-	Provider<ObjectSearchPart> objectSearchPart;
+	@PrototypeDependency
+	Provider <ObjectSearchPart> objectSearchPart;
 
-	@Inject
-	Provider<ObjectSearchPostAction> objectSearchPostAction;
+	@PrototypeDependency
+	Provider <ObjectSearchPostAction> objectSearchPostAction;
 
-	@Inject
-	Provider<ObjectSearchResultsPart> objectSearchResultsPart;
+	@PrototypeDependency
+	Provider <ObjectSearchResultsPart> objectSearchResultsPart;
 
 	// builder
 

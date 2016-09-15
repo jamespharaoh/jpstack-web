@@ -1,16 +1,18 @@
 package wbs.console.reporting;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("unaryStatsGrouper")
@@ -33,11 +35,12 @@ class UnaryStatsGrouper
 
 	@Override
 	public
-	String tdForGroup (
-			Object group) {
+	void writeTdForGroup (
+			@NonNull FormatWriter formatWriter,
+			@NonNull Object group) {
 
-		return stringFormat (
-			"<td>%h</td>\n",
+		htmlTableCellWrite (
+			formatWriter,
 			label);
 
 	}

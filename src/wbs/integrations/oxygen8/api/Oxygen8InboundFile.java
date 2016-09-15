@@ -1,7 +1,7 @@
 package wbs.integrations.oxygen8.api;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.framework.utils.etc.OptionalUtils.optionalValueEqualSafe;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalValueEqualSafe;
 
 import java.io.IOException;
 

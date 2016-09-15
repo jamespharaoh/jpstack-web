@@ -6,8 +6,9 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.GenericConfigLoader;
-import wbs.framework.utils.ThreadManager;
-import wbs.framework.utils.ThreadManagerImplementation;
+import wbs.framework.component.config.WbsSpecialConfig;
+import wbs.utils.thread.ThreadManager;
+import wbs.utils.thread.ThreadManagerImplementation;
 
 @SingletonComponent ("fixturesComponents")
 public
@@ -45,6 +46,17 @@ class FixturesComponents {
 	ThreadManager threadManager () {
 
 		return threadManagerImplemetationProvider.get ();
+
+	}
+
+	@SingletonComponent ("wbsSpecialConfig")
+	public
+	WbsSpecialConfig wbsSpecialConfig () {
+
+		return new WbsSpecialConfig ()
+
+			.assumeNegativeCache (
+				true);
 
 	}
 

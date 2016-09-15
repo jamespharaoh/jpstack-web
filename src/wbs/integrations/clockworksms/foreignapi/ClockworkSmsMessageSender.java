@@ -1,10 +1,10 @@
 package wbs.integrations.clockworksms.foreignapi;
 
-import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
-import static wbs.framework.utils.etc.EnumUtils.enumNotEqualSafe;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
+import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringToUtf8;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataToXml;
-import wbs.framework.utils.etc.RuntimeIoException;
+import wbs.utils.io.RuntimeIoException;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("clockworkSmsMessageSender")

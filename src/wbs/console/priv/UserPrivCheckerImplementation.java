@@ -3,7 +3,6 @@ package wbs.console.priv;
 import java.util.Collection;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Provider;
 
 import lombok.NonNull;
@@ -11,6 +10,7 @@ import lombok.experimental.Accessors;
 
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.ProxiedRequestComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -47,7 +47,7 @@ class UserPrivCheckerImplementation
 
 	// lifecycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 

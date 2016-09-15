@@ -1,7 +1,7 @@
 package wbs.platform.core.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringInSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringInSafe;
 
 import lombok.Cleanup;
 import lombok.NonNull;

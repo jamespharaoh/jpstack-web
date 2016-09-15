@@ -1,23 +1,25 @@
 package wbs.test.simulator.console;
 
-import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.json.simple.JSONValue;
 
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
+
+import org.json.simple.JSONValue;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.web.JsonResponder;
@@ -31,24 +33,24 @@ public
 class SimulatorSessionPollAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	SimulatorEventObjectHelper simulatorEventHelper;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<JsonResponder> jsonResponderProvider;
+	@PrototypeDependency
+	Provider <JsonResponder> jsonResponderProvider;
 
 	// details
 

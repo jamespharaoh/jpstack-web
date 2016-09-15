@@ -1,6 +1,6 @@
 package wbs.platform.exception.logic;
 
-import static wbs.framework.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 
 import java.util.Map;
 

@@ -1,18 +1,18 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.MapUtils.mapItemForKey;
-import static wbs.framework.utils.etc.MapUtils.mapItemForKeyOrThrow;
-import static wbs.framework.utils.etc.MapUtils.mapWithDerivedKey;
-import static wbs.framework.utils.etc.Misc.doNothing;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringSplitFullStop;
-import static wbs.framework.utils.etc.StringUtils.stringStartsWithSimple;
-import static wbs.framework.utils.etc.TypeUtils.isSubclassOf;
+import static wbs.utils.collection.MapUtils.mapItemForKey;
+import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
+import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
+import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.TypeUtils.isSubclassOf;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringSplitFullStop;
+import static wbs.utils.string.StringUtils.stringStartsWithSimple;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
@@ -33,13 +32,14 @@ import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @SingletonComponent ("objectManager")
@@ -74,7 +74,7 @@ class ObjectManagerImplementation
 
 	// init
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 
@@ -750,7 +750,7 @@ class ObjectManagerImplementation
 			} else {
 
 				object =
-					BeanLogic.getProperty (
+					PropertyUtils.getProperty (
 						object,
 						pathPart);
 
@@ -856,7 +856,7 @@ class ObjectManagerImplementation
 
 				objectClass =
 					Optional.of (
-						BeanLogic.propertyClassForClass (
+						PropertyUtils.propertyClassForClass (
 							objectClass.get (),
 							pathPart));
 

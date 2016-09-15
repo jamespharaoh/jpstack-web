@@ -1,6 +1,6 @@
 package wbs.platform.user.console;
 
-import static wbs.framework.utils.etc.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,13 +9,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
-
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.group.model.GroupRec;
@@ -29,19 +28,25 @@ public
 class UserPrivsSummaryPart
 	extends AbstractPagePart {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
-	Set<PrivStuff> privStuffs;
+	// state
+
+	Set <PrivStuff> privStuffs;
+
+	// implementation
 
 	@Override
 	public

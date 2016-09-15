@@ -1,30 +1,30 @@
 package wbs.smsapps.manualresponder.console;
 
-import javax.inject.Inject;
-
 import lombok.NonNull;
+
 import wbs.console.helper.ConsoleHooks;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.utils.RandomLogic;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.event.logic.EventLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberSearch;
+import wbs.utils.random.RandomLogic;
 
 @SingletonComponent ("manualResponderNumberConsoleHooks")
 public
 class ManualResponderNumberConsoleHooks
-	implements ConsoleHooks<ManualResponderNumberRec> {
+	implements ConsoleHooks <ManualResponderNumberRec> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	EventLogic eventLogic;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// implementation

@@ -1,5 +1,7 @@
 package wbs.console.request;
 
+import static wbs.utils.string.StringUtils.stringFormatArray;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,9 +17,11 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItem;
-
 import com.google.common.base.Optional;
+
+import lombok.NonNull;
+
+import org.apache.commons.fileupload.FileItem;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
@@ -25,6 +29,7 @@ import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;
 import wbs.console.tab.TabList;
 import wbs.framework.entity.record.Record;
+import wbs.utils.string.FormatWriter;
 
 public
 interface ConsoleRequestContext {
@@ -50,6 +55,16 @@ interface ConsoleRequestContext {
 
 	void addScript (
 			String script);
+
+	default
+	void addScriptFormat (
+			@NonNull Object ... arguments) {
+
+		addScript (
+			stringFormatArray (
+				arguments));
+
+	}
 
 	void addWarning (
 			String message);
@@ -85,7 +100,7 @@ interface ConsoleRequestContext {
 	void flushNotices ();
 
 	void flushNotices (
-			PrintWriter out);
+			FormatWriter formatWriter);
 
 	PrintWriter writer ();
 
@@ -94,42 +109,14 @@ interface ConsoleRequestContext {
 	Object context (
 			String key);
 
-	List<String> getParameterValues (
+	List <String> getParameterValues (
 			String name);
 
-	Map<String,String> requestFormData ();
+	Map <String, String> requestFormData ();
 
 	void formData (
 			String name,
 			String value);
-
-	@Deprecated
-	String magicTdCheck (
-			String name,
-			String label,
-			boolean value,
-			int colspan);
-
-	@Deprecated
-	String magicTdCheck (
-			String name,
-			String label,
-			boolean value);
-
-	@Deprecated
-	void magicTdRadio (
-			String name,
-			String value,
-			String label,
-			boolean selected,
-			Map<String,Object> options);
-
-	@Deprecated
-	void magicTdRadio (
-			String name,
-			String value,
-			String label,
-			boolean selected);
 
 	TabContext setTabContext (
 			TabContext tabContext);

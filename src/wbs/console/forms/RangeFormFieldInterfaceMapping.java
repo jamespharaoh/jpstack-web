@@ -1,10 +1,12 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.errorResult;
-import static wbs.framework.utils.etc.Misc.getError;
-import static wbs.framework.utils.etc.Misc.getValue;
-import static wbs.framework.utils.etc.Misc.isError;
-import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.utils.etc.Misc.errorResult;
+import static wbs.utils.etc.Misc.getError;
+import static wbs.utils.etc.Misc.getValue;
+import static wbs.utils.etc.Misc.isError;
+import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 import java.util.Map;
 
@@ -20,9 +22,6 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import com.google.common.base.Optional;
 
 import fj.data.Either;
-
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("rangeFormFieldInterfaceMapping")

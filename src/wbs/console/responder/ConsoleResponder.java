@@ -1,5 +1,7 @@
 package wbs.console.responder;
 
+import static wbs.utils.etc.Misc.doNothing;
+
 import java.io.IOException;
 
 import wbs.framework.component.annotations.SingletonDependency;
@@ -42,16 +44,23 @@ class ConsoleResponder
 		throws IOException {
 	}
 
+	protected
+	void cleanup () {
+		doNothing ();
+	}
+
 	@Override
 	public final
 	void execute ()
 		throws IOException {
 
 		try (
+
 			Transaction transaction =
 				database.beginReadOnly (
 					"ConsoleResponder.execute ()",
 					this)
+
 		) {
 
 			this.transaction =
@@ -66,6 +75,8 @@ class ConsoleResponder
 
 			this.transaction =
 				null;
+
+			cleanup ();
 
 		}
 

@@ -1,6 +1,6 @@
 package wbs.console.module;
 
-import static wbs.framework.utils.etc.StringUtils.hyphenToCamel;
+import static wbs.utils.string.StringUtils.hyphenToCamel;
 
 import javax.inject.Named;
 import javax.inject.Provider;

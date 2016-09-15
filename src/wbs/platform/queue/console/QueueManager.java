@@ -1,23 +1,25 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.joda.time.Duration;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
+import org.joda.time.Duration;
+
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.metamodel.QueueTypeSpec;
@@ -31,35 +33,35 @@ import wbs.platform.queue.model.QueueTypeRec;
 public
 class QueueManager {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	QueueConsoleLogic queueConsoleLogic;
 
-	// collection dependencies
+	// prototype dependencies
 
-	@Inject
-	Map<String,Provider<QueueConsolePlugin>> queueHelpersByBeanName =
+	@PrototypeDependency
+	Map <String, Provider <QueueConsolePlugin>> queueHelpersByBeanName =
 		Collections.emptyMap ();
 
 	// state
 
-	Map<String,QueueConsolePlugin> queueHelpers =
-		new HashMap<String,QueueConsolePlugin>();
+	Map <String, QueueConsolePlugin> queueHelpers =
+		new HashMap<> ();
 
 	// lifecycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 
 		// initialise queuePageFactories by querying each factory
 
 		for (
-			Map.Entry<String,Provider<QueueConsolePlugin>> entry
+			Map.Entry <String, Provider <QueueConsolePlugin>> entry
 				: queueHelpersByBeanName.entrySet ()
 		) {
 

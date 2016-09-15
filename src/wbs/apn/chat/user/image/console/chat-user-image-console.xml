@@ -1,0 +1,73 @@
+<console-module
+	name="chat-user-image">
+
+	<extend-context
+		name="chatUser.images"
+		base-name="chatUser"
+		extension-point="chatUser.images"
+		object-name="chatUser">
+
+		<section
+			name="image"
+			alias-of="image"
+			label="Photos">
+
+			<context-stuff
+				name="chatUserImageType"
+				value="image"/>
+
+			<context-tab-action-page
+				name="list"/>
+
+			<context-tab-responder-page
+				name="history"/>
+
+			<context-tab-action-page
+				name="upload"/>
+
+			<context-tab-responder-page
+				name="view"
+				hide-tab="yes"/>
+
+		</section>
+
+		<section
+			name="video"
+			alias-of="image"
+			label="Videos">
+
+			<context-stuff
+				name="chatUserImageType"
+				value="video"/>
+
+			<context-tab-action-page
+				name="list"/>
+
+			<context-tab-responder-page
+				name="history"/>
+
+			<context-tab-action-page
+				name="upload"/>
+
+			<context-tab-responder-page
+				name="view"
+				hide-tab="yes"/>
+
+		</section>
+
+	</extend-context>
+
+	<field-set
+		name="uploadForm"
+		class="wbs.apn.chat.user.image.console.ChatUserImageUploadForm">
+
+		<upload-field
+			name="upload"
+			label="File to upload"/>
+
+		<yes-no-field
+			name="setAsPrimary"/>
+
+	</field-set>
+
+</console-module>

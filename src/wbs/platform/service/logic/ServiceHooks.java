@@ -1,20 +1,20 @@
 package wbs.platform.service.logic;
 
-import static wbs.framework.utils.etc.Misc.doesNotContain;
+import static wbs.utils.etc.Misc.doesNotContain;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
+
+import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
@@ -30,32 +30,30 @@ import wbs.platform.service.model.ServiceTypeRec;
 
 public
 class ServiceHooks
-	implements ObjectHooks<ServiceRec> {
+	implements ObjectHooks <ServiceRec> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@WeakSingletonDependency
+	ObjectManager objectManager;
+
+	@SingletonDependency
 	ObjectTypeDao objectTypeDao;
 
-	@Inject
+	@SingletonDependency
 	ServiceTypeDao serviceTypeDao;
-
-	// indirect dependencies
-
-	@Inject
-	Provider<ObjectManager> objectManagerProvider;
 
 	// state
 
-	Map<Long,List<Long>> serviceTypeIdsByParentTypeId =
+	Map <Long, List <Long>> serviceTypeIdsByParentTypeId =
 		new HashMap<> ();
 
 	// lifecycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 
@@ -105,9 +103,6 @@ class ServiceHooks
 		) {
 			return;
 		}
-
-		ObjectManager objectManager =
-		   objectManagerProvider.get ();
 
 		Optional <SliceRec> slice =
 			objectManager.getAncestor (

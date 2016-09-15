@@ -1,9 +1,9 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.string.StringUtils.capitalise;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("textFormFieldBuilder")
@@ -130,7 +130,7 @@ class TextFormFieldBuilder {
 		if (! dynamic) {
 
 			propertyClass =
-				BeanLogic.propertyClassForClass (
+				PropertyUtils.propertyClassForClass (
 					context.containerClass (),
 					fieldName);
 

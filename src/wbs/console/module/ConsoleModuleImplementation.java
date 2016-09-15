@@ -1,7 +1,7 @@
 package wbs.console.module;
 
-import static wbs.framework.utils.etc.Misc.contains;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -1,8 +1,8 @@
 package wbs.console.tab;
 
-import static wbs.framework.utils.etc.StringUtils.joinWithSemicolonAndSpace;
-import static wbs.framework.utils.etc.StringUtils.joinWithoutSeparator;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
+import static wbs.utils.string.StringUtils.joinWithoutSeparator;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -312,7 +312,7 @@ class TabbedResponder
 				"margin-bottom: 1ex"));
 
 		requestContext.flushNotices (
-			printWriter);
+			formatWriter);
 
 		if (pagePartThrew != null) {
 

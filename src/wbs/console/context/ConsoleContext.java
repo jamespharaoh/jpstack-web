@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -15,8 +13,8 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabList;
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.web.PageNotFoundException;
 import wbs.framework.web.WebFile;
 
@@ -30,10 +28,8 @@ class ConsoleContext
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	// prototype dependencies
-
-	@PrototypeDependency
-	Provider <ConsoleManager> consoleManager;
+	@WeakSingletonDependency
+	ConsoleManager consoleManager;
 
 	// properties
 
@@ -184,7 +180,7 @@ class ConsoleContext
 			return null;
 
 		ConsoleContext parentContext =
-			consoleManager.get ().context (
+			consoleManager.context (
 				parentContextName (),
 				true);
 
@@ -196,7 +192,7 @@ class ConsoleContext
 	ConsoleContextTab parentContextTab (
 			ConsoleContextStuff stuff) {
 
-		return consoleManager.get ().tab (
+		return consoleManager.tab (
 			parentContextTabName (),
 			true);
 

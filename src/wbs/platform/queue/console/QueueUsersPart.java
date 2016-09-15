@@ -1,6 +1,18 @@
 package wbs.platform.queue.console;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceEqualWithClass;
+import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlUtils.htmlFormClose;
+import static wbs.utils.web.HtmlUtils.htmlFormOpenMethodAction;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,46 +20,47 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.joda.time.Instant;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
+import org.joda.time.Instant;
+
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.TimeFormatter;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimRec;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
+import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("queueUsersPart")
 public
 class QueueUsersPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	QueueItemClaimObjectHelper queueItemClaimHelper;
 
-	@Inject
+	@SingletonDependency
 	TimeFormatter timeFormatter;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// state
@@ -121,35 +134,33 @@ class QueueUsersPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlTableOpenList ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>User</th>\n",
-			"<th>Items</th>\n",
-			"<th>Oldest</th>\n",
-			"<th>Reclaim</th>\n",
-			"<th>Unclaim</th>\n",
-			"</tr>\n");
+		htmlTableHeaderRowWrite (
+			"User",
+			"Items",
+			"Oldest",
+			"Reclaim",
+			"Unclaim");
 
-		for (UserData userData
-				: userDatas) {
+		for (
+			UserData userData
+				: userDatas
+		) {
 
-			printFormat (
-				"<tr>\n");
+			htmlTableRowOpen ();
 
-			printFormat (
-				"%s\n",
-				objectManager.tdForObjectMiniLink (
-					userData.user));
+			objectManager.writeTdForObjectMiniLink (
+				userData.user);
 
-			printFormat (
-				"<td align=\"right\">%s</td>\n",
-				userData.count);
+			htmlTableCellWrite (
+				integerToDecimalString (
+					userData.count),
+				htmlAttribute (
+					"align",
+					"right"));
 
-			printFormat (
-				"<td>%s</td>\n",
+			htmlTableCellWrite (
 				timeFormatter.prettyDuration (
 					userData.oldest,
 					transaction.now ()));
@@ -161,45 +172,71 @@ class QueueUsersPart
 					userConsoleLogic.userRequired ())
 			) {
 
-				printFormat (
-					"<td></td>\n");
+				htmlTableCellWrite (
+					"");
 
 			} else {
 
-				printFormat (
-					"<td>",
+				htmlTableCellOpen ();
 
-					"<form method=\"post\" action=\"%h\">",
-					 requestContext.resolveLocalUrl ("/queue.users"),
+				htmlFormOpenMethodAction (
+					"post",
+					 requestContext.resolveLocalUrl (
+					 	"/queue.users"));
 
-					"<input type=\"hidden\" name=\"userId\" value=\"%h\">",
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"hidden\"",
+					" name=\"userId\"",
+					" value=\"%h\"",
 					userData.user.getId (),
+					">");
 
-					"<input type=\"submit\" name=\"reclaim\" value=\"reclaim\">",
+				formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"reclaim\"",
+					" value=\"reclaim\"",
+					">");
 
-					"</form></td>\n");
+				htmlFormClose ();
+
+				htmlTableCellClose ();
 
 			}
 
-			printFormat (
-				"<td>",
+			htmlTableCellOpen ();
 
-				"<form method=\"post\" action=\"%h\">",
-				requestContext.resolveLocalUrl ("/queue.users"),
+			htmlFormOpenMethodAction (
+				"post",
+				requestContext.resolveLocalUrl (
+					"/queue.users"));
 
-				"<input type=\"hidden\" name=\"userId\" value=\"%h\">",
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"hidden\"",
+				" name=\"userId\"",
+				" value=\"%h\"",
 				userData.user.getId (),
+				">");
 
-				"<input type=\"submit\" name=\"unclaim\" value=\"unclaim\">\n",
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"submit\"",
+				" name=\"unclaim\"",
+				" value=\"unclaim\"",
+				">");
 
-				"</form></td>\n",
 
-				"</tr>\n");
+			htmlFormClose ();
+
+			htmlTableCellClose ();
+
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
@@ -211,7 +248,7 @@ class QueueUsersPart
 
 		UserRec user;
 		Instant oldest;
-		int count;
+		long count;
 
 		@Override
 		public

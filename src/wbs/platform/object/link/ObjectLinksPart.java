@@ -4,14 +4,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
+import javax.inject.Provider;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.forms.FormFieldLogic;
@@ -21,9 +21,12 @@ import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
 import wbs.platform.user.model.UserObjectHelper;
+import wbs.utils.etc.PropertyUtils;
+import wbs.utils.web.HtmlTableCheckWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectLinksPart")
@@ -31,16 +34,21 @@ public
 class ObjectLinksPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <HtmlTableCheckWriter> htmlTableCheckWriterProvider;
 
 	// properties
 
@@ -61,14 +69,14 @@ class ObjectLinksPart
 
 	// state
 
-	Record<?> contextObject;
-	Set<?> contextLinks;
+	Record <?> contextObject;
+	Set <?> contextLinks;
 
-	List<? extends Record<?>> targetObjects;
+	List <? extends Record <?>> targetObjects;
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 		return scriptRefs;
 	}
 
@@ -81,8 +89,8 @@ class ObjectLinksPart
 				requestContext.contextStuff ());
 
 		contextLinks =
-			(Set<?>)
-			BeanLogic.getProperty (
+			(Set <?>)
+			PropertyUtils.getProperty (
 				contextObject,
 				contextLinksField);
 
@@ -139,6 +147,8 @@ class ObjectLinksPart
 			printFormat (
 				"<tr>\n");
 
+			formatWriter.increaseIndent ();
+
 			formFieldLogic.outputTableCellsList (
 				formatWriter,
 				formFieldSet,
@@ -146,14 +156,24 @@ class ObjectLinksPart
 				ImmutableMap.of (),
 				true);
 
-			printFormat (
-				"%s\n",
-				requestContext.magicTdCheck (
-					"link_" + targetObject.getId (),
-					"member",
-					contextLinks.contains (
-						targetObject)),
+			htmlTableCheckWriterProvider.get ()
 
+				.name (
+					"link_" + targetObject.getId ())
+
+				.label (
+					"member")
+
+				.value (
+					contextLinks.contains (
+						targetObject))
+
+				.write (
+					formatWriter);
+
+			formatWriter.decreaseIndent ();
+
+			printFormat (
 				"</tr>\n");
 
 		}

@@ -1,9 +1,11 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.TypeUtils.classEqualSafe;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.TypeUtils.classEqualSafe;
+import static wbs.utils.etc.TypeUtils.classNameFull;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +26,8 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.utils.TextualInterval;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
+import wbs.utils.time.TextualInterval;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("intervalFormFieldBuilder")
@@ -154,7 +156,7 @@ class IntervalFormFieldBuilder {
 
 			propertyClass =
 				Optional.of (
-					BeanLogic.propertyClassForClass (
+					PropertyUtils.propertyClassForClass (
 						context.containerClass (),
 						fieldName));
 
@@ -193,7 +195,11 @@ class IntervalFormFieldBuilder {
 
 		} else {
 
-			throw new RuntimeException ();
+			throw new RuntimeException (
+				stringFormat (
+					"Don't know how to map %s",
+					classNameFull (
+						propertyClass.get ())));
 
 		}
 

@@ -1,9 +1,9 @@
 package wbs.framework.data.tools;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
-import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.camelToHyphen;
+import static wbs.utils.string.StringUtils.nullIfEmptyString;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

@@ -1,13 +1,13 @@
 package wbs.platform.queue.console;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
+
 import wbs.console.helper.ConsoleHooks;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.queue.model.QueueItemRec;
@@ -17,17 +17,17 @@ import wbs.platform.queue.model.QueueRec;
 @SingletonComponent ("queueItemConsoleHooks")
 public
 class QueueItemConsoleHooks
-	implements ConsoleHooks<QueueItemRec> {
+	implements ConsoleHooks <QueueItemRec> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	QueueConsoleHelper queueHelper;
 
 	// implementation

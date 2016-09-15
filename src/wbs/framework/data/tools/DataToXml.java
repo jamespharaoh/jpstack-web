@@ -1,15 +1,15 @@
 package wbs.framework.data.tools;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
-import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.MapUtils.mapIsEmpty;
-import static wbs.framework.utils.etc.Misc.booleanToYesNo;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.camelToHyphen;
-import static wbs.framework.utils.etc.StringUtils.nullIfEmptyString;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.MapUtils.mapIsEmpty;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.Misc.booleanToYesNo;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.camelToHyphen;
+import static wbs.utils.string.StringUtils.nullIfEmptyString;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -40,8 +40,8 @@ import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataName;
 import wbs.framework.data.annotations.DataReference;
-import wbs.framework.utils.etc.BeanLogic;
-import wbs.framework.utils.etc.RuntimeIoException;
+import wbs.utils.etc.PropertyUtils;
+import wbs.utils.io.RuntimeIoException;
 
 @Accessors (fluent = true)
 public
@@ -256,7 +256,7 @@ class DataToXml {
 							field.getName ());
 
 					Object attributeValueObject =
-						BeanLogic.get (
+						PropertyUtils.get (
 							object,
 							field.getName ());
 
@@ -276,7 +276,7 @@ class DataToXml {
 							field.getName ());
 
 					Object attributeValueObject =
-						BeanLogic.get (
+						PropertyUtils.get (
 							object,
 							field.getName ());
 
@@ -307,7 +307,7 @@ class DataToXml {
 								field.getName ()));
 
 					Object childValueObject =
-						BeanLogic.get (
+						PropertyUtils.get (
 							object,
 							field.getName ());
 
@@ -334,7 +334,7 @@ class DataToXml {
 				if (annotation instanceof DataChildren) {
 
 					Object children =
-						BeanLogic.get (
+						PropertyUtils.get (
 							object,
 							field.getName ());
 
@@ -373,7 +373,7 @@ class DataToXml {
 							field.getName ());
 
 					Object referencedObject =
-						BeanLogic.get (
+						PropertyUtils.get (
 							object,
 							field.getName ());
 
@@ -539,7 +539,7 @@ class DataToXml {
 					continue;
 
 				Object nameValueObject =
-					BeanLogic.get (
+					PropertyUtils.get (
 						object,
 						field.getName ());
 

@@ -1,31 +1,26 @@
 package wbs.platform.object.search;
 
-import static wbs.framework.utils.etc.CollectionUtils.listSlice;
-import static wbs.framework.utils.etc.Misc.getMethodRequired;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.methodInvoke;
-import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIf;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.framework.utils.etc.OptionalUtils.presentInstances;
-import static wbs.framework.utils.etc.StringUtils.joinWithSpace;
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TimeUtils.localDateNotEqual;
-import static wbs.framework.utils.etc.TypeUtils.classEqualSafe;
-import static wbs.framework.utils.etc.TypeUtils.isNotInstanceOf;
+import static wbs.utils.collection.CollectionUtils.listSlice;
+import static wbs.utils.etc.Misc.getMethodRequired;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.methodInvoke;
+import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIf;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.etc.TypeUtils.classEqualSafe;
+import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
+import static wbs.utils.string.StringUtils.joinWithSpace;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.time.TimeUtils.localDateNotEqual;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
-import javax.inject.Inject;
-
-import org.joda.time.Instant;
-import org.joda.time.LocalDate;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -36,6 +31,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.joda.time.Instant;
+import org.joda.time.LocalDate;
+
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.forms.FormFieldLogic;
@@ -49,10 +48,11 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.etc.BeanLogic;
 import wbs.platform.user.console.UserConsoleLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchResultsPart")
@@ -60,24 +60,24 @@ public
 class ObjectSearchResultsPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleManager consoleManager;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
-	@Inject
+	@SingletonDependency
 	ConsoleObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper <?> consoleHelper;
 
 	@Getter @Setter
 	FormFieldSet formFieldSet;
@@ -86,7 +86,7 @@ class ObjectSearchResultsPart
 	FormFieldSet rowsFormFieldSet;
 
 	@Getter @Setter
-	Class<?> resultsClass;
+	Class <?> resultsClass;
 
 	@Getter @Setter
 	String resultsDaoMethodName;
@@ -454,7 +454,7 @@ class ObjectSearchResultsPart
 
 				Instant rowTimestamp =
 					(Instant)
-					BeanLogic.getProperty (
+					PropertyUtils.getProperty (
 						object,
 						consoleHelper.timestampField ().name ());
 

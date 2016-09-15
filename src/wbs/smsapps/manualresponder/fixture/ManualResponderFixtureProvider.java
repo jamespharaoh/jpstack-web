@@ -1,8 +1,7 @@
 package wbs.smsapps.manualresponder.fixture;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
@@ -25,45 +24,45 @@ public
 class ManualResponderFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	CurrencyObjectHelper currencyHelper;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	KeywordObjectHelper keywordHelper;
 
-	@Inject
+	@SingletonDependency
 	KeywordSetObjectHelper keywordSetHelper;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderObjectHelper manualResponderHelper;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderTemplateObjectHelper manualResponderTemplateHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuItemObjectHelper menuItemHelper;
 
-	@Inject
+	@SingletonDependency
 	RouteObjectHelper routeHelper;
 
-	@Inject
+	@SingletonDependency
 	RouterObjectHelper routerHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
-	@Inject
+	@SingletonDependency
 	SmsCustomerManagerObjectHelper smsCustomerManagerHelper;
 
 	// implementation

@@ -1,14 +1,14 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.LogicUtils.ifThenElse;
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.toEnum;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.NullUtils.ifNullThenRequired;
-import static wbs.framework.utils.etc.StringUtils.camelToSpaces;
-import static wbs.framework.utils.etc.StringUtils.capitalise;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.uncapitalise;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.toEnum;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NullUtils.ifNullThenRequired;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.uncapitalise;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
-import wbs.framework.utils.etc.BeanLogic;
+import wbs.utils.etc.PropertyUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("enumFormFieldBuilder")
@@ -130,7 +130,7 @@ class EnumFormFieldBuilder {
 				false);
 
 		Class <?> propertyClass =
-			BeanLogic.propertyClassForClass (
+			PropertyUtils.propertyClassForClass (
 				context.containerClass (),
 				name);
 

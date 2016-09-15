@@ -1,7 +1,7 @@
 package wbs.framework.component.tools;
 
-import static wbs.framework.utils.etc.StringUtils.stringEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

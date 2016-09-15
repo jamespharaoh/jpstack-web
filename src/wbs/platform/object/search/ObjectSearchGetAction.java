@@ -1,10 +1,8 @@
 package wbs.platform.object.search;
 
-import static wbs.framework.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.isNull;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +11,7 @@ import lombok.experimental.Accessors;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.Responder;
 
 @Accessors (fluent = true)
@@ -21,9 +20,9 @@ public
 class ObjectSearchGetAction
 	extends ConsoleAction {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	// properties

@@ -1,7 +1,7 @@
 package wbs.platform.exception.console;
 
-import static wbs.framework.utils.etc.ConcurrentUtils.futureValue;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.thread.ConcurrentUtils.futureValue;
 
 import java.util.concurrent.Future;
 

@@ -1,12 +1,12 @@
 package wbs.framework.logging;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.NumberUtils.equalToZero;
-import static wbs.framework.utils.etc.NumberUtils.moreThanZero;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringFormatArray;
-
 import org.apache.log4j.Logger;
+
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.equalToZero;
+import static wbs.utils.etc.NumberUtils.moreThanZero;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import lombok.Getter;
 import lombok.NonNull;

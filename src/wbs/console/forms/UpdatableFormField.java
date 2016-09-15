@@ -1,20 +1,20 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionHasOneElement;
-import static wbs.framework.utils.etc.CollectionUtils.collectionHasTwoElements;
-import static wbs.framework.utils.etc.Misc.eitherGetLeft;
-import static wbs.framework.utils.etc.Misc.getError;
-import static wbs.framework.utils.etc.Misc.getValue;
-import static wbs.framework.utils.etc.Misc.isError;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.Misc.isRight;
-import static wbs.framework.utils.etc.Misc.requiredValue;
-import static wbs.framework.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOr;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringSplitColon;
+import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.etc.Misc.eitherGetLeft;
+import static wbs.utils.etc.Misc.getError;
+import static wbs.utils.etc.Misc.getValue;
+import static wbs.utils.etc.Misc.isError;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.isRight;
+import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOr;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringSplitColon;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -37,7 +37,7 @@ import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.FormatWriter;
 
 import fj.data.Either;
 
@@ -190,8 +190,8 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
-			boolean link,
-			int colspan) {
+			@NonNull Boolean link,
+			@NonNull Long columnSpan) {
 
 		Optional<Native> nativeValue =
 			requiredValue (
@@ -218,7 +218,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			hints,
 			interfaceValue,
 			link,
-			colspan);
+			columnSpan);
 
 	}
 
@@ -254,7 +254,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			hints,
 			interfaceValue,
 			true,
-			1);
+			1l);
 
 	}
 

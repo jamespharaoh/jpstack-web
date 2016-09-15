@@ -1,7 +1,7 @@
 package wbs.framework.entity.generate;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionSize;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 

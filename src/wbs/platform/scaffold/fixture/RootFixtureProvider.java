@@ -1,23 +1,22 @@
 package wbs.platform.scaffold.fixture;
 
-import javax.inject.Inject;
-
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.fixtures.FixtureProvider;
-import wbs.framework.utils.RandomLogic;
 import wbs.platform.scaffold.model.RootObjectHelper;
+import wbs.utils.random.RandomLogic;
 
 @PrototypeComponent ("rootFixtureProvider")
 public
 class RootFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	RootObjectHelper rootHelper;
 
 	// implementation

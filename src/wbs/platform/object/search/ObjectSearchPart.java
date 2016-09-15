@@ -1,14 +1,12 @@
 package wbs.platform.object.search;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalCast;
 
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
-
-import javax.inject.Inject;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -18,6 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
@@ -28,6 +27,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
@@ -36,21 +36,21 @@ public
 class ObjectSearchPart
 	extends AbstractPagePart {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleHelperRegistry consoleHelperRegistry;
 
-	@Inject
+	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper <?> consoleHelper;
 
 	@Getter @Setter
-	Class<?> searchClass;
+	Class <?> searchClass;
 
 	@Getter @Setter
 	String sessionKey;
@@ -64,14 +64,14 @@ class ObjectSearchPart
 	// state
 
 	Object search;
-	Optional<UpdateResultSet> updateResultSet;
-	Map<String,Object> formHints;
+	Optional <UpdateResultSet> updateResultSet;
+	Map <String, Object> formHints;
 
 	// details
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
 		return ImmutableSet.<ScriptRef>builder ()
 

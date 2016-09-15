@@ -1,7 +1,8 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.StringUtils.stringIsEmpty;
-import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 import java.util.Map;
 
@@ -12,8 +13,6 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import com.google.common.base.Optional;
 
 import fj.data.Either;
-
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 @PrototypeComponent ("doubleFormFieldInterfaceMapping")
 public

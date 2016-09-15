@@ -1,12 +1,8 @@
 package wbs.test.simulator.daemon;
 
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 import java.util.List;
-
-import javax.inject.Inject;
-
-import org.json.simple.JSONValue;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -17,7 +13,10 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import org.json.simple.JSONValue;
+
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.sms.message.core.model.MessageObjectHelper;
@@ -36,23 +35,23 @@ import wbs.test.simulator.model.SimulatorSessionObjectHelper;
 @SingletonComponent ("simulatorSender")
 public
 class SimulatorSenderHelper
-	implements SmsSenderHelper<State> {
+	implements SmsSenderHelper <State> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
-	@Inject
+	@SingletonDependency
 	SimulatorEventObjectHelper simulatorEventHelper;
 
-	@Inject
+	@SingletonDependency
 	SimulatorSessionObjectHelper simulatorSessionHelper;
 
-	@Inject
+	@SingletonDependency
 	SimulatorSessionNumberObjectHelper simulatorSessionNumberHelper;
 
 	// details

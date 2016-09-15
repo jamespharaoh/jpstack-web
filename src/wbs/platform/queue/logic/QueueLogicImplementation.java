@@ -1,27 +1,26 @@
 package wbs.platform.queue.logic;
 
-import static wbs.framework.utils.etc.EnumUtils.enumNotInSafe;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.NumberUtils.integerNotEqualSafe;
-import static wbs.framework.utils.etc.NumberUtils.toJavaIntegerRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.TimeUtils.laterThan;
+import static wbs.utils.etc.EnumUtils.enumNotInSafe;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.time.TimeUtils.laterThan;
 
 import java.util.List;
-
-import javax.inject.Inject;
-
-import org.joda.time.Duration;
-import org.joda.time.Instant;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
@@ -47,30 +46,30 @@ public
 class QueueLogicImplementation
 	implements QueueLogic {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeObjectHelper objectTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueObjectHelper queueHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueItemObjectHelper queueItemHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueSubjectObjectHelper queueSubjectHelper;
 
-	@Inject
+	@SingletonDependency
 	QueueTypeObjectHelper queueTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	SliceLogic sliceLogic;
 
 	// implementation

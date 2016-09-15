@@ -1,12 +1,16 @@
 package wbs.console.responder;
 
+import static wbs.utils.string.FormatWriterUtils.clearCurrentFormatWriter;
+import static wbs.utils.string.FormatWriterUtils.setCurrentFormatWriter;
+
 import java.io.IOException;
-import java.io.PrintWriter;
+
+import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.utils.formatwriter.FormatWriter;
-import wbs.framework.utils.formatwriter.WriterFormatWriter;
+import wbs.utils.string.FormatWriter;
+import wbs.utils.string.WriterFormatWriter;
 
 public abstract
 class ConsolePrintResponder
@@ -23,9 +27,6 @@ class ConsolePrintResponder
 	protected
 	FormatWriter formatWriter;
 
-	protected
-	PrintWriter printWriter;
-
 	// implenentation
 
 	@Override
@@ -33,18 +34,31 @@ class ConsolePrintResponder
 	void setup ()
 		throws IOException {
 
-		printWriter =
-			requestContext.writer ();
-
 		formatWriter =
 			new WriterFormatWriter (
-				printWriter);
+				requestContext.writer ())
+
+			.indentString (
+				"  ");
+
+		setCurrentFormatWriter (
+			formatWriter);
 
 	}
 
+	@Override
+	protected
+	void cleanup () {
+
+		clearCurrentFormatWriter (
+			formatWriter);
+
+	}
+
+	@Deprecated
 	protected
 	void printFormat (
-			Object... arguments) {
+			@NonNull Object ... arguments) {
 
 		formatWriter.writeFormatArray (
 			arguments);

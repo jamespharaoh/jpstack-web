@@ -1,10 +1,10 @@
 package wbs.integrations.broadcastsystems.daemon;
 
-import static wbs.framework.utils.etc.Misc.stringToUrl;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.StringUtils.stringNotEqualSafe;
-import static wbs.framework.utils.etc.StringUtils.stringToUtf8;
+import static wbs.utils.etc.Misc.stringToUrl;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringToUtf8;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -30,7 +30,6 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.etc.Html;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutRec;
 import wbs.platform.exception.logic.ExceptionLogLogic;
@@ -38,6 +37,7 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender2;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.utils.web.HtmlUtils;
 
 @SingletonComponent ("broadcastSystemsSender2")
 @Log4j
@@ -147,9 +147,9 @@ class BroadcastSystemsSender2
 				"%s/%u/SendUTF8/%s/%s/%s",
 				broadcastSystemsRouteOut.getBaseUrl (),
 				broadcastSystemsRouteOut.getToken (),
-				Html.urlPathElementEncode (
+				HtmlUtils.urlPathElementEncode (
 					message.getNumFrom ()),
-				Html.urlPathElementEncode (
+				HtmlUtils.urlPathElementEncode (
 					message.getNumTo ()),
 				Base64.encodeBase64String (
 					stringToUtf8 (

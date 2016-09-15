@@ -1,29 +1,30 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.framework.utils.etc.CollectionUtils.collectionIsEmpty;
-import static wbs.framework.utils.etc.ConcurrentUtils.futureValue;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.thread.ConcurrentUtils.futureValue;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.joda.time.Instant;
-import org.joda.time.Interval;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.joda.time.Instant;
+import org.joda.time.Interval;
+
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.utils.TextualInterval;
 import wbs.platform.misc.CachedGetter;
 import wbs.platform.status.console.StatusLine;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -31,33 +32,35 @@ import wbs.platform.user.model.UserObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderOperatorReport;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestSearch;
+import wbs.utils.time.TextualInterval;
 
 @SingletonComponent ("manualResponderStatusLine")
 public
 class ManualResponderStatusLine
 	implements StatusLine {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	ManualResponderRequestObjectHelper manualResponderRequestHelper;
 
-	@Inject
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
-	@Inject
+	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<ManualResponderStatusLinePart> manualResponderStatusLinePart;
+	@PrototypeDependency
+	Provider <ManualResponderStatusLinePart>
+	manualResponderStatusLinePartProvider;
 
 	// state
 
@@ -78,7 +81,7 @@ class ManualResponderStatusLine
 	public
 	PagePart get () {
 
-		return manualResponderStatusLinePart.get ();
+		return manualResponderStatusLinePartProvider.get ();
 
 	}
 

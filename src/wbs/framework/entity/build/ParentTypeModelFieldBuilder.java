@@ -1,7 +1,7 @@
 package wbs.framework.entity.build;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.TypeUtils.classForNameRequired;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.TypeUtils.classForNameRequired;
 
 import com.google.common.collect.ImmutableList;
 

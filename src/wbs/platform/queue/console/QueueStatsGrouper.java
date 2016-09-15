@@ -6,46 +6,53 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
+import lombok.NonNull;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsGrouper;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.queue.model.QueueRec;
+import wbs.utils.string.FormatWriter;
 
 @SingletonComponent ("queueStatsGrouper")
 public
 class QueueStatsGrouper
 	implements StatsGrouper {
 
-	@Inject
+	// singleton dependencies
+
+	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
 
-	@Inject
+	@SingletonDependency
 	QueueConsoleHelper queueHelper;
+
+	// implementation
 
 	@Override
 	public
-	Set<Object> getGroups (
-			StatsDataSet dataSet) {
+	Set <Object> getGroups (
+			@NonNull StatsDataSet dataSet) {
 
-		return new HashSet<Object> (
+		return new HashSet <Object> (
 			dataSet.indexValues ().get ("queueId"));
 
 	}
 
 	@Override
 	public
-	String tdForGroup (
-			Object group) {
+	void writeTdForGroup (
+			@NonNull FormatWriter formatWriter,
+			@NonNull Object group) {
 
 		QueueRec queue =
 			queueHelper.findRequired (
 				(Long)
 				group);
 
-		return consoleObjectManager.tdForObjectMiniLink (
+		consoleObjectManager.writeTdForObjectMiniLink (
 			queue);
 
 	}

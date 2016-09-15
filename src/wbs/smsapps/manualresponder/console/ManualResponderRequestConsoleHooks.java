@@ -1,13 +1,13 @@
 package wbs.smsapps.manualresponder.console;
 
-import javax.inject.Inject;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
+
 import wbs.console.helper.ConsoleHooks;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
@@ -20,18 +20,18 @@ public
 class ManualResponderRequestConsoleHooks
 	implements ConsoleHooks <ManualResponderRequestRec> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ManualResponderConsoleHelper manualResponderHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	UserPrivChecker privChecker;
 
-	@Inject
+	@SingletonDependency
 	UserConsoleHelper userHelper;
 
 	// implementation

@@ -1,6 +1,6 @@
 package wbs.integrations.digitalselect.api;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.util.Map;

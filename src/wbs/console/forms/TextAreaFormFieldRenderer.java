@@ -1,31 +1,31 @@
 package wbs.console.forms;
 
-import static wbs.framework.utils.etc.NullUtils.ifNull;
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
-import static wbs.framework.utils.etc.EnumUtils.enumInSafe;
-import static wbs.framework.utils.etc.Misc.successResult;
+import static wbs.utils.etc.EnumUtils.enumInSafe;
+import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import com.google.common.base.Optional;
-
-import fj.data.Either;
-
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.utils.etc.Html;
-import wbs.framework.utils.formatwriter.FormatWriter;
+import wbs.utils.string.FormatWriter;
+import wbs.utils.web.HtmlUtils;
+
+import fj.data.Either;
 
 @PrototypeComponent ("textAreaFormFieldRenderer")
 @Accessors (fluent = true)
 public
-class TextAreaFormFieldRenderer<Container,Parent>
-	implements FormFieldRenderer<Container,String> {
+class TextAreaFormFieldRenderer <Container, Parent>
+	implements FormFieldRenderer <Container, String> {
 
 	// properties
 
@@ -266,7 +266,8 @@ class TextAreaFormFieldRenderer<Container,Parent>
 					if (charset == MessageTemplateTypeCharset.gsm) {
 
 						if (! Gsm.isGsm (parts[i]))
-							throw new RuntimeException ("Message text is invalid");
+							throw new RuntimeException (
+								"Message text is invalid");
 
 						messageLength +=
 							Gsm.length (parts[i]);
@@ -417,7 +418,7 @@ class TextAreaFormFieldRenderer<Container,Parent>
 
 		htmlWriter.writeFormat (
 			"%s",
-			Html.newlineToBr (
+			HtmlUtils.newlineToBr (
 			stringFormat (
 				"%h",
 				interfaceValue.or (""))));

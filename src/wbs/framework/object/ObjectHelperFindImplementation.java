@@ -1,7 +1,7 @@
 package wbs.framework.object;
 
-import static wbs.framework.utils.etc.Misc.getMethodRequired;
-import static wbs.framework.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.Misc.getMethodRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

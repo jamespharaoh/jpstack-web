@@ -2,19 +2,19 @@ package wbs.smsapps.orderer.daemon;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import com.google.common.base.Optional;
-
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.EmailLogic;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.lock.logic.LockLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -28,11 +28,12 @@ import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
-import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.orderer.model.OrdererOrderObjectHelper;
 import wbs.smsapps.orderer.model.OrdererOrderRec;
 import wbs.smsapps.orderer.model.OrdererRec;
+import wbs.utils.email.EmailLogic;
 
 @Accessors (fluent = true)
 @SingletonComponent ("ordererCommandTypeHandler")
@@ -40,40 +41,42 @@ public
 class OrdererCommandTypeHandler
 	implements CommandHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@Inject
+	@SingletonDependency
 	LockLogic coreLogic;
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DeliveryDao deliveryDao;
 
-	@Inject
+	@SingletonDependency
 	EmailLogic emailUtils;
 
-	@Inject
+	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
-	@Inject
+	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	OrdererOrderObjectHelper ordererOrderHelper;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
-	Provider<MessageSender> messageSender;
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <SmsMessageSender> messageSenderProvider;
 
 	// properties
 
@@ -178,7 +181,7 @@ class OrdererCommandTypeHandler
 		// send the billed message
 
 		MessageRec billedMessage =
-			messageSender.get ()
+			messageSenderProvider.get ()
 
 			.threadId (
 				message.getThreadId ())

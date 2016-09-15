@@ -1,18 +1,19 @@
 package wbs.smsapps.subscription.daemon;
 
-import static wbs.framework.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.framework.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
+import static wbs.utils.etc.Misc.isNotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -20,7 +21,7 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
-import wbs.sms.message.outbox.logic.MessageSender;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.smsapps.subscription.logic.SubscriptionLogic;
 import wbs.smsapps.subscription.model.SubscriptionBillObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionBillRec;
@@ -33,27 +34,27 @@ public
 class SubscriptionDeliveryNoticeHandler
 	implements DeliveryHandler {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
-	@Inject
+	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionBillObjectHelper subscriptionBillHelper;
 
-	@Inject
+	@SingletonDependency
 	SubscriptionLogic subscriptionLogic;
 
 	// prototype dependencies
 
-	@Inject
-	Provider<MessageSender> messageSender;
+	@PrototypeDependency
+	Provider <SmsMessageSender> messageSenderProvider;
 
 	// details
 

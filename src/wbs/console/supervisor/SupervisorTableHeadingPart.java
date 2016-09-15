@@ -1,5 +1,10 @@
 package wbs.console.supervisor;
 
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+
 import java.text.SimpleDateFormat;
 
 import lombok.Getter;
@@ -54,22 +59,22 @@ class SupervisorTableHeadingPart
 
 		if (supervisorTableHeadingSpec.label () != null) {
 
-			printFormat (
-				"<tr>\n",
+			htmlTableRowOpen ();
 
-				"<th colspan=\"%h\">%h</th>\n",
-				statsPeriod.size () + 2,
+			htmlTableHeaderCellWrite (
 				supervisorTableHeadingSpec.label (),
+				htmlColumnSpanAttribute (
+					statsPeriod.size () + 2l));
 
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
 		// hours
 
-		printFormat (
-			"<tr>\n",
-			"<th>%h</th>\n",
+		htmlTableRowOpen ();
+
+		htmlTableHeaderCellWrite (
 			supervisorTableHeadingSpec.groupLabel ());
 
 		for (
@@ -77,8 +82,7 @@ class SupervisorTableHeadingPart
 				: statsPeriod.steps ()
 		) {
 
-			printFormat (
-				"<th>%h</th>\n",
+			htmlTableHeaderCellWrite (
 				String.format (
 					"%02d",
 					step
@@ -88,11 +92,10 @@ class SupervisorTableHeadingPart
 
 		}
 
-		printFormat (
-			"<th>Total</th>\n");
+		htmlTableHeaderCellWrite (
+			"Total");
 
-		printFormat (
-			"</tr>\n");
+		htmlTableRowClose ();
 
 	}
 

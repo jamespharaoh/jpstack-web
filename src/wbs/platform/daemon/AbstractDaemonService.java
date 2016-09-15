@@ -1,17 +1,17 @@
 package wbs.platform.daemon;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.utils.ThreadManager;
+import wbs.utils.thread.ThreadManager;
 
 /**
  * AffiliateObjectHelper class for those wishing to implement DaemonService.
@@ -112,7 +112,7 @@ class AbstractDaemonService {
 	 * Sets up some stuff and calls createThreads (). Will simply return if
 	 * startService () has already been called since the last stopService ().
 	 */
-	@PostConstruct
+	@NormalLifecycleSetup
 	public synchronized
 	void startService () {
 
