@@ -1,11 +1,10 @@
 package wbs.services.messagetemplate.console;
 
-import static wbs.framework.utils.etc.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -17,7 +16,9 @@ import wbs.console.forms.ScriptRefFormFieldSpec;
 import wbs.console.forms.TextAreaFormFieldSpec;
 import wbs.console.module.ConsoleModuleBuilder;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryValueRec;
 import wbs.services.messagetemplate.model.MessageTemplateFieldTypeRec;
@@ -26,17 +27,17 @@ import wbs.services.messagetemplate.model.MessageTemplateSetRec;
 @PrototypeComponent ("messageTemplateEntryFieldsProvider")
 public
 class MessageTemplateEntryValueFieldsProvider
-	implements FieldsProvider<
+	implements FieldsProvider <
 		MessageTemplateEntryValueRec,
 		MessageTemplateSetRec
 	> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
-	@Inject
+	@SingletonDependency
 	MessageTemplateSetConsoleHelper messageTemplateSetConsoleHelper;
 
 	// state
@@ -175,8 +176,8 @@ class MessageTemplateEntryValueFieldsProvider
 	public static
 	class Config {
 
-		@Inject
-		Provider<MessageTemplateEntryValueFieldsProvider>
+		@PrototypeDependency
+		Provider <MessageTemplateEntryValueFieldsProvider>
 		messageTemplateEntryValueFieldsProvider;
 
 		@PrototypeComponent ("messageTemplateEntryValueListFieldsProvider")

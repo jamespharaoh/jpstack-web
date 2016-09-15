@@ -1,7 +1,7 @@
 package wbs.services.messagetemplate.logic;
 
-import static wbs.framework.utils.etc.CodeUtils.simplifyToCodeRequired;
-import static wbs.framework.utils.etc.StringUtils.emptyStringIfNull;
+import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
+import static wbs.utils.string.StringUtils.emptyStringIfNull;
 
 import lombok.NonNull;
 

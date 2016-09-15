@@ -1,11 +1,9 @@
 package wbs.services.messagetemplate.fixture;
 
-import javax.inject.Inject;
-
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.RandomLogic;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
@@ -23,50 +21,51 @@ import wbs.services.messagetemplate.model.MessageTemplateParameterObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateSetObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateSetRec;
 import wbs.services.messagetemplate.model.MessageTemplateTypeCharset;
+import wbs.utils.random.RandomLogic;
 
 public
 class MessageTemplateFixtureProvider
 	implements FixtureProvider {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
-	@Inject
+	@SingletonDependency
 	MenuItemObjectHelper menuItemHelper;
 
-	@Inject
+	@SingletonDependency
 	MessageTemplateDatabaseObjectHelper messageTemplateDatabaseHelper;
 
-	@Inject
+	@SingletonDependency
 	MessageTemplateEntryTypeObjectHelper messageTemplateEntryTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	MessageTemplateEntryValueObjectHelper messageTemplateEntryValueHelper;
 
-	@Inject
+	@SingletonDependency
 	MessageTemplateFieldTypeObjectHelper messageTemplateFieldTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	MessageTemplateFieldValueObjectHelper messageTemplateFieldValueHelper;
 
-	@Inject
+	@SingletonDependency
 	MessageTemplateParameterObjectHelper messageTemplateParameterHelper;
 
-	@Inject
+	@SingletonDependency
 	MessageTemplateSetObjectHelper messageTemplateSetHelper;
 
-	@Inject
+	@SingletonDependency
 	ObjectManager objectManager;
 
-	@Inject
+	@SingletonDependency
 	ObjectTypeObjectHelper objectTypeHelper;
 
-	@Inject
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
+	@SingletonDependency
 	SliceObjectHelper sliceHelper;
 
 	// implementation

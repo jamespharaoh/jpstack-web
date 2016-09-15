@@ -1,52 +1,53 @@
 package wbs.services.messagetemplate.model;
 
-import static wbs.framework.utils.etc.Misc.isNotNull;
-import static wbs.framework.utils.etc.Misc.isNull;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.framework.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
-
-import org.hibernate.TransientObjectException;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
+
+import org.hibernate.TransientObjectException;
+
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.object.ObjectHooks;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.utils.RandomLogic;
 import wbs.platform.queue.logic.QueueLogic;
+import wbs.utils.random.RandomLogic;
 
 public
 class MessageTemplateEntryValueHooks
-	implements ObjectHooks<MessageTemplateEntryValueRec> {
+	implements ObjectHooks <MessageTemplateEntryValueRec> {
 
-	// dependencies
+	// singleton dependencies
 
-	@Inject
+	@SingletonDependency
 	Database database;
 
-	@Inject
+	@WeakSingletonDependency
+	MessageTemplateFieldTypeObjectHelper messageTemplateFieldTypeHelper;
+
+	@WeakSingletonDependency
+	MessageTemplateFieldValueObjectHelper messageTemplateFieldValueHelper;
+
+	@SingletonDependency
 	RandomLogic randomLogic;
 
-	@Inject
-	Provider<ObjectManager> objectManager;
+	// prototype dependencies
 
-	@Inject
-	Provider<QueueLogic> queueLogic;
+	@PrototypeDependency
+	Provider <ObjectManager> objectManager;
 
-	// indirect dependencies
-
-	@Inject
-	Provider<MessageTemplateFieldTypeObjectHelper>
-	messageTemplateFieldTypeHelperProvider;
-
-	@Inject
-	Provider<MessageTemplateFieldValueObjectHelper>
-	messageTemplateFieldValueHelperProvider;
+	@PrototypeDependency
+	Provider <QueueLogic> queueLogic;
 
 	// implementation
 
@@ -55,9 +56,6 @@ class MessageTemplateEntryValueHooks
 	Object getDynamic (
 			@NonNull MessageTemplateEntryValueRec entryValue,
 			@NonNull String name) {
-
-		MessageTemplateFieldTypeObjectHelper messageTemplateFieldTypeHelper =
-			messageTemplateFieldTypeHelperProvider.get ();
 
 		MessageTemplateEntryTypeRec entryType =
 			entryValue.getMessageTemplateEntryType ();
@@ -103,12 +101,6 @@ class MessageTemplateEntryValueHooks
 			@NonNull MessageTemplateEntryValueRec entryValue,
 			@NonNull String name,
 			@NonNull Optional <?> valueOptional) {
-
-		MessageTemplateFieldTypeObjectHelper messageTemplateFieldTypeHelper =
-			messageTemplateFieldTypeHelperProvider.get ();
-
-		MessageTemplateFieldValueObjectHelper messageTemplateFieldValueHelper =
-			messageTemplateFieldValueHelperProvider.get ();
 
 		MessageTemplateEntryTypeRec entryType =
 			entryValue.getMessageTemplateEntryType ();
