@@ -1,6 +1,6 @@
 package wbs.framework.codegen;
 
-import static wbs.utils.collection.CollectionUtils.listLastElementRequired;
+import static wbs.utils.collection.CollectionUtils.listLastItemRequired;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
 import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.doesNotContain;
@@ -137,7 +137,7 @@ class JavaClassUnitWriter {
 			}
 
 			String simpleClassName =
-				listLastElementRequired (
+				listLastItemRequired (
 					stringSplitFullStop (
 						fullClassName));
 
@@ -233,7 +233,7 @@ class JavaClassUnitWriter {
 			} else {
 
 				String simpleClassName =
-					listLastElementRequired (
+					listLastItemRequired (
 						stringSplitFullStop (
 							fullClassName));
 

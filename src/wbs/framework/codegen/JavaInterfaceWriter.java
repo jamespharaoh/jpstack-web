@@ -4,7 +4,7 @@ import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
-import static wbs.utils.collection.CollectionUtils.listLastElementRequired;
+import static wbs.utils.collection.CollectionUtils.listLastItemRequired;
 import static wbs.utils.collection.CollectionUtils.listSliceAllButLastItemRequired;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormatArray;
@@ -199,7 +199,7 @@ class JavaInterfaceWriter
 				}
 
 				Function <JavaImportRegistry, String> extendsInterfaceName =
-					listLastElementRequired (
+					listLastItemRequired (
 						extendsInterfaceNames);
 
 				formatWriter.writeLineFormat (

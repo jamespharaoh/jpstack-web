@@ -2,6 +2,9 @@ package wbs.apn.chat.user.core.console;
 
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
@@ -10,9 +13,6 @@ import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethodAction;
-import static wbs.utils.web.HtmlUtils.htmlHeadingTwoWrite;
 
 import java.util.List;
 
@@ -85,8 +85,7 @@ class ChatUserNotesPart
 	private
 	void renderCreateForm () {
 
-		htmlFormOpenMethodAction (
-			"post",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
 				"/chatUser.notes"));
 

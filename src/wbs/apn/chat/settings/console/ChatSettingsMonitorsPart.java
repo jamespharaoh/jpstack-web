@@ -2,6 +2,18 @@ package wbs.apn.chat.settings.console;
 
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.List;
 
@@ -151,31 +163,32 @@ class ChatSettingsMonitorsPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
+		// form open
+
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
-				"/chat.settings.monitors"),
-			">\n");
+				"/chat.settings.monitors"));
 
-		printFormat (
-			"<table",
-			" class=\"list\"",
-			">\n");
+		// table open
 
-		printFormat (
-			"<tr>\n",
-			"<th>Orient</th>\n",
-			"<th>Male</th>\n",
-			"<th>Female</th>\n",
-			"</tr>\n");
+		htmlTableOpenList ();
 
-		printFormat (
-			"<tr>\n",
-			"<td>Gay</td>\n",
+		htmlTableHeaderRowWrite (
+			"Orient",
+			"Male",
+			"Female");
 
-			"<td><input",
+		// gay row
+
+		htmlTableRowOpen ();
+
+		htmlTableCellWrite (
+			"Gay");
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"text\"",
 			" name=\"gayMale\"",
 			" size=\"6\"",
@@ -183,9 +196,14 @@ class ChatSettingsMonitorsPart
 			ifNull (
 				requestContext.getForm ("gayMale"),
 				gayMale),
-			"></td>",
+			">");
 
-			"<td><input",
+		htmlTableCellClose ();
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"text\"",
 			" name=\"gayFemale\"",
 			" size=\"6\"",
@@ -193,15 +211,21 @@ class ChatSettingsMonitorsPart
 			ifNull (
 				requestContext.getForm ("gayFemale"),
 				gayFemale),
-			"></td>",
+			">");
 
-			"</tr>\n");
+		htmlTableRowClose ();
 
-		printFormat (
-			"<tr>\n",
-			"<td>Bi</td>\n",
+		// bi row
 
-			"<td><input",
+		htmlTableRowOpen ();
+
+		htmlTableCellWrite (
+			"Bi");
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"text\"",
 			" name=\"biMale\"",
 			" size=\"6\"",
@@ -209,9 +233,14 @@ class ChatSettingsMonitorsPart
 			ifNull (
 				requestContext.getForm ("biMale"),
 				biMale),
-			"></td>",
+			">");
 
-			"<td><input",
+		htmlTableCellClose ();
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"text\"",
 			" name=\"biFemale\"",
 			" size=\"6\"",
@@ -219,15 +248,23 @@ class ChatSettingsMonitorsPart
 			ifNull (
 				requestContext.getForm ("biFemale"),
 				biFemale),
-			"></td>",
+			">");
 
-			"</tr>\n");
+		htmlTableCellClose ();
 
-		printFormat (
-			"<tr>\n",
-			"<td>Straight</td>\n",
+		htmlTableRowClose ();
 
-			"<td><input",
+		// straight row
+
+		htmlTableRowOpen ();
+
+		htmlTableCellWrite (
+			"Straight");
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"text\"",
 			" name=\"straightMale\"",
 			" size=\"6\"",
@@ -235,9 +272,14 @@ class ChatSettingsMonitorsPart
 			ifNull (
 				requestContext.getForm ("straightMale"),
 				straightMale),
-			"></td>\n",
+			">");
 
-			"<td><input",
+		htmlTableCellClose ();
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"text\"",
 			" name=\"straightFemale\"",
 			" size=\"6\"",
@@ -245,21 +287,31 @@ class ChatSettingsMonitorsPart
 			ifNull (
 				requestContext.getForm ("straightFemale"),
 				straightFemale),
-			"></td>",
+			">");
 
-			"</tr>\n");
+		htmlTableCellClose ();
 
-		printFormat (
-			"</table>\n");
+		htmlTableRowClose ();
 
-		printFormat (
-			"<p><input",
+		// table close
+
+		htmlTableClose ();
+
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"save changes\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		// form close
+
+		htmlFormClose ();
 
 	}
 

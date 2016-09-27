@@ -5,6 +5,7 @@ import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.string.StringUtils.stringToUtf8;
+import static wbs.utils.string.StringUtils.utf8ToString;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -13,7 +14,15 @@ import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
 import org.apache.commons.io.IOUtils;
+
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -22,13 +31,6 @@ import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONObject;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -57,7 +59,7 @@ class ClockworkSmsMessageSender {
 	String url;
 
 	@Getter @Setter
-	String key;
+	Boolean simulateMultipart;
 
 	@Getter @Setter
 	ClockworkSmsMessageRequest request;
@@ -246,8 +248,9 @@ class ClockworkSmsMessageSender {
 			try {
 
 				xmlResponse =
-					IOUtils.toString (
-						httpResponse.getEntity ().getContent ());
+					utf8ToString (
+						IOUtils.toByteArray (
+							httpResponse.getEntity ().getContent ()));
 
 			} catch (IOException ioException) {
 
@@ -335,8 +338,9 @@ class ClockworkSmsMessageSender {
 			clockworkResponse =
 				(ClockworkSmsMessageResponse)
 				clockworkSmsForeignApiDataFromXml.readInputStream (
-					IOUtils.toInputStream (
-						xmlResponse),
+					new ByteArrayInputStream (
+						stringToUtf8 (
+							xmlResponse)),
 					url,
 					ImmutableList.of ());
 

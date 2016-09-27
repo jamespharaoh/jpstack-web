@@ -1,5 +1,7 @@
 package wbs.console.request;
 
+import static wbs.utils.string.StringUtils.stringFormat;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +10,6 @@ import javax.servlet.ServletRequest;
 import lombok.NonNull;
 
 import wbs.utils.string.FormatWriter;
-import wbs.utils.web.HtmlUtils;
 
 public
 class Notices {
@@ -33,7 +34,10 @@ class Notices {
 		public
 		String toString () {
 
-			return "<p class=\"" + HtmlUtils.htmlEncode(type) + "\">" + html + "</p>\n";
+			return stringFormat (
+				"<p class=\"%h\">%s</p>",
+				type,
+				html);
 
 		}
 

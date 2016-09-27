@@ -5,6 +5,7 @@ import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.requiredSuccess;
 import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.NumberUtils.moreThanOne;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -283,7 +284,6 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	public
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
-			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<Interface> interfaceValue,
 			@NonNull FormType formType,
@@ -297,9 +297,8 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 				FormType.search)
 		) {
 
-			javascriptWriter.writeFormat (
-				"%s$(\"#%j-%j\").val (\"none\");\n",
-				indent,
+			javascriptWriter.writeLineFormat (
+				"$(\"#%j-%j\").val (\"none\");",
 				formName,
 				name);
 
@@ -309,9 +308,8 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 				FormType.update)
 		) {
 
-			javascriptWriter.writeFormat (
-				"%s$(\"#%j-%j\").val (\"%h\");\n",
-				indent,
+			javascriptWriter.writeLineFormat (
+				"$(\"#%j-%j\").val (\"%h\");",
 				formName,
 				name,
 				interfaceValue.isPresent ()
@@ -445,7 +443,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Interface> interfaceValue,
 			@NonNull Boolean link,
-			@NonNull Long colspan) {
+			@NonNull Long columnSpan) {
 
 		// work out root
 
@@ -477,13 +475,34 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		// render table cell
 
-		objectManager.writeTdForObject (
-			formatWriter,
-			interfaceValue.orNull (),
-			rootOptional,
-			mini,
-			link,
-			colspan);
+		if (
+			optionalIsPresent (
+				interfaceValue)
+		) {
+
+			objectManager.writeTdForObject (
+				formatWriter,
+				interfaceValue.orNull (),
+				rootOptional,
+				mini,
+				link,
+				columnSpan);
+
+		} else if (
+			moreThanOne (
+				columnSpan)
+		) {
+
+			formatWriter.writeLineFormat (
+				"<td colspan=\"%h\">—</td>",
+				columnSpan);
+
+		} else {
+
+			formatWriter.writeLineFormat (
+				"<td>—</td>");
+
+		}
 
 	}
 

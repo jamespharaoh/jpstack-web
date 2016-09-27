@@ -10,12 +10,15 @@ import static wbs.utils.etc.LogicUtils.ifThenElseEmDash;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.ifPresentThenElse;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localDateNotEqual;
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.utils.web.HtmlInputUtils.htmlSelectYesNo;
 import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockClose;
 import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockOpen;
@@ -35,7 +38,6 @@ import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
-import static wbs.utils.web.HtmlUtils.htmlHeadingTwoWrite;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -872,8 +874,8 @@ class ChatMonitorInboxSummaryPart
 		htmlTableHeaderCellWrite (
 			"Add");
 
-		formatWriter.writeLineFormat (
-			"<td colspan='2'>%s</td>");
+		htmlTableCellOpen (
+			htmlColumnSpanAttribute (2l));
 
 		formatWriter.writeLineFormat (
 			"<form",
@@ -959,12 +961,16 @@ class ChatMonitorInboxSummaryPart
 
 		htmlSelectYesNo (
 			"alarmSticky",
-			requestContext.parameterOrNull ("alarmSticky") != null
-				? Boolean.parseBoolean (
-					requestContext.parameterOrNull ("alarmSticky"))
-				: alarm != null
-					? alarm.getSticky ()
-					: true,
+			ifPresentThenElse (
+				requestContext.parameter (
+					"alarmSticky"),
+				() -> Boolean.parseBoolean (
+					requestContext.parameterRequired (
+						"alarmSticky")),
+				() -> ifNotNullThenElse (
+					alarm,
+					() -> alarm.getSticky (),
+					() -> true)),
 			"sticky",
 			"not sticky");
 
@@ -1105,7 +1111,7 @@ class ChatMonitorInboxSummaryPart
 					enumEqualSafe (
 						chatMessage.getFromUser ().getType (),
 						ChatUserType.monitor)
-					&& isNull (
+					&& isNotNull (
 						chatMessage.getSender ()),
 					() -> chatMessage.getSender ().getUsername ()));
 

@@ -1,6 +1,11 @@
 package wbs.integrations.digitalselect.console;
 
+import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -52,36 +57,27 @@ class DigitalSelectRouteSummaryAdditionalPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<h2>Digital Select route information</h2>\n");
+		htmlHeadingTwoWrite (
+			"Digital Select route information");
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
 		if (digitalSelectRouteOut != null) {
 
-			printFormat (
-				"<tr>\n",
-				"<th>URL</th>\n",
-				"<td>%h</td>\n",
-				digitalSelectRouteOut.getUrl (),
-				"</tr>\n");
+			htmlTableDetailsRowWrite (
+				"URL",
+				digitalSelectRouteOut.getUrl ());
 
-			printFormat (
-				"<tr>\n",
-				"<th>Username</th>\n",
-				"<td>%h</td>\n",
-				digitalSelectRouteOut.getUsername (),
-				"</tr>\n");
+			htmlTableDetailsRowWrite (
+				"Username",
+				digitalSelectRouteOut.getUsername ());
 
-			printFormat (
-				"<tr>\n",
-				"<th>Password</th>\n",
-				"<td>%h</td>\n",
-				requestContext.canContext ("route.manage")
-					? digitalSelectRouteOut.getPassword ()
-					: "**********",
-				"</tr>\n");
+			htmlTableDetailsRowWrite (
+				"Password",
+				ifThenElse (
+					requestContext.canContext ("route.manage"),
+					() -> digitalSelectRouteOut.getPassword (),
+					() -> "**********"));
 
 		}
 
@@ -91,10 +87,8 @@ class DigitalSelectRouteSummaryAdditionalPart
 			&& route.getDeliveryReports ()
 		) {
 
-			printFormat (
-				"<tr>\n",
-				"<th>Delivery reports URL</th>\n",
-				"<td>%h</td>\n",
+			htmlTableDetailsRowWrite (
+				"Delivery reports URL",
 				stringFormat (
 					"%s",
 					wbsConfig.apiUrl (),
@@ -106,8 +100,7 @@ class DigitalSelectRouteSummaryAdditionalPart
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

@@ -32,19 +32,21 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.SneakyThrows;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+
 import org.apache.log4j.Logger;
 
 import wbs.utils.io.RuntimeIoException;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-
 import fj.data.Either;
-import lombok.Cleanup;
-import lombok.NonNull;
-import lombok.SneakyThrows;
 
 // TODO lots to deprecate here
 public
@@ -624,36 +626,6 @@ class Misc {
 
 		return Base64.encodeBase64String (
 			messageDigest.digest ());
-
-	}
-
-	public static
-	String booleanToString (
-			Boolean value,
-			String yesString,
-			String noString,
-			String nullString) {
-
-		if (value == null)
-			return nullString;
-
-		if (value == true)
-			return yesString;
-
-		if (value == false)
-			return noString;
-
-		throw new RuntimeException ();
-
-	}
-
-	public static
-	String booleanToYesNo (
-			@NonNull Boolean value) {
-
-		return value
-			? "yes"
-			: "no";
 
 	}
 

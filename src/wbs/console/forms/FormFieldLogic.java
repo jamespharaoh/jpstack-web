@@ -6,9 +6,22 @@ import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.equalToOne;
 import static wbs.utils.etc.NumberUtils.equalToThree;
 import static wbs.utils.etc.NumberUtils.equalToTwo;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenMethodActionEncoding;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -66,7 +79,7 @@ class FormFieldLogic {
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull String formName) {
 
 		UpdateResultSet updateResultSet =
@@ -90,7 +103,7 @@ class FormFieldLogic {
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull UpdateResultSet updateResults,
 			@NonNull Object container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull String formName) {
 
 		update (
@@ -110,7 +123,7 @@ class FormFieldLogic {
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull UpdateResultSet updateResults,
 			@NonNull Object container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String,Object> hints,
 			@NonNull String formName) {
 
 		for (
@@ -159,11 +172,14 @@ class FormFieldLogic {
 			@NonNull UpdateResultSet updateResultSet,
 			@NonNull String formName) {
 
-		List<String> errorFieldNames =
-			new ArrayList<String> ();
+		List <String> errorFieldNames =
+			new ArrayList<> ();
 
 		for (
-			Map.Entry<Pair<String,String>,UpdateResult<?,?>> updateResultEntry
+			Map.Entry <
+				Pair <String, String>,
+				UpdateResult <?, ?>
+			> updateResultEntry
 				: updateResultSet.updateResults ().entrySet ()
 		) {
 
@@ -300,8 +316,8 @@ class FormFieldLogic {
 				: formFieldSet.formFields ()
 		) {
 
-			htmlWriter.writeFormat (
-				"<th>%h</th>\n",
+			htmlWriter.writeLineFormat (
+				"<th>%h</th>",
 				formField.label ());
 
 		}
@@ -311,7 +327,7 @@ class FormFieldLogic {
 	public
 	void outputCsvHeadings (
 			@NonNull FormatWriter csvWriter,
-			@NonNull List<FormFieldSet> formFieldSets) {
+			@NonNull List <FormFieldSet> formFieldSets) {
 
 		boolean first =
 			true;
@@ -374,9 +390,9 @@ class FormFieldLogic {
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
-			@NonNull Optional<UpdateResultSet> updateResultSet,
+			@NonNull Optional <UpdateResultSet> updateResultSet,
 			@NonNull Object object,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -398,9 +414,9 @@ class FormFieldLogic {
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
-			@NonNull Optional<UpdateResultSet> updateResultSet,
+			@NonNull Optional <UpdateResultSet> updateResultSet,
 			@NonNull Object object,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -582,7 +598,7 @@ class FormFieldLogic {
 							formField.name ()));
 
 					error =
-						Optional.absent ();
+						optionalAbsent ();
 
 				} else {
 
@@ -594,7 +610,7 @@ class FormFieldLogic {
 			} else {
 
 				error =
-					Optional.<String>absent ();
+					optionalAbsent ();
 
 			}
 
@@ -614,11 +630,10 @@ class FormFieldLogic {
 	public
 	void outputFormReset (
 			@NonNull FormatWriter javascriptWriter,
-			@NonNull String indent,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull FormType formType,
 			@NonNull Object object,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull String formName) {
 
 		for (
@@ -631,7 +646,6 @@ class FormFieldLogic {
 
 			formField.renderFormReset (
 				javascriptWriter,
-				indent,
 				object,
 				hints,
 				formType,
@@ -698,18 +712,14 @@ class FormFieldLogic {
 			? "multipart/form-data"
 			: "application/x-www-form-urlencoded";
 
-		htmlWriter.writeFormat (
-			"<form",
-			" method=\"%h\"",
+		htmlFormOpenMethodActionEncoding (
+			htmlWriter,
 			method,
-			" action=\"%h\"",
 			actionUrl,
-			" enctype=\"%h\"",
-			enctype,
-			">\n");
+			enctype);
 
-		htmlWriter.writeFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails (
+			htmlWriter);
 
 		outputFormRows (
 			submission,
@@ -721,18 +731,22 @@ class FormFieldLogic {
 			formType,
 			formName);
 
-		htmlWriter.writeFormat (
-			"</table>\n");
+		htmlTableClose (
+			htmlWriter);
 
-		htmlWriter.writeFormat (
-			"<p><input",
+		htmlParagraphOpen (
+			htmlWriter);
+
+		htmlWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"%h\"",
 			submitButtonLabel,
-			"></p>\n");
+			">");
 
-		htmlWriter.writeFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		htmlFormClose ();
 
 	}
 
@@ -743,8 +757,8 @@ class FormFieldLogic {
 			@NonNull Object object,
 			@NonNull Map<String,Object> hints) {
 
-		htmlWriter.writeFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails (
+			htmlWriter);
 
 		outputTableRows (
 			htmlWriter,
@@ -752,8 +766,7 @@ class FormFieldLogic {
 			object,
 			hints);
 
-		htmlWriter.writeFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
@@ -764,30 +777,41 @@ class FormFieldLogic {
 			@NonNull List<?> objects,
 			boolean links) {
 
-		htmlWriter.writeFormat (
-			"<table class=\"list\">\n");
+		// table open
 
-		htmlWriter.writeFormat (
-			"<tr>\n");
+		htmlTableOpenList (
+			htmlWriter);
+
+		// table header
+
+		htmlTableRowOpen (
+			htmlWriter);
 
 		outputTableHeadings (
 			htmlWriter,
 			formFieldSet);
 
-		htmlWriter.writeFormat (
-			"</tr>");
+		htmlTableRowClose (
+			htmlWriter);
+
+		// table content
 
 		if (
 			collectionIsEmpty (
 				objects)
 		) {
 
-			htmlWriter.writeFormat (
-				"<tr><td",
-				" colspan=\"%h\"",
-				formFieldSet.columns (),
-				">%h</td></tr>\n",
-				"There is no data to display");
+			htmlTableRowOpen (
+				htmlWriter);
+
+			htmlTableCellWrite (
+				htmlWriter,
+				"There is no data to display",
+				htmlColumnSpanAttribute (
+					formFieldSet.columns ()));
+
+			htmlTableRowClose (
+				htmlWriter);
 
 		} else {
 
@@ -796,8 +820,8 @@ class FormFieldLogic {
 					: objects
 			) {
 
-				htmlWriter.writeFormat (
-					"<tr>\n");
+				htmlTableRowOpen (
+					htmlWriter);
 
 				outputTableCellsList (
 					htmlWriter,
@@ -806,15 +830,17 @@ class FormFieldLogic {
 					ImmutableMap.of (),
 					links);
 
-				htmlWriter.writeFormat (
-					"</tr>\n");
+				htmlTableRowClose (
+					htmlWriter);
 
 			}
 
 		}
 
-		htmlWriter.writeFormat (
-			"</table>\n");
+		// table close
+
+		htmlTableClose (
+			htmlWriter);
 
 	}
 
@@ -933,9 +959,11 @@ class FormFieldLogic {
 				continue;
 			}
 
-			htmlWriter.writeFormat (
-				"<tr>\n",
-				"<th>%h</th>\n",
+			htmlTableRowOpen (
+				htmlWriter);
+
+			htmlTableHeaderCellWrite (
+				htmlWriter,
 				formField.label ());
 
 			formField.renderTableCellProperties (
@@ -943,8 +971,8 @@ class FormFieldLogic {
 				object,
 				hints);
 
-			htmlWriter.writeFormat (
-				"</tr>\n");
+			htmlTableRowClose (
+				htmlWriter);
 
 		}
 
@@ -955,7 +983,7 @@ class FormFieldLogic {
 	public static
 	class UpdateResultSet {
 
-		Map<Pair<String,String>,UpdateResult<?,?>> updateResults =
+		Map <Pair <String, String>, UpdateResult <?, ?>> updateResults =
 			new LinkedHashMap<> ();
 
 		int errorCount;

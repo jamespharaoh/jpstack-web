@@ -10,6 +10,8 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 
 import java.util.Map;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -17,13 +19,11 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.Range;
 
-import com.google.common.base.Optional;
-
-import fj.data.Either;
-
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.utils.string.FormatWriter;
+
+import fj.data.Either;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("rangeFormFieldRenderer")
@@ -126,15 +126,13 @@ class RangeFormFieldRenderer<
 	public
 	void renderFormReset (
 			@NonNull FormatWriter htmlWriter,
-			@NonNull String indent,
 			@NonNull Container container,
-			@NonNull Optional<Range<Interface>> interfaceValue,
+			@NonNull Optional <Range <Interface>> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
 		minimum.renderFormReset (
 			htmlWriter,
-			indent,
 			container,
 			interfaceValue.isPresent ()
 				? Optional.of (
@@ -145,7 +143,6 @@ class RangeFormFieldRenderer<
 
 		maximum.renderFormReset (
 			htmlWriter,
-			indent,
 			container,
 			interfaceValue.isPresent ()
 				? Optional.of (

@@ -1,12 +1,25 @@
 package wbs.apn.chat.user.core.console;
 
 import static wbs.utils.etc.LogicUtils.comparableLessThan;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 import static wbs.utils.string.StringUtils.spacify;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localDateNotEqual;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
 import static wbs.utils.web.HtmlUtils.htmlColourFromObject;
 
 import java.util.List;
@@ -15,12 +28,11 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -91,17 +103,20 @@ class ChatUserHistoryPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"list\">\n");
+		// table open
 
-		printFormat (
-			"<tr>\n",
-			"<th>&nbsp;</th>\n",
-			"<th>Time</th>\n",
-			"<th>User</th>\n",
-			"<th>Message</th>\n",
-			"<th>Monitor</th>\n",
-			"</tr>\n");
+		htmlTableOpenList ();
+
+		// table header
+
+		htmlTableHeaderRowWrite (
+			"",
+			"Time",
+			"User",
+			"Message",
+			"Monitor");
+
+		// table content
 
 		DateTimeZone timezone =
 			chatUserLogic.getTimezone (
@@ -154,19 +169,22 @@ class ChatUserHistoryPart
 				previousDate =
 					nextDate;
 
-				printFormat (
-					"<tr class=\"sep\">\n");
+				htmlTableRowSeparatorWrite ();
 
-				printFormat (
-					"<tr style=\"font-weight: bold\">\n",
+				htmlTableRowOpen (
+					htmlStyleAttribute (
+						htmlStyleRuleEntry (
+							"font-weight",
+							"bold")));
 
-					"<td colspan=\"5\">%h</td>\n",
+				htmlTableCellWrite (
 					timeFormatter.dateStringLong (
 						chatUserLogic.getTimezone (
 							chatUser),
 						chatMessage.getTimestamp ()),
+					htmlColumnSpanAttribute (5l));
 
-					"</tr>\n");
+				htmlTableRowClose ();
 
 			}
 
@@ -192,55 +210,58 @@ class ChatUserHistoryPart
 
 			));
 
-			printFormat (
-				"<tr class=\"%h\">\n",
-				rowClass,
+			htmlTableRowOpen (
+				htmlClassAttribute (
+					rowClass));
 
-				"<td style=\"background-color: %h\">&nbsp;</td>\n",
-				colour,
+			htmlTableCellWrite (
+				"",
+				htmlStyleAttribute (
+					htmlStyleRuleEntry (
+						"background-color",
+						colour)));
 
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				timeFormatter.timeString (
 					chatUserLogic.getTimezone (
 						chatUser),
-					chatMessage.getTimestamp ()),
+					chatMessage.getTimestamp ()));
 
-				"<td>%s</td>\n",
+			htmlTableCellWriteHtml (
 				HtmlUtils.htmlNonBreakingWhitespace (
 					HtmlUtils.htmlEncode (
-						otherUserId)),
+						otherUserId)));
 
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				spacify (
 					chatMessage.getOriginalText ().getText ()));
 
 			if (fromUser.getType () == ChatUserType.monitor) {
 
-				printFormat (
-					"<td>%h</td>\n",
-					chatMessage.getSender () != null
-						? chatMessage.getSender ().getUsername ()
-						: "-");
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						chatMessage.getSender (),
+						() -> chatMessage.getSender ().getUsername ()));
 
 			} else if (toUser.getType () == ChatUserType.monitor) {
 
-				printFormat (
-					"<td>(yes)</td>\n");
+				htmlTableCellWrite (
+					"(yes)");
 
 			} else {
 
-				printFormat (
-					"<td>&nbsp;</td>\n");
+				htmlTableCellWrite (
+					"");
 
 			}
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		// table close
+
+		htmlTableClose ();
 
 	}
 

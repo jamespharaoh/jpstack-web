@@ -1,5 +1,12 @@
 package wbs.apn.chat.affiliate.console;
 
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,44 +58,48 @@ class ChatAffiliateKeywordsListPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"list\">\n");
+		// table open
 
-		printFormat (
-			"<tr>\n",
-			"<th>Scheme</th>\n",
-			"<th>Keyword</th>\n",
-			"<th>Join type</th>\n",
-			"<th>Gender</th>\n",
-			"<th>Orient</th>\n",
-			"</tr>\n");
+		htmlTableOpenList ();
 
-		for (ChatSchemeKeywordRec chatSchemeKeyword
-				: chatSchemeKeywords) {
+		htmlTableHeaderRowWrite (
+			"Scheme",
+			"Keyword",
+			"Join type",
+			"Gender",
+			"Orient");
 
-			printFormat (
-				"<tr>\n",
+		// table rows
 
-				"<td>%h</td>\n",
-				chatSchemeKeyword.getChatScheme ().getCode (),
+		for (
+			ChatSchemeKeywordRec chatSchemeKeyword
+				: chatSchemeKeywords
+		) {
 
-				"<td>%h</td>\n",
-				chatSchemeKeyword.getKeyword (),
+			htmlTableRowOpen ();
 
-				"<td>%h</td>\n",
-				chatSchemeKeyword.getJoinType (),
+			htmlTableCellWrite (
+				chatSchemeKeyword.getChatScheme ().getCode ());
 
-				"<td>%h</td>\n",
-				chatSchemeKeyword.getJoinGender (),
+			htmlTableCellWrite (
+				chatSchemeKeyword.getKeyword ());
 
-				"<td>%h</td>\n",
-				chatSchemeKeyword.getJoinOrient (),
+			htmlTableCellWrite (
+				chatSchemeKeyword.getJoinType ().name ());
 
-				"</tr>\n");
+			htmlTableCellWrite (
+				chatSchemeKeyword.getJoinGender ().name ());
+
+			htmlTableCellWrite (
+				chatSchemeKeyword.getJoinOrient ().name ());
+
+			htmlTableRowClose ();
+
 		}
 
-		printFormat (
-			"</table>\n");
+		// table close
+
+		htmlTableClose ();
 
 	}
 

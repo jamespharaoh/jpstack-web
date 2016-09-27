@@ -1,10 +1,10 @@
 package wbs.apn.chat.graphs.console;
 
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethodAction;
-import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenGetAction;
 
 import java.util.Collections;
 
@@ -51,8 +51,7 @@ class AbstractMonthlyGraphPart
 	public
 	void renderHtmlBodyContent ()  {
 
-		htmlFormOpenMethodAction (
-			"get",
+		htmlFormOpenGetAction (
 			requestContext.resolveLocalUrl (
 				myLocalPart));
 

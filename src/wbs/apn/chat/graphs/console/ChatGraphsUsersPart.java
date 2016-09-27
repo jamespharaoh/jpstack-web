@@ -1,7 +1,14 @@
 package wbs.apn.chat.graphs.console;
 
+import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenGetAction;
+import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
 
 import org.joda.time.LocalDate;
 
@@ -62,65 +69,80 @@ class ChatGraphsUsersPart
 
 		}
 
-		printFormat (
-			"<form",
-			" action=\"%h\"",
+		htmlFormOpenGetAction (
 			requestContext.resolveLocalUrl (
-				"/chat.graphs.users"),
-			" method=\"get\"",
-			">\n");
+				"/chat.graphs.users"));
 
-		printFormat (
-			"<p>Date<br>\n",
+		htmlParagraphOpen ();
 
+		formatWriter.writeLineFormat (
+			"Date<br>");
+
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"text\"",
 			" name=\"date\"",
 			" value=\"%h\"",
 			dateString,
-			">\n",
+			">");
 
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" value=\"ok\"",
-			"></p>");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
 
-		if (date != null) {
+		htmlFormClose (); 
 
-			printFormat (
-				"<p class=\"links\">\n",
+		if (
+			isNotNull (
+				date)
+		) {
 
-				"<a href=\"%h\">Prev week</a>\n",
+			// write date browser
+
+			htmlParagraphOpen (
+				htmlClassAttribute (
+					"links"));
+
+			htmlLinkWrite (
 				stringFormat (
 					"?date=%u",
 					timeFormatter.dateString (
 						date.minusWeeks (1))),
-
-				"<a href=\"%h\">Prev day</a>\n",
+				"Prev week");
+				
+			htmlLinkWrite (
 				stringFormat (
 					"?date=%h",
 					timeFormatter.dateString (
 						date.minusDays (1))),
+				"Prev day");
 
-				"<a href=\"%h\">Next day</a>\n",
+			htmlLinkWrite (
 				stringFormat (
 					"?date=%u",
 					timeFormatter.dateString (
 						date.plusDays (1))),
+					"Next day");
 
-				"<a href=\"%h\">Next week</a>",
+			htmlLinkWrite (
 				stringFormat (
 					"?date=%u",
 					timeFormatter.dateString (
 						date.plusWeeks (1))),
+				"Next week");
 
-				"</p>\n");
+			htmlParagraphClose ();
 
-			printFormat (
-				"<p><img",
+			// write graph image
+
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<img",
 				" style=\"graph\"",
 				" src=\"%h\"",
 				requestContext.resolveLocalUrl (
@@ -128,7 +150,9 @@ class ChatGraphsUsersPart
 						"/chat.graphs.usersImage",
 						"?date=%u",
 						dateString)),
-				"></p>\n");
+				">");
+
+			htmlParagraphClose ();
 
 		}
 

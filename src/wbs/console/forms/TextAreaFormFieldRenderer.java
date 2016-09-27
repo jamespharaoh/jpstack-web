@@ -324,7 +324,6 @@ class TextAreaFormFieldRenderer <Container, Parent>
 	public
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
-			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue,
 			@NonNull FormType formType,
@@ -339,8 +338,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 		) {
 
 			javascriptWriter.writeFormat (
-				"%s$(\"#%j-%j\").val (\"\");\n",
-				indent,
+				"$(\"#%j-%j\").val (\"\");",
 				formName,
 				name);
 
@@ -351,8 +349,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 		) {
 
 			javascriptWriter.writeFormat (
-				"%s$(\"#%j-%j\").val (\"%j\");\n",
-				indent,
+				"$(\"#%j-%j\").val (\"%j\");",
 				formName,
 				name,
 				interfaceValue.or (""));

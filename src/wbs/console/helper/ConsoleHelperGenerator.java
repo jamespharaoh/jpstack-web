@@ -5,7 +5,7 @@ import static wbs.utils.collection.ArrayUtils.arrayIsNotEmpty;
 import static wbs.utils.collection.ArrayUtils.arrayMap;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
-import static wbs.utils.collection.CollectionUtils.listLastElementRequired;
+import static wbs.utils.collection.CollectionUtils.listLastItemRequired;
 import static wbs.utils.collection.CollectionUtils.listSlice;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
@@ -1121,7 +1121,7 @@ class ConsoleHelperGenerator {
 				}
 
 				Parameter lastParameter =
-					listLastElementRequired (
+					listLastItemRequired (
 						parameters);
 
 				javaWriter.writeFormat (
@@ -1173,7 +1173,7 @@ class ConsoleHelperGenerator {
 					}
 
 					Parameter lastParameter =
-						listLastElementRequired (
+						listLastItemRequired (
 							parameters);
 
 					javaWriter.writeFormat (
@@ -1216,7 +1216,7 @@ class ConsoleHelperGenerator {
 					}
 
 					Parameter lastParameter =
-						listLastElementRequired (
+						listLastItemRequired (
 							parameters);
 
 					javaWriter.writeFormat (

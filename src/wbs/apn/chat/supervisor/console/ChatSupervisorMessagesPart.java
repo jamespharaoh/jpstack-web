@@ -1,6 +1,14 @@
 package wbs.apn.chat.supervisor.console;
 
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,10 +18,10 @@ import com.google.common.collect.ImmutableSet;
 
 import org.joda.time.Interval;
 
-import wbs.apn.chat.core.console.ChatConsoleLogic;
-import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.core.console.ChatConsoleLogic;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.console.html.MagicTableScriptRef;
@@ -118,61 +126,60 @@ class ChatSupervisorMessagesPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"list\">");
+		// table open
 
-		printFormat (
-			"<tr>\n",
-			"<th>From</th>\n",
-			"<th>To</th>\n",
-			"<th>Time</th>\n",
-			"<th>Message</th>\n",
-			"</tr>\n");
+		htmlTableOpenList ();
+
+		// table header
+
+		htmlTableHeaderRowWrite (
+			"From",
+			"To",
+			"Time",
+			"Message");
+
+		// table content
 
 		for (
 			ChatMessageRec chatMessage
 				: chatMessages
 		) {
 
-			printFormat (
-				"<tr",
-				" class=\"magic-table-row\"",
-				" data-target-href=\"%h\"",
-				requestContext.resolveLocalUrl (
-					stringFormat (
-						"/chat.supervisorConversation",
-						"?chatUserId1=%u",
-						chatMessage.getToUser ().getId (),
-						"&chatUserId2=%u",
-						chatMessage.getFromUser ().getId ())),
-				">\n");
+			htmlTableRowOpen (
+				htmlClassAttribute (
+					"magic-table-row"),
+				htmlDataAttribute (
+					"target-href",
+					requestContext.resolveLocalUrl (
+						stringFormat (
+							"/chat.supervisorConversation",
+							"?chatUserId1=%u",
+							chatMessage.getToUser ().getId (),
+							"&chatUserId2=%u",
+							chatMessage.getFromUser ().getId ()))));
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				chatConsoleLogic.textForChatUser (
 					chatMessage.getFromUser ()));
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				chatConsoleLogic.textForChatUser (
 					chatMessage.getToUser ()));
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				userConsoleLogic.timeString (
 					chatMessage.getTimestamp ()));
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				chatMessage.getOriginalText ().getText ());
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		// table close
+
+		htmlTableClose ();
 
 	}
 

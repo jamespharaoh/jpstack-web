@@ -1,5 +1,17 @@
 package wbs.smsapps.manualresponder.console;
 
+import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockClose;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockOpen;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleClose;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntryWrite;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 
@@ -12,33 +24,62 @@ class ManualResponderStatusLinePart
 	public
 	void renderHtmlHeadContent () {
 
-		printFormat (
+		renderStyleBlock ();
+		renderScriptBlock ();
 
-			"<style type=\"text/css\">\n",
+	}
 
-			"  #manualResponderRow { display: none; }\n",
+	private
+	void renderStyleBlock () {
 
-			"</style>\n");
+		htmlStyleBlockOpen ();
 
-		printFormat (
+		htmlStyleRuleOpen (
+			"#manualResponderRow");
 
-			"<script type=\"text/javascript\">\n",
+		htmlStyleRuleEntryWrite (
+			"display",
+			"none");
 
-			"  function updateManualResponder (numToday, numThisHour) {\n",
+		htmlStyleRuleClose ();
 
-			"    var cell = $('#manualResponderCell');\n",
-			"    var row = $('#manualResponderRow');\n",
+		htmlStyleBlockClose ();
 
-			"    cell.text ('Messages answered: ' + [\n",
-			"      String (numToday) + ' today',\n",
-			"      String (numThisHour) + ' this hour',\n",
-			"    ].join (', '));\n",
+	}
 
-			"    showTableRow (row [0], numToday > 0 || numThisHour > 0);\n",
+	private
+	void renderScriptBlock () {
 
-			"  }\n",
+		htmlScriptBlockOpen ();
 
-			"</script>\n");
+		formatWriter.writeLineFormatIncreaseIndent (
+			"function updateManualResponder (numToday, numThisHour) {");
+
+		formatWriter.writeLineFormat (
+			"var cell = $('#manualResponderCell');");
+
+		formatWriter.writeLineFormat (
+			"var row = $('#manualResponderRow');");
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"cell.text ('Messages answered: ' + [");
+
+		formatWriter.writeLineFormat (
+			"String (numToday) + ' today',");
+
+		formatWriter.writeLineFormat (
+			"String (numThisHour) + ' this hour',");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"].join (', '));");
+
+		formatWriter.writeLineFormat (
+			"showTableRow (row [0], numToday > 0 || numThisHour > 0);");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		htmlScriptBlockClose ();
 
 	}
 
@@ -46,12 +87,16 @@ class ManualResponderStatusLinePart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<tr",
-			" id=\"manualResponderRow\"",
-			">\n",
-			"<td id=\"manualResponderCell\">-</td>\n",
-			"</tr>\n");
+		htmlTableRowOpen (
+			htmlIdAttribute (
+				"manualResponderRow"));
+
+		htmlTableCellWrite (
+			"—",
+			htmlIdAttribute (
+				"manualResponderCell"));
+
+		htmlTableRowClose ();
 
 	}
 

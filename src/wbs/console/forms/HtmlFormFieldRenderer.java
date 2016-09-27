@@ -4,12 +4,12 @@ import static wbs.utils.etc.Misc.doNothing;
 
 import java.util.Map;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import com.google.common.base.Optional;
 
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -67,11 +67,12 @@ class HtmlFormFieldRenderer<Container>
 	public
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
-			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
+
+		doNothing ();
 
 	}
 

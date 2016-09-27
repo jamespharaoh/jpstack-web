@@ -1,15 +1,15 @@
 package wbs.apn.chat.user.image.console;
 
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPost;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
 import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethod;
-import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -61,8 +61,7 @@ class ChatUserImageRotatePart
 
 		}
 
-		htmlFormOpenMethod (
-			"post");
+		htmlFormOpenPost ();
 
 		formatWriter.writeLineFormat (
 			"<input",

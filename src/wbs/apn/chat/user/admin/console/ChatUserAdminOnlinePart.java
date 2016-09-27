@@ -1,8 +1,15 @@
 package wbs.apn.chat.user.admin.console;
 
-import wbs.apn.chat.user.core.model.ChatUserType;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -36,53 +43,56 @@ class ChatUserAdminOnlinePart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
-				"/chatUser.admin.online"),
-			">\n");
+				"/chatUser.admin.online"));
 
 		if (chatUser.getOnline ()) {
 
-			printFormat (
-				"<p>This user is online</p>\n");
+			htmlParagraphWrite (
+				"This user is online");
 
-			printFormat (
-				"<p><input",
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
 				" type=\"submit\"",
 				" name=\"offline\"",
 				" value=\"take offline\"",
-				"></p>\n");
+				">");
+
+			htmlParagraphClose ();
 
 		} else {
 
-			printFormat (
-				"<p>This user is offline</p>\n");
+			htmlParagraphWrite (
+				"This user is offline");
 
 			if (
 				chatUser.getType () == ChatUserType.user
 				&& chatUser.getFirstJoin () == null
 			) {
 
-				printFormat (
-					"<p>This user has never been online before, please don't ",
-					"bring them online unless you are sure!</p>\n");
+				htmlParagraphWriteFormat (
+					"This user has never been online before, please don't ",
+					"bring them online unless you are sure!");
 
 			}
 
-			printFormat (
-				"<p><input",
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
 				" type=\"submit\"",
 				" name=\"online\"",
 				" value=\"bring online\"",
-				"></p>\n");
+				">");
+
+			htmlParagraphClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlFormClose ();
 
 	}
 

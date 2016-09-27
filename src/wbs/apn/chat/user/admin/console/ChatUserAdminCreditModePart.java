@@ -3,13 +3,13 @@ package wbs.apn.chat.user.admin.console;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethodAction;
-import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
 
 import javax.inject.Named;
 
@@ -71,8 +71,7 @@ class ChatUserAdminCreditModePart
 
 		}
 
-		htmlFormOpenMethodAction (
-			"post",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
 				"/chatUser.admin.creditMode"));
 

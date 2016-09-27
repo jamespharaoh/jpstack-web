@@ -141,7 +141,7 @@ class ChatUserDaoHibernate
 			.add (
 				Restrictions.eq (
 					"creditMode",
-					ChatUserCreditMode.strict))
+					ChatUserCreditMode.billedMessage))
 
 			.add (
 				Restrictions.ge (

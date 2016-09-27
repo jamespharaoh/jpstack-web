@@ -1,6 +1,12 @@
 package wbs.test.simulator.console;
 
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlDivClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlDivOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -11,6 +17,7 @@ import javax.inject.Provider;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.html.SelectBuilder;
 import wbs.console.misc.JqueryScriptRef;
@@ -71,6 +78,23 @@ class SimulatorSessionConsolePart
 
 	}
 
+	@Override
+	public
+	Set <HtmlLink> links () {
+
+		return ImmutableSet.<HtmlLink> builder ()
+
+			.addAll (
+				super.links ())
+
+			.add (
+				HtmlLink.applicationCssStyle (
+					"/style/simulator-console.css"))
+
+			.build ();
+
+	}
+	
 	// implementation
 
 	@Override
@@ -103,44 +127,30 @@ class SimulatorSessionConsolePart
 
 	@Override
 	public
-	void renderHtmlHeadContent () {
-
-		printFormat (
-			"<style>\n",
-			"table.events tr.messageIn td { background: #ccccff }\n",
-			"table.events tr.messageOut td { background: #ffffcc }\n",
-			"table.events tr.messageBill td { background: #ffcccc }\n",
-			"</style>\n");
-
-	}
-
-	@Override
-	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<div",
-			" class=\"simulator\"",
-			" data-create-event-url=\"%h\"",
-			requestContext.resolveLocalUrl (
-				"/simulatorSession.createEvent"),
-			" data-poll-url=\"%h\"",
-			requestContext.resolveLocalUrl (
-				"/simulatorSession.poll"),
-			">\n");
+		htmlDivOpen (
+			htmlClassAttribute (
+				"simulator"),
+			htmlDataAttribute (
+				"create-event-url",
+				requestContext.resolveLocalUrl (
+					"/simulatorSession.createEvent")),
+			htmlDataAttribute (
+				"poll-url",
+				requestContext.resolveLocalUrl (
+					"/simulatorSession.poll")));
 
 		controls ();
 		eventsList ();
 
-		printFormat (
-			"</div>\n");
+		htmlDivClose ();
 
 	}
 
 	void controls () {
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
 		/*
 		pf ("<tr>\n",
@@ -158,36 +168,26 @@ class SimulatorSessionConsolePart
 			"</tr>\n");
 		*/
 
-		printFormat (
-			"<tr>\n",
-			"<th>Network</th>\n",
-
-			"<td>%s</td>\n",
-			selectBuilderProvider.get ()
+		htmlTableDetailsRowWriteHtml (
+			"Network",
+			() -> selectBuilderProvider.get ()
 				.htmlClass ("networkSelect")
 				.options (networkOptions)
 				.selectedValue ((String)
 					requestContext.session ("simulatorNetworkId"))
-				.build (),
+				.build ());
 
-			"</tr>\n");
-
-		printFormat (
-			"<tr>\n",
-			"<th>Num from</th>\n",
-
-			"<td>",
-			"<input",
-			" class=\"numFromText\"",
-			" type=\"text\"",
-			" value=\"%h\">",
-			emptyStringIfNull (
-				(String)
-				requestContext.session (
-					"simulatorNumFrom")),
-			"</td>\n",
-
-			"</tr>\n");
+		htmlTableDetailsRowWriteHtml (
+			"Num from",
+			() -> formatWriter.writeLineFormat (
+				"<input",
+				" class=\"numFromText\"",
+				" type=\"text\"",
+				" value=\"%h\">",
+				emptyStringIfNull (
+					(String)
+					requestContext.session (
+						"simulatorNumFrom"))));
 
 		printFormat (
 			"<tr>\n",

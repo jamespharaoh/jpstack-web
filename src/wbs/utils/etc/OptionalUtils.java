@@ -888,4 +888,22 @@ class OptionalUtils {
 
 	}
 
+	public static <Type>
+	Type ifPresentThenElse (
+			@NonNull Optional <?> optional,
+			@NonNull Supplier <Type> trueSupplier,
+			@NonNull Supplier <Type> falseSupplier) {
+
+		if (optional.isPresent ()) {
+
+			return trueSupplier.get ();
+
+		} else {
+
+			return falseSupplier.get ();
+
+		}
+
+	}
+
 }

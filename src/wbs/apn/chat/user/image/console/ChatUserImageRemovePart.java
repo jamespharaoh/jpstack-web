@@ -1,9 +1,9 @@
 package wbs.apn.chat.user.image.console;
 
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethod;
-import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPost;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -46,8 +46,7 @@ class ChatUserImageRemovePart
 	public
 	void renderHtmlBodyContent () {
 
-		htmlFormOpenMethod (
-			"post");
+		htmlFormOpenPost ();
 
 		if (chatUser.getChatUserImageList ().isEmpty ()) {
 

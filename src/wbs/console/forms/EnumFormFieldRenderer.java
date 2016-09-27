@@ -15,15 +15,17 @@ import java.util.Map;
 
 import com.google.common.base.Optional;
 
-import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FormField.FormType;
 import wbs.console.helper.EnumConsoleHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.utils.string.FormatWriter;
+
+import fj.data.Either;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("enumFormFieldRenderer")
@@ -58,7 +60,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		htmlWriter.writeFormat (
+		htmlWriter.writeLineFormat (
 			"<input",
 			" type=\"hidden\"",
 			" name=\"%h-%h\"",
@@ -69,7 +71,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 				? camelToHyphen (
 					interfaceValue.get ().name ())
 				: "none",
-			">\n");
+			">");
 
 	}
 
@@ -94,7 +96,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 						formName))
 				: interfaceValue;
 
-		htmlWriter.writeFormat (
+		htmlWriter.writeLineFormatIncreaseIndent (
 			"<select",
 			" id=\"%h-%h\"",
 			formName,
@@ -102,7 +104,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			" name=\"%h-%h\"",
 			formName,
 			name,
-			">\n");
+			">");
 
 		if (
 
@@ -119,13 +121,13 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 
 		) {
 
-			htmlWriter.writeFormat (
+			htmlWriter.writeLineFormat (
 				"<option",
 				" value=\"none\"",
 				currentValue.isPresent ()
 					? ""
 					: " selected",
-				">&mdash;</option>\n");
+				">&mdash;</option>");
 
 		}
 
@@ -140,7 +142,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			String optionLabel =
 				optionEntry.getValue ();
 
-			htmlWriter.writeFormat (
+			htmlWriter.writeLineFormat (
 				"<option",
 				" value=\"%h\"",
 				camelToHyphen (
@@ -148,13 +150,13 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 				optionValue == currentValue.orNull ()
 					? " selected"
 					: "",
-				">%h</option>\n",
+				">%h</option>",
 				optionLabel);
 
 		}
 
-		htmlWriter.writeFormat (
-			"</select>\n");
+		htmlWriter.writeLineFormatDecreaseIndent (
+			"</select>");
 
 	}
 
@@ -162,7 +164,6 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	public
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
-			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<Interface> interfaceValue,
 			@NonNull FormType formType,
@@ -176,9 +177,8 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 				FormType.search)
 		) {
 
-			javascriptWriter.writeFormat (
-				"%s$(\"#%j-%j\").val (\"none\");\n",
-				indent,
+			javascriptWriter.writeLineFormat (
+				"$(\"#%j-%j\").val (\"none\");",
 				formName,
 				name);
 
@@ -188,9 +188,8 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 				FormType.update)
 		) {
 
-			javascriptWriter.writeFormat (
-				"%s$(\"#%j-%j\").val (\"%h\");\n",
-				indent,
+			javascriptWriter.writeLineFormat (
+				"$(\"#%j-%j\").val (\"%h\");",
 				formName,
 				name,
 				interfaceValue.isPresent ()

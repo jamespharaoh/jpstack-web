@@ -214,6 +214,20 @@ writeBuildFile world = do
 
 			],
 
+			makeComboTarget "daemon-test" [
+
+				"build-framework",
+				"build-meta",
+				"generate-records",
+				"build-entity",
+				"generate-helpers",
+				"build-rest",
+
+				"daemon-deploy",
+				"daemon-test"
+
+			],
+
 			makeComboTarget "generate-records" [
 
 				"build-framework",
@@ -681,12 +695,34 @@ writeBuildFile world = do
 
 		]
 
+	let makeDaemonTestTarget =
+		makeSimpleTarget ("daemon-test") [
+
+			mkelem "java" [
+				sattr "classname"
+					"wbs.framework.component.tools.ComponentRunner",
+				sattr "classpathref" "classpath",
+				sattr "failonerror" "true"
+			] [
+				makeArgValue "wbs-test",
+				makeArgValue "wbs.test",
+				makeArgValue (
+					"utils,config,data,entity,schema,sql,model,hibernate," ++
+					"object,logic,daemon,model-meta"),
+				makeArgValue "",
+				makeArgValue "wbs.platform.daemon.DaemonRunner",
+				makeArgValue "runDaemon"
+			]
+
+		]
+
 	let makeDeployTargets =
 		[
 			makeDaemonDeployTarget,
 			makeWebDeployTarget "api",
 			makeWebDeployTarget "console",
-			makeTomcatTestTarget
+			makeTomcatTestTarget,
+			makeDaemonTestTarget
 		]
 
 	let makeServiceTarget name service action =

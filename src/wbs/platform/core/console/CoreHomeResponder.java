@@ -1,5 +1,8 @@
 package wbs.platform.core.console;
 
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingOneWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+
 import wbs.console.responder.HtmlResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
 
@@ -12,11 +15,11 @@ class CoreHomeResponder
 	protected
 	void renderHtmlBodyContents () {
 
-		printFormat (
-			"<h1>Home</h1>\n");
+		htmlHeadingOneWrite (
+			"Home");
 
-		printFormat (
-			"<p>Welcome to the SMS console.</p>\n");
+		htmlParagraphWrite (
+			"Welcome to the SMS console.");
 
 	}
 

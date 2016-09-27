@@ -2,9 +2,13 @@ package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWriteHtml;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
@@ -14,14 +18,11 @@ import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethodAction;
-import static wbs.utils.web.HtmlUtils.htmlHeadingTwoWrite;
 
-import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -82,8 +83,7 @@ class ChatUserAdminCreditPart
 
 		}
 
-		htmlFormOpenMethodAction (
-			"post",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
 				"/chatUser.admin.credit"));
 
@@ -207,8 +207,20 @@ class ChatUserAdminCreditPart
 				htmlTableCellWrite (
 					 chatUserCredit.getDetails ());
 
-				consoleObjectManager.writeTdForObjectMiniLink (
-					chatUserCredit.getUser ());
+				if (
+					isNotNull (
+						chatUserCredit.getUser ())
+				) {
+
+					consoleObjectManager.writeTdForObjectMiniLink (
+						chatUserCredit.getUser ());
+
+				} else {
+
+					htmlTableCellWrite (
+						"—");
+
+				}
 
 				htmlTableRowClose ();
 

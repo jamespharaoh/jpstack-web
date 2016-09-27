@@ -3,19 +3,35 @@ package wbs.apn.chat.user.pending.console;
 import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
-import static wbs.utils.web.HtmlInputUtils.htmlOption;
+import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingOneWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlInputUtils.htmlOptionWrite;
+import static wbs.utils.web.HtmlInputUtils.htmlSelectClose;
+import static wbs.utils.web.HtmlInputUtils.htmlSelectOpen;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
 import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlHeadingOneWrite;
-import static wbs.utils.web.JsonUtils.htmlScriptDefaultOptions;
 
 import java.util.Collections;
 import java.util.List;
@@ -31,6 +47,7 @@ import wbs.apn.chat.user.core.logic.ChatUserLogic.PendingMode;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.apn.chat.user.image.model.ChatUserImageType;
+import wbs.console.context.ConsoleContextScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.priv.UserPrivChecker;
@@ -75,13 +92,13 @@ class ChatUserPendingFormResponder
 
 	PendingMode mode;
 
-	// implementation
+	// details
 
 	@Override
 	protected
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())
@@ -89,9 +106,15 @@ class ChatUserPendingFormResponder
 			.add (
 				JqueryScriptRef.instance)
 
+			.add (
+				ConsoleContextScriptRef.javascript (
+					"/js/chat-user-pending-form.js"))
+
 			.build ();
 
 	}
+
+	// implementation
 
 	@Override
 	protected
@@ -172,65 +195,35 @@ class ChatUserPendingFormResponder
 
 		super.renderHtmlHeadContents ();
 
-		printFormat (
-			"<script language=\"JavaScript\">\n");
+		renderScriptBlock ();
 
-		printFormat (
-			"var chatHelpTemplates = new Array ();\n");
+	}
 
-		for (ChatHelpTemplateRec chatHelpTemplate
-				: chatHelpTemplates) {
+	private
+	void renderScriptBlock () {
 
-			printFormat (
-				"chatHelpTemplates[%s] = '%j';\n",
+		htmlScriptBlockOpen ();
+
+		formatWriter.writeLineFormat (
+			"var chatHelpTemplates = new Array ();");
+
+		for (
+			ChatHelpTemplateRec chatHelpTemplate
+				: chatHelpTemplates
+		) {
+
+			formatWriter.writeLineFormat (
+				"chatHelpTemplates[%s] = '%j';",
 				chatHelpTemplate.getId (),
 				chatHelpTemplate.getText ());
 
 		}
 
-		printFormat (
-			"function useTemplate () {\n",
-			"  var templateId = document.getElementById ('templateId');\n",
-			"  var text = document.getElementById ('message');\n",
-			"  if (templateId.value == '') return;\n",
-			"  var template = chatHelpTemplates[templateId.value];\n",
-			"  if (template) text.value = template;\n",
-			"}\n");
+		formatWriter.writeLineFormat (
+			"top.show_inbox (true);");
 
-		printFormat (
-			"function showPhoto () {\n",
-			"  try {\n",
-			"    document.getElementById ('photoRow').style.display = 'table-row';\n",
-			"  } catch (e) {\n",
-			"    document.getElementById ('photoRow').style.display = 'block';\n",
-			"  }\n",
-			"  document.getElementById ('templateRow').style.display = 'none';\n",
-			"  document.getElementById ('messageRow').style.display = 'none';\n",
-			"  document.getElementById ('approveButton').style.display = 'inline';\n",
-			"  document.getElementById ('rejectButton').style.display = 'none';\n",
-			"  $('#classificationRow').show ();\n",
-			"}\n");
-
-		printFormat (
-			"function showReject () {\n",
-			"  document.getElementById ('photoRow').style.display = 'none';\n",
-			"  try {\n",
-			"    document.getElementById ('templateRow').style.display = 'table-row';\n",
-			"    document.getElementById ('messageRow').style.display = 'table-row';\n",
-			"  } catch (e) {\n",
-			"    document.getElementById ('templateRow').style.display = 'block';\n",
-			"    document.getElementById ('messageRow').style.display = 'block';\n",
-			"  }\n",
-			"  document.getElementById ('approveButton').style.display = 'none';\n",
-			"  document.getElementById ('rejectButton').style.display = 'inline';\n",
-			"  $('#classificationRow').hide ();\n",
-			"}\n");
-
-		printFormat (
-			"top.show_inbox (true);\n");
-
-		printFormat (
-			"top.frames['main'].location = '%j';\n",
+		formatWriter.writeLineFormat (
+			"top.frames['main'].location = '%j';",
 			requestContext.resolveApplicationUrl (
 				stringFormat (
 					"/chatUser.pending",
@@ -238,8 +231,7 @@ class ChatUserPendingFormResponder
 					chatUser.getId (),
 					"/chatUser.pending.summary")));
 
-		printFormat (
-			"</script>\n");
+		htmlScriptBlockClose ();
 
 	}
 
@@ -253,24 +245,20 @@ class ChatUserPendingFormResponder
 		requestContext.flushNotices (
 			formatWriter);
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
+		// form open
 
-			" action=\"%h\"",
+		htmlFormOpenPostAction (
 			requestContext.resolveApplicationUrl (
 				stringFormat (
 					"/chatUser.pending",
 					"/%u",
 					chatUser.getId (),
-					"/chatUser.pending.form")),
-
-			">");
+					"/chatUser.pending.form")));
 
 		if (mode == PendingMode.none) {
 
-			printFormat (
-				"<p>No info to approve</p>\n");
+			htmlParagraphWrite (
+				"No info to approve");
 
 			if (
 				privChecker.canRecursive (
@@ -278,94 +266,86 @@ class ChatUserPendingFormResponder
 					"manage")
 			) {
 
-				printFormat (
-					"<p><input",
+				htmlParagraphOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
 					" type=\"submit\"",
 					" name=\"chatUserDismiss\"",
 					" value=\"dismiss queue item\"",
-					"></p>\n");
+					">");
+
+				htmlParagraphClose ();
 
 			}
 
 		} else {
 
-			printFormat (
+			htmlTableOpenDetails ();
 
-				"<table class=\"list\">\n");
-
-			printFormat (
-
-				"<tr>\n",
-
-				"<th>User</th>\n",
-
-				"<td>%h</td>\n",
+			htmlTableDetailsRowWrite (
+				"User",
 				stringFormat (
 					"%s/%s",
 					chatUser.getChat ().getCode (),
-					chatUser.getCode ()),
+					chatUser.getCode ()));
 
-				"</tr>\n");
+			htmlTableDetailsRowWriteHtml (
+				"Options",
+				() -> {
 
-			printFormat (
+				formatWriter.writeFormat (
+					"<input",
+					" type=\"button\"",
+					" value=\"approve\"",
+					" onclick=\"showPhoto ()\"",
+					">");
 
-				"<tr>\n",
+				formatWriter.writeFormat (
+					"<input",
+					" type=\"button\"",
+					" value=\"reject\"",
+					" onclick=\"showReject ()\"",
+					">");
 
-				"<th>Options</th>\n",
-
-				"<td><input",
-				" type=\"button\"",
-				" value=\"approve\"",
-				" onclick=\"showPhoto ()\"",
-				">",
-
-				"<input",
-				" type=\"button\"",
-				" value=\"reject\"",
-				" onclick=\"showReject ()\"",
-				"></td>\n",
-
-				"</tr>\n");
+			});
 
 			switch (mode) {
 
 			case name:
 
-				printFormat (
-					"<tr id=\"photoRow\">\n",
-					"<th>Name</th>\n",
-
-					"<td><textarea",
-					" name=\"name\"",
-					" rows=\"4\"",
-					" cols=\"48\"",
-					">%h</textarea></td>\n",
-					chatUser
-						.getNewChatUserName ()
-						.getOriginalName (),
-
-					"</tr>\n");
+				htmlTableDetailsRowWriteHtml (
+					"Name",
+					() -> formatWriter.writeLineFormat (
+						"<textarea",
+						" name=\"name\"",
+						" rows=\"4\"",
+						" cols=\"48\"",
+						">%h</textarea>",
+						chatUser
+							.getNewChatUserName ()
+							.getOriginalName ()),
+					htmlIdAttribute (
+						"photoRow"));
 
 				break;
 
 			case info:
 
-				printFormat (
-					"<tr id=\"photoRow\">\n",
-
-					"<th>Info</th>\n",
-
-					"<td><textarea",
-					" name=\"info\"",
-					" rows=\"4\"",
-					" cols=\"48\"",
-					">%h</textarea></td>\n",
-					chatUser
-						.getNewChatUserInfo ()
-						.getOriginalText ()
-						.getText (),
-
-					"</tr>\n");
+				htmlTableDetailsRowWriteHtml (
+					"Info",
+					() -> formatWriter.writeLineFormat (
+						"<textarea",
+						" name=\"info\"",
+						" rows=\"4\"",
+						" cols=\"48\"",
+						">%h</textarea>",
+						chatUser
+							.getNewChatUserInfo ()
+							.getOriginalText ()
+							.getText ()),
+					htmlIdAttribute (
+						"photoRow"));
 
 				break;
 
@@ -441,6 +421,8 @@ class ChatUserPendingFormResponder
 
 			}
 
+			// media
+
 			if (
 				enumInSafe (
 					mode,
@@ -454,17 +436,24 @@ class ChatUserPendingFormResponder
 						chatUser,
 						chatUserLogic.imageTypeForMode (mode));
 
-				printFormat (
-					"<tr id=\"classificationRow\">\n",
-					"<th>Classification</th>\n",
+				htmlTableRowOpen (
+					htmlIdAttribute (
+						"classificationRow"));
 
-					"<td><select name=\"classification\">\n");
+				htmlTableHeaderCellWrite (
+					"Classification");
 
-				htmlOption (
+				htmlTableCellOpen ();
+
+				htmlSelectOpen (
+					"classification");
+
+				htmlOptionWrite (
 					"primary",
-					"primary",
-					requestContext.getForm (
-						"classification"));
+					emptyStringIfNull (
+						requestContext.getForm (
+							"classification")),
+					"primary");
 
 				if (
 
@@ -476,11 +465,12 @@ class ChatUserPendingFormResponder
 
 				) {
 
-					htmlOption (
+					htmlOptionWrite (
 						"secondary",
-						"secondary",
-						requestContext.getForm (
-							"classification"));
+						emptyStringIfNull (
+							requestContext.getForm (
+								"classification")),
+						"secondary");
 
 				}
 
@@ -488,184 +478,208 @@ class ChatUserPendingFormResponder
 					chatUserImage.getAppend ()
 				) {
 
-					htmlOption (
+					htmlOptionWrite (
 						"landscape",
-						"landscape",
-						requestContext.getForm (
-							"classification"));
+						emptyStringIfNull (
+							requestContext.getForm (
+								"classification")),
+						"landscape");
 
 				}
 
-				printFormat (
-					"</select>\n",
-					"</td>\n",
-					"</tr>\n");
+				htmlSelectClose ();
+
+				htmlTableCellClose ();
+
+				htmlTableRowClose ();
 
 			}
 
-			printFormat (
+			// template
 
-				"<tr",
-				" id=\"templateRow\"",
-				" style=\"display: none\">\n",
+			htmlTableRowOpen (
+				htmlIdAttribute (
+					"templateRow"),
+				htmlStyleAttribute (
+					htmlStyleRuleEntry (
+						"display",
+						"none")));
 
-				"<th>Template</th>\n",
+			htmlTableHeaderCellWrite (
+				"Template");
 
-				"<td><select",
-				" id=\"templateId\"",
-				">\n",
+			htmlTableCellOpen ();
 
-				"<option>\n");
+			htmlSelectOpen (
+				htmlIdAttribute (
+					"templateId"));
 
-			for (ChatHelpTemplateRec chatelpTemplate
-					: chatHelpTemplates) {
+			htmlOptionWrite (
+				"");
 
-				printFormat (
-					"<option",
-					" value=\"%h\"",
-					chatelpTemplate.getId (),
-					">%h</option>\n",
+			for (
+				ChatHelpTemplateRec chatelpTemplate
+					: chatHelpTemplates
+			) {
+
+				htmlOptionWrite (
+					integerToDecimalString (
+						chatelpTemplate.getId ()),
 					chatelpTemplate.getCode ());
 
 			}
 
-			printFormat (
-				"</select>\n",
+			htmlSelectClose ();
 
+			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"button\"",
 				" onclick=\"useTemplate ()\"",
 				" value=\"ok\"",
-				"></td>\n",
+				">");
 
-				"</tr>\n");
+			htmlTableRowClose ();
 
-			printFormat (
-				"<tr",
-				" id=\"messageRow\"",
-				" style=\"display: none\"",
-				">\n",
+			// message
 
-				"<th>Message</th>\n",
+			htmlTableRowOpen (
+				htmlIdAttribute (
+					"messageRow"),
+				htmlStyleAttribute (
+					htmlStyleRuleEntry (
+						"display",
+						"none")));
 
-				"<td><textarea",
+			htmlTableHeaderCellWrite (
+				"Message");
+
+			htmlTableRowOpen ();
+
+			formatWriter.writeFormat (
+				"<textarea",
 				" id=\"message\"",
 				" name=\"message\"",
 				" rows=\"4\"",
 				" cols=\"48\"",
-				"></textarea></td>\n",
+				"></textarea>");
 
-				"</tr>\n");
+			htmlTableCellClose ();
 
-			printFormat (
-				"<tr>\n",
-				"<th>Actions</th>\n",
-				"<td>");
+			htmlTableRowClose ();
+
+			// actions
+
+			htmlTableRowOpen ();
+
+			htmlTableHeaderCellWrite (
+				"Actions");
+
+			htmlTableCellOpen ();
 
 			switch (mode) {
 
 			case name:
 
-				printFormat (
-
+				formatWriter.writeLineFormat (
 					"<input",
 					" id=\"approveButton\"",
 					" type=\"submit\"",
 					" name=\"chatUserNameApprove\"",
 					" value=\"approve name\"",
-					">\n",
+					">");
 
+				formatWriter.writeLineFormat (
 					"<input",
 					" id=\"rejectButton\"",
 					" style=\"display: none\"",
 					" type=\"submit\"",
 					" name=\"chatUserNameReject\"",
-					"value=\"reject name and send warning\"",
-					">\n");
+					" value=\"reject name and send warning\"",
+					">");
 
 				break;
 
 			case info:
 
-				printFormat (
-
+				formatWriter.writeLineFormat (
 					"<input",
 					" id=\"approveButton\"",
 					" type=\"submit\"",
 					" name=\"chatUserInfoApprove\"",
 					" value=\"approve info\"",
-					">\n",
+					">");
 
+				formatWriter.writeLineFormat (
 					"<input",
 					" id=\"rejectButton\"",
 					" style=\"display: none\"",
 					" type=\"submit\"",
 					" name=\"chatUserInfoReject\"",
 					" value=\"reject info and send warning\"",
-					">\n");
+					">");
 
 				break;
 
 			case image:
 
-				printFormat (
-
+				formatWriter.writeLineFormat (
 					"<input",
 					" id=\"approveButton\"",
 					" type=\"submit\"",
 					" name=\"chatUserImageApprove\"",
 					" value=\"approve photo\"",
-					">\n",
+					">");
 
+				formatWriter.writeLineFormat (
 					"<input",
 					" id=\"rejectButton\"",
 					" style=\"display: none\"",
 					" type=\"submit\"",
 					" name=\"chatUserImageReject\"",
 					" value=\"reject photo and send warning\"",
-					">\n");
+					">");
 
 				break;
 
 			case video:
 
-				printFormat (
-
+				formatWriter.writeLineFormat (
 					"<input",
 					" id=\"approveButton\"",
 					" type=\"submit\"",
 					" name=\"chatUserVideoApprove\"",
 					" value=\"approve video\"",
-					">\n",
+					">");
 
+				formatWriter.writeLineFormat (
 					"<input",
 					" id=\"rejectButton\"",
 					" style=\"display: none\"",
 					" type=\"submit\"",
 					" name=\"chatUserVideoReject\"",
 					" value=\"reject video and send warning\"",
-					">\n");
+					">");
 
 				break;
 
 			case audio:
 
-				printFormat (
-
+				formatWriter.writeLineFormat (
 					"<input",
 					" id=\"approveButton\"",
 					" type=\"submit\"",
 					" name=\"chatUserAudioApprove\"",
 					" value=\"approve audio\"",
-					">\n",
+					">");
 
+				formatWriter.writeLineFormat (
 					"<input",
 					" id=\"rejectButton\"",
 					" style=\"display: none\"",
 					" type=\"submit\"",
 					" name=\"chatUserAudioReject\"",
 					" value=\"reject audio and send warning\"",
-					">\n");
+					">");
 
 				break;
 
@@ -675,18 +689,18 @@ class ChatUserPendingFormResponder
 
 			}
 
-			printFormat (
-				"</td>\n",
+			htmlTableCellClose ();
 
-				"</tr>\n");
+			htmlTableRowClose ();
 
-			printFormat (
-				"</table>\n");
+			htmlTableClose ();
 
 		}
 
-		printFormat (
-			"</form>\n");
+		// form close
+
+		htmlFormClose ();
 
 	}
+
 }

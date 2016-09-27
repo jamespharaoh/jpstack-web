@@ -1,6 +1,10 @@
 package wbs.smsapps.alerts.console;
 
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPost;
 import static wbs.utils.web.HtmlInputUtils.htmlSelectYesNo;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
@@ -9,10 +13,6 @@ import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethod;
-import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -54,8 +54,7 @@ class AlertsSettingsNumbersPart
 
 		// top
 
-		htmlFormOpenMethod (
-			"post");
+		htmlFormOpenPost ();
 
 		if (
 			requestContext.canContext (

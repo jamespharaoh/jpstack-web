@@ -1,5 +1,8 @@
 package wbs.platform.core.console;
 
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+
 import java.io.IOException;
 
 import org.joda.time.Instant;
@@ -64,21 +67,21 @@ class CoreFrameSetResponder
 	public
 	void goDocType () {
 
-		printFormat (
-			"<!DOCTYPE html>\n");
+		formatWriter.writeLineFormat (
+			"<!DOCTYPE html>");
 
 	}
 
 	public
 	void goHtml () {
 
-		printFormat (
-			"<html>\n");
+		formatWriter.writeLineFormat (
+			"<html>");
 
 		goHtmlStuff ();
 
-		printFormat (
-			"</html>\n");
+		formatWriter.writeLineFormat (
+			"</html>");
 
 	}
 
@@ -94,13 +97,17 @@ class CoreFrameSetResponder
 	public
 	void goHead () {
 
-		printFormat (
-			"<head>\n");
+		formatWriter.writeLineFormat (
+			"<head>");
+
+		formatWriter.increaseIndent ();
 
 		goHeadStuff ();
 
-		printFormat (
-			"</head>\n");
+		formatWriter.decreaseIndent ();
+
+		formatWriter.writeLineFormat (
+			"</head>");
 
 	}
 
@@ -111,71 +118,120 @@ class CoreFrameSetResponder
 
 		goScripts ();
 
-		printFormat (
-			"<link rel=\"shortcut icon\" href=\"%h\">\n",
+		formatWriter.writeLineFormat (
+			"<link",
+			" rel=\"shortcut icon\"",
+			" href=\"%h\"",
 			requestContext.resolveApplicationUrl (
-				"/favicon.ico"));
+				"/favicon.ico"),
+			">");
 
-		printFormat (
-			"<link rel=\"icon\" href=\"%h\">\n",
+		formatWriter.writeLineFormat (
+			"<link",
+			" rel=\"icon\"",
+			" href=\"%h\"",
 			requestContext.resolveApplicationUrl (
-				"/favicon.ico"));
+				"/favicon.ico"),
+			">");
 
 	}
 
 	public
 	void goTitle () {
 
-		printFormat (
-			"<title>%h</title>\n",
+		formatWriter.writeLineFormat (
+			"<title>");
+
+		formatWriter.increaseIndent ();
+
+		formatWriter.writeLineFormat (
+			"%h",
 			wbsConfig.consoleTitle ());
+
+		formatWriter.decreaseIndent ();
+
+		formatWriter.writeLineFormat (
+			"</title>");
 
 	}
 
 	public
 	void goScripts () {
 
-		printFormat (
-			"<script type=\"text/javascript\">\n",
-			"  function show_inbox (show) {\n",
-			"    document.getElementById ('right_frameset').rows = show? '2*,1*' : '*,0';\n",
-			"  }\n",
-			"</script>\n");
+		htmlScriptBlockOpen ();
+
+		formatWriter.writeLineFormat (
+			"function show_inbox (show) {");
+
+		formatWriter.increaseIndent ();
+
+		formatWriter.writeLineFormat (
+			"document.getElementById ('right_frameset').rows =");
+
+		formatWriter.writeLineFormat (
+			"  show ? '2*,1*' : '*,0';");
+
+		formatWriter.decreaseIndent ();
+
+		formatWriter.writeLineFormat (
+			"}");
+
+		htmlScriptBlockClose ();
 
 	}
 
 	public
 	void goFrameset () {
 
-		printFormat (
+		formatWriter.writeLineFormat (
+			"<frameset cols=\"1*,4*\">");
 
-			"<frameset cols=\"1*,4*\">\n",
+		formatWriter.increaseIndent ();
 
-			"<frameset rows=\"2*,1*\">\n",
+		formatWriter.writeLineFormat (
+			"<frameset rows=\"2*,1*\">");
 
-			"<frame name=\"sidebar\" src=\"%h\">\n",
+		formatWriter.increaseIndent ();
+
+		formatWriter.writeLineFormat (
+			"<frame name=\"sidebar\" src=\"%h\">",
 			requestContext.resolveApplicationUrl (
-				"/sidebar"),
+				"/sidebar"));
 
-			"<frame name=\"status\" src=\"%h\">\n",
+		formatWriter.writeLineFormat (
+			"<frame name=\"status\" src=\"%h\">",
 			requestContext.resolveApplicationUrl (
-				"/status"),
+				"/status"));
 
-			"</frameset>\n",
+		formatWriter.decreaseIndent ();
 
-			"<frameset rows=\"1*,0\" id=\"right_frameset\">\n",
+		formatWriter.writeLineFormat (
+			"</frameset>");
 
-			"<frame name=\"main\" src=\"%h\">\n",
+		formatWriter.writeLineFormat (
+			"<frameset rows=\"1*,0\" id=\"right_frameset\">");
+
+		formatWriter.increaseIndent ();
+
+		formatWriter.writeLineFormat (
+			"<frame name=\"main\" src=\"%h\">",
 			requestContext.resolveApplicationUrl (
-				"/home"),
+				"/home"));
 
-			"<frame name=\"inbox\" src=\"%h\">\n",
+		formatWriter.writeLineFormat (
+			"<frame name=\"inbox\" src=\"%h\">",
 			requestContext.resolveApplicationUrl (
-				"/queues/queue.home"),
+				"/queues/queue.home"));
 
-			"</frameset>\n",
+		formatWriter.decreaseIndent ();
 
-			"</frameset>\n");
+		formatWriter.writeLineFormat (
+			"</frameset>");
+
+		formatWriter.decreaseIndent ();
+
+		formatWriter.writeLineFormat (
+			"</frameset>");
 
 	}
 

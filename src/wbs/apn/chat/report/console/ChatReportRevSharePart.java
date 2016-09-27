@@ -2,6 +2,14 @@ package wbs.apn.chat.report.console;
 
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,9 +28,6 @@ import lombok.NonNull;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
-import wbs.apn.chat.contact.model.ChatMessageSearch;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserSearch;
 import wbs.apn.chat.affiliate.console.ChatAffiliateConsoleHelper;
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.bill.console.ChatRouteConsoleHelper;
@@ -32,13 +37,16 @@ import wbs.apn.chat.bill.model.ChatRouteRec;
 import wbs.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.contact.model.ChatMessageSearch;
 import wbs.apn.chat.core.console.ChatMonthCostConsoleHelper;
 import wbs.apn.chat.core.model.ChatMonthCostRec;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserSearch;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
@@ -695,11 +703,9 @@ class ChatReportRevSharePart
 
 	void goSearchForm () {
 
-		printFormat (
-			"<form method=\"get\">\n");
+		htmlFormOpenGet ();
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
 			requestContext,
@@ -711,42 +717,44 @@ class ChatReportRevSharePart
 			FormType.search,
 			"search");
 
-		printFormat (
-			"<tr>\n",
-			"<th>Actions</th>\n",
-			"<td><input",
-			" type=\"submit\"",
-			" value=\"search\"",
-			"></td>\n",
-			"</tr>\n");
+		htmlTableDetailsRowWriteHtml (
+			"Actions",
+			stringFormat (
+				"<input",
+				" type=\"submit\"",
+				" value=\"search\"",
+				">"));
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
-		printFormat (
-			"</form>\n");
+		htmlFormClose ();
 
+	}
+
+	private void htmlFormOpenGet () {
+
+		// TODO Auto-generated method stub
+		
 	}
 
 	void goReport () {
 
-		printFormat (
-			"<h2>Stats</h2>\n");
+		htmlHeadingTwoWrite (
+			"Stats");
 
-		printFormat (
-			"<table class=\"list\">\n");
+		// table open
+
+		htmlTableOpenList ();
 
 		// header
 
-		printFormat (
-			"<tr>");
+		htmlTableRowOpen ();
 
 		formFieldLogic.outputTableHeadings (
 			formatWriter,
 			resultsFields);
 
-		printFormat (
-			"</tr>\n");
+		htmlTableRowClose ();
 
 		// row
 
@@ -755,8 +763,7 @@ class ChatReportRevSharePart
 				: chatReportsSorted
 		) {
 
-			printFormat (
-				"<tr>\n");
+			htmlTableRowOpen ();
 
 			formFieldLogic.outputTableCellsList (
 				formatWriter,
@@ -765,43 +772,37 @@ class ChatReportRevSharePart
 				ImmutableMap.of (),
 				true);
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"<tr>\n");
-
 		// total
 
-		printFormat (
-			"<tr>\n");
-			formFieldLogic.outputTableCellsList (
-				formatWriter,
-				resultsFields,
-				totalReport,
-				ImmutableMap.of (),
-				true);
+		htmlTableRowOpen ();
 
-		printFormat (
-			"</tr>\n");
+		formFieldLogic.outputTableCellsList (
+			formatWriter,
+			resultsFields,
+			totalReport,
+			ImmutableMap.of (),
+			true);
 
-		printFormat (
-			"</table>\n");
+		htmlTableRowClose ();
+
+		// table close
+
+		htmlTableClose ();
 
 	}
 
 	void goRates () {
 
-		printFormat (
-			"<h2>Rates</h2>\n");
+		htmlHeadingTwoWrite (
+			"Rates");
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlTableOpenList ();
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

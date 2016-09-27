@@ -7,6 +7,8 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.io.IOException;
 import java.util.Map;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -15,14 +17,12 @@ import lombok.experimental.Accessors;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 
-import com.google.common.base.Optional;
-
-import fj.data.Either;
-
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
+
+import fj.data.Either;
 
 @PrototypeComponent ("uploadFormFieldRenderer")
 @Accessors (fluent = true)
@@ -85,21 +85,18 @@ class UploadFormFieldRenderer<Container>
 	public
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
-			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<FileUpload> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		javascriptWriter.writeFormat (
-			"%s$(\"#%j-%j\").replaceWith (\n",
-			indent,
+		javascriptWriter.writeLineFormat (
+			"$(\"#%j-%j\").replaceWith (",
 			formName,
 			name);
 
-		javascriptWriter.writeFormat (
-			"%s\t$(\"#%j-%j\").clone (true));\n",
-			indent,
+		javascriptWriter.writeLineFormat (
+			"\t$(\"#%j-%j\").clone (true));",
 			formName,
 			name);
 

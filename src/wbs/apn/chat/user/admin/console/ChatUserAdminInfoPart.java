@@ -4,7 +4,11 @@ import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingThreeWrite;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
@@ -13,17 +17,14 @@ import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethodAction;
-import static wbs.utils.web.HtmlUtils.htmlHeadingThreeWrite;
 
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
 import wbs.apn.chat.core.console.ChatConsoleLogic;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.info.model.ChatUserInfoRec;
 import wbs.console.context.ConsoleApplicationScriptRef;
@@ -108,8 +109,7 @@ class ChatUserAdminInfoPart
 				"chat.userAdmin")
 		) {
 
-			htmlFormOpenMethodAction (
-				"post",
+			htmlFormOpenPostAction (
 				requestContext.resolveLocalUrl (
 					"/chatUser.admin.info"));
 
@@ -150,8 +150,9 @@ class ChatUserAdminInfoPart
 				"Reason",
 				() -> chatConsoleLogic.writeSelectForChatUserEditReason (
 					"editReason",
-					requestContext.getForm (
-						"editReason")));
+					emptyStringIfNull (
+						requestContext.getForm (
+							"editReason"))));
 
 			htmlTableDetailsRowWriteHtml (
 				"Action",

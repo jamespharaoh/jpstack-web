@@ -1,5 +1,7 @@
 package wbs.integrations.clockworksms.fixture;
 
+import static wbs.utils.etc.LogicUtils.parseBooleanYesNoRequired;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 import static wbs.utils.string.StringUtils.joinWithNewline;
 import static wbs.utils.string.StringUtils.joinWithSpace;
@@ -17,6 +19,7 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
@@ -56,6 +59,9 @@ class ClockworkSmsFixtureProvider
 
 	@SingletonDependency
 	ClockworkSmsRouteOutObjectHelper clockworkSmsRouteOutHelper;
+
+	@SingletonDependency
+	Database database;
 
 	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
@@ -120,6 +126,8 @@ class ClockworkSmsFixtureProvider
 				"main")
 
 		);
+
+		database.flush ();
 
 	}
 
@@ -201,6 +209,8 @@ class ClockworkSmsFixtureProvider
 
 		}
 
+		database.flush ();
+
 	}
 
 	private
@@ -210,11 +220,13 @@ class ClockworkSmsFixtureProvider
 			"clockwork-sms-route",
 			this::createRoute);
 
+		database.flush ();
+
 	}
 
 	private
 	void createRoute (
-			@NonNull Map<String,String> params) {
+			@NonNull Map <String, String> params) {
 
 		switch (
 			params.get (
@@ -343,15 +355,20 @@ class ClockworkSmsFixtureProvider
 				params.get ("key"))
 
 			.setMaxParts (
-				3l)
+				parseIntegerRequired (
+					params.get ("max-parts")))
+
+			.setSimulateMultipart (
+				parseBooleanYesNoRequired (
+					params.get ("simulate-multipart")))
 
 		);
 
 	}
 
 	public final static
-	List<DefaultDeliveryStatus> defaultDeliveryStatuses =
-		ImmutableList.<DefaultDeliveryStatus>builder ()
+	List <DefaultDeliveryStatus> defaultDeliveryStatuses =
+		ImmutableList.<DefaultDeliveryStatus> builder ()
 
 		.add (
 			new DefaultDeliveryStatus ()

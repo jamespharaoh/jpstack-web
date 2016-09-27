@@ -1,5 +1,7 @@
 package wbs.console.combo;
 
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -66,8 +68,7 @@ class ContextFormActionPart <FormState>
 
 		if (helpText != null) {
 
-			printFormat (
-				"<p>%h</p>\n",
+			htmlParagraphWrite (
 				helpText);
 
 		}

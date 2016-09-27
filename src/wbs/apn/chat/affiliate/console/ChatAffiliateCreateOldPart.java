@@ -4,6 +4,12 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
 import static wbs.utils.web.HtmlInputUtils.htmlOptionWrite;
 import static wbs.utils.web.HtmlInputUtils.htmlSelectClose;
 import static wbs.utils.web.HtmlInputUtils.htmlSelectOpen;
@@ -17,11 +23,6 @@ import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethodAction;
-import static wbs.utils.web.HtmlUtils.htmlHeadingTwoWrite;
-import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -128,8 +129,7 @@ class ChatAffiliateCreateOldPart
 
 		// open form
 
-		htmlFormOpenMethodAction (
-			"post",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
 				"/chatAffiliate.create.old"));
 
@@ -244,10 +244,9 @@ class ChatAffiliateCreateOldPart
 		htmlHeadingTwoWrite (
 			"Keywords");
 
-		formatWriter.writeLineFormat (
-			"<p>You can optionally create some join keywords for this ",
-			"affiliate at this point. If not, please remember to create ",
-			"some later.</p>");
+		htmlParagraphWriteFormat (
+			"You can optionally create some join keywords for this affiliate ",
+			"at this point. If not, please remember to create some later.");
 
 		htmlTableOpenList ();
 

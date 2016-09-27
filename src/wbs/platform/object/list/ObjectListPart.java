@@ -6,8 +6,18 @@ import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
-import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenGetAction;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -106,8 +116,8 @@ class ObjectListPart <
 	ObjectListTabSpec currentListTabSpec;
 	Record <?> currentObject;
 
-	List<? extends Record<?>> allObjects;
-	List<Record<?>> selectedObjects;
+	List <? extends Record <?>> allObjects;
+	List <Record <?>> selectedObjects;
 
 	ConsoleContext targetContext;
 	ParentType parent;
@@ -116,9 +126,9 @@ class ObjectListPart <
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())
@@ -345,8 +355,8 @@ class ObjectListPart <
 	}
 
 	void prepareAllObjectsViaGrandParent (
-			ConsoleHelper<?> parentHelper,
-			ConsoleHelper<?> grandParentHelper,
+			ConsoleHelper <?> parentHelper,
+			ConsoleHelper <?> grandParentHelper,
 			Long grandParentId) {
 
 		if (currentListBrowserSpec.isPresent ()) {
@@ -354,7 +364,7 @@ class ObjectListPart <
 			ObjectListBrowserSpec browserSpec =
 				currentListBrowserSpec.get ();
 
-			Record<?> grandParentObject =
+			Record <?> grandParentObject =
 				grandParentHelper.findOrThrow (
 					grandParentId,
 					() -> new NullPointerException (
@@ -395,8 +405,8 @@ class ObjectListPart <
 			try {
 
 				@SuppressWarnings ("unchecked")
-				List<Record<?>> allObjectsTemp =
-					(List<Record<?>>)
+				List <Record <?>> allObjectsTemp =
+					(List <Record <?>>)
 					daoMethod.invoke (
 						consoleHelper,
 						grandParentObject,
@@ -435,15 +445,15 @@ class ObjectListPart <
 					grandParentHelper.objectTypeId (),
 					grandParentId);
 
-			List<? extends Record<?>> parentObjects =
+			List <? extends Record <?>> parentObjects =
 				parentHelper.findByParent (
 					grandParentGlobalId);
 
-			List<Record<?>> allObjectsTemp =
-				new ArrayList<Record<?>> ();
+			List <Record <?>> allObjectsTemp =
+				new ArrayList <Record <?>> ();
 
 			for (
-				Record<?> parentObject
+				Record <?> parentObject
 					: parentObjects
 			) {
 
@@ -481,12 +491,12 @@ class ObjectListPart <
 		// select which objects we want to display
 
 		selectedObjects =
-			new ArrayList<Record<?>> ();
+			new ArrayList <Record <?>> ();
 
 	OUTER:
 
 		for (
-			Record<?> object
+			Record <?> object
 				: allObjects
 		) {
 
@@ -522,9 +532,9 @@ class ObjectListPart <
 		// TODO i hate generics
 
 		@SuppressWarnings ("unchecked")
-		List<Comparable<Comparable<?>>> temp =
-			(List<Comparable<Comparable<?>>>)
-			(List<?>)
+		List <Comparable <Comparable <?>>> temp =
+			(List <Comparable <Comparable <?>>>)
+			(List <?>)
 			selectedObjects;
 
 		Collections.sort (
@@ -569,46 +579,44 @@ class ObjectListPart <
 			requestContext.resolveLocalUrl (
 				"/" + localName);
 
-		printFormat (
-			"<form",
-			" method=\"get\"",
-			" action=\"%h\"",
-			localUrl,
-			">\n");
+		htmlFormOpenGetAction (
+			localUrl);
 
-		printFormat (
-			"<p",
-			" class=\"links\"",
-			">%h\n",
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"links"));
+
+		formatWriter.writeLineFormat (
+			"%h",
 			ifNull (
 				browserSpec.label (),
 				capitalise (
 					camelToSpaces (
 						browserSpec.fieldName ()))));
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"text\"",
 			" name=\"date\"",
 			" value=\"%h\"",
 			dateField.text,
-			">\n");
+			">");
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" value=\"ok\"",
-			">\n");
+			">");
 
-		printFormat (
-			"%s</p>\n",
-			ObsoleteDateLinks.dailyBrowserLinks (
-				localUrl,
-				requestContext.getFormData (),
-				dateField.date));
+		ObsoleteDateLinks.dailyBrowserLinks (
+			formatWriter,
+			localUrl,
+			requestContext.getFormData (),
+			dateField.date);
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		htmlFormClose ();
 
 	}
 
@@ -621,66 +629,59 @@ class ObjectListPart <
 			return;
 		}
 
-		printFormat (
-			"<p class=\"links\">\n");
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"links"));
 
 		for (
 			ObjectListTabSpec listTabSpec
 				: listTabSpecs.values ()
 		) {
 
-			printFormat (
-				"<a",
-
-				" href=\"%h\"",
+			htmlLinkWrite (
+				formatWriter,
 				requestContext.resolveLocalUrl (
 					stringFormat (
 						"/%u",
 						localName,
 						"?tab=%u",
 						listTabSpec.name ())),
-
-				listTabSpec == currentListTabSpec
-					? " class=\"selected\""
-					: "",
-
-				">%h</a>\n",
-				listTabSpec.label ());
+				listTabSpec.label (),
+				presentInstances (
+					optionalIf (
+						listTabSpec == currentListTabSpec,
+						() -> htmlClassAttribute (
+							"selected"))));
 
 		}
 
-		printFormat (
-			"</p>\n");
+		htmlParagraphClose ();
 
 	}
 
 	void goList () {
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlTableOpenList ();
 
-		printFormat (
-			"<tr>\n");
+		htmlTableRowOpen ();
 
 		formFieldLogic.outputTableHeadings (
 			formatWriter,
 			formFieldSet);
 
-		printFormat (
-			"</tr>\n");
+		htmlTableRowClose ();
 
 		// render rows
 
 		for (
-			Record<?> object
+			Record <?> object
 				: selectedObjects
 		) {
 
-			printFormat (
-				"<tr",
+			htmlTableRowOpen (
+				formatWriter,
 
-				" class=\"%h\"",
-				joinWithSpace (
+				htmlClassAttribute (
 					presentInstances (
 
 					Optional.of (
@@ -692,16 +693,17 @@ class ObjectListPart <
 
 				)),
 
-				" data-target-href=\"%h\"",
-				requestContext.resolveContextUrl (
-					stringFormat (
-						"%s",
-						targetContext.pathPrefix (),
-						"/%s",
-						consoleHelper.getPathId (
-							object))),
+				htmlDataAttribute (
+					"target-href",
+					requestContext.resolveContextUrl (
+						stringFormat (
+							"%s",
+							targetContext.pathPrefix (),
+							"/%s",
+							consoleHelper.getPathId (
+								object))))
 
-				">\n");
+			);
 
 			formFieldLogic.outputTableCellsList (
 				formatWriter,
@@ -710,13 +712,13 @@ class ObjectListPart <
 				ImmutableMap.of (),
 				false);
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose (
+				formatWriter);
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose (
+			formatWriter);
 
 	}
 

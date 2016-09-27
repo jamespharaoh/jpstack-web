@@ -1,5 +1,25 @@
 package wbs.platform.status.console;
 
+import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockClose;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockOpen;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleClose;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntryWrite;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +61,7 @@ class StatusResponder
 	protected
 	Set <ScriptRef> myScriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.add (
 				JqueryScriptRef.instance)
@@ -57,7 +77,7 @@ class StatusResponder
 					PagePart::scriptRefs)
 
 				.flatMap (
-					Set<ScriptRef>::stream)
+					Set::stream)
 
 				.iterator ())
 
@@ -74,16 +94,19 @@ class StatusResponder
 
 		super.setup ();
 
-		for (StatusLine statusLine
-				: statusLineManager.getStatusLines ()) {
+		for (
+			StatusLine statusLine
+				: statusLineManager.getStatusLines ()
+		) {
 
 			PagePart pagePart =
 				statusLine.get ();
 
 			pagePart.setup (
-				Collections.<String,Object>emptyMap ());
+				Collections.emptyMap ());
 
-			pageParts.add (pagePart);
+			pageParts.add (
+				pagePart);
 
 		}
 
@@ -95,8 +118,8 @@ class StatusResponder
 
 		super.prepare ();
 
-		for (PagePart pagePart : pageParts)
-			pagePart.prepare ();
+		pageParts.forEach (
+			PagePart::prepare);
 
 	}
 
@@ -106,36 +129,69 @@ class StatusResponder
 
 		super.renderHtmlHeadContents ();
 
-		printFormat (
-			"<style type=\"text/css\">\n",
-			"#timeRow { display: none; }\n",
-			"#noticeRow { display: none; }\n",
-			"</style>\n");
+		renderStyleBlock ();
+		renderScriptBlock ();
 
-		// config
+		pageParts.forEach (
+			PagePart::renderHtmlHeadContent);
 
-		printFormat (
-			"<script type=\"text/javascript\">\n");
+	}
 
-		printFormat (
-			"var statusRequestUrl = '%j';\n",
+	private
+	void renderStyleBlock () {
+
+		// style open
+
+		htmlStyleBlockOpen ();
+
+		// time row
+
+		htmlStyleRuleOpen (
+			"#timeRow");
+
+		htmlStyleRuleEntryWrite (
+			"display",
+			"none");
+
+		htmlStyleRuleClose ();
+
+		// notice row
+
+		htmlStyleRuleOpen (
+			"#noticeRow");
+
+		htmlStyleRuleEntryWrite (
+			"display",
+			"none");
+
+		htmlStyleRuleClose ();
+
+		// style close
+
+		htmlStyleBlockClose ();
+
+	}
+
+	private
+	void renderScriptBlock () {
+
+		// script open
+
+		htmlScriptBlockOpen ();
+
+		// variables
+
+		formatWriter.writeLineFormat (
+			"var statusRequestUrl = '%j';",
 			requestContext.resolveApplicationUrl (
 				"/status.update"));
 
-		printFormat (
-			"var statusRequestTime = 800;\n");
+		formatWriter.writeLineFormat (
+			"var statusRequestTime = 800;");
 
-		printFormat (
-			"</script>\n");
+		// script close
 
-		// page parts
-
-		for (
-			PagePart pagePart
-				: pageParts
-		) {
-			pagePart.renderHtmlHeadContent ();
-		}
+		htmlScriptBlockClose ();
 
 	}
 
@@ -143,12 +199,16 @@ class StatusResponder
 	protected
 	void renderHtmlBody () {
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<body onload=\"statusRequestSchedule ();\">");
+
+		formatWriter.increaseIndent ();
 
 		renderHtmlBodyContents ();
 
-		printFormat (
+		formatWriter.decreaseIndent ();
+
+		formatWriter.writeLineFormat (
 			"</body>");
 
 	}
@@ -157,55 +217,98 @@ class StatusResponder
 	protected
 	void renderHtmlBodyContents () {
 
-		printFormat (
-			"<table",
-			" id=\"statusTable\"",
-			" class=\"list\"",
-			" width=\"100%%\"",
-			">\n");
+		// table open
 
-		printFormat (
-			"<tr>\n",
-			"<th id=\"headerCell\">Status</th>\n",
-			"</tr>\n");
+		htmlTableOpenList (
 
-		printFormat (
-			"<tr id=\"loadingRow\">\n",
-			"<td id=\"loadingCell\">Loading...</td>\n",
-			"</tr>\n");
+			htmlIdAttribute (
+				"statusTable"),
 
-		printFormat (
-			"<tr id=\"noticeRow\">\n",
-			"<td id=\"noticeCell\">&mdash;</td>\n",
-			"</tr>\n");
+			htmlAttribute (
+				"width",
+				"100%")
 
-		printFormat (
-			"<tr id=\"timeRow\">\n",
-			"<td id=\"timeCell\">&mdash;</td>\n",
-			"</tr>\n");
+		);
 
-		for (PagePart pagePart : pageParts)
-			pagePart.renderHtmlBodyContent();
+		// heading row
 
-		printFormat (
-			"<tr>\n",
+		htmlTableRowOpen ();
 
-			"<td><form\n",
-			" action=\"logoff\"",
-			" method=\"post\"",
-			">",
+		htmlTableHeaderCellWrite (
+			"Status",
+			htmlIdAttribute (
+				"headerCell"));
 
+		htmlTableRowClose ();
+
+		// loading row
+
+		htmlTableRowOpen (
+			htmlIdAttribute (
+				"loadingRow"));
+
+		htmlTableCellWrite (
+			"Loading...",
+			htmlIdAttribute (
+				"loadingCell"));
+
+		htmlTableRowClose ();
+
+		// notice row
+
+		htmlTableRowOpen (
+			htmlIdAttribute (
+				"noticeRow"));
+
+		htmlTableCellWrite (
+			"—",
+			htmlIdAttribute (
+				"noticeCell"));
+
+		htmlTableRowClose ();
+
+		// time row
+
+		htmlTableRowOpen (
+			htmlIdAttribute (
+				"timeRow"));
+
+		htmlTableCellWrite (
+			"—",
+			htmlIdAttribute (
+				"timeCell"));
+
+		htmlTableRowClose ();
+
+		// parts
+
+		pageParts.forEach (
+			PagePart::renderHtmlBodyContent);
+
+		// log out row
+
+		htmlTableRowOpen ();
+
+		htmlTableCellOpen ();
+
+		htmlFormOpenPostAction (
+			"logoff");
+
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" value=\"log out\"",
-			">",
+			">");
 
-			"</form></td>\n",
+		htmlFormClose ();
 
-			"</tr>\n");
+		htmlTableCellClose ();
 
-		printFormat (
-			"</table>\n");
+		htmlTableRowClose ();
+
+		// table close
+
+		htmlTableClose ();
 
 	}
 

@@ -1,20 +1,20 @@
 package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.LogicUtils.allOf;
-import static wbs.utils.etc.Misc.booleanToYesNo;
+import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteRaw;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethodAction;
 
-import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -114,8 +114,7 @@ class ChatUserAdminDeletePart
 
 		// action button, or excuse for having none
 
-		htmlFormOpenMethodAction (
-			"post",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
 				"/chatUser.admin.delete"));
 

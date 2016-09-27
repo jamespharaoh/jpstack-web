@@ -3,6 +3,8 @@ package wbs.console.forms;
 import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
 import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
@@ -11,14 +13,16 @@ import java.util.Map;
 
 import com.google.common.base.Optional;
 
-import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.utils.string.FormatWriter;
+
+import fj.data.Either;
 
 @PrototypeComponent ("textFormFieldRenderer")
 @Accessors (fluent = true)
@@ -75,8 +79,8 @@ class TextFormFieldRenderer <Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -92,7 +96,7 @@ class TextFormFieldRenderer <Container>
 						formName));
 		}
 
-		htmlWriter.writeFormat (
+		htmlWriter.writeLineFormat (
 			"<input",
 			" type=\"hidden\"",
 			" name=\"%h-%h\"",
@@ -100,7 +104,7 @@ class TextFormFieldRenderer <Container>
 			name (),
 			" value=\"%h\"",
 			interfaceValue.or (""),
-			">\n");
+			">");
 
 	}
 
@@ -114,6 +118,8 @@ class TextFormFieldRenderer <Container>
 			@NonNull Optional<String> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
+
+		out.writeIndent ();
 
 		out.writeFormat (
 			"<input",
@@ -145,13 +151,17 @@ class TextFormFieldRenderer <Container>
 			out.writeFormat (
 				"<br>");
 
+			out.writeNewline ();
+
+			out.writeIndent ();
+
 			for (
 				Map.Entry<String,String> presetEntry
 					: presets ().entrySet ()
 			) {
 
 				out.writeFormat (
-					"\n<input",
+					"<input",
 					" type=\"button\"",
 					" name=\"%h\"",
 					stringFormat (
@@ -173,13 +183,14 @@ class TextFormFieldRenderer <Container>
 
 		}
 
+		out.writeNewline ();
+
 	}
 
 	@Override
 	public
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
-			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue,
 			@NonNull FormType formType,
@@ -193,9 +204,8 @@ class TextFormFieldRenderer <Container>
 				FormType.search)
 		) {
 
-			javascriptWriter.writeFormat (
-				"%s$(\"#%j-%j\").val (\"\");\n",
-				indent,
+			javascriptWriter.writeLineFormat (
+				"$(\"#%j-%j\").val (\"\");",
 				formName,
 				name);
 
@@ -205,9 +215,8 @@ class TextFormFieldRenderer <Container>
 				FormType.update)
 		) {
 
-			javascriptWriter.writeFormat (
-				"%s$(\"#%j-%j\").val (\"%j\");\n",
-				indent,
+			javascriptWriter.writeLineFormat (
+				"$(\"#%j-%j\").val (\"%j\");",
 				formName,
 				name,
 				interfaceValue.or (""));
@@ -267,12 +276,12 @@ class TextFormFieldRenderer <Container>
 		) {
 
 			return successResult (
-				Optional.absent ());
+				optionalAbsent ());
 
 		}
 
 		return successResult (
-			Optional.of (
+			optionalOf (
 				formValue));
 
 	}
@@ -282,11 +291,11 @@ class TextFormFieldRenderer <Container>
 	void renderHtmlSimple (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue,
 			boolean link) {
 
-		htmlWriter.writeFormat (
+		htmlWriter.writeLineFormat (
 			"%h",
 			interfaceValue.or (""));
 

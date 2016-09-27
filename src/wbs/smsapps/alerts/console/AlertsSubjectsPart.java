@@ -1,6 +1,6 @@
 package wbs.smsapps.alerts.console;
 
-import static wbs.utils.etc.Misc.booleanToYesNo;
+import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;

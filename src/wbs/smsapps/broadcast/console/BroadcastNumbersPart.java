@@ -1,13 +1,13 @@
 package wbs.smsapps.broadcast.console;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPost;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethod;
-import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
 
 import lombok.experimental.Accessors;
 
@@ -76,8 +76,7 @@ class BroadcastNumbersPart
 
 		// open form
 
-		htmlFormOpenMethod (
-			"post");
+		htmlFormOpenPost ();
 
 		// write numbers
 

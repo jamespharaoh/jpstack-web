@@ -2,10 +2,11 @@ package wbs.console.html;
 
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Map;
+
+import lombok.NonNull;
 
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormatter;
@@ -174,13 +175,13 @@ class ObsoleteDateLinks {
 	 */
 	public static
 	void browser (
-			final PrintWriter out,
-			final String url,
-			final Map<String,String> formData,
-			final LocalDate date,
-			final String dateFieldName,
-			final LinkMaker linkMaker,
-			final DateTimeFormatter dateFormatter) {
+			@NonNull FormatWriter formatWriter,
+			@NonNull String url,
+			@NonNull Map <String, String> formData,
+			@NonNull LocalDate date,
+			@NonNull String dateFieldName,
+			@NonNull LinkMaker linkMaker,
+			@NonNull DateTimeFormatter dateFormatter) {
 
 		LinkWriter linkWriter =
 			new LinkWriter () {
@@ -188,20 +189,16 @@ class ObsoleteDateLinks {
 			@Override
 			public
 			void writeLink (
-					LocalDate date,
-					String title) {
+					@NonNull LocalDate date,
+					@NonNull String title) {
 
-				out.println (
-					stringFormat (
-						"<a",
-						" href=\"%h\"",
-						makeLink (
-							url,
-							formData,
-							dateFieldName,
-							dateFormatter.print (date)),
-						">%h</a>\n",
-						title));
+				htmlLinkWrite (
+					makeLink (
+						url,
+						formData,
+						dateFieldName,
+						dateFormatter.print (date)),
+					title);
 
 			}
 
@@ -308,25 +305,20 @@ class ObsoleteDateLinks {
 	}
 
 	public static
-	String dailyBrowserLinks (
-			String url,
-			Map<String,String> formData,
-			LocalDate date) {
-
-		StringWriter stringWriter =
-			new StringWriter ();
+	void dailyBrowserLinks (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String url,
+			@NonNull Map <String,String> formData,
+			@NonNull LocalDate date) {
 
 		browser (
-			new PrintWriter (
-				stringWriter),
+			formatWriter,
 			url,
 			formData,
 			date,
 			"date",
 			dailyLinkMaker,
 			ObsoleteDateField.dateFormatter);
-
-		return stringWriter.toString ();
 
 	}
 

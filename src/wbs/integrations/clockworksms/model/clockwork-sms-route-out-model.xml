@@ -35,6 +35,10 @@
 			maximum="3"
 			default="1"/>
 
+		<yes-no-field
+			name="simulateMultipart"
+			default="no"/>
+
 	</fields>
 
 	<senders>

@@ -3,6 +3,7 @@ package wbs.imchat.console;
 import static wbs.utils.etc.Misc.max;
 import static wbs.utils.etc.OptionalUtils.ifNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
 
 import java.util.List;
 
@@ -12,10 +13,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
-import wbs.imchat.console.ImChatCustomerConsoleHelper;
-import wbs.imchat.console.ImChatCustomerCreditConsoleHelper;
-import wbs.imchat.model.ImChatCustomerCreditRec;
-import wbs.imchat.model.ImChatCustomerRec;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
@@ -24,6 +21,8 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.imchat.model.ImChatCustomerCreditRec;
+import wbs.imchat.model.ImChatCustomerRec;
 
 @PrototypeComponent ("imChatCustomerCreditPart")
 public
@@ -113,8 +112,8 @@ class ImChatCustomerCreditPart
 
 		requestContext.flushNotices ();
 
-		printFormat (
-			"<h2>Customer details</h2>\n");
+		htmlHeadingTwoWrite (
+			"Customer details");
 
 		formFieldLogic.outputDetailsTable (
 			formatWriter,
@@ -122,8 +121,8 @@ class ImChatCustomerCreditPart
 			request.customer (),
 			ImmutableMap.of ());
 
-		printFormat (
-			"<h2>Apply credit</h2>\n");
+		htmlHeadingTwoWrite (
+			"Apply credit");
 
 		formFieldLogic.outputFormTable (
 			requestContext,
@@ -139,8 +138,8 @@ class ImChatCustomerCreditPart
 			FormType.perform,
 			"credit");
 
-		printFormat (
-			"<h2>Recent credit history</h2>\n");
+		htmlHeadingTwoWrite (
+			"Recent credit history");
 
 		formFieldLogic.outputListTable (
 			formatWriter,

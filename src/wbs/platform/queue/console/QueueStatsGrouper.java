@@ -59,11 +59,11 @@ class QueueStatsGrouper
 
 	@Override
 	public
-	List<Object> sortGroups (
-			Set<Object> groups) {
+	List <Object> sortGroups (
+			Set <Object> groups) {
 
-		List<QueueRec> queues =
-			new ArrayList<QueueRec> (
+		List <QueueRec> queues =
+			new ArrayList<> (
 				groups.size ());
 
 		for (

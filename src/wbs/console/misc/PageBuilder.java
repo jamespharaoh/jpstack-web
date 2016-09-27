@@ -92,7 +92,7 @@ class PageBuilder {
 	}
 
 	public
-	int pages () {
+	long pages () {
 		return pages.size ();
 	}
 

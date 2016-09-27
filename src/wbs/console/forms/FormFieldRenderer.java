@@ -6,10 +6,12 @@ import java.util.Map;
 
 import com.google.common.base.Optional;
 
-import fj.data.Either;
 import lombok.NonNull;
+
 import wbs.console.forms.FormField.FormType;
 import wbs.utils.string.FormatWriter;
+
+import fj.data.Either;
 
 public
 interface FormFieldRenderer <Container, Interface> {
@@ -42,16 +44,15 @@ interface FormFieldRenderer <Container, Interface> {
 			FormFieldSubmission submission,
 			FormatWriter htmlWriter,
 			Container container,
-			Map<String,Object> hints,
-			Optional<Interface> interfaceValue,
+			Map <String, Object> hints,
+			Optional <Interface> interfaceValue,
 			FormType formType,
 			String formName);
 
 	void renderFormReset (
 			FormatWriter htmlWriter,
-			String indent,
 			Container container,
-			Optional<Interface> interfaceValue,
+			Optional <Interface> interfaceValue,
 			FormType formType,
 			String formName);
 

@@ -9,6 +9,7 @@ import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.string.StringUtils.spacify;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localDateNotEqual;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWriteHtml;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
@@ -20,7 +21,6 @@ import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
-import static wbs.utils.web.HtmlUtils.htmlHeadingTwoWrite;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,9 +29,9 @@ import java.util.List;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
-import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;

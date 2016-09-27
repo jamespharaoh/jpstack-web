@@ -1,11 +1,24 @@
 package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlInputUtils.htmlOptionWrite;
+import static wbs.utils.web.HtmlInputUtils.htmlOptionWriteSelected;
+import static wbs.utils.web.HtmlInputUtils.htmlSelectClose;
+import static wbs.utils.web.HtmlInputUtils.htmlSelectOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -60,109 +73,155 @@ class ChatUserAdminPrefsPart
 
 		}
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
+		// form open
+
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
-				"/chatUser.admin.prefs"),
-			">\n");
+				"/chatUser.admin.prefs"));
 
-		printFormat (
-			"<table class=\"details\">\n");
+		// table open
 
-		printFormat (
-			"<tr>\n",
-			"<th>Code</th>\n",
-			"<td>%h</td>\n",
-			chatUser.getCode (),
-			"</tr>\n");
+		htmlTableOpenDetails ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Gender</th>\n",
-			"<td><select name=\"gender\">\n");
+		// table contents
 
-		if (chatUser.getGender () == Gender.male) {
+		htmlTableDetailsRowWrite (
+			"Code",
+			chatUser.getCode ());
 
-			printFormat (
-				"<option selected>male</option>\n",
-				"<option>female</option>\n");
+		htmlTableDetailsRowWriteHtml (
+			"Gender",
+			() -> {
 
-		} else if (chatUser.getGender () == Gender.female) {
+			htmlSelectOpen (
+				"gender");
 
-			printFormat (
-				"<option>male</option>\n",
-				"<option selected>female</option>\n");
+			if (chatUser.getGender () == Gender.male) {
 
-		} else if (chatUser.getGender () == null) {
+				htmlOptionWrite (
+					"male",
+					true,
+					"male");
 
-			printFormat (
-				"<option>\n",
-				"<option>male</option>\n",
-				"<option>female</option>\n");
+				htmlOptionWrite (
+					"female",
+					false,
+					"female");
+	
+			} else if (chatUser.getGender () == Gender.female) {
+	
+				htmlOptionWrite (
+					"male",
+					false,
+					"male");
 
-		} else {
+				htmlOptionWrite (
+					"female",
+					true,
+					"female");
+	
+			} else if (chatUser.getGender () == null) {
+	
+				htmlOptionWrite (
+					"male",
+					false,
+					"male");
 
-			throw new RuntimeException ();
+				htmlOptionWrite (
+					"female",
+					false,
+					"female");
+	
+			} else {
 
-		}
+				shouldNeverHappen ();	
+	
+			}
 
-		printFormat (
-			"</select></td>\n",
+			htmlSelectClose ();	
 
-			"</tr>\n");
+		});
 
-		printFormat (
-			"<tr>\n",
-			"<th>Orient</th>\n",
+		htmlTableDetailsRowWriteHtml (
+			"Orient",
+			() -> {
 
-			"<td><select name=\"orient\">\n");
+			htmlSelectOpen (
+				"orient");
 
-		if (chatUser.getOrient () == Orient.gay) {
+			if (chatUser.getOrient () == Orient.gay) {
 
-			printFormat (
-				"<option selected>gay</option>\n",
-				"<option>bi</option>\n",
-				"<option>straight</option>\n");
+				htmlOptionWriteSelected (
+					"gay");
 
-		} else if (chatUser.getOrient () == Orient.bi) {
+				htmlOptionWrite (
+					"bi");
 
-			printFormat (
-				"<option>gay</option>\n",
-				"<option selected>bi</option>\n",
-				"<option>straight</option>\n");
+				htmlOptionWrite (
+					"straight");
+	
+			} else if (chatUser.getOrient () == Orient.bi) {
+	
+				htmlOptionWrite (
+					"gay");
 
-		} else if (chatUser.getOrient () == Orient.straight) {
+				htmlOptionWriteSelected (
+					"bi");
 
-			printFormat (
-				"<option>gay</option>\n",
-				"<option>bi</option>\n",
-				"<option selected>straight</option>\n");
+				htmlOptionWrite (
+					"straight");
+	
+			} else if (chatUser.getOrient () == Orient.straight) {
+	
+				htmlOptionWrite (
+					"gay");
 
-		} else {
+				htmlOptionWrite (
+					"bi");
 
-			printFormat (
-				"<option>\n",
-				"<option>gay</option>\n",
-				"<option>bi</option>\n",
-				"<option>straight</option>\n");
+				htmlOptionWriteSelected (
+					"straight");
+	
+			} else {
+	
+				htmlOptionWrite (
+					"—");
 
-		}
+				htmlOptionWrite (
+					"gay");
 
-		printFormat (
-			"</select></td>\n",
+				htmlOptionWrite (
+					"bi");
 
-			"</tr>\n");
+				htmlOptionWrite (
+					"straight");
 
-		printFormat (
-			"</table>\n");
+			}
 
-		printFormat (
-			"<p><input",
+			htmlSelectClose ();
+
+		});
+
+		// table close
+
+		htmlTableClose ();
+
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"update prefs\"",
-			"></p>\n");
+			">");
+
+		htmlParagraphClose ();
+
+		// form close
+
+		htmlFormClose ();
+
 	}
 
 }

@@ -7,9 +7,15 @@ import static wbs.utils.etc.Misc.eitherGetLeft;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.requiredSuccess;
 import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitColon;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -167,18 +173,18 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		Optional<Native> nativeValue =
+		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
 					container));
 
-		Optional<Generic> genericValue =
+		Optional <Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
 					nativeValue));
 
-		Optional<Interface> interfaceValue =
+		Optional <Interface> interfaceValue =
 			requiredValue (
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
@@ -186,7 +192,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 						hints,
 						genericValue)));
 
-		htmlWriter.writeFormat (
+		htmlWriter.writeLineFormat (
 			"<input",
 			" type=\"hidden\"",
 			" id=\"%h-%h\"",
@@ -212,18 +218,18 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
 
-		Optional<Native> nativeValue =
+		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
 					container));
 
-		Optional<Generic> genericValue =
+		Optional <Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
 					nativeValue));
 
-		Optional<Interface> interfaceValue =
+		Optional <Interface> interfaceValue =
 			requiredValue (
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
@@ -246,20 +252,20 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	void renderTableCellProperties (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map <String, Object> hints) {
 
-		Optional<Native> nativeValue =
+		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
 					container));
 
-		Optional<Generic> genericValue =
+		Optional <Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
 					nativeValue));
 
-		Optional<Interface> interfaceValue =
+		Optional <Interface> interfaceValue =
 			requiredValue (
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
@@ -283,23 +289,23 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> error,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> error,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		Optional<Native> nativeValue =
+		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
 					container));
 
-		Optional<Generic> genericValue =
+		Optional <Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
 					nativeValue));
 
-		Optional<Interface> interfaceValue =
+		Optional <Interface> interfaceValue =
 			requiredValue (
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
@@ -307,11 +313,15 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 						hints,
 						genericValue)));
 
-		htmlWriter.writeFormat (
-			"<tr>\n",
-			"<th>%h</th>\n",
-			label (),
-			"<td>");
+		htmlTableRowOpen (
+			htmlWriter);
+
+		htmlTableHeaderCellWrite (
+			htmlWriter,
+			label ());
+
+		htmlTableCellOpen (
+			htmlWriter);
 
 		renderer.renderHtmlComplex (
 			htmlWriter,
@@ -319,9 +329,11 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			hints,
 			interfaceValue);
 
-		htmlWriter.writeFormat (
-			"</td>\n",
-			"</tr>\n");
+		htmlTableCellClose (
+			htmlWriter);
+
+		htmlTableRowClose (
+			htmlWriter);
 
 	}
 
@@ -329,9 +341,8 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	public
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
-			@NonNull String indent,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -342,20 +353,20 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	void renderCsvRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map <String, Object> hints) {
 
-		Optional<Native> nativeValue =
+		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
 					container));
 
-		Optional<Generic> genericValue =
+		Optional <Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
 					nativeValue));
 
-		Optional<String> csvValueOptional =
+		Optional <String> csvValueOptional =
 			requiredSuccess (
 				csvMapping.genericToInterface (
 					container,
@@ -386,19 +397,19 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 
 	@Override
 	public
-	UpdateResult<Generic,Native> update (
+	UpdateResult <Generic, Native> update (
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull String formName) {
 
-		return new UpdateResult<Generic,Native> ()
+		return new UpdateResult <Generic, Native> ()
 
 			.updated (
 				false)
 
 			.error (
-				Optional.<String>absent ());
+				optionalAbsent ());
 
 	}
 

@@ -1,11 +1,14 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.etc.LogicUtils.ifThenElseEmDash;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
@@ -70,9 +73,9 @@ class QueueListActivePart
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())
@@ -93,7 +96,7 @@ class QueueListActivePart
 	public
 	void prepare () {
 
-		List<QueueInfo> queueInfosTemp =
+		List <QueueInfo> queueInfosTemp =
 			queueSubjectSorterProvider.get ()
 
 			.queueCache (
@@ -107,7 +110,7 @@ class QueueListActivePart
 			.availableQueues ();
 
 		queueInfos =
-			new ArrayList<QueueInfo> ();
+			new ArrayList <> ();
 
 		for (
 			QueueInfo queueInfo
@@ -144,16 +147,19 @@ class QueueListActivePart
 				requestContext.consoleContext (),
 				queueContextType);
 
-		printFormat (
-			"<tr>\n",
-			"<th>Object</th>\n",
-			"<th>Queue</th>\n",
-			"<th colspan=\"2\">Available</th>\n",
-			"<th colspan=\"2\">Claimed</th>\n",
-			"<th colspan=\"2\">Preferred</th>\n",
-			"<th colspan=\"2\">Waiting</th>\n",
-			"<th colspan=\"2\">Total</th>\n",
-			"</tr>\n");
+		htmlTableHeaderRowWrite (
+			"Object",
+			"Queue",
+			"Available",
+			null,
+			"Claimed",
+			null,
+			"Preferred",
+			null,
+			"Waiting",
+			null,
+			"Total",
+			null);
 
 		for (
 			QueueInfo queueInfo
@@ -162,6 +168,8 @@ class QueueListActivePart
 
 			QueueRec queue =
 				queueInfo.queue ();
+
+			// table row open
 
 			htmlTableRowOpen (
 				htmlClassAttribute (
@@ -174,6 +182,8 @@ class QueueListActivePart
 							queueContext.pathPrefix (),
 							"/%u",
 							queue.getId ()))));
+
+			// details
 
 			htmlTableCellWrite (
 				objectManager.objectPath (
@@ -189,13 +199,13 @@ class QueueListActivePart
 				integerToDecimalString (
 					queueInfo.availableItems ()));
 
-			printFormat (
-				"<td>%h</td>\n",
-				queueInfo.availableItems () > 0
-					? timeFormatter.prettyDuration (
+			htmlTableCellWrite (
+				ifThenElseEmDash (
+					moreThanZero (
+						queueInfo.availableItems ()),
+					() -> timeFormatter.prettyDuration (
 						queueInfo.oldestAvailable (),
-						transaction.now ())
-					: "-");
+						transaction.now ())));
 
 			// claimed
 
@@ -203,13 +213,13 @@ class QueueListActivePart
 				integerToDecimalString (
 					queueInfo.claimedItems ()));
 
-			printFormat (
-				"<td>%h</td>\n",
-				queueInfo.claimedItems () > 0
-					? timeFormatter.prettyDuration (
+			htmlTableCellWrite (
+				ifThenElseEmDash (
+					moreThanZero (
+						queueInfo.claimedItems ()),
+					() -> timeFormatter.prettyDuration (
 						queueInfo.oldestClaimed (),
-						transaction.now ())
-					: "-");
+						transaction.now ())));
 
 			// preferred
 
@@ -217,13 +227,13 @@ class QueueListActivePart
 				integerToDecimalString (
 					queueInfo.totalUnavailableItems ()));
 
-			printFormat (
-				"<td>%h</td>\n",
-				queueInfo.totalUnavailableItems () > 0
-					? timeFormatter.prettyDuration (
+			htmlTableCellWrite (
+				ifThenElseEmDash (
+					moreThanZero (
+						queueInfo.totalUnavailableItems ()),
+					() -> timeFormatter.prettyDuration (
 						queueInfo.oldestUnavailable (),
-						transaction.now ())
-					: "-");
+						transaction.now ())));
 
 			// waiting
 
@@ -231,13 +241,13 @@ class QueueListActivePart
 				integerToDecimalString (
 					queueInfo.waitingItems ()));
 
-			printFormat (
-				"<td>%h</td>\n",
-				queueInfo.waitingItems () > 0
-					? timeFormatter.prettyDuration (
+			htmlTableCellWrite (
+				ifThenElseEmDash (
+					moreThanZero (
+						queueInfo.waitingItems ()),
+					() -> timeFormatter.prettyDuration (
 						queueInfo.oldestWaiting (),
-						transaction.now ())
-					: "-");
+						transaction.now ())));
 
 			// total
 
@@ -245,17 +255,21 @@ class QueueListActivePart
 				integerToDecimalString (
 					queueInfo.totalItems ()));
 
-			printFormat (
-				"<td>%h</td>\n",
-				queueInfo.totalItems () > 0
-					? timeFormatter.prettyDuration (
+			htmlTableCellWrite (
+				ifThenElseEmDash (
+					moreThanZero (
+						queueInfo.totalItems ()),
+					() -> timeFormatter.prettyDuration (
 						queueInfo.oldest (),
-						transaction.now ())
-					: "-");
+						transaction.now ())));
+
+			// table row close
 
 			htmlTableRowClose ();
 
 		}
+
+		// table close
 
 		htmlTableClose ();
 

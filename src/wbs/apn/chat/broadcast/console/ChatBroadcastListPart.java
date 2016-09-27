@@ -1,6 +1,6 @@
 package wbs.apn.chat.broadcast.console;
 
-import static wbs.utils.etc.Misc.booleanToYesNo;
+import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;

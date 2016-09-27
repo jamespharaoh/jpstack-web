@@ -552,7 +552,7 @@ class ChatCreditLogicImplementation
 
 		switch (chatUser.getCreditMode ()) {
 
-		case strict:
+		case billedMessage:
 			return userCreditCheckStrict (
 				chatUser);
 
@@ -579,7 +579,7 @@ class ChatCreditLogicImplementation
 
 		// sanity check
 
-		if (chatUser.getCreditMode () != ChatUserCreditMode.strict)
+		if (chatUser.getCreditMode () != ChatUserCreditMode.billedMessage)
 			throw new IllegalArgumentException ();
 
 		// check network
@@ -750,7 +750,7 @@ class ChatCreditLogicImplementation
 		if (
 			enumNotEqualSafe (
 				chatUser.getCreditMode (),
-				ChatUserCreditMode.strict)
+				ChatUserCreditMode.billedMessage)
 		) {
 
 			log.debug (
@@ -898,7 +898,7 @@ class ChatCreditLogicImplementation
 
 		if (route.getDeliveryReports ()) {
 
-			if (chatUser.getCreditMode () == ChatUserCreditMode.strict) {
+			if (chatUser.getCreditMode () == ChatUserCreditMode.billedMessage) {
 
 				chatUser
 
@@ -968,7 +968,7 @@ class ChatCreditLogicImplementation
 		Optional<String> deliveryTypeCode =
 			route.getDeliveryReports ()
 				? Optional.of (
-					chatUser.getCreditMode () == ChatUserCreditMode.strict
+					chatUser.getCreditMode () == ChatUserCreditMode.billedMessage
 						? "chat_bill_strict"
 						: "chat_bill")
 				: Optional.<String>absent ();
@@ -1244,7 +1244,7 @@ class ChatCreditLogicImplementation
 			} else if (
 				enumEqualSafe (
 					chatUser.getCreditMode (),
-					ChatUserCreditMode.strict)
+					ChatUserCreditMode.billedMessage)
 			) {
 
 				if (! chatNetwork.getAllowReverseBill ()) {

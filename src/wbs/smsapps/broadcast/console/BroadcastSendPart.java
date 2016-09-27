@@ -1,14 +1,15 @@
 package wbs.smsapps.broadcast.console;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenMethod;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPost;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethod;
-import static wbs.utils.web.HtmlUtils.htmlHeadingTwoWrite;
-import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -86,8 +87,7 @@ class BroadcastSendPart
 				"You will be able to add and remove numbers and send or ",
 				"schedule it again.</p>");
 
-			htmlFormOpenMethod (
-				"post");
+			htmlFormOpenPost ();
 
 			htmlParagraphOpen ();
 
@@ -111,8 +111,7 @@ class BroadcastSendPart
 				"<p>Cancelling a broadcast will stop it from being sent, now ",
 				"or in the future.</p>");
 
-			htmlFormOpenMethod (
-				"post");
+			htmlFormOpenPost ();
 
 			htmlParagraphOpen ();
 
@@ -143,8 +142,7 @@ class BroadcastSendPart
 				"<p>Cancelling a broadcast will stop the current send and ",
 				"prevent it from being sent in the future.</p>");
 
-			htmlFormOpenMethod (
-				"post");
+			htmlFormOpenPost ();
 
 			htmlParagraphOpen ();
 

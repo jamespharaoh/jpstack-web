@@ -7,10 +7,10 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localTime;
 import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethodAction;
-import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenGetAction;
 
 import java.util.Collections;
 import java.util.List;
@@ -94,10 +94,10 @@ class SupervisorPart
 
 	StatsPeriod statsPeriod;
 
-	Map<String,Object> statsConditions;
-	Map<String,StatsDataSet> statsDataSets;
+	Map <String, Object> statsConditions;
+	Map <String, StatsDataSet> statsDataSets;
 
-	List<PagePart> pageParts =
+	List <PagePart> pageParts =
 		Collections.emptyList ();
 
 	// implementation
@@ -452,8 +452,7 @@ class SupervisorPart
 
 		}
 
-		htmlFormOpenMethodAction (
-			"get",
+		htmlFormOpenGetAction (
 			localUrl);
 
 		htmlParagraphOpen ();

@@ -1,6 +1,10 @@
 package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -43,34 +47,40 @@ class ChatUserAdminDobPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\">\n",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
 				"/chatUser.admin.dob"));
 
-		printFormat (
-			"<p>Date of birth (yyyy-mm-dd)<br>\n",
+		htmlParagraphOpen ();
 
+		formatWriter.writeLineFormat (
+			"Date of birth (yyyy-mm-dd)<br>");
+
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"text\"",
 			" name=\"dob\"",
-			" value=\"%h\"></p>\n",
+			" value=\"%h\"",
 			ifNull (
 				requestContext.getForm ("dob"),
 				timeFormatter.dateString (
 					chatUser.getDob ()),
-				""));
+				""),
+			">");
 
-		printFormat (
-			"<p><input",
+		htmlParagraphClose ();
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"update date of birth\"",
-			"><p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		htmlFormClose ();
 
 	}
 

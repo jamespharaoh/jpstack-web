@@ -1,6 +1,17 @@
 package wbs.apn.chat.namednote.console;
 
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.List;
 
@@ -50,38 +61,45 @@ class ChatNoteNamesPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"chat.settings.noteNames\"",
-			">\n");
+		// form open
 
-		printFormat (
-			"<p><input",
+		htmlFormOpenPostAction (
+			"chat.settings.noteNames");
+
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"saveChanges\"",
 			" value=\"save changes\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlParagraphClose ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Name</th>\n",
-			"<th>Options</th>\n",
-			"</tr>\n");
+		// table open
+
+		htmlTableOpenList ();
+
+		htmlTableHeaderRowWrite (
+			"Name",
+			"Options");
+
+		// table contents
 
 		for (
 			ChatNoteNameRec noteName
 				: noteNames
 		) {
 
-			printFormat (
-				"<tr>\n");
+			htmlTableRowOpen ();
 
-			printFormat (
-				"<td><input",
+			htmlTableCellOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
 				" type=\"text\"",
 				" name=\"noteName%d\"",
 				noteName.getId (),
@@ -91,72 +109,93 @@ class ChatNoteNamesPart
 						"noteName%d",
 						noteName.getId ()),
 					noteName.getName ()),
-				"></td>\n");
+				">");
 
-			printFormat (
-				"<td><input",
+			htmlTableCellClose ();
+
+			htmlTableCellOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
 				" type=\"submit\"",
 				" name=\"noteMoveUp%d\"",
 				noteName.getId (),
 				" value=\"&uarr;\"",
-				">\n");
+				">");
 
-			printFormat (
+			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"submit\"",
 				" name=\"noteMoveDown%d\"",
 				noteName.getId (),
 				" value=\"&darr;\"",
-				">\n");
+				">");
 
-			printFormat (
+			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"submit\"",
 				" name=\"noteDelete%d\"",
 				noteName.getId (),
 				" value=\"&times;\"",
-				"></td>\n");
+				">");
 
-			printFormat (
-				"</tr>\n");
+			htmlTableCellClose ();
+
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"<tr>\n");
+		// new note
 
-		printFormat (
-			"<td><input",
+		htmlTableRowOpen ();
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"text\"",
 			" name=\"noteNameNew\"",
 			" value=\"%h\"",
 			requestContext.getForm (
 				"noteNameNew",
 				""),
-			"></td>\n");
+			">");
 
-		printFormat (
-			"<td><input",
+		htmlTableCellClose ();
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"saveChanges\"",
 			" value=\"add new\"",
-			"></td>\n");
+			">");
 
-		printFormat (
-			"</tr>\n");
+		htmlTableCellClose ();
 
-		printFormat (
-			"</table>\n");
+		htmlTableRowClose ();
 
-		printFormat (
-			"<p><input",
+		// table close
+
+		htmlTableClose ();
+
+		// form controls again
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"saveChanges\"",
 			" value=\"save changes\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		// form close
+
+		htmlFormClose ();
 
 	}
 

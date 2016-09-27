@@ -2,14 +2,21 @@ package wbs.apn.chat.user.image.console;
 
 import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostActionMultipart;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import wbs.console.forms.FormField.FormType;
 import wbs.apn.chat.user.image.model.ChatUserImageType;
+import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
@@ -74,22 +81,20 @@ class ChatUserImageUploadPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<p>Please upload the photo or video.</p>\n");
+		htmlParagraphWrite (
+			"Please upload the photo or video.");
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
+		// form open
+
+		htmlFormOpenPostActionMultipart (
 			requestContext.resolveLocalUrl (
 				stringFormat (
 					"/chatUser.%s.upload",
-					chatUserImageType.name ())),
-			" enctype=\"multipart/form-data\"",
-			">\n");
+					chatUserImageType.name ())));
 
-		printFormat (
-			"<table class=\"details\">\n");
+		// form fields
+
+		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
 			requestContext,
@@ -101,17 +106,23 @@ class ChatUserImageUploadPart
 			FormType.perform,
 			"upload");
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
-		printFormat (
-			"<p><input",
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"upload file\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		// form close
+
+		htmlFormClose ();
 
 	}
 

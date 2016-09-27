@@ -1,11 +1,28 @@
 package wbs.imchat.console;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
-import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlDivClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlDivOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingThreeWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteHtml;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,14 +36,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 import lombok.NonNull;
-import wbs.imchat.model.ImChatConversationRec;
-import wbs.imchat.model.ImChatCustomerDetailTypeRec;
-import wbs.imchat.model.ImChatCustomerDetailValueRec;
-import wbs.imchat.model.ImChatCustomerRec;
-import wbs.imchat.model.ImChatMessageObjectHelper;
-import wbs.imchat.model.ImChatMessageRec;
-import wbs.imchat.model.ImChatProfileRec;
-import wbs.imchat.model.ImChatRec;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
@@ -40,6 +50,14 @@ import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.imchat.model.ImChatConversationRec;
+import wbs.imchat.model.ImChatCustomerDetailTypeRec;
+import wbs.imchat.model.ImChatCustomerDetailValueRec;
+import wbs.imchat.model.ImChatCustomerRec;
+import wbs.imchat.model.ImChatMessageObjectHelper;
+import wbs.imchat.model.ImChatMessageRec;
+import wbs.imchat.model.ImChatProfileRec;
+import wbs.imchat.model.ImChatRec;
 import wbs.utils.web.HtmlUtils;
 
 @PrototypeComponent ("imChatPendingSummaryPart")
@@ -173,29 +191,43 @@ class ImChatPendingSummaryPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<div class=\"layout-container\">\n",
-			"<table class=\"layout\">\n",
-			"<tbody>\n",
-			"<tr>\n",
-			"<td style=\"width: 50%%\">\n");
+		htmlDivOpen (
+			htmlClassAttribute (
+				"layout-container"));
+
+		htmlTableOpen (
+			htmlClassAttribute (
+				"layout"));
+
+		htmlTableRowOpen ();
+
+		htmlTableCellOpen (
+			htmlStyleAttribute (
+				htmlStyleRuleEntry (
+					"width",
+					"50%")));
 
 		goCustomerSummary ();
 		goCustomerDetails ();
 
-		printFormat (
-			"</td>\n",
-			"<td style=\"width: 50%%\">\n");
+		htmlTableCellClose ();
+
+		htmlTableCellOpen (
+			htmlStyleAttribute (
+				htmlStyleRuleEntry (
+					"width",
+					"50%")));
 
 		goProfileSummary ();
 		goCustomerNotes ();
 
-		printFormat (
-			"</td>\n",
-			"</tr>\n",
-			"</tbody>\n",
-			"</table>\n",
-			"</div>\n");
+		htmlTableCellClose ();
+
+		htmlTableRowClose ();
+
+		htmlTableClose ();
+
+		htmlDivClose ();
 
 		goHistory ();
 
@@ -203,12 +235,10 @@ class ImChatPendingSummaryPart
 
 	void goCustomerDetails () {
 
-		printFormat (
-			"<h3>Customer details</h3>\n");
+		htmlHeadingThreeWrite (
+			"Customer details");
 
-		printFormat (
-			"<table class=\"details\">\n",
-			"<tbody>\n");
+		htmlTableOpenDetails ();
 
 		for (
 			ImChatCustomerDetailTypeRec detailType
@@ -229,28 +259,22 @@ class ImChatPendingSummaryPart
 				customer.getDetails ().get (
 					detailType.getId ());
 
-			printFormat (
-				"<tr>\n",
-				"<th>%h</th>\n",
+			htmlTableDetailsRowWrite (
 				detailType.getName (),
-				"<td>%h</td>\n",
-				detailValue != null
-					? detailValue.getValue ()
-					: "-",
-				"</tr>\n");
+				ifNotNullThenElseEmDash (
+					detailValue,
+					() -> detailValue.getValue ()));
 
 		}
 
-		printFormat (
-			"</tbody>\n",
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
 	void goCustomerSummary () {
 
-		printFormat (
-			"<h3>Customer summary</h3>\n");
+		htmlHeadingThreeWrite (
+			"Customer summary");
 
 		formFieldLogic.outputDetailsTable (
 			formatWriter,
@@ -262,8 +286,8 @@ class ImChatPendingSummaryPart
 
 	void goProfileSummary () {
 
-		printFormat (
-			"<h3>Profile summary</h3>\n");
+		htmlHeadingThreeWrite (
+			"Profile summary");
 
 		formFieldLogic.outputDetailsTable (
 			formatWriter,
@@ -275,56 +299,52 @@ class ImChatPendingSummaryPart
 
 	void goCustomerNotes () {
 
-		printFormat (
-			"<h3>Notes</h3>\n");
+		htmlHeadingThreeWrite (
+			"Notes");
 
-		printFormat (
-			"<p",
-			" id=\"%h\"",
-			stringFormat (
-				"im-chat-customer-note-%d",
-				customer.getId ()),
-			" class=\"im-chat-customer-note-editable\"",
-			">%s</p>\n",
+		htmlParagraphWriteHtml (
 			HtmlUtils.newlineToBr (
 				HtmlUtils.htmlEncode (
 					customer.getNotesText () != null
 						? customer.getNotesText ().getText ()
-						: "")));
+						: "")),
+			htmlIdAttribute (
+				stringFormat (
+					"im-chat-customer-note-%d",
+					customer.getId ())),
+			htmlClassAttribute (
+				"im-chat-customer-note-editable"));
 
 	}
 
 	void goHistory () {
 
-		printFormat (
-			"<h3>Conversation history</h3>\n");
+		htmlHeadingThreeWrite (
+			"Conversation history");
 
 		// retrieve messages
 
-		List<ImChatMessageRec> messages =
-			new ArrayList<ImChatMessageRec> (
+		List <ImChatMessageRec> messages =
+			new ArrayList<> (
 				conversation.getMessagesIn ());
 
-		List<ImChatMessageRec> historyRequests =
+		List <ImChatMessageRec> historyRequests =
 			Lists.reverse (
 				messages);
 
 		// create message table
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlTableOpenList ();
 
 		// header
 
-		printFormat (
-			"<tr>\n");
+		htmlTableRowOpen ();
 
 		formFieldLogic.outputTableHeadings (
 			formatWriter,
 			messageFields);
 
-		printFormat (
-			"</tr>\n");
+		htmlTableRowClose ();
 
 		// row
 
@@ -341,12 +361,10 @@ class ImChatPendingSummaryPart
 				ImChatMessageRec historyReply =
 					historyRequest.getPartnerImChatMessage ();
 
-				printFormat (
-					"<tr",
-					" class=\"%h\"",
-					classForMessage (
-						historyReply),
-					">\n");
+				htmlTableRowOpen (
+					htmlClassAttribute (
+						classForMessage (
+							historyReply)));
 
 				formFieldLogic.outputTableCellsList (
 					formatWriter,
@@ -355,30 +373,26 @@ class ImChatPendingSummaryPart
 					ImmutableMap.of (),
 					true);
 
-				printFormat (
-					"</tr>\n");
+				htmlTableRowClose ();
 
 			}
 
-			printFormat (
-				"<tr",
-				" class=\"%h\"",
-				joinWithSpace (
+			htmlTableRowOpen (
+				htmlClassAttribute (
 					presentInstances (
 
-					Optional.of (
-						classForMessage (
-							historyRequest)),
+				Optional.of (
+					classForMessage (
+						historyRequest)),
 
-					optionalIf (
-						referenceEqualWithClass (
-							ImChatMessageRec.class,
-							message,
-							historyRequest),
-						() -> "selected")
+				optionalIf (
+					referenceEqualWithClass (
+						ImChatMessageRec.class,
+						message,
+						historyRequest),
+					() -> "selected")
 
-				)),
-				">\n");
+			)));
 
 			formFieldLogic.outputTableCellsList (
 				formatWriter,
@@ -387,16 +401,11 @@ class ImChatPendingSummaryPart
 				ImmutableMap.of (),
 				true);
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"<tr>\n");
-
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

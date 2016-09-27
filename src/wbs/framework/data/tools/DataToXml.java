@@ -2,8 +2,8 @@ package wbs.framework.data.tools;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.MapUtils.mapIsEmpty;
+import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
-import static wbs.utils.etc.Misc.booleanToYesNo;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
@@ -12,7 +12,6 @@ import static wbs.utils.string.StringUtils.nullIfEmptyString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -26,6 +25,8 @@ import java.util.Set;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.io.output.FileWriterWithEncoding;
 
 import org.dom4j.Branch;
 import org.dom4j.Document;
@@ -50,8 +51,7 @@ class DataToXml {
 	public
 	void write (
 			@NonNull Writer writer,
-			@NonNull Object object)
-		throws IOException {
+			@NonNull Object object) {
 
 		Document document =
 			DocumentHelper.createDocument ();
@@ -68,41 +68,12 @@ class DataToXml {
 				writer,
 				format);
 
-		xmlWriter.write (
-			document);
-
-		xmlWriter.flush ();
-
-	}
-
-	public
-	void writeToFile (
-			@NonNull String filename,
-			@NonNull Object object)
-		throws IOException {
-
-		write (
-			new FileWriter (
-				new File (
-					filename)),
-			object);
-
-	}
-
-	public
-	String writeToString (
-			@NonNull Object object) {
-
 		try {
 
-			StringWriter stringWriter =
-				new StringWriter ();
+			xmlWriter.write (
+				document);
 
-			write (
-				stringWriter,
-				object);
-
-			return stringWriter.toString ();
+			xmlWriter.flush ();
 
 		} catch (IOException ioException) {
 
@@ -110,6 +81,44 @@ class DataToXml {
 				ioException);
 
 		}
+
+	}
+
+	public
+	void writeToFile (
+			@NonNull String filename,
+			@NonNull Object object) {
+
+		try {
+
+			write (
+				new FileWriterWithEncoding (
+					new File (
+						filename),
+					"utf-8"),
+				object);
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
+
+	}
+
+	public
+	String writeToString (
+			@NonNull Object object) {
+
+		StringWriter stringWriter =
+			new StringWriter ();
+
+		write (
+			stringWriter,
+			object);
+
+		return stringWriter.toString ();
 
 	}
 
@@ -458,14 +467,16 @@ class DataToXml {
 
 					entryElement.addAttribute (
 						"value",
-						(String) entry.getValue ());
+						(String)
+						entry.getValue ());
 
 				} else if (entry.getValue () instanceof Boolean) {
 
 					entryElement.addAttribute (
 						"value",
 						booleanToYesNo (
-							(Boolean) entry.getValue ()));
+							(Boolean)
+							entry.getValue ()));
 
 				} else {
 

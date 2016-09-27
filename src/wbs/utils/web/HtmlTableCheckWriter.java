@@ -1,5 +1,6 @@
 package wbs.utils.web;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -24,13 +25,17 @@ class HtmlTableCheckWriter {
 
 	// properties
 
-	Optional <String> name;
+	Optional <String> name =
+		optionalAbsent ();
 
-	Optional <String> label;
+	Optional <String> label =
+		optionalAbsent ();
 
-	Optional <Boolean> value;
+	Optional <Boolean> value =
+		optionalAbsent ();
 
-	Optional <Long> columnSpan;
+	Optional <Long> columnSpan =
+		optionalAbsent ();
 
 	// property setters
 

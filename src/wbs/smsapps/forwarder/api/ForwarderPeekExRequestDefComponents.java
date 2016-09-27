@@ -5,9 +5,9 @@ import wbs.platform.rpc.core.Rpc;
 import wbs.platform.rpc.core.RpcDefinition;
 import wbs.platform.rpc.core.RpcType;
 
-@SingletonComponent ("forwarderPeekExRequestDefConfig")
+@SingletonComponent ("forwarderPeekExRequestDefComponents")
 public
-class ForwarderPeekExRequestDefConfig {
+class ForwarderPeekExRequestDefComponents {
 
 	@SingletonComponent ("forwarderPeekExRequestDef")
 	public

@@ -48,7 +48,8 @@ class StatsConsoleLogic {
 				groups);
 
 		List <Object> sortedGroups =
-			grouper.sortGroups (groups);
+			grouper.sortGroups (
+				groups);
 
 		// output
 

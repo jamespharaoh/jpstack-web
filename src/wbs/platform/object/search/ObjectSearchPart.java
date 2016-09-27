@@ -3,6 +3,14 @@ package wbs.platform.object.search;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -160,18 +168,15 @@ class ObjectSearchPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
-			requestContext.resolveLocalUrl (
-				"/" + fileName),
-			">\n");
+		// form open
 
-		printFormat (
-			"<table",
-			" class=\"details\"",
-			">\n");
+		htmlFormOpenPostAction (
+			requestContext.resolveLocalUrl (
+				"/" + fileName));
+
+		// search fields
+
+		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
 			requestContext,
@@ -183,45 +188,50 @@ class ObjectSearchPart
 			FormType.search,
 			"search");
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
-		printFormat (
-			"<p><input",
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"search\"",
-			">\n");
+			">");
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"button\"",
 			" value=\"reset form\"",
 			" onclick=\"resetSearchForm (); return false;\"",
-			">\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
 
-		printFormat (
-			"<script type=\"text/javascript\">\n");
+		// form close
 
-		printFormat (
-			"\tfunction resetSearchForm () {\n");
+		htmlFormClose ();
+
+		// form field scripts
+
+		htmlScriptBlockOpen ();
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"function resetSearchForm () {");
 
 		formFieldLogic.outputFormReset (
 			formatWriter,
-			"\t\t",
 			formFieldSet,
 			FormType.search,
 			search,
 			formHints,
 			"search");
 
-		printFormat (
-			"\t}\n");
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
 
-		printFormat (
-			"</script>\n");
+		htmlScriptBlockClose ();
 
 	}
 

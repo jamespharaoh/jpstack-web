@@ -1,6 +1,8 @@
 package wbs.integrations.clockworksms.daemon;
 
+import static wbs.sms.gsm.GsmUtils.gsmCountMessageParts;
 import static wbs.sms.gsm.GsmUtils.gsmStringIsNotValid;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -85,7 +87,7 @@ class ClockworkSmsSenderHelper
 
 		// lookup route out
 
-		Optional<ClockworkSmsRouteOutRec> clockworkSmsRouteOutOptional =
+		Optional <ClockworkSmsRouteOutRec> clockworkSmsRouteOutOptional =
 			clockworkSmsRouteOutHelper.find (
 				smsRoute.getId ());
 
@@ -94,7 +96,7 @@ class ClockworkSmsSenderHelper
 				clockworkSmsRouteOutOptional)
 		) {
 
-			return new SetupRequestResult<ClockworkSmsMessageSender> ()
+			return new SetupRequestResult <ClockworkSmsMessageSender> ()
 
 				.status (
 					SetupRequestStatus.configError)
@@ -116,7 +118,7 @@ class ClockworkSmsSenderHelper
 				smsMessage.getText ().getText ())
 		) {
 
-			return new SetupRequestResult<ClockworkSmsMessageSender> ()
+			return new SetupRequestResult <ClockworkSmsMessageSender> ()
 
 				.status (
 					SetupRequestStatus.validationError)
@@ -140,7 +142,7 @@ class ClockworkSmsSenderHelper
 				gsmParts)
 		) {
 
-			return new SetupRequestResult<ClockworkSmsMessageSender> ()
+			return new SetupRequestResult <ClockworkSmsMessageSender> ()
 
 				.status (
 					SetupRequestStatus.validationError)
@@ -168,7 +170,7 @@ class ClockworkSmsSenderHelper
 
 		} else {
 
-			return new SetupRequestResult<ClockworkSmsMessageSender> ()
+			return new SetupRequestResult <ClockworkSmsMessageSender> ()
 
 				.status (
 					SetupRequestStatus.unknownError)
@@ -239,6 +241,9 @@ class ClockworkSmsSenderHelper
 			.url (
 				clockworkSmsRouteOut.getUrl ())
 
+			.simulateMultipart (
+				clockworkSmsRouteOut.getSimulateMultipart ())
+
 			.request (
 				clockworkRequest);
 
@@ -248,7 +253,7 @@ class ClockworkSmsSenderHelper
 
 		// return
 
-		return new SetupRequestResult<ClockworkSmsMessageSender> ()
+		return new SetupRequestResult <ClockworkSmsMessageSender> ()
 
 			.status (
 				SetupRequestStatus.success)
@@ -345,7 +350,14 @@ class ClockworkSmsSenderHelper
 
 			.otherIds (
 				ImmutableList.of (
-					clockworkSmsResponse.messageId ()));
+					clockworkSmsResponse.messageId ()))
+
+			.simulateMessageParts (
+				ifThenElse (
+					clockworkSender.simulateMultipart (),
+					() -> gsmCountMessageParts (
+						clockworkSender.request ().sms ().get (0).content ()),
+					() -> null));
 
 	}
 

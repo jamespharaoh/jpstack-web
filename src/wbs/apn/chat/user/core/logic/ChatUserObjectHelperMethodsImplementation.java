@@ -168,7 +168,7 @@ class ChatUserObjectHelperMethodsImplementation
 			.setCreditMode (
 				number.getFree ()
 					? ChatUserCreditMode.free
-					: ChatUserCreditMode.strict);
+					: ChatUserCreditMode.billedMessage);
 
 		// set adult verify on some services
 		// TODO this should probably not be here

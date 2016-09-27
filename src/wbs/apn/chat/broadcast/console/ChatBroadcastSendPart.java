@@ -1,5 +1,13 @@
 package wbs.apn.chat.broadcast.console;
 
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingThreeWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPost;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -9,8 +17,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-import wbs.apn.chat.core.console.ChatConsoleLogic;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.console.ChatConsoleLogic;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
@@ -139,11 +147,10 @@ class ChatBroadcastSendPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<form method=\"post\">\n");
+		htmlFormOpenPost ();
 
-		printFormat (
-			"<h3>Recipients</h3>\n");
+		htmlHeadingThreeWrite (
+			"Recipients");
 
 		formFieldLogic.outputFormAlwaysHidden (
 			requestContext,
@@ -197,8 +204,7 @@ class ChatBroadcastSendPart
 
 		if (! form.search ()) {
 
-			printFormat (
-				"<table class=\"details\">\n");
+			htmlTableOpenDetails ();
 
 			formFieldLogic.outputFormRows (
 				requestContext,
@@ -220,15 +226,18 @@ class ChatBroadcastSendPart
 				FormType.search,
 				"send");
 
-			printFormat (
-				"</table>\n");
+			htmlTableClose ();
 
-			printFormat (
-				"<p><input",
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
 				" type=\"submit\"",
 				" name=\"searchOn\"",
 				" value=\"enable search\"",
-				"></p>\n");
+				">");
+
+			htmlParagraphClose ();
 
 			formFieldLogic.outputFormTemporarilyHidden (
 				requestContext,
@@ -243,8 +252,7 @@ class ChatBroadcastSendPart
 
 		if (form.search ()) {
 
-			printFormat (
-				"<table class=\"details\">\n");
+			htmlTableOpenDetails ();
 
 			formFieldLogic.outputFormRows (
 				requestContext,
@@ -266,15 +274,16 @@ class ChatBroadcastSendPart
 				FormType.search,
 				"send");
 
-			printFormat (
-				"</table>\n");
+			htmlTableClose ();
 
-			printFormat (
-				"<p><input",
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
 				" type=\"submit\"",
 				" name=\"searchOff\"",
 				" value=\"disable search\"",
-				"></p>\n");
+				">");
 
 			formFieldLogic.outputFormTemporarilyHidden (
 				requestContext,
@@ -287,11 +296,10 @@ class ChatBroadcastSendPart
 
 		}
 
-		printFormat (
-			"<h3>Message</h3>\n");
+		htmlHeadingThreeWrite (
+			"Message");
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
 			requestContext,
@@ -303,15 +311,18 @@ class ChatBroadcastSendPart
 			FormType.search,
 			"send");
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
-		printFormat (
-			"<p><input",
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"verify\"",
 			" value=\"verify\"",
-			"></p>\n");
+			">");
+
+		htmlParagraphClose ();
 
 		formFieldLogic.outputFormTemporarilyHidden (
 			requestContext,
@@ -322,8 +333,7 @@ class ChatBroadcastSendPart
 			FormType.search,
 			"send");
 
-		printFormat (
-			"</form>\n");
+		htmlFormClose ();
 
 	}
 

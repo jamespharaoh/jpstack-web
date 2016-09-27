@@ -101,7 +101,8 @@ $(function () {
 
 	var createOptionSets = function () {
 
-		optionSets.forEach (function (optionSet) {
+		optionSets.forEach (
+			function (optionSet) {
 
 			// create the new option set element
 
@@ -109,13 +110,16 @@ $(function () {
 				optionSetTemplate.clone ();
 
 			optionSet.nameElem =
-				optionSet.elem.find (".optionSetName")
+				optionSet.elem.find (
+					".optionSetName")
 
-			optionSet.nameElem.text (optionSet.name);
+			optionSet.nameElem.text (
+				optionSet.name);
 
 			// iterate option
 
-			optionSet.options.forEach (function (option) {
+			optionSet.options.forEach (
+				function (option) {
 
 				option.key =
 					"optionSet/" + optionSet.name + "/" + option.name;
@@ -139,9 +143,13 @@ $(function () {
 
 				// setup checkbox
 
-				option.checkboxElem.attr ("id", option.checkboxId);
+				option.checkboxElem.attr (
+					"id",
+					option.checkboxId);
 
-				option.checkboxElem.prop ("checked", option.enabled);
+				option.checkboxElem.prop (
+					"checked",
+					option.enabled);
 
 				(function (option) { // capture value of option
 
@@ -150,11 +158,14 @@ $(function () {
 						// update local storage and stuff
 
 						option.enabled =
-							option.checkboxElem.prop ("checked");
+							option.checkboxElem.prop (
+								"checked");
 
 						localStorage.setItem (
 							option.key,
-							option.enabled ? "true" : "false");
+							option.enabled
+								? "true"
+								: "false");
 
 						// update display of queue items
 
@@ -166,19 +177,24 @@ $(function () {
 
 				// setup label
 
-				option.labelElem.text (option.name);
+				option.labelElem.text (
+					option.name);
 
-				option.labelElem.attr ("for", option.checkboxId);
+				option.labelElem.attr (
+					"for",
+					option.checkboxId);
 
 				// add the option element
 
-				optionSet.elem.append (option.elem);
+				optionSet.elem.append (
+					option.elem);
 
 			});
 
 			// add the option set element
 
-			optionSetsElem.append (optionSet.elem);
+			optionSetsElem.append (
+				optionSet.elem);
 
 		});
 
@@ -186,16 +202,20 @@ $(function () {
 
 	// display and hide queue items based on selection
 
-	var queueItemMatches = function (queueItem, option) {
+	var queueItemMatches =
+		function (queueItem, option) {
 
 		if (option.or) {
 
 			var match = false;
 
-			option.or.forEach (function (subOption) {
+			option.or.forEach (
+				function (subOption) {
 
 				var subMatch =
-					queueItemMatches (queueItem, subOption);
+					queueItemMatches (
+						queueItem,
+						subOption);
 
 				if (subMatch)
 					match = true;
@@ -229,7 +249,8 @@ $(function () {
 
 	// filter queue items by a single option set
 
-	var filterQueueItems = function (optionSet, queueItems) {
+	var filterQueueItems =
+		function (optionSet, queueItems) {
 
 		var enabledQueueItems = [];
 		var disabledQueueItems = [];
@@ -249,9 +270,15 @@ $(function () {
 				}
 
 				if (option.checkboxElem.prop ("checked")) {
-					enabledQueueItems.push (queueItem);
+
+					enabledQueueItems.push (
+						queueItem);
+
 				} else {
-					disabledQueueItems.push (queueItem);
+
+					disabledQueueItems.push (
+						queueItem);
+
 				}
 
 			});
@@ -262,7 +289,8 @@ $(function () {
 
 		var oldestDisabled = undefined;
 
-		disabledQueueItems.forEach (function (queueItem) {
+		disabledQueueItems.forEach (
+			function (queueItem) {
 
 			if (! oldestDisabled) {
 				oldestDisabled = queueItem;
@@ -292,10 +320,13 @@ $(function () {
 
 		// filter queue items based on each option set
 
-		optionSets.forEach (function (optionSet) {
+		optionSets.forEach (
+			function (optionSet) {
 
 			var ret =
-				filterQueueItems (optionSet, queueItems);
+				filterQueueItems (
+					optionSet,
+					queueItems);
 
 			queueItems =
 				ret.queueItems;
@@ -319,22 +350,32 @@ $(function () {
 
 		$(".queueItemTable .queueItemRow").hide ();
 
-		queueItems.forEach (function (queueItem) {
+		queueItems.forEach (
+			function (queueItem) {
+
 			queueItem.row.show ();
+
 		});
 
 		$(".queueItemTable .loadingRow").hide ();
 
 		// display disabled info
 
-		var numDisabled = allQueueItems.length - queueItems.length;
+		var numDisabled =
+			allQueueItems.length - queueItems.length;
 
-		var disabledInfo = "" + numDisabled + " items disabled";
+		var disabledInfo =
+			"" + numDisabled + " items disabled";
 
-		if (oldestDisabled)
-			disabledInfo += ", oldest is " + oldestDisabled.oldestString;
+		if (oldestDisabled) {
 
-		$(".disabledInfo").text (disabledInfo);
+			disabledInfo +=
+				", oldest is " + oldestDisabled.oldestString;
+
+		}
+
+		$(".disabledInfo").text (
+			disabledInfo);
 
 	};
 

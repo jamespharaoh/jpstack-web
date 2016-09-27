@@ -3,6 +3,8 @@ package wbs.platform.queue.console;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
@@ -11,8 +13,6 @@ import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethodAction;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -179,8 +179,7 @@ class QueueUsersPart
 
 				htmlTableCellOpen ();
 
-				htmlFormOpenMethodAction (
-					"post",
+				htmlFormOpenPostAction (
 					 requestContext.resolveLocalUrl (
 					 	"/queue.users"));
 
@@ -207,8 +206,7 @@ class QueueUsersPart
 
 			htmlTableCellOpen ();
 
-			htmlFormOpenMethodAction (
-				"post",
+			htmlFormOpenPostAction (
 				requestContext.resolveLocalUrl (
 					"/queue.users"));
 

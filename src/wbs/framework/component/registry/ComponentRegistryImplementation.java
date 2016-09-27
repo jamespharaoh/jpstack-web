@@ -845,7 +845,7 @@ class ComponentRegistryImplementation
 					outputFile,
 					componentDefinition);
 
-			} catch (IOException exception) {
+			} catch (Exception exception) {
 
 				log.warn (
 					stringFormat (
@@ -868,7 +868,7 @@ class ComponentRegistryImplementation
 				orderedSingletonsFile,
 				singletons);
 
-		} catch (IOException exception) {
+		} catch (Exception exception) {
 
 			log.warn (
 				stringFormat (

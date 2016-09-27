@@ -1,9 +1,26 @@
 package wbs.apn.chat.user.core.console;
 
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localDateNotEqual;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
 import static wbs.utils.web.HtmlUtils.htmlColourFromObject;
 
 import java.util.Set;
@@ -12,9 +29,8 @@ import java.util.TreeSet;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -72,32 +88,44 @@ class ChatUserHelpPart
 			requestContext.resolveLocalUrl (
 				"/chatUser.helpForm");
 
-		printFormat (
-			"<p><button onclick=\"%h\">send message</button></p>\n",
+		htmlParagraphOpen ();
+
+		formatWriter.writeFormat (
+			"<button",
+			" onclick=\"%h\"",
 			stringFormat (
 				"top.frames['inbox'].location='%j';",
-				link));
+				link),
+			">send message</button>");
 
-		if (chatHelpLogs.size () == 0) {
+		htmlParagraphClose ();
 
-			printFormat (
-				"<p>No history to display.</p>\n");
+		if (
+			collectionIsEmpty (
+				chatHelpLogs)
+		) {
+
+			htmlParagraphWrite (
+				"No history to display.");
 
 			return;
 
 		}
 
-		printFormat (
-			"<table class=\"list\">\n");
+		// table open
 
-		printFormat (
-			"<tr>\n",
-			"<th>&nbsp;</th>\n",
-			"<th>Time</th>\n",
-			"<th>Message</th>\n",
-			"<th>Our number</th>\n",
-			"<th>User</th>\n",
-			"</tr>\n");
+		htmlTableOpenList ();
+
+		// table headers
+
+		htmlTableHeaderRowWrite (
+			"",
+			"Time",
+			"Message",
+			"Our number",
+			"User");
+
+		// table content
 
 		LocalDate previousDate = null;
 
@@ -132,19 +160,22 @@ class ChatUserHelpPart
 				previousDate =
 					nextDate;
 
-				printFormat (
-					"<tr class=\"sep\">\n");
+				htmlTableRowSeparatorWrite ();
 
-				printFormat (
-					"<tr style=\"font-weight: bold\">\n",
+				htmlTableRowOpen (
+					htmlStyleAttribute (
+						htmlStyleRuleEntry (
+							"font-weight",
+							"bold")));
 
-					"<td colspan=\"5\">%h</td>\n",
+				htmlTableCellWrite (
 					timeFormatter.dateStringLong (
 						chatUserLogic.getTimezone (
 							chatUser),
 						chatHelpLog.getTimestamp ()),
+					htmlColumnSpanAttribute (5l));
 
-					"</tr>\n");
+				htmlTableRowClose ();
 
 			}
 
@@ -152,47 +183,44 @@ class ChatUserHelpPart
 				messageConsoleLogic.classForMessageDirection (
 					chatHelpLog.getDirection ());
 
-			printFormat (
-				"<tr class=\"%h\">\n",
-				rowClass);
+			htmlTableRowOpen (
+				htmlClassAttribute (
+					rowClass));
 
-			printFormat (
-				"<td",
-				" style=\"background: %h\"",
-				htmlColourFromObject (
-					ifNull (
-						chatHelpLog.getOurNumber (),
-						0)),
-				">&nbsp;</td>\n");
+			htmlTableCellWriteHtml (
+				"&nbsp;",
+				htmlStyleAttribute (
+					htmlStyleRuleEntry (
+						"background",
+						htmlColourFromObject (
+							ifNull (
+								chatHelpLog.getOurNumber (),
+								0)))));
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				timeFormatter.timeString (
 					chatUserLogic.getTimezone (
 						chatUser),
 					chatHelpLog.getTimestamp ()));
 
-			printFormat (
-				"<td>%h</td>\n",
+
+			htmlTableCellWrite (
 				chatHelpLog.getText ());
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				chatHelpLog.getOurNumber ());
 
-			printFormat (
-				"<td>%h</td>\n",
-				chatHelpLog.getUser () == null
-					? ""
-					: chatHelpLog.getUser ().getUsername ());
+			htmlTableCellWrite (
+				ifNotNullThenElseEmDash (
+					chatHelpLog.getUser (),
+				() ->
+					chatHelpLog.getUser ().getUsername ()));
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

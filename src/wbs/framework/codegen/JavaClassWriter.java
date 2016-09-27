@@ -1,11 +1,12 @@
 package wbs.framework.codegen;
 
 import static wbs.utils.collection.ArrayUtils.arrayIsNotEmpty;
+import static wbs.utils.collection.ArrayUtils.arrayMap;
 import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
-import static wbs.utils.collection.CollectionUtils.listLastElementRequired;
+import static wbs.utils.collection.CollectionUtils.listLastItemRequired;
 import static wbs.utils.collection.CollectionUtils.listSlice;
 import static wbs.utils.collection.CollectionUtils.listSliceAllButLastItemRequired;
 import static wbs.utils.collection.IterableUtils.iterableMap;
@@ -20,6 +21,7 @@ import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 import static wbs.utils.string.StringUtils.uncapitalise;
 
@@ -33,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.inject.Provider;
 
@@ -549,7 +552,7 @@ class JavaClassWriter
 				}
 
 				Function <JavaImportRegistry, String> implementsInterface =
-					listLastElementRequired (
+					listLastItemRequired (
 						implementsInterfaces);
 
 				formatWriter.writeLineFormat (
@@ -744,9 +747,39 @@ class JavaClassWriter
 
 			formatWriter.writeNewline ();
 
+			// sort method names efficiently
+
+			List <Method> sortedMethods =
+				Arrays.stream (
+					delegateInterface.getMethods ())
+
+				.map (
+					method -> Pair.of (
+						stringFormat (
+							"%s (%s)",
+							method.getName (),
+							joinWithCommaAndSpace (
+								arrayMap (
+									Class::getName,
+									method.getParameterTypes ()))),
+						method))
+
+				.sorted (
+					(left, right) ->
+						left.getKey ().compareTo (
+							right.getKey ()))
+
+				.map (
+					Pair::getValue)
+
+				.collect (
+					Collectors.toList ());
+
+			// iterate methods
+
 			for (
 				Method method
-					: delegateInterface.getMethods ()
+					: sortedMethods
 			) {
 
 				// don't add the same method twice
@@ -863,7 +896,7 @@ class JavaClassWriter
 			}
 
 			Parameter lastParameter =
-				listLastElementRequired (
+				listLastItemRequired (
 					parameters);
 
 			formatWriter.writeLineFormat (
@@ -916,7 +949,7 @@ class JavaClassWriter
 				}
 
 				Parameter lastParameter =
-					listLastElementRequired (
+					listLastItemRequired (
 						parameters);
 
 				formatWriter.writeLineFormat (
@@ -959,7 +992,7 @@ class JavaClassWriter
 				}
 
 				Parameter lastParameter =
-					listLastElementRequired (
+					listLastItemRequired (
 						parameters);
 
 				formatWriter.writeLineFormat (

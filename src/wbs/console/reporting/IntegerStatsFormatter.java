@@ -4,6 +4,7 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.mapEntry;
 import static wbs.utils.etc.NumberUtils.equalToZero;
+import static wbs.utils.string.StringUtils.emptyStringIfNull;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -92,6 +93,8 @@ class IntegerStatsFormatter
 			formatWriter.writeFormat (
 				"<td></td>\n");
 
+			return;
+
 		}
 
 		// simple cell if no link
@@ -104,6 +107,8 @@ class IntegerStatsFormatter
 			formatWriter.writeFormat (
 				"<td style=\"text-align: right\">%h</td>\n",
 				value);
+
+			return;
 
 		}
 
@@ -150,7 +155,8 @@ class IntegerStatsFormatter
 
 			.href (
 				urlParams.toUrl (
-					targetBase))
+					emptyStringIfNull (
+						targetBase)))
 
 			.style (
 				"text-align: right")

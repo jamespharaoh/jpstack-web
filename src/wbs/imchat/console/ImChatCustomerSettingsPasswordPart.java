@@ -2,16 +2,21 @@ package wbs.imchat.console;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.string.StringUtils.stringInSafe;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import wbs.imchat.console.ImChatCustomerConsoleHelper;
-import wbs.imchat.model.ImChatCustomerRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
+import wbs.imchat.model.ImChatCustomerRec;
 import wbs.platform.event.console.EventConsoleLogic;
 import wbs.platform.event.console.EventLinkConsoleHelper;
 import wbs.platform.event.model.EventLinkRec;
@@ -89,42 +94,65 @@ class ImChatCustomerSettingsPasswordPart
 
 		requestContext.flushNotices ();
 
-		printFormat (
-			"<h2>Request new password</h2>\n");
+		renderRequestNewPasswordForm ();
 
-		printFormat (
-			"<p>This will generate a new password for the customer, and send ",
+		renderRecentPasswordEvents ();
+
+	}
+
+	private
+	void renderRequestNewPasswordForm () {
+
+		// heading
+
+		htmlHeadingTwoWrite (
+			"Request new password");
+
+		// information
+
+		htmlParagraphWriteFormat (
+			"This will generate a new password for the customer, and send it ",
 			"it to them via email as usual. It will also display it on the ",
-			"screen.</p>\n");
+			"screen.");
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
+		// form open
+
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
-				"/imChatCustomer.settings.password"),
-			">\n");
+				"/imChatCustomer.settings.password"));
 
-		printFormat (
-			"<p><input",
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"generate new password\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
 
-		printFormat (
-			"<h2>Recent forgotten password events</h2>");
+		// form close
+
+		htmlFormClose ();
+
+	}
+
+	private
+	void renderRecentPasswordEvents () {
+
+		htmlHeadingTwoWrite (
+			"Recent forgotten password events");
 
 		if (
 			collectionIsEmpty (
 				events)
 		) {
 
-			printFormat (
-				"<p>No forgotten password events have been logged for this ",
-				"customer.</p>");
+			htmlParagraphWriteFormat (
+				"No forgotten password events have been logged for this ",
+				"customer.");
 
 		} else {
 

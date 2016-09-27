@@ -1,15 +1,20 @@
 package wbs.platform.object.browse;
 
 import static wbs.utils.etc.OptionalUtils.optionalIf;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
-import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -254,34 +259,33 @@ class ObjectBrowsePart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"list\">\n");
+		// table open
 
-		printFormat (
-			"<tr>\n");
+		htmlTableOpenList ();
+
+		// table header
+
+		htmlTableRowOpen ();
 
 		formFieldLogic.outputTableHeadings (
 			formatWriter,
 			formFieldSet);
 
-		printFormat (
-			"</tr>\n");
+		htmlTableRowClose ();
 
-		// render rows
+		// table content
 
 		for (
 			Record<?> object
 				: allObjects
 		) {
 
-			printFormat (
-				"<tr",
+			htmlTableRowOpen (
 
-				" class=\"%h\"",
-				joinWithSpace (
+				htmlClassAttribute (
 					presentInstances (
 
-					Optional.of (
+					optionalOf (
 						"magic-table-row"),
 
 					optionalIf (
@@ -290,16 +294,17 @@ class ObjectBrowsePart
 
 				)),
 
-				" data-target-href=\"%h\"",
-				requestContext.resolveContextUrl (
-					stringFormat (
-						"%s",
-						targetContext.pathPrefix (),
-						"/%s",
-						consoleHelper.getPathId (
-							object))),
+				htmlDataAttribute (
+					"target-href",
+					requestContext.resolveContextUrl (
+						stringFormat (
+							"%s",
+							targetContext.pathPrefix (),
+							"/%s",
+							consoleHelper.getPathId (
+								object))))
 
-				">\n");
+			);
 
 			formFieldLogic.outputTableCellsList (
 				formatWriter,
@@ -308,13 +313,13 @@ class ObjectBrowsePart
 				ImmutableMap.of (),
 				false);
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		// table close
+
+		htmlTableClose ();
 
 	}
 

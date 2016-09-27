@@ -366,7 +366,7 @@ class ChatUserSearchOldPart
 			"Dating mode",
 			() -> chatUserDateModeConsoleHelper.writeSelect (
 				"dateMode",
-				objectToStringNullSafe (
+				emptyStringIfNull (
 					params.get (
 						"dateMode"))));
 
@@ -375,24 +375,27 @@ class ChatUserSearchOldPart
 			() -> htmlSelect (
 				"online",
 				searchOnlineOptions,
-				objectToStringNullSafe (
-					params.get ("online"))));
+				emptyStringIfNull (
+					params.get (
+						"online"))));
 
 		htmlTableDetailsRowWriteHtml (
 			"Output",
 			() -> htmlSelect (
 				"output",
 				searchOutputOptions,
-				objectToStringNullSafe (
-					params.get ("output"))));
+				emptyStringIfNull (
+					params.get (
+						"output"))));
 
 		htmlTableDetailsRowWriteHtml (
 			"Order",
 			() -> htmlSelect (
 				"order",
 				searchOrderOptions,
-				objectToStringNullSafe (
-					params.get ("order"))));
+				emptyStringIfNull (
+					params.get (
+						"order"))));
 
 		printFormat (
 			"<tr>\n",

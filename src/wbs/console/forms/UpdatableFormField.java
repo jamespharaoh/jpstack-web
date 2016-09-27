@@ -13,8 +13,14 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitColon;
+import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -302,25 +308,25 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderFormRow (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> error,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> error,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		Optional<Native> nativeValue =
+		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
 					container));
 
-		Optional<Generic> genericValue =
+		Optional <Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
 					nativeValue));
 
-		Optional<Interface> interfaceValue =
+		Optional <Interface> interfaceValue =
 			requiredValue (
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
@@ -328,20 +334,23 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 						hints,
 						genericValue)));
 
-		out.writeFormat (
-			"<tr>\n",
-			"<th>%h</th>\n",
-			label (),
-			"<td",
-			" style=\"%s\"",
-			stringFormat (
-				"text-align: %s",
-				renderer.propertiesAlign ().name ()),
-			">");
+		htmlTableRowOpen (
+			formatWriter);
+
+		htmlTableHeaderCellWrite (
+			formatWriter,
+			label ());
+
+		htmlTableCellOpen (
+			formatWriter,
+			htmlStyleAttribute (
+				htmlStyleRuleEntry (
+					"text-align",
+					renderer.propertiesAlign ().name ())));
 
 		renderer.renderFormInput (
 			submission,
-			out,
+			formatWriter,
 			container,
 			hints,
 			interfaceValue,
@@ -353,16 +362,20 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				error)
 		) {
 
-			out.writeFormat (
-				"<br>\n",
+			formatWriter.writeLineFormat (
+				"<br>");
+
+			formatWriter.writeLineFormat (
 				"%h",
 				error.get ());
 
 		}
 
-		out.writeFormat (
-			"</td>\n",
-			"</tr>\n");
+		htmlTableCellClose (
+			formatWriter);
+
+		htmlTableRowClose (
+			formatWriter);
 
 	}
 
@@ -370,24 +383,23 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
-			@NonNull String indent,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		Optional<Native> nativeValue =
+		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
 					container));
 
-		Optional<Generic> genericValue =
+		Optional <Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
 					nativeValue));
 
-		Optional<Interface> interfaceValue =
+		Optional <Interface> interfaceValue =
 			requiredValue (
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
@@ -397,7 +409,6 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 		renderer.renderFormReset (
 			javascriptWriter,
-			indent,
 			container,
 			interfaceValue,
 			formType,
@@ -410,7 +421,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	void renderCsvRow (
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map <String,Object> hints) {
 
 		Optional<Native> nativeValue =
 			requiredValue (

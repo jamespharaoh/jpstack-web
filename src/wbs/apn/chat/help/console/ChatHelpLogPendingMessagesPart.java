@@ -1,11 +1,21 @@
 package wbs.apn.chat.help.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
+
 import java.util.List;
 
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.help.console.ChatHelpLogConsoleHelper;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -98,74 +108,72 @@ class ChatHelpLogPendingMessagesPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"list\">");
+		htmlTableOpenList ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>From</th>\n",
-			"<th>To</th>\n",
-			"<th>Timestamp</th>\n",
-			"<th>Charge</th>\n",
-			"</tr>\n");
+		htmlTableHeaderRowWrite (
+			"From",
+			"To",
+			"Timestamp",
+			"Charge");
 
-		for (MessageRec message
-				: messages) {
+		for (
+			MessageRec message
+				: messages
+		) {
 
-			printFormat (
-				"<tr class=\"sep\">\n");
+			htmlTableRowSeparatorWrite ();
 
 			String rowClass;
 
 			if (message.getDirection () == MessageDirection.in) {
-
 				rowClass = "message-in";
-
 			} else if (message.getCharge () > 0) {
-
 				rowClass = "message-out-charge";
-
 			} else {
-
 				rowClass = "message-out";
-
 			}
 
-			printFormat (
-				"<tr class=\"%h\">\n",
-				rowClass,
+			// message attributes row
 
-				"<td>%h</td>\n",
-				message.getNumFrom (),
+			htmlTableRowOpen (
+				htmlClassAttribute (
+					rowClass));
 
-				"<td>%h</td>\n",
-				message.getNumTo (),
+			htmlTableCellWrite (
+				message.getNumFrom ());
 
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
+				message.getNumTo ());
+
+			htmlTableCellWrite (
 				timeFormatter.timestampTimezoneString (
 					chatUserLogic.getTimezone (
 						chatUser),
-					message.getCreatedTime ()),
+					message.getCreatedTime ()));
 
-				"<td>%h</td>\n",
-				message.getCharge (),
+			htmlTableCellWrite (
+				integerToDecimalString (
+					message.getCharge ()));
 
-				"</tr>\n");
+			htmlTableRowClose ();
 
-			printFormat (
-				"<tr class=\"%h\">\n",
-				rowClass,
+			// message content row
 
-				"<td colspan=\"4\">%s</td>\n",
+			htmlTableRowOpen (
+				htmlClassAttribute (
+					rowClass));
+
+			htmlTableCellWrite (
 				HtmlUtils.encodeNewlineToBr (
 					message.getText ().getText ()),
+				htmlColumnSpanAttribute (
+					4l));
 
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

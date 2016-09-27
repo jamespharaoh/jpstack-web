@@ -2,6 +2,11 @@ package wbs.platform.queue.console;
 
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
 
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
@@ -67,21 +72,17 @@ class QueueItemActionsPart
 
 		if (! canSupervise) {
 
-			printFormat (
-				"<p>You do not have permission to perform actions on this ",
-				"queue item.</p>\n");
+			htmlParagraphWriteFormat (
+				"You do not have permission to perform actions on this queue ",
+				"item.");
 
 			return;
 
 		}
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
-				"/queueItem.actions"),
-			">\n");
+				"/queueItem.actions"));
 
 		if (
 			isNotNull (
@@ -95,51 +96,58 @@ class QueueItemActionsPart
 					userConsoleLogic.userRequired ())
 			) {
 
-				printFormat (
-					"<p>This queue item is claimed by you. You may return it ",
-					"to the queue.</p>\n");
+				htmlParagraphWriteFormat (
+					"This queue item is claimed by you. You may return it to ",
+					"the queue.");
 
-				printFormat (
-					"<p><input",
+				htmlParagraphOpen ();
+
+				formatWriter.writeLineFormat (
+					"<input",
 					" type=\"submit\"",
 					" name=\"unclaim\"",
 					" value=\"unclaim\"",
-					">\n");
+					">");
+
+				htmlParagraphClose ();
 
 			} else {
 
-				printFormat (
-					"<p>This queue item is claimed by \"%h\". You may return ",
+				htmlParagraphWriteFormat (
+					"This queue item is claimed by \"%h\". ",
 					objectManager.objectPathMini (
 						queueItem.getQueueItemClaim ().getUser ()),
-					"it to the queue or reclaim it yourself.</p>\n");
+					"You may return it to the queue or reclaim it yourself.");
 
-				printFormat (
-					"<p><input",
+				htmlParagraphOpen ();
+
+				formatWriter.writeFormat (
+					"<input",
 					" type=\"submit\"",
 					" name=\"unclaim\"",
 					" value=\"unclaim\"",
-					">\n");
+					">");
 
-				printFormat (
+				formatWriter.writeFormat (
 					"<input",
 					" type=\"submit\"",
 					" name=\"reclaim\"",
 					" value=\"reclaim\"",
-					"></p>\n");
+					">");
+
+				htmlParagraphClose ();
 
 			}
 
 		} else {
 
-			printFormat (
-				"<p>There are no actions that you can perform on this queue ",
-				"item at this time.</p>\n");
+			htmlParagraphWriteFormat (
+				"There are no actions that you can perform on this queue item ",
+				"at this time.");
 
 		}
 
-		printFormat (
-			"</form>\n");
+		htmlFormClose ();
 
 	}
 

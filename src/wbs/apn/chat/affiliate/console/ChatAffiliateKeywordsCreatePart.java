@@ -2,13 +2,13 @@ package wbs.apn.chat.affiliate.console;
 
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethodAction;
-import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
 
 import javax.inject.Named;
 
@@ -42,18 +42,14 @@ class ChatAffiliateKeywordsCreatePart
 	public
 	void renderHtmlBodyContent () {
 
-		htmlFormOpenMethodAction (
-			"post",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
 				"/chatAffiliate.keywords.create"));
 
 		htmlTableOpenDetails ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Keyword</th>\n",
-
-			"<td>%s</td>\n",
+		htmlTableDetailsRowWriteHtml (
+			"Keyword",
 			stringFormat (
 				"<input",
 				" type=\"text\"",
@@ -61,10 +57,7 @@ class ChatAffiliateKeywordsCreatePart
 				" value=\"%h\"",
 				emptyStringIfNull (
 					requestContext.getForm (
-						"keyword")),
-				">"),
-
-			"</tr>\n");
+						"keyword"))));
 
 		htmlTableDetailsRowWriteHtml (
 			"Join type",

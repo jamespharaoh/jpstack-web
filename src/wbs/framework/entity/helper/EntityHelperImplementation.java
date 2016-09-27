@@ -236,7 +236,7 @@ class EntityHelperImplementation
 					outputFilename,
 					model);
 
-			} catch (IOException exception) {
+			} catch (Exception exception) {
 
 				log.warn (
 					stringFormat (

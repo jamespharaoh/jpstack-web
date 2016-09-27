@@ -30,8 +30,7 @@ class ParentFieldSpec
 		name = "column")
 	String columnName;
 
-	@DataAttribute (
-		name = "cacheable")
+	@DataAttribute
 	Boolean cacheable;
 
 }

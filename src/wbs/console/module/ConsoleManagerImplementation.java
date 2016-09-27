@@ -899,7 +899,7 @@ class ConsoleManagerImplementation
 					outputFileName,
 					consoleModule);
 
-			} catch (IOException exception) {
+			} catch (Exception exception) {
 
 				log.warn (
 					stringFormat (

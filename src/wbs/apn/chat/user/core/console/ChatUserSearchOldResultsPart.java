@@ -3,10 +3,20 @@ package wbs.apn.chat.user.core.console;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.etc.Misc.sum;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlDivWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -447,35 +457,38 @@ class ChatUserSearchOldResultsPart
 		if (pageBuilders [0].pages () <= 1)
 			return;
 
-		printFormat (
-			"<p",
-			" class=\"links\"",
-			">Select page\n");
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"links"));
+
+		formatWriter.writeLineFormat (
+			"Select page");
 
 		for (
-			int page = 0;
+			long page = 0l;
 			page < pageBuilders [0].pages ();
 			page ++
 		) {
 
-			printFormat (
-				"<a",
-				" class=\"little-page-link-%s\"",
-				page,
-				" href=\"#\"",
-				" onclick=\"%h\"",
-				joinWithSpace (
+			htmlLinkWrite (
+				"#",
+				integerToDecimalString (
+					page + 1),
+				htmlClassAttribute (
 					stringFormat (
-						"pageBuilder.showLittlePage (%s);",
-						page),
-					"magicTable.setupMagicHandlers ($('#pageHolder'));"),
-				">%s</a>\n",
-				page + 1);
+						"little-page-link-%s",
+						page)),
+				htmlAttribute (
+					"onclick",
+					joinWithSpace (
+						stringFormat (
+							"pageBuilder.showLittlePage (%s);",
+							page),
+						"magicTable.setupMagicHandlers ($('#pageHolder'));")));
 
 		}
 
-		printFormat (
-			"</p>\n");
+		htmlParagraphClose ();
 
 	}
 
@@ -483,68 +496,88 @@ class ChatUserSearchOldResultsPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<p",
-			" class=\"links\"",
-			">Select mode\n");
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"links"));
 
-		printFormat (
-			"<a",
-			" class=\"big-page-link-0\"",
-			" href=\"#\"",
-			" onclick=\"%h\"",
-			joinWithSpace (
-				"pageBuilder.showBigPage (0);",
-				"magicTable.setupMagicHandlers ($('#pageHolder'));"),
-			">Normal</a>\n");
+		formatWriter.writeLineFormat (
+			"Select mode");
 
-		printFormat (
-			"<a",
-			" class=\"big-page-link-1\"",
-			" href=\"#\"",
-			" onclick=\"%h\"",
-			joinWithSpace (
-				"pageBuilder.showBigPage (1);",
-				"magicTable.setupMagicHandlers ($('#pageHolder'));"),
-			">Credit</a></p>\n");
+		htmlLinkWrite (
+			"#",
+			"Normal",
+			htmlClassAttribute (
+				"big-page-link-0"),
+			htmlAttribute (
+				"onclick",
+				joinWithSpace (
+					"pageBuilder.showBigPage (0);",
+					"magicTable.setupMagicHandlers ($('#pageHolder'));")));
+
+		htmlLinkWrite (
+			"#",
+			"Credit",
+			htmlClassAttribute (
+				"big-page-link-1"),
+			htmlAttribute (
+				"onclick",
+				joinWithSpace (
+					"pageBuilder.showBigPage (1);",
+					"magicTable.setupMagicHandlers ($('#pageHolder'));")));
+
+		htmlParagraphClose ();
 
 		goPages ();
 
-		printFormat (
-			"<div id=\"pageHolder\">Please wait...</div>\n");
+		htmlDivWrite (
+			"Please wait...",
+			htmlIdAttribute (
+				"pageHolder"));
 
 		goPages ();
 
-		printFormat (
-			"<script type=\"text/javascript\">\n");
+		// script open
 
-		printFormat (
-			"var pages = [ [\n");
+		htmlScriptBlockOpen ();
+
+		// page data
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"var pages = [ [");
 
 		pageBuilders [0].goPages (
 			formatWriter);
 
-		printFormat (
-			"], [\n");
+		formatWriter.writeLineFormatDecreaseIncreaseIndent (
+			"], [");
 
 		pageBuilders [1].goPages (
 			formatWriter);
 
-		printFormat (
-			"] ];\n");
+		formatWriter.writeLineFormatDecreaseIndent (
+			"] ];");
 
-		printFormat (
-			"var pageBuilder =\n",
-			"\tnew PageBuilder (pages);\n");
+		// page builder
 
-		printFormat (
-			"$(function () {\n",
-			"\tpageBuilder.init ();\n",
-			"\tmagicTable.setupMagicHandlers ($('#pageHolder'));\n",
-			"});\n");
+		formatWriter.writeLineFormat (
+			"var pageBuilder =");
 
-		printFormat (
-			"</script>\n");
+		formatWriter.writeLineFormat (
+			"  new PageBuilder (pages);");
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"$(function () {");
+
+		formatWriter.writeLineFormat (
+			"pageBuilder.init ();");
+
+		formatWriter.writeLineFormat (
+			"magicTable.setupMagicHandlers ($('#pageHolder'));");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"});");
+
+		htmlScriptBlockClose ();
 
 	}
 

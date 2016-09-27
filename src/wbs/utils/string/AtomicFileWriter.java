@@ -6,14 +6,14 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
-
-import wbs.utils.io.RuntimeIoException;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.io.FileUtils;
+
+import wbs.utils.io.RuntimeIoException;
 
 @Accessors (fluent = true)
 public
@@ -42,14 +42,15 @@ class AtomicFileWriter
 			@NonNull String filename) {
 
 		file =
-			new File (filename);
+			new File (
+				filename);
 
 	}
 
 	@Override
 	public
 	void writeFormat (
-			@NonNull Object... arguments) {
+			@NonNull Object ... arguments) {
 
 		stringBuilder.append (
 			stringFormatArray (
@@ -122,6 +123,7 @@ class AtomicFileWriter
 			@NonNull String newContents) {
 
 		if (! file.exists ()) {
+
 			return true;
 		}
 

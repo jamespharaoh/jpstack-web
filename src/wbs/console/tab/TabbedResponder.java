@@ -1,8 +1,26 @@
 package wbs.console.tab;
 
-import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
+import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlDivWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingOneWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteHtml;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,9 +96,9 @@ class TabbedResponder
 
 	@Override
 	protected
-	Set<HtmlLink> htmlLinks () {
+	Set <HtmlLink> htmlLinks () {
 
-		return ImmutableSet.<HtmlLink>builder ()
+		return ImmutableSet.<HtmlLink> builder ()
 
 			.addAll (
 				super.htmlLinks ())
@@ -94,7 +112,7 @@ class TabbedResponder
 
 	@Override
 	protected
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
 		return pagePart.scriptRefs ();
 
@@ -222,19 +240,39 @@ class TabbedResponder
 
 		pagePart.renderHtmlHeadContent ();
 
-		printFormat (
-			"<script type=\"text/javascript\">\n",
+		htmlScriptBlockOpen ();
 
-			"function toggleHead (elem) {\n",
-			"  while (elem.nodeName.toLowerCase () != 'table')\n",
-			"    elem = elem.parentNode;\n",
-			"  if (elem.className == 'head-1-big')\n",
-			"    elem.className = 'head-1-small';\n",
-			"  else if (elem.className == 'head-1-small')\n",
-			"    elem.className = 'head-1-big';\n",
-			"}\n",
+		formatWriter.writeLineFormatIncreaseIndent (
+			"function toggleHead (elem) {");
 
-			"</script>\n");
+		formatWriter.writeLineFormatIncreaseIndent (
+			"while (elem.nodeName.toLowerCase () != 'table') {");
+
+		formatWriter.writeLineFormat (
+			"elem = elem.parentNode;");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"if (elem.className == 'head-1-big') {");
+
+		formatWriter.writeLineFormat (
+			"elem.className = 'head-1-small';");
+
+		formatWriter.writeLineFormatDecreaseIncreaseIndent (
+			"} else if (elem.className == 'head-1-small') {");
+
+		formatWriter.writeLineFormat (
+			"elem.className = 'head-1-big';");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		htmlScriptBlockClose ();
 
 	}
 
@@ -246,25 +284,35 @@ class TabbedResponder
 	protected
 	void renderHtmlBodyContents () {
 
-		printFormat (
-			"<h1>%h</h1>\n",
+		htmlHeadingOneWrite (
 			title);
 
-		for (MyLayer myLayer : myLayers) {
+		for (
+			MyLayer myLayer
+				: myLayers
+		) {
 
-			printFormat (
-				"<table",
-				" class=\"head-1-big\"",
-				"><tr>\n",
+			htmlTableOpen (
+				formatWriter,
+				htmlClassAttribute (
+					"head-1-big"));
 
-				"<td",
-				" class=\"h\"",
-				" onclick=\"toggleHead (this)\"",
-				">%h</td>\n",
-				myLayer.title);
+			htmlTableRowOpen (
+				formatWriter);
 
-			printFormat (
-				"<td class=\"l\">\n");
+			htmlTableCellWrite (
+				formatWriter,
+				myLayer.title,
+				htmlClassAttribute (
+					"h"),
+				htmlAttribute (
+					"onclick",
+					"toggleHead (this)"));
+
+			htmlTableCellOpen (
+				formatWriter,
+				htmlClassAttribute (
+					"l"));
 
 			for (
 				TabRef tabRef
@@ -276,61 +324,79 @@ class TabbedResponder
 
 				if (tabRef.getTab () == myLayer.tab) {
 
-					printFormat (
-						"<a",
-						" class=\"selected\"",
-						" href=\"%h\"",
+					htmlLinkWrite (
+						formatWriter,
 						tabRef.getTab ().getUrl (),
-						">%h</a>\n",
-						tabRef.getLabel ());
+						tabRef.getLabel (),
+						htmlClassAttribute (
+							"selected"));
 
 				} else {
 
-					printFormat (
-						"<a",
-						" href=\"%h\"",
+					htmlLinkWrite (
+						formatWriter,
 						tabRef.getTab ().getUrl (),
-						">%h</a>\n",
 						tabRef.getLabel ());
 
 				}
 
 			}
 
-			printFormat (
-				"</td>\n",
+			htmlTableCellClose (
+				formatWriter);
 
-				"</tr></table>\n");
+			htmlTableRowClose (
+				formatWriter);
+
+			htmlTableClose (
+				formatWriter);
 
 		}
 
-		printFormat (
-			"<div style=\"%h\"></div>\n",
-			joinWithSemicolonAndSpace (
-				"clear: both",
-				"border-top: 1px solid white",
-				"margin-bottom: 1ex"));
+		htmlDivWrite (
+			formatWriter,
+			"",
+			htmlStyleAttribute (
+				htmlStyleRuleEntry (
+					"clear",
+					"both"),
+				htmlStyleRuleEntry (
+					"border-top",
+					"1px solid white"),
+				htmlStyleRuleEntry (
+					"margin-bottom",
+					"1ex")));
 
 		requestContext.flushNotices (
 			formatWriter);
 
-		if (pagePartThrew != null) {
+		if (
+			isNotNull (
+				pagePartThrew)
+		) {
 
-			printFormat (
-				"<p>Unable to show page contents.</p>\n");
+			htmlParagraphWrite (
+				"Unable to show page contents.");
 
-			if (privChecker.canRecursive (
+			if (
+				privChecker.canRecursive (
 					GlobalId.root,
-					"debug")) {
+					"debug")
+			) {
 
-				printFormat (
-					"<p><pre>%h</pre></p>\n",
-					exceptionLogic.throwableDump (
-						pagePartThrew));
+				htmlParagraphWriteHtml (
+					formatWriter,
+					stringFormat (
+						"<pre>%h</pre>",
+						exceptionLogic.throwableDump (
+							pagePartThrew)));
 
 			}
 
-		} else if (pagePart != null) {
+		} else if (
+			isNotNull (
+				pagePart)
+		) {
 
 			pagePart.renderHtmlBodyContent ();
 

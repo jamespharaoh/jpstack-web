@@ -1,6 +1,14 @@
 package wbs.integrations.oxygen8.console;
 
+import static wbs.utils.etc.LogicUtils.booleanToYesNo;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -53,59 +61,48 @@ class Oxygen8RouteSummaryAdditionalPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<h2>Oxygen8 route information</h2>\n");
+		htmlHeadingTwoWrite (
+			"Oxygen8 route information");
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
-		if (oxygen8RouteOut != null) {
+		if (
+			isNotNull (
+				oxygen8RouteOut)
+		) {
 
-			printFormat (
-				"<tr>\n",
-				"<th>Relay URL</th>\n",
-				"<td>%h</td>\n",
-				oxygen8RouteOut.getRelayUrl (),
-				"</tr>\n");
+			htmlTableDetailsRowWrite (
+				"Relay URL",
+				oxygen8RouteOut.getRelayUrl ());
 
-			printFormat (
-				"<tr>\n",
-				"<th>Shortcode</th>\n",
-				"<td>%h</td>\n",
-				oxygen8RouteOut.getShortcode (),
-				"</tr>\n");
+			htmlTableDetailsRowWrite (
+				"Shortcode",
+				oxygen8RouteOut.getShortcode ());
 
-			printFormat (
-				"<tr>\n",
-				"<th>Premium</th>\n",
-				"<td>%h</td>\n",
-				oxygen8RouteOut.getPremium () ? "yes" : "no",
-				"</tr>\n");
+			htmlTableDetailsRowWrite (
+				"Premium",
+				booleanToYesNo (
+					oxygen8RouteOut.getPremium ()));
 
-			printFormat (
-				"<tr>\n",
-				"<th>Username</th>\n",
-				"<td>%h</td>\n",
-				oxygen8RouteOut.getUsername (),
-				"</tr>\n");
+			htmlTableDetailsRowWrite (
+				"Username",
+				oxygen8RouteOut.getUsername ());
 
-			printFormat (
-				"<tr>\n",
-				"<th>Password</th>\n",
-				"<td>%h</td>\n",
-				requestContext.canContext ("route.manage")
-					? oxygen8RouteOut.getPassword ()
-					: "**********",
-				"</tr>\n");
+			htmlTableDetailsRowWrite (
+				"Password",
+				ifThenElse (
+					requestContext.canContext ("route.manage"),
+					() -> oxygen8RouteOut.getPassword (),
+					() -> "**********"));
+
+			htmlTableRowClose ();
 
 		}
 
 		if (route.getCanReceive ()) {
 
-			printFormat (
-				"<tr>\n",
-				"<th>Inbound URL</th>\n",
-				"<td>%h</td>\n",
+			htmlTableDetailsRowWrite (
+				"Inbound URL",
 				stringFormat (
 					"%s",
 					wbsConfig.apiUrl (),
@@ -113,8 +110,7 @@ class Oxygen8RouteSummaryAdditionalPart
 					"/route",
 					"/%u",
 					route.getId (),
-					"/in"),
-				"</tr>\n");
+					"/in"));
 
 		}
 
@@ -124,10 +120,8 @@ class Oxygen8RouteSummaryAdditionalPart
 			&& route.getDeliveryReports ()
 		) {
 
-			printFormat (
-				"<tr>\n",
-				"<th>Delivery reports URL</th>\n",
-				"<td>%h</td>\n",
+			htmlTableDetailsRowWrite (
+				"Delivery reports URL",
 				stringFormat (
 					"%s",
 					wbsConfig.apiUrl (),
@@ -139,8 +133,7 @@ class Oxygen8RouteSummaryAdditionalPart
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

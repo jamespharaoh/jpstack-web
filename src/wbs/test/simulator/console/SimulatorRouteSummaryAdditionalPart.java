@@ -1,5 +1,8 @@
 package wbs.test.simulator.console;
 
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
+
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 
@@ -12,12 +15,12 @@ class SimulatorRouteSummaryAdditionalPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<h2>Simulator route information</h2>\n");
+		htmlHeadingTwoWrite (
+			"Simulator route information");
 
-		printFormat (
-			"<p>This is a simulator route and its messages will be delivered ",
-			"to the simulator message queue.</p>\n");
+		htmlParagraphWriteFormat (
+			"This is a simulator route and its messages will be delivered to ",
+			"the simulator message queue.");
 
 	}
 

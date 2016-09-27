@@ -1,6 +1,8 @@
 package wbs.platform.object.summary;
 
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -123,8 +125,7 @@ class ObjectSummaryFieldsPart <
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
 		formFieldLogic.outputTableRows (
 			formatWriter,
@@ -132,8 +133,7 @@ class ObjectSummaryFieldsPart <
 			object,
 			ImmutableMap.of ());
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

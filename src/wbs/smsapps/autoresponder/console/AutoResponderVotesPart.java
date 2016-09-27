@@ -4,16 +4,15 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.simplify;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenLayout;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethod;
-import static wbs.utils.web.HtmlUtils.htmlHeadingTwoWrite;
-import static wbs.utils.web.HtmlUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlUtils.htmlParagraphOpen;
 
 import java.util.List;
 import java.util.Map;
@@ -168,8 +167,7 @@ class AutoResponderVotesPart
 	public
 	void renderHtmlBodyContent () {
 
-		htmlFormOpenMethod (
-			"get");
+		htmlFormOpenGet ();
 
 		// time period
 
@@ -228,6 +226,12 @@ class AutoResponderVotesPart
 
 		htmlTableClose ();
 
+	}
+
+	private void htmlFormOpenGet () {
+
+		// TODO Auto-generated method stub
+		
 	}
 
 }

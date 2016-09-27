@@ -9,6 +9,8 @@ import static wbs.utils.etc.OptionalUtils.optionalValueEqualWithClass;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
 import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
@@ -17,17 +19,15 @@ import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlFormOpenMethodAction;
 import static wbs.utils.web.HtmlUtils.htmlLinkWriteHtml;
 
 import java.util.List;
 
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -116,8 +116,7 @@ class ChatUserImageListPart
 	public
 	void renderHtmlBodyContent () {
 
-		htmlFormOpenMethodAction (
-			"post",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
 				stringFormat (
 					"/chatUser.%s.list",

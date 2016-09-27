@@ -19,6 +19,7 @@
   <target name="javadoc" depends="just-javadoc"/>
   <target name="fixtures" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data, just-fixtures"/>
   <target name="tomcat-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest, just-api-deploy, just-console-deploy, just-daemon-deploy, just-tomcat-test"/>
+  <target name="daemon-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest, just-daemon-deploy, just-daemon-test"/>
   <target name="generate-records" depends="just-build-framework, just-build-meta, just-generate-records"/>
   <target name="generate-helpers" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers"/>
   <target name="just-clean">
@@ -260,7 +261,7 @@
       <fileset dir="src/wbs/apn/chat/user/info/api/files"/>
       <fileset dir="src/wbs/apn/chat/user/join/api/files"/>
       <fileset dir="src/wbs/apn/chat/user/pending/api/files"/>
-      <fileset dir="src/wbs/clients/allstar/misc/api/files"/>
+      <fileset dir="src/wbs/allstar/misc/api/files"/>
       <fileset dir="src/wbs/imchat/api/files"/>
       <fileset dir="src/wbs/services/wallet/api/files"/>
       <fileset dir="src/wbs/services/ticket/core/api/files"/>
@@ -436,7 +437,7 @@
       <fileset dir="src/wbs/apn/chat/user/info/console/files"/>
       <fileset dir="src/wbs/apn/chat/user/join/console/files"/>
       <fileset dir="src/wbs/apn/chat/user/pending/console/files"/>
-      <fileset dir="src/wbs/clients/allstar/misc/console/files"/>
+      <fileset dir="src/wbs/allstar/misc/console/files"/>
       <fileset dir="src/wbs/imchat/console/files"/>
       <fileset dir="src/wbs/services/wallet/console/files"/>
       <fileset dir="src/wbs/services/ticket/core/console/files"/>
@@ -502,6 +503,16 @@
     <exec failonerror="false" executable="work/tomcat-test/bin/catalina.sh">
       <arg line="run"/>
     </exec>
+  </target>
+  <target name="just-daemon-test">
+    <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
+      <arg value="wbs-test"/>
+      <arg value="wbs.test"/>
+      <arg value="utils,config,data,entity,schema,sql,model,hibernate,object,logic,daemon,model-meta"/>
+      <arg value=""/>
+      <arg value="wbs.platform.daemon.DaemonRunner"/>
+      <arg value="runDaemon"/>
+    </java>
   </target>
   <target name="just-api-restart">
     <exec failonerror="false" executable="./service">

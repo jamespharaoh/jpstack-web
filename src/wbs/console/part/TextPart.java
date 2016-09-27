@@ -19,8 +19,7 @@ class TextPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"%s",
+		formatWriter.writeString (
 			text);
 
 	}

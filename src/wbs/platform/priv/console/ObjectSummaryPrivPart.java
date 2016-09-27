@@ -2,13 +2,19 @@ package wbs.platform.priv.console;
 
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
-import static wbs.utils.web.HtmlInputUtils.htmlOption;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlInputUtils.htmlOptionWrite;
+import static wbs.utils.web.HtmlInputUtils.htmlSelectClose;
+import static wbs.utils.web.HtmlInputUtils.htmlSelectOpen;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlUtils.htmlFormClose;
-import static wbs.utils.web.HtmlUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.List;
 import java.util.Map;
@@ -197,6 +203,14 @@ class ObjectSummaryPrivPart
 	public
 	void renderHtmlBodyContent () {
 
+		renderUsers ();
+		renderGroups ();
+
+	}
+
+	private
+	void renderUsers () {
+
 		htmlHeadingTwoWrite (
 			"Users");
 
@@ -216,7 +230,7 @@ class ObjectSummaryPrivPart
 		}
 
 		for (
-			Map.Entry<String,UserPrivSets> entry
+			Map.Entry <String, UserPrivSets> entry
 				: userPrivs.entrySet ()
 		) {
 
@@ -226,103 +240,125 @@ class ObjectSummaryPrivPart
 			UserPrivSets userPrivSets =
 				entry.getValue ();
 
-			printFormat (
-				"<tr>\n",
+			htmlTableRowOpen ();
 
-				"<td>%h</td>\n",
-				userPath,
+			htmlTableCellWrite (
+				userPath);
 
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				joinWithCommaAndSpace (
-					userPrivSets.canPrivCodes),
+					userPrivSets.canPrivCodes));
 
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				joinWithCommaAndSpace (
-					userPrivSets.canGrantPrivCodes),
+					userPrivSets.canGrantPrivCodes));
 
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
+
+		// table close
 
 		htmlTableClose ();
 
-		printFormat (
-			"<form",
-			" method=\"get\"",
-			" action=\"\"",
-			">\n");
+		// form open
 
-		printFormat (
-			"<p>Edit privs for user to user<br>\n",
+		htmlFormOpenGet ();
 
-			"<select name=\"userId\">\n");
+		// edit privs
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeFormat (
+			"Edit privs for user to user<br>");
+
+		htmlSelectOpen (
+			"userId");
 
 		for (
-			Map.Entry<String, UserRec> entry :
+			Map.Entry <String, UserRec> entry :
 				users.entrySet ()
 		) {
 
-			htmlOption (
+			htmlOptionWrite (
 				entry.getValue ().getId ().toString (),
-				entry.getKey (),
-				null);
+				entry.getKey ());
 
 		}
 
-		printFormat (
-			"</select>\n",
+		htmlSelectClose ();
 
+		formatWriter.writeFormat (
 			"<input",
 			" type=\"submit\"",
 			" value=\"go\"",
-			"></p>\n");
+			">");
+
+		htmlParagraphClose ();
+
+		// form close
 
 		htmlFormClose ();
+
+	}
+
+	private void htmlFormOpenGet () {
+
+		// TODO Auto-generated method stub
+		
+	}
+
+	private
+	void renderGroups () {
+
+		// heading
 
 		htmlHeadingTwoWrite (
 			"Groups");
 
-		printFormat (
-			"<table class=\"list\">");
+		// table open
 
-		printFormat (
-			"<tr>\n",
-			"<th>Group</th>\n",
-			"<th>Privs</th>\n",
-			"</tr>");
+		htmlTableOpenList ();
+
+		htmlTableHeaderRowWrite (
+			"Group",
+			"Privs");
 
 		if (groupPrivs.size () == 0) {
 
-			printFormat (
-				"<td colspan=\"3\">No user privs to show</td>\n");
+			htmlTableCellWrite (
+				"No user privs to show",
+				htmlColumnSpanAttribute (3l));
 
 		}
 
-		for (Map.Entry<String, Set<String>> entry
-				: groupPrivs.entrySet ()) {
+		for (
+			Map.Entry <String, Set <String>> entry
+				: groupPrivs.entrySet ()
+		) {
 
 			String groupPath =
 				entry.getKey ();
 
-			Set<String> privCodes =
+			Set <String> privCodes =
 				entry.getValue ();
 
-			printFormat (
-				"<tr>\n",
+			htmlTableRowOpen ();
 
-				"<td>%h</td>\n",
-				groupPath,
+			htmlTableCellWrite (
+				groupPath);
 
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				joinWithCommaAndSpace (
-					privCodes),
+					privCodes));
 
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		// table close
+
+		htmlTableClose ();
 
 	}
 

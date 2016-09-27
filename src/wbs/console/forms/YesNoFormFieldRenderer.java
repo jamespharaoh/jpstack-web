@@ -1,7 +1,9 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.EnumUtils.enumInSafe;
-import static wbs.utils.etc.Misc.booleanToString;
+import static wbs.utils.etc.LogicUtils.booleanToString;
+import static wbs.utils.etc.LogicUtils.booleanToTrueFalseNone;
+import static wbs.utils.etc.LogicUtils.booleanToYesNoNone;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.stringToBoolean;
 import static wbs.utils.etc.Misc.successResult;
@@ -12,14 +14,16 @@ import java.util.Map;
 
 import com.google.common.base.Optional;
 
-import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.forms.FormField.FormType;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.utils.string.FormatWriter;
+
+import fj.data.Either;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("yesNoFormFieldRenderer")
@@ -64,11 +68,8 @@ class YesNoFormFieldRenderer<Container>
 			formName,
 			name (),
 			" value=\"%h\"",
-			booleanToString (
-				interfaceValue.orNull (),
-				"yes",
-				"no",
-				"none"),
+			booleanToYesNoNone (
+				interfaceValue),
 			">\n");
 
 		doNothing ();
@@ -159,9 +160,8 @@ class YesNoFormFieldRenderer<Container>
 	public
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
-			@NonNull String indent,
 			@NonNull Container container,
-			@NonNull Optional<Boolean> interfaceValue,
+			@NonNull Optional <Boolean> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -173,9 +173,8 @@ class YesNoFormFieldRenderer<Container>
 				FormType.search)
 		) {
 
-			javascriptWriter.writeFormat (
-				"%s$(\"#%j-%j\").val (\"none\");\n",
-				indent,
+			javascriptWriter.writeLineFormat (
+				"$(\"#%j-%j\").val (\"none\");",
 				formName,
 				name);
 
@@ -185,16 +184,12 @@ class YesNoFormFieldRenderer<Container>
 				FormType.update)
 		) {
 
-			javascriptWriter.writeFormat (
-				"%s$(\"#%j-%j\").val (%s);\n",
-				indent,
+			javascriptWriter.writeLineFormat (
+				"$(\"#%j-%j\").val (%s);",
 				formName,
 				name,
-				booleanToString (
-					interfaceValue.orNull (),
-					"true",
-					"false",
-					"none"));
+				booleanToTrueFalseNone (
+					interfaceValue));
 
 		} else {
 
@@ -232,7 +227,7 @@ class YesNoFormFieldRenderer<Container>
 
 	@Override
 	public
-	Either<Optional<Boolean>,String> formToInterface (
+	Either <Optional <Boolean>, String> formToInterface (
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
@@ -256,17 +251,17 @@ class YesNoFormFieldRenderer<Container>
 	void renderHtmlSimple (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Boolean> genericValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Boolean> genericValue,
 			boolean link) {
 
 		htmlWriter.writeFormat (
 			"%h",
 			booleanToString (
-				genericValue.orNull (),
+				genericValue,
 				yesLabel (),
 				noLabel (),
-				"-"));
+				"—"));
 
 	}
 

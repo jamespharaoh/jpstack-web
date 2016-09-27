@@ -31,6 +31,7 @@ import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
+import wbs.console.html.HtmlLink;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
@@ -92,9 +93,9 @@ class ChatUserOnlinePart
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())
@@ -107,6 +108,23 @@ class ChatUserOnlinePart
 
 			.build ();
 
+	}
+
+	@Override
+	public
+	Set <HtmlLink> links () {
+
+		return ImmutableSet.<HtmlLink> builder ()
+
+			.addAll (
+				super.links ())
+
+			.add (
+				HtmlLink.applicationCssStyle (
+					"/style/chat-user-online.css"))
+
+			.build ();
+	
 	}
 
 	// implementation
@@ -140,60 +158,6 @@ class ChatUserOnlinePart
 			consoleManager.relatedContextRequired (
 				requestContext.consoleContext (),
 				targetContextType);
-
-	}
-
-	@Override
-	public
-	void renderHtmlHeadContent () {
-
-		printFormat (
-
-			"<style type=\"text/css\">\n",
-
-			"table.list td.chat-user-type-user {\n",
-			"  text-align: center;\n",
-			"  background: #cccccc;\n",
-			"  color: black;\n",
-			"}\n",
-
-			"table.list td.chat-user-type-monitor {\n",
-			"  text-align: center;\n",
-			"  background: #999999;\n",
-			"  color: white;\n",
-			"}\n",
-
-			"table.list td.gender-male {\n",
-			"  text-align: center;\n",
-			"  background: #ccccff;\n",
-			"  color: black;\n",
-			"}\n",
-
-			"table.list td.gender-female {\n",
-			"  text-align: center;\n",
-			"  background: #ffcccc;\n",
-			"  color: black;\n",
-			"}\n",
-
-			"table.list td.orient-gay {\n",
-			"  text-align: center;\n",
-			"  background: #ffccff;\n",
-			"  color: black;\n",
-			"}\n",
-
-			"table.list td.orient-bi {\n",
-			"  text-align: center;\n",
-			"  background: #ffffcc;\n",
-			"  color: black;\n",
-			"}\n",
-
-			"table.list td.orient-straight {\n",
-			"  text-align: center;\n",
-			"  background: #ccffff;\n",
-			"  color: black;\n",
-			"}\n",
-
-			"</style>\n");
 
 	}
 
@@ -243,9 +207,11 @@ class ChatUserOnlinePart
 			chatConsoleLogic.writeTdForChatUserOrientShort (
 				chatUser);
 
-			htmlTableCellWrite (
-				htmlEncodeNonBreakingWhitespace (
-					chatUser.getName ()));
+			htmlTableCellWriteHtml (
+				ifNotNullThenElseEmDash (
+					chatUser.getName (),
+					() -> htmlEncodeNonBreakingWhitespace (
+						chatUser.getName ())));
 
 			if (! chatUser.getChatUserImageList ().isEmpty ()) {
 

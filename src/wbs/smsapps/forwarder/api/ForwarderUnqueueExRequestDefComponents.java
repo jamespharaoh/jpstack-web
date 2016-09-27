@@ -5,9 +5,9 @@ import wbs.platform.rpc.core.Rpc;
 import wbs.platform.rpc.core.RpcDefinition;
 import wbs.platform.rpc.core.RpcType;
 
-@SingletonComponent ("forwarderUnqueueExRequestDefConfig")
+@SingletonComponent ("forwarderUnqueueExRequestDefComponents")
 public
-class ForwarderUnqueueExRequestDefConfig {
+class ForwarderUnqueueExRequestDefComponents {
 
 	@SingletonComponent ("forwarderUnqueueExRequestDef")
 	public

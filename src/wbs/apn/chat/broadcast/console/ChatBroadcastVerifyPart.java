@@ -1,6 +1,16 @@
 package wbs.apn.chat.broadcast.console;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingThreeWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenMethod;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPost;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.util.List;
 import java.util.Map;
@@ -12,8 +22,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -172,8 +182,7 @@ class ChatBroadcastVerifyPart
 
 		// form
 
-		printFormat (
-			"<form method=\"post\">\n");
+		htmlFormOpenPost ();
 
 		// always hidden
 
@@ -267,34 +276,24 @@ class ChatBroadcastVerifyPart
 
 		// message info
 
-		printFormat (
-			"<h3>Message</h3>\n");
+		htmlHeadingThreeWrite (
+			"Message");
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>From user code</th>\n",
-			"<td>%h</td>\n",
-			fromUser.getCode (),
-			"</tr>\n");
+		htmlTableDetailsRowWrite (
+			"From user code",
+			fromUser.getCode ());
 
-		printFormat (
-			"<tr>\n",
-			"<th>From user name</th>\n",
-			"<td>%h</td>\n",
-			fromUser.getName (),
-			"</tr>\n");
+		htmlTableDetailsRowWrite (
+			"From user name",
+			fromUser.getName ());
 
-		printFormat (
-			"<tr>\n",
-			"<th>From user info</th>\n",
-			"<td>%h</td>\n",
-			fromUser.getInfoText () != null
-				? fromUser.getInfoText ().getText ()
-				: "-",
-			"</tr>\n");
+		htmlTableDetailsRowWrite (
+			"From user info",
+			ifNotNullThenElseEmDash (
+				fromUser.getInfoText (),
+				() -> fromUser.getInfoText ().getText ()));
 
 		formFieldLogic.outputFormRows (
 			requestContext,
@@ -306,30 +305,36 @@ class ChatBroadcastVerifyPart
 			FormType.search,
 			"send");
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
-		printFormat (
-			"<p><input",
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"send\"",
 			" value=\"send\"",
-			">\n");
+			">");
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" name=\"back\"",
 			" value=\"back\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		// form close
+
+		htmlFormClose ();
 
 		// recipients info
 
-		printFormat (
-			"<h3>Recipients</h3>\n");
+		htmlHeadingThreeWrite (
+			"Recipients");
 
 		@SuppressWarnings ("unchecked")
 		List <Long> chatUserIds =
@@ -337,15 +342,21 @@ class ChatBroadcastVerifyPart
 			requestContext.requestRequired (
 				"chatBroadcastChatUserIds");
 
-		printFormat (
-			"<p>%d recipients in total.</p>\n",
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"%d recipients in total.",
 			chatUserIds.size ());
 
 		if (form.search ()) {
 
-			printFormat (
-				"<p>The actual number of recipients may change slightly on ",
-				"send as the search will be performed again.</p>\n");
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"The actual number of recipients may change slightly on send ",
+				"as the search will be performed again.");
+
+			htmlParagraphClose ();
 
 		}
 

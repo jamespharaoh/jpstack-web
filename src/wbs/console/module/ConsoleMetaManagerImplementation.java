@@ -190,7 +190,7 @@ class ConsoleMetaManagerImplementation
 					outputFileName,
 					consoleMetaModule);
 
-			} catch (IOException exception) {
+			} catch (Exception exception) {
 
 				log.warn (
 					stringFormat (

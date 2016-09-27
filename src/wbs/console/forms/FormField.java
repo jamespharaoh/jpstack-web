@@ -123,9 +123,8 @@ interface FormField <Container, Generic, Native, Interface> {
 	default
 	void renderFormReset (
 			@NonNull FormatWriter htmlWriter,
-			@NonNull String indent,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -137,7 +136,7 @@ interface FormField <Container, Generic, Native, Interface> {
 	void renderCsvRow (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map <String, Object> hints) {
 
 		doNothing ();
 

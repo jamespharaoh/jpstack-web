@@ -1,6 +1,15 @@
 package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.LogicUtils.booleanToString;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteRaw;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.util.Set;
 
@@ -8,9 +17,9 @@ import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableSet;
 
-import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
@@ -82,111 +91,102 @@ class ChatUserAdminBarringPart
 				ChatUserType.monitor)
 		) {
 
-			printFormat (
-				"<p>This is a monitor and cannot be barred.</p>\n");
+			htmlParagraphWrite (
+				"This is a monitor and cannot be barred.");
 
 			return;
 
 		}
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
+		// form open
+
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
-				"/chatUser.admin.barring"),
-			">\n");
+				"/chatUser.admin.barring"));
 
-		printFormat (
-			"<table",
-			" class=\"details\"",
-			">\n");
+		// table open
 
-		printFormat (
-			"<tr>\n",
-			"<th>Status</th>\n",
-			"<td>%h</td>\n",
-			chatUser.getBarred ()
-				? "barred"
-				: "not barred",
-			"</tr>\n");
+		htmlTableOpenDetails ();
+
+		// table content
+
+		htmlTableDetailsRowWrite (
+			"Status",
+			booleanToString (
+				chatUser.getBarred (),
+				"barred",
+				"not barred"));
 
 		if (requestContext.canContext ("chat.userAdmin")) {
 
-			printFormat (
-				"<tr>\n",
-				"<th>Action</th>");
+			htmlTableDetailsRowWriteRaw (
+				"Action",
+				() -> {
 
-			if (chatUser.getBarred ()) {
+				if (chatUser.getBarred ()) {
+	
+					htmlTableCheckWriterProvider.get ()
+	
+						.name (
+							"bar_off")
+	
+						.label (
+							"remove bar")
+	
+						.value (
+							false)
+	
+						.write (
+							formatWriter);
+	
+				} else {
+	
+					htmlTableCheckWriterProvider.get ()
+	
+						.name (
+							"bar_off")
+	
+						.label (
+							"bar user")
+	
+						.value (
+							false)
+	
+						.write (
+							formatWriter);
+	
+				}
 
-				htmlTableCheckWriterProvider.get ()
+			});
+			
+			htmlTableDetailsRowWriteHtml (
+				"Reason",
+				() -> formatWriter.writeFormat (
+					"<textarea",
+					" rows=\"4\"",
+					" cols=\"48\"",
+					" name=\"reason\"",
+					"></textarea>"));
 
-					.name (
-						"bar_off")
-
-					.label (
-						"remove bar")
-
-					.value (
-						false)
-
-					.write (
-						formatWriter);
-
-			} else {
-
-				htmlTableCheckWriterProvider.get ()
-
-					.name (
-						"bar_off")
-
-					.label (
-						"bar user")
-
-					.value (
-						false)
-
-					.write (
-						formatWriter);
-
-			}
-
-			printFormat (
-				"</tr>\n");
-
-			printFormat (
-				"<tr>\n",
-				"<th>Reason</th>\n");
-
-			printFormat (
-				"<td><textarea",
-				" rows=\"4\"",
-				" cols=\"48\"",
-				" name=\"reason\"></textarea></td>\n");
-
-			printFormat (
-				"</tr>\n");
-
-			printFormat (
-				"<tr>\n",
-				"<th>Action</th>\n");
-
-			printFormat (
-				"<td><input",
-				" type=\"submit\"",
-				" value=\"save changes\"",
-				"></td>\n");
-
-			printFormat (
-				"</tr>\n");
+			htmlTableDetailsRowWriteHtml (
+				"Action",
+				() -> formatWriter.writeFormat (
+					"<input",
+					" type=\"submit\"",
+					" value=\"save changes\"",
+					">"));
 
 		}
 
-		printFormat (
-			"</table>\n");
+		// table close
 
-		printFormat (
-			"</form>\n");
+		htmlTableClose ();
+
+		// form close
+
+		htmlFormClose ();
+
+		// flush scripts
 
 		requestContext.flushScripts ();
 

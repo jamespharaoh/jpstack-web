@@ -1,12 +1,15 @@
 package wbs.apn.chat.user.core.console;
 
+import static wbs.utils.etc.LogicUtils.booleanToYesNo;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
-import static wbs.utils.etc.Misc.booleanToYesNo;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
@@ -24,11 +27,10 @@ import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.core.logic.ChatLogicHooks;
 import wbs.apn.chat.core.logic.ChatLogicHooks.ChatUserCharge;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.scheme.model.ChatSchemeChargesRec;
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -197,7 +199,7 @@ class ChatUserSummaryPart
 
 		if (! chatUser.getChatUserImageList ().isEmpty ()) {
 
-			htmlTableDetailsRowWriteRaw (
+			htmlTableDetailsRowWriteHtml (
 				"Pic",
 				() -> mediaConsoleLogic.writeMediaThumb100 (
 					chatUser.getChatUserImageList ().get (0).getMedia ()));
@@ -262,9 +264,13 @@ class ChatUserSummaryPart
 
 			htmlTableDetailsRowWriteRaw (
 				"Affiliate",
-				() -> objectManager.writeTdForObjectMiniLink (
+				ifNotNullThenElse (
 					chatUser.getChatAffiliate (),
-					chatUser.getChatScheme ()));
+					() -> objectManager.writeTdForObjectMiniLink (
+						chatUser.getChatAffiliate (),
+						chatUser.getChatScheme ()),
+					() -> htmlTableCellWrite (
+						"—")));
 
 			htmlTableDetailsRowWrite (
 				"Barred",
@@ -396,7 +402,8 @@ class ChatUserSummaryPart
 
 			htmlTableDetailsRowWrite (
 				"Credit mode",
-				chatUser.getCreditMode ().name ());
+				camelToSpaces (
+					chatUser.getCreditMode ().name ()));
 
 			htmlTableDetailsRowWrite (
 				"Credit check",

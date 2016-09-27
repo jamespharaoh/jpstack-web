@@ -3,7 +3,7 @@ package wbs.apn.chat.bill.model;
 public
 enum ChatUserCreditMode {
 
-	strict,
+	billedMessage,
 	prePay,
 	barred,
 	free;

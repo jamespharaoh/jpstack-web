@@ -1,5 +1,10 @@
 package wbs.console.part;
 
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteHtml;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 
 @PrototypeComponent ("notFoundPart")
@@ -11,14 +16,18 @@ class NotFoundPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
+		htmlParagraphWrite (
+			"Page not found",
+			htmlClassAttribute (
+				"error"));
 
-			"<p class=\"error\">Page not found</p>\n",
+		htmlParagraphWrite (
+			"The requested page could not be found:");
 
-			"<p>The requested page could not be found:</p>\n",
-
-			"<p><code>%h</code></p>\n",
-			requestContext.requestUri ());
+		htmlParagraphWriteHtml (
+			stringFormat (
+				"<code>%h</code>",
+				requestContext.requestUri ()));
 
 	}
 

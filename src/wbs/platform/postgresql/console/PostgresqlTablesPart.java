@@ -1,5 +1,10 @@
 package wbs.platform.postgresql.console;
 
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 
@@ -12,20 +17,16 @@ class PostgresqlTablesPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlTableOpenList ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Table</th>\n",
-			"<th>Size</th>\n",
-			"</tr>");
+		htmlTableHeaderRowWrite (
+			"Table",
+			"Size");
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
-		printFormat (
-			"<p>TODO</p>\n");
+		htmlParagraphWrite (
+			"TODO");
 
 	}
 

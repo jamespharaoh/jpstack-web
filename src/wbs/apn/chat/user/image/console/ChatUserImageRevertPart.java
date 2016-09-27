@@ -1,5 +1,7 @@
 package wbs.apn.chat.user.image.console;
 
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 
@@ -12,8 +14,8 @@ class ChatUserImageRevertPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<p>Not implemented...</p>\n");
+		htmlParagraphWrite (
+			"Not implemented...");
 
 	}
 

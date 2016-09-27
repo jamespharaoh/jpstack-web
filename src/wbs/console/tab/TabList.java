@@ -1,13 +1,19 @@
 package wbs.console.tab;
 
-import java.io.PrintWriter;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import lombok.NonNull;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.utils.web.HtmlUtils;
+import wbs.utils.string.FormatWriter;
 
 public
 class TabList {
@@ -54,20 +60,37 @@ class TabList {
 
 		public
 		void go (
-				ConsoleRequestContext requestContext) {
+				@NonNull FormatWriter formatWriter) {
 
-			PrintWriter out =
-				requestContext.writer ();
+			htmlParagraphOpen (
+				formatWriter,
+				htmlClassAttribute (
+					"links"));
 
-			out.println("<p class=\"links\">");
-			for (PreparedTab preparedTab : preparedTabs) {
-				out.print("<a");
-				if (preparedTab.selected)
-					out.print(" class=\"selected\"");
-				out.println(" href=\"" + HtmlUtils.htmlEncode(preparedTab.url) + "\">"
-						+ HtmlUtils.htmlEncode(preparedTab.label) + "</a>");
+			for (
+				PreparedTab preparedTab
+					: preparedTabs
+			) {
+
+				if (preparedTab.selected) {
+
+					htmlLinkWrite (
+						preparedTab.url,
+						preparedTab.label,
+						htmlClassAttribute (
+							"selected"));
+
+				} else {
+
+					htmlLinkWrite (
+						preparedTab.url,
+						preparedTab.label);
+
+				}
+
 			}
-			out.println("</p>");
+
+			htmlParagraphClose ();
 
 		}
 
