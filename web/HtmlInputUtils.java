@@ -24,6 +24,39 @@ class HtmlInputUtils {
 	public static
 	void htmlSelectOpen (
 			@NonNull FormatWriter formatWriter,
+			@NonNull HtmlAttribute ... attributes) {
+
+		formatWriter.writeIndent ();
+
+		formatWriter.writeFormat (
+			"<select");
+
+		htmlAttributesWrite (
+			formatWriter,
+			attributes);
+
+		formatWriter.writeFormat (
+			">");
+
+		formatWriter.writeNewline ();
+
+		formatWriter.increaseIndent ();
+
+	}
+
+	public static
+	void htmlSelectOpen (
+			@NonNull HtmlAttribute ... attributes) {
+
+		htmlSelectOpen (
+			currentFormatWriter (),
+			attributes);
+
+	}
+
+	public static
+	void htmlSelectOpen (
+			@NonNull FormatWriter formatWriter,
 			@NonNull String name,
 			@NonNull HtmlAttribute ... attributes) {
 
@@ -141,17 +174,154 @@ class HtmlInputUtils {
 
 	}
 
-	public static <Key>
-	void htmlOption (
-			@NonNull Key value,
-			@NonNull String label,
-			@NonNull Key defaultValue) {
+	public static
+	void htmlOptionWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String value,
+			@NonNull String selectedValue,
+			@NonNull String content,
+			@NonNull HtmlAttribute ... attributes) {
 
-		htmlOption (
+		htmlOptionWrite (
 			currentFormatWriter (),
 			value,
-			label,
-			defaultValue);
+			stringEqualSafe (
+				value,
+				selectedValue),
+			content,
+			attributes);
+
+	}
+
+	public static
+	void htmlOptionWrite (
+			@NonNull String value,
+			@NonNull String selectedValue,
+			@NonNull String content,
+			@NonNull HtmlAttribute ... attributes) {
+
+		htmlOptionWrite (
+			currentFormatWriter (),
+			value,
+			selectedValue,
+			content,
+			attributes);
+
+	}
+
+	public static
+	void htmlOptionWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull HtmlAttribute ... attributes) {
+
+		htmlOptionWrite (
+			formatWriter,
+			"",
+			false,
+			"",
+			attributes);
+
+	}
+
+	public static
+	void htmlOptionWrite (
+			@NonNull HtmlAttribute ... attributes) {
+
+		htmlOptionWrite (
+			currentFormatWriter (),
+			"",
+			false,
+			"",
+			attributes);
+
+	}
+
+	public static
+	void htmlOptionWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String value,
+			@NonNull HtmlAttribute ... attributes) {
+
+		htmlOptionWrite (
+			formatWriter,
+			value,
+			false,
+			value,
+			attributes);
+
+	}
+
+	public static
+	void htmlOptionWrite (
+			@NonNull String value,
+			@NonNull HtmlAttribute ... attributes) {
+
+		htmlOptionWrite (
+			currentFormatWriter (),
+			value,
+			false,
+			value,
+			attributes);
+
+	}
+
+	public static
+	void htmlOptionWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String value,
+			@NonNull String content,
+			@NonNull HtmlAttribute ... attributes) {
+
+		htmlOptionWrite (
+			formatWriter,
+			value,
+			false,
+			content,
+			attributes);
+
+	}
+
+	public static
+	void htmlOptionWrite (
+			@NonNull String value,
+			@NonNull String content,
+			@NonNull HtmlAttribute ... attributes) {
+
+		htmlOptionWrite (
+			currentFormatWriter (),
+			value,
+			false,
+			content,
+			attributes);
+
+	}
+
+	public static
+	void htmlOptionWriteSelected (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String value,
+			@NonNull HtmlAttribute ... attributes) {
+
+		htmlOptionWrite (
+			formatWriter,
+			value,
+			true,
+			value,
+			attributes);
+
+	}
+
+	public static
+	void htmlOptionWriteSelected (
+			@NonNull String value,
+			@NonNull HtmlAttribute ... attributes) {
+
+		htmlOptionWrite (
+			currentFormatWriter (),
+			value,
+			true,
+			value,
+			attributes);
 
 	}
 

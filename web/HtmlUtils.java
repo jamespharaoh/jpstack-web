@@ -1,22 +1,19 @@
 package wbs.utils.web;
 
-import static wbs.utils.etc.Misc.isNull;
-import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.replaceAll;
-import static wbs.utils.string.StringUtils.stringEqualSafe;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlAttributeUtils.htmlAttributesWrite;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Map;
 
 import lombok.NonNull;
 
 import wbs.utils.string.FormatWriter;
 import wbs.utils.web.HtmlAttributeUtils.HtmlAttribute;
+import wbs.utils.web.HtmlAttributeUtils.ToHtmlAttribute;
 
 public
 class HtmlUtils {
@@ -289,201 +286,112 @@ class HtmlUtils {
 
 	}
 
-	// html div
-
-	public static
-	void htmlDivOpen (
-			@NonNull FormatWriter formatWriter,
-			@NonNull HtmlAttribute ... attributes) {
-
-		formatWriter.writeIndent ();
-
-		formatWriter.writeFormat (
-			"<div");
-
-		htmlAttributesWrite (
-			formatWriter,
-			attributes);
-
-		formatWriter.writeFormat (
-			">");
-
-		formatWriter.writeNewline ();
-
-		formatWriter.increaseIndent ();
-
-	}
-
-	public static
-	void htmlDivOpen (
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlDivOpen (
-			currentFormatWriter (),
-			attributes);
-
-	}
-
-	public static
-	void htmlDivClose (
-			@NonNull FormatWriter formatWriter) {
-
-		formatWriter.decreaseIndent ();
-
-		formatWriter.writeLineFormat (
-			"</div>");
-
-	}
-
-	public static
-	void htmlDivClose () {
-
-		htmlDivClose (
-			currentFormatWriter ());
-
-	}
-
-	// html paragraphs
-
-	public static
-	void htmlParagraphOpen (
-			@NonNull FormatWriter formatWriter,
-			@NonNull HtmlAttribute ... attributes) {
-
-		formatWriter.writeIndent ();
-
-		formatWriter.writeFormat (
-			"<p");
-
-		htmlAttributesWrite (
-			formatWriter,
-			attributes);
-
-		formatWriter.writeFormat (
-			">");
-
-		formatWriter.writeNewline ();
-
-		formatWriter.increaseIndent ();
-
-	}
-
-	public static
-	void htmlParagraphOpen (
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlParagraphOpen (	
-			currentFormatWriter (),
-			attributes);
-
-	}
-
-	public static
-	void htmlParagraphClose (
-			@NonNull FormatWriter formatWriter) {
-
-		formatWriter.decreaseIndent ();
-
-		formatWriter.writeLineFormat (
-			"</p>");
-
-	}
-
-	public static
-	void htmlParagraphClose () {
-
-		htmlParagraphClose (	
-			currentFormatWriter ());
-
-	}
-
-	// html heading
-
-	public static
-	void htmlHeadingOneWrite (
-			@NonNull FormatWriter formatWriter,
-			@NonNull String label) {
-
-		formatWriter.writeLineFormat (
-			"<h1>%h</h1>",
-			label);
-
-	}
-
-	public static
-	void htmlHeadingOneWrite (
-			@NonNull String label) {
-
-		htmlHeadingOneWrite (
-			currentFormatWriter (),
-			label);
-
-	}
-
-	public static
-	void htmlHeadingTwoWrite (
-			@NonNull FormatWriter formatWriter,
-			@NonNull String label) {
-
-		formatWriter.writeLineFormat (
-			"<h2>%h</h2>",
-			label);
-
-	}
-
-	public static
-	void htmlHeadingTwoWrite (
-			@NonNull String label) {
-
-		htmlHeadingTwoWrite (
-			currentFormatWriter (),
-			label);
-
-	}
-
-	public static
-	void htmlHeadingThreeWrite (
-			@NonNull FormatWriter formatWriter,
-			@NonNull String label) {
-
-		formatWriter.writeLineFormat (
-			"<h3>%h</h3>",
-			label);
-
-	}
-
-	public static
-	void htmlHeadingThreeWrite (
-			@NonNull String label) {
-
-		htmlHeadingThreeWrite (
-			currentFormatWriter (),
-			label);
-
-	}
-
-	public static
-	void htmlHeadingFourWrite (
-			@NonNull FormatWriter formatWriter,
-			@NonNull String label) {
-
-		formatWriter.writeLineFormat (
-			"<h4>%h</h4>",
-			label);
-
-	}
-
-	public static
-	void htmlHeadingFourWrite (
-			@NonNull String label) {
-
-		htmlHeadingFourWrite (
-			currentFormatWriter (),
-			label);
-
-	}
-
 	// html link
+
+	public static
+	void htmlLinkWriteInline (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String href,
+			@NonNull String content,
+			@NonNull Iterable <ToHtmlAttribute> attributes) {
+
+		formatWriter.writeFormat (
+			"<a href=\"%h\"",
+			href);
+
+		htmlAttributesWrite (
+			formatWriter,
+			attributes);
+
+		formatWriter.writeFormat (
+			">%h</a>",
+			content);
+
+	}
+
+	public static
+	void htmlLinkWriteInline (
+			@NonNull String href,
+			@NonNull String content,
+			@NonNull Iterable <ToHtmlAttribute> attributes) {
+
+		htmlLinkWriteInline (
+			currentFormatWriter (),
+			href,
+			content,
+			attributes);
+
+	}
+
+	public static
+	void htmlLinkWriteInline (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String href,
+			@NonNull String content,
+			@NonNull ToHtmlAttribute ... attributes) {
+
+		htmlLinkWriteInline (
+			formatWriter,
+			href,
+			content,
+			Arrays.asList (
+				attributes));
+
+	}
+
+	public static
+	void htmlLinkWriteInline (
+			@NonNull String href,
+			@NonNull String content,
+			@NonNull ToHtmlAttribute ... attributes) {
+
+		htmlLinkWriteInline (
+			currentFormatWriter (),
+			href,
+			content,
+			Arrays.asList (
+				attributes));
+
+	}
+
+	public static
+	void htmlLinkWrite (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String href,
+			@NonNull String content,
+			@NonNull Iterable <ToHtmlAttribute> attributes) {
+
+		formatWriter.writeIndent ();
+
+		formatWriter.writeFormat (
+			"<a href=\"%h\"",
+			href);
+
+		htmlAttributesWrite (
+			formatWriter,
+			attributes);
+
+		formatWriter.writeFormat (
+			">%h</a>",
+			content);
+
+		formatWriter.writeNewline ();
+
+	}
+
+	public static
+	void htmlLinkWrite (
+			@NonNull String href,
+			@NonNull String content,
+			@NonNull Iterable <ToHtmlAttribute> attributes) {
+
+		htmlLinkWrite (
+			currentFormatWriter (),
+			href,
+			content,
+			attributes);
+
+	}
 
 	public static
 	void htmlLinkWrite (
@@ -602,150 +510,6 @@ class HtmlUtils {
 			currentFormatWriter (),
 			href,
 			content,
-			attributes);
-
-	}
-
-	// html form
-
-	public static
-	void htmlFormOpen (
-			@NonNull FormatWriter formatWriter,
-			@NonNull HtmlAttribute ... attributes) {
-
-		formatWriter.writeIndent ();
-
-		formatWriter.writeFormat (
-			"<form");
-
-		htmlAttributesWrite (
-			formatWriter,
-			attributes);
-
-		formatWriter.writeFormat (
-			">");
-
-		formatWriter.writeNewline ();
-
-		formatWriter.increaseIndent ();
-
-	}
-
-	public static
-	void htmlFormOpen (
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlFormOpen (
-			currentFormatWriter (),
-			attributes);
-
-	}
-
-	public static
-	void htmlFormOpenMethodAction (
-			@NonNull FormatWriter formatWriter,
-			@NonNull String method,
-			@NonNull String action,
-			@NonNull HtmlAttribute ... attributes) {
-
-		formatWriter.writeIndent ();
-
-		formatWriter.writeFormat (
-			"<form");
-
-		formatWriter.writeFormat (
-			" method=\"%h\"",
-			method);
-
-		formatWriter.writeFormat (
-			" action=\"%h\"",
-			action);
-
-		htmlAttributesWrite (
-			formatWriter,
-			attributes);
-
-		formatWriter.writeFormat (
-			">");
-
-		formatWriter.writeNewline ();
-
-		formatWriter.increaseIndent ();
-
-	}
-
-	public static
-	void htmlFormOpenMethodAction (
-			@NonNull String method,
-			@NonNull String action,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlFormOpenMethodAction (
-			currentFormatWriter (),
-			method,
-			action,
-			attributes);
-
-	}
-
-	public static
-	void htmlFormOpenMethod (
-			@NonNull FormatWriter formatWriter,
-			@NonNull String method,
-			@NonNull HtmlAttribute ... attributes) {
-
-		formatWriter.writeIndent ();
-
-		formatWriter.writeFormat (
-			"<form");
-
-		formatWriter.writeFormat (
-			" method=\"%h\"",
-			method);
-
-		htmlAttributesWrite (
-			formatWriter,
-			attributes);
-
-		formatWriter.writeFormat (
-			">");
-
-		formatWriter.writeNewline ();
-
-		formatWriter.increaseIndent ();
-
-	}
-
-	public static
-	void htmlFormOpenMethod (
-			@NonNull String method,
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlFormOpenMethod (
-			currentFormatWriter (),
-			method,
-			attributes);
-
-	}
-
-	public static
-	void htmlFormClose (
-			@NonNull FormatWriter formatWriter,
-			@NonNull HtmlAttribute ... attributes) {
-
-		formatWriter.decreaseIndent ();
-
-		formatWriter.writeLineFormat (
-			"</form>");
-
-	}
-
-	public static
-	void htmlFormClose (
-			@NonNull HtmlAttribute ... attributes) {
-
-		htmlFormClose (
-			currentFormatWriter (),
 			attributes);
 
 	}

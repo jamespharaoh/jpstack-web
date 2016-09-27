@@ -180,7 +180,7 @@ class CollectionUtils {
 	}
 
 	public static <Type>
-	Type listLastElementRequired (
+	Type listLastItemRequired (
 			@NonNull List <Type> list) {
 
 		return list.get (

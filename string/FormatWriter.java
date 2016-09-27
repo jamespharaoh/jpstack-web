@@ -1,6 +1,9 @@
 package wbs.utils.string;
 
 import static wbs.utils.string.StringUtils.stringFormatArray;
+import static wbs.utils.string.StringUtils.stringIsNotEmpty;
+
+import lombok.NonNull;
 
 public
 interface FormatWriter {
@@ -49,7 +52,31 @@ interface FormatWriter {
 
 	default
 	void writeLineFormat (
-			Object ... arguments) {
+			@NonNull Object ... arguments) {
+
+		String lineContent =
+			stringFormatArray (
+				arguments);
+
+		if (
+			stringIsNotEmpty (
+				lineContent)
+		) {
+
+			writeIndent ();
+	
+			writeString (
+				lineContent);
+	
+			writeNewline ();
+
+		}
+	
+	}
+
+	default
+	void writeLineFormatIncreaseIndent (
+			@NonNull Object ... arguments) {
 
 		writeIndent ();
 
@@ -58,6 +85,42 @@ interface FormatWriter {
 				arguments));
 
 		writeNewline ();
+
+		increaseIndent ();
+
+	}
+
+	default
+	void writeLineFormatDecreaseIndent (
+			@NonNull Object ... arguments) {
+
+		decreaseIndent ();
+
+		writeIndent ();
+
+		writeString (
+			stringFormatArray (
+				arguments));
+
+		writeNewline ();
+
+	}
+
+	default
+	void writeLineFormatDecreaseIncreaseIndent (
+			@NonNull Object ... arguments) {
+
+		decreaseIndent ();
+
+		writeIndent ();
+
+		writeString (
+			stringFormatArray (
+				arguments));
+
+		writeNewline ();
+
+		increaseIndent ();
 
 	}
 

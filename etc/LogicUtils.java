@@ -1,9 +1,11 @@
 package wbs.utils.etc;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collection;
@@ -60,7 +62,7 @@ class LogicUtils {
 	@SafeVarargs
 	public static
 	boolean noneOf (
-			@NonNull Supplier<Boolean>... conditions) {
+			@NonNull Supplier <Boolean>... conditions) {
 
 		for (
 			Supplier <Boolean> condition
@@ -289,19 +291,17 @@ class LogicUtils {
 			@NonNull Runnable falseStatement) {
 
 		if (
-			collectionIsEmpty (
+			collectionIsNotEmpty (
 				notEmptyCollection)
 		) {
 
-			trueStatement.run ();
+			return trueStatement;
 
 		} else {
 
-			falseStatement.run ();
+			return falseStatement;
 
 		}
-
-		return () -> {};
 
 	}
 
@@ -532,6 +532,28 @@ class LogicUtils {
 	}
 
 	public static
+	Boolean parseBooleanYesNoRequired (
+			@NonNull String string) {
+
+		if (
+			string.equals (
+				"yes")
+		) {
+			return true;
+		}
+
+		if (
+			string.equals (
+				"no")
+		) {
+			return false;
+		}
+
+		throw new IllegalArgumentException ();
+
+	}
+
+	public static
 	Optional <Boolean> parseBooleanTrueFalse (
 			@NonNull String string) {
 
@@ -582,6 +604,90 @@ class LogicUtils {
 		}
 
 		throw new IllegalArgumentException ();
+
+	}
+
+	public static
+	String booleanToString (
+			@NonNull Optional <Boolean> valueOptional,
+			@NonNull String yesString,
+			@NonNull String noString,
+			@NonNull String notPresentString) {
+
+		if (
+			optionalIsPresent (
+				valueOptional)
+		) {
+
+			return ifThenElse (
+				valueOptional.get (),
+				() -> yesString,
+				() -> noString);
+
+		} else {
+
+			return notPresentString;
+
+		}
+
+	}
+
+	public static
+	String booleanToString (
+			@NonNull Boolean value,
+			@NonNull String yesString,
+			@NonNull String noString) {
+
+		return ifThenElse (
+			value,
+			() -> yesString,
+			() -> noString);
+
+	}
+
+	public static
+	String booleanToYesNo (
+			@NonNull Boolean value) {
+
+		return booleanToString (
+			value,
+			"yes",
+			"no");
+
+	}
+
+	public static
+	String booleanToYesNoNone (
+			@NonNull Optional <Boolean> valueOptional) {
+
+		return booleanToString (
+			valueOptional,
+			"yes",
+			"no",
+			"none");
+
+	}
+
+	public static
+	String booleanToTrueFalse (
+			@NonNull Boolean value) {
+
+		return booleanToString (
+			value,
+			"true",
+			"false");
+
+	}
+
+	public static
+	String booleanToTrueFalseNone (
+			@NonNull Optional <Boolean> valueOptional) {
+
+		return booleanToString (
+			valueOptional,
+			"true",
+			"false",
+			"none");
 
 	}
 
