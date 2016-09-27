@@ -6,6 +6,18 @@ import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringSplitFullStop;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingOneWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.util.List;
 import java.util.Set;
@@ -114,8 +126,7 @@ class CoreLogonResponder
 	public
 	void renderHtmlBodyContents () {
 
-		printFormat (
-			"<h1>%h</h1>\n",
+		htmlHeadingOneWrite (
 			wbsConfig.consoleTitle ());
 
 		goTestUsers ();
@@ -133,14 +144,15 @@ class CoreLogonResponder
 			return;
 		}
 
-		printFormat (
-			"<h2>Quick login</h2>\n");
+		htmlHeadingTwoWrite (
+			"Quick login");
 
-		printFormat (
-			"<p>Login shortcuts for development mode only</p>\n");
+		htmlParagraphWrite (
+			"Login shortcuts for development mode only");
 
-		printFormat (
-			"<p class=\"login-buttons\">\n");
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"login-buttons"));
 
 		for (
 			String username
@@ -181,124 +193,129 @@ class CoreLogonResponder
 				continue;
 			}
 
-			printFormat (
+			formatWriter.writeLineFormat (
 				"<button",
 				" class=\"login-button\"",
 				" data-slice-code=\"%h\"",
 				sliceCode,
 				" data-user-code=\"%h\"",
 				userCode,
-				" disabled>%h</button>\n",
+				" disabled>%h</button>",
 				username);
 
 		}
 
-		printFormat (
-			"</p>\n");
+		htmlParagraphClose ();
 
 	}
 
 	void goLoginForm () {
 
-		printFormat (
-			"<h2>Please log in</h2>\n");
+		htmlHeadingTwoWrite (
+			"Please log in");
 
 		requestContext.flushNotices ();
 
-		printFormat (
-			"<form",
-			" id=\"login-form\"",
-			" action=\"%h\"",
+		// form open
+
+		htmlFormOpenPostAction (
 			requestContext.resolveApplicationUrl (
 				"/"),
-			" method=\"post\"",
-			">\n");
+			htmlIdAttribute (
+				"login-form"));
+
+		// form hidden
 
 		if (
 			optionalIsPresent (
 				slice)
 		) {
 
-			printFormat (
+			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"hidden\"",
 				" name=\"slice\"",
 				" value=\"%h\"",
 				slice.get ().getCode (),
-				">\n");
+				">");
 
 		}
 
-		printFormat (
-			"<table class=\"details\">\n");
+		// table open
+
+		htmlTableOpenDetails ();
+
+		// slice row
 
 		if (
 			optionalIsNotPresent (
 				slice)
 		) {
 
-			printFormat (
-				"<tr>\n",
-
-				"<th>Slice</th>\n",
-
-				"<td><input",
-				" class=\"slice-input\"",
-				" type=\"text\"",
-				" name=\"slice\"",
-				" value=\"%h\"",
-				requestContext.parameterOrDefault (
-					"slice",
-					wbsConfig.defaultSlice ()),
-				" size=\"32\"",
-				"></td>\n",
-
-				"</tr>\n");
+			htmlTableDetailsRowWriteHtml (
+				"Slice",
+				() -> formatWriter.writeLineFormat (
+					"<input",
+					" class=\"slice-input\"",
+					" type=\"text\"",
+					" name=\"slice\"",
+					" value=\"%h\"",
+					requestContext.parameterOrDefault (
+						"slice",
+						wbsConfig.defaultSlice ()),
+					" size=\"32\"",
+					">"));
 
 		}
 
-		printFormat (
-			"<tr>\n",
+		// username row
 
-			"<th>Username</th>\n",
+		htmlTableDetailsRowWriteHtml (
+			"Username",
+			() -> formatWriter.writeLineFormat (
+				"<input",
+				" class=\"username-input\"",
+				" type=\"text\"",
+				" name=\"username\"",
+				" value=\"%h\"",
+				requestContext.parameterOrDefault (
+					"username",
+					""),
+				" size=\"32\"",
+				">"));
 
-			"<td><input",
-			" class=\"username-input\"",
-			" type=\"text\"",
-			" name=\"username\"",
-			" value=\"%h\"",
-			requestContext.parameterOrDefault (
-				"username",
-				""),
-			" size=\"32\"",
-			"></td>\n",
+		// password row
 
-			"</tr>\n");
+		htmlTableDetailsRowWriteHtml (
+			"Password",
+			() -> formatWriter.writeLineFormat (
+				"<input",
+				" class=\"password-input\"",
+				" type=\"password\"",
+				" name=\"password\"",
+				" value=\"\"",
+				" size=\"32\"",
+				">"));
 
-		printFormat (
-			"<tr>\n",
-			"<th>Password</th>\n",
+		// table close
 
-			"<td><input",
-			" class=\"password-input\"",
-			" type=\"password\"",
-			" name=\"password\"",
-			" value=\"\"",
-			" size=\"32\"",
-			"></td>\n",
+		htmlTableClose ();
 
-			"<td><input",
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
-			" value=\"ok\"",
-			"></td>\n",
+			" value=\"log in\"",
+			">");
 
-			"</tr>\n");
+		htmlParagraphClose ();
 
-		printFormat (
-			"</table>\n");
+		// form close
 
-		printFormat (
-			"</form>\n");
+		htmlFormClose ();
 
 	}
 

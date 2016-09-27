@@ -1,21 +1,41 @@
 package wbs.platform.object.search;
 
+import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.CollectionUtils.listSlice;
 import static wbs.utils.etc.Misc.getMethodRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.methodInvoke;
 import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
-import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localDateNotEqual;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttributeFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPost;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
+import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -299,39 +319,41 @@ class ObjectSearchResultsPart
 
 	void goNewSearch () {
 
-		printFormat (
-			"<form method=\"post\">\n");
+		htmlFormOpenPost ();
 
-		printFormat (
-			"<p><input",
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"new-search\"",
 			" value=\"new search\"",
-			">\n");
+			">");
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" name=\"repeat-search\"",
 			" value=\"repeat search\"",
-			">\n");
+			">");
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" name=\"download-csv\"",
 			" value=\"download csv\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>");
+		htmlParagraphClose ();
+
+		htmlFormClose ();
 
 	}
 
 	void goTotalObjects () {
 
-		printFormat (
-			"<p>Search returned %h items</p>\n",
+		htmlParagraphWriteFormat (
+			"Search returned %h items",
 			totalObjects);
 
 	}
@@ -341,62 +363,57 @@ class ObjectSearchResultsPart
 		if (pageCount == 1)
 			return;
 
-		printFormat (
-			"<p",
-			" class=\"links\"",
-			">Select page\n");
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"links"));
 
-		printFormat (
-			"<a",
-			" class=\"%h\"",
-			singlePage
-				? "selected"
-				: "",
-			" href=\"?page=all\"",
-			">All</a>\n");
+		formatWriter.writeLineFormat (
+			"Select page");
+
+		htmlLinkWrite (
+			"?page=all",
+			"All",
+			presentInstances (
+				optionalIf (
+					singlePage,
+					() -> htmlClassAttribute (
+						"selected"))));
 
 		for (
-			int page = 0;
+			long page = 0;
 			page < pageCount;
 			page ++
 		) {
 
-			printFormat (
-				"<a",
-				" class=\"%h\"",
-				! singlePage && page == pageNumber
-					? "selected"
-					: "",
-				" href=\"%h\"",
+			htmlLinkWrite (
 				stringFormat (
 					"?page=%h",
 					page),
-				">%s</a>\n",
-				page + 1);
+				integerToDecimalString (
+					page + 1),
+				presentInstances (
+					optionalIf (
+						! singlePage && page == pageNumber,
+						() -> htmlClassAttribute (
+							"selected"))));
 
 		}
 
-		printFormat (
-			"</p>\n");
+		htmlParagraphClose ();
 
 	}
 
 	void goSearchResults () {
 
-		printFormat (
-			"<table",
-			" class=\"list\"",
-			">\n");
+		htmlTableOpenList ();
 
-		printFormat (
-			"<tr>\n");
+		htmlTableRowOpen ();
 
 		formFieldLogic.outputTableHeadings (
 			formatWriter,
 			formFieldSet);
 
-		printFormat (
-			"</tr>\n");
+		htmlTableRowClose ();
 
 		LocalDate currentDate =
 			new LocalDate (0);
@@ -408,13 +425,15 @@ class ObjectSearchResultsPart
 
 			if (object == null) {
 
-				printFormat (
-					"<tr>\n",
-					"<td",
-					" colspan=\"%h\"",
-					formFieldSet.formFields ().size (),
-					">(deleted)</td>\n",
-					"</tr>\n");
+				htmlTableRowOpen ();
+
+				htmlTableCellWrite (
+					"(deleted)",
+					htmlColumnSpanAttribute (
+						collectionSize (
+							formFieldSet.formFields ())));
+
+				htmlTableRowClose ();
 
 				continue;
 
@@ -425,18 +444,20 @@ class ObjectSearchResultsPart
 				object instanceof Record
 
 				&& ! consoleHelper.canView (
-					(Record<?>)
+					(Record <?>)
 					object)
 
 			)  {
 
-				printFormat (
-					"<tr>\n",
-					"<td",
-					" colspan=\"%h\"",
-					formFieldSet.formFields ().size (),
-					">(resricted)</td>\n",
-					"</tr>\n");
+				htmlTableRowOpen ();
+
+				htmlTableCellWrite (
+					"(restricted)",
+					htmlColumnSpanAttribute (
+						collectionSize (
+							formFieldSet.formFields ())));
+
+				htmlTableRowClose ();
 
 				continue;
 
@@ -470,20 +491,22 @@ class ObjectSearchResultsPart
 					currentDate =
 						rowDate;
 
-					printFormat (
-						"<tr class=\"sep\">\n");
+					htmlTableRowSeparatorWrite ();
 
-					printFormat (
-						"<tr style=\"font-weight: bold\">\n");
+					htmlTableRowOpen (
+						htmlStyleAttribute (
+							htmlStyleRuleEntry (
+								"font-weight",
+								"bold")));
 
-					printFormat (
-						"<td colspan=\"%h\">%h</td>\n",
-						formFieldSet.formFields ().size (),
+					htmlTableCellWrite (
 						userConsoleLogic.dateStringLong (
-							rowTimestamp));
+							rowTimestamp),
+						htmlColumnSpanAttribute (
+							collectionSize (
+								formFieldSet.formFields ())));
 
-					printFormat (
-						"</tr>\n");
+					htmlTableRowClose ();
 
 				}
 
@@ -494,18 +517,15 @@ class ObjectSearchResultsPart
 					rowsFormFieldSet)
 			) {
 
-				printFormat (
-					"<tr class=\"sep\">\n");
+				htmlTableRowSeparatorWrite ();
 
 			}
 
 			if (object instanceof Record) {
 
-				printFormat (
-					"<tr",
+				htmlTableRowOpen (
 
-					" class=\"%h\"",
-					joinWithSpace (
+					htmlClassAttribute (
 						presentInstances (
 
 						Optional.of (
@@ -525,22 +545,23 @@ class ObjectSearchResultsPart
 
 					)),
 
-					" data-rows-class=\"%h\"",
-					stringFormat (
-						"search-result-%s",
-						object.getId ()),
+					htmlDataAttribute (
+						"rows-class",
+						stringFormat (
+							"search-result-%s",
+							object.getId ())),
 
-					" data-target-href=\"%h\"",
-					objectUrl (
-						(Record<?>)
-						object),
+					htmlDataAttribute (
+						"target-href",
+						objectUrl (
+							(Record<?>)
+							object))
 
-					">\n");
+				);
 
 			} else {
 
-				printFormat (
-					"<tr>\n");
+				htmlTableRowOpen ();
 
 			}
 
@@ -556,15 +577,14 @@ class ObjectSearchResultsPart
 					rowsFormFieldSet)
 			) {
 
-				printFormat (
-					"</tr>\n");
+				htmlTableRowClose ();
 
-				printFormat (
-					"<tr",
+				htmlTableRowOpen (
+					presentInstances (
 
-					" class=\"%h\"",
-					joinWithSpace (
-						presentInstances (
+					optionalOf (
+						htmlClassAttribute (
+							presentInstances (
 
 						Optional.of (
 							"magic-table-row"),
@@ -579,25 +599,25 @@ class ObjectSearchResultsPart
 							() -> "selected"),
 
 						getListClass (
-							object))),
+							object)
 
-					" data-rows-class=\"%h\"",
-					stringFormat (
-						"search-result-%s",
-						object.getId ()));
+					))),
 
-				if (object instanceof Record) {
+					optionalOf (
+						htmlDataAttributeFormat (
+							"rows-class",
+							"search-result-%s",
+							object.getId ())),
 
-					printFormat (
-						" data-target-href=\"%h\"",
-						objectUrl (
-							(Record<?>)
-							object));
+					optionalIf (
+						object instanceof Record,
+						() -> htmlDataAttribute (
+							"target-href",
+							objectUrl (
+								(Record <?>)
+								object)))
 
-				}
-
-				printFormat (
-					">\n");
+				));
 
 				formFieldLogic.outputTableRowsList (
 					formatWriter,
@@ -608,13 +628,11 @@ class ObjectSearchResultsPart
 
 			}
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

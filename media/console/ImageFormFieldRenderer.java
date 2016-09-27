@@ -134,21 +134,18 @@ class ImageFormFieldRenderer <Container>
 	public
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
-			@NonNull String indent,
 			@NonNull Container container,
 			@NonNull Optional<MediaRec> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		javascriptWriter.writeFormat (
-			"%s$(\"#%j-%j\").replaceWith (\n",
-			indent,
+		javascriptWriter.writeLineFormat (
+			"$(\"#%j-%j\").replaceWith (",
 			formName,
 			name);
 
-		javascriptWriter.writeFormat (
-			"%s\t$(\"#%j-%j\").clone (true));\n",
-			indent,
+		javascriptWriter.writeLineFormat (
+			"\t$(\"#%j-%j\").clone (true));",
 			formName,
 			name);
 

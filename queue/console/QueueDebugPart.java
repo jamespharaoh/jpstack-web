@@ -1,10 +1,24 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.etc.LogicUtils.booleanToString;
+import static wbs.utils.etc.LogicUtils.booleanToYesNo;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlRowSpanAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -152,17 +166,14 @@ class QueueDebugPart
 			FormType.search,
 			"search");
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlTableOpenList ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Queue</th>",
-			"<th>Own operator activity</th>\n",
-			"<th>Preferred user</th>\n",
-			"<th>Overflow</th>\n",
-			"<th>Conclusion</th>\n",
-			"</tr>\n");
+		htmlTableHeaderRowWrite (
+			"Queue",
+			"Own operator activity",
+			"Preferred user",
+			"Overflow",
+			"Conclusion");
 
 		for (
 			QueueInfo queueInfo
@@ -191,13 +202,13 @@ class QueueDebugPart
 					objectManager.getObjectTypeId (
 						queueParent));
 
-			printFormat (
-				"<tr colspan=\"%h\">\n",
-				form.allItems ()
-					? 2 * queueInfo.subjectInfos.size ()
-					: 2);
+			htmlTableRowOpen (
+				htmlColumnSpanAttribute (
+					form.allItems ()
+						? 2l * queueInfo.subjectInfos.size ()
+						: 2l));
 
-			List<SubjectInfo> subjectInfos =
+			List <SubjectInfo> subjectInfos =
 				form.allItems ()
 					? queueInfo.subjectInfos
 					: ImmutableList.of (
@@ -214,130 +225,162 @@ class QueueDebugPart
 
 					// queue
 
-					printFormat (
-						"<td",
-						" rowspan=\"%h\"",
-						subjectInfos.size () * 2,
-						" style=\"vertical-align: top\"",
-						">Slice: <a href=\"%h\">%h</a><br>\n",
+					htmlTableCellOpen (
+						htmlRowSpanAttribute (
+							2l * subjectInfos.size ()),
+						htmlStyleAttribute (
+							htmlStyleRuleEntry (
+								"vertical-align",
+								"top")));
+
+					formatWriter.writeLineFormat (
+						"Slice: <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
 							queueInfo.slice ()),
 						queueInfo.slice ().getCode ());
 
-					printFormat (
-						"Type: <a href=\"%h\">%h</a><br>\n",
+					formatWriter.writeLineFormat (
+						"Type: <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
 							queueParentType),
 						queueParentType.getCode ());
 
-					printFormat (
-						"Service: <a href=\"%h\">%h</a><br>\n",
+					formatWriter.writeLineFormat (
+						"Service: <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
 							queueParent),
 						objectManager.objectPathMini (
 							queueParent,
 							queueInfo.slice ()));
 
-					printFormat (
-						"Queue: <a href=\"%h\">%h</a><br>\n",
+					formatWriter.writeLineFormat (
+						"Queue: <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
 							queueInfo.queue ()),
 						queueInfo.queue ().getCode ());
 
-					printFormat (
-						"Reply priv: %h<br>\n",
+					formatWriter.writeLineFormat (
+						"Reply priv: %h<br>",
 						queueInfo.canReplyExplicit ()
 							? "explicit"
 							: queueInfo.canReplyImplicit ()
 								? "implicit"
 								: "no");
 
-					printFormat (
-						"Reply overflow priv: %h<br>\n",
+					formatWriter.writeLineFormat (
+						"Reply overflow priv: %h<br>",
 						queueInfo.canReplyOverflowExplicit ()
 							? "explicit"
 							: queueInfo.canReplyOverflowImplicit ()
 								? "implicit"
 								: "no");
 
-					printFormat (
-						"Is overflow user: %h</td>\n",
+					formatWriter.writeLineFormat (
+						"Is overflow user: %h<br>",
 						queueInfo.isOverflowUser ()
 							? "yes"
 							: "no");
 
+					htmlTableCellClose ();
+
 					// operator activity
 
-					printFormat (
-						"<td",
-						" rowspan=\"%h\"",
-						subjectInfos.size () * 2,
-						" style=\"vertical-align: top\"",
-						">Last update: %h<br>\n",
+					htmlTableCellOpen (
+						htmlRowSpanAttribute (
+							2l * subjectInfos.size ()),
+						htmlStyleAttribute (
+							htmlStyleRuleEntry (
+								"vertical-align",
+								"top")));
+
+					formatWriter.writeLineFormat (
+						"Last update: %h<br>",
 						userConsoleLogic.timestampWithoutTimezoneString (
-							queueInfo.slice ().getCurrentQueueInactivityUpdateTime ()));
+							queueInfo.slice ()
+								.getCurrentQueueInactivityUpdateTime ()));
 
-					printFormat (
-						"Inactive since: %h<br>\n",
-						queueInfo.slice ().getCurrentQueueInactivityTime () != null
-							? userConsoleLogic.timestampWithoutTimezoneString (
-								queueInfo.slice ().getCurrentQueueInactivityTime ())
-							: "none");
+					formatWriter.writeLineFormat (
+						"Inactive since: %h<br>",
+						ifNotNullThenElse (
+							queueInfo.slice ().getCurrentQueueInactivityTime (),
+							() -> userConsoleLogic
+								.timestampWithoutTimezoneString (
+									queueInfo.slice ()
+										.getCurrentQueueInactivityTime ()),
+							() -> "none"));
 
-					printFormat (
-						"Configured inactivity time: %h<br>\n",
-						queueInfo.slice ().getQueueOverflowInactivityTime () != null
-							? userConsoleLogic.prettyDuration (
+					formatWriter.writeLineFormat (
+						"Configured inactivity time: %h<br>",
+						ifNotNullThenElse (
+							queueInfo.slice ()
+								.getQueueOverflowInactivityTime (),
+							() -> userConsoleLogic.prettyDuration (
 								Duration.standardSeconds (
-									queueInfo.slice ().getQueueOverflowInactivityTime ()))
-							: "disabled");
+									queueInfo.slice ()
+										.getQueueOverflowInactivityTime ())),
+							() -> "disabled"));
 
-					printFormat (
-						"Actual inactivity time: %h<br>\n",
-						queueInfo.slice ().getCurrentQueueInactivityTime () != null
-							? userConsoleLogic.prettyDuration (
-								queueInfo.slice ().getCurrentQueueInactivityTime (),
-								transaction.now ())
-							: "none");
+					formatWriter.writeLineFormat (
+						"Actual inactivity time: %h<br>",
+						ifNotNullThenElse (
+							queueInfo.slice ()
+								.getCurrentQueueInactivityTime (),
+							() -> userConsoleLogic.prettyDuration (
+								queueInfo.slice ()
+									.getCurrentQueueInactivityTime (),
+								transaction.now ()),
+							() -> "none"));
 
-					printFormat (
-						"Conclusion: %h</td>",
+					formatWriter.writeLineFormat (
+						"Conclusion: %h<br>",
 						queueInfo.slice ().getCurrentQueueInactivityTime () != null
 							? queueInfo.ownOperatorsActive ()
 								? "own operators active"
 								: "overflow active"
 							: "no data");
 
+					htmlTableCellClose ();
+
 				}
 
 				// subject
 
-				printFormat (
-					"<td",
-					" colspan=\"3\"",
-					" style=\"%h\"",
-					joinWithSemicolonAndSpace (
-						"text-align: center",
-						"background: #dddddd"),
-					">Subject: <a",
-					" href=\"%h\"",
+				htmlTableCellOpen (
+					htmlColumnSpanAttribute (3l),
+					htmlStyleAttribute (
+						htmlStyleRuleEntry (
+							"text-align",
+							"center"),
+						htmlStyleRuleEntry (
+							"background",
+							"#dddddd")));
+
+				formatWriter.writeLineFormat (
+					"Subject:");
+
+				htmlLinkWrite (
 					objectManager.localLink (
 						subjectInfo.subject ()),
-					">%h</a></td>\n",
 					objectManager.objectPathMini (
 						subjectInfo.subject (),
 						queueInfo.queue ()));
 
-				printFormat (
-					"</tr>\n",
-					"<tr>\n");
+				htmlTableCellClose ();
+
+				htmlTableRowClose ();
 
 				// preferred user
 
-				printFormat (
-					"<td",
-					" style=\"vertical-align: top\"",
-					">Preferred by: %s<br>",
+				htmlTableRowOpen ();
+
+				htmlTableCellOpen (
+					htmlStyleAttribute (
+						htmlStyleRuleEntry (
+							"vertical-align",
+							"top")));
+
+				formatWriter.writeLineFormat (
+					"Preferred by: %s",
 					subjectInfo.preferred ()
 						? subjectInfo.preferredByUs ()
 							? "this user"
@@ -349,111 +392,131 @@ class QueueDebugPart
 									subjectInfo.preferredUser ()))
 						: "nobody");
 
-				printFormat (
-					"Preferred by overflow user: %h<br>\n",
-					subjectInfo.preferredByOverflowOperator ()
-						? "yes"
-						: "no");
+				formatWriter.writeLineFormat (
+					"Preferred by overflow user: %h<br>",
+					booleanToYesNo (
+						subjectInfo.preferredByOverflowOperator ()));
 
-				printFormat (
-					"Configured delay: %h<br>\n",
+				formatWriter.writeLineFormat (
+					"Configured delay: %h<br>",
 					userConsoleLogic.prettyDuration (
 						queueInfo.configuredPreferredUserDelay ()));
 
-				printFormat (
-					"Actual delay: %h</td>\n",
+				formatWriter.writeLineFormat (
+					"Actual delay: %h<br>",
 					subjectInfo.actualPreferredUserDelay () != null
 						? userConsoleLogic.prettyDuration (
 							subjectInfo.actualPreferredUserDelay ())
 						: "none");
 
+				htmlTableCellClose ();
+
 				// overflow
 
-				printFormat (
-					"<td",
-					" style=\"vertical-align: top\"",
-					">Configured grace time: %h<br>\n",
-					queueInfo.slice ().getQueueOverflowGraceTime () != null
-						? userConsoleLogic.prettyDuration (
+				htmlTableCellOpen (
+					htmlStyleAttribute (
+						htmlStyleRuleEntry (
+							"vertical-align",
+							"top")));
+
+				formatWriter.writeLineFormat (
+					"Configured grace time: %h<br>",
+					ifNotNullThenElse (
+						queueInfo.slice ().getQueueOverflowGraceTime (),
+						() -> userConsoleLogic.prettyDuration (
 							Duration.standardSeconds (
-								queueInfo.slice ().getQueueOverflowGraceTime ()))
-						: "none");
+								queueInfo.slice ()
+									.getQueueOverflowGraceTime ())),
+						() -> "none"));
 
-				printFormat (
-					"Configured overload time: %h<br>\n",
-					queueInfo.slice ().getQueueOverflowOverloadTime () != null
-						? userConsoleLogic.prettyDuration (
+				formatWriter.writeLineFormat (
+					"Configured overload time: %h<br>",
+					ifNotNullThenElse (
+						queueInfo.slice ().getQueueOverflowOverloadTime (),
+						() -> userConsoleLogic.prettyDuration (
 							Duration.standardSeconds (
-								queueInfo.slice ().getQueueOverflowOverloadTime ()))
-						: "none");
+								queueInfo.slice ()
+									.getQueueOverflowOverloadTime ())),
+						() -> "none"));
 
-				printFormat (
-					"Is overflow user: %h<br>\n",
-					queueInfo.isOverflowUser ()
-						? "yes"
-						: "no");
+				formatWriter.writeLineFormat (
+					"Is overflow user: %h<br>",
+					booleanToYesNo (
+						queueInfo.isOverflowUser ()));
 
-				printFormat (
+				formatWriter.writeLineFormat (
 					"Own operators active: %h<br>",
-					queueInfo.ownOperatorsActive ()
-						? "yes"
-						: "no");
+					booleanToYesNo (
+						queueInfo.ownOperatorsActive ()));
 
-				printFormat (
-					"Actual overflow delay: %h</td>\n",
-					subjectInfo.overflowDelay () != null
-						? userConsoleLogic.prettyDuration (
-							subjectInfo.overflowDelay ())
-						: "none");
+				formatWriter.writeLineFormat (
+					"Actual overflow delay: %h<br>",
+					ifNotNullThenElse (
+						subjectInfo.overflowDelay (),
+						() -> userConsoleLogic.prettyDuration (
+							subjectInfo.overflowDelay ()),
+						() -> "none"));
+
+				htmlTableCellClose ();
 
 				// conclusion
 
-				printFormat (
-					"<td",
-					" style=\"vertical-align: top\"",
-					">Priority: %h<br>\n",
+				htmlTableCellOpen (
+					htmlStyleAttribute (
+						htmlStyleRuleEntry (
+							"vertical-align",
+							"top")));
+
+				formatWriter.writeLineFormat (
+					"Priority: %h<br>",
 					subjectInfo.priority ());
 
-				printFormat (
-					"Created time: %h<br>\n",
+				formatWriter.writeLineFormat (
+					"Created time: %h<br>",
 					userConsoleLogic.timestampWithoutTimezoneString (
 						subjectInfo.createdTime ()));
 
-				printFormat (
-					"Preferred user delay: %h<br>\n",
-					subjectInfo.actualPreferredUserDelay != null
-						? userConsoleLogic.prettyDuration (
-							subjectInfo.actualPreferredUserDelay ())
-						: "none");
+				formatWriter.writeLineFormat (
+					"Preferred user delay: %h<br>",
+					ifNotNullThenElse (
+						subjectInfo.actualPreferredUserDelay,
+						() -> userConsoleLogic.prettyDuration (
+							subjectInfo.actualPreferredUserDelay ()),
+						() -> "none"));
 
-				if (subjectInfo.overflowDelay != null) {
+				if (
+					isNotNull (
+						subjectInfo.overflowDelay)
+				) {
 
-					printFormat (
-						"Overflow delay: %h (%h)<br>\n",
-						subjectInfo.overflowDelay != null
-							? userConsoleLogic.prettyDuration (
-								subjectInfo.overflowDelay ())
-							: "none",
-						queueInfo.ownOperatorsActive ()
-							? "overload"
-							: "grace");
+					formatWriter.writeLineFormat (
+						"Overflow delay: %h (%h)<br>",
+						ifNotNullThenElse (
+							subjectInfo.overflowDelay,
+							() -> userConsoleLogic.prettyDuration (
+								subjectInfo.overflowDelay ()),
+							() -> "none"),
+						booleanToString (
+							queueInfo.ownOperatorsActive (),
+							"overload",
+							"grace"));
 
 				} else {
 
-					printFormat (
-						"Overflow delay: none<br>\n");
+					formatWriter.writeLineFormat (
+						"Overflow delay: none<br>");
 
 				}
 
-				printFormat (
-					"Effective time: %h<br>\n",
+				formatWriter.writeLineFormat (
+					"Effective time: %h<br>",
 					userConsoleLogic.timestampWithoutTimezoneString (
 						subjectInfo.effectiveTime ()));
 
 				if (subjectInfo.claimed ()) {
 
-					printFormat (
-						"Claimed: yes, by <a href=\"%h\">%h</a><br>\n",
+					formatWriter.writeLineFormat (
+						"Claimed: yes, by <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
 							subjectInfo.claimedByUser ()),
 						objectManager.objectPathMini (
@@ -461,36 +524,37 @@ class QueueDebugPart
 
 				} else {
 
-					printFormat (
-						"Claimed: no");
+					formatWriter.writeLineFormat (
+						"Claimed: no<br>");
 
 				}
 
 				if (subjectInfo.available ()) {
 
-					printFormat (
-						"Available: yes, for %h</td>\n",
+					formatWriter.writeLineFormat (
+						"Available: yes, for %h<br>",
 						userConsoleLogic.prettyDuration (
 							subjectInfo.effectiveTime (),
 							transaction.now ()));
 
 				} else if (subjectInfo.claimed ()) {
 
-					printFormat (
-						"Available: no, already claimed</td>\n");
+					formatWriter.writeLineFormat (
+						"Available: no, already claimed<br>");
 
 				} else {
 
-					printFormat (
-						"Available: no, for %h</td>\n",
+					formatWriter.writeLineFormat (
+						"Available: no, for %h<br>",
 						userConsoleLogic.prettyDuration (
 							transaction.now (),
 							subjectInfo.effectiveTime ()));
 
 				}
 
-				printFormat (
-					"</tr>\n");
+				htmlTableCellClose ();
+
+				htmlTableRowClose ();
 
 				row ++;
 
@@ -498,8 +562,7 @@ class QueueDebugPart
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

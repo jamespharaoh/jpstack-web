@@ -2,6 +2,14 @@ package wbs.platform.object.settings;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostActionEncoding;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -204,20 +212,14 @@ class ObjectSettingsPart <
 
 			}
 
-			printFormat (
-				"<form",
-				" method=\"post\"",
-				" action=\"%h\"",
+			htmlFormOpenPostActionEncoding (
 				requestContext.resolveLocalUrl (
 					localName),
-				" enctype=\"%h\"",
-				enctype,
-				">\n");
+				enctype);
 
 		}
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
 			requestContext,
@@ -229,41 +231,38 @@ class ObjectSettingsPart <
 			FormType.update,
 			"settings");
 
-		printFormat (
-			"</table>");
+		htmlTableClose ();
 
 		if (canEdit) {
 
-			printFormat (
-				"<p><input",
+			htmlParagraphOpen ();
+
+			formatWriter.writeLineFormat (
+				"<input",
 				" type=\"submit\"",
 				" value=\"save changes\"",
-				"></p>\n");
+				">");
 
-			printFormat (
-				"</form>\n");
+			htmlParagraphClose ();
+
+			htmlFormClose ();
 
 			if (removeLocalName != null) {
 
-				printFormat (
-					"<h2>Remove</h2>");
+				htmlHeadingTwoWrite (
+					"Remove");
 
-				printFormat (
-					"<form",
-					" method=\"post\"",
-					" action=\"%h\"",
+				htmlFormOpenPostAction (
 					requestContext.resolveLocalUrl (
-						removeLocalName),
-					">\n");
+						removeLocalName));
 
-				printFormat (
-					"<p><input",
+				formatWriter.writeLineFormat (
+					"<input",
 					" type=\"submit\"",
 					" value=\"remove\"",
-					"></p>\n");
+					">");
 
-				printFormat (
-					"</form>\n");
+				htmlFormClose ();
 
 			}
 

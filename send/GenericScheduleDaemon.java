@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
@@ -30,6 +31,7 @@ class GenericScheduleDaemon <
 
 	// singleton dependencies
 
+	@SingletonDependency
 	Database database;
 
 	// hooks
@@ -96,11 +98,11 @@ class GenericScheduleDaemon <
 				"GenericScheduleDaemon.runOnce ()",
 				this);
 
-		List<Job> jobs =
+		List <Job> jobs =
 			helper ().findScheduledJobs (
 				transaction.now ());
 
-		List<Long> jobIds =
+		List <Long> jobIds =
 			new ArrayList<> ();
 
 		for (

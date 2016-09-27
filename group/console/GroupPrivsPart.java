@@ -1,6 +1,14 @@
 package wbs.platform.group.console;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.web.HtmlAttributeUtils.htmlAttributeFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockWrite;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +19,10 @@ import java.util.TreeMap;
 
 import com.google.common.collect.ImmutableSet;
 
+import lombok.NonNull;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
@@ -44,29 +55,44 @@ class GroupPrivsPart
 	@SingletonDependency
 	PrivConsoleHelper privHelper;
 
-	static
-	Set<ScriptRef> privsScriptRefs =
-		ImmutableSet.<ScriptRef>of (
-
-		ConsoleApplicationScriptRef.javascript (
-			"/js/tree.js")
-
-	);
-
 	PrivsNode rootNode =
 		new PrivsNode ();
 
-	Set<Long> canPrivIds =
+	Set <Long> canPrivIds =
 		new HashSet<> ();
 
-	Map<GlobalId,PrivsNode> nodesByDataObjectId =
-		new HashMap<GlobalId,PrivsNode> ();
+	Map <GlobalId, PrivsNode> nodesByDataObjectId =
+		new HashMap<> ();
+
+	// details
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
-		return privsScriptRefs;
+	Set <ScriptRef> scriptRefs () {
+
+		return ImmutableSet.<ScriptRef> of (
+
+			ConsoleApplicationScriptRef.javascript (
+				"/js/tree.js")
+
+		);
+
 	}
+
+	@Override
+	public
+	Set <HtmlLink> links () {
+
+		return ImmutableSet.<HtmlLink> of (
+
+			HtmlLink.applicationCssStyle (
+				"/style/group-privs.css")
+
+		);
+
+	}
+
+	// implementation
 
 	@Override
 	public
@@ -204,132 +230,229 @@ class GroupPrivsPart
 	public
 	void renderHtmlHeadContent () {
 
-		printFormat (
-			"<script language=\"JavaScript\">\n");
+		renderScriptBlock ();
 
-		printFormat (
-			"var newPrivData = {};\n");
+	}
 
-		printFormat (
-			"var treeOpts = {\n",
-			"  blankImage: '%j',\n",
-			requestContext.resolveApplicationUrl (
-				"/images/tree-blank.gif"),
-			"  plusImage: '%j',\n",
-			requestContext.resolveApplicationUrl (
-				"/images/tree-plus.gif"),
-			"  minusImage: '%j',\n",
-			requestContext.resolveApplicationUrl (
-				"/images/tree-minus.gif"),
-			"  imageWidth: 17,\n",
-			"  imageHeight: 17\n",
-			"}\n");
+	private
+	void renderScriptBlock () {
 
-		printFormat (
-			"var ob = new SimpleTreeItemGenerator ('%j');\n",
+		// script block open
+
+		htmlScriptBlockOpen ();
+
+		// new priv data
+
+		formatWriter.writeLineFormat (
+			"var newPrivData = {};");
+
+		// tree opts
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"var treeOpts = {");
+
+		formatWriter.writeLineFormat (
+			"blankImage: '%j',",
+			requestContext.resolveApplicationUrl (
+				"/images/tree-blank.gif"));
+
+		formatWriter.writeLineFormat (
+			"plusImage: '%j',",
+			requestContext.resolveApplicationUrl (
+				"/images/tree-plus.gif"));
+
+		formatWriter.writeLineFormat (
+			"minusImage: '%j',",
+			requestContext.resolveApplicationUrl (
+				"/images/tree-minus.gif"));
+
+		formatWriter.writeLineFormat (
+			"imageWidth: 17,");
+
+		formatWriter.writeLineFormat (
+			"imageHeight: 17\n");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// ob
+
+		formatWriter.writeLineFormat (
+			"var ob = new SimpleTreeItemGenerator ('%j');",
 			requestContext.resolveApplicationUrl (
 				"/images/tree-object.gif"));
 
-		printFormat (
-			"ob.generateTail = function (itemData) {\n",
-			"  return '<span class=\"node\">' + itemData [2] + '</span>';\n",
-			"}\n");
+		formatWriter.writeLineFormatIncreaseIndent (
+			"ob.generateTail = function (itemData) {");
 
-		printFormat (
-			"var pr = new SimpleTreeItemGenerator ('%j');\n",
+		formatWriter.writeLineFormat (
+			"return '<span class=\"node\">' + itemData [2] + '</span>';");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// pr
+
+		formatWriter.writeLineFormat (
+			"var pr = new SimpleTreeItemGenerator ('%j');",
 			requestContext.resolveApplicationUrl (
 				"/images/tree-priv.gif"));
 
-		printFormat (
-			"var nextPrivDocId = 0;\n");
+		// next priv doc it
 
-		printFormat (
-			"pr.generateTail = function (itemData) {\n",
-			"  var privDocId = nextPrivDocId ++;\n",
-			"  s = ' <span class=\"priv\">' + itemData[2] + '</span>'\n",
-			"    + ' |'\n",
-			"    + ' <a href=\"javascript:togglePriv (' + privDocId + ', &quot;can&quot;, ' + itemData[3] + ')\"'\n",
-			"    + ' id=\"' + privDocId + '-can\"'\n",
-			"    + ' class=\"' + (itemData[4]? 'can-on' : 'can-off') + '\">'\n",
-			"    + 'can</a>';\n",
-			"  return s;\n",
-			"}\n");
+		formatWriter.writeLineFormat (
+			"var nextPrivDocId = 0;");
 
-		printFormat (
-			"function togglePriv (id, type, privId) {\n",
-			"  var a = document.getElementById (id + '-' + type);\n",
-			"  if (a.className == type + '-off') {\n",
-			"    a.className = type + '-on';\n",
-			"    newPrivData[privId + '-' + type] = 1;\n",
-			"  } else {\n",
-			"    a.className = type + '-off';\n",
-			"    newPrivData[privId + '-' + type] = 0;\n",
-			"  }\n",
-			"}\n");
+		// pr generate tail
 
-		printFormat (
-			"function getUpdateString () {\n",
-			"  var s = '';\n",
-			"  for (var key in newPrivData) {\n",
-			"    if (s.length > 0) s += ',';\n",
-			"      s += key + '=' + newPrivData[key];\n",
-			"  }\n",
-			"  return s;\n",
-			"}\n");
+		formatWriter.writeLineFormatIncreaseIndent (
+			"pr.generateTail = function (itemData) {");
 
-		printFormat (
-			"var treeData = [\n");
+		formatWriter.writeLineFormat (
+			"var privDocId = nextPrivDocId ++;");
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"s = [");
+
+		formatWriter.writeLineFormat (
+			"'<span class=\"priv\">' + itemData [2] + '</span>',");
+
+		formatWriter.writeLineFormat (
+			"'|',");
+
+		formatWriter.writeLineFormat (
+			"'<a href=\"javascript:togglePriv (' + privDocId + ', &quot;can",
+			"&quot;, ' + itemData[3] + ')\"',");
+
+		formatWriter.writeLineFormat (
+			"'id=\"' + privDocId + '-can\"',");
+
+		formatWriter.writeLineFormat (
+			"'class=\"' + (itemData [4] ? 'can-on' : 'can-off') + '\">',");
+
+		formatWriter.writeLineFormat (
+			"'can</a>',");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"].join (' ');");
+
+		formatWriter.writeLineFormat (
+			"return s;");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// toggle priv
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"function togglePriv (id, type, privId) {");
+
+		formatWriter.writeLineFormat (
+			"var a = document.getElementById (id + '-' + type);");
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"if (a.className == type + '-off') {");
+
+		formatWriter.writeLineFormat (
+			"a.className = type + '-on';");
+
+		formatWriter.writeLineFormat (
+			"newPrivData[privId + '-' + type] = 1;");
+
+		formatWriter.writeLineFormatDecreaseIncreaseIndent (
+			"} else {");
+
+		formatWriter.writeLineFormat (
+			"a.className = type + '-off';");
+
+		formatWriter.writeLineFormat (
+			"newPrivData[privId + '-' + type] = 0;");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// get update string
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"function getUpdateString () {");
+
+		formatWriter.writeLineFormat (
+			"var s = '';");
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"for (var key in newPrivData) {");
+
+		formatWriter.writeLineFormat (
+			"if (s.length > 0) s += ',';");
+
+		formatWriter.writeLineFormat (
+			"s += key + '=' + newPrivData[key];");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"  }");
+
+		formatWriter.writeLineFormat (
+			"  return s;");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// tree data
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"var treeData = [");
 
 		goNode (
 			rootNode);
 
-		printFormat (
-			"];\n");
+		formatWriter.writeLineFormatDecreaseIndent (
+			"];");
 
-		printFormat (
-			"</script>\n");
+		// script block close
 
-		printFormat (
-			"<style type=\"text/css\">\n",
-			".node { font-weight: bold; color: blue; }\n",
-			".can-off { text-decoration: none; color: black; font-weight: normal; }\n",
-			".can-on { text-decoration: none; color: red; font-weight: bold; }\n",
-			".cangrant-off { text-decoration: none; color: black; font-weight: normal; }\n",
-			".cangrant-on { text-decoration: none; color: red; font-weight: bold; }\n",
-			".group-can { text-decoration: none; color: red; font-weight: normal; }\n",
-			"</style>\n");
+		htmlScriptBlockClose ();
 
 	}
 
 	void goNode (
 			PrivsNode node) {
 
-		for (PrivRec priv
-				: node.privs.values ()) {
+		for (
+			PrivRec priv
+				: node.privs.values ()
+		) {
 
-			printFormat (
-				"[pr, 0, '%j', %s, %s],\n",
+			formatWriter.writeLineFormat (
+				"[pr, 0, '%j', %s, %s],",
 				priv.getCode (),
 				priv.getId (),
-				canPrivIds.contains (
-					priv.getId ())
-						? "1"
-						: "0");
+				ifThenElse (
+					canPrivIds.contains (
+						priv.getId ()),
+					() -> "1",
+					() -> "0"));
 		}
 
-		for (Map.Entry<String,Map<String,PrivsNode>> typeNodesEntry
-				: node.nodesByCodeByTypeCode.entrySet ()) {
+		for (
+			Map.Entry <String, Map <String, PrivsNode>> typeNodesEntry
+				: node.nodesByCodeByTypeCode.entrySet ()
+		) {
 
 			String typeCode =
 				typeNodesEntry.getKey ();
 
-			Map<String,PrivsNode> typeNodesByCode =
+			Map <String, PrivsNode> typeNodesByCode =
 				typeNodesEntry.getValue ();
 
 			boolean expanded = false;
 
-			for (PrivsNode childNode
-					: typeNodesByCode.values ()) {
+			for (
+				PrivsNode childNode
+					: typeNodesByCode.values ()
+			) {
 
 				if (childNode.expanded) {
 					expanded = true;
@@ -338,15 +461,15 @@ class GroupPrivsPart
 
 			}
 
-			printFormat (
-				"[ob, %s, '%j', [\n",
-				expanded
-					? "2"
-					: "1",
+			formatWriter.writeLineFormatIncreaseIndent (
+				"[ob, %s, '%j', [",
+				expanded ? "2" : "1",
 				typeCode);
 
-			for (Map.Entry<String,PrivsNode> childNodeEntry
-					: typeNodesByCode.entrySet ()) {
+			for (
+				Map.Entry<String,PrivsNode> childNodeEntry
+					: typeNodesByCode.entrySet ()
+			) {
 
 				String code =
 					childNodeEntry.getKey ();
@@ -354,23 +477,21 @@ class GroupPrivsPart
 				PrivsNode childNode =
 					childNodeEntry.getValue ();
 
-				printFormat (
-					"[ob, %s, '%j', [\n",
-					childNode.expanded
-						? "2"
-						: "1",
+				formatWriter.writeLineFormatIncreaseIndent (
+					"[ob, %s, '%j', [",
+					childNode.expanded ? "2" : "1",
 					code);
 
 				goNode (
 					childNode);
 
-				printFormat (
-					"]],\n");
+				formatWriter.writeLineFormatDecreaseIndent (
+					"]],");
 
 			}
 
-			printFormat (
-				"]],\n");
+			formatWriter.writeLineFormatDecreaseIndent (
+				"]],");
 
 		}
 
@@ -378,92 +499,117 @@ class GroupPrivsPart
 
 	public
 	boolean doExpansion (
-			PrivsNode node) {
+			@NonNull PrivsNode node) {
 
 		boolean expanded =
 			false;
 
 		// see if we have any active privs
-		for (PrivRec priv : node.privs.values()) {
-			if (canPrivIds.contains(priv.getId())) {
+
+		for (
+			PrivRec priv
+				: node.privs.values ()
+		) {
+
+			if (
+				canPrivIds.contains (
+					priv.getId ())
+			) {
+
 				expanded = true;
+
 				break;
+
 			}
+
 		}
 
 		// then call doExpansion for all child nodes
-		for (Map<String, PrivsNode> typeNodesByCode : node.nodesByCodeByTypeCode
-				.values()) {
-			for (PrivsNode childNode : typeNodesByCode.values()) {
-				if (doExpansion(childNode))
+
+		for (
+			Map <String, PrivsNode> typeNodesByCode
+				: node.nodesByCodeByTypeCode.values ()
+		) {
+
+			for (
+				PrivsNode childNode
+					: typeNodesByCode.values ()
+			) {
+
+				if (doExpansion (childNode)) {
 					expanded = true;
+				}
+
 			}
+
 		}
 
 		// update this node's expanded status
+
 		node.expanded = expanded;
 
 		// and return
+
 		return expanded;
+
 	}
 
 	@Override
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-
-			" action=\"%h\"",
-			requestContext.resolveLocalUrl ("/group.privs"),
-
-			" onsubmit=\"%h\"",
-			stringFormat (
+		htmlFormOpenPostAction (
+			requestContext.resolveLocalUrl (
+				"/group.privs"),
+			htmlAttributeFormat (
+				"onsubmit",
 				"javascript:%s = %s",
 				"document.getElementById ('privdata').value",
-				"getUpdateString ()"),
+				"getUpdateString ()"));
 
-			">\n");
-
-		printFormat (
+		formatWriter.writeFormat (
 			"<input",
 			" type=\"hidden\"",
 			" name=\"privdata\"",
 			" id=\"privdata\"",
 			" value=\"\"",
-			">\n");
+			">");
 
-		printFormat (
-			"<p><input",
+		htmlParagraphOpen ();
+
+		formatWriter.writeFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"save changes\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"<script language=\"JavaScript\">\n",
-			"document.write (buildTree (treeData, treeOpts));\n",
-			"</script>\n");
+		htmlParagraphClose ();
 
-		printFormat (
-			"<p><input",
+		htmlScriptBlockWrite (
+			"document.write (buildTree (treeData, treeOpts));");
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"save changes\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		htmlFormClose ();
 
 	}
 
 	static
 	class PrivsNode {
 
-		Map<String,Map<String,PrivsNode>> nodesByCodeByTypeCode =
-			new TreeMap<String,Map<String,PrivsNode>> ();
+		Map <String, Map <String, PrivsNode>> nodesByCodeByTypeCode =
+			new TreeMap<> ();
 
-		Map<String,PrivRec> privs =
-			new TreeMap<String,PrivRec> ();
+		Map <String, PrivRec> privs =
+			new TreeMap<> ();
 
 		boolean expanded =
 			false;

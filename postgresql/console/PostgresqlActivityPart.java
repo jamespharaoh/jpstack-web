@@ -1,9 +1,21 @@
 package wbs.platform.postgresql.console;
 
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -74,8 +86,8 @@ class PostgresqlActivityPart
 		doList (
 			activeStatActivities);
 
-		printFormat (
-			"<h2>Idle</h2>\n");
+		htmlHeadingTwoWrite (
+			"Idle");
 
 		doList (
 			idleStatActivities);
@@ -83,59 +95,53 @@ class PostgresqlActivityPart
 	}
 
 	void doList (
-			List<PostgresqlStatActivityRec> statActivities) {
+			@NonNull List <PostgresqlStatActivityRec> statActivities) {
 
-		if (statActivities.size () == 0) {
+		if (
+			collectionIsEmpty (
+				statActivities)
+		) {
 
-			printFormat (
-				"<p>(none)</p>\n");
+			htmlParagraphWrite (
+				"(none)");
 
 			return;
 
 		}
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlTableOpenList ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>PID</th>\n",
-			"<th>Database</th>\n",
-			"<th>User</th>\n",
-			"<th>Query</th>\n",
-			"</tr>\n");
+		htmlTableHeaderRowWrite (
+			"PID",
+			"Database",
+			"User",
+			"Query");
 
 		for (
 			PostgresqlStatActivityRec statActivity
 				: statActivities
 		) {
 
-			printFormat (
-				"<tr>\n");
+			htmlTableRowOpen ();
 
-			printFormat (
-				"<td>%h</td>\n",
-				statActivity.getId ());
+			htmlTableHeaderCellWrite (
+				integerToDecimalString (
+					statActivity.getId ()));
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableHeaderCellWrite (
 				statActivity.getDatabaseName ());
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableHeaderCellWrite (
 				statActivity.getUserName ());
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableHeaderCellWrite (
 				statActivity.getCurrentQuery ());
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

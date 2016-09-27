@@ -2,6 +2,7 @@ package wbs.platform.object.create;
 
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -254,8 +255,8 @@ class ObjectCreatePart <
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<p>Please enter the details for the new %h</p>\n",
+		htmlParagraphWriteFormat (
+			"Please enter the details for the new %h",
 			consoleHelper.shortName ());
 
 		formFieldLogic.outputFormTable (

@@ -1,7 +1,19 @@
 package wbs.platform.postgresql.console;
 
-import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
 
 import java.util.Map;
 import java.util.Set;
@@ -43,10 +55,7 @@ class PostgresqlMaintenanceListPart
 		Set <PostgresqlMaintenanceRec>
 	>
 	maintenancesByFrequency =
-		new TreeMap <
-			PostgresqlMaintenanceFrequency,
-			Set <PostgresqlMaintenanceRec>
-		> ();
+		new TreeMap <> ();
 
 	// details
 
@@ -82,7 +91,7 @@ class PostgresqlMaintenanceListPart
 
 			maintenancesByFrequency.put (
 				frequency,
-				new TreeSet<PostgresqlMaintenanceRec> ());
+				new TreeSet <PostgresqlMaintenanceRec> ());
 
 		}
 
@@ -103,24 +112,20 @@ class PostgresqlMaintenanceListPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlTableOpenList ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Seq</th>\n",
-			"<th>Command</th>\n",
-			"<th>Last run</th>\n",
-			"<th>Last duration</th>\n",
-			"</tr>\n");
+		htmlTableHeaderRowWrite (
+			"Seq",
+			"Command",
+			"Last run",
+			"Last duration");
 
 		for (
 			PostgresqlMaintenanceFrequency frequency
 				: PostgresqlMaintenanceFrequency.values ()
 		) {
 
-			printFormat (
-				"<tr class=\"sep\">\n");
+			htmlTableRowSeparatorWrite ();
 
 			Duration totalDuration =
 				maintenancesByFrequency.get (
@@ -143,20 +148,20 @@ class PostgresqlMaintenanceListPart
 				.orElse (
 					Duration.ZERO);
 
-			printFormat (
-				"<tr style=\"font-weight: bold\">\n");
+			htmlTableRowOpen (
+				htmlStyleRuleEntry (
+					"font-weight",
+					"bold"));
 
-			printFormat (
-				"<td colspan=\"3\">%h</td>\n",
-				frequency.getDescription ());
+			htmlTableCellWrite (
+				frequency.getDescription (),
+				htmlColumnSpanAttribute (3l));
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				userConsoleLogic.prettyDuration (
 					totalDuration));
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 			for (
 				PostgresqlMaintenanceRec postgresqlMaintenance
@@ -164,52 +169,45 @@ class PostgresqlMaintenanceListPart
 						frequency)
 			) {
 
-				printFormat (
-					"<tr",
-					" class=\"magic-table-row\"",
+				htmlTableRowOpen (
+					htmlClassAttribute (
+						"magic-table-row"),
+					htmlDataAttribute (
+						"target-href",
+						requestContext.resolveContextUrl (
+							stringFormat (
+								"/postgresqlMaintenance",
+								"/%u",
+								postgresqlMaintenance.getId (),
+								"/postgresqlMaintenance.summary"))));
 
-					" data-target-href=\"%h\"",
-					requestContext.resolveContextUrl (
-						stringFormat (
-							"/postgresqlMaintenance",
-							"/%u",
-							postgresqlMaintenance.getId (),
-							"/postgresqlMaintenance.summary")),
+				htmlTableCellWrite (
+					integerToDecimalString (
+						postgresqlMaintenance.getSequence ()));
 
-					">\n");
-
-				printFormat (
-					"<td>%h</td>\n",
-					postgresqlMaintenance.getSequence ());
-
-				printFormat (
-					"<td>%h</td>\n",
+				htmlTableCellWrite (
 					postgresqlMaintenance.getCommand ());
 
-				printFormat (
-					"<td>%h</td>\n",
-					ifNull (
-						userConsoleLogic.timestampWithTimezoneString (
-							postgresqlMaintenance.getLastRun ()),
-						"-"));
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						postgresqlMaintenance.getLastRun (),
+						() -> userConsoleLogic.timestampWithTimezoneString (
+							postgresqlMaintenance.getLastRun ())));
 
-				printFormat (
-					"<td>%h</td>\n",
-					ifNull (
-						userConsoleLogic.prettyDuration (
+				htmlTableCellWrite (
+					ifNotNullThenElseEmDash (
+						postgresqlMaintenance.getLastDuration (),
+						() -> userConsoleLogic.prettyDuration (
 							new Duration (
-								postgresqlMaintenance.getLastDuration ())),
-						"-"));
+								postgresqlMaintenance.getLastDuration ()))));
 
-				printFormat (
-					"</tr>\n");
+				htmlTableRowClose ();
 
 			}
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

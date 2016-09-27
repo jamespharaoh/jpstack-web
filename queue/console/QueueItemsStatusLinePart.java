@@ -1,6 +1,16 @@
 package wbs.platform.queue.console;
 
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockClose;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockOpen;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleClose;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntryWrite;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.Set;
 
@@ -18,9 +28,9 @@ class QueueItemsStatusLinePart
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>of (
+		return ImmutableSet.<ScriptRef> of (
 
 			ConsoleApplicationScriptRef.javascript (
 				"/js/queue-status.js")
@@ -33,10 +43,22 @@ class QueueItemsStatusLinePart
 	public
 	void renderHtmlHeadContent () {
 
-		printFormat (
-			"<style type=\"text/css\">\n",
-			"#queueRow { display: none; cursor: pointer; }\n",
-			"</style>\n");
+		htmlStyleBlockOpen ();
+
+		htmlStyleRuleOpen (
+			"#queueRow");
+
+		htmlStyleRuleEntryWrite (
+			"display",
+			"none");
+
+		htmlStyleRuleEntryWrite (
+			"cursor",
+			"pointer");
+
+		htmlStyleRuleClose ();
+
+		htmlStyleBlockClose ();
 
 	}
 
@@ -44,20 +66,33 @@ class QueueItemsStatusLinePart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<tr",
-			" id=\"queue-row\"",
-			" onmouseover=\"this.className='hover';\"",
-			" onmouseout=\"this.className='';\"",
-			" onclick=\"%h\"",
-			stringFormat (
-				"top.frames ['inbox'].location = '%j';",
-				requestContext.resolveApplicationUrl (
-					"/queues/queue.home")),
-			"><td",
-			" id=\"queue-cell\"",
-			">-</td>\n",
-			"</tr>\n");
+		htmlTableRowOpen (
+
+			htmlIdAttribute (
+				"queue-row"),
+
+			htmlAttribute (
+				"onmouseover",
+				"this.className='hover';"),
+
+			htmlAttribute (
+				"onmouseout",
+				"this.className='';"),
+
+			htmlAttribute (
+				"onclick",
+				stringFormat (
+					"top.frames ['inbox'].location = '%j';",
+					requestContext.resolveApplicationUrl (
+						"/queues/queue.home")))
+		);
+
+		htmlTableCellWrite (
+			"—",
+			htmlIdAttribute (
+				"queue-cell"));
+
+		htmlTableRowClose ();
 
 	}
 

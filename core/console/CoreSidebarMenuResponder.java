@@ -1,8 +1,16 @@
 package wbs.platform.core.console;
 
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
-import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
+import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.Collections;
 import java.util.List;
@@ -62,9 +70,9 @@ class CoreSidebarMenuResponder
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())
@@ -127,11 +135,12 @@ class CoreSidebarMenuResponder
 	protected
 	void renderHtmlBodyContents () {
 
-		printFormat (
-			"<table",
-			" class=\"menu\"",
-			" width=\"100%%\"",
-			">\n");
+		htmlTableOpen (
+			htmlClassAttribute (
+				"menu"),
+			htmlAttribute (
+				"width",
+				"100%"));
 
 		ABSwap abSwap =
 			new ABSwap ();
@@ -156,43 +165,44 @@ class CoreSidebarMenuResponder
 
 				if (! doneGroup) {
 
-					printFormat (
-						"<tr>\n",
-						"<th>%h</th>\n",
-						menuGroup.getLabel (),
+					htmlTableRowOpen ();
 
-						"</tr>\n");
+					htmlTableHeaderCellWrite (
+						menuGroup.getLabel ());
+
+					htmlTableRowClose ();
 
 					doneGroup = true;
 
 				}
 
-				printFormat (
-					"<tr",
-					" class=\"%h\"",
-					joinWithSpace (
+				htmlTableRowOpen (
+
+					htmlClassAttribute (
 						"magic-table-row",
 						abSwap.swap ()),
-					" data-target-href=\"%h\"",
-					requestContext.resolveApplicationUrl (
-						menu.getTargetPath ()),
-					" data-target-frame=\"%h\"",
-					menu.getTargetFrame (),
-					">\n");
 
-				printFormat (
-					"<td>%h</td>\n",
-						menu.getLabel ());
+					htmlDataAttribute (
+						"target-href",
+						requestContext.resolveApplicationUrl (
+							menu.getTargetPath ())),
 
-				printFormat (
-					"</tr>\n");
+					htmlDataAttribute (
+						"target-frame",
+						menu.getTargetFrame ())
+
+				);
+
+				htmlTableCellWrite (
+					menu.getLabel ());
+
+				htmlTableRowClose ();
 
 			}
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

@@ -112,11 +112,11 @@ class QueueSubjectSorter {
 
 	Transaction transaction;
 
-	Set<SubjectInfo> subjectInfos =
-		new HashSet<SubjectInfo> ();
+	Set <SubjectInfo> subjectInfos =
+		new HashSet<> ();
 
-	Map<QueueRec,QueueInfo> queueInfos =
-		new HashMap<QueueRec,QueueInfo> ();
+	Map <QueueRec, QueueInfo> queueInfos =
+		new HashMap<> ();
 
 	SortedQueueSubjects result =
 		new SortedQueueSubjects ();
@@ -859,7 +859,7 @@ class QueueSubjectSorter {
 
 		Duration configuredPreferredUserDelay;
 
-		List<SubjectInfo> subjectInfos =
+		List <SubjectInfo> subjectInfos =
 			new ArrayList<> ();
 
 		// all

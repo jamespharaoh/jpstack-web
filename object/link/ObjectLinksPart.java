@@ -1,5 +1,15 @@
 package wbs.platform.object.link;
 
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -106,46 +116,57 @@ class ObjectLinksPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<form",
-			" action=\"%h\"",
-			requestContext.resolveLocalUrl (
-				"/" + localFile),
-			" method=\"post\"",
-			">\n");
+		// form open
 
-		printFormat (
-			"<p><input",
+		htmlFormOpenPostAction (
+			requestContext.resolveLocalUrl (
+				"/" + localFile));
+
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"save changes\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"<table class=\"list\">\n");
+		htmlParagraphClose ();
 
-		printFormat (
-			"<tr>\n");
+		// table open
+
+		htmlTableOpenList ();
+
+		// table header
+
+		htmlTableRowOpen ();
 
 		formFieldLogic.outputTableHeadings (
 			formatWriter,
 			formFieldSet);
 
-		printFormat (
-			"<th>Member</th>\n",
-			"</tr>\n");
+		htmlTableHeaderCellWrite (
+			"Member");
+
+		htmlTableRowClose ();
+
+		// table content
 
 		for (
-			Record<?> targetObject
+			Record <?> targetObject
 				: targetObjects
 		) {
 
-			if (! privChecker.canRecursive (
+			if (
+				! privChecker.canRecursive (
 					targetObject,
-					"manage"))
+					"manage")
+			) {
 				continue;
+			}
 
-			printFormat (
-				"<tr>\n");
+			htmlTableRowOpen ();
 
 			formatWriter.increaseIndent ();
 
@@ -173,29 +194,42 @@ class ObjectLinksPart
 
 			formatWriter.decreaseIndent ();
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		// table close
 
-		printFormat (
-			"<p><input",
+		htmlTableClose ();
+
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"save changes\"",
-			"></p>\n");
+			">");
 
-		for (Record<?> targetObject
-				: targetObjects) {
+		htmlParagraphClose ();
 
-			if (! privChecker.canRecursive (
+		// form hidden fields
+
+		for (
+			Record<?> targetObject
+				: targetObjects
+		) {
+
+			if (
+				! privChecker.canRecursive (
 					targetObject,
-					"manage"))
+					"manage")
+			) {
 				continue;
+			}
 
-			printFormat (
+			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"hidden\"",
 				" name=\"old_link\"",
@@ -204,12 +238,15 @@ class ObjectLinksPart
 				contextLinks.contains (targetObject)
 					? "true"
 					: "false",
-				">\n");
+				">");
 
 		}
 
-		printFormat (
-			"</form>\n");
+		// form close
+
+		htmlFormClose ();
+
+		// flush scripts
 
 		requestContext.flushScripts ();
 
@@ -218,7 +255,7 @@ class ObjectLinksPart
 	// data
 
 	static
-	Set<ScriptRef> scriptRefs =
+	Set <ScriptRef> scriptRefs =
 		ImmutableSet.<ScriptRef> of (
 
 		ConsoleApplicationScriptRef.javascript (
