@@ -1,5 +1,13 @@
 package wbs.services.ticket.create;
 
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+
 import java.util.List;
 
 import com.google.common.base.Optional;
@@ -210,19 +218,14 @@ class ObjectTicketCreatePart <
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<p>Please enter the details for the new ticket</p>\n");
+		htmlParagraphWriteFormat (
+			"Please enter the details for the new ticket");
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
-				"/" + localFile),
-			">\n");
+				"/" + localFile));
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
 			requestContext,
@@ -234,17 +237,19 @@ class ObjectTicketCreatePart <
 			FormType.create,
 			"create");
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
-		printFormat (
-			"<p><input",
+		htmlParagraphOpen ();
+
+		formatWriter.writeFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"create ticket\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		htmlFormClose ();
 
 	}
 
