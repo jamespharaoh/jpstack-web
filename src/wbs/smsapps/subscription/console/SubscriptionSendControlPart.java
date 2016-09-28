@@ -1,5 +1,15 @@
 package wbs.smsapps.subscription.console;
 
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPost;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+
 import org.joda.time.Instant;
 
 import wbs.console.part.AbstractPagePart;
@@ -48,25 +58,24 @@ class SubscriptionSendControlPart
 
 		case cancelled:
 
-			printFormat (
-				"<p>This send has been cancelled and can no longer be sent.",
-				"</p>\n");
+			htmlParagraphWriteFormat (
+				"This send has been cancelled and can no longer be sent.");
 
 			break;
 
 		case partiallySent:
 
-			printFormat (
-				"<p>This send was partially sent and then cancelled. It can ",
-				"no longer be sent.</p>\n");
+			htmlParagraphWriteFormat (
+				"This send was partially sent and then cancelled. It can no ",
+				"longer be sent.");
 
 			break;
 
 		case scheduled:
 
-			printFormat (
-				"<p>This send has been scheduled but not yet sent. It can be ",
-				"unscheduled or cancelled.</p>\n");
+			htmlParagraphWriteFormat (
+				"This send has been scheduled but not yet sent. It can be ",
+				"unscheduled or cancelled.");
 
 			goUnschedule ();
 			goCancel ();
@@ -75,8 +84,8 @@ class SubscriptionSendControlPart
 
 		case sending:
 
-			printFormat (
-				"<p>This send is being sent. It can be cancelled.</p>\n");
+			htmlParagraphWriteFormat (
+				"This send is being sent. It can be cancelled.");
 
 			goCancel ();
 
@@ -84,17 +93,17 @@ class SubscriptionSendControlPart
 
 		case sent:
 
-			printFormat (
-				"<p>This send has already been sent.</p>\n");
+			htmlParagraphWriteFormat (
+				"This send has already been sent.");
 
 			break;
 
 		case notSent:
 
-			printFormat (
-				"<p>This send has not yet been sent. It can be sent now or ",
+			htmlParagraphWriteFormat (
+				"This send has not yet been sent. It can be sent now or ",
 				"scheduled to automatically sent at a specific time in the ",
-				"future. Alternatively, it can be cancelled.</p>\n");
+				"future. Alternatively, it can be cancelled.");
 
 			goSendNow ();
 			goSchedule ();
@@ -112,111 +121,140 @@ class SubscriptionSendControlPart
 
 	void goDetails () {
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Description</th>\n",
-			"<td>%h</td>\n",
-			subscriptionSend.getDescription (),
-			"</tr>\n");
+		htmlTableDetailsRowWrite (
+			"Description",
+			subscriptionSend.getDescription ());
 
-
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
 	void goSchedule () {
 
-		printFormat (
-			"<h2>Schedule</h2>\n");
+		htmlHeadingTwoWrite (
+			"Schedule");
 
-		printFormat (
-			"<p>Scheduling this send will cause it to be sent ",
-			"automatically at the specified time in the future.</p>\n");
+		htmlParagraphWriteFormat (
+			"Scheduling this send will cause it to be sent automatically at ",
+			"the specified time in the future.");
 
-		printFormat (
-			"<form method=\"post\">\n",
+		// form open
 
-			"<p>Time and date<br>\n",
+		htmlFormOpenPost ();
+
+		// time and date
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"Time and date<br>");
+
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"text\"",
 			" name=\"timestamp\"",
 			" value=\"%h\"",
 			userConsoleLogic.timestampWithTimezoneString (
 				Instant.now ()),
-			"></p>\n",
+			">");
 
-			"<p><input",
+		htmlParagraphClose ();
+
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"schedule\"",
 			" value=\"schedule\"",
-			"></p>\n",
+			">");
 
-			"</form>\n");
+		htmlParagraphClose ();
+
+		// form close
+
+		htmlFormClose ();
 
 	}
 
 	void goUnschedule () {
 
-		printFormat (
-			"<h2>Unschedule</h2>\n");
+		htmlHeadingTwoWrite (
+			"Unschedule");
 
-		printFormat (
-			"<p>Unscheduling a send will prevent it from being sent. You ",
-			"will be able to add and remove numbers and send or schedule ",
-			"it again.</p>\n");
+		htmlParagraphWriteFormat (
+			"Unscheduling a send will prevent it from being sent. You will be ",
+			"able to add and remove numbers and send or schedule it again");
 
-		printFormat (
-			"<form method=\"post\">\n",
-			"<p><input",
+		htmlFormOpenPost ();
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"unschedule\"",
 			" value=\"unschedule\"",
-			"></p>\n",
-			"</form>\n");
+			">");
+
+		htmlParagraphClose ();
+
+		htmlFormClose ();
 
 	}
 
 	void goSendNow () {
 
-		printFormat (
-			"<h2>Send now</h2>\n");
+		htmlHeadingTwoWrite (
+			"Send now");
 
-		printFormat (
-			"<p>Sending a send will begin sending messages immediately.",
-			"</p>\n");
+		htmlParagraphWriteFormat (
+			"Sending a send will begin sending messages immediately.");
 
-		printFormat (
-			"<form method=\"post\">\n",
-			"<p><input",
+		htmlFormOpenPost ();
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"send\"",
 			" value=\"send\"",
-			"></p>\n",
-			"</form>\n");
+			">");
+
+		htmlParagraphClose ();
+
+		htmlFormClose ();
 
 	}
 
 	void goCancel () {
 
-		printFormat (
-			"<h2>Cancel</h2>\n");
+		htmlHeadingTwoWrite (
+			"Cancel");
 
-		printFormat (
-			"<p>Cancelling a send will stop it from being sent, now or in ",
-			"the future.</p>\n");
+		htmlParagraphWriteFormat (
+			"Cancelling a send will stop it from being sent, now or in the ",
+			"future.");
 
-		printFormat (
-			"<form method=\"post\">\n",
-			"<p><input",
+		htmlFormOpenPost ();
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"cancel\"",
 			" value=\"cancel\"",
-			"></p>\n",
-			"</form>\n");
+			">");
+
+		htmlParagraphClose ();
+
+		htmlFormClose ();
 
 	}
 

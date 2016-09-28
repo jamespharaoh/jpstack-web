@@ -1,5 +1,10 @@
 package wbs.smsapps.subscription.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -37,18 +42,14 @@ class SubscriptionNumberOverviewPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Subscribers</th>\n",
-			"<td>%h</td>\n",
-			subscription.getNumSubscribers (),
-			"</tr>\n");
+		htmlTableDetailsRowWrite (
+			"Subscribers",
+			integerToDecimalString (
+				subscription.getNumSubscribers ()));
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 

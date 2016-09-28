@@ -1,5 +1,10 @@
 package wbs.smsapps.subscription.console;
 
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
@@ -59,16 +64,11 @@ class SubscriptionNumberAddRemovePart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
-				"/subscriptionNumber.addRemove"),
-			">\n");
+				"/subscriptionNumber.addRemove"));
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
 			requestContext,
@@ -80,25 +80,25 @@ class SubscriptionNumberAddRemovePart
 			FormType.perform,
 			"update");
 
-		printFormat (
-			"</table>\n");
+		htmlTableOpenDetails ();
 
-		printFormat (
+		htmlParagraphOpen ();
 
-			"<p><input",
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"add\"",
 			" value=\"add numbers\"",
-			"/>\n",
+			">");
 
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" name=\"remove\"",
 			" value=\"remove numbers\"",
-			"/></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlFormClose ();
 
 	}
 

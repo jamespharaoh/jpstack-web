@@ -1,12 +1,41 @@
 package wbs.smsapps.manualresponder.console;
 
 import static wbs.utils.etc.LogicUtils.allOf;
+import static wbs.utils.etc.LogicUtils.booleanToString;
+import static wbs.utils.etc.LogicUtils.ifThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.not;
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlUtils.htmlEncodeNonBreakingWhitespace;
+import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -35,7 +64,6 @@ import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
-import wbs.utils.web.HtmlUtils;
 
 @PrototypeComponent ("manualResponderRequestPendingFormResponder")
 public
@@ -255,19 +283,25 @@ class ManualResponderRequestPendingFormResponder
 
 		// show relevant frames
 
-		printFormat (
-			"<script language=\"JavaScript\">\n");
+		htmlScriptBlockOpen ();
 
-		printFormat (
-			"top.show_inbox (true);\n",
-			"top.frames ['main'].location = 'about:blank';\n",
-			"window.setTimeout (function () {\n",
-			"\ttop.frames ['main'].location = '%j'\n",
-			summaryUrl,
+		formatWriter.writeLineFormat (
+			"top.show_inbox (true);");
+
+		formatWriter.writeLineFormat (
+			"top.frames ['main'].location = 'about:blank';");
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"window.setTimeout (function () {");
+
+		formatWriter.writeLineFormat (
+			"top.frames ['main'].location = '%j'\n",
+			summaryUrl);
+
+		formatWriter.writeLineFormatDecreaseIndent (
 			"}, 1);\n");
 
-		printFormat (
-			"</script>\n");
+		htmlScriptBlockClose (); 
 
 	}
 
@@ -325,40 +359,65 @@ class ManualResponderRequestPendingFormResponder
 	private
 	void goForm () {
 
-		printFormat (
-			"<form",
-			" class=\"manual-responder-request-pending-form\"",
-			" action=\"%h\"",
+		// form open
+
+		htmlFormOpenPostAction (
 			requestContext.resolveApplicationUrl (
 				stringFormat (
 					"/manualResponderRequest.pending",
 					"/%u",
 					request.getId (),
 					"/manualResponderRequest.pending.form")),
-			" method=\"post\"",
-			">\n");
+			htmlClassAttribute (
+				"manual-responder-request-pending-form"));
 
-		printFormat (
-			"<table",
-			" class=\"list\"",
-			" style=\"width: 100%%\"",
-			">\n");
+		// table open
 
-		printFormat (
-			"<tr>\n",
-			"<th style=\"width: 0\">&nbsp;</th>\n",
-			"<th style=\"width: 0\">Template</th>\n",
-			"<th style=\"width: 0\">Charge</th>\n",
-			"<th>Message</th>\n",
-			"<th style=\"width: 0\">Send</th>\n",
-			"</tr>\n");
+		htmlTableOpenList (
+			htmlStyleRuleEntry (
+				"width",
+				"100%"));
 
-		if (alreadyReplied)
+		// table header
+
+		htmlTableRowOpen ();
+
+		htmlTableHeaderCellWrite (
+			"",
+			htmlStyleRuleEntry (
+				"width",
+				"0"));
+
+		htmlTableHeaderCellWrite (
+			"Template",
+			htmlStyleRuleEntry (
+				"width",
+				"0"));
+
+		htmlTableHeaderCellWrite (
+			"Charge",
+			htmlStyleRuleEntry (
+				"width",
+				"0"));
+
+		htmlTableHeaderCellWrite (
+			"Message");
+
+		htmlTableHeaderCellWrite (
+			"Send",
+			htmlStyleRuleEntry (
+				"width",
+				"0"));
+
+		htmlTableRowClose ();
+
+		if (alreadyReplied) {
 			renderIgnore ();
+		}
 
 		int selectedTemplateId = -1;
 
-		Optional<String> templateIdStringOptional =
+		Optional <String> templateIdStringOptional =
 			requestContext.parameter (
 				"template-id");
 
@@ -387,11 +446,13 @@ class ManualResponderRequestPendingFormResponder
 		if (canIgnore && ! alreadyReplied)
 			renderIgnore ();
 
-		printFormat (
-			"</table>\n");
+		// table close
 
-		printFormat (
-			"</form>\n");
+		htmlTableClose ();
+
+		// form close
+
+		htmlFormClose ();
 
 	}
 
@@ -400,60 +461,89 @@ class ManualResponderRequestPendingFormResponder
 			ManualResponderTemplateRec template,
 			boolean selected) {
 
-		printFormat (
+		// table row open
 
-			"<tr",
-			" class=\"template\"",
+		htmlTableRowOpen (
 
-			" data-template-id=\"%h\"",
-			template.getId (),
+			htmlClassAttribute (
+				"template"),
 
-			" data-template-mode=\"%h\"",
-			template.getSplitLong ()
-				? "split"
-				: "join",
+			htmlDataAttribute (
+				"template-id",
+				integerToDecimalString (
+					template.getId ())),
 
-			" data-template-min-message-parts=\"%h\"",
-			template.getMinimumMessageParts (),
+			htmlDataAttribute (
+				"template-mode",
+				booleanToString (
+					template.getSplitLong (),
+					"split",
+					"join")),
 
-			" data-template-max-messages=\"%h\"",
-			template.getMaximumMessages (),
+			htmlDataAttribute (
+				"template-min-message-parts",
+				integerToDecimalString (
+					template.getMinimumMessageParts ())),
 
-			" data-template-max-for-single-message=\"%h\"",
-			160,
+			htmlDataAttribute (
+				"template-max-messages",
+				integerToDecimalString (
+					template.getMaximumMessages ())),
 
-			" data-template-max-for-message-part=\"%h\"",
-			request
-					.getNumber ()
-					.getNetwork ()
-					.getShortMultipartMessages ()
-				? 134
-				: 153,
+			htmlDataAttribute (
+				"template-max-for-single-message",
+				"160"),
 
-			" data-template-single=\"%h\"",
-			template.getApplyTemplates ()
-				? template.getSingleTemplate ()
-				: "{message}",
+			htmlDataAttribute (
+				"template-max-for-message-part",
+				integerToDecimalString (
+					request
+						.getNumber ()
+						.getNetwork ()
+						.getShortMultipartMessages ()
+					? 134l
+					: 153l)),
 
-			" data-template-first=\"%h\"",
-			template.getApplyTemplates ()
-				? template.getFirstTemplate ()
-				: "{message}",
+			htmlDataAttribute (
+				"template-single",
+				booleanToString (
+					template.getApplyTemplates (),
+					emptyStringIfNull (
+						template.getSingleTemplate ()),
+					"{message}")),
 
-			" data-template-middle=\"%h\"",
-			template.getApplyTemplates ()
-				? template.getMiddleTemplate ()
-				: "{message}",
+			htmlDataAttribute (
+				"template-first",
+				booleanToString (
+					template.getApplyTemplates (),
+					emptyStringIfNull (
+						template.getFirstTemplate ()),
+					"{message}")),
 
-			" data-template-last=\"%h\"",
-			template.getApplyTemplates ()
-				? template.getLastTemplate ()
-				: "{message}",
+			htmlDataAttribute (
+				"template-middle",
+				booleanToString (
+					template.getApplyTemplates (),
+					emptyStringIfNull (
+						template.getMiddleTemplate ()),
+					"{message}")),
 
-			">\n");
+			htmlDataAttribute (
+				"template-last",
+				booleanToString (
+					template.getApplyTemplates (),
+					emptyStringIfNull (
+						template.getLastTemplate ()),
+					"{message}"))
 
-		printFormat (
-			"<td><input",
+		);
+
+		// radio button
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" class=\"template-radio\"",
 			" type=\"radio\"",
 			" name=\"template-id\"",
@@ -462,32 +552,37 @@ class ManualResponderRequestPendingFormResponder
 			selected
 				? " checked"
 				: "",
-			"></td>\n");
+			">");
 
-		printFormat (
-			"<td>%s</td>\n",
-			HtmlUtils.htmlNonBreakingWhitespace (
-				HtmlUtils.htmlEncode (
-					template.getName ())));
+		htmlTableCellClose ();
+
+		// template name
+
+		htmlTableCellWriteHtml (
+			htmlEncodeNonBreakingWhitespace (
+				template.getName ()));
+
+		// message
 
 		RouteRec route =
 			routerLogic.resolveRouter (
 				template.getRouter ());
 
-		printFormat (
-			"<td>%s</td>\n",
-			HtmlUtils.htmlNonBreakingWhitespace (
-				HtmlUtils.htmlEncode (
-					route.getOutCharge () > 0
-						? currencyLogic.formatText (
-							route.getCurrency (),
-							Long.valueOf(route.getOutCharge ()))
-						: "-")));
+		htmlTableCellWriteHtml (
+			htmlEncodeNonBreakingWhitespace (
+				ifThenElseEmDash (
+					moreThanZero (
+						route.getOutCharge ()),
+					() -> currencyLogic.formatText (
+						route.getCurrency (),
+						route.getOutCharge ()))));
 
 		if (template.getCustomisable ()) {
 
-			printFormat (
-				"<td><textarea",
+			htmlTableCellOpen ();
+
+			formatWriter.writeLineFormat (
+				"<textarea",
 
 				" class=\"template-text\"",
 				" style=\"display: none\"",
@@ -498,159 +593,186 @@ class ManualResponderRequestPendingFormResponder
 				" rows=\"3\"",
 				" cols=\"48\"",
 
-				">%h</textarea><br>\n",
+				">%h</textarea><br>",
 				requestContext.parameterOrDefault (
 					"message-" + template.getId (),
-					template.getDefaultText ()),
+					template.getDefaultText ()));
 
+			formatWriter.writeLineFormat (
 				"<span",
 				" class=\"template-chars\"",
 				" style=\"display: none\"",
-				"></span></td>\n");
+				"></span>");
+
+			htmlTableCellClose ();
 
 		} else {
 
-			printFormat (
-				"<td>%h</td>\n",
+			htmlTableCellWriteHtml (
 				template.getDefaultText ());
 
 		}
 
-		printFormat (
-			"<td><input",
+		// send
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" class=\"template-submit\"",
 			" type=\"submit\"",
 			" value=\"send\"",
-			"></td>\n");
+			">");
 
-		printFormat (
-			"</tr>\n");
+		htmlTableCellClose ();
+
+		// table row close
+
+		htmlTableRowClose ();
 
 	}
 
 	private
 	void goNotFound () {
 
-		printFormat (
-			"<h2>Not found</h2>\n");
+		htmlHeadingTwoWrite (
+			"Not found");
 
-		printFormat (
-			"<p>The specified request does not exist.</p>\n");
+		htmlParagraphWriteFormat (
+			"The specified request does not exist.");
 
-		printFormat (
-			"<p",
-			" class=\"links\"",
-			"><a",
-			" href=\"%h\"",
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"links"));
+
+		htmlLinkWrite (
 			requestContext.resolveApplicationUrl (
 				"/queues/queue.home"),
-			">Queues</a></p>\n");
+			"Queues");
+
+		htmlParagraphClose ();
 
 	}
 
 	private
 	void goNotPending () {
 
-		printFormat (
-			"<h2>No longer pending</h2>\n");
+		htmlHeadingTwoWrite (
+			"No longer pending");
 
-		printFormat (
-			"<p>The specified request does not exist.</p>\n");
+		htmlParagraphWriteFormat (
+			"The specified request does not exist.");
 
-		printFormat (
-			"<p",
-			" class=\"links\"",
-			"><a",
-			" href=\"%h\"",
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"links"));
+
+		htmlLinkWrite (
 			requestContext.resolveApplicationUrl (
 				"/queues/queue.home"),
-			">Queues</a></p>\n");
+			"Queues");
+
+		htmlParagraphClose ();
 
 	}
 
 	private
 	void goAccessDenied () {
 
-		printFormat (
-			"<h2>Access denied</h2>\n");
+		htmlHeadingTwoWrite (
+			"Access denied");
 
-		printFormat (
-			"<p>You do not have permission to reply to this manual ",
-			"responder.</p>");
+		htmlParagraphWriteFormat (
+			"You do not have permission to reply to this manual responder.");
 
-		printFormat (
-			"<p",
-			" class=\"links\"",
-			"><a",
-			" href=\"%h\"",
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"links"));
+
+		htmlLinkWrite (
 			requestContext.resolveContextUrl (
 				"/queues/queue.home"),
-			">Queues</a></p>\n");
+			"Queues");
+
+		htmlParagraphClose ();
 
 	}
 
 	private
 	void goNoTemplates () {
 
-		printFormat (
-			"<p class=\"error\">No templates specified for this manual ",
-			"responder.</p>");
+		htmlParagraphWriteFormat (
+			"No templates specified for this manual responder",
+			htmlClassAttribute (
+				"error"));
 
 	}
 
 	private
 	void goLinks () {
 
-		printFormat (
-			"<p",
-			" class=\"links\"",
-			">\n");
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"links"));
 
-		printFormat (
-			"<a",
-			" href=\"%h\">Queues</a>\n",
+		htmlLinkWrite (
 			requestContext.resolveApplicationUrl (
-				"/queues/queue.home"));
+				"/queues/queue.home"),
+			"Queues");
 
-		printFormat (
-			"<a",
-			" href=\"%h\"",
+		htmlLinkWrite (
 			summaryUrl,
-			" target=\"main\"",
-			">Summary</a>\n");
+			"Summary",
+			htmlAttribute (
+				"target",
+				"main"));
 
-		printFormat (
-			"<a",
-			" href=\"javascript:top.show_inbox (false);\"",
-			">Close</a>\n");
+		htmlLinkWrite (
+			"javascript:top.show_inbox (false);",
+			"Close");
 
-		printFormat (
-			"</p>\n");
+		htmlParagraphClose ();
 
 	}
 
 	private
 	void renderIgnore () {
 
-		printFormat (
-			"<tr",
-			" class=\"template\"",
-			" data-template-id=\"ignore\"",
-			">\n");
+		// table row open
 
-		printFormat (
-			"<td><input",
+		htmlTableRowOpen (
+			htmlClassAttribute (
+				"template"),
+			htmlDataAttribute (
+				"template-id",
+				"ignore"));
+
+		// radio button
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" class=\"template-radio\"",
 			" type=\"radio\"",
 			" name=\"template-id\"",
 			" value=\"ignore\"",
-			"></td>\n");
+			">");
 
-		printFormat (
-			"<td colspan=\"3\">&nbsp;</td>\n");
+		htmlTableCellClose ();
 
-		printFormat (
-			"<td><input",
+		// blank cells
+
+		htmlTableCellWrite (
+			"",
+			htmlColumnSpanAttribute (3l));
+
+		// send
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" class=\"template-submit\"",
 			" type=\"submit\"",
 			" value=\"%h\"",
@@ -658,10 +780,13 @@ class ManualResponderRequestPendingFormResponder
 				? "done sending"
 				: "ignore",
 			" disabled=\"true\"",
-			"></td>\n");
+			">");
 
-		printFormat (
-			"</tr>\n");
+		htmlTableCellClose ();
+
+		// table row close
+
+		htmlTableRowClose ();
 
 	}
 

@@ -1,5 +1,11 @@
 package wbs.console.responder;
 
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingOneWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteHtml;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -45,18 +51,17 @@ class ErrorResponder
 	public
 	void renderHtmlBodyContents () {
 
-		printFormat (
-			"<h1>%h</h1>\n",
+		htmlHeadingOneWrite (
 			title);
 
 		requestContext.flushNotices ();
 
-		printFormat (
-			"<p class=\"error\">%h</p>\n",
-			title);
+		htmlParagraphWrite (
+			title,
+			htmlClassAttribute (
+				"error"));
 
-		printFormat (
-			"<p>%h</p>\n",
+		htmlParagraphWrite (
 			message);
 
 		if (
@@ -66,10 +71,11 @@ class ErrorResponder
 				"debug")
 		) {
 
-			printFormat (
-				"<p><pre>%h</pre></p>\n",
-				exceptionLogic.throwableDump (
-					exception));
+			htmlParagraphWriteHtml (
+				stringFormat (
+					"<pre>%h</pre>",
+					exceptionLogic.throwableDump (
+						exception)));
 
 		}
 

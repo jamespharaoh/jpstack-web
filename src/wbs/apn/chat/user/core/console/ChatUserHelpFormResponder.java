@@ -1,6 +1,18 @@
 package wbs.apn.chat.user.core.console;
 
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlSpanWrite;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.request.ConsoleRequestContext;
@@ -42,36 +54,26 @@ class ChatUserHelpFormResponder
 	public
 	void renderHtmlBodyContents () {
 
-		printFormat (
-			"<h2>Send help message</h2>\n");
+		htmlHeadingTwoWrite (
+			"Send help message");
 
 		requestContext.flushNotices (
 			formatWriter);
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
-				"/chatUser.helpForm"),
-			">\n");
+				"/chatUser.helpForm"));
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
 		String userInfo =
 			chatUser.getName () == null
 				? chatUser.getCode ()
 				: chatUser.getCode () + " " + chatUser.getName ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>User</th>\n",
-
-			"<td>%h</td>\n",
-			userInfo,
-
-			"</tr>\n");
+		htmlTableDetailsRowWrite (
+			"User",
+			userInfo);
 
 		String charCountScript =
 			stringFormat (
@@ -79,48 +81,45 @@ class ChatUserHelpFormResponder
 				"document.getElementById ('text')",
 				"document.getElementById ('chars')");
 
-		printFormat (
-			"<tr>\n",
-			"<th>Message</th>\n",
+		htmlTableDetailsRowWriteHtml (
+			"Message",
+			() -> formatWriter.writeLineFormat (
+				"<textarea",
+				" id=\"text\"",
+				" cols=\"64\"",
+				" rows=\"4\"",
+				" name=\"text\"",
+				" onkeyup=\"%h\"",
+				charCountScript,
+				" onfocus=\"%h\"",
+				charCountScript,
+				"></textarea>"));
 
-			"<td><textarea",
-			" id=\"text\"",
-			" cols=\"64\"",
-			" rows=\"4\"",
-			" name=\"text\"",
-			" onkeyup=\"%h\"",
-			charCountScript,
-			" onfocus=\"%h\"",
-			charCountScript,
-			"></textarea></td>\n",
+		htmlTableDetailsRowWriteHtml (
+			"Chars",
+			() -> htmlSpanWrite (
+				"",
+				htmlIdAttribute (
+					"chars")));
 
-			"</tr>\n");
+		htmlTableClose ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Chars</th>\n",
+		htmlParagraphOpen ();
 
-			"<td><span id=\"chars\">&nbsp;</span></td>\n",
-
-			"</tr>\n");
-
-		printFormat (
-			"</table>\n");
-
-		printFormat (
-			"<p><input",
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"send message\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
 
-		printFormat (
-			"<script type=\"text/javascript\">\n",
-			"%s;\n",
-			charCountScript,
-			"</script>\n");
+		htmlFormClose ();
+
+		htmlScriptBlockWrite (
+			stringFormat (
+				"%s;",
+				charCountScript));
 
 	}
 

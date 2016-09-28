@@ -1,5 +1,11 @@
 package wbs.console.responder;
 
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingOneWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormatError;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteHtml;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -20,18 +26,19 @@ class NotFoundResponder
 	public
 	void renderHtmlBodyContents () {
 
-		printFormat (
-			"<h1>Page not found</h1>\n");
+		htmlHeadingOneWrite (
+			"Page not found");
 
-		printFormat (
-			"<p class=\"error\">Page not found</p>\n");
+		htmlParagraphWriteFormatError (
+			"Page not found");
 
-		printFormat (
-			"<p>The requested page could not be found:</p>\n");
+		htmlParagraphWriteFormat (
+			"The requested page could not be found:");
 
-		printFormat (
-			"<p><code>%h</code></p>\n",
-			requestContext.requestUri ());
+		htmlParagraphWriteHtml (
+			stringFormat (
+				"<code>%h</code>",
+				requestContext.requestUri ()));
 
 	}
 

@@ -524,7 +524,7 @@ class ChatCoreFixtureProvider
 					number)
 
 				.setCreditMode (
-					ChatUserCreditMode.billedMessage)
+					ChatUserCreditMode.billedMessages)
 
 			);
 

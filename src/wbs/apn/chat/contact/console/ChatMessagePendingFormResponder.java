@@ -2,8 +2,26 @@ package wbs.apn.chat.contact.console;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingOneWrite;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlInputUtils.htmlOptionWrite;
+import static wbs.utils.web.HtmlInputUtils.htmlSelectClose;
+import static wbs.utils.web.HtmlInputUtils.htmlSelectOpen;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.List;
 
@@ -62,223 +80,75 @@ class ChatMessagePendingFormResponder
 
 		super.renderHtmlHeadContents ();
 
-		printFormat (
-			"<script language=\"JavaScript\">\n",
+		// script open
 
-			"var originalMessage = '%j';\n",
-			chatMessage.getOriginalText ().getText (),
+		htmlScriptBlockOpen ();
 
-			"var editedMessage = '%j';\n",
-			chatMessage.getEditedText ().getText (),
+		// original message
 
-			"var helpTemplates = new Array ();\n");
+		formatWriter.writeLineFormat (
+			"var originalMessage = '%j';",
+			chatMessage.getOriginalText ().getText ());
+
+		// edited message
+
+		formatWriter.writeLineFormat (
+			"var editedMessage = '%j';",
+			chatMessage.getEditedText ().getText ());
+
+		// help templates
+
+		formatWriter.writeLineFormat (
+			"var helpTemplates = new Array ();");
 
 		for (
 			ChatHelpTemplateRec chatHelpTemplate
 				: chatHelpTemplates
 		) {
 
-			printFormat (
-				"helpTemplates[%s] = '%j';\n",
+			formatWriter.writeLineFormat (
+				"helpTemplates [%s] = '%j';",
 				chatHelpTemplate.getId (),
 				chatHelpTemplate.getText ());
 
 		}
 
-		printFormat (
-			"function useTemplate () {\n",
-			"  var templateId = document.getElementById ('templateId');\n",
-			"  var text = document.getElementById ('message');\n",
-			"  if (templateId.value == '') return;\n",
-			"  var template = helpTemplates[templateId.value];\n",
-			"  if (template) text.value = template;\n",
-			"}\n");
+		// use template function
 
-		printFormat (
-			"function showMessage (message) {\n");
+		formatWriter.writeLineFormatIncreaseIndent (
+			"function useTemplate () {");
 
-		printFormat (
-			"  document.getElementById ('message').value =\n",
-			"    message;\n");
+		formatWriter.writeLineFormat (
+			"var templateId = document.getElementById ('templateId');");
 
-		printFormat (
-			"  document.getElementById ('helpRow').style.display =\n",
-			"    'none';\n");
+		formatWriter.writeLineFormat (
+			"var text = document.getElementById ('message');");
 
-		printFormat (
-			"  document.getElementById ('sendButton').style.display =\n",
-			"    'inline';\n");
+		formatWriter.writeLineFormat (
+			"if (templateId.value == '') return;");
 
-		if (requestContext.request ("showSendWithoutApproval") != null) {
+		formatWriter.writeLineFormat (
+			"var template = helpTemplates[templateId.value];");
 
-			printFormat (
-				"  document.getElementById ('sendWithoutApprovalButton').style",
-					".display =\n",
-				"    'inline';\n");
+		formatWriter.writeLineFormat (
+			"if (template) text.value = template;");
 
-		}
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
 
-		printFormat (
-			"  document.getElementById ('rejectButton').style.display =\n",
-			"    'none';\n");
+		// show message function
 
-		printFormat (
-			"}\n");
+		formatWriter.writeLineFormatIncreaseIndent (
+			"function showMessage (message) {");
 
-		printFormat (
-			"function showReject () {\n");
+		formatWriter.writeLineFormat (
+			"document.getElementById ('message').value = message;");
 
-		printFormat (
-			"  document.getElementById ('message').value = '';\n");
+		formatWriter.writeLineFormat (
+			"document.getElementById ('helpRow').style.display = 'none';");
 
-		printFormat (
-			"  try {\n",
-			"    document.getElementById ('helpRow').style.display =\n",
-			"      'table-row';\n",
-			"  } catch (e) {\n",
-			"    document.getElementById ('helpRow').style.display =\n",
-			"      'block';\n",
-			"  }\n");
-
-		printFormat (
-			"  document.getElementById ('sendButton').style.display =\n",
-			"    'none';\n");
-
-		if (requestContext.request ("showSendWithoutApproval") != null) {
-
-			printFormat (
-				"  document.getElementById ('sendWithoutApprovalButton').style",
-					".display =\n",
-				"    'none';\n");
-
-		}
-
-		printFormat (
-			"  document.getElementById ('rejectButton').style.display =\n",
-			"    'inline';\n");
-
-		printFormat (
-			"}\n");
-
-		printFormat (
-			"</script>\n");
-
-	}
-
-	@Override
-	public
-	void renderHtmlBodyContents () {
-
-		printFormat (
-			"<h1>Chat message to approve</h1>");
-
-		requestContext.flushNotices (
-			formatWriter);
-
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
-			requestContext.resolveApplicationUrl (
-				stringFormat (
-					"/chatMessage.pending",
-					"/%u",
-					chatMessage.getId (),
-					"/chatMessage.pending.form")),
-			">\n");
-
-		printFormat (
-			"<input",
-			" type=\"hidden\"",
-			" name=\"chat_message_id\"",
-			" value=\"%h\"",
-			chatMessage.getId (),
-			">\n");
-
-		printFormat (
-			"<table class=\"details\">\n");
-
-		printFormat (
-			"<tr>\n",
-			"<th>Options</th>\n",
-
-			"<td><input",
-			" type=\"button\"",
-			" value=\"original message\"",
-			" onclick=\"showMessage (originalMessage);\"",
-			">\n",
-
-			"<input",
-			" type=\"button\"",
-			" value=\"edited message\"",
-			" onclick=\"showMessage (editedMessage);\"",
-			"></td>\n",
-
-			"</tr>\n");
-
-		printFormat (
-			"<tr",
-			" id=\"helpRow\"",
-			" style=\"display: none\"",
-			">\n",
-
-			"<th>Template</th>\n",
-
-			"<td><select id=\"templateId\">\n",
-			"<option>\n");
-
-		for (
-			ChatHelpTemplateRec chatHelpTemplate
-				: chatHelpTemplates
-		) {
-
-			printFormat (
-				"<option",
-				" value=\"%h\"",
-				chatHelpTemplate.getId (),
-				">%h</option>\n",
-				chatHelpTemplate.getCode ());
-
-		}
-
-		printFormat (
-			"</select>\n",
-
-			"<input",
-			" type=\"button\"",
-			" onclick=\"useTemplate ()\"",
-			" value=\"ok\"",
-			"></td>\n",
-
-			"</tr>\n");
-
-		printFormat (
-			"<tr>\n",
-			"<th>Message</th>\n",
-
-			"<td><textarea",
-			" id=\"message\"",
-			" name=\"message\"",
-			" rows=\"4\"",
-			" cols=\"48\"",
-			">%h</textarea></td>\n",
-			ifNull (
-				requestContext.parameterOrElse (
-					"message",
-					() -> chatMessage.getOriginalText ().getText ())),
-
-			"</tr>\n");
-
-		printFormat (
-			"<tr>\n",
-			"<th>Actions</th>\n",
-
-			"<td><input",
-			" id=\"sendButton\"",
-			" type=\"submit\"",
-			" name=\"send\"",
-			" value=\"send as shown\"",
-			">\n");
+		formatWriter.writeLineFormat (
+			"document.getElementById ('sendButton').style.display = 'inline';");
 
 		if (
 			isNotNull (
@@ -286,28 +156,231 @@ class ChatMessagePendingFormResponder
 					"showSendWithoutApproval"))
 		) {
 
-			printFormat (
+			formatWriter.writeLineFormat (
+				"document.getElementById ('sendWithoutApprovalButton').style",
+				".display = 'inline';");
+
+		}
+
+		formatWriter.writeLineFormat (
+			"document.getElementById ('rejectButton').style.display = 'none';");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// show reject function
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"function showReject () {");
+
+		formatWriter.writeLineFormat (
+			"document.getElementById ('message').value = '';");
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"try {");
+
+		formatWriter.writeLineFormat (
+			"document.getElementById ('helpRow').style.display = 'table-row';");
+
+		formatWriter.writeLineFormatDecreaseIncreaseIndent (
+			"} catch (e) {");
+
+		formatWriter.writeLineFormat (
+			"document.getElementById ('helpRow').style.display = 'block';");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		formatWriter.writeLineFormat (
+			"document.getElementById ('sendButton').style.display =\n",
+			"    'none';\n");
+
+		if (
+			isNotNull (
+				requestContext.request (
+					"showSendWithoutApproval"))
+		) {
+
+			formatWriter.writeLineFormat (
+				"document.getElementById ('sendWithoutApprovalButton').style",
+				".display = 'none';");
+
+		}
+
+		formatWriter.writeLineFormat (
+			"document.getElementById ('rejectButton').style.display = ",
+			"'inline';");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// script close
+
+		htmlScriptBlockClose ();
+
+	}
+
+	@Override
+	public
+	void renderHtmlBodyContents () {
+
+		htmlHeadingOneWrite (
+			"Chat message to approve");
+
+		requestContext.flushNotices (
+			formatWriter);
+
+		htmlFormOpenPostAction (
+			requestContext.resolveApplicationUrl (
+				stringFormat (
+					"/chatMessage.pending",
+					"/%u",
+					chatMessage.getId (),
+					"/chatMessage.pending.form")));
+
+		formatWriter.writeLineFormat (
+			"<input",
+			" type=\"hidden\"",
+			" name=\"chat_message_id\"",
+			" value=\"%h\"",
+			chatMessage.getId (),
+			">");
+
+		// table open
+
+		htmlTableOpenDetails ();
+
+		// options
+
+		htmlTableDetailsRowWriteHtml (
+			"Options",
+			() -> {
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"button\"",
+				" value=\"original message\"",
+				" onclick=\"showMessage (originalMessage);\"",
+				">");
+
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"button\"",
+				" value=\"edited message\"",
+				" onclick=\"showMessage (editedMessage);\"",
+				">");
+		});
+
+		// template
+
+		htmlTableRowOpen (
+			htmlIdAttribute (
+				"helpRow"),
+			htmlStyleRuleEntry (
+				"display",
+				"none"));
+
+		htmlTableHeaderCellWrite (
+			"Template");
+
+		htmlTableCellOpen ();
+
+		htmlSelectOpen (
+			htmlIdAttribute (
+				"templateId"));
+
+		htmlOptionWrite ();
+
+		for (
+			ChatHelpTemplateRec chatHelpTemplate
+				: chatHelpTemplates
+		) {
+
+			htmlOptionWrite (
+				integerToDecimalString (
+					chatHelpTemplate.getId ()),
+				chatHelpTemplate.getCode ());
+
+		}
+
+		htmlSelectClose ();
+
+		formatWriter.writeLineFormat (
+			"<input",
+			" type=\"button\"",
+			" onclick=\"useTemplate ()\"",
+			" value=\"ok\"",
+			">");
+
+		htmlTableCellClose ();
+
+		htmlTableRowClose ();
+
+		// message
+
+		htmlTableDetailsRowWriteHtml (
+			"Message",
+			() -> formatWriter.writeLineFormat (
+				"<textarea",
+				" id=\"message\"",
+				" name=\"message\"",
+				" rows=\"4\"",
+				" cols=\"48\"",
+				">%h</textarea>",
+				ifNull (
+					requestContext.parameterOrElse (
+						"message",
+						() -> chatMessage.getOriginalText ().getText ()))));
+
+		// actions
+
+		htmlTableRowOpen ();
+
+		htmlTableHeaderCellWrite (
+			"Actions");
+
+		formatWriter.writeLineFormat (
+			"<input",
+			" id=\"sendButton\"",
+			" type=\"submit\"",
+			" name=\"send\"",
+			" value=\"send as shown\"",
+			">");
+
+		if (
+			isNotNull (
+				requestContext.request (
+					"showSendWithoutApproval"))
+		) {
+
+			formatWriter.writeLineFormat (
 				"<input",
 				" id=\"sendWithoutApprovalButton\"",
 				" type=\"submit\"",
 				" name=\"sendWithoutApproval\"",
 				" value=\"send as shown (no warning)\"",
-				">\n");
+				">");
 
 		}
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" id=\"rejectButton\"",
 			" style=\"display: none\"",
 			" type=\"submit\"",
 			" name=\"reject\"",
 			" value=\"reject and send warning\"",
-			"></td>\n",
+			">");
 
-			"</tr>\n",
+		htmlTableCellClose ();
 
-			"</table>\n");
+		htmlTableRowClose ();
+
+		// table close
+
+		htmlTableClose ();
+
+		// script
 
 		if (
 			optionalIsPresent (
@@ -315,21 +388,23 @@ class ChatMessagePendingFormResponder
 					"reject"))
 		) {
 
-			printFormat (
+			htmlScriptBlockOpen ();
 
-				"<script language=\"JavaScript\">\n",
-				"showReject ();\n",
+			formatWriter.writeLineFormat (
+				"showReject ();");
 
-				"document.getElementById ('message').value = '%j';\n",
+			formatWriter.writeLineFormat (
+				"document.getElementById ('message').value = '%j';",
 				requestContext.parameterRequired (
-					"message"),
+					"message"));
 
-				"</script>\n");
+			htmlScriptBlockClose ();
 
 		}
 
-		printFormat (
-			"</form>\n");
+		// form close
+
+		htmlScriptBlockClose ();
 
 	}
 

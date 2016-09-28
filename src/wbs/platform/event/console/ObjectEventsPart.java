@@ -1,8 +1,8 @@
 package wbs.platform.event.console;
 
 import java.util.Collection;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +14,6 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.platform.event.model.EventLinkObjectHelper;
-import wbs.platform.event.model.EventLinkRec;
 import wbs.platform.event.model.EventRec;
 import wbs.platform.user.console.UserConsoleLogic;
 
@@ -45,7 +44,7 @@ class ObjectEventsPart
 
 	// state
 
-	Set <EventRec> events;
+	List <EventRec> events;
 
 	// implementation
 
@@ -54,29 +53,26 @@ class ObjectEventsPart
 	void prepare () {
 
 		events =
-			new TreeSet<> ();
+			dataObjectIds.stream ()
 
-		for (
-			GlobalId dataObjectId
-				: dataObjectIds
-		) {
+			.map (
+				objectId ->
+					eventLinkHelper.findByTypeAndRef (
+						objectId.typeId (),
+						objectId.objectId ()))
 
-			Collection<EventLinkRec> eventLinks =
-				eventLinkHelper.findByTypeAndRef (
-					dataObjectId.typeId (),
-					dataObjectId.objectId ());
+			.flatMap (
+				eventLinks ->
+					eventLinks.stream ())
 
-			for (
-				EventLinkRec eventLink
-					: eventLinks
-			) {
+			.map (
+				eventLink ->
+					eventLink.getEvent ())
 
-				events.add (
-					eventLink.getEvent ());
+			.sorted ()
 
-			}
-
-		}
+			.collect (
+				Collectors.toList ());
 
 	}
 

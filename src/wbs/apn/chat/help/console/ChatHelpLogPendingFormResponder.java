@@ -1,6 +1,30 @@
 package wbs.apn.chat.help.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlSpanWrite;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlInputUtils.htmlOptionWrite;
+import static wbs.utils.web.HtmlInputUtils.htmlSelectClose;
+import static wbs.utils.web.HtmlInputUtils.htmlSelectOpen;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
 
 import java.util.Collections;
 import java.util.List;
@@ -8,8 +32,6 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
-import wbs.apn.chat.help.console.ChatHelpLogConsoleHelper;
-import wbs.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.console.context.ConsoleApplicationScriptRef;
@@ -94,52 +116,77 @@ class ChatHelpLogPendingFormResponder
 
 		super.renderHtmlHeadContents ();
 
-		printFormat (
-			"<script language=\"javascript\">\n");
+		htmlScriptBlockOpen ();
 
-		printFormat (
-			"top.show_inbox (true);\n",
-			"top.frames ['main'].location = '%j';\n",
+		formatWriter.writeLineFormat (
+			"top.show_inbox (true);");
+
+		formatWriter.writeLineFormat (
+			"top.frames ['main'].location = '%j';",
 			requestContext.resolveApplicationUrl (
 				stringFormat (
 					"/chatHelpLog.pending",
 					"/%u",
 					chatHelpLog.getId (),
-					"/chatHelpLog.pending.summary")),
+					"/chatHelpLog.pending.summary")));
 
-			"var helpTemplates = new Array ();\n");
+		formatWriter.writeLineFormat (
+			"var helpTemplates = new Array ();");
 
 		for (
 			ChatHelpTemplateRec chatHelpTemplate
 				: chatHelpTemplates
 		) {
 
-			printFormat (
-				"helpTemplates [%s] = '%j';\n",
+			formatWriter.writeLineFormat (
+				"helpTemplates [%s] = '%j';",
 				chatHelpTemplate.getId (),
 				chatHelpTemplate.getText ());
 
 		}
 
-		printFormat (
-			"function useTemplate () {\n",
-			"  var templateId = document.getElementById ('template_id');\n",
-			"  var text = document.getElementById ('text');\n",
-			"  if (templateId.value == '') return;\n",
-			"  var template = helpTemplates[templateId.value];\n",
-			"  if (template) text.value = template;\n",
+		// use template
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"function useTemplate () {");
+
+		formatWriter.writeLineFormat (
+			"var templateId = document.getElementById ('template_id');");
+
+		formatWriter.writeLineFormat (
+			"var text = document.getElementById ('text');");
+
+		formatWriter.writeLineFormat (
+			"if (templateId.value == '') return;");
+
+		formatWriter.writeLineFormat (
+			"var template = helpTemplates[templateId.value];");
+
+		formatWriter.writeLineFormat (
+			"if (template) text.value = template;");
+
+		formatWriter.writeLineFormatDecreaseIndent (
 			"}");
 
-		printFormat (
-			"function showReply () {\n",
-			"}\n");
+		// show reply
 
-		printFormat (
-			"function showInfo () {\n",
-			"}\n");
+		formatWriter.writeLineFormatIncreaseIndent (
+			"function showReply () {");
 
-		printFormat (
-			"</script>\n");
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// show info
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"function showInfo () {");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// script close
+
+		htmlScriptBlockClose ();
 
 	}
 
@@ -149,88 +196,114 @@ class ChatHelpLogPendingFormResponder
 
 		requestContext.flushNotices ();
 
-		printFormat (
-			"<p class=\"links\"><a href=\"%h\">Queues</a>\n",
+		// links
+
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"links"));
+
+		htmlLinkWrite (
 			requestContext.resolveApplicationUrl (
 				"/queues/queue.home"),
+			"Queues");
 
-			"<a href=\"%h\">Close</a></p>\n",
-			"javascript:top.show_inbox (false);");
+		htmlLinkWrite (
+			"javascript:top.show_inbox (false);",
+			"Close");
 
-		printFormat (
-			"<h2>Respond to chat help request</h2>\n");
+		htmlParagraphClose ();
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
+		// heading
+
+		htmlHeadingTwoWrite (
+			"Respond to chat help request");
+
+		// form open
+
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
-				"/chatHelpLog.pending.form"),
-			">\n");
+				"/chatHelpLog.pending.form"));
 
-		printFormat (
-			"<table class=\"details\">\n");
+		// table open
 
-		printFormat (
-			"<tr>\n",
-			"<th>Request</th>\n",
+		htmlTableOpenDetails ();
 
-			"<td>%h</td>\n",
-			chatHelpLog.getText (),
+		// request
 
-			"</tr>");
+		htmlTableDetailsRowWrite (
+			"Request",
+			chatHelpLog.getText ());
 
-		printFormat (
-			"<tr>\n",
-			"<th>Options</th>\n",
+		// options
 
-			"<td><input",
-			" type=\"button\"",
-			" onclick=\"showReply ()\"",
-			" value=\"reply\"",
-			">",
+		htmlTableDetailsRowWriteHtml (
+			"Options",
+			() -> {
 
-			"<input",
-			" type=\"button\"",
-			" onclick=\"showInfo ()\"",
-			" value=\"change info\"",
-			"></td>\n",
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"button\"",
+				" onclick=\"showReply ()\"",
+				" value=\"reply\"",
+				">");
 
-			"</tr>\n");
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"button\"",
+				" onclick=\"showInfo ()\"",
+				" value=\"change info\"",
+				">");
 
-		printFormat (
-			"<tr id=\"replyTemplateRow\">\n",
-			"<th>Template</th>\n",
+		});
 
-			"<td><select id=\"template_id\">\n",
-			"<option>\n");
+		// template
 
-		for (ChatHelpTemplateRec chatHelpTemplate
-				: chatHelpTemplates) {
+		htmlTableDetailsRowWriteHtml (
+			"Template",
+			() -> {
 
-			printFormat (
-				"<option value=\"%h\">%h</option>\n",
-				chatHelpTemplate.getId (),
-				chatHelpTemplate.getCode ());
+			htmlSelectOpen (
+				htmlIdAttribute (
+					"template_id"));
 
-		}
+			htmlOptionWrite ();
 
-		printFormat (
-			"</select>\n",
+			for (
+				ChatHelpTemplateRec chatHelpTemplate
+					: chatHelpTemplates
+			) {
 
-			"<input",
-			" type=\"button\"",
-			" onclick=\"useTemplate ()\"",
-			" value=\"ok\"></td>\n",
+				htmlOptionWrite (
+					integerToDecimalString (
+						chatHelpTemplate.getId ()),
+					chatHelpTemplate.getCode ());
 
-			"</tr>");
+			}
 
-		printFormat (
-			"<tr id=\"replyTextRow\">\n",
+			htmlSelectClose ();
 
-			"<th>Reply</th>\n",
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"button\"",
+				" onclick=\"useTemplate ()\"",
+				" value=\"ok\"",
+				">");
 
-			"<td><textarea",
+		});
+
+		// reply
+
+		htmlTableRowOpen (
+			htmlIdAttribute (
+				"replyTextRow"));
+
+		htmlTableHeaderCellWrite (
+			"Reply");
+
+		htmlTableCellOpen ();
+
+		formatWriter.writeLineFormat (
+			"<textarea",
 			" id=\"text\"",
 			" name=\"text\"",
 			" cols=\"64\"",
@@ -247,55 +320,67 @@ class ChatHelpLogPendingFormResponder
 				"this",
 				"document.getElementById ('chars')",
 				"149"),
-			"></textarea></td>\n",
+			"></textarea>");
 
-			"</tr>\n");
+		htmlTableCellClose ();
 
-		printFormat (
-			"<tr id=\"replyCharsRow\">\n",
-			"<th>Chars</th>\n",
-			"<td><span id=\"chars\">&nbsp;</span></td>\n",
-			"</tr>\n");
+		htmlTableRowClose ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Actions</th>\n",
+		// chars
 
-			"<td><input",
-			" id=\"replyButton\"",
-			" type=\"submit\"",
-			" name=\"reply\"",
-			" value=\"send reply\"",
-			">",
+		htmlTableDetailsRowWriteHtml (
+			"Chars",
+			() -> htmlSpanWrite (
+				"",
+				htmlIdAttribute (
+					"chars")),
+			htmlIdAttribute (
+				"replyCharsRow"));
 
-			"<input",
-			" style=\"display: none\"",
-			" id=\"infoButton\"",
-			" type=\"submit\"",
-			" name=\"info\"",
-			" value=\"change info\"",
-			">");
+		// actions
 
-		if (requestContext.canContext ("chat.supervisor")) {
+		htmlTableDetailsRowWriteHtml (
+			"Actions",
+			() -> {
 
-			printFormat (
+			formatWriter.writeLineFormat (
 				"<input",
-				" id=\"ignoreButton\"",
+				" id=\"replyButton\"",
 				" type=\"submit\"",
-				" name=\"ignore\"",
-				" value=\"ignore request\">");
+				" name=\"reply\"",
+				" value=\"send reply\"",
+				">");
 
-		}
+			formatWriter.writeLineFormat (
+				"<input",
+				" style=\"display: none\"",
+				" id=\"infoButton\"",
+				" type=\"submit\"",
+				" name=\"info\"",
+				" value=\"change info\"",
+				">");
 
-		printFormat (
-			"</td>\n",
-			"</tr>");
+			if (requestContext.canContext ("chat.supervisor")) {
 
-		printFormat (
-			"</table>\n");
+				formatWriter.writeLineFormat (
+					"<input",
+					" id=\"ignoreButton\"",
+					" type=\"submit\"",
+					" name=\"ignore\"",
+					" value=\"ignore request\"",
+					">");
 
-		printFormat (
-			"</form>\n");
+			}
+
+		});
+
+		// table close
+
+		htmlTableClose ();
+
+		// form close
+
+		htmlFormClose ();
 
 	}
 

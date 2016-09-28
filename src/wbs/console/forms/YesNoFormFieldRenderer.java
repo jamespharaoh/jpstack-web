@@ -28,8 +28,8 @@ import fj.data.Either;
 @Accessors (fluent = true)
 @PrototypeComponent ("yesNoFormFieldRenderer")
 public
-class YesNoFormFieldRenderer<Container>
-	implements FormFieldRenderer<Container,Boolean> {
+class YesNoFormFieldRenderer <Container>
+	implements FormFieldRenderer <Container, Boolean> {
 
 	// properties
 
@@ -56,8 +56,8 @@ class YesNoFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Boolean> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Boolean> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -82,12 +82,12 @@ class YesNoFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Boolean> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Boolean> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		Optional<Boolean> currentValue =
+		Optional <Boolean> currentValue =
 			formValuePresent (
 					submission,
 					formName)

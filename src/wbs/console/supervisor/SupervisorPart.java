@@ -1,8 +1,9 @@
 package wbs.console.supervisor;
 
-import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.OptionalUtils.optionalIf;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localTime;
@@ -11,6 +12,7 @@ import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
 import static wbs.utils.web.HtmlFormUtils.htmlFormOpenGetAction;
+import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
 
 import java.util.Collections;
 import java.util.List;
@@ -426,16 +428,7 @@ class SupervisorPart
 					: supervisorConfigs
 			)  {
 
-				printFormat (
-					"<a",
-					" class=\"%h\"",
-					ifThenElse (
-						stringEqualSafe (
-							oneSupervisorConfig.name (),
-							selectedSupervisorConfigName),
-						() -> "selected",
-						() -> ""),
-					" href=\"%h\"",
+				htmlLinkWrite (
 					stringFormat (
 						"%s",
 						localUrl,
@@ -443,8 +436,14 @@ class SupervisorPart
 						oneSupervisorConfig.name (),
 						"&date=%u",
 						dateField.text),
-					">%h</a>\n",
-					oneSupervisorConfig.label ());
+					oneSupervisorConfig.label (),
+					htmlClassAttribute (
+						presentInstances (
+							optionalIf (
+								stringEqualSafe (
+									oneSupervisorConfig.name (),
+									selectedSupervisorConfigName),
+								() -> "selected"))));
 
 			}
 

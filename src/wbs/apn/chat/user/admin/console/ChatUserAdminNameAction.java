@@ -1,15 +1,16 @@
 package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.Misc.toEnum;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalValueEqualSafe;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
-import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import lombok.Cleanup;
 
-import wbs.apn.chat.user.core.model.ChatUserEditReason;
-import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.model.ChatUserEditReason;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.apn.chat.user.info.model.ChatUserNameObjectHelper;
 import wbs.apn.chat.user.info.model.ChatUserNameRec;
 import wbs.console.action.ConsoleAction;
@@ -106,8 +107,9 @@ class ChatUserAdminNameAction
 					"chatUserId"));
 
 		if (
-			stringNotEqualSafe (
-				chatUser.getName (),
+			optionalValueEqualSafe (
+				optionalFromNullable (
+					chatUser.getName ()),
 				name)
 		) {
 

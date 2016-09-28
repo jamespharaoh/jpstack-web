@@ -92,8 +92,9 @@ class ChatUserAdminNamePart
 			"Reason",
 			() -> chatConsoleLogic.writeSelectForChatUserEditReason (
 				"editReason",
-				requestContext.getForm (
-					"editReason")));
+				emptyStringIfNull (
+					requestContext.getForm (
+						"editReason"))));
 
 		htmlTableDetailsRowWriteHtml (
 			"Action",

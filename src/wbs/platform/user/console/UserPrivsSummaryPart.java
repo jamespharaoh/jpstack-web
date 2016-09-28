@@ -1,6 +1,13 @@
 package wbs.platform.user.console;
 
+import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -165,64 +172,59 @@ class UserPrivsSummaryPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<table class=\"list\">");
+		htmlTableOpenList ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Object</th>\n",
-			"<th>Priv</th>\n",
-			"<th>Can</th>\n",
-			"<th>Grant</th>\n",
-			"<th>Groups</th>\n",
-			"</tr>\n");
+		htmlTableHeaderRowWrite (
+			"Object",
+			"Priv",
+			"Can",
+			"Grant",
+			"Groups");
 
-		for (PrivStuff privStuff
-				: privStuffs) {
+		for (
+			PrivStuff privStuff
+				: privStuffs
+		) {
 
-			printFormat (
-				"<tr>\n",
+			htmlTableRowOpen ();
 
-				"<td>%h</td>\n",
-				privStuff.path,
+			htmlTableCellWrite (
+				privStuff.path);
 
-				"<td>%h</td>\n",
-				privStuff.privCode,
+			htmlTableCellWrite (
+				privStuff.privCode);
 
-				"<td>%h</td>\n",
-				privStuff.userPriv != null
-						&& privStuff.userPriv.getCan ()
-					? "yes"
-					: "no",
+			htmlTableCellWrite (
+				booleanToYesNo (
+					privStuff.userPriv != null
+					&& privStuff.userPriv.getCan ()));
 
-				"<td>%h</td>\n",
-				privStuff.userPriv != null
-						&& privStuff.userPriv.getCanGrant ()
-					? "yes"
-					: "no",
+			htmlTableCellWrite (
+				booleanToYesNo (
+					privStuff.userPriv != null
+					&& privStuff.userPriv.getCanGrant ()));
 
-				"<td>%h</td>\n",
+			htmlTableCellWrite (
 				joinWithCommaAndSpace (
-					privStuff.groups),
+					privStuff.groups));
 
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
 	class PrivStuff
-		implements Comparable<PrivStuff> {
+		implements Comparable <PrivStuff> {
 
 		String path;
 		String privCode;
 		UserPrivRec userPriv;
 
-		List<String> groups =
-			new ArrayList<String> ();
+		List <String> groups =
+			new ArrayList<> ();
 
 		@Override
 		public

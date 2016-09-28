@@ -144,7 +144,7 @@ class ChatUserAdminBarringPart
 					htmlTableCheckWriterProvider.get ()
 	
 						.name (
-							"bar_off")
+							"bar_on")
 	
 						.label (
 							"bar user")

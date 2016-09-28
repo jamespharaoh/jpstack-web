@@ -5,7 +5,16 @@ import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
 import static wbs.utils.web.HtmlBlockUtils.htmlDivClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlDivOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableBodyClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableBodyOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeadClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeadOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpen;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.util.LinkedHashMap;
@@ -189,76 +198,69 @@ class SimulatorSessionConsolePart
 					requestContext.session (
 						"simulatorNumFrom"))));
 
-		printFormat (
-			"<tr>\n",
-			"<th>Num to</th>\n",
+		htmlTableDetailsRowWriteHtml (
+			"Num to",
+			() -> formatWriter.writeLineFormat (
+				"<input",
+				" class=\"numToText\"",
+				" type=\"text\"",
+				" value=\"%h\"",
+				emptyStringIfNull (
+					(String)
+					requestContext.session (
+						"simulatorNumTo")),
+				">"));
 
-			"<td>",
-			"<input",
-			" class=\"numToText\"",
-			" type=\"text\"",
-			" value=\"%h\">",
-			emptyStringIfNull (
-				(String)
-				requestContext.session (
-					"simulatorNumTo")),
-			"</td>\n",
+		htmlTableDetailsRowWriteHtml (
+			"Message",
+			() -> formatWriter.writeLineFormat (
+				"<input",
+				" class=\"messageText\"",
+				" type=\"text\"",
+				" value=\"%h\"",
+				emptyStringIfNull (
+					(String)
+					requestContext.session (
+						"simulatorMessage")),
+				">"));
 
-			"</tr>\n");
+		htmlTableClose ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Message</th>\n",
+		htmlParagraphOpen ();
 
-			"<td>",
-			"<input",
-			" class=\"messageText\"",
-			" type=\"text\"",
-			" value=\"%h\">",
-			emptyStringIfNull (
-				(String)
-				requestContext.session (
-					"simulatorMessage")),
-			"</td>\n",
-
-			"</tr>\n");
-
-		printFormat (
-			"</table>\n");
-
-		printFormat (
-			"<p><button",
+		formatWriter.writeLineFormat (
+			"<button",
 			" class=\"sendButton\"",
 			" type=\"submit\"",
-			">send message</button></p>\n");
+			">send message</button>");
+
+		htmlParagraphClose ();
 
 	}
 
 	void eventsList () {
 
-		printFormat (
-			"<table class=\"list events\">\n");
+		htmlTableOpen (
+			htmlClassAttribute (
+				"list",
+				"events"));
 
-		printFormat (
-			"<thead>\n");
+		htmlTableHeadOpen ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Date</th>\n",
-			"<th>Time</th>\n",
-			"<th>Type</th>\n",
-			"<th>Details</th>\n",
-			"<th>Actions</th>\n",
-			"</tr>\n");
+		htmlTableHeaderRowHtml (
+			"Date",
+			"Time",
+			"Type",
+			"Details",
+			"Actions");
 
-		printFormat (
-			"</thead>\n");
+		htmlTableHeadClose ();
 
-		printFormat (
-			"<tbody>\n");
+		htmlTableBodyOpen ();
 
-		printFormat (
-			"</table>\n");
+		htmlTableBodyClose ();
+
+		htmlTableClose ();
 
 	}
 

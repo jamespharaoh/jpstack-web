@@ -2,6 +2,25 @@ package wbs.apn.chat.contact.console;
 
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlSpanWrite;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockClose;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockOpen;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
 
 import java.util.Set;
 
@@ -124,12 +143,19 @@ class ChatMonitorInboxFormResponder
 		if (chatMonitorInbox == null)
 			return;
 
-		printFormat (
-			"<script language=\"javascript\">\n",
+		// script block open
 
-			"top.show_inbox (true);\n",
+		htmlScriptBlockOpen ();
 
-			"top.frames['main'].location = '%j';\n",
+		// show inbox
+
+		formatWriter.writeLineFormat (
+			"top.show_inbox (true);");
+
+		// set location
+
+		formatWriter.writeLineFormat (
+			"top.frames ['main'].location = '%j';",
 			requestContext.resolveApplicationUrl (
 				stringFormat (
 					"%s",
@@ -140,20 +166,34 @@ class ChatMonitorInboxFormResponder
 						.pathPrefix (),
 					"/%u",
 					chatMonitorInbox.getId (),
-					"/chatMonitorInbox.summary")),
+					"/chatMonitorInbox.summary")));
 
-			"</script>\n");
+		// script block close
+
+		htmlScriptBlockClose ();
+
+		// style block
 
 		if (
 			userChatUser.getOperatorLabel ()
 				== ChatUserOperatorLabel.operator
 		) {
 
-			printFormat (
-				"<style type=\"text/css\">\n",
-				"h2 { background: #800000; }\n",
-				"table.details th { background: #800000; }\n",
-				"</style>\n");
+			htmlStyleBlockOpen ();
+
+			htmlStyleRuleWrite (
+				"h2",
+				htmlStyleRuleEntry (
+					"background",
+					"#800000"));
+
+			htmlStyleRuleWrite (
+				"table.details th",
+				htmlStyleRuleEntry (
+					"background",
+					"#800000"));
+
+			htmlStyleBlockClose ();
 
 		}
 
@@ -177,39 +217,38 @@ class ChatMonitorInboxFormResponder
 		requestContext.flushNotices (
 			formatWriter);
 
-		printFormat (
-			"<p",
-			" class=\"links\"",
-			">\n");
+		// links
 
-		printFormat (
-			"<a",
-			" href=\"%h\"",
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"links"));
+
+		htmlLinkWrite (
 			requestContext.resolveApplicationUrl (
 				"/queues/queue.home"),
-			">Queues</a>\n");
+			"Queues");
 
-		printFormat (
-			"<a",
-			" href=\"%h\"",
+		htmlLinkWrite (
 			"javascript:top.show_inbox (false)",
-			">Close</a>\n");
+			"Close");
 
-		printFormat (
-			"</p>\n");
+		htmlParagraphClose ();
+
+		// handle deleted chat monitor inbox
 
 		if (chatMonitorInbox == null)
 			return;
 
-		printFormat (
-			"<h2>Send message as %h</h2>\n",
-			userChatUser.getOperatorLabel ());
+		// send message
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
+		htmlHeadingTwoWrite (
+			stringFormat (
+				"Send message as %s",
+				userChatUser.getOperatorLabel ()));
 
-			" action=\"%h\"",
+		// form open
+
+		htmlFormOpenPostAction (
 			requestContext.resolveApplicationUrl (
 				stringFormat (
 					"%s",
@@ -220,74 +259,77 @@ class ChatMonitorInboxFormResponder
 						.pathPrefix (),
 					"/%u",
 					chatMonitorInbox.getId (),
-					"/chatMonitorInbox.form")),
+					"/chatMonitorInbox.form")));
 
-			">\n");
+		// table open
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>From</th>\n",
+		// from
 
-			"<td>%h</td>\n",
-			doName (monitorChatUser),
+		htmlTableDetailsRowWrite (
+			"From",
+			doName (
+				monitorChatUser));
 
-			"</tr>\n");
+		// to
 
-		printFormat (
-			"<tr>\n",
-			"<th>To</th>\n",
+		htmlTableDetailsRowWrite (
+			"To",
+			doName (
+				userChatUser));
 
-			"<td>%h</td>\n",
-			doName (userChatUser),
+		// message
 
-			"</tr>\n");
+		htmlTableDetailsRowWriteHtml (
+			"Message",
+			() -> formatWriter.writeLineFormat (
+				"<textarea",
+				" name=\"text\"",
+				" cols=\"64\"",
+				" rows=\"4\"",
+				" onkeyup=\"%h\"",
+				stringFormat (
+					"gsmCharCountMultiple2 (this, %s, %d);",
+					"document.getElementById ('chars')",
+					ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
+						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES),
+				" onfocus=\"%h\"",
+				stringFormat (
+					"gsmCharCountMultiple2 (this, %s, %d);",
+					"document.getElementById ('chars')",
+					ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
+						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES),
+				"></textarea>"));
 
-		printFormat (
-			"<tr>\n",
+		// chars
 
-			"<th>Message</th>\n",
+		htmlTableDetailsRowWriteHtml (
+			"Chars",
+			() -> {
 
-			"<td",
-			" colspan=\"2\"",
-			"><textarea",
-			" name=\"text\"",
-			" cols=\"64\"",
-			" rows=\"4\"",
-			" onkeyup=\"%h\"",
-			stringFormat (
-				"gsmCharCountMultiple2 (this, %s, %d);",
-				"document.getElementById ('chars')",
-				ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
-					* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES),
-			" onfocus=\"%h\"",
-			stringFormat (
-				"gsmCharCountMultiple2 (this, %s, %d);",
-				"document.getElementById ('chars')",
-				ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
-					* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES),
-			"></textarea></td>\n",
+			htmlSpanWrite (
+				"",
+				htmlIdAttribute (
+					"chars"));
 
-			"</tr>\n");
+			htmlSpanWrite (
+				"",
+				htmlIdAttribute (
+					"messageCount"));
 
-		printFormat (
-			"<tr>\n",
+		});
 
-			"<th>Chars</th>\n",
+		// table close
 
-			"<td>%s %s</td>\n",
-			"<span id=\"chars\">&nbsp;</span>",
-			"<span id=\"messageCount\">&nbsp;</span>",
+		htmlTableClose ();
 
-			"</tr>\n");
+		// form controls
 
-		printFormat (
-			"</table>\n");
+		htmlParagraphOpen ();
 
-		printFormat (
-			"<p><input",
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" name=\"send\"",
 			" value=\"send message\"",
@@ -298,9 +340,9 @@ class ChatMonitorInboxFormResponder
 					"send message with no alarm (please ignore this message " +
 					"if you already set one)")
 				: "",
-			">\n");
+			">");
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" name=\"sendAndNote\"",
@@ -312,9 +354,9 @@ class ChatMonitorInboxFormResponder
 					"send message with no alarm (please ignore this message " +
 					"if you already set one)")
 				: "",
-			">\n");
+			">");
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" name=\"ignore\"",
@@ -326,10 +368,13 @@ class ChatMonitorInboxFormResponder
 					"ignore message with no alarm (please ignore this " +
 					"message if you already set one)")
 				: "",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		// form close
+
+		htmlFormClose ();
 
 	}
 

@@ -18,7 +18,7 @@ class ChatUserCreditModeType
 
 		enumClass (ChatUserCreditMode.class);
 
-		add (1l, ChatUserCreditMode.billedMessage);
+		add (1l, ChatUserCreditMode.billedMessages);
 		add (2l, ChatUserCreditMode.prePay);
 		add (3l, ChatUserCreditMode.barred);
 		add (4l, ChatUserCreditMode.free);

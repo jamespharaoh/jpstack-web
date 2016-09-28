@@ -1,6 +1,13 @@
 package wbs.platform.user.console;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlAttributeFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockWrite;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +19,7 @@ import java.util.TreeMap;
 import com.google.common.collect.ImmutableSet;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
@@ -52,23 +60,23 @@ class UserPrivsEditorPart
 	PrivsEditorNode rootNode =
 		new PrivsEditorNode ();
 
-	Set<Long> canPrivIds =
+	Set <Long> canPrivIds =
 		new HashSet<> ();
 
-	Set<Long> canGrantPrivIds =
+	Set <Long> canGrantPrivIds =
 		new HashSet<> ();
 
-	Set<Long> groupPrivIds =
+	Set <Long> groupPrivIds =
 		new HashSet<> ();
 
-	Map<GlobalId,PrivsEditorNode> nodesByDataObjectId =
-		new HashMap<GlobalId,PrivsEditorNode> ();
+	Map <GlobalId, PrivsEditorNode> nodesByDataObjectId =
+		new HashMap<> ();
 
 	// implementation
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
 		return ImmutableSet.<ScriptRef>of (
 
@@ -80,26 +88,37 @@ class UserPrivsEditorPart
 	}
 
 	@Override
+	public Set <HtmlLink> links () {
+	
+		// TODO Auto-generated method stub
+		return super.links ();
+	}
+
+	@Override
 	public
 	void prepare () {
 
 		// build the privs tree
 
-		List<PrivRec> privs =
+		List <PrivRec> privs =
 			privHelper.findAll ();
 
-		for (PrivRec priv
-				: privs) {
+		for (
+			PrivRec priv
+				: privs
+		) {
 
 			if (! privChecker.canGrant (
 					priv.getId ()))
 				continue;
 
-			Record<?> parentObject =
-				objectManager.getParent (priv);
+			Record <?> parentObject =
+				objectManager.getParent (
+					priv);
 
 			PrivsEditorNode parentNode =
-				findNode (parentObject);
+				findNode (
+					parentObject);
 
 			parentNode.privs.put (
 				priv.getCode (),
@@ -135,11 +154,15 @@ class UserPrivsEditorPart
 
 		}
 
-		for (GroupRec group
-				: user.getGroups ()) {
+		for (
+			GroupRec group
+				: user.getGroups ()
+		) {
 
-			for (PrivRec priv
-					: group.getPrivs ()) {
+			for (
+				PrivRec priv
+					: group.getPrivs ()
+			) {
 
 				groupPrivIds.add (
 					priv.getId ());
@@ -155,7 +178,7 @@ class UserPrivsEditorPart
 	}
 
 	PrivsEditorNode findNode (
-			Record<?> object) {
+			Record <?> object) {
 
 		// end the recursion if we reach the root node
 
@@ -231,111 +254,222 @@ class UserPrivsEditorPart
 
 		super.renderHtmlHeadContent ();
 
-		printFormat (
-			"<script language=\"JavaScript\">\n",
+		renderScriptBlock ();
 
-			"var newPrivData = {}\n",
+	}
 
-			"var treeOpts = {\n",
-			"  blankImage: '%j',\n",
+	private
+	void renderScriptBlock () {
+
+		// script open
+
+		htmlScriptBlockOpen ();
+
+		// new priv data
+
+		formatWriter.writeLineFormat (
+			"var newPrivData = {}");
+
+		// tree opts
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"var treeOpts = {");
+
+		formatWriter.writeLineFormat (
+			"blankImage: '%j',",
 			requestContext.resolveApplicationUrl (
-				"/images/tree-blank.gif"),
-			"  plusImage: '%j',\n",
+				"/images/tree-blank.gif"));
+
+		formatWriter.writeLineFormat (
+			"plusImage: '%j',",
 			requestContext.resolveApplicationUrl (
-				"/images/tree-plus.gif"),
-			"  minusImage: '%j',\n",
+				"/images/tree-plus.gif"));
+
+		formatWriter.writeLineFormat (
+			"minusImage: '%j',",
 			requestContext.resolveApplicationUrl (
-				"/images/tree-minus.gif"),
-			"  imageWidth: 17,\n",
-			"  imageHeight: 17\n",
-			"}\n",
+				"/images/tree-minus.gif"));
 
-			"var ob = new SimpleTreeItemGenerator ('%j');\n",
+		formatWriter.writeLineFormat (
+			"imageWidth: 17,");
+
+		formatWriter.writeLineFormat (
+			"imageHeight: 17");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// ob
+
+		formatWriter.writeLineFormat (
+			"var ob = new SimpleTreeItemGenerator ('%j');",
 			requestContext.resolveApplicationUrl (
-				"/images/tree-object.gif"),
+				"/images/tree-object.gif"));
 
-			"ob.generateTail = function (itemData) {\n",
-			"  return ' <span class=\"node\">' + itemData[2] + '</span>';\n",
-			"}\n",
+		formatWriter.writeLineFormatIncreaseIndent (
+			"ob.generateTail = function (itemData) {");
 
-			"var pr = new SimpleTreeItemGenerator ('%j');\n",
+		formatWriter.writeLineFormat (
+			"return ' <span class=\"node\">' + itemData[2] + '</span>';");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// pr
+
+		formatWriter.writeLineFormat (
+			"var pr = new SimpleTreeItemGenerator ('%j');",
 			requestContext.resolveApplicationUrl (
-				"/images/tree-priv.gif"),
+				"/images/tree-priv.gif"));
 
-			"var nextPrivDocId = 0;\n",
+		// next priv doc id
 
-			"pr.generateTail = function (itemData) {\n",
+		formatWriter.writeLineFormat (
+			"var nextPrivDocId = 0;");
 
-			"  var privDocId = nextPrivDocId ++;\n",
+		// pr generate tail
 
-			"  s = ' <span class=\"priv\">' + itemData[2] + '</span>'\n",
-			"    + ' |'\n",
-			"    + ' <a href=\"javascript:togglePriv (' + privDocId + ', &quot;can&quot;, ' + itemData[6] + ')\"'\n",
-			"    + ' id=\"' + privDocId + '-can\"'\n",
-			"    + ' class=\"' + (itemData[3]? 'can-on' : 'can-off') + '\">'\n",
-			"    + 'can</a>'\n",
-			"    + ' |'\n",
-			"    + ' <a href=\"javascript:togglePriv (' + privDocId + ', &quot;cangrant&quot;, ' + itemData[6] + ')\"'\n",
-			"    + ' id=\"' + privDocId + '-cangrant\"'\n",
-			"    + ' class=\"' + (itemData[4]? 'cangrant-on' : 'cangrant-off') + '\">'\n",
-			"    + 'can grant</a>';\n",
+		formatWriter.writeLineFormatIncreaseIndent (
+			"pr.generateTail = function (itemData) {");
 
-			"  if (itemData[5])\n",
-			"    s += ' | <span class=\"group-can\">(group can)</span>';\n",
+		formatWriter.writeLineFormat (
+			"var privDocId = nextPrivDocId ++;");
 
-			"  return s;\n",
+		formatWriter.writeLineFormat (
+			"s = ' <span class=\"priv\">' + itemData[2] + '</span>'");
 
-			"}\n",
+		formatWriter.writeLineFormat (
+			"  + ' |'");
 
-			"function togglePriv (id, type, privId) {\n",
-			"  var a = document.getElementById (id + '-' + type);\n",
-			"  if (a.className == type + '-off') {\n",
-			"    a.className = type + '-on';\n",
-			"    newPrivData[privId + '-' + type] = 1;\n",
-			"  } else {\n",
-			"    a.className = type + '-off';\n",
-			"    newPrivData[privId + '-' + type] = 0;\n",
-			"  }\n",
-			"}\n",
+		formatWriter.writeLineFormat (
+			"  + ' <a href=\"javascript:togglePriv (' + privDocId + ', &quot;",
+			"can&quot;, ' + itemData[6] + ')\"'");
 
-			"function getUpdateString () {\n",
-			"  var s = '';\n",
-			"  for (var key in newPrivData) {\n",
-			"    if (s.length > 0) s += ',';\n",
-			"      s += key + '=' + newPrivData[key];\n",
-			"  }\n",
-			"  return s;\n",
-			"}\n",
+		formatWriter.writeLineFormat (
+			"  + ' id=\"' + privDocId + '-can\"'");
 
-			"var treeData = [\n");
+		formatWriter.writeLineFormat (
+			"  + ' class=\"' + (itemData[3]? 'can-on' : 'can-off') + '\">'");
+
+		formatWriter.writeLineFormat (
+			"  + 'can</a>'");
+
+		formatWriter.writeLineFormat (
+			"  + ' |'");
+
+		formatWriter.writeLineFormat (
+			"  + ' <a href=\"javascript:togglePriv (' + privDocId + ', &quot;",
+			"cangrant&quot;, ' + itemData[6] + ')\"'");
+
+		formatWriter.writeLineFormat (
+			"  + ' id=\"' + privDocId + '-cangrant\"'");
+
+		formatWriter.writeLineFormat (
+			"  + ' class=\"' + (itemData[4]? 'cangrant-on' : 'cangrant-off') ",
+			"+ '\">'");
+
+		formatWriter.writeLineFormat (
+			"  + 'can grant</a>';");
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"if (itemData[5]) {");
+
+		formatWriter.writeLineFormat (
+			"s += ' | <span class=\"group-can\">(group can)</span>';");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		formatWriter.writeLineFormat (
+			"return s;");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// toggle priv
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"function togglePriv (id, type, privId) {");
+
+		formatWriter.writeLineFormat (
+			"var a = document.getElementById (id + '-' + type);");
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"if (a.className == type + '-off') {");
+
+		formatWriter.writeLineFormat (
+			"a.className = type + '-on';");
+
+		formatWriter.writeLineFormat (
+			"newPrivData[privId + '-' + type] = 1;");
+
+		formatWriter.writeLineFormatDecreaseIncreaseIndent (
+			"} else {");
+
+		formatWriter.writeLineFormat (
+			"a.className = type + '-off';");
+
+		formatWriter.writeLineFormat (
+			"newPrivData[privId + '-' + type] = 0;");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// get update string
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"function getUpdateString () {");
+
+		formatWriter.writeLineFormat (
+			"var s = '';");
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"for (var key in newPrivData) {");
+
+		formatWriter.writeLineFormat (
+			"if (s.length > 0) s += ',';");
+
+		formatWriter.writeLineFormat (
+			"s += key + '=' + newPrivData[key];");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		formatWriter.writeLineFormat (
+			"return s;");
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		// tree data
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"var treeData = [");
 
 		goNode (rootNode);
 
-		printFormat (
-			"]\n",
+		formatWriter.writeLineFormatDecreaseIndent (
+			"]");
 
-			"</script>\n");
+		// script close
 
-		printFormat (
-			"<style type=\"text/css\">\n",
-			".node { font-weight: bold; color: blue; }\n",
-			".can-off { text-decoration: none; color: black; font-weight: normal; }\n",
-			".can-on { text-decoration: none; color: red; font-weight: bold; }\n",
-			".cangrant-off { text-decoration: none; color: black; font-weight: normal; }\n",
-			".cangrant-on { text-decoration: none; color: red; font-weight: bold; }\n",
-			".group-can { text-decoration: none; color: red; font-weight: normal; }\n",
-			"</style>\n");
+		htmlScriptBlockClose ();
 
 	}
 
 	void goNode (
 			PrivsEditorNode node) {
 
-		for (PrivRec priv
-				: node.privs.values ()) {
+		for (
+			PrivRec priv
+				: node.privs.values ()
+		) {
 
-			printFormat (
-				"[pr, 0, '%h', %s, %s, %s, %s],\n",
+			formatWriter.writeLineFormat (
+				"[pr, 0, '%h', %s, %s, %s, %s],",
 				priv.getCode (),
 				canPrivIds.contains (priv.getId ())
 					? "1"
@@ -350,19 +484,23 @@ class UserPrivsEditorPart
 
 		}
 
-		for (Map.Entry<String,Map<String,PrivsEditorNode>> nodesByCodeEntry
-				: node.nodesByCodeByTypeCode.entrySet ()) {
+		for (
+			Map.Entry <String, Map <String, PrivsEditorNode>> nodesByCodeEntry
+				: node.nodesByCodeByTypeCode.entrySet ()
+		) {
 
 			String typeCode =
 				nodesByCodeEntry.getKey ();
 
-			Map<String,PrivsEditorNode> typeNodesByCode =
+			Map <String, PrivsEditorNode> typeNodesByCode =
 				nodesByCodeEntry.getValue ();
 
 			boolean expanded = false;
 
-			for (PrivsEditorNode childNode
-					: typeNodesByCode.values ())
+			for (
+				PrivsEditorNode childNode
+					: typeNodesByCode.values ()
+			) {
 
 				if (childNode.expanded) {
 
@@ -372,15 +510,19 @@ class UserPrivsEditorPart
 
 				}
 
-			printFormat (
-				"[ob, %s, '%h', [\n",
+			}
+
+			formatWriter.writeLineFormatIncreaseIndent (
+				"[ob, %s, '%h', [",
 				expanded
 					? "2"
 					: "1",
 				typeCode);
 
-			for (Map.Entry<String,PrivsEditorNode> typeNodeEntry
-					: typeNodesByCode.entrySet ()) {
+			for (
+				Map.Entry <String, PrivsEditorNode> typeNodeEntry
+					: typeNodesByCode.entrySet ()
+			) {
 
 				String code =
 					typeNodeEntry.getKey ();
@@ -388,8 +530,8 @@ class UserPrivsEditorPart
 				PrivsEditorNode childNode =
 					typeNodeEntry.getValue ();
 
-				printFormat (
-					"[ob, %s, '%h', [\n",
+				formatWriter.writeLineFormatIncreaseIndent (
+					"[ob, %s, '%h', [",
 					childNode.expanded
 						? "2"
 						: "1",
@@ -397,13 +539,13 @@ class UserPrivsEditorPart
 
 				goNode (childNode);
 
-				printFormat (
-					"]],\n");
+				formatWriter.writeLineFormatDecreaseIndent (
+					"]],");
 
 			}
 
-			printFormat (
-				"]],\n");
+			formatWriter.writeLineFormatDecreaseIndent (
+				"]],");
 
 		}
 
@@ -462,49 +604,59 @@ class UserPrivsEditorPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
+		// form open
 
-			" action=\"%h\"",
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
 				"/user.privs.editor"),
-
-			" onsubmit=\"%h\"",
-			stringFormat (
+			htmlAttributeFormat (
+				"onsubmit",
 				"javascript:%s = %s",
 				"document.getElementById ('privdata').value",
-				"getUpdateString ()"),
+				"getUpdateString ()"));
 
-			">\n");
+		// form hidden
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"hidden\"",
 			" name=\"privdata\"",
 			" id=\"privdata\"",
 			" value=\"\"",
-			">\n");
+			">");
 
-		printFormat (
-			"<p><input",
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"save changes\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"<script language=\"JavaScript\">\n",
-			"document.write (buildTree (treeData, treeOpts));\n",
-			"</script>\n");
+		htmlParagraphClose ();
 
-		printFormat (
-			"<p><input",
+		// build tree script
+
+		htmlScriptBlockWrite (
+			"document.write (buildTree (treeData, treeOpts));");
+
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"save changes\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		// form close
+
+		htmlFormClose ();
 
 	}
 
