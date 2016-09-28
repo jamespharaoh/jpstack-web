@@ -1,6 +1,33 @@
 package wbs.services.ticket.core.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingThreeWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockClose;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockOpen;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlUtils.htmlEncodeNonBreakingWhitespace;
+import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
 
 import java.util.List;
 import java.util.Set;
@@ -20,7 +47,6 @@ import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketStateRec;
 import wbs.services.ticket.core.model.TicketTemplateRec;
-import wbs.utils.web.HtmlUtils;
 
 @PrototypeComponent ("ticketPendingFormResponder")
 public
@@ -116,27 +142,48 @@ class TicketPendingFormResponder
 
 		super.renderHtmlHeadContents ();
 
-		printFormat (
-			"<script language=\"JavaScript\">\n");
+		// script block
 
-		printFormat (
-			"top.show_inbox (true);\n",
-			"top.frames ['main'].location = 'about:blank';\n",
-			"window.setTimeout (function () { top.frames ['main'].location = '%j' }, 1);\n",
+		htmlScriptBlockOpen ();
+
+		formatWriter.writeLineFormat (
+			"top.show_inbox (true);");
+
+		formatWriter.writeLineFormat (
+			"top.frames ['main'].location = 'about:blank';");
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"window.setTimeout (function () {");
+
+		formatWriter.writeLineFormat (
+			"top.frames ['main'].location = '%j';",
 			summaryUrl);
 
-		printFormat (
-			"</script>\n");
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}, 1);");
 
-		printFormat (
-			"<style type=\"text/css\">\n",
-			"  .template-chars.error {\n",
-			"    background-color: darkred;\n",
-			"    color: white;\n",
-			"    padding-left: 10px;\n",
-			"    padding-right: 10px;\n",
-			"  }\n",
-			"</style>\n");
+		htmlScriptBlockClose ();
+
+		// style block
+
+		htmlStyleBlockOpen ();
+
+		htmlStyleRuleWrite (
+			".template-chars.error",
+			htmlStyleRuleEntry (
+				"background-color",
+				"darkred"),
+			htmlStyleRuleEntry (
+				"color",
+				"white"),
+			htmlStyleRuleEntry (
+				"padding-left",
+				"10px"),
+			htmlStyleRuleEntry (
+				"padding-right",
+				"10px"));
+
+		htmlStyleBlockClose ();
 
 	}
 
@@ -147,60 +194,67 @@ class TicketPendingFormResponder
 		requestContext.flushNotices (
 			formatWriter);
 
-		printFormat (
-			"<p",
-			" class=\"links\"",
-			">\n",
+		// links
 
-			"<a",
-			" href=\"%h\">Queues</a>\n",
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"links"));
+
+		htmlLinkWrite (
 			requestContext.resolveApplicationUrl (
 				"/queues/queue.home"),
+			"Queues");
 
-			"<a",
-			" href=\"%h\"",
+		htmlLinkWrite (
 			summaryUrl,
-			" target=\"main\"",
-			">Summary</a>\n",
+			"Summary",
+			htmlAttribute (
+				"target",
+				"main"));
 
-			"<a",
-			" href=\"javascript:top.show_inbox (false);\"",
-			">Close</a>\n",
+		htmlLinkWrite (
+			"javascript:top.show_inbox (false);",
+			"Close");
 
-			"</p>\n");
+		htmlParagraphClose ();
 
-		printFormat (
-			"<h2>Ticket management</h2>\n");
+		// header
 
-		printFormat (
-			"<form",
-			" action=\"%h\"",
+		htmlHeadingTwoWrite (
+			"Ticket management");
+
+		// form open
+
+		htmlFormOpenPostAction (
 			requestContext.resolveApplicationUrl (
 				stringFormat (
 					"/ticket.pending",
 					"/%u",
 					ticket.getId (),
-					"/ticket.pending.form")),
-			" method=\"post\"",
-			">\n");
+					"/ticket.pending.form")));
 
-		printFormat (
-			"<table",
-			" id=\"templates\"",
-			" class=\"list\"",
-			" style=\"width: 100%%\"",
-			">\n");
+		// table open
 
-		printFormat (
-			"<tr>\n",
-			"<th>&nbsp;</td>\n",
-			"<th>Name</th>\n",
-			"<th>New State</th>\n",
-			"<th>Time to queue</th>\n",
-			"</tr>\n");
+		htmlTableOpen (
+			htmlIdAttribute (
+				"templates"),
+			htmlClassAttribute (
+				"list"),
+			htmlStyleRuleEntry (
+				"width",
+				"100%"));
 
-		List<TicketTemplateRec> templatesReversed
-			= Lists.reverse(templates);
+		// table header
+
+		htmlTableHeaderRowWrite (
+			"",
+			"Name",
+			"New State",
+			"Time to queue");
+
+		List <TicketTemplateRec> templatesReversed =
+			Lists.reverse (
+				templates);
 
 		for (
 			TicketTemplateRec template
@@ -211,55 +265,51 @@ class TicketPendingFormResponder
 				template);
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
-		addTicketNote();
+		addTicketNote ();
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" class=\"template-submit\"",
 			" type=\"submit\"",
 			" name=\"send\"",
 			" value=\"Send\"",
-			">\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlFormClose ();
 
 	}
 
 	void addTicketNote () {
 
-		printFormat (
-			"<p><h3>Add new note</h3>\n");
+		htmlHeadingThreeWrite (
+			"Add new note");
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<label for=\"note-text\">",
 			"Note text",
 			"</label>");
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" id=\"note-text\"",
 			" type=\"textarea\"",
 			" name=\"note-text\"",
-			">\n");
-
-		printFormat (
-			"</p>\n");
+			">");
 
 	}
 
 	void doTemplate (
-		TicketTemplateRec template) {
+			TicketTemplateRec template) {
 
-		printFormat (
-			"<tr",
-			" class=\"template\"",
-			" data-template=\"%h\"",
-			template.getId (),
-			">\n");
+		htmlTableRowOpen (
+			htmlClassAttribute (
+				"template"),
+			htmlDataAttribute (
+				"template",
+				integerToDecimalString (
+					template.getId ())));
 
 		/*
 		if (template.getTicketState()
@@ -310,9 +360,9 @@ class TicketPendingFormResponder
 		}
 		*/
 
-		printFormat (
-			"<td>%s</td>\n",
-			HtmlUtils.htmlNonBreakingWhitespace (HtmlUtils.htmlEncode (template.getName ())));
+		htmlTableCellWriteHtml (
+			htmlEncodeNonBreakingWhitespace (
+				template.getName ()));
 
 		/*
 		printFormat (
@@ -322,9 +372,10 @@ class TicketPendingFormResponder
 					.toString ());
 		*/
 
-		printFormat (
+		htmlTableCellOpen ();
 
-			"<td><input",
+		formatWriter.writeLineFormat (
+			"<input",
 
 			" id=\"timestamp-%h\"",
 			template.getId (),
@@ -339,10 +390,11 @@ class TicketPendingFormResponder
 			" value=\"%d\"",
 			template.getTicketState ().getMinimum (),
 
-			"></td>\n");
+			">");
 
-		printFormat (
-			"</tr>\n");
+		htmlTableCellClose ();
+
+		htmlTableRowClose ();
 
 	}
 

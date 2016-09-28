@@ -1,5 +1,12 @@
 package wbs.services.ticket.core.console;
 
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingThreeWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+
 import javax.inject.Named;
 
 import com.google.common.collect.ImmutableMap;
@@ -94,11 +101,10 @@ class TicketPendingHistoryPart
 
 	void goSummary () {
 
-		printFormat (
-			"<h3>Summary</h3>\n");
+		htmlHeadingThreeWrite (
+			"Summary");
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
 		formFieldLogic.outputTableRows (
 			formatWriter,
@@ -106,32 +112,27 @@ class TicketPendingHistoryPart
 			ticket,
 			ImmutableMap.of ());
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
 	void goTicketNotes () {
 
-		printFormat (
-			"<h3>Notes</h3>\n");
+		htmlHeadingThreeWrite (
+			"Notes");
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
-		printFormat (
-			"<tr>\n",
-			"<th>Index</td>\n",
-			"<th>Text</th>\n",
-			"</tr>\n");
+		htmlTableHeaderRowWrite (
+			"Index",
+			"Text");
 
 		for (
 			TicketNoteRec ticketNote
 				: ticket.getTicketNotes ()
 		) {
 
-			printFormat (
-				"<tr>\n");
+			htmlTableRowOpen ();
 
 			formFieldLogic.outputTableCellsList (
 				formatWriter,
@@ -140,23 +141,20 @@ class TicketPendingHistoryPart
 				ImmutableMap.of (),
 				true);
 
-			printFormat (
-				"</tr>\n");
+			htmlTableRowClose ();
 
 		}
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
 	void goStateSummary () {
 
-		printFormat (
-			"<h3>State</h3>\n");
+		htmlHeadingThreeWrite (
+			"State");
 
-		printFormat (
-			"<table class=\"details\">\n");
+		htmlTableOpenDetails ();
 
 		formFieldLogic.outputTableRows (
 			formatWriter,
@@ -164,8 +162,7 @@ class TicketPendingHistoryPart
 			ticket.getTicketState (),
 			ImmutableMap.of ());
 
-		printFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
