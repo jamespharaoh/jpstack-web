@@ -1,5 +1,10 @@
 package wbs.platform.user.console;
 
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 
@@ -12,40 +17,59 @@ class UserPasswordPart
 	public
 	void renderHtmlBodyContent () {
 
-		printFormat (
-			"<form",
-			" method=\"post\"",
-			" action=\"%h\"",
+		// form open
+
+		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
-				"/user.password"),
-			">\n");
+				"/user.password"));
 
-		printFormat (
-			"<p>Enter new password<br>\n",
+		// password
 
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"Enter new password<br>");
+
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"password\"",
 			" name=\"password_1\"",
 			" size=\"32\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"<p>Enter again to confirm<br>\n",
+		htmlParagraphClose ();
 
+		// password confirmation
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"Enter again to confirm<br>");
+
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"password\"",
 			" name=\"password_2\"",
 			" size=\"32\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"<p><input",
+		htmlParagraphClose ();
+
+		// form controls
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeFormat (
+			"<input",
 			" type=\"submit\"",
 			" value=\"save changes\"",
-			"></p>\n");
+			">");
 
-		printFormat (
-			"</form>\n");
+		htmlParagraphClose ();
+
+		// form close
+
+		htmlFormClose ();
 
 	}
 

@@ -1,6 +1,9 @@
 package wbs.platform.core.console;
 
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlHeadingOneWrite;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteHtml;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -127,13 +130,13 @@ class CoreTitledResponder
 
 		super.renderHtmlHeadContents ();
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<link",
 			" rel=\"stylesheet\"",
 			" href=\"%h\"",
 			requestContext.resolveApplicationUrl (
 				"/style/basic.css"),
-			">\n");
+			">");
 
 		pagePart.renderHtmlHeadContent ();
 
@@ -147,8 +150,7 @@ class CoreTitledResponder
 	protected
 	void renderHtmlBodyContents () {
 
-		printFormat (
-			"<h1>%h</h1>\n",
+		htmlHeadingOneWrite (
 			title);
 
 		requestContext.flushNotices (
@@ -156,8 +158,8 @@ class CoreTitledResponder
 
 		if (pagePartThrew != null) {
 
-			printFormat (
-				"<p>Unable to show page contents.</p>\n");
+			htmlParagraphWriteFormat (
+				"Unable to show page contents.");
 
 			if (
 				privChecker.canRecursive (
@@ -165,10 +167,11 @@ class CoreTitledResponder
 					"debug")
 			) {
 
-				printFormat (
-					"<p><pre>%h</pre></p>\n",
-					exceptionLogic.throwableDump (
-						pagePartThrew));
+				htmlParagraphWriteHtml (
+					stringFormat (
+						"<pre>%h</pre>",
+						exceptionLogic.throwableDump (
+							pagePartThrew)));
 
 			}
 

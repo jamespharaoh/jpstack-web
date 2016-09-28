@@ -1,9 +1,20 @@
 package wbs.platform.event.console;
 
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.instantToDateNullSafe;
 import static wbs.utils.time.TimeUtils.millisToInstant;
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWriteHtml;
+import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
 import static wbs.utils.web.HtmlUtils.htmlLinkWriteHtml;
 
 import java.util.ArrayList;
@@ -287,7 +298,7 @@ class EventConsoleLogicImplementation
 			objectManager.writeHtmlForObject (
 				formatWriter,
 				dataObject,
-				null,
+				optionalAbsent (),
 				false);
 
 		} else {
@@ -302,16 +313,13 @@ class EventConsoleLogicImplementation
 	public
 	void writeEventsTable (
 			@NonNull FormatWriter htmlWriter,
-			@NonNull Iterable<EventRec> events) {
+			@NonNull Iterable <EventRec> events) {
 
-		htmlWriter.writeFormat (
-			"<table class=\"list\">");
+		htmlTableOpenList ();
 
-		htmlWriter.writeFormat (
-			"<tr>\n",
-			"<th>Time</th>\n",
-			"<th>Details</th>\n",
-			"</tr>");
+		htmlTableHeaderRowWrite (
+			"Time",
+			"Details");
 
 		int dayNumber = 0;
 
@@ -329,21 +337,23 @@ class EventConsoleLogicImplementation
 
 			int newDayNumber =
 				(calendar.get (Calendar.YEAR) << 9)
-					+ calendar.get (Calendar.DAY_OF_YEAR);
+				+ calendar.get (Calendar.DAY_OF_YEAR);
 
 			if (newDayNumber != dayNumber) {
 
-				htmlWriter.writeFormat (
-					"<tr class=\"sep\">\n");
+				htmlTableRowSeparatorWrite ();
 
-				htmlWriter.writeFormat (
-					"<tr style=\"font-weight: bold\">\n",
+				htmlTableRowOpen (
+					htmlStyleRuleEntry (
+						"font-weight",
+						"bold"));
 
-					"<td colspan=\"2\">%h</td>\n",
+				htmlTableCellWrite (
 					userConsoleLogic.dateStringLong (
 						event.getTimestamp ()),
+					htmlColumnSpanAttribute (2l));
 
-					"</tr>\n");
+				htmlTableRowClose ();
 
 				dayNumber =
 					newDayNumber;
@@ -356,8 +366,7 @@ class EventConsoleLogicImplementation
 
 		}
 
-		htmlWriter.writeFormat (
-			"</table>\n");
+		htmlTableClose ();
 
 	}
 
@@ -367,16 +376,11 @@ class EventConsoleLogicImplementation
 			@NonNull FormatWriter formatWriter,
 			@NonNull EventRec event) {
 
-		formatWriter.writeFormat (
-			"<tr>\n");
+		htmlTableRowOpen ();
 
-		formatWriter.writeFormat (
-			"<td>%h</td>\n",
+		htmlTableCellWrite (
 			userConsoleLogic.timeString (
 				event.getTimestamp ()));
-
-		formatWriter.writeFormat (
-			"<td>");
 
 		try {
 
@@ -387,8 +391,7 @@ class EventConsoleLogicImplementation
 				eventFormatWriter,
 				event);
 
-			formatWriter.writeFormat (
-				"<td>%s</td>\n",
+			htmlTableCellWriteHtml (
 				eventFormatWriter.toString ());
 
 		} catch (RuntimeException exception) {
@@ -399,13 +402,12 @@ class EventConsoleLogicImplementation
 					event.getId ()),
 				exception);
 
-			formatWriter.writeFormat (
-				"<td>(error displaying this event)</td>\n");
+			htmlTableCellWrite (
+				"(error displaying this event)");
 
 		}
 
-		formatWriter.writeFormat (
-			"</tr>\n");
+		htmlTableRowClose ();
 
 	}
 
