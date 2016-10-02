@@ -112,7 +112,7 @@ class ChatUserImageUploadPart
 
 		htmlParagraphOpen ();
 
-		formatWriter.writeFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" value=\"upload file\"",

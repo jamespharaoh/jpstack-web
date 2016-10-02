@@ -264,7 +264,7 @@ class ChatUserSummaryPart
 
 			htmlTableDetailsRowWriteRaw (
 				"Affiliate",
-				ifNotNullThenElse (
+				() -> ifNotNullThenElse (
 					chatUser.getChatAffiliate (),
 					() -> objectManager.writeTdForObjectMiniLink (
 						chatUser.getChatAffiliate (),

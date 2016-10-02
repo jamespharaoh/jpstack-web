@@ -7,7 +7,6 @@ import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalValueEqualWithClass;
-import static wbs.utils.etc.OptionalUtils.optionalValueNotEqualWithClass;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -22,11 +21,11 @@ import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -317,7 +316,7 @@ class ChatUserImageListAction
 						index);
 
 				if (
-					optionalValueNotEqualWithClass (
+					optionalValueEqualWithClass (
 						ChatUserImageRec.class,
 						optionalFromNullable (
 							chatUserLogic.getMainChatUserImageByType (

@@ -49,10 +49,10 @@ class UploadFormFieldRenderer<Container>
 	public
 	void renderFormTemporarilyHidden (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter htmlWriter,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<FileUpload> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <FileUpload> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -64,20 +64,20 @@ class UploadFormFieldRenderer<Container>
 	public
 	void renderFormInput (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<FileUpload> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <FileUpload> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		out.writeFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"file\"",
 			" name=\"%h-%h\"",
 			formName,
 			name (),
-			">\n");
+			">");
 
 	}
 
@@ -86,7 +86,7 @@ class UploadFormFieldRenderer<Container>
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
-			@NonNull Optional<FileUpload> interfaceValue,
+			@NonNull Optional <FileUpload> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 

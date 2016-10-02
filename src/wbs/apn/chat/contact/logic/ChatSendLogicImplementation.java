@@ -17,14 +17,14 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.help.logic.ChatHelpLogLogic;
-import wbs.apn.chat.help.logic.ChatHelpTemplateLogic;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.help.logic.ChatHelpLogLogic;
+import wbs.apn.chat.help.logic.ChatHelpTemplateLogic;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -351,7 +351,7 @@ class ChatSendLogicImplementation
 		String originalText =
 			chatHelpTemplate.getText ();
 
-		Map<String,String> allParams =
+		Map <String, String> allParams =
 			addDefaultParams (
 				chatUser,
 				suppliedParams);
@@ -376,16 +376,17 @@ class ChatSendLogicImplementation
 
 		chatHelpLogLogic.createChatHelpLogOut (
 			chatUser,
-			Optional.<ChatHelpLogRec>absent (),
-			Optional.<UserRec>absent (),
+			optionalAbsent (),
+			optionalAbsent (),
 			message,
-			Optional.<ChatMessageRec>absent (),
+			optionalAbsent (),
 			finalText,
-			Optional.<CommandRec>absent ());
+			optionalAbsent ());
 
 		// and return
 
-		return Optional.of (message);
+		return optionalOf (
+			message);
 
 	}
 

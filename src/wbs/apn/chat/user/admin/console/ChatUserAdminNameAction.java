@@ -2,7 +2,7 @@ package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.etc.OptionalUtils.optionalValueEqualSafe;
+import static wbs.utils.etc.OptionalUtils.optionalValueNotEqualSafe;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
 
 import lombok.Cleanup;
@@ -65,8 +65,10 @@ class ChatUserAdminNameAction
 	public
 	Responder goReal () {
 
-		if (! requestContext.canContext (
-				"chat.userAdmin")) {
+		if (
+			! requestContext.canContext (
+				"chat.userAdmin")
+		) {
 
 			requestContext.addError (
 				"Access denied");
@@ -107,7 +109,7 @@ class ChatUserAdminNameAction
 					"chatUserId"));
 
 		if (
-			optionalValueEqualSafe (
+			optionalValueNotEqualSafe (
 				optionalFromNullable (
 					chatUser.getName ()),
 				name)

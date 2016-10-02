@@ -27,7 +27,7 @@ function showPhoto () {
 
 	} catch (e) {
 
-		document.getElementById ('photoRow').style.display = block';
+		document.getElementById ('photoRow').style.display = 'block';
 
 	}
 

@@ -7,6 +7,7 @@ import static wbs.utils.etc.LogicUtils.booleanToYesNoNone;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.stringToBoolean;
 import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -61,7 +62,7 @@ class YesNoFormFieldRenderer <Container>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		htmlWriter.writeFormat (
+		htmlWriter.writeLineFormat (
 			"<input",
 			" type=\"hidden\"",
 			" name=\"%h-%h\"",
@@ -70,7 +71,7 @@ class YesNoFormFieldRenderer <Container>
 			" value=\"%h\"",
 			booleanToYesNoNone (
 				interfaceValue),
-			">\n");
+			">");
 
 		doNothing ();
 
@@ -101,7 +102,7 @@ class YesNoFormFieldRenderer <Container>
 						"none"))
 				: interfaceValue;
 
-		htmlWriter.writeFormat (
+		htmlWriter.writeLineFormat (
 			"<select",
 			" name=\"%h-%h\"",
 			formName,
@@ -123,35 +124,35 @@ class YesNoFormFieldRenderer <Container>
 
 		) {
 
-			htmlWriter.writeFormat (
+			htmlWriter.writeLineFormat (
 				"<option",
 				" value=\"none\"",
 				currentValue.isPresent ()
 					? ""
 					: " selected",
-				">&mdash;</option>\n");
+				">&mdash;</option>");
 
 		}
 
-		htmlWriter.writeFormat (
+		htmlWriter.writeLineFormat (
 			"<option",
 			" value=\"yes\"",
 			currentValue.or (false) == true
 				? " selected"
 				: "",
-			">%h</option>\n",
+			">%h</option>",
 			yesLabel ());
 
-		htmlWriter.writeFormat (
+		htmlWriter.writeLineFormat (
 			"<option",
 			" value=\"no\"",
 			currentValue.or (true) == false
 				? " selected"
 				: "",
-			">%h</option>\n",
+			">%h</option>",
 			noLabel ());
 
-		htmlWriter.writeFormat (
+		htmlWriter.writeLineFormat (
 			"</select>");
 
 	}
@@ -237,7 +238,7 @@ class YesNoFormFieldRenderer <Container>
 				formName);
 
 		return successResult (
-			Optional.fromNullable (
+			optionalFromNullable (
 				stringToBoolean (
 					formValue,
 					"yes",

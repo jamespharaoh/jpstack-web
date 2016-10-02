@@ -339,6 +339,8 @@ class ChatMessagePendingFormResponder
 		htmlTableHeaderCellWrite (
 			"Actions");
 
+		htmlTableCellOpen ();
+
 		formatWriter.writeLineFormat (
 			"<input",
 			" id=\"sendButton\"",

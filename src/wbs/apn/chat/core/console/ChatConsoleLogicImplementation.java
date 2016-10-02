@@ -295,7 +295,7 @@ class ChatConsoleLogicImplementation
 			"");
 
 		for (
-			Map.Entry<ChatUserEditReason,String> ent
+			Map.Entry <ChatUserEditReason, String> ent
 				: chatUserEditReasonToText.entrySet ()
 		) {
 

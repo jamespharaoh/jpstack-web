@@ -32,7 +32,8 @@ class AbstractStringSubstituter {
 		while (matcher.find ()) {
 
 			String substitute =
-				getSubstitute (matcher.group (1));
+				getSubstitute (
+					matcher.group (1));
 
 			if (substitute == null) {
 
@@ -45,7 +46,8 @@ class AbstractStringSubstituter {
 
 			matcher.appendReplacement (
 				stringBuffer,
-				substitute);
+				Matcher.quoteReplacement (
+					substitute));
 
 		}
 

@@ -189,7 +189,7 @@ class ChatUserImageListPart
 						type.toString (),
 						"?chatUserImageId=%u",
 						chatUserImage.getId ())),
-				ifNotNullThenElse (
+				() -> ifNotNullThenElse (
 					chatUserImage.getMedia (),
 					() -> mediaConsoleLogic.writeMediaThumb100 (
 						chatUserImage.getMedia ()),

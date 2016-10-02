@@ -47,7 +47,7 @@ import wbs.apn.chat.user.core.logic.ChatUserLogic.PendingMode;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.apn.chat.user.image.model.ChatUserImageType;
-import wbs.console.context.ConsoleContextScriptRef;
+import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.priv.UserPrivChecker;
@@ -107,7 +107,7 @@ class ChatUserPendingFormResponder
 				JqueryScriptRef.instance)
 
 			.add (
-				ConsoleContextScriptRef.javascript (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/chat-user-pending-form.js"))
 
 			.build ();
@@ -223,7 +223,7 @@ class ChatUserPendingFormResponder
 			"top.show_inbox (true);");
 
 		formatWriter.writeLineFormat (
-			"top.frames['main'].location = '%j';",
+			"top.frames ['main'].location = '%j';",
 			requestContext.resolveApplicationUrl (
 				stringFormat (
 					"/chatUser.pending",
@@ -294,14 +294,14 @@ class ChatUserPendingFormResponder
 				"Options",
 				() -> {
 
-				formatWriter.writeFormat (
+				formatWriter.writeLineFormat (
 					"<input",
 					" type=\"button\"",
 					" value=\"approve\"",
 					" onclick=\"showPhoto ()\"",
 					">");
 
-				formatWriter.writeFormat (
+				formatWriter.writeLineFormat (
 					"<input",
 					" type=\"button\"",
 					" value=\"reject\"",
@@ -538,6 +538,8 @@ class ChatUserPendingFormResponder
 				" value=\"ok\"",
 				">");
 
+			htmlTableCellClose ();
+
 			htmlTableRowClose ();
 
 			// message
@@ -553,9 +555,9 @@ class ChatUserPendingFormResponder
 			htmlTableHeaderCellWrite (
 				"Message");
 
-			htmlTableRowOpen ();
+			htmlTableCellOpen ();
 
-			formatWriter.writeFormat (
+			formatWriter.writeLineFormat (
 				"<textarea",
 				" id=\"message\"",
 				" name=\"message\"",

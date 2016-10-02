@@ -16,7 +16,7 @@ class MapStringSubstituter
 
 	public
 	MapStringSubstituter (
-			Map<String,String> substitutions,
+			Map <String, String> substitutions,
 			boolean ignoreMissing) {
 
 		this.substitutions =
