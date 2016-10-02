@@ -5,7 +5,6 @@ import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 import static wbs.utils.web.HtmlAttributeUtils.htmlAttributesWrite;
 
@@ -153,8 +152,6 @@ class HtmlInputUtils {
 			content);
 
 		formatWriter.writeNewline ();
-
-		formatWriter.increaseIndent ();
 
 	}
 
@@ -631,26 +628,38 @@ class HtmlInputUtils {
 			label != null
 			&& ! label.isEmpty ();
 
-		formatWriter.writeLineFormat (
-			"<option",
+		formatWriter.writeIndent ();
 
-			"%s",
-			gotValue
-				? stringFormat (
-					" value=\"%h\"",
-					value.toString ())
-				: "",
+		formatWriter.writeFormat (
+			"<option");
 
-			selected
-				? " selected"
-				: "",
+		if (gotValue) {
 
-			"%s",
-			gotLabel
-				? stringFormat (
-					">%h</option>\n",
-					label)
-				: ">");
+			formatWriter.writeFormat (
+				" value=\"%h\"",
+				value.toString ());
+
+		}
+
+		if (selected) {
+
+			formatWriter.writeFormat (
+				" selected");
+
+		}
+
+		formatWriter.writeFormat (
+			">");
+
+		if (gotLabel) {
+
+			formatWriter.writeFormat (
+				"%h</option>",
+				label);
+
+		}
+
+		formatWriter.writeNewline ();
 
 	}
 

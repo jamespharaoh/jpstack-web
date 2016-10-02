@@ -187,7 +187,7 @@ class LogicUtils {
 	}
 
 	public static
-	Runnable ifNotNullThenElse (
+	void ifNotNullThenElse (
 			Object notNullObject,
 			@NonNull Runnable trueStatement,
 			@NonNull Runnable falseStatement) {
@@ -197,11 +197,11 @@ class LogicUtils {
 				notNullObject)
 		) {
 
-			return trueStatement;
+			trueStatement.run ();
 
 		} else {
 
-			return falseStatement;
+			falseStatement.run ();
 
 		}
 

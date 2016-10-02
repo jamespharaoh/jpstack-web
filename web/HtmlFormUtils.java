@@ -6,7 +6,7 @@ import static wbs.utils.web.HtmlAttributeUtils.htmlAttributesWrite;
 import lombok.NonNull;
 
 import wbs.utils.string.FormatWriter;
-import wbs.utils.web.HtmlAttributeUtils.HtmlAttribute;
+import wbs.utils.web.HtmlAttributeUtils.ToHtmlAttribute;
 
 public
 class HtmlFormUtils {
@@ -16,7 +16,7 @@ class HtmlFormUtils {
 	public static
 	void htmlFormOpen (
 			@NonNull FormatWriter formatWriter,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		formatWriter.writeIndent ();
 
@@ -38,7 +38,7 @@ class HtmlFormUtils {
 
 	public static
 	void htmlFormOpen (
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpen (
 			currentFormatWriter (),
@@ -53,7 +53,7 @@ class HtmlFormUtils {
 			@NonNull FormatWriter formatWriter,
 			@NonNull String method,
 			@NonNull String action,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		formatWriter.writeIndent ();
 
@@ -85,7 +85,7 @@ class HtmlFormUtils {
 	void htmlFormOpenMethodAction (
 			@NonNull String method,
 			@NonNull String action,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethodAction (
 			currentFormatWriter (),
@@ -99,7 +99,7 @@ class HtmlFormUtils {
 	void htmlFormOpenGetAction (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String action,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethodAction (
 			formatWriter,
@@ -112,7 +112,7 @@ class HtmlFormUtils {
 	public static
 	void htmlFormOpenGetAction (
 			@NonNull String action,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethodAction (
 			currentFormatWriter (),
@@ -126,7 +126,7 @@ class HtmlFormUtils {
 	void htmlFormOpenPostAction (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String action,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethodAction (
 			formatWriter,
@@ -139,7 +139,7 @@ class HtmlFormUtils {
 	public static
 	void htmlFormOpenPostAction (
 			@NonNull String action,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethodAction (
 			currentFormatWriter (),
@@ -155,7 +155,7 @@ class HtmlFormUtils {
 	void htmlFormOpenMethod (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String method,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		formatWriter.writeIndent ();
 
@@ -182,7 +182,7 @@ class HtmlFormUtils {
 	public static
 	void htmlFormOpenMethod (
 			@NonNull String method,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethod (
 			currentFormatWriter (),
@@ -194,7 +194,7 @@ class HtmlFormUtils {
 	public static
 	void htmlFormOpenPost (
 			@NonNull FormatWriter formatWriter,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethod (
 			formatWriter,
@@ -205,7 +205,7 @@ class HtmlFormUtils {
 
 	public static
 	void htmlFormOpenPost (
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethod (
 			currentFormatWriter (),
@@ -222,7 +222,7 @@ class HtmlFormUtils {
 			@NonNull String method,
 			@NonNull String action,
 			@NonNull String encoding,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		formatWriter.writeIndent ();
 
@@ -259,7 +259,7 @@ class HtmlFormUtils {
 			@NonNull String method,
 			@NonNull String action,
 			@NonNull String encoding,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethodActionEncoding (
 			currentFormatWriter (),
@@ -275,7 +275,7 @@ class HtmlFormUtils {
 			@NonNull FormatWriter formatWriter,
 			@NonNull String action,
 			@NonNull String encoding,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethodActionEncoding (
 			formatWriter,
@@ -290,7 +290,7 @@ class HtmlFormUtils {
 	void htmlFormOpenPostActionEncoding (
 			@NonNull String action,
 			@NonNull String encoding,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethodActionEncoding (
 			currentFormatWriter (),
@@ -306,7 +306,7 @@ class HtmlFormUtils {
 			@NonNull FormatWriter formatWriter,
 			@NonNull String method,
 			@NonNull String action,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethodActionEncoding (
 			formatWriter,
@@ -315,24 +315,13 @@ class HtmlFormUtils {
 			"multipart/form-data",
 			attributes);
 
-		htmlAttributesWrite (
-			formatWriter,
-			attributes);
-
-		formatWriter.writeFormat (
-			">");
-
-		formatWriter.writeNewline ();
-
-		formatWriter.increaseIndent ();
-
 	}
 
 	public static
 	void htmlFormOpenMethodActionMultipart (
 			@NonNull String method,
 			@NonNull String action,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethodActionMultipart (
 			currentFormatWriter (),
@@ -346,7 +335,7 @@ class HtmlFormUtils {
 	void htmlFormOpenPostActionMultipart (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String action,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethodActionMultipart (
 			formatWriter,
@@ -359,7 +348,7 @@ class HtmlFormUtils {
 	public static
 	void htmlFormOpenPostActionMultipart (
 			@NonNull String action,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormOpenMethodActionMultipart (
 			currentFormatWriter (),
@@ -374,7 +363,7 @@ class HtmlFormUtils {
 	public static
 	void htmlFormClose (
 			@NonNull FormatWriter formatWriter,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		formatWriter.decreaseIndent ();
 
@@ -385,7 +374,7 @@ class HtmlFormUtils {
 
 	public static
 	void htmlFormClose (
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlFormClose (
 			currentFormatWriter (),
