@@ -272,6 +272,7 @@
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
       <fileset dir="src/wbs/integrations/dialogue/api/files"/>
       <fileset dir="src/wbs/integrations/digitalselect/api/files"/>
+      <fileset dir="src/wbs/integrations/fonix/api/files"/>
       <fileset dir="src/wbs/integrations/hybyte/api/files"/>
       <fileset dir="src/wbs/integrations/mediaburst/api/files"/>
       <fileset dir="src/wbs/integrations/mig/api/files"/>
@@ -448,6 +449,7 @@
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
       <fileset dir="src/wbs/integrations/dialogue/console/files"/>
       <fileset dir="src/wbs/integrations/digitalselect/console/files"/>
+      <fileset dir="src/wbs/integrations/fonix/console/files"/>
       <fileset dir="src/wbs/integrations/hybyte/console/files"/>
       <fileset dir="src/wbs/integrations/mediaburst/console/files"/>
       <fileset dir="src/wbs/integrations/mig/console/files"/>

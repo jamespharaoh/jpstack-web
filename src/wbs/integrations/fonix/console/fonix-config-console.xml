@@ -1,0 +1,60 @@
+<console-module
+	name="fonix-config">
+
+	<console-helper-provider
+		object-name="fonixConfig"
+		view-priv="root:manage">
+
+		<priv-key
+			name="fonix.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<priv-key
+			name="fonixConfig.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="fonixConfigName"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="fonixConfig"
+		object-name="fonixConfig">
+
+		<list>
+
+			<object-list-page/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page/>
+
+			<object-settings-page/>
+
+			<context-link
+				name="network"
+				link="fonixNetwork"
+				label="Networks"
+				priv-key="fonix.manage"/>
+
+			<context-link
+				name="deliveryStatus"
+				link="fonixDeliveryStatus"
+				label="Delivery statuses"
+				priv-key="fonix.manage"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+</console-module>

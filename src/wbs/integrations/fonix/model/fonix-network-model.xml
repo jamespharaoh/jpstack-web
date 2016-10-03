@@ -1,0 +1,30 @@
+<model-meta
+	name="fonixNetwork"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="fonixConfig"/>
+
+		<identity-reference-field
+			type="network"/>
+
+		<!-- details -->
+
+		<deleted-field/>
+
+		<!-- settings -->
+
+		<string-field
+			name="theirCode"/>
+
+	</fields>
+
+</model-meta>

@@ -1,16 +1,13 @@
-package wbs.integrations.clockworksms.api;
+package wbs.integrations.fonix.api;
 
 import static wbs.utils.etc.LogicUtils.booleanEqual;
-import static wbs.utils.etc.LogicUtils.ifThenElse;
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.string.StringUtils.joinWithSpace;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.lowercase;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.utf8ToString;
-
-import java.io.ByteArrayInputStream;
 
 import javax.inject.Provider;
 
@@ -23,9 +20,7 @@ import wbs.api.mvc.ApiLoggingAction;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.data.tools.DataFromXml;
-import wbs.framework.data.tools.DataFromXmlBuilder;
-import wbs.framework.data.tools.DataToXml;
+import wbs.framework.data.tools.DataFromGeneric;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
@@ -33,14 +28,13 @@ import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.web.PageNotFoundException;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
-import wbs.integrations.clockworksms.model.ClockworkSmsDeliveryStatusDetailCodeObjectHelper;
-import wbs.integrations.clockworksms.model.ClockworkSmsDeliveryStatusDetailCodeRec;
-import wbs.integrations.clockworksms.model.ClockworkSmsDeliveryStatusObjectHelper;
-import wbs.integrations.clockworksms.model.ClockworkSmsDeliveryStatusRec;
-import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogObjectHelper;
-import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogType;
-import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutObjectHelper;
-import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutRec;
+import wbs.integrations.fonix.logic.FonixLogic;
+import wbs.integrations.fonix.model.FonixDeliveryStatusObjectHelper;
+import wbs.integrations.fonix.model.FonixDeliveryStatusRec;
+import wbs.integrations.fonix.model.FonixInboundLogObjectHelper;
+import wbs.integrations.fonix.model.FonixInboundLogType;
+import wbs.integrations.fonix.model.FonixRouteOutObjectHelper;
+import wbs.integrations.fonix.model.FonixRouteOutRec;
 import wbs.platform.text.web.TextResponder;
 import wbs.sms.message.core.logic.SmsMessageLogic;
 import wbs.sms.message.core.model.MessageObjectHelper;
@@ -50,31 +44,30 @@ import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.utils.string.FormatWriter;
 
-@PrototypeComponent ("clockworkSmsRouteReportAction")
+@PrototypeComponent ("fonxRouteReportAction")
 public
-class ClockworkSmsRouteReportAction
+class FonixRouteReportAction
 	extends ApiLoggingAction {
 
 	// singleton dependencies
 
 	@SingletonDependency
-	ClockworkSmsDeliveryStatusObjectHelper clockworkSmsDeliveryStatusHelper;
+	FonixDeliveryStatusObjectHelper fonixDeliveryStatusHelper;
 
 	@SingletonDependency
-	ClockworkSmsDeliveryStatusDetailCodeObjectHelper
-	clockworkSmsDeliveryStatusDetailCodeHelper;
+	FonixInboundLogObjectHelper fonixInboundLogHelper;
 
 	@SingletonDependency
-	ClockworkSmsInboundLogObjectHelper clockworkSmsInboundLogHelper;
-
-	@SingletonDependency
-	ClockworkSmsRouteOutObjectHelper clockworkSmsRouteOutHelper;
+	FonixRouteOutObjectHelper fonixRouteOutHelper;
 
 	@SingletonDependency
 	Database database;
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@SingletonDependency
+	FonixLogic fonixLogic;
 
 	@SingletonDependency
 	RequestContext requestContext;
@@ -98,8 +91,7 @@ class ClockworkSmsRouteReportAction
 
 	// state
 
-	ClockworkSmsRouteReportRequest request;
-	ClockworkSmsRouteReportResponse response;
+	FonixRouteReportRequest request;
 	Boolean success = false;
 
 	// implementation
@@ -126,21 +118,12 @@ class ClockworkSmsRouteReportAction
 
 		// decode request
 
-		DataFromXml dataFromXml =
-			new DataFromXmlBuilder ()
-
-			.registerBuilderClasses (
-				ClockworkSmsRouteReportRequest.class,
-				ClockworkSmsRouteReportRequest.Item.class)
-
-			.build ();
-
 		request =
-			(ClockworkSmsRouteReportRequest)
-			dataFromXml.readInputStream (
-				new ByteArrayInputStream (
-					requestBytes),
-				"clockwork-sms-route-report.xml");
+			new DataFromGeneric ()
+
+			.fromMap (
+				FonixRouteReportRequest.class,
+				requestContext.parameterMapSimple ());
 
 	}
 
@@ -153,7 +136,10 @@ class ClockworkSmsRouteReportAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
-				"ClockworkSmsRouteOutAction.handle ()",
+				stringFormat (
+					"%s.%s ()",
+					getClass ().getSimpleName (),
+					"updateDatabase"),
 				this);
 
 		// lookup route
@@ -189,131 +175,97 @@ class ClockworkSmsRouteReportAction
 			optionalGetRequired (
 				smsRouteOptional);
 
-		// lookup clockwork sms route in
+		// lookup fonix route in
 
-		Optional <ClockworkSmsRouteOutRec> clockworkSmsRouteOutOptional =
-			clockworkSmsRouteOutHelper.find (
+		Optional <FonixRouteOutRec> fonixRouteOutOptional =
+			fonixRouteOutHelper.find (
 				smsRoute.getId ());
 
 		if (
 
 			optionalIsNotPresent (
-				clockworkSmsRouteOutOptional)
+				fonixRouteOutOptional)
 
 			|| booleanEqual (
-				clockworkSmsRouteOutOptional.get ().getDeleted (),
+				fonixRouteOutOptional.get ().getDeleted (),
 				true)
 
 		) {
 			throw new PageNotFoundException ();
 		}
 
-		ClockworkSmsRouteOutRec clockworkSmsRouteOut =
+		FonixRouteOutRec fonixRouteOut =
 			optionalGetRequired (
-				clockworkSmsRouteOutOptional);
+				fonixRouteOutOptional);
 
-		// iterate delivery reports
+		// process delivery report
 
-		response =
-			new ClockworkSmsRouteReportResponse ();
-
-		for (
-			ClockworkSmsRouteReportRequest.Item item
-				: request.items ()
-		) {
-
-			response.items.add (
-				handleDeliveryReport (
-					clockworkSmsRouteOut,
-					item));
-
-		}
+		handleDeliveryReport (
+			fonixRouteOut);
 
 		// commit and return
 
 		transaction.commit ();
 
-		success = true;
-
 	}
 
 	private
-	ClockworkSmsRouteReportResponse.Item handleDeliveryReport (
-			@NonNull ClockworkSmsRouteOutRec clockworkSmsRouteOut,
-			@NonNull ClockworkSmsRouteReportRequest.Item item) {
+	void handleDeliveryReport (
+			@NonNull FonixRouteOutRec fonixRouteOut) {
 
 		// lookup the delivery status
 
-		Optional <ClockworkSmsDeliveryStatusRec> deliveryStatusOptional =
-			clockworkSmsDeliveryStatusHelper.findByCode (
-				clockworkSmsRouteOut.getClockworkSmsConfig (),
+		Optional <FonixDeliveryStatusRec> deliveryStatusOptional =
+			fonixDeliveryStatusHelper.findByCode (
+				fonixRouteOut.getFonixConfig (),
 				lowercase (
-					item.status ()));
+					request.statusCode ()));
 
 		if (
 			optionalIsNotPresent (
 				deliveryStatusOptional)
 		) {
 
-			return new ClockworkSmsRouteReportResponse.Item ()
+			exceptionLogger.logSimple (
+				"webapi",
+				requestContext.requestUri (),
+				stringFormat (
+					"Delivery status not recognised: %s",
+					request.statusCode ()),
+				"",
+				Optional.absent (),
+				GenericExceptionResolution.ignoreWithThirdPartyWarning);
 
-				.dlrId (
-					item.dlrId ())
-
-				.response (
-					"status not recognised");
+			return;
 
 		}
 
-		ClockworkSmsDeliveryStatusRec deliveryStatus =
+		FonixDeliveryStatusRec deliveryStatus =
 			optionalGetRequired (
 				deliveryStatusOptional);
-
-		// lookup the delivery status detail code
-
-		Optional <ClockworkSmsDeliveryStatusDetailCodeRec>
-		deliveryStatusDetailCodeOptional =
-			clockworkSmsDeliveryStatusDetailCodeHelper.findByCode (
-				clockworkSmsRouteOut.getClockworkSmsConfig (),
-				item.errCode ());
-
-		if (
-			optionalIsNotPresent (
-				deliveryStatusDetailCodeOptional)
-		) {
-
-			return new ClockworkSmsRouteReportResponse.Item ()
-
-				.dlrId (
-					item.dlrId ())
-
-				.response (
-					"status detail code not recognised");
-
-		}
-
-		ClockworkSmsDeliveryStatusDetailCodeRec deliveryStatusDeliveryCode =
-			optionalGetRequired (
-				deliveryStatusDetailCodeOptional);
 
 		// lookup the message
 
 		Optional <MessageRec> smsMessageOptional =
 			smsMessageLogic.findMessageByMangledId (
-				item.clientId ());
+				request.guid ());
 
 		if (
 			optionalIsNotPresent (
 				smsMessageOptional)
 		) {
 
-			return new ClockworkSmsRouteReportResponse.Item ()
+			exceptionLogger.logSimple (
+				"webapi",
+				requestContext.requestUri (),
+				stringFormat (
+					"Message guid not recognised: %s",
+					request.guid ()),
+				"",
+				optionalAbsent (),
+				GenericExceptionResolution.ignoreWithThirdPartyWarning);
 
-				.dlrId (
-					item.dlrId ())
-
-				.response (
-					"message not recognised");
+			return;
 
 		}
 
@@ -328,34 +280,14 @@ class ClockworkSmsRouteReportAction
 			smsDeliveryReportLogic.deliveryReport (
 				smsMessage,
 				deliveryStatus.getMessageStatus (),
-				Optional.of (
-					item.status ()),
-				Optional.of (
-					ifThenElse (
-						isNotNull (
-							deliveryStatusDeliveryCode),
-						() -> stringFormat (
-							"%s — %s",
-							deliveryStatus.getTheirDescription (),
-							deliveryStatusDeliveryCode.getTheirDescription ()),
-						() -> deliveryStatus.getTheirDescription ())),
-				Optional.of (
-					joinWithSpace (
-						stringFormat (
-							"status=%s",
-							item.status ()),
-						stringFormat (
-							"errCode=%s",
-							item.errCode ()))),
-				Optional.absent ());
-
-			return new ClockworkSmsRouteReportResponse.Item ()
-
-				.dlrId (
-					item.dlrId ())
-
-				.response (
-					"ok");
+				optionalOf (
+					request.statusCode ()),
+				optionalOf  (
+					request.statusText ()),
+				optionalAbsent (),
+				optionalOf (
+					fonixLogic.stringToInstant (
+						request.statusTime ())));
 
 		} catch (Exception exception) {
 
@@ -365,14 +297,6 @@ class ClockworkSmsRouteReportAction
 				exception,
 				Optional.absent (),
 				GenericExceptionResolution.ignoreWithThirdPartyWarning);
-
-			return new ClockworkSmsRouteReportResponse.Item ()
-
-				.dlrId (
-					item.dlrId ())
-
-				.response (
-					"internal error");
 
 		}
 
@@ -385,12 +309,7 @@ class ClockworkSmsRouteReportAction
 
 		// encode response
 
-		DataToXml dataToXml =
-			new DataToXml ();
-
-		String responseString =
-			dataToXml.writeToString (
-				response);
+		String responseString = "OK";
 
 		// write to debug log
 
@@ -408,7 +327,7 @@ class ClockworkSmsRouteReportAction
 		return textResponderProvider.get ()
 
 			.contentType (
-				"application/xml")
+				"text/plain")
 
 			.text (
 				responseString);
@@ -423,11 +342,14 @@ class ClockworkSmsRouteReportAction
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
-				"ClockworkSmsRouteReportAction.storeLog ()",
+				stringFormat (
+					"%s.%s ()",
+					getClass ().getSimpleName (),
+					"storeLog"),
 				this);
 
-		clockworkSmsInboundLogHelper.insert (
-			clockworkSmsInboundLogHelper.createInstance ()
+		fonixInboundLogHelper.insert (
+			fonixInboundLogHelper.createInstance ()
 
 			.setRoute (
 				smsRouteHelper.findRequired (
@@ -436,7 +358,7 @@ class ClockworkSmsRouteReportAction
 							"smsRouteId"))))
 
 			.setType (
-				ClockworkSmsInboundLogType.smsDelivery)
+				FonixInboundLogType.smsDelivery)
 
 			.setTimestamp (
 				transaction.now ())

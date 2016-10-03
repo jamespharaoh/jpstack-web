@@ -232,7 +232,19 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			}
 			*/
 
-			List<?> list =
+			if (
+				isNull (
+					model.parentField ())
+			) {
+
+				throw new UnsupportedOperationException (
+					stringFormat (
+						"%sObjectHelper.findByParentAndCode (...)",
+						model.objectName ()));
+
+			}
+
+			List <?> list =
 				session.createQuery (
 
 				stringFormat (

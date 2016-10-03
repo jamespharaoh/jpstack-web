@@ -1,13 +1,21 @@
 package wbs.utils.etc;
 
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.Data;
 import lombok.NonNull;
+import lombok.experimental.Accessors;
 
 public
 class PropertyUtils {
@@ -358,5 +366,153 @@ class PropertyUtils {
 		return getter.getReturnType ();
 
 	}
+
+	public static
+	void checkRequiredProperties (
+			@NonNull List <RequiredProperty> requiredProperties,
+			@NonNull Object object) {
+
+		for (
+			RequiredProperty requiredProperty
+				: requiredProperties
+		) {
+
+			Object propertyValue =
+				getProperty (
+					object,
+					requiredProperty.name ());
+
+			switch (requiredProperty.type ()) {
+
+			case notNull:
+
+				if (
+					isNull (
+						propertyValue)
+				) {
+
+					throw new IllegalStateException (
+						stringFormat (
+							"Property '%s' of '%s' must not be null",
+							requiredProperty.name (),
+							object.getClass ().getSimpleName ()));
+
+				}
+
+				break;
+
+			case notEmptyCollection:
+
+				if (
+
+					isNull (
+						propertyValue)
+
+					|| collectionIsEmpty (
+						(Collection <?>)
+						propertyValue)
+
+				) {
+
+					throw new IllegalStateException (
+						stringFormat (
+							"Property '%s' of '%s' ",
+							requiredProperty.name (),
+							object.getClass ().getSimpleName (),
+							"must not be empty or null"));
+
+				}
+
+				break;
+
+			case notEmptyString:
+
+				if (
+
+					isNull (
+						propertyValue)
+
+					|| stringIsEmpty (
+						stringTrim (
+							(String)
+							propertyValue))
+
+				) {
+
+					throw new IllegalStateException (
+						stringFormat (
+							"Property '%s' of '%s' ",
+							requiredProperty.name (),
+							object.getClass ().getSimpleName (),
+							"must not be empty or null"));
+
+				}
+
+				break;
+
+			}
+
+		}
+
+	}
+
+	@Accessors (fluent = true)
+	@Data
+	public static
+	class RequiredProperty {
+
+		String name;
+		RequiredPropertyType type;
+
+		public static
+		RequiredProperty notNull (
+				@NonNull String name) {
+
+			return new RequiredProperty ()
+
+				.name (
+					name)
+
+				.type (
+					RequiredPropertyType.notNull);
+
+		}
+
+		public static
+		RequiredProperty notEmptyCollection (
+				@NonNull String name) {
+
+			return new RequiredProperty ()
+
+				.name (
+					name)
+
+				.type (
+					RequiredPropertyType.notEmptyCollection);
+
+		}
+
+		public static
+		RequiredProperty notEmptyString (
+				@NonNull String name) {
+
+			return new RequiredProperty ()
+
+				.name (
+					name)
+
+				.type (
+					RequiredPropertyType.notEmptyString);
+
+		}
+
+	}
+
+	public static
+	enum RequiredPropertyType {
+		notNull,
+		notEmptyCollection,
+		notEmptyString;
+	}			
 
 }

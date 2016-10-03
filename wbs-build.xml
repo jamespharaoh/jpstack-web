@@ -621,6 +621,10 @@
 			package="wbs.integrations.digitalselect"/>
 
 		<plugin
+			name="fonix"
+			package="wbs.integrations.fonix"/>
+
+		<plugin
 			name="hybyte"
 			package="wbs.integrations.hybyte"/>
 

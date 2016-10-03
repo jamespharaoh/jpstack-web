@@ -4,6 +4,8 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.utils.exception.RuntimeNumberFormatException;
+
 public
 class NumberUtils {
 

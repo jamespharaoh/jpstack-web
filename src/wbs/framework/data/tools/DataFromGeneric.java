@@ -2,6 +2,11 @@ package wbs.framework.data.tools;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.ReflectionUtils.fieldSet;
+import static wbs.utils.etc.TypeUtils.classInstantiate;
+import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
@@ -12,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.NonNull;
-import lombok.SneakyThrows;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -21,19 +25,43 @@ import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 
 public
-class DataFromJson {
+class DataFromGeneric {
 
-	@SneakyThrows ({
-		InstantiationException.class,
-		IllegalAccessException.class
-	})
 	public <Data>
-	Data fromJson (
-			Class <Data> dataClass,
-			JSONObject jsonValue) {
+	Data fromObject (
+			@NonNull Class <Data> dataClass,
+			@NonNull Object object) {
+
+		if (
+			isInstanceOf (
+				Map.class,
+				object)
+		) {
+
+			return fromMap (
+				dataClass,
+				(Map <?, ?>) object);
+
+		} else {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Unable to construct '%s' from '%s'",
+					dataClass.getSimpleName (),
+					object.getClass ().getSimpleName ()));
+
+		}
+
+	}
+
+	public <Data>
+	Data fromMap (
+			@NonNull Class <Data> dataClass,
+			@NonNull Map <?, ?> map) {
 
 		Data dataValue =
-			dataClass.newInstance ();
+			classInstantiate (
+				dataClass);
 
 		for (
 			Field field
@@ -43,7 +71,7 @@ class DataFromJson {
 			field.setAccessible (true);
 
 			Object fieldValue =
-				jsonValue.get (
+				map.get (
 					field.getName ());
 
 			if (fieldValue == null) {
@@ -61,7 +89,7 @@ class DataFromJson {
 
 				doDataAttribute (
 					dataClass,
-					jsonValue,
+					fieldValue,
 					dataValue,
 					field,
 					dataAttribute,
@@ -80,7 +108,7 @@ class DataFromJson {
 
 				doDataChildren (
 					dataClass,
-					jsonValue,
+					fieldValue,
 					dataValue,
 					field,
 					dataChildren,
@@ -97,49 +125,54 @@ class DataFromJson {
 	private <Data>
 	void doDataAttribute (
 			@NonNull Class <Data> dataClass,
-			@NonNull JSONObject jsonValue,
+			@NonNull Object jsonValue,
 			@NonNull Object dataValue,
 			@NonNull Field field,
 			@NonNull DataAttribute dataAttribute,
-			@NonNull Object fieldValue)
-		throws
-			InstantiationException,
-			IllegalAccessException {
+			@NonNull Object fieldValue) {
 
 		if (field.getType () == Integer.class) {
 
-			field.set (
+			fieldSet (
+				field,
 				dataValue,
-				toJavaIntegerRequired (
-					(Long)
-					fieldValue));
+				optionalFromNullable (
+					toJavaIntegerRequired (
+						(Long)
+						fieldValue)));
 
 		} else if (field.getType () == Long.class) {
 
-			field.set (
+			fieldSet (
+				field,
 				dataValue,
-				(Long)
-				fieldValue);
+				optionalFromNullable (
+					(Long)
+					fieldValue));
 
 		} else if (field.getType () == String.class) {
 
-			field.set (
+			fieldSet (
+				field,
 				dataValue,
-				(String)
-				fieldValue);
+				optionalFromNullable (
+					(String)
+					fieldValue));
 
 		} else if (field.getType () == JSONObject.class) {
 
-			field.set (
+			fieldSet (
+				field,
 				dataValue,
-				(JSONObject)
-				fieldValue);
+				optionalFromNullable (
+					(JSONObject)
+					fieldValue));
 
 		} else {
 
 			throw new RuntimeException (
 				stringFormat (
-					"Unable to map json attribute %s.%s ",
+					"Unable to map map attribute %s.%s ",
 					field.getDeclaringClass ().getSimpleName (),
 					field.getName (),
 					"of type %s",
@@ -152,14 +185,11 @@ class DataFromJson {
 	private <Data>
 	void doDataChildren (
 			@NonNull Class <Data> dataClass,
-			@NonNull JSONObject jsonValue,
+			@NonNull Object fieldValue2,
 			@NonNull Object dataValue,
 			@NonNull Field field,
 			@NonNull DataChildren dataChildren,
-			@NonNull Object fieldValueObject)
-		throws
-			InstantiationException,
-			IllegalAccessException {
+			@NonNull Object fieldValueObject) {
 
 		if (
 			List.class.isAssignableFrom (
@@ -183,7 +213,7 @@ class DataFromJson {
 					field.getGenericType ();
 
 				listValue.add (
-					fromJson (
+					fromObject (
 						(Class <?>)
 							parameterizedType.getActualTypeArguments () [0],
 						(JSONObject)
@@ -191,9 +221,11 @@ class DataFromJson {
 
 			}
 
-			field.set (
+			fieldSet (
+				field,
 				dataValue,
-				listValue);
+				optionalOf (
+					listValue));
 
 		} else if (
 			Map.class.isAssignableFrom (
@@ -222,9 +254,11 @@ class DataFromJson {
 
 			}
 
-			field.set (
+			fieldSet (
+				field,
 				dataValue,
-				mapValue);
+				optionalOf (
+					mapValue));
 
 		} else {
 

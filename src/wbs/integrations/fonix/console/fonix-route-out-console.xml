@@ -1,0 +1,128 @@
+<console-module
+	name="fonix-route-out">
+
+	<console-helper-provider
+		object-name="fonixRouteOut"
+		view-priv="root:manage">
+
+		<priv-key
+			name="fonix.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<priv-key
+			name="fonixRouteOut.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="fonixRouteOutName"
+			delegate="route"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="fonixRouteOut"
+		object-name="fonixRouteOut">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="fonixRouteOut">
+
+		<parent-field/>
+
+		<object-field
+			name="fonixConfig"
+			label="Config"
+			object-type="fonixConfig"/>
+
+		<text-field
+			name="url"/>
+
+		<text-field
+			name="apiKey"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="fonixRouteOut">
+
+		<parent-field/>
+
+		<object-field
+			name="fonixConfig"
+			label="Config"
+			object-type="fonixConfig"/>
+
+		<text-field
+			name="url"/>
+
+		<text-field
+			name="apiKey"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="fonixRouteOut">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="fonixConfig"
+			label="Config"
+			object-type="fonixConfig"/>
+
+		<text-field
+			name="url"/>
+
+		<text-field
+			name="apiKey"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="fonixRouteOut">
+
+		<object-field
+			name="fonixConfig"
+			label="Config"
+			object-type="fonixConfig"/>
+
+		<text-field
+			name="url"/>
+
+		<text-field
+			name="apiKey"/>
+
+	</field-set>
+
+</console-module>

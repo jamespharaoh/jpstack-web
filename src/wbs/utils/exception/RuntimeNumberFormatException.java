@@ -1,4 +1,4 @@
-package wbs.utils.etc;
+package wbs.utils.exception;
 
 import lombok.NonNull;
 

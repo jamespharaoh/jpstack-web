@@ -1,0 +1,104 @@
+<console-module
+	name="fonix-route-in">
+
+	<console-helper-provider
+		object-name="fonixRouteIn"
+		view-priv="root:manage">
+
+		<priv-key
+			name="fonix.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<priv-key
+			name="fonixRouteIn.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-stuff
+			name="fonixRouteInName"
+			delegate="route"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="fonixRouteIn"
+		object-name="fonixRouteIn">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="fonixRouteIn">
+
+		<parent-field/>
+
+		<object-field
+			name="fonixConfig"
+			label="Config"
+			object-type="fonixConfig"/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="fonixRouteIn">
+
+		<parent-field/>
+
+		<object-field
+			name="fonixConfig"
+			label="Config"
+			object-type="fonixConfig"/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="fonixRouteIn">
+
+		<id-field/>
+		<parent-field/>
+
+		<object-field
+			name="fonixConfig"
+			label="Config"
+			object-type="fonixConfig"/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="fonixRouteIn">
+
+		<object-field
+			name="fonixConfig"
+			label="Config"
+			object-type="fonixConfig"/>
+
+	</field-set>
+
+</console-module>
