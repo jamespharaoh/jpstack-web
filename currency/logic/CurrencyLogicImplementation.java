@@ -89,8 +89,16 @@ class CurrencyLogicImplementation
 		stringBuilder.append (
 			currency.getPrefix ());
 
+		if (amount < 0) {
+
+			stringBuilder.append (
+				"-");
+
+		}
+
 		stringBuilder.append (
-			amount / currency.getDivisions ());
+			Math.abs (
+				amount / currency.getDivisions ()));
 
 		if (currency.getDivisions () == 1) {
 

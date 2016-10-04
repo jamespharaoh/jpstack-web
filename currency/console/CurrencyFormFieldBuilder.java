@@ -1,6 +1,8 @@
 package wbs.platform.currency.console;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -13,6 +15,7 @@ import javax.inject.Provider;
 import org.apache.commons.lang3.Range;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.forms.DereferenceFormFieldAccessor;
 import wbs.console.forms.FormField;
 import wbs.console.forms.FormFieldAccessor;
 import wbs.console.forms.FormFieldBuilderContext;
@@ -32,9 +35,9 @@ import wbs.console.forms.RangeFormFieldInterfaceMapping;
 import wbs.console.forms.RangeFormFieldRenderer;
 import wbs.console.forms.ReadOnlyFormField;
 import wbs.console.forms.RequiredFormFieldValueValidator;
-import wbs.console.forms.SimpleFormFieldAccessor;
 import wbs.console.forms.TextFormFieldRenderer;
 import wbs.console.forms.UpdatableFormField;
+import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -43,7 +46,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.utils.etc.PropertyUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("currencyFormFieldBuilder")
@@ -56,11 +58,18 @@ class CurrencyFormFieldBuilder {
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
+
 	// prototype dependencies
 
 	@PrototypeDependency
 	Provider <CurrencyFormFieldInterfaceMapping>
 	currencyFormFieldInterfaceMappingProvider;
+
+	@PrototypeDependency
+	Provider <DereferenceFormFieldAccessor>
+	dereferenceFormFieldAccessorProvider;
 
 	@PrototypeDependency
 	Provider <IdentityFormFieldNativeMapping>
@@ -95,10 +104,6 @@ class CurrencyFormFieldBuilder {
 	requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
-
-	@PrototypeDependency
 	Provider <TextFormFieldRenderer>
 	textFormFieldRendererProvider;
 
@@ -129,6 +134,11 @@ class CurrencyFormFieldBuilder {
 		String name =
 			spec.name ();
 
+		String fieldName =
+			ifNull (
+				spec.fieldName (),
+				name);
+
 		String label =
 			ifNull (
 				spec.label (),
@@ -156,10 +166,13 @@ class CurrencyFormFieldBuilder {
 				spec.maximum (),
 				Long.MAX_VALUE);
 
-		Class<?> propertyClass =
-			PropertyUtils.propertyClassForClass (
-				context.containerClass (),
-				name);
+		Class <?> propertyClass =
+			optionalGetRequired (
+				objectManager.dereferenceType (
+					optionalOf (
+						context.containerClass ()),
+					optionalOf (
+						fieldName)));
 
 		Boolean blankIfZero =
 			ifNull (
@@ -169,10 +182,10 @@ class CurrencyFormFieldBuilder {
 		// accessor
 
 		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+			dereferenceFormFieldAccessorProvider.get ()
 
-			.name (
-				name)
+			.path (
+				fieldName)
 
 			.nativeClass (
 				propertyClass);

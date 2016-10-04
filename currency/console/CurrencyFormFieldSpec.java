@@ -20,6 +20,10 @@ class CurrencyFormFieldSpec {
 		required = true)
 	String name;
 
+	@DataAttribute (
+		name = "field")
+	String fieldName;
+
 	@DataAttribute
 	String label;
 
@@ -29,13 +33,11 @@ class CurrencyFormFieldSpec {
 	@DataAttribute
 	Boolean readOnly;
 
-	@DataAttribute (
-		name = "min")
+	@DataAttribute
 	Long minimum =
 		Long.MIN_VALUE;
 
-	@DataAttribute (
-		name = "max")
+	@DataAttribute
 	Long maximum =
 		Long.MAX_VALUE;
 
