@@ -1,4 +1,4 @@
-package wbs.apn.chat.core.console;
+package wbs.apn.chat.report.console;
 
 import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -29,9 +29,9 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 
-@PrototypeComponent ("chatStatisticsPart")
+@PrototypeComponent ("chatReportStatisticsPart")
 public
-class ChatStatisticsPart
+class ChatReportStatisticsPart
 	extends AbstractPagePart {
 
 	// singleton dependencies

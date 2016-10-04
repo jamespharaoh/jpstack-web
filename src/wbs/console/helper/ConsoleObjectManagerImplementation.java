@@ -720,4 +720,14 @@ class ConsoleObjectManagerImplementation
 
 	}
 
+	@Override
+	public
+	Optional <Class <?>> objectClassForTypeCode (
+			String typeCode) {
+
+		return objectManager.objectClassForTypeCode (
+			typeCode);
+
+	}
+
 }

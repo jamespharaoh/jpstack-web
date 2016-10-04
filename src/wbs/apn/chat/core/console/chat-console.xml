@@ -90,9 +90,6 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<context-tab-responder-page
-				name="statistics"/>
-
 			<extension-point
 				name="chat.settings"/>
 
@@ -111,8 +108,17 @@
 			<extension-point
 				name="chat.plugin"/>
 
-			<extension-point
-				name="chat.broadcast"/>
+			<section
+				name="tools"
+				label="Tools">
+
+				<extension-point
+					name="chat.broadcast"/>
+
+				<extension-point
+					name="chat.rebill"/>
+
+			</section>
 
 			<extension-point
 				name="chat.supervisor"/>

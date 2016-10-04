@@ -2,6 +2,8 @@ package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 
@@ -13,6 +15,7 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -21,7 +24,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.utils.etc.PropertyUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("textFormFieldBuilder")
@@ -33,6 +35,9 @@ class TextFormFieldBuilder {
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
+
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
 
 	// prototype dependencies
 
@@ -125,14 +130,17 @@ class TextFormFieldBuilder {
 
 		// field type
 
-		Class<?> propertyClass;
+		Class <?> propertyClass;
 
 		if (! dynamic) {
 
 			propertyClass =
-				PropertyUtils.propertyClassForClass (
-					context.containerClass (),
-					fieldName);
+				optionalGetRequired (
+					objectManager.dereferenceType (
+						optionalOf (
+							context.containerClass ()),
+						optionalOf (
+							fieldName)));
 
 		} else {
 

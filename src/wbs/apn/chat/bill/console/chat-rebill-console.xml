@@ -1,0 +1,104 @@
+<console-module
+	name="chat-rebill">
+
+	<extend-context
+		name="chat.rebill"
+		base-name="chat"
+		extension-point="chat.rebill"
+		object-name="chat">
+
+		<context-tab-action-page
+			name="rebill"/>
+
+		<context-tab-responder
+			name="rebillVerify"
+			tab="chat.tools.rebill"/>
+
+		<context-tab-responder
+			name="rebillConfirm"
+			tab="chat.tools.rebill"/>
+
+	</extend-context>
+
+	<field-set
+		name="search"
+		class="wbs.apn.chat.bill.console.ChatRebillSearch">
+
+		<timestamp-from-field
+			name="lastAction"/>
+
+		<currency-field
+			name="minimumCreditOwed"
+			currency="chat.currency"
+			minimum="1"/>
+
+		<yes-no-field
+			name="includeBlocked"
+			nullable="no"/>
+
+		<yes-no-field
+			name="includeFailed"
+			nullable="no"/>
+
+	</field-set>
+
+	<field-set
+		name="bill-results"
+		object-name="chatUser">
+
+		<code-field/>
+
+		<enum-field
+			name="gender"/>
+
+		<enum-field
+			name="orient"/>
+
+		<text-field
+			name="name"/>
+
+		<currency-field
+			name="credit"
+			field="credit"
+			currency="chat.currency"/>
+
+		<timestamp-from-field
+			name="lastAction"/>
+
+	</field-set>
+
+	<field-set
+		name="non-bill-results"
+		class="wbs.apn.chat.bill.console.ChatRebillNonBillResult">
+
+		<text-field
+			name="code"
+			field="chatUser.code"/>
+
+		<enum-field
+			name="gender"
+			field="chatUser.gender"/>
+
+		<enum-field
+			name="orient"
+			field="chatUser.orient"/>
+
+		<text-field
+			name="name"
+			field="chatUser.name"/>
+
+		<currency-field
+			name="credit"
+			field="chatUser.credit"
+			currency="chatUser.chat.currency"/>
+
+		<timestamp-from-field
+			name="lastAction"
+			field="chatUser.lastAction"/>
+
+		<text-field
+			name="reason"/>
+
+	</field-set>
+
+</console-module>

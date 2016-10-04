@@ -30,8 +30,8 @@ import fj.data.Either;
 @Accessors (fluent = true)
 @PrototypeComponent ("enumFormFieldRenderer")
 public
-class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
-	implements FormFieldRenderer<Container,Interface> {
+class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
+	implements FormFieldRenderer <Container, Interface> {
 
 	// properties
 
@@ -45,7 +45,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	Boolean nullable;
 
 	@Getter @Setter
-	EnumConsoleHelper<Interface> enumConsoleHelper;
+	EnumConsoleHelper <Interface> enumConsoleHelper;
 
 	// implementation
 
@@ -55,8 +55,8 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Interface> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Interface> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -81,12 +81,12 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Interface> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Interface> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		Optional<Interface> currentValue =
+		Optional <Interface> currentValue =
 			formValuePresent (
 					submission,
 					formName)
@@ -132,7 +132,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 		}
 
 		for (
-			Map.Entry<Interface,String> optionEntry
+			Map.Entry <Interface, String> optionEntry
 				: enumConsoleHelper.map ().entrySet ()
 		) {
 
@@ -165,7 +165,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
-			@NonNull Optional<Interface> interfaceValue,
+			@NonNull Optional <Interface> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -221,7 +221,7 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 
 	@Override
 	public
-	Either<Optional<Interface>,String> formToInterface (
+	Either <Optional <Interface>, String> formToInterface (
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
@@ -263,8 +263,8 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 	void renderHtmlSimple (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Interface> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Interface> interfaceValue,
 			boolean link) {
 
 		htmlWriter.writeFormat (
@@ -277,8 +277,8 @@ class EnumFormFieldRenderer<Container,Interface extends Enum<Interface>>
 
 	@Override
 	public
-	Optional<String> htmlClass (
-			@NonNull Optional<Interface> interfaceValueOptional) {
+	Optional <String> htmlClass (
+			@NonNull Optional <Interface> interfaceValueOptional) {
 
 		return optionalMapOptional (
 			interfaceValueOptional,

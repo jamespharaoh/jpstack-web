@@ -13,6 +13,7 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
+import wbs.apn.chat.bill.logic.ChatCreditLogic.BillCheckOptions;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
@@ -176,7 +177,7 @@ class ChatCreditDaemon
 
 		chatCreditLogic.userBill (
 			chatUser,
-			false);
+			new BillCheckOptions ());
 
 		transaction.commit ();
 

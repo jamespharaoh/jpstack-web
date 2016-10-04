@@ -28,7 +28,6 @@
 	<layer name="console">
 		<component class="console.ChatConsoleLogicImplementation"/>
 		<component class="console.ChatKeywordJoinTypeConsoleHelper"/>
-		<component class="console.ChatStatisticsPart"/>
 	</layer>
 
 	<layer name="daemon">

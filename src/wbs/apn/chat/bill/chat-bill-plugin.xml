@@ -2,12 +2,17 @@
 	name="chat-bill"
 	package="wbs.apn.chat.bill">
 
+	<sql-scripts>
+		<sql-schema name="chat-bill"/>
+	</sql-scripts>
+
 	<models>
 		<custom-type name="chatUserCreditMode"/>
 		<model name="chatDailyLimitLog"/>
 		<model name="chatNetwork"/>
 		<model name="chatPromo"/>
 		<model name="chatPromoUser"/>
+		<model name="chatRebillLog"/>
 		<model name="chatRoute"/>
 		<model name="chatRouteNetwork"/>
 		<model name="chatUserBillLog"/>
@@ -18,6 +23,11 @@
 
 	<layer name="logic">
 		<component class="logic.ChatCreditLogicImplementation"/>
+	</layer>
+
+	<layer name="console">
+		<component class="console.ChatRebillAction"/>
+		<component class="console.ChatRebillPart"/>
 	</layer>
 
 	<layer name="daemon">
@@ -31,6 +41,7 @@
 	<console-modules>
 		<console-module name="chat-network"/>
 		<console-module name="chat-promo"/>
+		<console-module name="chat-rebill"/>
 		<console-module name="chat-route"/>
 		<console-module name="chat-route-network"/>
 		<console-module name="chat-user-credit"/>

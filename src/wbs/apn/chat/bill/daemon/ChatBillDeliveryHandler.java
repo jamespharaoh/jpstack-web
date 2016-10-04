@@ -17,6 +17,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
+import wbs.apn.chat.bill.logic.ChatCreditLogic.BillCheckOptions;
 import wbs.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -266,7 +267,8 @@ class ChatBillDeliveryHandler
 
 			chatCreditLogic.userBill (
 				chatUser,
-				true);
+				new BillCheckOptions ()
+					.retry (true));
 
 		}
 

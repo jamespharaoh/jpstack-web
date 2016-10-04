@@ -2,6 +2,7 @@ package wbs.console.forms;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.console.module.ConsoleModuleData;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
@@ -18,6 +19,10 @@ class EnumFormFieldSpec {
 	@DataAttribute (
 		required = true)
 	String name;
+
+	@DataAttribute (
+		name = "field")
+	String fieldName;
 
 	@DataAttribute
 	String label;

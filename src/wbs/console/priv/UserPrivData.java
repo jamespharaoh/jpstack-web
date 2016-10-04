@@ -271,23 +271,23 @@ class UserPrivData {
 	class SharedData {
 
 		public
-		Map<GlobalId,ObjectData> objectDatasByObjectId =
-			new HashMap<GlobalId,ObjectData> ();
-
-		public
-		Map<String,Long> objectTypeIdsByClassName =
+		Map <GlobalId, ObjectData> objectDatasByObjectId =
 			new HashMap<> ();
 
 		public
-		Map<Long,Long> chainedPrivIds =
+		Map <String, Long> objectTypeIdsByClassName =
 			new HashMap<> ();
 
 		public
-		Map<Long,Long> managePrivIds =
+		Map <Long, Long> chainedPrivIds =
 			new HashMap<> ();
 
 		public
-		Map<Long,String> objectTypeCodesById;
+		Map <Long, Long> managePrivIds =
+			new HashMap<> ();
+
+		public
+		Map <Long, String> objectTypeCodesById;
 
 	}
 

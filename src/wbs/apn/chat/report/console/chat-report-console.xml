@@ -19,6 +19,9 @@
 		<extension-point
 			name="chatReport.graphs"/>
 
+		<context-tab-responder-page
+			name="statistics"/>
+
 	</simple-context>
 
 	<simple-context

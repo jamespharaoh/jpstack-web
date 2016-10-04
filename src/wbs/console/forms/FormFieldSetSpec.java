@@ -47,7 +47,7 @@ class FormFieldSetSpec {
 	// children
 
 	@DataChildren (direct = true)
-	List<Object> formFieldSpecs =
-		new ArrayList<Object> ();
+	List <Object> formFieldSpecs =
+		new ArrayList<> ();
 
 }

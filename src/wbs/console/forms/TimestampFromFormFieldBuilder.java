@@ -1,6 +1,8 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -14,6 +16,7 @@ import javax.inject.Provider;
 import org.joda.time.Instant;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -22,7 +25,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.utils.etc.PropertyUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("timestampFromFormFieldBuilder")
@@ -35,11 +37,18 @@ class TimestampFromFormFieldBuilder {
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
+
 	// prototype dependencies
 
 	@PrototypeDependency
 	Provider <DateFormFieldNativeMapping>
 	dateFormFieldNativeMappingProvider;
+
+	@PrototypeDependency
+	Provider <DereferenceFormFieldAccessor>
+	dereferenceFormFieldAccessorProvider;
 
 	@PrototypeDependency
 	Provider <IdentityFormFieldNativeMapping>
@@ -56,10 +65,6 @@ class TimestampFromFormFieldBuilder {
 	@PrototypeDependency
 	Provider <RequiredFormFieldValueValidator>
 	requiredFormFieldValueValidatorProvider;
-
-	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
 
 	@PrototypeDependency
 	Provider <TextFormFieldRenderer>
@@ -94,6 +99,11 @@ class TimestampFromFormFieldBuilder {
 		String name =
 			spec.name ();
 
+		String fieldName =
+			ifNull (
+				spec.fieldName (),
+				name);
+
 		String label =
 			ifNull (
 				spec.label (),
@@ -113,10 +123,13 @@ class TimestampFromFormFieldBuilder {
 
 		// accessor and native mapping
 
-		Class<?> propertyClass =
-			PropertyUtils.propertyClassForClass (
-				context.containerClass (),
-				name);
+		Class <?> propertyClass =
+			optionalGetRequired (
+				objectManager.dereferenceType (
+					optionalOf (
+						context.containerClass ()),
+					optionalOf (
+						fieldName)));
 
 		FormFieldAccessor formFieldAccessor;
 		FormFieldNativeMapping formFieldNativeMapping;
@@ -124,10 +137,10 @@ class TimestampFromFormFieldBuilder {
 		if (propertyClass == Instant.class) {
 
 			formFieldAccessor =
-				simpleFormFieldAccessorProvider.get ()
+				dereferenceFormFieldAccessorProvider.get ()
 
-				.name (
-					name)
+				.path (
+					fieldName)
 
 				.nativeClass (
 					Instant.class);
@@ -138,10 +151,10 @@ class TimestampFromFormFieldBuilder {
 		} else if (propertyClass == Date.class) {
 
 			formFieldAccessor =
-				simpleFormFieldAccessorProvider.get ()
+				dereferenceFormFieldAccessorProvider.get ()
 
-				.name (
-					name)
+				.path (
+					fieldName)
 
 				.nativeClass (
 					Date.class);

@@ -1,5 +1,6 @@
 package wbs.platform.priv.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -13,6 +14,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Provider;
 import javax.sql.DataSource;
+
+import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.Getter;
@@ -276,7 +279,7 @@ class PrivDataLoaderImplementation
 
 			// sort out objectTypeIdsByClassName
 
-			Collection<ObjectTypeRec> objectTypes =
+			Collection <ObjectTypeRec> objectTypes =
 				objectTypeHelper.findAll ();
 
 			for (
@@ -284,15 +287,20 @@ class PrivDataLoaderImplementation
 					: objectTypes
 			) {
 
-				try {
+				Optional <Class <?>> objectClassOptional =
+					objectManager.objectClassForTypeCode (
+						objectType.getCode ());
+
+				if (
+					optionalIsPresent (
+						objectClassOptional)
+				) {
 
 					newData.objectTypeIdsByClassName.put (
-						objectManager.objectClassForTypeCodeRequired (
-							objectType.getCode ()
-						).getName (),
+						objectClassOptional.get ().getName (),
 						objectType.getId ());
 
-				} catch (IllegalArgumentException exception) {
+				} else {
 
 					log.warn (
 						stringFormat (
@@ -396,9 +404,10 @@ class PrivDataLoaderImplementation
 				Collections.unmodifiableMap (
 					objectTypeHelper.findAll ().stream ()
 
-				.collect (Collectors.toMap (
-					ObjectTypeRec::getId,
-					ObjectTypeRec::getCode))
+				.collect (
+					Collectors.toMap (
+						ObjectTypeRec::getId,
+						ObjectTypeRec::getCode))
 
 			);
 

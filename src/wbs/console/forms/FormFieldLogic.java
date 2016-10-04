@@ -1,12 +1,14 @@
 package wbs.console.forms;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.etc.Misc.doNothing;
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.equalToOne;
 import static wbs.utils.etc.NumberUtils.equalToThree;
 import static wbs.utils.etc.NumberUtils.equalToTwo;
+import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -550,7 +552,7 @@ class FormFieldLogic {
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
-			@NonNull Optional<UpdateResultSet> updateResultSet,
+			@NonNull Optional <UpdateResultSet> updateResultSet,
 			@NonNull Object object,
 			@NonNull Map<String,Object> hints,
 			@NonNull FormType formType,
@@ -579,16 +581,16 @@ class FormFieldLogic {
 					updateResultSet)
 			) {
 
-				UpdateResult updateResult =
-					updateResultSet.get ().updateResults ().get (
-						stringFormat (
-							"%s-%s",
+				Optional <UpdateResult <?, ?>> updateResultOptional =
+					mapItemForKey (
+						updateResultSet.get ().updateResults (),
+						Pair.of (
 							formName,
 							formField.name ()));
 
 				if (
-					isNull (
-						updateResult)
+					optionalIsNotPresent (
+						updateResultOptional)
 				) {
 
 					log.error (
@@ -603,7 +605,7 @@ class FormFieldLogic {
 				} else {
 
 					error =
-						updateResult.error ();
+						updateResultOptional.get ().error ();
 
 				}
 
@@ -660,9 +662,9 @@ class FormFieldLogic {
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
-			@NonNull Optional<UpdateResultSet> updateResultSet,
+			@NonNull Optional <UpdateResultSet> updateResultSet,
 			@NonNull Object object,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull String method,
 			@NonNull String actionUrl,
 			@NonNull String submitButtonLabel,
@@ -690,9 +692,9 @@ class FormFieldLogic {
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
-			@NonNull Optional<UpdateResultSet> updateResultSet,
+			@NonNull Optional <UpdateResultSet> updateResultSet,
 			@NonNull Object object,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull String method,
 			@NonNull String actionUrl,
 			@NonNull String submitButtonLabel,
@@ -774,7 +776,7 @@ class FormFieldLogic {
 	void outputListTable (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
-			@NonNull List<?> objects,
+			@NonNull List <?> objects,
 			boolean links) {
 
 		// table open
@@ -986,8 +988,16 @@ class FormFieldLogic {
 		Map <Pair <String, String>, UpdateResult <?, ?>> updateResults =
 			new LinkedHashMap<> ();
 
-		int errorCount;
-		int updateCount;
+		long errorCount;
+		long updateCount;
+
+		public
+		boolean errors () {
+
+			return moreThanZero (
+				errorCount);
+
+		}
 
 	}
 

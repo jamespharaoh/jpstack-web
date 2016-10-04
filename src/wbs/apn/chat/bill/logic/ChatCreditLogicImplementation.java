@@ -6,6 +6,9 @@ import static wbs.utils.etc.LogicUtils.notEqualSafe;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.sum;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringInSafe;
@@ -438,7 +441,7 @@ class ChatCreditLogicImplementation
 	ChatCreditCheckResult userSpendCreditCheck (
 			@NonNull ChatUserRec chatUser,
 			@NonNull Boolean userActed,
-			@NonNull Optional<Long> threadId) {
+			@NonNull Optional <Long> threadId) {
 
 		log.debug (
 			stringFormat (
@@ -462,7 +465,8 @@ class ChatCreditLogicImplementation
 
 			userBill (
 				chatUser,
-				true);
+				new BillCheckOptions ()
+					.retry (true));
 
 		}
 
@@ -661,53 +665,46 @@ class ChatCreditLogicImplementation
 
 	}
 
-	/**
-	 * Bills the user by sending messages, if appropriate.
-	 *
-	 * The retry parameter indicates we can retry revoked credit. This is only
-	 * set when something has happened which prevents users who are not being
-	 * billed from being rebilled continually.
-	 *
-	 * @param chatUser
-	 *            the user to bill if appropriate
-	 * @param retry
-	 *            if true then revoked credit will be retried also
-	 */
 	@Override
 	public
-	void userBill (
-			ChatUserRec chatUser,
-			boolean retry) {
-
+	Optional <String> userBillCheck (
+			@NonNull ChatUserRec chatUser,
+			@NonNull BillCheckOptions options) {
+	
 		Transaction transaction =
 			database.currentTransaction ();
 
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();
 
+		// check user has number
+
 		if (chatUser.getNumber () == null) {
 
-			log.warn (
+			return optionalOf (
 				stringFormat (
 					"Unable to bill chat user %s with no number",
 					objectManager.objectPathMini (
 						chatUser)));
 
-			return;
-
 		}
 
 		// check number is successful
 
-		if (! chatNumberReportLogic.isNumberReportSuccessful (
-				chatUser.getNumber ())) {
+		if (
 
-			log.debug (
+			! chatNumberReportLogic.isNumberReportSuccessful (
+				chatUser.getNumber ())
+
+			&& ! options.includeFailed ()
+
+		) {
+
+			return optionalOf (
 				stringFormat (
-					"Ignoring credit request for %s because not successful",
-					chatUser.getId ()));
-
-			return;
+					"Ignoring credit request for %s ",
+					chatUser.getId (),
+					"due to repeated billed message failure"));
 
 		}
 
@@ -719,29 +716,30 @@ class ChatCreditLogicImplementation
 					chatUser.getNumber ())
 		) {
 
-			log.debug (
+			return optionalOf (
 				stringFormat (
 					"Ignoring credit request for %s because permanent failure",
 					chatUser.getId ()));
 
-			return;
-
 		}
+
+		// check block all
 
 		if (
 
 			chatUser.getBlockAll ()
 
-			&& ! chatUser.getChat ().getBillBlockedUsers ()
+			&& ! (
+				chatUser.getChat ().getBillBlockedUsers ()
+				|| options.includeBlocked ()
+			)
 
 		) {
 
-			log.debug (
+			return optionalOf (
 				stringFormat (
 					"Ignoring credit request for %s because block all",
 					chatUser.getId ()));
-
-			return;
 
 		}
 
@@ -753,14 +751,12 @@ class ChatCreditLogicImplementation
 				ChatUserCreditMode.billedMessages)
 		) {
 
-			log.debug (
+			return optionalOf (
 				stringFormat (
 					"Ignoring credit request for %s ",
 					chatUser.getId (),
 					"as their credit mode is %s",
 					chatUser.getCreditMode ()));
-
-			return;
 
 		}
 
@@ -768,13 +764,11 @@ class ChatCreditLogicImplementation
 
 		if (chatUser.getCredit () >= 0) {
 
-			log.debug (
+			return optionalOf (
 				stringFormat (
 					"Ignoring credit request for %s as their credit is %s",
 					chatUser.getId (),
 					chatUser.getCredit ()));
-
-			return;
 
 		}
 
@@ -783,21 +777,26 @@ class ChatCreditLogicImplementation
 		boolean revoked =
 			chatUser.getCredit () + chatUser.getCreditRevoked () >= 0;
 
-		if (revoked && ! retry)
-			return;
+		if (revoked && ! options.retry ()) {
+
+			return optionalOf (
+				stringFormat (
+					"Ignoring credit request for %s ",
+					chatUser.getId (),
+					"as credit is revoked and retry is disabled"));
+
+		}
 
 		// apply daily bill limit
 
 		if (userBillLimitApplies (chatUser)) {
 
-			log.debug (
+			return optionalOf (
 				stringFormat (
-					"rejecting bill message for chat user %s due to daily ",
+					"Ignoring credit request for %s due to daily ",
 					objectManager.objectPathMini (
 						chatUser),
 					"limit"));
-
-			return;
 
 		}
 
@@ -826,19 +825,46 @@ class ChatCreditLogicImplementation
 
 		) {
 
-			log.info (
+			return optionalOf (
 				stringFormat (
 					"Rejecting bill for user %s because last sent %s",
 					chatUser.getId (),
 					chatUser.getLastBillSent ()));
 
-			return;
-
 		}
 
-		userBillReal (
-			chatUser,
-			true);
+		// return success
+
+		return optionalAbsent ();
+
+	}
+
+	@Override
+	public
+	void userBill (
+			@NonNull ChatUserRec chatUser,
+			@NonNull BillCheckOptions options) {
+
+		Optional <String> reasonOptional =
+			userBillCheck (
+				chatUser,
+				options);
+
+		if (
+			optionalIsPresent (
+				reasonOptional)
+		) {
+
+			log.warn (
+				reasonOptional.get ());
+
+		} else {
+
+			userBillReal (
+				chatUser,
+				true);
+
+		}
 
 	}
 

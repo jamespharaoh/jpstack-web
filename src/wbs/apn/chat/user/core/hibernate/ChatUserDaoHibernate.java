@@ -24,20 +24,20 @@ import org.hibernate.criterion.Subqueries;
 import org.hibernate.sql.JoinType;
 import org.joda.time.Instant;
 
-import wbs.apn.chat.bill.model.ChatUserCreditMode;
-import wbs.apn.chat.user.core.model.ChatUserDateMode;
-import wbs.apn.chat.user.core.model.ChatUserSearch;
-import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
-import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
+import wbs.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.apn.chat.category.model.ChatCategoryRec;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserDao;
+import wbs.apn.chat.user.core.model.ChatUserDateMode;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserSearch;
 import wbs.apn.chat.user.core.model.ChatUserSessionRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.sms.number.core.model.NumberRec;
 
@@ -114,7 +114,8 @@ class ChatUserDaoHibernate
 	public
 	List <ChatUserRec> findWantingBill (
 			@NonNull ChatRec chat,
-			@NonNull Instant startTime) {
+			@NonNull Instant lastAction,
+			@NonNull Long maximumCredit) {
 
 		return findMany (
 			"findWantingBill",
@@ -136,7 +137,7 @@ class ChatUserDaoHibernate
 			.add (
 				Restrictions.lt (
 					"credit",
-					0l))
+					maximumCredit))
 
 			.add (
 				Restrictions.eq (
@@ -146,11 +147,13 @@ class ChatUserDaoHibernate
 			.add (
 				Restrictions.ge (
 					"lastAction",
-					startTime))
+					lastAction))
 
+/*
 			.add (
 				Restrictions.sqlRestriction (
 					"credit + credit_revoked < 0"))
+*/
 
 		);
 

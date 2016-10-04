@@ -17,10 +17,14 @@ public
 class TimestampFromFormFieldSpec {
 
 	@DataAttribute
-	String label;
+	String name;
+
+	@DataAttribute (
+		name = "field")
+	String fieldName;
 
 	@DataAttribute
-	String name;
+	String label;
 
 	@DataAttribute
 	Boolean nullable;

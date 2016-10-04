@@ -145,8 +145,8 @@ class EnumConsoleHelper <E extends Enum <E>> {
 
 	}
 
-	protected
-	EnumConsoleHelper<E> auto () {
+	public
+	EnumConsoleHelper <E> auto () {
 
 		for (
 			E value
@@ -165,7 +165,7 @@ class EnumConsoleHelper <E extends Enum <E>> {
 	}
 
 	public
-	Optional<String> htmlClass (
+	Optional <String> htmlClass (
 			@NonNull E value) {
 
 		return Optional.<String>absent ();

@@ -3,6 +3,7 @@ package wbs.platform.currency.console;
 import static wbs.utils.etc.Misc.errorResult;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -50,22 +51,22 @@ class CurrencyFormFieldInterfaceMapping <Container>
 
 	@Override
 	public
-	Either<Optional<Long>,String> interfaceToGeneric (
+	Either <Optional <Long>, String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue) {
 
 		if (! interfaceValue.isPresent ()) {
 
 			return successResult (
-				Optional.<Long>absent ());
+				optionalAbsent ());
 
 		}
 
 		if (interfaceValue.get ().isEmpty ()) {
 
 			return successResult (
-				Optional.<Long>absent ());
+				optionalAbsent ());
 
 		}
 

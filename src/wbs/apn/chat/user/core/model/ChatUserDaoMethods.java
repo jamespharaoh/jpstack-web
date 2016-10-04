@@ -8,7 +8,6 @@ import org.joda.time.Instant;
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.category.model.ChatCategoryRec;
 import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.sms.number.core.model.NumberRec;
 
 public
@@ -34,7 +33,20 @@ interface ChatUserDaoMethods {
 
 	List <ChatUserRec> findWantingBill (
 			ChatRec chat,
-			Instant date);
+			Instant lastAction,
+			Long maximumCredit);
+
+	default
+	List <ChatUserRec> findWantingBill (
+			ChatRec chat,
+			Instant lastAction) {
+
+		return findWantingBill (
+			chat,
+			lastAction,
+			0l);
+
+	}
 
 	List <ChatUserRec> findWantingWarning ();
 

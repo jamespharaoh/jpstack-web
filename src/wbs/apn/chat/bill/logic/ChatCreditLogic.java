@@ -2,6 +2,9 @@ package wbs.apn.chat.bill.logic;
 
 import com.google.common.base.Optional;
 
+import lombok.Data;
+import lombok.experimental.Accessors;
+
 import org.joda.time.LocalDate;
 
 import wbs.apn.chat.bill.model.ChatUserSpendRec;
@@ -54,21 +57,13 @@ interface ChatCreditLogic {
 	ChatCreditCheckResult userCreditCheckStrict (
 			ChatUserRec chatUser);
 
-	/**
-	 * Bills the user by sending allMessages, if appropriate.
-	 *
-	 * The retry parameter indicates we can retry revoked credit. This is only
-	 * set when something has happened which prevents users who are not being
-	 * billed from being rebilled continually.
-	 *
-	 * @param chatUser
-	 *            the user to bill if appropriate
-	 * @param retry
-	 *            if true then revoked credit will be retried also
-	 */
+	Optional <String> userBillCheck (
+			ChatUserRec chatUser,
+			BillCheckOptions options);
+
 	void userBill (
 			ChatUserRec chatUser,
-			boolean retry);
+			BillCheckOptions options);
 
 	void userBillReal (
 			ChatUserRec chatUser,
@@ -109,5 +104,14 @@ interface ChatCreditLogic {
 
 	String userCreditDebug (
 			ChatUserRec chatUser);
+
+	@Accessors (fluent = true)
+	@Data
+	public static
+	class BillCheckOptions {
+		Boolean retry = false;
+		Boolean includeBlocked = false;
+		Boolean includeFailed = false;
+	}
 
 }

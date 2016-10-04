@@ -280,7 +280,7 @@
 			name="spendWarningEvery"
 			currency="chatScheme.chat.currency"
 			nullable="yes"
-			min="1"/>
+			minimum="1"/>
 
 	</field-set>
 

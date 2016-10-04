@@ -5,6 +5,8 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.ifNullThenRequired;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -18,6 +20,7 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.helper.EnumConsoleHelper;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -28,7 +31,6 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
-import wbs.utils.etc.PropertyUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("enumFormFieldBuilder")
@@ -44,7 +46,14 @@ class EnumFormFieldBuilder {
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
+
 	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <DereferenceFormFieldAccessor>
+	dereferenceFormFieldAccessorProvider;
 
 	@PrototypeDependency
 	Provider <EnumCsvFormFieldInterfaceMapping>
@@ -79,10 +88,6 @@ class EnumFormFieldBuilder {
 	requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
-
-	@PrototypeDependency
 	Provider <UpdatableFormField>
 	updatableFormFieldProvider;
 
@@ -107,6 +112,11 @@ class EnumFormFieldBuilder {
 		String name =
 			spec.name ();
 
+		String fieldName =
+			ifNull (
+				spec.fieldName (),
+				name);
+
 		String label =
 			ifNull (
 				spec.label (),
@@ -130,9 +140,12 @@ class EnumFormFieldBuilder {
 				false);
 
 		Class <?> propertyClass =
-			PropertyUtils.propertyClassForClass (
-				context.containerClass (),
-				name);
+			optionalGetRequired (
+				objectManager.dereferenceType (
+					optionalOf (
+						context.containerClass ()),
+					optionalOf (
+						fieldName)));
 
 		String enumConsoleHelperName =
 			ifNullThenRequired (
@@ -159,9 +172,12 @@ class EnumFormFieldBuilder {
 		);
 
 		EnumConsoleHelper enumConsoleHelper =
-			componentManager.getComponentRequired (
+			componentManager.getComponentOrElse (
 				enumConsoleHelperName,
-				EnumConsoleHelper.class);
+				EnumConsoleHelper.class,
+				() -> new EnumConsoleHelper ()
+					.enumClass (propertyClass)
+					.auto ());
 
 		Optional <Optional <Object>> implicitValue =
 			spec.implicitValue () != null
@@ -175,10 +191,10 @@ class EnumFormFieldBuilder {
 		// accessor
 
 		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+			dereferenceFormFieldAccessorProvider.get ()
 
-			.name (
-				name)
+			.path (
+				fieldName)
 
 			.nativeClass (
 				enumConsoleHelper.enumClass ());

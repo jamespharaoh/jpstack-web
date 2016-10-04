@@ -1,0 +1,10 @@
+                                Table "public.sender"
+   Column    |  Type   |                          Modifiers                          
+-------------+---------+-------------------------------------------------------------
+ id          | integer | not null default nextval(('sender_id_seq'::text)::regclass)
+ code        | text    | not null
+ description | text    | not null
+Indexes:
+    "sender_pkey" PRIMARY KEY, btree (id)
+    "sender_code_key" UNIQUE, btree (code)
+

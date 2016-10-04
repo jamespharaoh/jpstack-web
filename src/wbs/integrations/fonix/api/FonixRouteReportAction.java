@@ -44,7 +44,7 @@ import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.utils.string.FormatWriter;
 
-@PrototypeComponent ("fonxRouteReportAction")
+@PrototypeComponent ("fonixRouteReportAction")
 public
 class FonixRouteReportAction
 	extends ApiLoggingAction {

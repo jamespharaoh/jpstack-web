@@ -1,6 +1,7 @@
 package wbs.framework.object;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import java.util.Collection;
 import java.util.List;
@@ -69,6 +70,9 @@ interface ObjectManagerMethods {
 
 	// utilities
 
+	Optional <Class <?>> objectClassForTypeCode (
+			String typeCode);
+
 	Class <?> objectClassForTypeCodeRequired (
 			String typeCode);
 
@@ -124,8 +128,8 @@ interface ObjectManagerMethods {
 
 	default
 	String objectPathMini (
-			@NonNull Record<?> object,
-			@NonNull Optional<Record<?>> root) {
+			@NonNull Record <?> object,
+			@NonNull Optional <Record <?>> root) {
 
 		return objectPath (
 			object,
@@ -137,12 +141,12 @@ interface ObjectManagerMethods {
 
 	default
 	String objectPathMini (
-			@NonNull Record<?> object,
-			@NonNull Record<?> root) {
+			@NonNull Record <?> object,
+			@NonNull Record <?> root) {
 
 		return objectPath (
 			object,
-			Optional.<Record<?>>of (
+			optionalOf (
 				root),
 			true,
 			false);

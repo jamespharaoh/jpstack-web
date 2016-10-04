@@ -7,6 +7,8 @@ import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.TypeUtils.isSubclassOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -122,6 +124,15 @@ class ObjectManagerImplementation
 
 	// implementation
 
+	Optional <ObjectHelper <?>> objectHelperForTypeCode (
+			@NonNull String typeCode) {
+
+		return mapItemForKey (
+			objectHelpersByTypeCode,
+			typeCode);
+
+	}
+
 	@Override
 	public
 	ObjectHelper<?> objectHelperForTypeCodeRequired (
@@ -178,6 +189,21 @@ class ObjectManagerImplementation
 
 		return objectHelper.getParent (
 			object);
+
+	}
+
+	@Override
+	public
+	Optional <Class <?>> objectClassForTypeCode (
+			@NonNull String typeCode) {
+
+		Optional <ObjectHelper <?>> objectHelperOptional =
+				objectHelperForTypeCode (
+					typeCode);
+
+		return optionalMapRequired (
+			objectHelperOptional,
+			ObjectHelper::objectClass);
 
 	}
 
@@ -720,7 +746,7 @@ class ObjectManagerImplementation
 
 				object =
 					getParent (
-						(Record<?>) object);
+						(Record <?>) object);
 
 			} else if (
 				stringEqualSafe (
@@ -731,7 +757,7 @@ class ObjectManagerImplementation
 				object =
 					getParent (
 					getParent (
-						(Record<?>)
+						(Record <?>)
 						object));
 
 			} else if (
@@ -744,7 +770,7 @@ class ObjectManagerImplementation
 					getParent (
 					getParent (
 					getParent (
-						(Record<?>)
+						(Record <?>)
 						object)));
 
 			} else {
