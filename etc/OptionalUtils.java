@@ -802,7 +802,7 @@ class OptionalUtils {
 
 	public static <From,To>
 	Optional<To> optionalMapRequired (
-			@NonNull Optional<From> optionalValue,
+			@NonNull Optional <From> optionalValue,
 			@NonNull Function<? super From,To> mappingFunction) {
 
 		if (
