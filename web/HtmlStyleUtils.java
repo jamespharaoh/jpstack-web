@@ -2,6 +2,7 @@ package wbs.utils.web;
 
 import static wbs.utils.collection.CollectionUtils.listLastItemRequired;
 import static wbs.utils.collection.CollectionUtils.listSliceAllButLastItemRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
@@ -9,6 +10,7 @@ import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.Data;
@@ -529,19 +531,38 @@ class HtmlStyleUtils {
 	@Data
 	public static
 	class HtmlStyleRuleEntry
-		implements ToHtmlAttribute {
+		implements
+			ToHtmlAttribute,
+			ToHtmlStyleRuleEntry {
 
 		String name;
 		List <String> values;
 
 		@Override
 		public
-		HtmlAttribute htmlAttribute () {
+		Optional <HtmlAttribute> htmlAttribute () {
 
-			return htmlStyleAttribute (
-				this);
+			return optionalOf (
+				htmlStyleAttribute (
+					this));
 
 		}
+
+		@Override
+		public
+		Optional <HtmlStyleRuleEntry> htmlStyleRuleEntry () {
+
+			return optionalOf (
+				this);
+		
+		}
+
+	}
+
+	public static
+	interface ToHtmlStyleRuleEntry {
+
+		Optional <HtmlStyleRuleEntry> htmlStyleRuleEntry ();
 
 	}
 
