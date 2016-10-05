@@ -1,9 +1,9 @@
 package wbs.integrations.fonix.foreignapi;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Provider;
 
 import wbs.framework.apiclient.GenericHttpSender;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 
@@ -24,7 +24,7 @@ class FonixMessageSender
 
 	// life cycle
 
-	@PostConstruct
+	@NormalLifecycleSetup
 	public
 	void init () {
 

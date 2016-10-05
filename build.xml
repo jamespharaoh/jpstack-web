@@ -588,6 +588,7 @@
       <script name="src/wbs/smsapps/manualresponder/model/manual-responder.sql"/>
       <script name="src/wbs/apn/chat/core/model/chat-stats.sql"/>
       <script name="src/wbs/apn/chat/affiliate/model/chat-affiliate-users-summary.sql"/>
+      <script name="src/wbs/apn/chat/bill/model/chat-bill.sql"/>
       <script name="src/wbs/apn/chat/broadcast/model/chat-broadcast.sql"/>
       <script name="src/wbs/apn/chat/contact/model/chat-message.sql"/>
       <script name="src/wbs/apn/chat/namednote/model/chat-named-note.sql"/>

@@ -4,6 +4,7 @@ import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.doesNotContain;
@@ -68,8 +69,8 @@ import wbs.framework.component.registry.InjectedProperty.CollectionType;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.component.tools.EasyReadWriteLock;
 import wbs.framework.component.tools.EasyReadWriteLock.HeldLock;
-import wbs.utils.etc.PropertyUtils;
 import wbs.framework.component.tools.NoSuchComponentException;
+import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @Log4j
@@ -417,6 +418,9 @@ class ComponentManagerImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialize) {
 
+boolean yes = componentDefinition.name ().equals ("fonixMessageSender");
+if (yes) debugFormat ("CM INSTANTIATE");
+
 		@Cleanup
 		HeldLock heldlock =
 			lock.read ();
@@ -507,6 +511,7 @@ class ComponentManagerImplementation
 
 		// initialize
 
+if (yes) debugFormat ("CM INIT?");
 		if (
 
 			initialize
@@ -517,12 +522,14 @@ class ComponentManagerImplementation
 
 		) {
 
+if (yes) debugFormat ("YES");
 			initializeComponent (
 				componentDefinition,
 				component,
 				componentMetaData);
 
 		}
+if (yes) debugFormat ("DONE");
 
 		// and finish
 
@@ -1180,7 +1187,7 @@ class ComponentManagerImplementation
 	}
 
 	public
-	Provider<?> getComponentProvider (
+	Provider <?> getComponentProvider (
 			@NonNull ComponentDefinition componentDefinition) {
 
 		return getComponentProvider (
@@ -1190,7 +1197,7 @@ class ComponentManagerImplementation
 	}
 
 	public
-	Provider<?> getComponentProvider (
+	Provider <?> getComponentProvider (
 			final ComponentDefinition componentDefinition,
 			final Boolean initialized) {
 

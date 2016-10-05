@@ -1,9 +1,11 @@
 package wbs.framework.apiclient;
 
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.string.StringUtils.utf8ToString;
 
 import java.io.IOException;
@@ -82,6 +84,15 @@ class GenericHttpSender <
 	public
 	SenderType request (
 			@NonNull RequestType request) {
+
+debugFormat (
+	"GENERIC HTTP SENDER, HELPER IS %s, REQUEST IS %s",
+	ifNull (
+		helper,
+		"NULL"),
+	ifNull (
+		request,
+		"NULL"));
 
 		helper.request (
 			request);
@@ -327,16 +338,21 @@ class GenericHttpSender <
 		);
 
 		// check response
-
+/*
 		if (
 			integerNotEqualSafe (
 				httpResponse.getStatusLine ().getStatusCode (),
 				200l)
 		) {
 
-			throw new RuntimeException ();
+			throw new RuntimeException (
+				stringFormat (
+					"Server returned %s: %s",
+					httpResponse.getStatusLine ().getStatusCode (),
+					httpResponse.getStatusLine ().getReasonPhrase ()));
 
 		}
+*/
 
 		// update state and return
 
@@ -370,7 +386,31 @@ class GenericHttpSender <
 
 		// decode response
 
-		helper.decode ();
+		helper
+
+			.responseStatusCode (
+				fromJavaInteger (
+					httpResponse.getStatusLine ().getStatusCode ()))
+
+			.responseStatusReason (
+				httpResponse.getStatusLine ().getReasonPhrase ())
+
+			.responseHeaders (
+				ImmutableMap.copyOf (
+					Arrays.stream (
+						httpResponse.getAllHeaders ())
+
+				.collect (
+					Collectors.toMap (
+						Header::getName,
+						Header::getValue))
+
+			))
+
+			.responseBody (
+				httpResponse.toString ())
+
+			.decode ();
 
 		// update state and return
 

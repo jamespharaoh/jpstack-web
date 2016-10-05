@@ -15,8 +15,8 @@ public
 class UrlParams {
 
 	private final
-	Map<String,List<String>> params =
-		new LinkedHashMap<String,List<String>> ();
+	Map <String, List <String>> params =
+		new LinkedHashMap <String, List <String>> ();
 
 	public
 	UrlParams () {
@@ -76,36 +76,28 @@ class UrlParams {
 	public
 	UrlParams set (
 			@NonNull String name,
-			Object value) {
+			@NonNull String value) {
 
-		if (value == null) {
+		List <String> values =
+			new ArrayList <String> ();
 
-			params.remove (name);
+		params.put (
+			name,
+			values);
 
-		} else {
-
-			List<String> values =
-				new ArrayList<String> ();
-
-			params.put (
-				name,
-				values);
-
-			values.add (
-				value.toString ());
-
-		}
+		values.add (
+			value);
 
 		return this;
 
 	}
 
 	public
-	UrlParams set (
-			@NonNull Map<String,String> values) {
+	UrlParams setSimpleMap (
+			@NonNull Map <String, String> values) {
 
 		for (
-			Map.Entry<String,String> entry
+			Map.Entry <String, String> entry
 				: values.entrySet ()
 		) {
 
@@ -139,17 +131,21 @@ class UrlParams {
 
 		char sep = '?';
 
-		for (Map.Entry<String,List<String>> entry
-				: params.entrySet ()) {
+		for (
+			Map.Entry <String, List <String>> entry
+				: params.entrySet ()
+		) {
 
 			String name =
 				entry.getKey ();
 
-			List<String> values =
+			List <String> values =
 				entry.getValue ();
 
-			for (String value
-					: values) {
+			for (
+				String value
+					: values
+			) {
 
 				stringBuilder.append (sep);
 
@@ -204,14 +200,14 @@ class UrlParams {
 		boolean first = true;
 
 		for (
-			Map.Entry<String,List<String>> entry
+			Map.Entry <String, List <String>> entry
 				: params.entrySet ()
 		) {
 
 			String name =
 				entry.getKey ();
 
-			List<String> values =
+			List <String> values =
 				entry.getValue ();
 
 			for (String value : values) {
@@ -289,6 +285,52 @@ class UrlParams {
 			}
 
 		}
+
+	}
+
+	public static
+	String simpleMapToString (
+			@NonNull Map <String, String> paramsMap) {
+
+		UrlParams urlParams =
+			new UrlParams ();
+
+		urlParams.setSimpleMap (
+			paramsMap);
+
+		return urlParams.toString ();
+
+	}
+
+	public static
+	String mapToString (
+			@NonNull Map <String, List <String>> paramsMap) {
+
+		UrlParams urlParams =
+			new UrlParams ();
+
+		for (
+			Map.Entry <String, List <String>> entry
+				: paramsMap.entrySet ()
+		) {
+
+			String name =
+				entry.getKey ();
+
+			for (
+				String value
+					: entry.getValue ()
+			) {
+
+				urlParams.set (
+					name,
+					value);
+
+			}
+
+		}
+
+		return urlParams.toString ();
 
 	}
 

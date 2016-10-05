@@ -27,6 +27,15 @@ interface GenericHttpSenderHelper <
 
 	// response information setters
 
+	GenericHttpSenderHelper <RequestType, ResponseType> responseStatusCode (
+			Long responseStatusCode);
+
+	GenericHttpSenderHelper <RequestType, ResponseType> responseStatusReason (
+			String responseStatusReason);
+
+	GenericHttpSenderHelper <RequestType, ResponseType> responseHeaders (
+			Map <String, String> responseHeaders);
+
 	GenericHttpSenderHelper <RequestType, ResponseType> responseBody (
 			String responseBody);
 

@@ -19,6 +19,7 @@ import org.json.simple.JSONValue;
 import wbs.framework.apiclient.GenericHttpSenderHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
+import wbs.framework.web.UrlParams;
 import wbs.utils.etc.PropertyUtils.RequiredProperty;
 
 @Accessors (fluent = true)
@@ -30,13 +31,10 @@ class FonixMessageSenderHelper
 		FonixMessageSendResponse
 	> {
 
-	// properties
+	// request properties
 
 	@Setter
 	FonixMessageSendRequest request;
-
-	@Getter
-	FonixMessageSendResponse response;
 
 	@Getter
 	Map <String, String> requestHeaders;
@@ -47,8 +45,22 @@ class FonixMessageSenderHelper
 	@Getter
 	String requestBody;
 
+	// response properties
+
+	@Setter
+	Long responseStatusCode;
+
+	@Setter
+	String responseStatusReason;
+
+	@Setter
+	Map <String, String> responseHeaders;
+
 	@Setter
 	String responseBody;
+
+	@Getter
+	FonixMessageSendResponse response;
 
 	// property accessors
 
@@ -81,7 +93,7 @@ class FonixMessageSenderHelper
 
 			.put (
 				"Content-Type",
-				"application/x-www-form-urlencoded; charset=utf-8")
+				"application/x-www-form-urlencoded")
 
 			.put (
 				"x-api-key",
@@ -114,6 +126,10 @@ class FonixMessageSenderHelper
 						request.dummy ())))
 
 			.build ();
+
+		requestBody =
+			UrlParams.mapToString (
+				requestParameters);
 
 	}
 
