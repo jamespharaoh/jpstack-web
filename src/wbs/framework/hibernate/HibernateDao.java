@@ -220,7 +220,7 @@ class HibernateDao {
 	protected <Record>
 	Record findOne (
 			@NonNull String methodName,
-			@NonNull Class<Record> theClass,
+			@NonNull Class <Record> theClass,
 			@NonNull Criteria criteria) {
 
 		@Cleanup
@@ -235,7 +235,7 @@ class HibernateDao {
 
 		// perform the operation
 
-		List<?> objectList =
+		List <?> objectList =
 			criteria.list ();
 
 		// handle empty list
@@ -283,9 +283,9 @@ class HibernateDao {
 
 	@Deprecated
 	protected <Record>
-	List<Record> findMany (
-			@NonNull Class<Record> theClass,
-			@NonNull List<?> list) {
+	List <Record> findMany (
+			@NonNull Class <Record> theClass,
+			@NonNull List <?> list) {
 
 		@SuppressWarnings ("unchecked")
 		List <Record> ret =
@@ -311,9 +311,9 @@ class HibernateDao {
 	}
 
 	protected <Record>
-	List<Record> findMany (
+	List <Record> findMany (
 			@NonNull String methodName,
-			@NonNull Class<Record> theClass,
+			@NonNull Class <Record> theClass,
 			@NonNull Criteria criteria) {
 
 		@Cleanup
@@ -328,7 +328,7 @@ class HibernateDao {
 
 		// perform the operation
 
-		List<?> objectList =
+		List <?> objectList =
 			criteria.list ();
 
 		// check the first object at least is of the right type
@@ -351,8 +351,8 @@ class HibernateDao {
 		// forcibly cast the whole list
 
 		@SuppressWarnings ("unchecked")
-		List<Record> recordList =
-			(List<Record>) objectList;
+		List <Record> recordList =
+			(List <Record>) objectList;
 
 		// and return
 

@@ -195,22 +195,22 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	void renderTableCellList (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
 
-		Optional<Native> nativeValue =
+		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
 					container));
 
-		Optional<Generic> genericValue =
+		Optional <Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
 					nativeValue));
 
-		Optional<Interface> interfaceValue =
+		Optional <Interface> interfaceValue =
 			requiredValue (
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
@@ -218,7 +218,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 						hints,
 						genericValue)));
 
-		renderer.renderHtmlTableCell (
+		renderer.renderHtmlTableCellList (
 			htmlWriter,
 			container,
 			hints,
@@ -254,7 +254,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 						hints,
 						genericValue)));
 
-		renderer.renderHtmlTableCell (
+		renderer.renderHtmlTableCellProperties (
 			htmlWriter,
 			container,
 			hints,

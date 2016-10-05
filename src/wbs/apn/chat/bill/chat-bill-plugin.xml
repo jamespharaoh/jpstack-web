@@ -26,8 +26,8 @@
 	</layer>
 
 	<layer name="console">
-		<component class="console.ChatRebillAction"/>
-		<component class="console.ChatRebillPart"/>
+		<component class="console.ChatRebillSendAction"/>
+		<component class="console.ChatRebillSendPart"/>
 	</layer>
 
 	<layer name="daemon">
@@ -42,6 +42,7 @@
 		<console-module name="chat-network"/>
 		<console-module name="chat-promo"/>
 		<console-module name="chat-rebill"/>
+		<console-module name="chat-rebill-log"/>
 		<console-module name="chat-route"/>
 		<console-module name="chat-route-network"/>
 		<console-module name="chat-user-credit"/>

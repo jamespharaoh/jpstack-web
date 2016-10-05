@@ -172,8 +172,8 @@ class ConsoleObjectManagerImplementation
 
 		} else {
 
-			formatWriter.writeFormat (
-				"<td>%h</td>\n",
+			formatWriter.writeLineFormat (
+				"<td>%h</td>",
 				path);
 
 		}

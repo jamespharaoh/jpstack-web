@@ -78,7 +78,7 @@ class ExtendContextBuilder <
 	void buildChildren (
 			@NonNull Builder builder) {
 
-		List<ResolvedConsoleContextExtensionPoint> resolvedExtensionPoints =
+		List <ResolvedConsoleContextExtensionPoint> resolvedExtensionPoints =
 			consoleMetaManager.resolveExtensionPoint (
 				extensionPointName);
 
@@ -94,8 +94,8 @@ class ExtendContextBuilder <
 
 		}
 
-		ConsoleContextBuilderContainer<ObjectType> nextBuilderContainer =
-			new ConsoleContextBuilderContainerImplementation<ObjectType> ()
+		ConsoleContextBuilderContainer <ObjectType> nextBuilderContainer =
+			new ConsoleContextBuilderContainerImplementation <ObjectType> ()
 
 			.consoleHelper (
 				consoleHelper)
@@ -143,9 +143,9 @@ class ExtendContextBuilder <
 			spec.extensionPointName ();
 
 		@SuppressWarnings ("unchecked")
-		ConsoleHelper<ObjectType> consoleHelperTemp =
+		ConsoleHelper <ObjectType> consoleHelperTemp =
 			spec.objectName () != null
-				? (ConsoleHelper<ObjectType>)
+				? (ConsoleHelper <ObjectType>)
 				consoleHelperRegistry.findByObjectName (
 					spec.objectName ())
 				: null;

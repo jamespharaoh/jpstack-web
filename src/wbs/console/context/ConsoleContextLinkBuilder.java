@@ -67,7 +67,7 @@ class ConsoleContextLinkBuilder <
 			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addTabLocation (
-			"end",
+			container.tabLocation (),
 			name,
 			resolvedExtensionPoint.contextTypeNames ());
 

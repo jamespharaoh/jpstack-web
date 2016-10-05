@@ -440,7 +440,8 @@ class ConsoleHelperBuilder {
 
 			if (optionalHtml.isPresent ()) {
 
-				formatWriter.writeString (
+				formatWriter.writeLineFormat (
+					"%s",
 					optionalHtml.get ());
 
 			} else {
@@ -452,7 +453,7 @@ class ConsoleHelperBuilder {
 						false,
 						mini);
 
-				formatWriter.writeFormat (
+				formatWriter.writeLineFormat (
 					"<a href=\"%h\">%h</a>",
 					requestContext.resolveLocalUrl (
 						getDefaultLocalPath (

@@ -138,7 +138,7 @@ class TabbedResponder
 		if (pagePart != null) {
 
 			pagePart.setup (
-				Collections.<String,Object>emptyMap ());
+				Collections.emptyMap ());
 
 		}
 
@@ -177,8 +177,9 @@ class TabbedResponder
 
 		}
 
-		if (myLayer1 == null)
+		if (myLayer1 == null) {
 			throw new RuntimeException ();
+		}
 
 		myLayer1.tab (tab);
 

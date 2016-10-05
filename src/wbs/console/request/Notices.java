@@ -80,7 +80,8 @@ class Notices {
 				: notices
 		) {
 
-			formatWriter.writeString (
+			formatWriter.writeLineFormat (
+				"%s",
 				notice.toString ());
 
 		}

@@ -6,6 +6,7 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.requiredSuccess;
 import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.NumberUtils.moreThanOne;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -75,12 +76,12 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Interface> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Interface> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		htmlWriter.writeFormat (
+		htmlWriter.writeLineFormat (
 			"<input",
 			" type=\"hidden\"",
 			" name=\"%h-%h\"",
@@ -98,22 +99,22 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	public
 	void renderFormInput (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter out,
+			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Interface> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Interface> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
 		// lookup root
 
-		Optional<Record<?>> root;
+		Optional <Record <?>> root;
 
 		if (rootFieldName != null) {
 
 			root =
-				Optional.<Record<?>>of (
-					(Record<?>)
+				optionalOf (
+					(Record <?>)
 					objectManager.dereference (
 						container,
 						rootFieldName,
@@ -122,13 +123,13 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		} else {
 
 			root =
-				Optional.<Record<?>>absent ();
+				optionalAbsent ();
 
 		}
 
 		// get current option
 
-		Optional<Interface> currentValue =
+		Optional <Interface> currentValue =
 			formValuePresent (
 					submission,
 					formName)
@@ -178,11 +179,11 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		// sort options by path
 
-		Map<String,Record<?>> sortedOptions =
-			new TreeMap<String,Record<?>> ();
+		Map <String, Record <?>> sortedOptions =
+			new TreeMap<> ();
 
 		for (
-			Record<?> option
+			Record <?> option
 				: filteredOptions
 		) {
 
@@ -194,7 +195,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		}
 
-		out.writeFormat (
+		formatWriter.writeLineFormat (
 			"<select",
 			" id=\"%h-%h\"",
 			formName,
@@ -221,7 +222,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		) {
 
-			out.writeFormat (
+			formatWriter.writeLineFormat (
 				"<option",
 				" value=\"none\"",
 				currentValue.isPresent ()
@@ -263,7 +264,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 				continue;
 			}
 
-			out.writeFormat (
+			formatWriter.writeLineFormat (
 				"<option",
 				" value=\"%h\"",
 				optionValue.getId (),
@@ -275,7 +276,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		}
 
-		out.writeFormat (
+		formatWriter.writeLineFormat (
 			"</select>");
 
 	}
@@ -362,12 +363,12 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		) {
 
 			return successResult (
-				Optional.<Interface>absent ());
+				optionalAbsent ());
 
 		} else {
 
 			Long objectId =
-				Long.parseLong (
+				parseIntegerRequired (
 					param);
 
 			Interface interfaceValue =
@@ -375,7 +376,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 					objectId);
 
 			return successResult (
-				Optional.of (
+				optionalOf (
 					interfaceValue));
 
 		}
@@ -387,19 +388,19 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	void renderHtmlSimple (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Interface> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Interface> interfaceValue,
 			boolean link) {
 
 		// work out root
 
-		Optional<Record<?>> root;
+		Optional <Record <?>> root;
 
 		if (rootFieldName != null) {
 
 			root =
-				Optional.of (
-					(Record<?>)
+				optionalOf (
+					(Record <?>)
 					objectManager.dereference (
 						container,
 						rootFieldName));
@@ -407,7 +408,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		} else {
 
 			root =
-				Optional.absent ();
+				optionalAbsent ();
 
 		}
 
@@ -418,7 +419,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 				interfaceValue)
 		) {
 
-			htmlWriter.writeFormat (
+			htmlWriter.writeLineFormat (
 				"%h",
 				objectManager.objectPath (
 					interfaceValue.get (),
@@ -428,7 +429,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		} else {
 
-			htmlWriter.writeFormat (
+			htmlWriter.writeLineFormat (
 				"&mdash;");
 
 		}
@@ -437,7 +438,78 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 	@Override
 	public
-	void renderHtmlTableCell (
+	void renderHtmlTableCellList (
+			@NonNull FormatWriter formatWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Interface> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long columnSpan) {
+
+		// work out root
+
+		Optional <Record <?>> rootOptional;
+
+		if (
+
+			optionalIsPresent (
+				interfaceValue)
+
+			&& isNotNull (
+				rootFieldName)
+
+		) {
+
+			rootOptional =
+				optionalOf (
+					(Record <?>)
+					objectManager.dereference (
+						container,
+						rootFieldName));
+
+		} else {
+
+			rootOptional =
+				optionalAbsent ();
+
+		}
+
+		// render table cell
+
+		if (
+			optionalIsPresent (
+				interfaceValue)
+		) {
+
+			objectManager.writeTdForObject (
+				formatWriter,
+				interfaceValue.orNull (),
+				rootOptional,
+				mini,
+				link,
+				columnSpan);
+
+		} else if (
+			moreThanOne (
+				columnSpan)
+		) {
+
+			formatWriter.writeLineFormat (
+				"<td colspan=\"%h\">—</td>",
+				columnSpan);
+
+		} else {
+
+			formatWriter.writeLineFormat (
+				"<td>—</td>");
+
+		}
+
+	}
+
+	@Override
+	public
+	void renderHtmlTableCellProperties (
 			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,

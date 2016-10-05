@@ -7,16 +7,20 @@
 		extension-point="chat.rebill"
 		object-name="chat">
 
-		<context-tab-action-page
-			name="rebill"/>
+		<section
+			name="rebill"
+			label="Rebill">
 
-		<context-tab-responder
-			name="rebillVerify"
-			tab="chat.tools.rebill"/>
+			<context-tab-action-page
+				name="send"
+				priv-key="chat.supervisor"/>
 
-		<context-tab-responder
-			name="rebillConfirm"
-			tab="chat.tools.rebill"/>
+			<context-link
+				name="history"
+				link="chatRebillLog"
+				label="History"/>
+
+		</section>
 
 	</extend-context>
 

@@ -79,7 +79,7 @@ class ContextTabActionPageBuilder <
 	String actionName;
 	String title;
 	String pagePartName;
-	List<String> privKeys;
+	List <String> privKeys;
 
 	// build
 

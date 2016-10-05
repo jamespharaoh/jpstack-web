@@ -256,7 +256,7 @@ class YesNoFormFieldRenderer <Container>
 			@NonNull Optional <Boolean> genericValue,
 			boolean link) {
 
-		htmlWriter.writeFormat (
+		htmlWriter.writeLineFormat (
 			"%h",
 			booleanToString (
 				genericValue,

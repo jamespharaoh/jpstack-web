@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -47,13 +48,13 @@ class ConsoleContextTab {
 	String localFile;
 
 	@DataChildren
-	List<String> privKeys =
-		new ArrayList<String> ();
+	List <String> privKeys =
+		new ArrayList<> ();
 
 	// property helpers
 
 	public
-	List<String> privKeys () {
+	List <String> privKeys () {
 
 		return privKeys;
 
@@ -61,10 +62,12 @@ class ConsoleContextTab {
 
 	public
 	ConsoleContextTab privKeys (
-			String... privKeys) {
+			@NonNull String ... privKeys) {
 
-		for (String privKey
-				: privKeys) {
+		for (
+			String privKey
+				: privKeys
+		) {
 
 			if (privKey == null)
 				continue;
@@ -80,7 +83,7 @@ class ConsoleContextTab {
 
 	public
 	ConsoleContextTab privKeys (
-			List<String> privKeys) {
+			List <String> privKeys) {
 
 		this.privKeys =
 			privKeys;

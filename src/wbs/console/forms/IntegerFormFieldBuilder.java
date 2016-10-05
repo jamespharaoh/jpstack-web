@@ -1,6 +1,9 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -10,7 +13,11 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.Range;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.forms.FormField.Align;
+import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -19,7 +26,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.utils.etc.PropertyUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("integerFormFieldBuilder")
@@ -27,10 +33,13 @@ import wbs.utils.etc.PropertyUtils;
 public
 class IntegerFormFieldBuilder {
 
-	// dependencies
+	// singleton dependencies
 
 	@SingletonDependency
 	FormFieldPluginManager formFieldPluginManager;
+
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
 
 	// prototype dependencies
 
@@ -65,6 +74,10 @@ class IntegerFormFieldBuilder {
 	@PrototypeDependency
 	Provider <SimpleFormFieldAccessor>
 	simpleFormFieldAccessorProvider;
+
+	@PrototypeDependency
+	Provider <TextualRangeFormFieldInterfaceMapping>
+	textualRangeFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
 	Provider <TextFormFieldRenderer>
@@ -137,17 +150,37 @@ class IntegerFormFieldBuilder {
 				spec.dynamic (),
 				false);
 
-		Class<?> propertyClass =
-			dynamic
-				? Long.class
-				: PropertyUtils.propertyClassForClass (
-					context.containerClass (),
-					name);
-
 		Boolean blankIfZero =
 			ifNull (
 				spec.blankIfZero (),
 				false);
+
+		// property class
+
+		Class <?> propertyClass;
+		boolean range;
+
+		if (dynamic) {
+
+			propertyClass =
+				Long.class;
+
+		} else {
+
+			propertyClass =
+				optionalGetRequired (
+					objectManager.dereferenceType (
+						optionalOf (
+							context.containerClass ()),
+						optionalOf (
+							name)));
+
+		}
+
+		range =
+			classEqualSafe (
+				propertyClass,
+				Range.class);
 
 		// accessor
 
@@ -215,11 +248,30 @@ class IntegerFormFieldBuilder {
 
 		// interface mapping
 
-		FormFieldInterfaceMapping interfaceMapping =
-			integerFormFieldInterfaceMappingProvider.get ()
+		FormFieldInterfaceMapping interfaceMapping;
 
-			.blankIfZero (
-				blankIfZero);
+		if (range) {
+
+			interfaceMapping =
+				textualRangeFormFieldInterfaceMappingProvider.get ()
+
+				.itemMapping (
+					integerFormFieldInterfaceMappingProvider.get ()
+
+					.blankIfZero (
+						blankIfZero)
+
+				);
+
+		} else {
+
+			interfaceMapping =
+				integerFormFieldInterfaceMappingProvider.get ()
+
+				.blankIfZero (
+					blankIfZero);
+
+		}
 
 		// renderer
 
@@ -235,7 +287,10 @@ class IntegerFormFieldBuilder {
 			.nullable (
 				ifNull (
 					spec.nullable (),
-					false));
+					false))
+
+			.listAlign (
+				Align.right);
 
 		// update hook
 

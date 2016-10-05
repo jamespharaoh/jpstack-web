@@ -7,16 +7,16 @@ import com.google.common.base.Optional;
 import fj.data.Either;
 
 public
-interface FormFieldInterfaceMapping<Container,Generic,Interface> {
+interface FormFieldInterfaceMapping <Container, Generic, Interface> {
 
-	Either<Optional<Generic>,String> interfaceToGeneric (
+	Either <Optional <Generic>, String> interfaceToGeneric (
 			Container container,
-			Map<String,Object> hints,
-			Optional<Interface> interfaceValue);
+			Map <String, Object> hints,
+			Optional <Interface> interfaceValue);
 
-	Either<Optional<Interface>,String> genericToInterface (
+	Either <Optional <Interface>, String> genericToInterface (
 			Container container,
-			Map<String,Object> hints,
-			Optional<Generic> genericValue);
+			Map <String, Object> hints,
+			Optional <Generic> genericValue);
 
 }

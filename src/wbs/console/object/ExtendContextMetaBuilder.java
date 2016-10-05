@@ -1,5 +1,7 @@
 package wbs.console.object;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
 import wbs.console.context.ConsoleContextMetaBuilderContainer;
 import wbs.console.module.ConsoleMetaModuleImplementation;
@@ -38,7 +40,7 @@ class ExtendContextMetaBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 

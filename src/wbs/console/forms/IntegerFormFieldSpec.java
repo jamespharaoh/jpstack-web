@@ -35,13 +35,11 @@ class IntegerFormFieldSpec {
 	@DataAttribute
 	Boolean readOnly;
 
-	@DataAttribute (
-		name = "min")
+	@DataAttribute
 	Long minimum =
 		Long.MIN_VALUE;
 
-	@DataAttribute (
-		name = "max")
+	@DataAttribute
 	Long maximum =
 		Long.MAX_VALUE;
 

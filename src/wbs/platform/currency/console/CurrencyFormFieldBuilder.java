@@ -32,10 +32,10 @@ import wbs.console.forms.IntegerFormFieldInterfaceMapping;
 import wbs.console.forms.IntegerFormFieldValueValidator;
 import wbs.console.forms.NullFormFieldConstraintValidator;
 import wbs.console.forms.RangeFormFieldInterfaceMapping;
-import wbs.console.forms.RangeFormFieldRenderer;
 import wbs.console.forms.ReadOnlyFormField;
 import wbs.console.forms.RequiredFormFieldValueValidator;
 import wbs.console.forms.TextFormFieldRenderer;
+import wbs.console.forms.TextualRangeFormFieldInterfaceMapping;
 import wbs.console.forms.UpdatableFormField;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.builder.Builder;
@@ -92,10 +92,6 @@ class CurrencyFormFieldBuilder {
 	rangeFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
-	Provider <RangeFormFieldRenderer>
-	rangeFormFieldInterfaceRendererProvider;
-
-	@PrototypeDependency
 	Provider <ReadOnlyFormField>
 	readOnlyFormFieldProvider;
 
@@ -106,6 +102,10 @@ class CurrencyFormFieldBuilder {
 	@PrototypeDependency
 	Provider <TextFormFieldRenderer>
 	textFormFieldRendererProvider;
+
+	@PrototypeDependency
+	Provider <TextualRangeFormFieldInterfaceMapping>
+	textualRangeFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
 	Provider <UpdatableFormField>
@@ -223,7 +223,7 @@ class CurrencyFormFieldBuilder {
 
 		// value validator
 
-		List<FormFieldValueValidator> valueValidators =
+		List <FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
 
 		if (! nullable) {
@@ -261,16 +261,7 @@ class CurrencyFormFieldBuilder {
 			interfaceMapping =
 				rangeFormFieldInterfaceMappingProvider.get ()
 
-				.left (
-					currencyFormFieldInterfaceMappingProvider.get ()
-
-					.currencyPath (
-						spec.currencyPath ())
-
-					.blankIfZero (
-						blankIfZero))
-
-				.right (
+				.itemMapping (
 					currencyFormFieldInterfaceMappingProvider.get ()
 
 					.currencyPath (
@@ -294,7 +285,7 @@ class CurrencyFormFieldBuilder {
 
 		// renderer
 
-		FormFieldRenderer unitRenderer =
+		FormFieldRenderer renderer =
 			textFormFieldRendererProvider.get ()
 
 			.name (
@@ -308,20 +299,8 @@ class CurrencyFormFieldBuilder {
 					spec.nullable (),
 					false))
 
-			.size (
-				range
-					? FormField.defaultSize / 2 - 2
-					: FormField.defaultSize)
-
 			.listAlign (
 				FormField.Align.right);
-
-		FormFieldRenderer renderer =
-			range
-				? rangeFormFieldInterfaceRendererProvider.get ()
-					.minimum (unitRenderer)
-					.maximum (unitRenderer)
-				: unitRenderer;
 
 		// update hook
 

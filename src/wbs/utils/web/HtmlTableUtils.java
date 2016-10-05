@@ -431,7 +431,8 @@ class HtmlTableUtils {
 
 		htmlTableRowOpen (
 			currentFormatWriter (),
-			attributes);
+			Arrays.asList (
+				attributes));
 
 	}
 
@@ -606,7 +607,7 @@ class HtmlTableUtils {
 	void htmlTableCellWriteHtml (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String content,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		formatWriter.writeIndent ();
 
@@ -628,7 +629,7 @@ class HtmlTableUtils {
 	public static
 	void htmlTableCellWriteHtml (
 			@NonNull String content,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlTableCellWriteHtml (
 			currentFormatWriter (),

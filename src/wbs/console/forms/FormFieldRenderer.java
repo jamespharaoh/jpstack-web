@@ -1,6 +1,9 @@
 package wbs.console.forms;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
 
 import java.util.Map;
 
@@ -57,7 +60,7 @@ interface FormFieldRenderer <Container, Interface> {
 			String formName);
 
 	default
-	void renderHtmlTableCell (
+	void renderHtmlTableCellList (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -65,23 +68,12 @@ interface FormFieldRenderer <Container, Interface> {
 			@NonNull Boolean link,
 			@NonNull Long colspan) {
 
-		htmlWriter.writeFormat (
-			"<td",
-			" style=\"%h\"",
-			stringFormat (
-				"text-align: %s",
-				propertiesAlign ().name ()));
-
-		if (colspan != 1) {
-
-			htmlWriter.writeFormat (
-				" colspan=\"%h\"",
-				colspan);
-
-		}
-
-		htmlWriter.writeFormat (
-			">");
+		htmlTableCellOpen (
+			htmlStyleRuleEntry (
+				"text-align",
+				listAlign ().name ()),
+			htmlColumnSpanAttribute (
+				colspan));
 
 		renderHtmlSimple (
 			htmlWriter,
@@ -90,24 +82,50 @@ interface FormFieldRenderer <Container, Interface> {
 			interfaceValue,
 			link);
 
-		htmlWriter.writeFormat (
-			"</td>");
+		htmlTableCellClose ();
+
+	}
+
+	default
+	void renderHtmlTableCellProperties (
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Interface> interfaceValue,
+			@NonNull Boolean link,
+			@NonNull Long colspan) {
+
+		htmlTableCellOpen (
+			htmlStyleRuleEntry (
+				"text-align",
+				propertiesAlign ().name ()),
+			htmlColumnSpanAttribute (
+				colspan));
+
+		renderHtmlSimple (
+			htmlWriter,
+			container,
+			hints,
+			interfaceValue,
+			link);
+
+		htmlTableCellClose ();
 
 	}
 
 	void renderHtmlSimple (
 			FormatWriter htmlWriter,
 			Container container,
-			Map<String,Object> hints,
-			Optional<Interface> interfaceValue,
+			Map <String, Object> hints,
+			Optional <Interface> interfaceValue,
 			boolean link);
 
 	default
 	void renderHtmlComplex (
-			FormatWriter htmlWriter,
-			Container container,
-			Map<String,Object> hints,
-			Optional<Interface> interfaceValue) {
+			@NonNull FormatWriter htmlWriter,
+			@NonNull Container container,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Interface> interfaceValue) {
 
 		renderHtmlSimple (
 			htmlWriter,
@@ -123,7 +141,7 @@ interface FormFieldRenderer <Container, Interface> {
 			String formName);
 
 	default
-	Either<Optional<Interface>,String> formToInterface (
+	Either <Optional <Interface>, String> formToInterface (
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
@@ -132,8 +150,8 @@ interface FormFieldRenderer <Container, Interface> {
 	}
 
 	default
-	Optional<String> htmlClass (
-			Optional<Interface> interfaceValue) {
+	Optional <String> htmlClass (
+			@NonNull Optional <Interface> interfaceValue) {
 
 		return Optional.absent ();
 

@@ -237,7 +237,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 						hints,
 						genericValue)));
 
-		renderer.renderHtmlTableCell (
+		renderer.renderHtmlTableCellList (
 			htmlWriter,
 			container,
 			hints,
@@ -273,7 +273,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 						hints,
 						genericValue)));
 
-		renderer.renderHtmlTableCell (
+		renderer.renderHtmlTableCellProperties (
 			htmlWriter,
 			container,
 			hints,

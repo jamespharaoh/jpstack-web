@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
@@ -89,6 +91,16 @@ class IterableUtils {
 
 			.collect (
 				Collectors.toList ());
+
+	}
+
+	public static <ItemType>
+	Stream <ItemType> iterableStream (
+			@NonNull Iterable <ItemType> iterable) {
+
+		return StreamSupport.stream (
+			iterable.spliterator (),
+			false);
 
 	}
 

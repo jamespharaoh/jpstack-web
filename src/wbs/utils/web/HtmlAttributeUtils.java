@@ -1,8 +1,12 @@
 package wbs.utils.web;
 
 import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.collection.IterableUtils.iterableStream;
+import static wbs.utils.etc.NumberUtils.equalToOne;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.notMoreThanZero;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.utils.string.StringUtils.joinWithSpace;
@@ -11,10 +15,13 @@ import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.util.Arrays;
 
+import com.google.common.base.Optional;
+
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import wbs.utils.etc.OptionalUtils;
 import wbs.utils.string.FormatWriter;
 import wbs.utils.web.HtmlStyleUtils.HtmlStyleRuleEntry;
 
@@ -50,16 +57,23 @@ class HtmlAttributeUtils {
 			@NonNull FormatWriter formatWriter,
 			@NonNull Iterable <ToHtmlAttribute> attributes) {
 
-		for (
-			ToHtmlAttribute attribute
-				: attributes
-		) {
+		iterableStream (
+			attributes)
 
-			htmlAttributeWrite (
-				formatWriter,
-				attribute.htmlAttribute ());
+			.map (
+				ToHtmlAttribute::htmlAttribute)
 
-		}
+			.filter (
+				OptionalUtils::optionalIsPresent)
+
+			.map (
+				OptionalUtils::optionalGetRequired)
+
+			.forEach (
+				attribute ->
+					htmlAttributeWrite (
+						formatWriter,
+						attribute));
 
 	}
 
@@ -159,46 +173,68 @@ class HtmlAttributeUtils {
 	}
 
 	public static
-	HtmlAttribute htmlColumnSpanAttribute (
+	ToHtmlAttribute htmlColumnSpanAttribute (
 			@NonNull Long value) {
 
 		if (
 			notMoreThanZero (
 				value)
 		) {
+
 			throw new IllegalArgumentException ();
+
+		} else if (
+			equalToOne (
+				value)
+		) {
+
+			return htmlAttributeAbsent ();
+
+		} else {
+
+			return new HtmlAttribute ()
+	
+				.name (
+					"colspan")
+	
+				.value (
+					integerToDecimalString (
+						value));
+
 		}
-
-		return new HtmlAttribute ()
-
-			.name (
-				"colspan")
-
-			.value (
-				integerToDecimalString (
-					value));
 
 	}
 
 	public static
-	HtmlAttribute htmlRowSpanAttribute (
+	ToHtmlAttribute htmlRowSpanAttribute (
 			@NonNull Long value) {
 
 		if (
 			notMoreThanZero (
 				value)
 		) {
+
 			throw new IllegalArgumentException ();
+
+		} else if (
+			equalToOne (
+				value)
+		) {
+
+			return htmlAttributeAbsent ();
+
+		} else {
+
+			return new HtmlAttribute ()
+	
+				.name (
+					"rowspan")
+	
+				.value (
+					integerToDecimalString (
+						value));
+
 		}
-
-		return new HtmlAttribute ()
-
-			.name (
-				"rowspan")
-
-			.value (
-				integerToDecimalString (
-					value));
 
 	}
 
@@ -299,6 +335,32 @@ class HtmlAttributeUtils {
 
 	}
 
+	public static
+	ToHtmlAttribute htmlAttributeAbsent () {
+
+		return htmlAttributeAbsentInstance;
+
+	}
+
+	public
+	interface ToHtmlAttribute {
+		Optional <HtmlAttribute> htmlAttribute ();
+	}
+
+	private final static
+	ToHtmlAttribute htmlAttributeAbsentInstance =
+		new ToHtmlAttribute () {
+
+		@Override
+		public 
+		Optional <HtmlAttribute> htmlAttribute () {
+
+			return optionalAbsent ();
+
+		}
+
+	};
+
 	@Accessors (fluent = true)
 	@Data
 	public static
@@ -310,15 +372,13 @@ class HtmlAttributeUtils {
 
 		@Override
 		public
-		HtmlAttribute htmlAttribute () {
-			return this;
+		Optional <HtmlAttribute> htmlAttribute () {
+
+			return optionalOf (
+				this);
+
 		}
 
-	}
-
-	public
-	interface ToHtmlAttribute {
-		HtmlAttribute htmlAttribute ();
 	}
 
 }

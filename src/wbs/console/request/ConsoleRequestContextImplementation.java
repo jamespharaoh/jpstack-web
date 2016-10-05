@@ -378,8 +378,8 @@ class ConsoleRequestContextImplementation
 			writer ();
 
 		@SuppressWarnings ("unchecked")
-		List<String> scripts =
-			(List<String>)
+		List <String> scripts =
+			(List <String>)
 			orNull (
 				request (
 					"scripts"));

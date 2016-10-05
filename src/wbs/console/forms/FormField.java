@@ -62,7 +62,7 @@ interface FormField <Container, Generic, Native, Interface> {
 	void renderTableCellList (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
 
@@ -74,7 +74,7 @@ interface FormField <Container, Generic, Native, Interface> {
 	void renderTableCellProperties (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map <String, Object> hints) {
 
 		doNothing ();
 
@@ -85,7 +85,7 @@ interface FormField <Container, Generic, Native, Interface> {
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 

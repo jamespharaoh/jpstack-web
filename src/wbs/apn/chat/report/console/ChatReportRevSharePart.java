@@ -4,6 +4,7 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
+import static wbs.utils.web.HtmlFormUtils.htmlFormOpenGetAction;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
@@ -212,8 +213,8 @@ class ChatReportRevSharePart
 
 		// sort chat reports
 
-		List<ChatReportRevShareItem> chatReportsTemp =
-			new ArrayList<ChatReportRevShareItem> (
+		List <ChatReportRevShareItem> chatReportsTemp =
+			new ArrayList<> (
 				chatReportsByAffiliate.values ());
 
 		Collections.sort (
@@ -227,12 +228,12 @@ class ChatReportRevSharePart
 
 	void addSmsMessages () {
 
-		List<ServiceRec> services =
+		List <ServiceRec> services =
 			objectManager.getChildren (
 				chat,
 				ServiceRec.class);
 
-		ArrayList<Long> serviceIds =
+		ArrayList <Long> serviceIds =
 			new ArrayList<> ();
 
 		for (
@@ -245,7 +246,7 @@ class ChatReportRevSharePart
 
 		}
 
-		List<MessageStatsRec> allMessageStats =
+		List <MessageStatsRec> allMessageStats =
 			messageStatsHelper.search (
 				new MessageStatsSearch ()
 
@@ -275,9 +276,9 @@ class ChatReportRevSharePart
 		// aggregate by affiliate
 
 		chatReportsByAffiliate =
-			new HashMap<AffiliateRec,ChatReportRevShareItem> ();
+			new HashMap<> ();
 
-		List<Long> errorRoutes =
+		List <Long> errorRoutes =
 			new ArrayList<> ();
 
 		for (
@@ -305,7 +306,10 @@ class ChatReportRevSharePart
 
 			if (chatRoute == null) {
 
-				if (! errorRoutes.contains (route.getId ())) {
+				if (
+					! errorRoutes.contains (
+						route.getId ())
+				) {
 
 					errorRoutes.add (
 						route.getId ());
@@ -327,7 +331,7 @@ class ChatReportRevSharePart
 			NetworkRec network =
 				messageStats.getMessageStatsId ().getNetwork ();
 
-			Optional<ChatRouteNetworkRec> chatRouteNetwork =
+			Optional <ChatRouteNetworkRec> chatRouteNetwork =
 				Optional.fromNullable (
 					chatRoute.getChatRouteNetworks ().get (
 						network.getId ()));
@@ -355,7 +359,7 @@ class ChatReportRevSharePart
 
 	void addCredits () {
 
-		List<ChatUserCreditRec> chatUserCredits =
+		List <ChatUserCreditRec> chatUserCredits =
 			chatUserCreditHelper.findByTimestamp (
 				chat,
 				new Interval (
@@ -392,7 +396,7 @@ class ChatReportRevSharePart
 
 	void addJoiners () {
 
-		List<ChatUserRec> joiners =
+		List <ChatUserRec> joiners =
 			chatUserHelper.search (
 				new ChatUserSearch ()
 
@@ -433,7 +437,7 @@ class ChatReportRevSharePart
 	void addToReport (
 			@NonNull ChatReportRevShareItem report,
 			@NonNull ChatRouteRec chatRoute,
-			@NonNull Optional<ChatRouteNetworkRec> chatRouteNetwork,
+			@NonNull Optional <ChatRouteNetworkRec> chatRouteNetwork,
 			@NonNull MessageStatsData statsValue) {
 
 		if (
@@ -633,7 +637,7 @@ class ChatReportRevSharePart
 
 	void addChatMessages () {
 
-		Optional<ChatMonthCostRec> chatMonthCostOptional =
+		Optional <ChatMonthCostRec> chatMonthCostOptional =
 			chatMonthCostHelper.findByCode (
 				chat,
 				form.month ());
@@ -648,7 +652,7 @@ class ChatReportRevSharePart
 		ChatMonthCostRec chatMonthCost =
 			chatMonthCostOptional.get ();
 
-		List<ChatMessageRec> chatMessages =
+		List <ChatMessageRec> chatMessages =
 			chatMessageHelper.search (
 				new ChatMessageSearch ()
 
@@ -703,7 +707,9 @@ class ChatReportRevSharePart
 
 	void goSearchForm () {
 
-		htmlFormOpenGet ();
+		htmlFormOpenGetAction (
+			requestContext.resolveLocalUrl (
+				"/chatReport.revShare"));
 
 		htmlTableOpenDetails ();
 
@@ -729,12 +735,6 @@ class ChatReportRevSharePart
 
 		htmlFormClose ();
 
-	}
-
-	private void htmlFormOpenGet () {
-
-		// TODO Auto-generated method stub
-		
 	}
 
 	void goReport () {

@@ -202,14 +202,14 @@
 		<integer-field
 			name="startHour"
 			nullable="yes"
-			min="0"
-			max="24"/>
+			minimum="0"
+			maximum="24"/>
 
 		<integer-field
 			name="endHour"
 			nullable="yes"
-			min="0"
-			max="24"/>
+			minimum="0"
+			maximum="24"/>
 
 	</field-set>
 

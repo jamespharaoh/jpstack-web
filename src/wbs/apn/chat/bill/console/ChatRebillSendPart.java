@@ -40,9 +40,9 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 
-@PrototypeComponent ("chatRebillPart")
+@PrototypeComponent ("chatRebillSendPart")
 public
-class ChatRebillPart
+class ChatRebillSendPart
 	extends AbstractPagePart {
 
 	// singleton dependencies

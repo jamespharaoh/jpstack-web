@@ -1,5 +1,8 @@
 package wbs.console.forms;
 
+import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveTwoElements;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.etc.Misc.errorResult;
 import static wbs.utils.etc.Misc.getError;
 import static wbs.utils.etc.Misc.getValue;
@@ -9,7 +12,11 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringSplitColon;
+import static wbs.utils.string.StringUtils.stringSplitSimple;
 
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Optional;
@@ -21,34 +28,35 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.Range;
 
+import org.apache.tomcat.util.http.Parameters.FailReason;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 
 import fj.data.Either;
 
 @Accessors (fluent = true)
-@PrototypeComponent ("rangeFormFieldInterfaceMapping")
+@PrototypeComponent ("textualRangeFormFieldInterfaceMapping")
 public
-class RangeFormFieldInterfaceMapping <
+class TextualRangeFormFieldInterfaceMapping <
 	Container,
-	Generic extends Comparable <Generic>,
-	Interface extends Comparable <Interface>
+	Generic extends Comparable <Generic>
 >
 	implements FormFieldInterfaceMapping <
 		Container,
 		Range <Generic>,
-		Range <Interface>
+		String
 	> {
 
 	// properties
 
 	@Getter @Setter
-	FormFieldInterfaceMapping <Container, Generic, Interface> itemMapping;
+	FormFieldInterfaceMapping <Container, Generic, String> itemMapping;
 
 	// implementation
 
 	@Override
 	public
-	Either <Optional <Range <Interface>>, String> genericToInterface (
+	Either <Optional <String>, String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Range <Generic>> genericValue) {
@@ -65,11 +73,11 @@ class RangeFormFieldInterfaceMapping <
 
 		// get minimum
 
-		Either <Optional <Interface>, String> leftResult =
+		Either <Optional <String>, String> leftResult =
 			itemMapping.genericToInterface (
 				container,
 				hints,
-				Optional.of (
+				optionalOf (
 					genericValue.get ().getMinimum ()));
 
 		if (
@@ -96,7 +104,7 @@ class RangeFormFieldInterfaceMapping <
 
 		// get maximum
 
-		Either <Optional <Interface>, String> rightResult =
+		Either <Optional <String>, String> rightResult =
 			itemMapping.genericToInterface (
 				container,
 				hints,
@@ -128,8 +136,9 @@ class RangeFormFieldInterfaceMapping <
 		// return
 
 		return successResult (
-			Optional.of (
-				Range.between (
+			optionalOf (
+				stringFormat (
+					"%s to %s",
 					optionalGetRequired (
 						getValue (
 							leftResult)),
@@ -144,7 +153,7 @@ class RangeFormFieldInterfaceMapping <
 	Either <Optional <Range <Generic>>, String> interfaceToGeneric (
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
-			@NonNull Optional <Range <Interface>> interfaceValue) {
+			@NonNull Optional <String> interfaceValue) {
 
 		if (
 			optionalIsNotPresent (
@@ -156,14 +165,32 @@ class RangeFormFieldInterfaceMapping <
 
 		}
 
+		// split minimum and maximum
+
+		List <String> interfaceParts =
+			stringSplitSimple (
+				" to ",
+				interfaceValue.get ());
+
+		if (
+			collectionDoesNotHaveTwoElements (
+				interfaceParts)
+		) {
+
+			return errorResult (
+				"Please enter a valid range, eg \"min to max\"");
+
+		}
+
 		// get minimum
 
 		Either <Optional <Generic>, String> leftResult =
 			itemMapping.interfaceToGeneric (
 				container,
 				hints,
-				Optional.of (
-					interfaceValue.get ().getMinimum ()));
+				optionalOf (
+					listFirstElementRequired (
+						interfaceParts)));
 
 		if (
 			isError (
@@ -183,7 +210,7 @@ class RangeFormFieldInterfaceMapping <
 		) {
 
 			return successResult (
-				Optional.absent ());
+				optionalAbsent ());
 
 		}
 
@@ -193,8 +220,9 @@ class RangeFormFieldInterfaceMapping <
 			itemMapping.interfaceToGeneric (
 				container,
 				hints,
-				Optional.of (
-					interfaceValue.get ().getMaximum ()));
+				optionalOf (
+					listSecondElementRequired (
+						interfaceParts)));
 
 		if (
 			isError (

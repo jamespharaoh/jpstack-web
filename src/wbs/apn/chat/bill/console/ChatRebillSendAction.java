@@ -37,9 +37,9 @@ import wbs.framework.database.Transaction;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
 
-@PrototypeComponent ("chatRebillAction")
+@PrototypeComponent ("chatRebillSendAction")
 public
-class ChatRebillAction
+class ChatRebillSendAction
 	extends ConsoleAction {
 
 	// singleton dependencies
