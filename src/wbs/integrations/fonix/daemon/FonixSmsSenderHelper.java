@@ -4,6 +4,7 @@ import static wbs.sms.gsm.GsmUtils.gsmStringIsNotValid;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.moreThanOne;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -188,6 +189,9 @@ public class FonixSmsSenderHelper
 			.apiKey (
 				fonixRouteOut.getApiKey ())
 
+			.id (
+				smsMessage.getId ())
+
 			.originator (
 				smsMessage.getNumFrom ())
 
@@ -273,10 +277,30 @@ public class FonixSmsSenderHelper
 	ProcessResponseResult processSend (
 			@NonNull FonixMessageSender fonixSender) {
 
+		// check for generic error
+
+		if (
+			optionalIsPresent (
+				fonixSender.errorMessage ())
+		) {
+
+			return new ProcessResponseResult ()
+
+				.status (
+					ProcessResponseStatus.remoteError)
+
+				.statusMessage (
+					fonixSender.errorMessage ().get ())
+
+				.failureType (
+					FailureType.temporary);
+
+		}
+
+		// check for fonix error
+
 		FonixMessageSendResponse fonixResponse =
 			fonixSender.response ();
-
-		// check for general error
 
 		if (
 			isNotNull (
@@ -320,13 +344,13 @@ public class FonixSmsSenderHelper
 	
 				.status (
 					ProcessResponseStatus.remoteError)
-	
+
 				.statusMessage (
 					stringFormat (
 						"Parameter error: %s: %s",
 						fonixFailure.parameter (),
 						fonixFailure.failcode ()))
-	
+
 				.failureType (
 					FailureType.temporary);
 

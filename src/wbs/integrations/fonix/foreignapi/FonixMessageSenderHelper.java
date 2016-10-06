@@ -1,6 +1,8 @@
 package wbs.integrations.fonix.foreignapi;
 
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.PropertyUtils.checkRequiredProperties;
 
 import java.util.List;
@@ -23,7 +25,7 @@ import wbs.framework.web.UrlParams;
 import wbs.utils.etc.PropertyUtils.RequiredProperty;
 
 @Accessors (fluent = true)
-@PrototypeComponent ("fonicMessageSenderHelper")
+@PrototypeComponent ("fonixMessageSenderHelper")
 public
 class FonixMessageSenderHelper
 	implements GenericHttpSenderHelper <
@@ -96,13 +98,19 @@ class FonixMessageSenderHelper
 				"application/x-www-form-urlencoded")
 
 			.put (
-				"x-api-key",
+				"X-Api-Key",
 				request.apiKey ())
 
 			.build ();
 
 		requestParameters =
 			ImmutableMap.<String, List <String>> builder ()
+
+			.put (
+				"REQUESTID",
+				ImmutableList.of (
+					integerToDecimalString (
+						request.id ())))
 
 			.put (
 				"ORIGINATOR",
@@ -136,6 +144,10 @@ class FonixMessageSenderHelper
 	@Override
 	public
 	void decode () {
+
+debugFormat (
+	"BODY: %s",
+	responseBody);
 
 		JSONObject jsonObject =
 			(JSONObject)

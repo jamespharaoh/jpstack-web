@@ -2,6 +2,10 @@ package wbs.framework.data.tools;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.ReflectionUtils.fieldSet;
+import static wbs.utils.etc.TypeUtils.classEqualSafe;
+import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
@@ -12,28 +16,25 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.NonNull;
-import lombok.SneakyThrows;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataChild;
 import wbs.framework.data.annotations.DataChildren;
 
 public
 class DataFromJson {
 
-	@SneakyThrows ({
-		InstantiationException.class,
-		IllegalAccessException.class
-	})
 	public <Data>
 	Data fromJson (
-			Class <Data> dataClass,
-			JSONObject jsonValue) {
+			@NonNull Class <Data> dataClass,
+			@NonNull JSONObject jsonValue) {
 
 		Data dataValue =
-			dataClass.newInstance ();
+			classInstantiate (
+				dataClass);
 
 		for (
 			Field field
@@ -50,6 +51,8 @@ class DataFromJson {
 				continue;
 			}
 
+			// handle data attribute
+
 			DataAttribute dataAttribute =
 				field.getAnnotation (
 					DataAttribute.class);
@@ -61,13 +64,35 @@ class DataFromJson {
 
 				doDataAttribute (
 					dataClass,
-					jsonValue,
 					dataValue,
 					field,
 					dataAttribute,
 					fieldValue);
 
 			}
+
+			// handle data child
+
+			DataChild dataChild =
+				field.getAnnotation (
+					DataChild.class);
+
+			if (
+				isNotNull (
+					dataChild)
+			) {
+
+				doDataChild (
+					dataClass,
+					dataValue,
+					field,
+					dataChild,
+					(JSONObject)
+					fieldValue);
+
+			}
+
+			// handle data children
 
 			DataChildren dataChildren =
 				field.getAnnotation (
@@ -80,7 +105,6 @@ class DataFromJson {
 
 				doDataChildren (
 					dataClass,
-					jsonValue,
 					dataValue,
 					field,
 					dataChildren,
@@ -97,43 +121,63 @@ class DataFromJson {
 	private <Data>
 	void doDataAttribute (
 			@NonNull Class <Data> dataClass,
-			@NonNull JSONObject jsonValue,
 			@NonNull Object dataValue,
 			@NonNull Field field,
 			@NonNull DataAttribute dataAttribute,
-			@NonNull Object fieldValue)
-		throws
-			InstantiationException,
-			IllegalAccessException {
+			@NonNull Object fieldValue) {
 
-		if (field.getType () == Integer.class) {
+		if (
+			classEqualSafe (
+				Long.class,
+				field.getType ())
+		) {
 
-			field.set (
+			fieldSet (
+				field,
 				dataValue,
-				toJavaIntegerRequired (
+				optionalOf (
 					(Long)
 					fieldValue));
 
-		} else if (field.getType () == Long.class) {
+		} else if (
+			classEqualSafe (
+				String.class,
+				field.getType ())
+		) {
 
-			field.set (
+			fieldSet (
+				field,
 				dataValue,
-				(Long)
-				fieldValue);
+				optionalOf (
+					(String)
+					fieldValue));
 
-		} else if (field.getType () == String.class) {
+		} else if (
+			classEqualSafe (
+				Integer.class,
+				field.getType ())
+		) {
 
-			field.set (
+			fieldSet (
+				field,
 				dataValue,
-				(String)
-				fieldValue);
+				optionalOf (
+					toJavaIntegerRequired (
+						(Long)
+						fieldValue)));
 
-		} else if (field.getType () == JSONObject.class) {
+		} else if (
+			classEqualSafe (
+				JSONObject.class,
+				field.getType ())
+		) {
 
-			field.set (
+			fieldSet (
+				field,
 				dataValue,
-				(JSONObject)
-				fieldValue);
+				optionalOf (
+					(JSONObject)
+					fieldValue));
 
 		} else {
 
@@ -150,19 +194,34 @@ class DataFromJson {
 	}
 
 	private <Data>
+	void doDataChild (
+			@NonNull Class <Data> dataClass,
+			@NonNull Object dataValue,
+			@NonNull Field field,
+			@NonNull DataChild dataChild,
+			@NonNull JSONObject fieldValue) {
+
+		fieldSet (
+			field,
+			dataValue,
+			optionalOf (
+				fromJson (
+					field.getType (),
+					fieldValue)));
+
+	}
+
+	private <Data>
 	void doDataChildren (
 			@NonNull Class <Data> dataClass,
-			@NonNull JSONObject jsonValue,
 			@NonNull Object dataValue,
 			@NonNull Field field,
 			@NonNull DataChildren dataChildren,
-			@NonNull Object fieldValueObject)
-		throws
-			InstantiationException,
-			IllegalAccessException {
+			@NonNull Object fieldValueObject) {
 
 		if (
-			List.class.isAssignableFrom (
+			classEqualSafe (
+				List.class,
 				field.getType ())
 		) {
 
@@ -191,12 +250,15 @@ class DataFromJson {
 
 			}
 
-			field.set (
+			fieldSet (
+				field,
 				dataValue,
-				listValue);
+				optionalOf (
+					listValue));
 
 		} else if (
-			Map.class.isAssignableFrom (
+			classEqualSafe (
+				Map.class,
 				field.getType ())
 		) {
 
@@ -222,9 +284,11 @@ class DataFromJson {
 
 			}
 
-			field.set (
+			fieldSet (
+				field,
 				dataValue,
-				mapValue);
+				optionalOf (
+					mapValue));
 
 		} else {
 

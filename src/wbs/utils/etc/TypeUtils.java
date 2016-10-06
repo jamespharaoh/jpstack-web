@@ -25,6 +25,8 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.codegen.JavaImportRegistry;
+import wbs.utils.exception.RuntimeIllegalAccessException;
+import wbs.utils.exception.RuntimeInstantiationException;
 
 public
 class TypeUtils {
@@ -549,12 +551,12 @@ class TypeUtils {
 
 		} catch (IllegalAccessException illegalAccessException) {
 
-			throw new RuntimeException (
+			throw new RuntimeIllegalAccessException (
 				illegalAccessException);
 
 		} catch (InstantiationException instantiationException) {
 
-			throw new RuntimeException (
+			throw new RuntimeInstantiationException (
 				instantiationException);
 
 		}

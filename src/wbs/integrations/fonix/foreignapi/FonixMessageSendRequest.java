@@ -12,6 +12,8 @@ class FonixMessageSendRequest {
 
 	String url;
 	String apiKey;
+
+	Long id;
 	String originator;
 	List <String> numbers;
 	String body;

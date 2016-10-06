@@ -4,7 +4,6 @@ import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.doesNotContain;
@@ -418,9 +417,6 @@ class ComponentManagerImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialize) {
 
-boolean yes = componentDefinition.name ().equals ("fonixMessageSender");
-if (yes) debugFormat ("CM INSTANTIATE");
-
 		@Cleanup
 		HeldLock heldlock =
 			lock.read ();
@@ -511,7 +507,6 @@ if (yes) debugFormat ("CM INSTANTIATE");
 
 		// initialize
 
-if (yes) debugFormat ("CM INIT?");
 		if (
 
 			initialize
@@ -522,14 +517,12 @@ if (yes) debugFormat ("CM INIT?");
 
 		) {
 
-if (yes) debugFormat ("YES");
 			initializeComponent (
 				componentDefinition,
 				component,
 				componentMetaData);
 
 		}
-if (yes) debugFormat ("DONE");
 
 		// and finish
 

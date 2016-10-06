@@ -1,4 +1,4 @@
-package wbs.integrations.clockworksms.hibernate;
+package wbs.integrations.fonix.hibernate;
 
 import static wbs.utils.etc.Misc.isNotNull;
 
@@ -12,26 +12,34 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.hibernate.HibernateDao;
-import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogDao;
-import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogRec;
-import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogSearch;
+import wbs.integrations.fonix.model.FonixInboundLogDaoMethods;
+import wbs.integrations.fonix.model.FonixInboundLogRec;
+import wbs.integrations.fonix.model.FonixInboundLogSearch;
 
 public
-class ClockworkSmsInboundLogDaoHibernate
+class FonixInboundLogDaoHibernate
 	extends HibernateDao
-	implements ClockworkSmsInboundLogDao {
+	implements FonixInboundLogDaoMethods {
 
 	// implementation
 
 	@Override
 	public
 	List <Long> searchIds (
-			@NonNull ClockworkSmsInboundLogSearch search) {
+			@NonNull FonixInboundLogSearch search) {
 
 		Criteria criteria =
 			createCriteria (
-				ClockworkSmsInboundLogRec.class,
-				"_clockworkSmsInboundLog");
+				FonixInboundLogRec.class,
+				"_fonixInboundLog");
+
+		// add default order
+
+		criteria
+
+			.addOrder (
+				Order.desc (
+					"id"));
 
 		// restrict by route
 
@@ -42,7 +50,7 @@ class ClockworkSmsInboundLogDaoHibernate
 
 			criteria.add (
 				Restrictions.eq (
-					"_clockworkSmsInboundLog.route.id",
+					"_fonixInboundLog.route.id",
 					search.routeId ()));
 
 		}
@@ -56,12 +64,12 @@ class ClockworkSmsInboundLogDaoHibernate
 
 			criteria.add (
 				Restrictions.ge (
-					"_clockworkSmsInboundLog.timestamp",
+					"_fonixInboundLog.timestamp",
 					search.timestamp ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
-					"_clockworkSmsInboundLog.timestamp",
+					"_fonixInboundLog.timestamp",
 					search.timestamp ().end ()));
 
 		}
@@ -75,7 +83,7 @@ class ClockworkSmsInboundLogDaoHibernate
 
 			criteria.add (
 				Restrictions.ilike (
-					"_clockworkSmsInboundLog.details",
+					"_fonixInboundLog.details",
 					"%" + search.details () + "%"));
 
 		}
@@ -89,7 +97,7 @@ class ClockworkSmsInboundLogDaoHibernate
 
 			criteria.add (
 				Restrictions.eq (
-					"_clockworkSmsInboundLog.type",
+					"_fonixInboundLog.type",
 					search.type ()));
 
 		}
@@ -103,17 +111,10 @@ class ClockworkSmsInboundLogDaoHibernate
 
 			criteria.add (
 				Restrictions.eq (
-					"_clockworkSmsInboundLog.success",
+					"_fonixInboundLog.success",
 					search.success ()));
 
 		}
-
-		// add default order
-
-		criteria
-
-			.addOrder (
-				Order.desc ("id"));
 
 		// set to return ids only
 
@@ -125,7 +126,7 @@ class ClockworkSmsInboundLogDaoHibernate
 		// perform and return
 
 		return findMany (
-			"searchIds (search)",
+			"searchIds (fonixInboundLogSearch)",
 			Long.class,
 			criteria);
 

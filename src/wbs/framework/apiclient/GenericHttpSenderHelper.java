@@ -1,6 +1,9 @@
 package wbs.framework.apiclient;
 
+import static wbs.utils.etc.NumberUtils.integerRangeAsSet;
+
 import java.util.Map;
+import java.util.Set;
 
 public
 interface GenericHttpSenderHelper <
@@ -11,7 +14,7 @@ interface GenericHttpSenderHelper <
 	// request data setters
 
 	GenericHttpSenderHelper <RequestType, ResponseType> request (
-		RequestType request);
+			RequestType request);
 
 	// request information getters
 
@@ -24,6 +27,21 @@ interface GenericHttpSenderHelper <
 	void verify ();
 	void encode ();
 	void decode ();
+
+	// options
+
+	public final static
+	Set <Long> validStatusCodesDefault =
+		integerRangeAsSet (
+			200l,
+			300l);
+
+	default
+	Set <Long> validStatusCodes () {
+
+		return validStatusCodesDefault;
+
+	}
 
 	// response information setters
 

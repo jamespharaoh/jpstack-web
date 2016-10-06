@@ -16,7 +16,7 @@ class UrlParams {
 
 	private final
 	Map <String, List <String>> params =
-		new LinkedHashMap <String, List <String>> ();
+		new LinkedHashMap <> ();
 
 	public
 	UrlParams () {
@@ -27,19 +27,20 @@ class UrlParams {
 			@NonNull UrlParams oldUrlParams) {
 
 		for (
-			Map.Entry<String,List<String>> entry
+			Map.Entry <String, List <String>> entry
 				: oldUrlParams.params.entrySet ()
 		) {
 
 			String name =
 				entry.getKey ();
 
-			List<String> values =
+			List <String> values =
 				entry.getValue ();
 
 			params.put (
 				name,
-				new ArrayList<String> (values));
+				new ArrayList <String> (
+					values));
 
 		}
 
@@ -210,7 +211,10 @@ class UrlParams {
 			List <String> values =
 				entry.getValue ();
 
-			for (String value : values) {
+			for (
+				String value
+					: values
+			) {
 
 				if (! first)
 					stringBuilder.append ('&');

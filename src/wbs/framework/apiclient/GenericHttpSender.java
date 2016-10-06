@@ -1,11 +1,14 @@
 package wbs.framework.apiclient;
 
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringToUtf8;
 import static wbs.utils.string.StringUtils.utf8ToString;
 
 import java.io.IOException;
@@ -13,6 +16,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
@@ -25,10 +29,9 @@ import org.apache.commons.compress.utils.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.tools.ant.filters.StringInputStream;
 import org.json.simple.JSONObject;
 
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -70,8 +73,11 @@ class GenericHttpSender <
 		State.init;
 
 	CloseableHttpClient httpClient;
+
 	HttpPost httpPost;
+
 	HttpResponse httpResponse;
+	String responseBody;
 
 	@Getter
 	JSONObject requestTrace;
@@ -79,20 +85,15 @@ class GenericHttpSender <
 	@Getter
 	JSONObject responseTrace;
 
+	@Getter
+	Optional <String> errorMessage =
+		optionalAbsent ();
+
 	// property accessors
 
 	public
 	SenderType request (
 			@NonNull RequestType request) {
-
-debugFormat (
-	"GENERIC HTTP SENDER, HELPER IS %s, REQUEST IS %s",
-	ifNull (
-		helper,
-		"NULL"),
-	ifNull (
-		request,
-		"NULL"));
 
 		helper.request (
 			request);
@@ -148,6 +149,12 @@ debugFormat (
 			new HttpPost (
 				helper.url ());
 
+		// convert to binary representation
+
+		byte[] requestData =
+			stringToUtf8 (
+				helper.requestBody ());
+
 		// set default headers
 
 		httpPost.setHeader (
@@ -170,10 +177,8 @@ debugFormat (
 		// set body
 
 		httpPost.setEntity (
-			new InputStreamEntity (
-				new StringInputStream (
-					helper.requestBody (),
-					"utf-8")));
+			new ByteArrayEntity (
+				requestData));
 
 		// create debug trace
 
@@ -288,8 +293,6 @@ debugFormat (
 		state =
 			State.receiveError;
 
-		String responseBody;
-
 		// receive responsea
 
 		try {
@@ -337,23 +340,6 @@ debugFormat (
 
 		);
 
-		// check response
-/*
-		if (
-			integerNotEqualSafe (
-				httpResponse.getStatusLine ().getStatusCode (),
-				200l)
-		) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Server returned %s: %s",
-					httpResponse.getStatusLine ().getStatusCode (),
-					httpResponse.getStatusLine ().getReasonPhrase ()));
-
-		}
-*/
-
 		// update state and return
 
 		state =
@@ -384,33 +370,55 @@ debugFormat (
 		state =
 			State.receiveError;
 
-		// decode response
+		// check response
 
-		helper
-
-			.responseStatusCode (
+		if (
+			doesNotContain (
+				helper.validStatusCodes (),
 				fromJavaInteger (
 					httpResponse.getStatusLine ().getStatusCode ()))
+		) {
 
-			.responseStatusReason (
-				httpResponse.getStatusLine ().getReasonPhrase ())
+			// invalid status code
 
-			.responseHeaders (
-				ImmutableMap.copyOf (
-					Arrays.stream (
-						httpResponse.getAllHeaders ())
+			errorMessage =
+				optionalOf (
+					stringFormat (
+						"Server returned %s: %s",
+						httpResponse.getStatusLine ().getStatusCode (),
+						httpResponse.getStatusLine ().getReasonPhrase ()));
 
-				.collect (
-					Collectors.toMap (
-						Header::getName,
-						Header::getValue))
+		} else { 
 
-			))
+			// decode response
+	
+			helper
+	
+				.responseStatusCode (
+					fromJavaInteger (
+						httpResponse.getStatusLine ().getStatusCode ()))
+	
+				.responseStatusReason (
+					httpResponse.getStatusLine ().getReasonPhrase ())
+	
+				.responseHeaders (
+					ImmutableMap.copyOf (
+						Arrays.stream (
+							httpResponse.getAllHeaders ())
+	
+					.collect (
+						Collectors.toMap (
+							Header::getName,
+							Header::getValue))
+	
+				))
+	
+				.responseBody (
+					responseBody)
+	
+				.decode ();
 
-			.responseBody (
-				httpResponse.toString ())
-
-			.decode ();
+		}
 
 		// update state and return
 
