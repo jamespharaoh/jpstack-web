@@ -63,8 +63,9 @@ class ChatAffiliateKeywordsCreatePart
 			"Join type",
 			() -> chatKeywordJoinTypeConsoleHelper.writeSelect (
 				"joinType",
-				requestContext.getForm (
-					"joinType")));
+				emptyStringIfNull (
+					requestContext.getForm (
+						"joinType"))));
 
 		htmlTableDetailsRowWriteHtml (
 			"Gender",
@@ -72,8 +73,9 @@ class ChatAffiliateKeywordsCreatePart
 
 			genderConsoleHelper.writeSelect (
 				"gender",
-				requestContext.getForm (
-					"gender"));
+				emptyStringIfNull (
+					requestContext.getForm (
+						"gender")));
 
 			formatWriter.writeLineFormat (
 				"(optional)");
@@ -86,8 +88,9 @@ class ChatAffiliateKeywordsCreatePart
 
 			orientConsoleHelper.writeSelect (
 				"orient",
-				requestContext.getForm (
-					"orient"));
+				emptyStringIfNull (
+					requestContext.getForm (
+						"orient")));
 
 			formatWriter.writeLineFormat (
 				"(optional)");

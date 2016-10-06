@@ -1,5 +1,6 @@
 package wbs.apn.chat.affiliate.console;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
@@ -85,13 +86,19 @@ class ChatAffiliateKeywordsListPart
 				chatSchemeKeyword.getKeyword ());
 
 			htmlTableCellWrite (
-				chatSchemeKeyword.getJoinType ().name ());
+				ifNotNullThenElseEmDash (
+					chatSchemeKeyword.getJoinType (),
+					() -> chatSchemeKeyword.getJoinType ().name ()));
 
 			htmlTableCellWrite (
-				chatSchemeKeyword.getJoinGender ().name ());
+				ifNotNullThenElseEmDash (
+					chatSchemeKeyword.getJoinGender (),
+					() -> chatSchemeKeyword.getJoinGender ().name ()));
 
 			htmlTableCellWrite (
-				chatSchemeKeyword.getJoinOrient ().name ());
+				ifNotNullThenElseEmDash (
+					chatSchemeKeyword.getJoinOrient (),
+					() -> chatSchemeKeyword.getJoinOrient ().name ()));
 
 			htmlTableRowClose ();
 

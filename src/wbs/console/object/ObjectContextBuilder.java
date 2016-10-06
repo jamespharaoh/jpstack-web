@@ -96,22 +96,22 @@ class ObjectContextBuilder <
 
 	// state
 
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	String name;
 	String structuralName;
 	String beanName;
 
 	String objectTitle;
-	Optional<String> defaultFileName;
+	Optional <String> defaultFileName;
 
 	Cryptor cryptor;
 
 	Boolean hasListChildren;
 	Boolean hasObjectChildren;
 
-	List<String> listContextTypeNames;
-	List<String> objectContextTypeNames;
+	List <String> listContextTypeNames;
+	List <String> objectContextTypeNames;
 
 	// build
 
@@ -127,7 +127,7 @@ class ObjectContextBuilder <
 		buildSimpleContexts ();
 		buildSimpleTabs ();
 
-		List<ResolvedConsoleContextLink> resolvedContextLinks =
+		List <ResolvedConsoleContextLink> resolvedContextLinks =
 			consoleMetaManager.resolveContextLink (
 				name);
 
@@ -144,8 +144,8 @@ class ObjectContextBuilder <
 
 		}
 
-		ConsoleContextBuilderContainer<ObjectType> listContainer =
-			new ConsoleContextBuilderContainerImplementation<ObjectType> ()
+		ConsoleContextBuilderContainer <ObjectType> listContainer =
+			new ConsoleContextBuilderContainerImplementation <ObjectType> ()
 
 			.consoleHelper (
 				consoleHelper)
@@ -178,8 +178,8 @@ class ObjectContextBuilder <
 			consoleModule,
 			MissingBuilderBehaviour.error);
 
-		ConsoleContextBuilderContainer<ObjectType> objectContainer =
-			new ConsoleContextBuilderContainerImplementation<ObjectType> ()
+		ConsoleContextBuilderContainer <ObjectType> objectContainer =
+			new ConsoleContextBuilderContainerImplementation <ObjectType> ()
 
 			.consoleHelper (
 				consoleHelper)
@@ -351,7 +351,7 @@ class ObjectContextBuilder <
 				.defaultLabel (
 					"Object title"),
 
-			ImmutableList.<String>of ());
+			ImmutableList.<String> of ());
 
 		consoleModule.addContextTab (
 			"end",
@@ -368,7 +368,7 @@ class ObjectContextBuilder <
 					capitalise (
 						consoleHelper.friendlyName ())),
 
-			Collections.<String>emptyList ());
+			Collections.<String> emptyList ());
 
 	}
 
@@ -494,8 +494,8 @@ class ObjectContextBuilder <
 	void setDefaults () {
 
 		@SuppressWarnings ("unchecked")
-		ConsoleHelper<ObjectType> consoleHelperTemp =
-			(ConsoleHelper<ObjectType>)
+		ConsoleHelper <ObjectType> consoleHelperTemp =
+			(ConsoleHelper <ObjectType>)
 			consoleHelperRegistry.findByObjectName (
 				spec.objectName ());
 
@@ -551,7 +551,7 @@ class ObjectContextBuilder <
 			! spec.objectChildren ().isEmpty ();
 
 		listContextTypeNames =
-			ImmutableList.<String>builder ()
+			ImmutableList.<String> builder ()
 
 				.addAll (
 					maybeList (
@@ -566,7 +566,7 @@ class ObjectContextBuilder <
 				.build ();
 
 		objectContextTypeNames =
-			ImmutableList.<String>builder ()
+			ImmutableList.<String> builder ()
 
 				.addAll (
 					maybeList (
