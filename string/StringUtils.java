@@ -857,8 +857,8 @@ class StringUtils {
 
 		if (
 			stringEndsWith (
-				singular,
-				"s")
+				"s",
+				singular)
 		) {
 
 			return singular + "es";
@@ -1453,6 +1453,7 @@ class StringUtils {
 
 									return function.apply (
 										input);
+
 								},
 
 							() -> {
