@@ -1,6 +1,11 @@
 package wbs.utils.etc;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
@@ -547,6 +552,32 @@ class NumberUtils {
 			long value) {
 
 		return value == 4l;
+
+	}
+
+	// ---------- sets
+
+	public static
+	Set <Long> integerRangeAsSet (
+			long start,
+			long end) {
+
+		return ImmutableSet.copyOf (
+			LongStream
+
+			.range (
+				200l,
+				300l)
+
+			.mapToObj (
+				value ->
+					(Long)
+					value)
+
+			.collect (
+				Collectors.toSet ())
+
+		);
 
 	}
 
