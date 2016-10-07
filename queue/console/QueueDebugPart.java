@@ -32,7 +32,7 @@ import com.google.common.collect.ImmutableMap;
 
 import org.joda.time.Duration;
 
-import wbs.console.forms.FormField.FormType;
+import wbs.console.forms.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.ConsoleObjectManager;

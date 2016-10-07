@@ -235,7 +235,7 @@ class ImageFormFieldBuilder {
 
 		// form field
 
-		formFieldSet.addFormField (
+		formFieldSet.addFormItem (
 			updatableFormFieldProvider.get ()
 
 			.name (

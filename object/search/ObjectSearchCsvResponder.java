@@ -28,14 +28,13 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.entity.record.IdObject;
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.WriterFormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchCsvResponder")
 public
-class ObjectSearchCsvResponder
+class ObjectSearchCsvResponder <RecordType>
 	extends ConsoleResponder {
 
 	// singleton dependencies
@@ -55,7 +54,7 @@ class ObjectSearchCsvResponder
 	ConsoleHelper <?> consoleHelper;
 
 	@Getter @Setter
-	List <FormFieldSet> formFieldSets;
+	List <FormFieldSet <RecordType>> formFieldSets;
 
 	@Getter @Setter
 	String resultsDaoMethodName;
@@ -145,13 +144,13 @@ class ObjectSearchCsvResponder
 		int batchesSinceFlush = 0;
 
 		for (
-			List<Long> batch
+			List <Long> batch
 				: Lists.partition (
 					objectIds,
 					64)
 		) {
 
-			List<IdObject> objects;
+			List <RecordType> objects;
 
 			if (
 				isNotNull (
@@ -162,17 +161,17 @@ class ObjectSearchCsvResponder
 					getMethodRequired (
 						consoleHelper.getClass (),
 						resultsDaoMethodName,
-						ImmutableList.<Class<?>>of (
+						ImmutableList.<Class<?>> of (
 							searchObject.getClass (),
 							List.class));
 
 				@SuppressWarnings ("unchecked")
-				List<IdObject> objectsTemp =
-					(List<IdObject>)
+				List <RecordType> objectsTemp =
+					(List <RecordType>)
 					methodInvoke (
 						method,
 						consoleHelper,
-						ImmutableList.<Object>of (
+						ImmutableList.<Object> of (
 							searchObject,
 							batch));
 
@@ -189,16 +188,21 @@ class ObjectSearchCsvResponder
 						: batch
 				) {
 
-					objects.add (
+					@SuppressWarnings ("unchecked")
+					RecordType objectTemp =
+						(RecordType)
 						consoleHelper.findRequired (
-							objectId));
+							objectId);
+
+					objects.add (
+						objectTemp);
 
 				}
 
 			}
 
 			for (
-				Object object
+				RecordType object
 					: objects
 			) {
 
