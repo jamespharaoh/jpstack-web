@@ -1,10 +1,10 @@
 package wbs.utils.web;
 
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringIsEmpty;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 import static wbs.utils.web.HtmlAttributeUtils.htmlAttributesWrite;
 
@@ -449,7 +449,7 @@ class HtmlInputUtils {
 		boolean value;
 
 		if (
-			isNull (
+			stringIsEmpty (
 				formValue)
 		) {
 
