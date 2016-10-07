@@ -611,7 +611,7 @@ class ObjectListPart <
 		ObsoleteDateLinks.dailyBrowserLinks (
 			formatWriter,
 			localUrl,
-			requestContext.getFormData (),
+			requestContext.formData (),
 			dateField.date);
 
 		htmlParagraphClose ();
