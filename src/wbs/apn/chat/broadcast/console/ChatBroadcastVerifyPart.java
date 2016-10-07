@@ -27,10 +27,10 @@ import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormType;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleModule;
@@ -74,12 +74,13 @@ class ChatBroadcastVerifyPart
 	ChatRec chat;
 	ChatUserRec fromUser;
 
-	FormFieldSet searchFields;
-	FormFieldSet numbersFields;
-	FormFieldSet commonFields;
-	FormFieldSet messageUserFields;
-	FormFieldSet messageMessageFields;
-	FormFieldSet verifyUserFields;
+	FormFieldSet <ChatBroadcastSendForm> searchFields;
+	FormFieldSet <ChatBroadcastSendForm> numbersFields;
+	FormFieldSet <ChatBroadcastSendForm> commonFields;
+	FormFieldSet <ChatBroadcastSendForm> messageUserFields;
+	FormFieldSet <ChatBroadcastSendForm> messageMessageFields;
+
+	FormFieldSet <ChatUserRec> verifyUserFields;
 
 	ChatBroadcastSendForm form;
 	Map<String,Object> formHints;
@@ -123,28 +124,34 @@ class ChatBroadcastVerifyPart
 					"chatId"));
 
 		searchFields =
-			chatBroadcastConsoleModule.formFieldSets ().get (
-				"send-search");
+			FormFieldSet.unsafeCast (
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-search"));
 
 		numbersFields =
-			chatBroadcastConsoleModule.formFieldSets ().get (
-				"send-numbers");
+			FormFieldSet.unsafeCast (
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-numbers"));
 
 		commonFields =
-			chatBroadcastConsoleModule.formFieldSets ().get (
-				"send-common");
+			FormFieldSet.unsafeCast (
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-common"));
 
 		messageUserFields =
-			chatBroadcastConsoleModule.formFieldSets ().get (
-				"send-message-user");
+			FormFieldSet.unsafeCast (
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-message-user"));
 
 		messageMessageFields =
-			chatBroadcastConsoleModule.formFieldSets ().get (
-				"send-message-message");
+			FormFieldSet.unsafeCast (
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-message-message"));
 
 		verifyUserFields =
-			chatBroadcastConsoleModule.formFieldSets ().get (
-				"verify-user");
+			FormFieldSet.unsafeCast (
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"verify-user"));
 
 		form =
 			(ChatBroadcastSendForm)

@@ -18,7 +18,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FormField.FormType;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.utils.string.FormatWriter;
 

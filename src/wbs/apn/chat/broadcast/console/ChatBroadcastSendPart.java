@@ -20,10 +20,10 @@ import com.google.common.collect.ImmutableSet;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.console.ChatConsoleLogic;
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormType;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleModule;
@@ -54,21 +54,21 @@ class ChatBroadcastSendPart
 
 	// state
 
-	FormFieldSet searchFields;
-	FormFieldSet numbersFields;
-	FormFieldSet commonFields;
-	FormFieldSet messageUserFields;
-	FormFieldSet messageMessageFields;
+	FormFieldSet <ChatBroadcastSendForm> searchFields;
+	FormFieldSet <ChatBroadcastSendForm> numbersFields;
+	FormFieldSet <ChatBroadcastSendForm> commonFields;
+	FormFieldSet <ChatBroadcastSendForm> messageUserFields;
+	FormFieldSet <ChatBroadcastSendForm> messageMessageFields;
 
 	ChatBroadcastSendForm form;
-	Optional<UpdateResultSet> updateResults;
-	Map<String,Object> formHints;
+	Optional <UpdateResultSet> updateResults;
+	Map <String, Object> formHints;
 
 	// details
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
 		return ImmutableSet.<ScriptRef>builder ()
 
@@ -97,24 +97,29 @@ class ChatBroadcastSendPart
 	void prepare () {
 
 		searchFields =
-			chatBroadcastConsoleModule.formFieldSets ().get (
-				"send-search");
+			FormFieldSet.unsafeCast (
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-search"));
 
 		numbersFields =
-			chatBroadcastConsoleModule.formFieldSets ().get (
-				"send-numbers");
+			FormFieldSet.unsafeCast (
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-numbers"));
 
 		commonFields =
-			chatBroadcastConsoleModule.formFieldSets ().get (
-				"send-common");
+			FormFieldSet.unsafeCast (
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-common"));
 
 		messageUserFields =
-			chatBroadcastConsoleModule.formFieldSets ().get (
-				"send-message-user");
+			FormFieldSet.unsafeCast (
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-message-user"));
 
 		messageMessageFields =
-			chatBroadcastConsoleModule.formFieldSets ().get (
-				"send-message-message");
+			FormFieldSet.unsafeCast (
+				chatBroadcastConsoleModule.formFieldSets ().get (
+					"send-message-message"));
 
 		form =
 			(ChatBroadcastSendForm)

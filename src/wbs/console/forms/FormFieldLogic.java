@@ -12,6 +12,7 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringReplaceAllSimple;
 import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
@@ -43,7 +44,6 @@ import lombok.extern.log4j.Log4j;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.tuple.Pair;
 
-import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -56,18 +56,15 @@ import wbs.utils.string.FormatWriter;
 public
 class FormFieldLogic {
 
-	public
+	public <Container>
 	void implicit (
-			@NonNull FormFieldSet formFieldSet,
-			@NonNull Object container) {
+			@NonNull FormFieldSet <Container> formFieldSet,
+			@NonNull Container container) {
 
 		for (
-			FormField formField
+			FormField <Container, ?, ?, ?> formField
 				: formFieldSet.formFields ()
 		) {
-
-			if (formField.virtual ())
-				continue;
 
 			formField.implicit (
 				container);
@@ -119,22 +116,19 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void update (
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormFieldSet formFieldSet,
+			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull UpdateResultSet updateResults,
-			@NonNull Object container,
+			@NonNull Container container,
 			@NonNull Map <String,Object> hints,
 			@NonNull String formName) {
 
 		for (
-			FormField formField
+			FormField <Container, ?, ?, ?> formField
 				: formFieldSet.formFields ()
 		) {
-
-			if (formField.virtual ())
-				continue;
 
 			UpdateResult updateResult =
 				formField.update (
@@ -308,13 +302,13 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void outputTableHeadings (
 			@NonNull FormatWriter htmlWriter,
-			@NonNull FormFieldSet formFieldSet) {
+			@NonNull FormFieldSet <Container> formFieldSet) {
 
 		for (
-			FormField formField
+			FormField <Container, ?, ?, ?> formField
 				: formFieldSet.formFields ()
 		) {
 
@@ -326,16 +320,16 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void outputCsvHeadings (
 			@NonNull FormatWriter csvWriter,
-			@NonNull List <FormFieldSet> formFieldSets) {
+			@NonNull List <FormFieldSet <Container>> formFieldSets) {
 
 		boolean first =
 			true;
 
 		for (
-			FormFieldSet formFieldSet
+			FormFieldSet <Container> formFieldSet
 				: formFieldSets
 		) {
 
@@ -353,7 +347,10 @@ class FormFieldLogic {
 
 				csvWriter.writeFormat (
 					"\"%s\"",
-					formField.label ().replace ("\"", "\"\""));
+					stringReplaceAllSimple (
+						"\"",
+						"\"\"",
+						formField.label ()));
 
 				first = false;
 
@@ -387,13 +384,13 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void outputFormRows (
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormatWriter htmlWriter,
-			@NonNull FormFieldSet formFieldSet,
+			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Optional <UpdateResultSet> updateResultSet,
-			@NonNull Object object,
+			@NonNull Container object,
 			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
@@ -411,13 +408,13 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void outputFormAlwaysHidden (
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormatWriter htmlWriter,
-			@NonNull FormFieldSet formFieldSet,
+			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Optional <UpdateResultSet> updateResultSet,
-			@NonNull Object object,
+			@NonNull Container object,
 			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
@@ -435,24 +432,21 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void outputFormAlwaysHidden (
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
-			@NonNull FormFieldSet formFieldSet,
-			@NonNull Optional<UpdateResultSet> updateResultSet,
-			@NonNull Object object,
-			@NonNull Map<String,Object> hints,
+			@NonNull FormFieldSet <Container> formFieldSet,
+			@NonNull Optional <UpdateResultSet> updateResultSet,
+			@NonNull Container object,
+			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
 		for (
-			FormField formField
+			FormField <Container, ?, ?, ?> formField
 				: formFieldSet.formFields ()
 		) {
-
-			if (formField.virtual ())
-				continue;
 
 			if (
 				! formField.canView (
@@ -509,23 +503,20 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void outputFormTemporarilyHidden (
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
-			@NonNull FormFieldSet formFieldSet,
-			@NonNull Object object,
-			@NonNull Map<String,Object> hints,
+			@NonNull FormFieldSet <Container> formFieldSet,
+			@NonNull Container object,
+			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
 		for (
-			FormField formField
+			FormField <Container, ?, ?, ?> formField
 				: formFieldSet.formFields ()
 		) {
-
-			if (formField.virtual ())
-				continue;
 
 			if (
 				! formField.canView (
@@ -547,14 +538,14 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void outputFormRows (
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
-			@NonNull FormFieldSet formFieldSet,
+			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Optional <UpdateResultSet> updateResultSet,
-			@NonNull Object object,
-			@NonNull Map<String,Object> hints,
+			@NonNull Container object,
+			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -562,9 +553,6 @@ class FormFieldLogic {
 			FormField formField
 				: formFieldSet.formFields ()
 		) {
-
-			if (formField.virtual ())
-				continue;
 
 			if (
 				! formField.canView (
@@ -574,7 +562,7 @@ class FormFieldLogic {
 				continue;
 			}
 
-			Optional<String> error;
+			Optional <String> error;
 
 			if (
 				optionalIsPresent (
@@ -629,22 +617,19 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void outputFormReset (
 			@NonNull FormatWriter javascriptWriter,
-			@NonNull FormFieldSet formFieldSet,
+			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull FormType formType,
-			@NonNull Object object,
+			@NonNull Container object,
 			@NonNull Map <String, Object> hints,
 			@NonNull String formName) {
 
 		for (
-			FormField formField
+			FormField <Container, ?, ?, ?> formField
 				: formFieldSet.formFields ()
 		) {
-
-			if (formField.virtual ())
-				continue;
 
 			formField.renderFormReset (
 				javascriptWriter,
@@ -772,12 +757,12 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void outputListTable (
 			@NonNull FormatWriter htmlWriter,
-			@NonNull FormFieldSet formFieldSet,
-			@NonNull List <?> objects,
-			boolean links) {
+			@NonNull FormFieldSet <Container> formFieldSet,
+			@NonNull List <Container> objects,
+			@NonNull Boolean links) {
 
 		// table open
 
@@ -818,7 +803,7 @@ class FormFieldLogic {
 		} else {
 
 			for (
-				Object object
+				Container object
 					: objects
 			) {
 
@@ -846,27 +831,24 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void outputCsvRow (
 			@NonNull FormatWriter csvWriter,
-			@NonNull List<FormFieldSet> formFieldSets,
-			@NonNull Object object,
-			@NonNull Map<String,Object> hints) {
+			@NonNull List <FormFieldSet <Container>> formFieldSets,
+			@NonNull Container object,
+			@NonNull Map <String, Object> hints) {
 
 		boolean first = true;
 
 		for (
-			FormFieldSet formFieldSet
+			FormFieldSet <Container> formFieldSet
 				: formFieldSets
 		) {
 
 			for (
-				FormField formField
+				FormField <Container, ?, ?, ?> formField
 					: formFieldSet.formFields ()
 			) {
-
-				if (formField.virtual ())
-					continue;
 
 				if (! first) {
 
@@ -891,21 +873,18 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void outputTableCellsList (
 			@NonNull FormatWriter htmlWriter,
-			@NonNull FormFieldSet formFieldSet,
-			@NonNull Object object,
+			@NonNull FormFieldSet <Container> formFieldSet,
+			@NonNull Container object,
 			@NonNull Map <String, Object> hints,
 			@NonNull Boolean links) {
 
 		for (
-			FormField formField
+			FormField <Container, ?, ?, ?> formField
 				: formFieldSet.formFields ()
 		) {
-
-			if (formField.virtual ())
-				continue;
 
 			formField.renderTableCellList (
 				htmlWriter,
@@ -918,21 +897,18 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void outputTableRowsList (
 			@NonNull FormatWriter htmlWriter,
-			@NonNull FormFieldSet formFieldSet,
-			@NonNull Object object,
+			@NonNull FormFieldSet <Container> formFieldSet,
+			@NonNull Container object,
 			@NonNull Boolean links,
 			@NonNull Long columnSpan) {
 
 		for (
-			FormField formField
+			FormField <Container, ?, ?, ?> formField
 				: formFieldSet.formFields ()
 		) {
-
-			if (formField.virtual ())
-				continue;
 
 			formField.renderTableCellList (
 				htmlWriter,
@@ -945,21 +921,17 @@ class FormFieldLogic {
 
 	}
 
-	public
+	public <Container>
 	void outputTableRows (
 			@NonNull FormatWriter htmlWriter,
-			@NonNull FormFieldSet formFieldSet,
-			@NonNull Object object,
-			@NonNull Map<String,Object> hints) {
+			@NonNull FormFieldSet <Container> formFieldSet,
+			@NonNull Container object,
+			@NonNull Map <String, Object> hints) {
 
 		for (
-			FormField formField
+			FormField <Container, ?, ?, ?> formField
 				: formFieldSet.formFields ()
 		) {
-
-			if (formField.virtual ()) {
-				continue;
-			}
 
 			htmlTableRowOpen (
 				htmlWriter);

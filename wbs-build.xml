@@ -625,16 +625,8 @@
 			package="wbs.integrations.fonix"/>
 
 		<plugin
-			name="hybyte"
-			package="wbs.integrations.hybyte"/>
-
-		<plugin
 			name="mediaburst"
 			package="wbs.integrations.mediaburst"/>
-
-		<plugin
-			name="mig"
-			package="wbs.integrations.mig"/>
 
 		<plugin
 			name="oxygen8"

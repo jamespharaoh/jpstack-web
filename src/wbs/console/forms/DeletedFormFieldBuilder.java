@@ -189,7 +189,7 @@ class DeletedFormFieldBuilder {
 
 		if (! readOnly) {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				updatableFormFieldProvider.get ()
 
 				.name (
@@ -226,7 +226,7 @@ class DeletedFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				readOnlyFormFieldProvider.get ()
 
 				.name (

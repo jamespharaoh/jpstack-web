@@ -246,7 +246,7 @@ class NameFormFieldBuilder {
 
 		if (readOnly) {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				readOnlyFormFieldProvider.get ()
 
 				.name (
@@ -271,7 +271,7 @@ class NameFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				updatableFormFieldProvider.get ()
 
 				.name (

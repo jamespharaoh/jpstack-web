@@ -1,6 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import wbs.framework.data.annotations.DataClass;
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @DataClass ("form-field-set")
 public
-class FormFieldSet {
+class FormFieldSet <Container> {
 
 	// properties
 
@@ -38,32 +39,41 @@ class FormFieldSet {
 	Boolean fileUpload;
 
 	@DataChildren
-	@Getter @Setter
-	List<FormField> formFields =
-		new ArrayList<FormField> ();
+	@Getter
+	List <FormItem> formItems =
+		new ArrayList<> ();
+
+	@Getter
+	List <FormField> formFields =
+		new ArrayList<> ();
+
+	@Getter
+	Long columns = 0l;
 
 	// state
 
 	@DataChildrenIndex
 	@Getter @Setter
-	Map<String,FormField> formFieldsByName =
-		new HashMap<String,FormField> ();
+	Map <String, FormField> formFieldsByName =
+		new HashMap<> ();
 
 	// utility methods
 
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		Set<ScriptRef> scriptRefs =
-			new LinkedHashSet<ScriptRef> ();
+		// TODO build this as we go
+
+		Set <ScriptRef> scriptRefs =
+			new LinkedHashSet<> ();
 
 		for (
-			FormField formField
-				: formFields
+			FormItem formItem
+				: formItems
 		) {
 
 			scriptRefs.addAll (
-				formField.scriptRefs ());
+				formItem.scriptRefs ());
 
 		}
 
@@ -72,37 +82,18 @@ class FormFieldSet {
 	}
 
 	public
-	long columns () {
+	FormFieldSet addFormItem (
+			@NonNull FormItem <Container> formItem) {
 
-		long ret = 0;
-
-		for (
-			FormField formField
-				: formFields
+		if (
+			isInstanceOf (
+				FormField.class,
+				formItem)
 		) {
 
-			if (formField.virtual ()) {
-				continue;
-			}
-
-			ret ++;
-
-		}
-
-		return ret;
-
-	}
-
-	public
-	FormFieldSet addFormField (
-			@NonNull FormField formField) {
-
-		if (formField.virtual ()) {
-
-			formFields.add (
-				formField);
-
-		} else {
+			FormField <Container, ?, ?, ?> formField =
+				(FormField <Container, ?, ?, ?>)
+				formItem;
 
 			if (
 				contains (
@@ -118,12 +109,34 @@ class FormFieldSet {
 
 			}
 
+			formItems.add (
+				formItem);
+
 			formFields.add (
 				formField);
 
 			formFieldsByName.put (
 				formField.name (),
 				formField);
+
+			columns ++;
+
+		} else if (
+			isInstanceOf (
+				FormFieldGroup.class,
+				formItem)
+		) {
+
+			formItems.add (
+				formItem);
+
+			formItem.children ().forEach (
+				this::addFormItem);
+
+		} else {
+
+			formItems.add (
+				formItem);
 
 		}
 
@@ -137,6 +150,18 @@ class FormFieldSet {
 
 		return formFieldsByName.get (
 			name);
+
+	}
+
+	public static <Container>
+	FormFieldSet <Container> unsafeCast (
+			@NonNull FormFieldSet <?> fields) {
+
+		FormFieldSet <Container> fieldsTemp =
+			(FormFieldSet <Container>)
+			fields;
+
+		return fieldsTemp;
 
 	}
 

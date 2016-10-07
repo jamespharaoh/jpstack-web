@@ -21,7 +21,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 @PrototypeComponent ("formFieldSetBuilder")
 @ConsoleModuleBuilderHandler
 public
-class FormFieldSetBuilder {
+class FormFieldSetBuilder <Container> {
 
 	// singleton dependencies
 
@@ -125,8 +125,8 @@ class FormFieldSetBuilder {
 			.consoleHelper (
 				consoleHelper);
 
-		FormFieldSet formFieldSet =
-			new FormFieldSet ()
+		FormFieldSet <Container> formFieldSet =
+			new FormFieldSet <Container> ()
 
 			.name (
 				joinWithFullStop (
@@ -145,15 +145,23 @@ class FormFieldSetBuilder {
 				spec.name ());
 
 		for (
-			FormField<?,?,?,?> formField
+			FormItem <?> formItem
+				: formFieldSet.formItems ()
+		) {
+
+			formItem.init (
+				fullName);
+
+		}
+
+		for (
+			FormField <?, ?, ?, ?> formField
 				: formFieldSet.formFields ()
 		) {
 
-			formField.init (
-				fullName);
-
-			if (formField.fileUpload ())
+			if (formField.fileUpload ()) {
 				formFieldSet.fileUpload (true);
+			}
 
 		}
 

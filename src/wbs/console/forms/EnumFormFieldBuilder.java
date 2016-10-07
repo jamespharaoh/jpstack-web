@@ -260,7 +260,7 @@ class EnumFormFieldBuilder {
 
 		if (hidden) {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				hiddenFormFieldProvider.get ()
 
 				.name (
@@ -282,7 +282,7 @@ class EnumFormFieldBuilder {
 
 		} else if (readOnly) {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				readOnlyFormFieldProvider.get ()
 
 				.name (
@@ -310,7 +310,7 @@ class EnumFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				updatableFormFieldProvider.get ()
 
 				.name (

@@ -222,7 +222,7 @@ class FloatingPointFormFieldBuilder {
 
 		if (! readOnly) {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				updatableFormFieldProvider.get ()
 
 				.name (
@@ -256,7 +256,7 @@ class FloatingPointFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				readOnlyFormFieldProvider.get ()
 
 				.name (

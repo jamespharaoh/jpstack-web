@@ -191,7 +191,7 @@ class DateFormFieldBuilder {
 
 		if (readOnly) {
 
-			target.addFormField (
+			target.addFormItem (
 
 				readOnlyFormFieldProvider.get ()
 
@@ -220,7 +220,7 @@ class DateFormFieldBuilder {
 
 		} else {
 
-			target.addFormField (
+			target.addFormItem (
 
 				updatableFormFieldProvider.get ()
 

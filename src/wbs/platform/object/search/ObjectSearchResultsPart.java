@@ -431,7 +431,7 @@ class ObjectSearchResultsPart
 					"(deleted)",
 					htmlColumnSpanAttribute (
 						collectionSize (
-							formFieldSet.formFields ())));
+							formFieldSet.formItems ())));
 
 				htmlTableRowClose ();
 
@@ -455,7 +455,7 @@ class ObjectSearchResultsPart
 					"(restricted)",
 					htmlColumnSpanAttribute (
 						collectionSize (
-							formFieldSet.formFields ())));
+							formFieldSet.formItems ())));
 
 				htmlTableRowClose ();
 
@@ -504,7 +504,7 @@ class ObjectSearchResultsPart
 							rowTimestamp),
 						htmlColumnSpanAttribute (
 							collectionSize (
-								formFieldSet.formFields ())));
+								formFieldSet.formItems ())));
 
 					htmlTableRowClose ();
 

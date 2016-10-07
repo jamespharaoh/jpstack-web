@@ -14,6 +14,7 @@ import wbs.console.forms.FormFieldBuilderContext;
 import wbs.console.forms.FormFieldBuilderContextImplementation;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormFieldSetSpec;
+import wbs.console.forms.FormItem;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleHelperRegistry;
 import wbs.framework.builder.Builder;
@@ -73,11 +74,11 @@ class ConsoleModuleBuilder
 
 	// implementation
 
-	public
-	FormFieldSet buildFormFieldSet (
-			@NonNull ConsoleHelper<?> consoleHelper,
+	public <Container>
+	FormFieldSet <Container> buildFormFieldSet (
+			@NonNull ConsoleHelper <?> consoleHelper,
 			@NonNull String fieldSetName,
-			@NonNull List<Object> formFieldSpecs) {
+			@NonNull List <Object> formFieldSpecs) {
 
 		FormFieldBuilderContext formFieldBuilderContext =
 			new FormFieldBuilderContextImplementation ()
@@ -88,8 +89,8 @@ class ConsoleModuleBuilder
 			.consoleHelper (
 				consoleHelper);
 
-		FormFieldSet formFieldSet =
-			new FormFieldSet ();
+		FormFieldSet <Container> formFieldSet =
+			new FormFieldSet <Container> ();
 
 		builder.descend (
 			formFieldBuilderContext,
@@ -98,15 +99,26 @@ class ConsoleModuleBuilder
 			MissingBuilderBehaviour.error);
 
 		for (
-			FormField<?,?,?,?> formField
+			FormItem <?> formItem
+				: formFieldSet.formItems ()
+		) {
+
+			formItem.init (
+				fieldSetName);
+
+		}
+
+		for (
+			FormField <?, ?, ?, ?> formField
 				: formFieldSet.formFields ()
 		) {
 
-			formField.init (
-				fieldSetName);
+			if (formField.fileUpload ()) {
 
-			if (formField.fileUpload ())
-				formFieldSet.fileUpload (true);
+				formFieldSet.fileUpload (
+					true);
+
+			}
 
 		}
 

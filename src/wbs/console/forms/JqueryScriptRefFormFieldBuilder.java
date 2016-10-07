@@ -46,7 +46,7 @@ class JqueryScriptRefFormFieldBuilder {
 	void build (
 			Builder builder) {
 
-		formFieldSet.addFormField (
+		formFieldSet.addFormItem (
 			scriptRefFormFieldProvider.get ()
 
 			.scriptRefs (

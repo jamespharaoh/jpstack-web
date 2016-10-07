@@ -213,7 +213,7 @@ class YesNoFormFieldBuilder {
 
 		if (hidden) {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				hiddenFormFieldProvider.get ()
 
 				.name (
@@ -235,7 +235,7 @@ class YesNoFormFieldBuilder {
 
 		} else if (! readOnly) {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				updatableFormFieldProvider.get ()
 
 				.name (
@@ -275,7 +275,7 @@ class YesNoFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				readOnlyFormFieldProvider.get ()
 
 				.name (

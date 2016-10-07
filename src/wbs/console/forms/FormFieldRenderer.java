@@ -11,7 +11,6 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.console.forms.FormField.FormType;
 import wbs.utils.string.FormatWriter;
 
 import fj.data.Either;

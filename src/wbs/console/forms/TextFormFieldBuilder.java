@@ -248,7 +248,7 @@ class TextFormFieldBuilder {
 
 		if (hidden) {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				hiddenFormFieldProvider.get ()
 
 				.name (
@@ -270,7 +270,7 @@ class TextFormFieldBuilder {
 
 		} else if (readOnly) {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				readOnlyFormFieldProvider.get ()
 
 				.name (
@@ -298,7 +298,7 @@ class TextFormFieldBuilder {
 
 		} else {
 
-			formFieldSet.addFormField (
+			formFieldSet.addFormItem (
 				updatableFormFieldProvider.get ()
 
 				.name (

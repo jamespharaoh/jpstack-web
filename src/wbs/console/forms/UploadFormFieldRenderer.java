@@ -17,7 +17,6 @@ import lombok.experimental.Accessors;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 
-import wbs.console.forms.FormField.FormType;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
@@ -27,8 +26,8 @@ import fj.data.Either;
 @PrototypeComponent ("uploadFormFieldRenderer")
 @Accessors (fluent = true)
 public
-class UploadFormFieldRenderer<Container>
-	implements FormFieldRenderer<Container,FileUpload> {
+class UploadFormFieldRenderer <Container>
+	implements FormFieldRenderer <Container, FileUpload> {
 
 	// properties
 

@@ -31,10 +31,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormType;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -62,9 +62,9 @@ class ChatRebillSendPart
 
 	// state
 
-	FormFieldSet searchFormFields;
-	FormFieldSet billResultsFormFields;
-	FormFieldSet nonBillResultsFormFields;
+	FormFieldSet <ChatRebillSearch> searchFormFields;
+	FormFieldSet <ChatUserRec> billResultsFormFields;
+	FormFieldSet <ChatRebillNonBillResult> nonBillResultsFormFields;
 
 	Optional <UpdateResultSet> formUpdates;
 	ChatRebillSearch formValues;
@@ -81,17 +81,23 @@ class ChatRebillSendPart
 
 		// get form fields
 
-		searchFormFields =
+		@SuppressWarnings ("unchecked")
+		FormFieldSet <ChatRebillSearch> searchFormFieldsTemp =
 			chatRebillConsoleModule.formFieldSets ().get (
 				"search");
 
+		searchFormFields =
+			searchFormFieldsTemp;
+
 		billResultsFormFields =
-			chatRebillConsoleModule.formFieldSets ().get (
-				"bill-results");
+			FormFieldSet.unsafeCast (
+				chatRebillConsoleModule.formFieldSets ().get (
+					"bill-results"));
 
 		nonBillResultsFormFields =
-			chatRebillConsoleModule.formFieldSets ().get (
-				"non-bill-results");
+			FormFieldSet.unsafeCast (
+				chatRebillConsoleModule.formFieldSets ().get (
+					"non-bill-results"));
 
 		// get form data
 

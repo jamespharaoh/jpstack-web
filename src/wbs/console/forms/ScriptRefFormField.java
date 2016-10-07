@@ -13,21 +13,9 @@ import wbs.framework.component.annotations.PrototypeComponent;
 @PrototypeComponent ("scriptRefFormField")
 public
 class ScriptRefFormField
-	implements FormField<Object,Object,Object,Object> {
-
-	@Getter
-	Boolean virtual = true;
-
-	@Getter
-	Boolean large;
+	implements VirtualFormItem <Object> {
 
 	@Getter @Setter
-	Set<ScriptRef> scriptRefs;
-
-	@Override
-	public
-	Boolean fileUpload () {
-		return false;
-	}
+	Set <ScriptRef> scriptRefs;
 
 }

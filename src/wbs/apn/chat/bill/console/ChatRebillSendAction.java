@@ -71,7 +71,7 @@ class ChatRebillSendAction
 
 	// state
 
-	FormFieldSet formFields;
+	FormFieldSet <?> formFields;
 	ChatRebillSearch formValues;
 	Map <String, Object> formHints;
 	UpdateResultSet formUpdates;

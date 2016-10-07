@@ -125,7 +125,7 @@ class HtmlFormFieldBuilder {
 
 		// form field
 
-		formFieldSet.addFormField (
+		formFieldSet.addFormItem (
 			readOnlyFormFieldProvider.get ()
 
 			.name (

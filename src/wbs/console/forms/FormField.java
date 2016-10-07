@@ -3,7 +3,6 @@ package wbs.console.forms;
 import static wbs.utils.etc.Misc.doNothing;
 
 import java.util.Map;
-import java.util.Set;
 
 import com.google.common.base.Optional;
 
@@ -11,50 +10,26 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import wbs.console.html.ScriptRef;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.utils.string.FormatWriter;
 
 public
-interface FormField <Container, Generic, Native, Interface> {
+interface FormField <Container, Generic, Native, Interface>
+	extends FormItem <Container> {
 
 	final static
 	int defaultSize = 48;
 
 	Boolean fileUpload ();
-	Boolean virtual ();
 	Boolean large ();
 
-	default
-	String name () {
-
-		throw new UnsupportedOperationException ();
-
-	}
-
-	default
-	String label () {
-
-		throw new UnsupportedOperationException ();
-
-	}
-
-	Set<ScriptRef> scriptRefs ();
-
+	@Override
 	default
 	boolean canView (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map <String, Object> hints) {
 
 		return true;
-
-	}
-
-	default
-	void init (
-			String fieldSetName) {
-
-		doNothing ();
 
 	}
 
@@ -151,10 +126,10 @@ interface FormField <Container, Generic, Native, Interface> {
 	}
 
 	default
-	UpdateResult<Generic,Native> update (
+	UpdateResult <Generic, Native> update (
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull String formName) {
 
 		throw new UnsupportedOperationException ();
@@ -163,23 +138,14 @@ interface FormField <Container, Generic, Native, Interface> {
 
 	default
 	void runUpdateHook (
-			@NonNull UpdateResult<Generic,Native> updateResult,
+			@NonNull UpdateResult <Generic, Native> updateResult,
 			@NonNull Container container,
-			@NonNull PermanentRecord<?> linkObject,
-			@NonNull Optional<Object> objectRef,
-			@NonNull Optional<String> objectType) {
+			@NonNull PermanentRecord <?> linkObject,
+			@NonNull Optional <Object> objectRef,
+			@NonNull Optional <String> objectType) {
 
 		doNothing ();
 
-	}
-
-	@Accessors (fluent = true)
-	public static
-	enum FormType {
-		create,
-		update,
-		search,
-		perform;
 	}
 
 	@Accessors (fluent = true)

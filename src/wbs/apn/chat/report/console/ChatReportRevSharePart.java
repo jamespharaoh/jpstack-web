@@ -48,9 +48,9 @@ import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserSearch;
-import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormType;
 import wbs.console.module.ConsoleManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
@@ -133,8 +133,8 @@ class ChatReportRevSharePart
 
 	// state
 
-	FormFieldSet searchFields;
-	FormFieldSet resultsFields;
+	FormFieldSet <ChatReportRevShareForm> searchFields;
+	FormFieldSet <ChatReportRevShareItem> resultsFields;
 
 	ChatReportRevShareForm form;
 
@@ -155,12 +155,14 @@ class ChatReportRevSharePart
 	void prepare () {
 
 		searchFields =
-			chatReportConsoleModule.formFieldSets ().get (
-				"monthReportSearch");
-
+			FormFieldSet.unsafeCast (
+				chatReportConsoleModule.formFieldSets ().get (
+					"monthReportSearch"));
+	
 		resultsFields =
-			chatReportConsoleModule.formFieldSets ().get (
-				"simpleReportResults");
+			FormFieldSet.unsafeCast (
+				chatReportConsoleModule.formFieldSets ().get (
+					"simpleReportResults"));
 
 		// get search form
 

@@ -106,7 +106,7 @@ class IdFormFieldBuilder {
 
 		// field
 
-		formFieldSet.addFormField (
+		formFieldSet.addFormItem (
 			readOnlyFormFieldProvider.get ()
 
 			.name (

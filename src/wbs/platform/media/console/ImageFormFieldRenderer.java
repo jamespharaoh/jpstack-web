@@ -18,9 +18,9 @@ import lombok.experimental.Accessors;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 
-import wbs.console.forms.FormField.FormType;
 import wbs.console.forms.FormFieldRenderer;
 import wbs.console.forms.FormFieldSubmission;
+import wbs.console.forms.FormType;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.platform.media.logic.MediaLogic;
@@ -71,8 +71,8 @@ class ImageFormFieldRenderer <Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<MediaRec> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <MediaRec> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -86,8 +86,8 @@ class ImageFormFieldRenderer <Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<MediaRec> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <MediaRec> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 

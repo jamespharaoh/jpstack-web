@@ -60,6 +60,9 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	@Getter
 	Boolean virtual = false;
 
+	@Getter
+	Boolean group = false;
+
 	@DataAttribute
 	@Getter @Setter
 	Boolean large = false;

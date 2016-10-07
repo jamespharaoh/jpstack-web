@@ -55,6 +55,9 @@ class HiddenFormField <Container, Generic, Native>
 	@Getter
 	Boolean virtual = false;
 
+	@Getter
+	Boolean group = false;
+
 	@DataAttribute
 	@Getter @Setter
 	Boolean large = false;

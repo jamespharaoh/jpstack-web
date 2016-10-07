@@ -29,20 +29,20 @@ import org.apache.log4j.Level;
 
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.broadcast.logic.ChatBroadcastLogic;
-import wbs.apn.chat.broadcast.model.ChatBroadcastNumberState;
-import wbs.apn.chat.broadcast.model.ChatBroadcastState;
-import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserSearch;
-import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.broadcast.model.ChatBroadcastNumberObjectHelper;
+import wbs.apn.chat.broadcast.model.ChatBroadcastNumberState;
 import wbs.apn.chat.broadcast.model.ChatBroadcastObjectHelper;
 import wbs.apn.chat.broadcast.model.ChatBroadcastRec;
+import wbs.apn.chat.broadcast.model.ChatBroadcastState;
+import wbs.apn.chat.contact.model.ChatMessageMethod;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserDao;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserSearch;
+import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
@@ -202,23 +202,23 @@ class ChatBroadcastSendAction
 
 			// load form
 
-			FormFieldSet searchFields =
+			FormFieldSet <?> searchFields =
 				chatBroadcastConsoleModule.formFieldSets ().get (
 					"send-search");
 
-			FormFieldSet numbersFields =
+			FormFieldSet <?> numbersFields =
 				chatBroadcastConsoleModule.formFieldSets ().get (
 					"send-numbers");
 
-			FormFieldSet commonFields =
+			FormFieldSet <?> commonFields =
 				chatBroadcastConsoleModule.formFieldSets ().get (
 					"send-common");
 
-			FormFieldSet messageUserFields =
+			FormFieldSet <?> messageUserFields =
 				chatBroadcastConsoleModule.formFieldSets ().get (
 					"send-message-user");
 
-			FormFieldSet messageMessageFields =
+			FormFieldSet <?> messageMessageFields =
 				chatBroadcastConsoleModule.formFieldSets ().get (
 					"send-message-message");
 

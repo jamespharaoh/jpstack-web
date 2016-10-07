@@ -159,7 +159,7 @@ class JsonFormFieldBuilder {
 
 		// form field
 
-		formFieldSet.addFormField (
+		formFieldSet.addFormItem (
 			readOnlyFormFieldProvider.get ()
 
 			.name (
