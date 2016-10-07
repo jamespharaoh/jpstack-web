@@ -1,7 +1,10 @@
 package wbs.apn.chat.namednote.console;
 
+import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
@@ -79,7 +82,10 @@ class ChatNoteNamesAction
 			chatNoteNameHelper.findNotDeleted (
 				chat);
 
-		if (requestContext.getForm ("saveChanges") != null) {
+		if (
+			requestContext.formIsPresent (
+				"saveChanges")
+		) {
 
 			// update note names
 
@@ -96,8 +102,9 @@ class ChatNoteNamesAction
 						noteName.getId ());
 
 				String newName =
-					requestContext.getForm (
-						formKey);
+					optionalOrNull (
+						requestContext.form (
+							formKey));
 
 				if (newName == null)
 					continue;
@@ -135,7 +142,7 @@ class ChatNoteNamesAction
 
 			if (
 				stringIsNotEmpty (
-					requestContext.getForm (
+					requestContext.formOrEmptyString (
 						"noteNameNew"))
 			) {
 
@@ -150,7 +157,7 @@ class ChatNoteNamesAction
 							chatNoteNames.size ()))
 
 					.setName (
-						requestContext.getForm (
+						requestContext.formRequired (
 							"noteNameNew"))
 
 					.setDescription (
@@ -175,8 +182,15 @@ class ChatNoteNamesAction
 					"noteMoveUp%d",
 					chatNoteName.getId ());
 
-			if (requestContext.getForm (noteMoveUpKey) != null
-					&& chatNoteName.getIndex () > 0) {
+			if (
+
+				requestContext.formIsPresent (
+					noteMoveUpKey)
+
+				&& moreThanZero (
+					chatNoteName.getIndex ())
+
+			) {
 
 				long index =
 					chatNoteName.getIndex ();
@@ -218,10 +232,16 @@ class ChatNoteNamesAction
 					"noteMoveDown%d",
 					chatNoteName.getId ());
 
-			if (requestContext.getForm (noteMoveDownKey)
-						!= null
-					&& chatNoteName.getIndex ()
-						< chatNoteNames.size () - 1) {
+			if (
+
+				requestContext.formIsPresent (
+					noteMoveDownKey)
+
+				&& lessThan (
+					chatNoteName.getIndex (),
+					chatNoteNames.size () - 1)
+
+			) {
 
 				long index =
 					chatNoteName.getIndex ();
@@ -257,7 +277,10 @@ class ChatNoteNamesAction
 					"noteDelete%d",
 					chatNoteName.getId ());
 
-			if (requestContext.getForm (noteDeleteKey) != null) {
+			if (
+				requestContext.formIsPresent (
+					noteDeleteKey)
+			) {
 
 				long index =
 					chatNoteName.getIndex ();

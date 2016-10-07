@@ -2,6 +2,7 @@ package wbs.platform.object.create;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.instantToDateNullSafe;
@@ -442,10 +443,12 @@ class ObjectCreateAction <
 		) {
 
 			String parentIdString =
-				requestContext.getForm (
-					stringFormat (
-						"create-%s",
-						consoleHelper.parentFieldName ()));
+				optionalOrNull (
+					requestContext.form (
+						stringFormat (
+							"create-%s",
+							consoleHelper.parentFieldName ())));
+
 			if (
 				isNotNull (
 					parentIdString)

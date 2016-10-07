@@ -1,6 +1,5 @@
 package wbs.apn.chat.user.core.console;
 
-import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
@@ -97,10 +96,11 @@ class ChatUserNotesPart
 		htmlTableDetailsRowWriteHtml (
 			"Note",
 			stringFormat (
-				"<textarea name=\"note\">%h</textarea>",
-				emptyStringIfNull (
-					requestContext.getForm (
-						"note"))));
+				"<textarea",
+				" name=\"note\"",
+				">%h</textarea>",
+				requestContext.formOrEmptyString (
+					"note")));
 
 		htmlTableClose ();
 

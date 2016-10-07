@@ -1,6 +1,6 @@
 package wbs.apn.chat.user.admin.console;
 
-import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.LogicUtils.ifNullThenEmDash;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
@@ -82,19 +82,18 @@ class ChatUserAdminNamePart
 				" type=\"text\"",
 				" name=\"name\"",
 				" value=\"%h\"",
-				ifNull (
-					requestContext.getForm ("name"),
-					chatUser.getName (),
-					""),
+				requestContext.formOrElse (
+					"name",
+					() -> ifNullThenEmDash (
+						chatUser.getName ())),
 				">"));
 
 		htmlTableDetailsRowWriteHtml (
 			"Reason",
 			() -> chatConsoleLogic.writeSelectForChatUserEditReason (
 				"editReason",
-				emptyStringIfNull (
-					requestContext.getForm (
-						"editReason"))));
+				requestContext.formOrEmptyString (
+					"editReason")));
 
 		htmlTableDetailsRowWriteHtml (
 			"Action",

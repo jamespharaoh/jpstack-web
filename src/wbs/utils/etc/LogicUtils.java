@@ -600,7 +600,7 @@ class LogicUtils {
 			string.equals (
 				"false")
 		) {
-			return true;
+			return false;
 		}
 
 		throw new IllegalArgumentException ();

@@ -104,7 +104,7 @@ class ChatNoteNamesPart
 				" name=\"noteName%d\"",
 				noteName.getId (),
 				" value=\"%h\"",
-				requestContext.getForm (
+				requestContext.formOrDefault (
 					stringFormat (
 						"noteName%d",
 						noteName.getId ()),
@@ -156,9 +156,8 @@ class ChatNoteNamesPart
 			" type=\"text\"",
 			" name=\"noteNameNew\"",
 			" value=\"%h\"",
-			requestContext.getForm (
-				"noteNameNew",
-				""),
+			requestContext.formOrEmptyString (
+				"noteNameNew"),
 			">");
 
 		htmlTableCellClose ();

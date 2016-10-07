@@ -1,6 +1,7 @@
 package wbs.apn.chat.user.admin.console;
 
-import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
+import static wbs.utils.etc.LogicUtils.ifThenElseEmDash;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
@@ -61,11 +62,12 @@ class ChatUserAdminDobPart
 			" type=\"text\"",
 			" name=\"dob\"",
 			" value=\"%h\"",
-			ifNull (
-				requestContext.getForm ("dob"),
-				timeFormatter.dateString (
-					chatUser.getDob ()),
-				""),
+			requestContext.formOrElse (
+				"dob",
+				() -> ifNotNullThenElseEmDash (
+					chatUser.getDob (),
+					() -> timeFormatter.dateString (
+						chatUser.getDob ()))),
 			">");
 
 		htmlParagraphClose ();

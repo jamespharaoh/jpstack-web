@@ -1,6 +1,5 @@
 package wbs.apn.chat.affiliate.console;
 
-import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
@@ -55,17 +54,15 @@ class ChatAffiliateKeywordsCreatePart
 				" type=\"text\"",
 				" name=\"keyword\"",
 				" value=\"%h\"",
-				emptyStringIfNull (
-					requestContext.getForm (
-						"keyword"))));
+				requestContext.formOrEmptyString (
+					"keyword")));
 
 		htmlTableDetailsRowWriteHtml (
 			"Join type",
 			() -> chatKeywordJoinTypeConsoleHelper.writeSelect (
 				"joinType",
-				emptyStringIfNull (
-					requestContext.getForm (
-						"joinType"))));
+				requestContext.formOrEmptyString(
+					"joinType")));
 
 		htmlTableDetailsRowWriteHtml (
 			"Gender",
@@ -73,9 +70,8 @@ class ChatAffiliateKeywordsCreatePart
 
 			genderConsoleHelper.writeSelect (
 				"gender",
-				emptyStringIfNull (
-					requestContext.getForm (
-						"gender")));
+				requestContext.formOrEmptyString (
+					"gender"));
 
 			formatWriter.writeLineFormat (
 				"(optional)");
@@ -88,9 +84,8 @@ class ChatAffiliateKeywordsCreatePart
 
 			orientConsoleHelper.writeSelect (
 				"orient",
-				emptyStringIfNull (
-					requestContext.getForm (
-						"orient")));
+				requestContext.formOrEmptyString (
+					"orient"));
 
 			formatWriter.writeLineFormat (
 				"(optional)");

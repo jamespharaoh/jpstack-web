@@ -68,12 +68,12 @@ class SimulatorSessionPollAction
 
 		Long lastId =
 			parseIntegerRequired (
-				requestContext.getForm (
+				requestContext.formRequired (
 					"last"));
 
 		Long limit =
 			parseIntegerRequired (
-				requestContext.getForm (
+				requestContext.formRequired (
 					"limit"));
 
 		@Cleanup

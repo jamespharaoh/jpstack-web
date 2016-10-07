@@ -186,7 +186,7 @@ class ChatRebillSendPart
 
 		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
-				"/chat.rebill"));
+				"/chat.rebill.send"));
 
 		htmlTableOpenDetails ();
 

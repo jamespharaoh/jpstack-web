@@ -1,7 +1,7 @@
 package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
-import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
@@ -81,9 +81,10 @@ class ChatUserAdminCreditModePart
 			"Credit mode",
 			() -> chatUserCreditModeConsoleHelper.writeSelect (
 				"creditMode",
-				ifNull (
-					requestContext.getForm ("creditMode"),
-					chatUser.getCreditMode ().toString ())));
+				requestContext.formOrElse (
+					"creditMode",
+					() -> camelToSpaces (
+						chatUser.getCreditMode ().name ()))));
 
 		htmlTableDetailsRowWriteHtml (
 			"Actions",

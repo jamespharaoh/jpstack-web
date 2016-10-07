@@ -2,6 +2,7 @@ package wbs.test.simulator.console;
 
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.LogicUtils.parseBooleanTrueFalseRequired;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.string.StringUtils.doesNotStartWithSimple;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -128,7 +129,8 @@ class SimulatorSessionCreateEventAction
 		try {
 
 			String type =
-				requestContext.getForm ("type");
+				requestContext.formRequired (
+					"type");
 
 			if (
 				stringEqualSafe (
@@ -218,21 +220,21 @@ class SimulatorSessionCreateEventAction
 			simulatorSession.getSimulator ();
 
 		String numFrom =
-			requestContext.getForm (
+			requestContext.formRequired (
 				"numFrom");
 
 		String numTo =
-			requestContext.getForm (
+			requestContext.formRequired (
 				"numTo");
 
 		String messageText =
-			requestContext.getForm (
+			requestContext.formRequired (
 				"message");
 
 		NetworkRec network =
 			networkHelper.findRequired (
-				Long.parseLong (
-					requestContext.getForm (
+				parseIntegerRequired (
+					requestContext.formRequired (
 						"networkId")));
 
 		// store in session
@@ -365,13 +367,13 @@ class SimulatorSessionCreateEventAction
 					"simulatorSessionId"));
 
 		Long messageId =
-			Long.parseLong (
-				requestContext.getForm (
+			parseIntegerRequired (
+				requestContext.formRequired (
 					"messageId"));
 
 		Boolean success =
 			parseBooleanTrueFalseRequired (
-				requestContext.getForm (
+				requestContext.formRequired (
 					"success"));
 
 		// submit delivery report

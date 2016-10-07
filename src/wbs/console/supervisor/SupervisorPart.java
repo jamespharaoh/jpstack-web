@@ -480,7 +480,7 @@ class SupervisorPart
 		ObsoleteDateLinks.dailyBrowserParagraph (
 			formatWriter,
 			localUrl,
-			requestContext.getFormData (),
+			requestContext.formData (),
 			dateField.date);
 
 		// warning if time change

@@ -3,8 +3,8 @@ package wbs.console.request;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.orNull;
-import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.ifNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalValueEqualSafe;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
@@ -423,7 +423,7 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	Map<String,String> requestFormData () {
+	Map <String, String> requestFormData () {
 
 		return parameterMapSimple ();
 
@@ -437,7 +437,7 @@ class ConsoleRequestContextImplementation
 
 		formData (
 			ImmutableMap.copyOf (
-				getFormData ().entrySet ().stream ()
+				formData ().entrySet ().stream ()
 
 			.map (
 				entry ->
@@ -551,7 +551,7 @@ class ConsoleRequestContextImplementation
 	@Override
 	public
 	void formData (
-			@NonNull Map<String,String> newFormData) {
+			@NonNull Map <String, String> newFormData) {
 
 		request (
 			"formData",
@@ -565,17 +565,17 @@ class ConsoleRequestContextImplementation
 
 		request (
 			"formData",
-			Collections.<String,String>emptyMap ());
+			Collections.emptyMap ());
 
 	}
 
 	@Override
 	public
-	Map<String,String> getFormData () {
+	Map <String, String> formData () {
 
 		@SuppressWarnings ("unchecked")
-		Optional<Map<String,String>> formData =
-			(Optional<Map<String,String>>)
+		Optional <Map <String, String>> formData =
+			(Optional <Map <String, String>>)
 			request (
 				"formData");
 
@@ -587,28 +587,6 @@ class ConsoleRequestContextImplementation
 		}
 
 		return requestFormData ();
-
-	}
-
-	@Override
-	public
-	String getForm (
-			@NonNull String key) {
-
-		return getFormData ()
-			.get (key);
-
-	}
-
-	@Override
-	public
-	String getForm (
-			@NonNull String key,
-			String def) {
-
-		return ifNull (
-			getFormData ().get (key),
-			def);
 
 	}
 
@@ -758,7 +736,7 @@ class ConsoleRequestContextImplementation
 		formData (
 			ImmutableMap.<String,String>copyOf (
 				Maps.filterKeys (
-					getFormData (),
+					formData (),
 					Predicates.in (keys))));
 
 	}

@@ -96,7 +96,7 @@ class AlertsSettingsNumbersPart
 
 			htmlTableCellOpen ();
 
-			formatWriter.writeFormat (
+			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"text\"",
 				" name=\"%h\"",
@@ -104,7 +104,7 @@ class AlertsSettingsNumbersPart
 					"name_%s",
 					alertsNumber.getId ()),
 				" value=\"%h\"",
-				requestContext.getForm (
+				requestContext.formOrDefault (
 					stringFormat (
 						"name_%s",
 						alertsNumber.getId ()),
@@ -117,7 +117,7 @@ class AlertsSettingsNumbersPart
 
 			htmlTableCellOpen ();
 
-			formatWriter.writeFormat (
+			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"text\"",
 				" name=\"%h\"",
@@ -125,12 +125,14 @@ class AlertsSettingsNumbersPart
 					"number_%s",
 					alertsNumber.getId ()),
 				" value=\"%h\"",
-				requestContext.getForm (
+				requestContext.formOrDefault (
 					stringFormat (
 						"number_%s",
 						alertsNumber.getId ()),
 					alertsNumber.getNumber ().getNumber ()),
-				"></td>\n");
+				">");
+
+			htmlTableCellClose ();
 
 			htmlTableCellOpen ();
 
@@ -140,7 +142,7 @@ class AlertsSettingsNumbersPart
 				stringFormat (
 					"enabled_%s",
 					alertsNumber.getId ()),
-				requestContext.getForm (
+				requestContext.formOrEmptyString (
 					stringFormat (
 						"enabled_%s",
 						alertsNumber.getId ())),
@@ -181,19 +183,21 @@ class AlertsSettingsNumbersPart
 			" type=\"text\"",
 			" name=\"name_new\"",
 			" value=\"%h\"",
-			requestContext.getForm (
-				"name_new",
-				""),
+			requestContext.formOrEmptyString (
+				"name_new"),
 			">");
+
+		htmlTableCellClose ();
+
+		htmlTableCellOpen ();
 
 		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"text\"",
 			" name=\"number_new\"",
 			" value=\"%h\"",
-			requestContext.getForm (
-				"number_new",
-				""),
+			requestContext.formOrEmptyString (
+				"number_new"),
 			">");
 
 		htmlTableCellClose ();
@@ -202,7 +206,7 @@ class AlertsSettingsNumbersPart
 
 		htmlSelectYesNo (
 			"enabled_new",
-			requestContext.getForm (
+			requestContext.formOrEmptyString (
 				"enabled_new"),
 			true);
 
@@ -212,7 +216,7 @@ class AlertsSettingsNumbersPart
 
 		htmlTableCellOpen ();
 
-		formatWriter.writeFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" name=\"add_new\"",
@@ -236,7 +240,7 @@ class AlertsSettingsNumbersPart
 
 			htmlParagraphOpen ();
 
-			formatWriter.writeFormat (
+			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"submit\"",
 				" value=\"save changes\"",

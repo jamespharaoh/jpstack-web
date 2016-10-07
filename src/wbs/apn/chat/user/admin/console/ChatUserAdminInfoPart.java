@@ -1,9 +1,7 @@
 package wbs.apn.chat.user.admin.console;
 
-import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlHeadingThreeWrite;
@@ -135,12 +133,11 @@ class ChatUserAdminInfoPart
 					" onfocus=\"%h\"",
 					charCountJavascript,
 					">%h</textarea></td>",
-					ifNull (
-						requestContext.getForm ("info"),
-						ifNotNullThenElse (
+					requestContext.formOrElse (
+						"info",
+						() -> ifNotNullThenElseEmDash (
 							chatUser.getInfoText (),
-							() -> chatUser.getInfoText ().getText (),
-							() -> ""))));
+							() -> chatUser.getInfoText ().getText ()))));
 
 			htmlTableDetailsRowWriteHtml (
 				"Chars",
@@ -150,9 +147,8 @@ class ChatUserAdminInfoPart
 				"Reason",
 				() -> chatConsoleLogic.writeSelectForChatUserEditReason (
 					"editReason",
-					emptyStringIfNull (
-						requestContext.getForm (
-							"editReason"))));
+					requestContext.formOrEmptyString (
+						"editReason")));
 
 			htmlTableDetailsRowWriteHtml (
 				"Action",

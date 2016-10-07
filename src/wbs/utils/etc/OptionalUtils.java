@@ -547,6 +547,23 @@ class OptionalUtils {
 	}
 
 	public static <Type>
+	Type optionalOrThrow (
+			@NonNull Optional <Type> optional,
+			@NonNull Supplier <RuntimeException> exceptionSupplier) {
+
+		if (optional.isPresent ()) {
+
+			return optional.get ();
+
+		} else {
+
+			throw exceptionSupplier.get ();
+
+		}
+
+	}
+
+	public static <Type>
 	Optional <Type> requiredOptional (
 			@NonNull Optional <Type> optional) {
 

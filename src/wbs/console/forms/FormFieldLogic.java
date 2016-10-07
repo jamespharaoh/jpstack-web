@@ -373,7 +373,7 @@ class FormFieldLogic {
 				requestContext.isMultipart ())
 
 			.parameters (
-				requestContext.getFormData ())
+				requestContext.formData ())
 
 			.fileItems (
 				requestContext.isMultipart ()

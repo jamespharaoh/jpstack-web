@@ -83,7 +83,7 @@ class ChatRebillSendAction
 	Responder backupResponder () {
 
 		return responder (
-			"chatRebillResponder");
+			"chatRebillSendResponder");
 
 	}
 

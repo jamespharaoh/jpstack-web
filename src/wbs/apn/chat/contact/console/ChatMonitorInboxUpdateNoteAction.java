@@ -1,6 +1,5 @@
 package wbs.apn.chat.contact.console;
 
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.servlet.ServletException;
@@ -89,9 +88,8 @@ class ChatMonitorInboxUpdateNoteAction
 					"id"));
 
 		if (
-			isNotNull (
-				requestContext.getForm (
-					"deleteNote"))
+			requestContext.formIsPresent (
+				"deleteNote")
 		) {
 
 			log.info (
@@ -108,9 +106,8 @@ class ChatMonitorInboxUpdateNoteAction
 				"Note deleted");
 
 		} else if (
-			isNotNull (
-				requestContext.getForm (
-					"pegNote"))
+			requestContext.formIsPresent (
+				"pegNote")
 
 		) {
 
@@ -128,9 +125,8 @@ class ChatMonitorInboxUpdateNoteAction
 				"Note pegged");
 
 		} else if (
-			isNotNull (
-				requestContext.getForm (
-					"unpegNote"))
+			requestContext.formIsPresent (
+				"unpegNote")
 		) {
 
 			note.setPegged (false);

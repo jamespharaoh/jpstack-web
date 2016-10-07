@@ -7,6 +7,7 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -162,7 +163,11 @@ class ChatBroadcastSendAction
 	protected
 	Responder backupResponder () {
 
-		if (requestContext.getForm ("send") != null) {
+		if (
+			optionalIsPresent (
+				requestContext.form (
+					"send"))
+		) {
 
 			return responder (
 				"chatBroadcastVerifyResponder");
@@ -181,10 +186,12 @@ class ChatBroadcastSendAction
 	Responder goReal () {
 
 		boolean verify =
-			requestContext.getForm ("verify") != null;
+			requestContext.formIsPresent (
+				"verify");
 
 		boolean send =
-			requestContext.getForm ("send") != null;
+			requestContext.formIsPresent (
+				"send");
 
 		ProfileLogger profileLogger =
 			new ProfileLogger (
@@ -302,9 +309,8 @@ class ChatBroadcastSendAction
 			// enable or disable search
 
 			if (
-				isNotNull (
-					requestContext.getForm (
-						"searchOn"))
+				requestContext.formIsPresent (
+					"searchOn")
 			) {
 
 				form.search (
@@ -319,9 +325,8 @@ class ChatBroadcastSendAction
 			}
 
 			if (
-				isNotNull (
-					requestContext.getForm (
-						"searchOff"))
+				requestContext.formIsPresent (
+					"searchOff")
 			) {
 
 				form.search (

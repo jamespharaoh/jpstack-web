@@ -4,7 +4,6 @@ import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
@@ -450,9 +449,8 @@ class ChatUserPendingFormResponder
 
 				htmlOptionWrite (
 					"primary",
-					emptyStringIfNull (
-						requestContext.getForm (
-							"classification")),
+					requestContext.formOrEmptyString (
+						"classification"),
 					"primary");
 
 				if (
@@ -467,9 +465,8 @@ class ChatUserPendingFormResponder
 
 					htmlOptionWrite (
 						"secondary",
-						emptyStringIfNull (
-							requestContext.getForm (
-								"classification")),
+						requestContext.formOrEmptyString (
+							"classification"),
 						"secondary");
 
 				}
@@ -480,9 +477,8 @@ class ChatUserPendingFormResponder
 
 					htmlOptionWrite (
 						"landscape",
-						emptyStringIfNull (
-							requestContext.getForm (
-								"classification")),
+						requestContext.formOrEmptyString (
+							"classification"),
 						"landscape");
 
 				}

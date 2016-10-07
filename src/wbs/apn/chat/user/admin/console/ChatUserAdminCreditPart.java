@@ -111,9 +111,8 @@ class ChatUserAdminCreditPart
 				" type=\"text\"",
 				" name=\"creditAmount\"",
 				" value=\"%h\"",
-				requestContext.getForm (
-					"creditAmount",
-					""),
+				requestContext.formOrEmptyString (
+					"creditAmount"),
 				">"));
 
 		htmlTableDetailsRowWriteHtml (
@@ -124,9 +123,8 @@ class ChatUserAdminCreditPart
 				" type=\"text\"",
 				" name=\"billAmount\"",
 				" value=\"%h\"",
-				requestContext.getForm (
-					"billAmount",
-					""),
+				requestContext.formOrEmptyString (
+					"billAmount"),
 				">"));
 
 		htmlTableDetailsRowWriteHtml (
@@ -136,9 +134,8 @@ class ChatUserAdminCreditPart
 				" type=\"text\"",
 				" name=\"details\"",
 				" value=\"%h\"",
-				requestContext.getForm (
-					"details",
-					""),
+				requestContext.formOrEmptyString (
+					"details"),
 				">"));
 
 		htmlTableClose ();

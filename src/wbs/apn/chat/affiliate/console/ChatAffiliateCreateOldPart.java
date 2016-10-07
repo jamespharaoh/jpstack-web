@@ -1,7 +1,6 @@
 package wbs.apn.chat.affiliate.console;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
@@ -191,7 +190,8 @@ class ChatAffiliateCreateOldPart
 					schemeEntry.getValue ()),
 				stringEqualSafe (
 					schemeEntry.getValue ().toString (),
-					requestContext.getForm ("chatScheme")),
+					requestContext.formOrEmptyString (
+						"chatScheme")),
 				schemeEntry.getKey ());
 
 		}
@@ -212,9 +212,8 @@ class ChatAffiliateCreateOldPart
 				" name=\"name\"",
 				" size=\"32\"",
 				" value=\"%h\"",
-				emptyStringIfNull (
-					requestContext.getForm (
-						"name")),
+				requestContext.formOrEmptyString (
+					"name"),
 				">"));
 
 		// description
@@ -227,9 +226,8 @@ class ChatAffiliateCreateOldPart
 				" name=\"description\"",
 				" size=\"32\"",
 				" value=\"%h\"",
-				emptyStringIfNull (
-					requestContext.getForm (
-						"description")),
+				requestContext.formOrEmptyString (
+					"description"),
 				">"));
 
 		// close table
@@ -276,9 +274,8 @@ class ChatAffiliateCreateOldPart
 				" name=\"keyword%h\"",
 				index,
 				" value=\"%h\"",
-				emptyStringIfNull (
-					requestContext.getForm (
-						"keyword" + index)),
+				requestContext.formOrEmptyString (
+					"keyword" + index),
 			">");
 
 			htmlTableCellClose ();
@@ -289,7 +286,7 @@ class ChatAffiliateCreateOldPart
 
 			chatKeywordJoinTypeConsoleHelper.writeSelect (
 				"joinType" + index,
-				requestContext.getForm (
+				requestContext.formOrEmptyString (
 					"joinType" + index));
 
 			htmlTableCellClose ();
@@ -300,7 +297,7 @@ class ChatAffiliateCreateOldPart
 
 			genderConsoleHelper.writeSelect (
 				"gender" + index,
-				requestContext.getForm (
+				requestContext.formOrEmptyString (
 					"gender" + index));
 
 			htmlTableCellClose ();
@@ -311,7 +308,7 @@ class ChatAffiliateCreateOldPart
 
 			orientConsoleHelper.writeSelect (
 				"orient" + index,
-				requestContext.getForm (
+				requestContext.formOrEmptyString (
 					"orient" + index));
 
 			htmlTableCellClose ();

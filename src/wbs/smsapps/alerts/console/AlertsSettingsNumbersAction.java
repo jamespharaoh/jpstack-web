@@ -1,16 +1,19 @@
 package wbs.smsapps.alerts.console;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
-import static wbs.utils.etc.LogicUtils.booleanEqual;
+import static wbs.utils.etc.LogicUtils.booleanNotEqual;
+import static wbs.utils.etc.LogicUtils.parseBooleanTrueFalseRequired;
+import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.doNothing;
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.string.StringUtils.pluralise;
-import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 
@@ -95,8 +98,8 @@ class AlertsSettingsNumbersAction
 
 		}
 
-		List<String> notices =
-			new ArrayList<String> ();
+		List <String> notices =
+			new ArrayList<> ();
 
 		@Cleanup
 		Transaction transaction =
@@ -116,8 +119,11 @@ class AlertsSettingsNumbersAction
 		int numEnabled = 0;
 		int numDisabled = 0;
 
+		Set <String> numbersSeen =
+			new HashSet<> ();
+
 		for (
-			Iterator<AlertsNumberRec> alertsNumberIterator =
+			Iterator <AlertsNumberRec> alertsNumberIterator =
 				alertsSettings.getAlertsNumbers ().iterator ();
 			alertsNumberIterator.hasNext ();
 			doNothing ()
@@ -129,11 +135,10 @@ class AlertsSettingsNumbersAction
 			// delete
 
 			if (
-				isNotNull (
-					requestContext.getForm (
-						stringFormat (
-							"delete_%d",
-							alertsNumber.getId ())))
+				requestContext.formIsPresent (
+					stringFormat (
+						"delete_%d",
+						alertsNumber.getId ()))
 			) {
 
 				alertsNumberHelper.remove (
@@ -158,17 +163,16 @@ class AlertsSettingsNumbersAction
 			// update
 
 			String newName =
-				requestContext.getForm (
+				requestContext.formOrEmptyString (
 					stringFormat (
 						"name_%d",
-						alertsNumber.getId ()),
-					"");
+						alertsNumber.getId ()));
 
 			if (newName == null)
 				continue;
 
 			if (
-				! stringEqualSafe (
+				stringNotEqualSafe (
 					alertsNumber.getName (),
 					newName)
 			) {
@@ -191,16 +195,31 @@ class AlertsSettingsNumbersAction
 			}
 
 			String newNumber =
-				requestContext.getForm (
+				requestContext.formRequired (
 					stringFormat (
 						"number_%s",
 						alertsNumber.getId ()));
 
 			if (
-				stringEqualSafe (
+				stringNotEqualSafe (
 					alertsNumber.getNumber ().getNumber (),
 					newNumber)
 			) {
+
+				if (
+					contains (
+						numbersSeen,
+						newNumber)
+				) {
+
+					requestContext.addError (
+						stringFormat (
+							"Duplicate number: %s",
+							newNumber));
+
+					return null;
+
+				}
 
 				NumberRec numberRec =
 					numberHelper.findOrCreate (
@@ -223,15 +242,18 @@ class AlertsSettingsNumbersAction
 
 			}
 
+			numbersSeen.add (
+				newNumber);
+
 			boolean newEnabled =
-				Boolean.parseBoolean (
-					requestContext.getForm (
+				parseBooleanTrueFalseRequired (
+					requestContext.formRequired (
 						stringFormat (
 							"enabled_%s",
 							alertsNumber.getId ())));
 
 			if (
-				booleanEqual (
+				booleanNotEqual (
 					alertsNumber.getEnabled (),
 					newEnabled)
 			) {
@@ -310,15 +332,32 @@ class AlertsSettingsNumbersAction
 		// add
 
 		if (
-			isNotNull (
-				requestContext.getForm (
-					"add_new"))
+			requestContext.formIsPresent (
+				"add_new")
 		) {
+
+			String newNumber =
+				requestContext.formRequired (
+					"number_new");
+
+			if (
+				contains (
+					numbersSeen,
+					newNumber)
+			) {
+
+				requestContext.addError (
+					stringFormat (
+						"Duplicate number: %s",
+						newNumber));
+
+				return null;
+
+			}
 
 			NumberRec numberRec =
 				numberHelper.findOrCreate (
-					requestContext.getForm (
-						"number_new"));
+					newNumber);
 
 			AlertsNumberRec alertsNumber =
 				alertsNumberHelper.createInstance ()
@@ -327,18 +366,16 @@ class AlertsSettingsNumbersAction
 					alertsSettings)
 
 				.setName (
-					requestContext.getForm (
-						"name_new",
-						""))
+					requestContext.formOrEmptyString (
+						"name_new"))
 
 				.setNumber (
 					numberRec);
 
 			boolean newEnabled =
 				Boolean.parseBoolean (
-					requestContext.getForm (
-						"enabled_new",
-						""));
+					requestContext.formOrEmptyString (
+						"enabled_new"));
 
 			alertsNumber
 
@@ -414,6 +451,8 @@ class AlertsSettingsNumbersAction
 				"No changes to save");
 
 		}
+
+		requestContext.setEmptyFormData ();
 
 		return null;
 

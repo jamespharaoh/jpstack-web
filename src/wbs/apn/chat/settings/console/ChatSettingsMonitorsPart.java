@@ -1,6 +1,6 @@
 package wbs.apn.chat.settings.console;
 
-import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
@@ -50,13 +50,22 @@ class ChatSettingsMonitorsPart
 	// state
 
 	private
-	int
-		gayMale,
-		gayFemale,
-		biMale,
-		biFemale,
-		straightMale,
-		straightFemale;
+	long gayMale;
+
+	private
+	long gayFemale;
+
+	private
+	long biMale;
+
+	private
+	long biFemale;
+
+	private
+	long straightMale;
+
+	private
+	long straightFemale;
 
 	// implementation
 
@@ -193,9 +202,10 @@ class ChatSettingsMonitorsPart
 			" name=\"gayMale\"",
 			" size=\"6\"",
 			" value=\"%h\"",
-			ifNull (
-				requestContext.getForm ("gayMale"),
-				gayMale),
+			requestContext.formOrElse (
+				"gayMale",
+				() -> integerToDecimalString (
+					gayMale)),
 			">");
 
 		htmlTableCellClose ();
@@ -208,9 +218,10 @@ class ChatSettingsMonitorsPart
 			" name=\"gayFemale\"",
 			" size=\"6\"",
 			" value=\"%h\"",
-			ifNull (
-				requestContext.getForm ("gayFemale"),
-				gayFemale),
+			requestContext.formOrElse (
+				"gayFemale",
+				() -> integerToDecimalString (
+					gayFemale)),
 			">");
 
 		htmlTableRowClose ();
@@ -230,9 +241,10 @@ class ChatSettingsMonitorsPart
 			" name=\"biMale\"",
 			" size=\"6\"",
 			" value=\"%h\"",
-			ifNull (
-				requestContext.getForm ("biMale"),
-				biMale),
+			requestContext.formOrElse (
+				"biMale",
+				() -> integerToDecimalString (
+					biMale)),
 			">");
 
 		htmlTableCellClose ();
@@ -245,9 +257,10 @@ class ChatSettingsMonitorsPart
 			" name=\"biFemale\"",
 			" size=\"6\"",
 			" value=\"%h\"",
-			ifNull (
-				requestContext.getForm ("biFemale"),
-				biFemale),
+			requestContext.formOrElse (
+				"biFemale",
+				() -> integerToDecimalString (
+					biFemale)),
 			">");
 
 		htmlTableCellClose ();
@@ -269,9 +282,10 @@ class ChatSettingsMonitorsPart
 			" name=\"straightMale\"",
 			" size=\"6\"",
 			" value=\"%h\"",
-			ifNull (
-				requestContext.getForm ("straightMale"),
-				straightMale),
+			requestContext.formOrElse (
+				"straightMale",
+				() -> integerToDecimalString (
+					straightMale)),
 			">");
 
 		htmlTableCellClose ();
@@ -284,9 +298,10 @@ class ChatSettingsMonitorsPart
 			" name=\"straightFemale\"",
 			" size=\"6\"",
 			" value=\"%h\"",
-			ifNull (
-				requestContext.getForm ("straightFemale"),
-				straightFemale),
+			requestContext.formOrElse (
+				"straightFemale",
+				() -> integerToDecimalString (
+					straightFemale)),
 			">");
 
 		htmlTableCellClose ();

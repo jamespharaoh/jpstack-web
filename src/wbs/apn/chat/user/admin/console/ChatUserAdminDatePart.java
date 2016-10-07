@@ -2,7 +2,6 @@ package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.objectToStringNullSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -19,8 +18,8 @@ import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
 import javax.inject.Named;
 
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserDateLogRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.helper.ConsoleObjectManager;
@@ -102,9 +101,9 @@ class ChatUserAdminDatePart
 			"Date mode",
 			() -> chatUserDateModeConsoleHelper.writeSelect (
 				"dateMode",
-				ifNull (
-					requestContext.getForm ("dateMode"),
-					objectToStringNullSafe (
+				requestContext.formOrElse (
+					"dateMode",
+					() -> objectToStringNullSafe (
 						chatUser.getDateMode ()))));
 
 		htmlTableDetailsRowWriteHtml (
@@ -114,9 +113,10 @@ class ChatUserAdminDatePart
 				" type=\"text\"",
 				" name=\"radius\"",
 				" value=\"%h\"",
-				ifNull (
-					requestContext.getForm ("radius"),
-					chatUser.getDateRadius ().toString ()),
+				requestContext.formOrElse (
+					"radius",
+					() -> integerToDecimalString (
+						chatUser.getDateRadius ())),
 				">"));
 
 		htmlTableDetailsRowWriteHtml (
@@ -126,9 +126,10 @@ class ChatUserAdminDatePart
 				" type=\"text\"",
 				" name=\"startHour\"",
 				" value=\"%h\"",
-				ifNull (
-					requestContext.getForm ("startHour"),
-					chatUser.getDateStartHour ().toString ()),
+				requestContext.formOrElse (
+					"startHour",
+					() -> integerToDecimalString (
+						chatUser.getDateStartHour ())),
 				">"));
 
 		htmlTableDetailsRowWriteHtml (
@@ -138,9 +139,10 @@ class ChatUserAdminDatePart
 				" type=\"text\"",
 				" name=\"endHour\"",
 				" value=\"%h\"",
-				ifNull (
-					requestContext.getForm ("endHour"),
-					chatUser.getDateEndHour ().toString ()),
+				requestContext.formOrElse (
+					"endHour",
+					() -> integerToDecimalString (
+						chatUser.getDateEndHour ())),
 				">"));
 
 		htmlTableDetailsRowWriteHtml (
@@ -150,9 +152,10 @@ class ChatUserAdminDatePart
 				" type=\"text\"",
 				" name=\"dailyMax\"",
 				" value=\"%h\"",
-				ifNull (
-					requestContext.getForm ("dailyMax"),
-					chatUser.getDateDailyMax ().toString ()),
+				requestContext.formOrElse (
+					"dailyMax",
+					() -> integerToDecimalString (
+						chatUser.getDateDailyMax ())),
 				">"));
 
 		htmlTableClose ();

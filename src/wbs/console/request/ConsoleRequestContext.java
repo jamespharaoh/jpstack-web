@@ -1,5 +1,11 @@
 package wbs.console.request;
 
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.io.IOException;
@@ -9,6 +15,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -136,18 +143,76 @@ interface ConsoleRequestContext {
 			String wantedPath);
 
 	void formData (
-			Map<String,String> newFormData);
+			Map <String, String> newFormData);
 
 	void setEmptyFormData ();
 
-	Map<String,String> getFormData ();
+	Map <String, String> formData ();
 
-	String getForm (
-			String key);
+	default
+	Optional <String> form (
+			@NonNull String key) {
 
-	String getForm (
-			String key,
-			String def);
+		return optionalFromNullable (
+			formData ().get (
+				key));
+
+	}
+
+	default
+	boolean formIsPresent (
+			@NonNull String key) {
+
+		return optionalIsPresent (
+			form (key));
+
+	}
+
+	default
+	String formRequired (
+			String key) {
+
+		return optionalOrThrow (
+			form (key),
+			() -> new NoSuchElementException (
+				stringFormat (
+					"Form data does not contain key: %s",
+					key)));
+
+
+	}
+
+	default
+	String formOrElse (
+			@NonNull String key,
+			@NonNull Supplier <String> defaultSupplier) {
+
+		return optionalOrElse (
+			form (key),
+			defaultSupplier);
+
+	}
+
+	default
+	String formOrDefault (
+			@NonNull String key,
+			@NonNull String defaultValue) {
+
+		return optionalOrElse (
+			form (key),
+			() -> defaultValue);
+
+	}
+
+	default
+	String formOrEmptyString (
+			@NonNull String key) {
+
+		return formOrElse (
+			key,
+			() -> "");
+
+	}
 
 	boolean isCommitted ();
 
