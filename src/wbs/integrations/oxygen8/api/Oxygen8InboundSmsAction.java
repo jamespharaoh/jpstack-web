@@ -99,6 +99,8 @@ class Oxygen8InboundSmsAction
 	Long dateReceived;
 	Integer campaignId;
 
+	Boolean success = false;
+
 	// implementation
 
 	@Override
@@ -235,9 +237,14 @@ class Oxygen8InboundSmsAction
 			.setDetails (
 				debugLog.toString ())
 
+			.setSuccess (
+				success)
+
 		);
 
 		transaction.commit ();
+
+		success = true;
 
 	}
 

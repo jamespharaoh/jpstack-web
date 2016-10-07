@@ -208,7 +208,7 @@ class GenericConsoleHelperProvider
 			if (viewPrivKeySpecs == null) {
 
 				viewPrivKeySpecs =
-					new ArrayList<PrivKeySpec> ();
+					new ArrayList<> ();
 
 			}
 

@@ -38,13 +38,6 @@ import java.util.regex.Pattern;
 
 import javax.inject.Provider;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -55,6 +48,15 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import org.apache.commons.lang3.tuple.Pair;
+
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChild;
@@ -82,6 +84,9 @@ class DataFromXmlImplementation
 	// properties
 
 	@Getter @Setter
+	TaskLogger taskLogger;
+
+	@Getter @Setter
 	Map <String, List <DataClassInfo>> dataClassesMap;
 
 	@Getter @Setter
@@ -96,9 +101,16 @@ class DataFromXmlImplementation
 			@NonNull String filename,
 			@NonNull List <Object> parents) {
 
-		TaskLogger taskLogger =
-			new TaskLogger (
-				log);
+		if (
+			isNull (
+				taskLogger)
+		) {
+
+			taskLogger =
+				new TaskLogger (
+					log);
+
+		}
 
 		taskLogger.firstErrorFormat (
 			"Error reading %s from filesystem",
@@ -132,9 +144,6 @@ class DataFromXmlImplementation
 
 			result =
 				new ElementBuilder ()
-
-				.taskLogger (
-					taskLogger)
 
 				.element (
 					document.getRootElement ())
@@ -222,9 +231,6 @@ class DataFromXmlImplementation
 
 	@Accessors (fluent = true)
 	class ElementBuilder {
-
-		@Getter @Setter
-		TaskLogger taskLogger;
 
 		@Getter @Setter
 		Element element;
@@ -803,9 +809,6 @@ class DataFromXmlImplementation
 				Object child =
 					new ElementBuilder ()
 
-					.taskLogger (
-						taskLogger)
-
 					.element (
 						childElement)
 
@@ -1114,9 +1117,6 @@ class DataFromXmlImplementation
 
 					children.add (
 						new ElementBuilder ()
-
-						.taskLogger (
-							taskLogger)
 
 						.element (
 							childElement)

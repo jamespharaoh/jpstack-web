@@ -3,6 +3,7 @@ package wbs.console.forms;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalValueEqualSafe;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -183,11 +184,11 @@ class ObjectFormFieldBuilder {
 
 		// field type
 
-		Optional<Class<?>> propertyClassOptional =
+		Optional <Class <?>> propertyClassOptional =
 			objectManager.dereferenceType (
-				Optional.<Class<?>>of (
+				optionalOf (
 					context.containerClass ()),
-				Optional.of (
+				optionalOf (
 					fieldName));
 
 		// accessor

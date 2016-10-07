@@ -12,25 +12,39 @@ import wbs.framework.data.annotations.DataClass;
 public
 class FonixRouteInRequest {
 
-	@DataAttribute
+	@DataAttribute (
+		name = "IFVERSION",
+		required = true)
 	String ifVersion;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "MONUMBER",
+		required = true)
 	String moNumber;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "OPERATOR",
+		required = true)
 	String operator;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "DESTINATION",
+		required = true)
 	String destination;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "BODY",
+		required = true)
 	String body;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "RECEIVETIME",
+		required = true)
 	String receiveTime;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "GUID",
+		required = true)
 	String guid;
 
 }

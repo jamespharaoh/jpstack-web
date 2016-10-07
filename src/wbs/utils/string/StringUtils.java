@@ -20,6 +20,8 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.utils.exception.RuntimeUnsupportedEncodingException;
+
 public
 class StringUtils {
 
@@ -724,6 +726,16 @@ class StringUtils {
 	}
 
 	public static
+	List <String> stringSplitNewline (
+			@NonNull String source) {
+
+		return stringSplitSimple (
+			"\n",
+			source);
+
+	}
+
+	public static
 	boolean doesNotStartWithSimple (
 			@NonNull String string,
 			@NonNull String prefix) {
@@ -773,11 +785,37 @@ class StringUtils {
 				bytes,
 				charset);
 
-		} catch (UnsupportedEncodingException exception) {
+		} catch (UnsupportedEncodingException unsupportedEncodingException) {
 
-			throw new RuntimeException (exception);
+			throw new RuntimeUnsupportedEncodingException (
+				unsupportedEncodingException);
 
 		}
+
+	}
+
+	public static
+	String bytesToStringSafe (
+			@NonNull byte[] bytes,
+			@NonNull String charset) {
+
+		String value =
+			bytesToString (
+				bytes,
+				charset);
+
+		if (
+			stringInSafe (
+				value,
+				"\0")
+		) {
+
+			throw new IllegalArgumentException (
+				"String contains null bytes");
+
+		}
+
+		return value;
 
 	}
 
@@ -786,6 +824,16 @@ class StringUtils {
 			@NonNull byte[] bytes) {
 
 		return bytesToString (
+			bytes,
+			"utf-8");
+
+	}
+
+	public static
+	String utf8ToStringSafe (
+			@NonNull byte[] bytes) {
+
+		return bytesToStringSafe (
 			bytes,
 			"utf-8");
 

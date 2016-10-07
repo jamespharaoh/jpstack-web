@@ -1,7 +1,6 @@
 package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
-import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
@@ -83,8 +82,7 @@ class ChatUserAdminCreditModePart
 				"creditMode",
 				requestContext.formOrElse (
 					"creditMode",
-					() -> camelToSpaces (
-						chatUser.getCreditMode ().name ()))));
+					() -> chatUser.getCreditMode ().name ())));
 
 		htmlTableDetailsRowWriteHtml (
 			"Actions",

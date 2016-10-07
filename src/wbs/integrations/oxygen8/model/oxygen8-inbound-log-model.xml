@@ -26,6 +26,9 @@
 		<string-field
 			name="details"/>
 
+		<yes-no-field
+			name="success"/>
+
 	</fields>
 
 </model-meta>

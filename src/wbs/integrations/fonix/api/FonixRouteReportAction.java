@@ -24,7 +24,6 @@ import wbs.framework.data.tools.DataFromGeneric;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.web.PageNotFoundException;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
@@ -207,6 +206,8 @@ class FonixRouteReportAction
 
 		transaction.commit ();
 
+		success = true;
+
 	}
 
 	private
@@ -226,17 +227,10 @@ class FonixRouteReportAction
 				deliveryStatusOptional)
 		) {
 
-			exceptionLogger.logSimple (
-				"webapi",
-				requestContext.requestUri (),
+			throw new RuntimeException (
 				stringFormat (
 					"Delivery status not recognised: %s",
-					request.statusCode ()),
-				"",
-				Optional.absent (),
-				GenericExceptionResolution.ignoreWithThirdPartyWarning);
-
-			return;
+					request.statusCode ()));
 
 		}
 
@@ -248,24 +242,17 @@ class FonixRouteReportAction
 
 		Optional <MessageRec> smsMessageOptional =
 			smsMessageLogic.findMessageByMangledId (
-				request.guid ());
+				request.requestId ());
 
 		if (
 			optionalIsNotPresent (
 				smsMessageOptional)
 		) {
 
-			exceptionLogger.logSimple (
-				"webapi",
-				requestContext.requestUri (),
+			throw new RuntimeException (
 				stringFormat (
 					"Message guid not recognised: %s",
-					request.guid ()),
-				"",
-				optionalAbsent (),
-				GenericExceptionResolution.ignoreWithThirdPartyWarning);
-
-			return;
+					request.guid ()));
 
 		}
 
@@ -275,30 +262,17 @@ class FonixRouteReportAction
 
 		// store the delivery report
 
-		try {
-
-			smsDeliveryReportLogic.deliveryReport (
-				smsMessage,
-				deliveryStatus.getMessageStatus (),
-				optionalOf (
-					request.statusCode ()),
-				optionalOf  (
-					request.statusText ()),
-				optionalAbsent (),
-				optionalOf (
-					fonixLogic.stringToInstant (
-						request.statusTime ())));
-
-		} catch (Exception exception) {
-
-			exceptionLogger.logThrowable (
-				"webapi",
-				requestContext.requestUri (),
-				exception,
-				Optional.absent (),
-				GenericExceptionResolution.ignoreWithThirdPartyWarning);
-
-		}
+		smsDeliveryReportLogic.deliveryReport (
+			smsMessage,
+			deliveryStatus.getMessageStatus (),
+			optionalOf (
+				request.statusCode ()),
+			optionalOf  (
+				request.statusText ()),
+			optionalAbsent (),
+			optionalOf (
+				fonixLogic.stringToInstant (
+					request.statusTime ())));
 
 	}
 

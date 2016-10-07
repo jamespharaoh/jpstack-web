@@ -352,6 +352,17 @@ class ConsoleHelperBuilder {
 
 		}
 
+		@Override
+		public
+		Boolean isDeleted (
+				Record entity) {
+
+			return objectHelper.getDeleted (
+				entity,
+				true);
+
+		}
+
 	}
 
 	private

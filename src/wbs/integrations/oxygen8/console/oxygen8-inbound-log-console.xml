@@ -47,16 +47,20 @@
 			object-type="route"
 			nullable="yes"/>
 
-		<timestamp-field
-			name="timestampAfter"
-			nullable="yes"/>
-
-		<timestamp-field
-			name="timestampBefore"
+		<interval-field
+			name="timestamp"
 			nullable="yes"/>
 
 		<text-field
 			name="details"
+			nullable="yes"/>
+
+		<enum-field
+			name="type"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="success"
 			nullable="yes"/>
 
 	</field-set>
@@ -65,10 +69,18 @@
 		name="results"
 		object-name="oxygen8InboundLog">
 
-		<id-field/>
-
 		<timestamp-field
 			name="timestamp"/>
+
+		<object-field
+			name="route"
+			object-type="route"/>
+
+		<enum-field
+			name="type"/>
+
+		<yes-no-field
+			name="success"/>
 
 	</field-set>
 
@@ -80,6 +92,16 @@
 
 		<timestamp-field
 			name="timestamp"/>
+
+		<object-field
+			name="route"
+			object-type="route"/>
+
+		<enum-field
+			name="type"/>
+
+		<yes-no-field
+			name="success"/>
 
 		<text-area-field
 			name="details"/>

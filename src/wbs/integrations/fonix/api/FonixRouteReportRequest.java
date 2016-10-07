@@ -12,31 +12,54 @@ import wbs.framework.data.annotations.DataClass;
 public
 class FonixRouteReportRequest {
 
-	@DataAttribute
+	@DataAttribute (
+		name = "IFVERSION",
+		required = true)
 	String ifVersion;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "OPERATOR",
+		required = true)
 	String operator;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "MONUMBER",
+		required = true)
 	String moNumber;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "DESTINATION",
+		required = true)
 	String destination;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "STATUSCODE",
+		required = true)
 	String statusCode;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "STATUSTEXT",
+		required = true)
 	String statusText;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "STATUSTIME",
+		required = true)
 	String statusTime;
 
-	@DataAttribute
-	Long price;
+	@DataAttribute (
+		name = "PRICE",
+		required = true)
+	String price;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "GUID",
+		required = true)
 	String guid;
+
+	@DataAttribute (
+		name = "REQUESTID",
+		required = true)
+	String requestId;
 
 }

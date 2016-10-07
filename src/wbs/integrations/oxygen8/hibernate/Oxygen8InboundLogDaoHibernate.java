@@ -1,13 +1,16 @@
 package wbs.integrations.oxygen8.hibernate;
 
+import static wbs.utils.etc.Misc.isNotNull;
+
 import java.util.List;
+
+import lombok.NonNull;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogDao;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogRec;
@@ -23,7 +26,7 @@ class Oxygen8InboundLogDaoHibernate
 	@Override
 	public
 	List <Long> searchIds (
-			@NonNull Oxygen8InboundLogSearch oxygen8InboundLogSearch) {
+			@NonNull Oxygen8InboundLogSearch search) {
 
 		Criteria criteria =
 			createCriteria (
@@ -32,43 +35,76 @@ class Oxygen8InboundLogDaoHibernate
 
 		// restrict by route
 
-		if (oxygen8InboundLogSearch.getRouteId () != null) {
+		if (
+			isNotNull (
+				search.routeId ())
+		) {
 
 			criteria.add (
 				Restrictions.eq (
 					"_oxygen8InboundLog.route.id",
-					oxygen8InboundLogSearch.getRouteId ()));
+					search.routeId ()));
 
 		}
 
 		// restrict by timestamp
 
-		if (oxygen8InboundLogSearch.getTimestampAfter () != null) {
+		if (
+			isNotNull (
+				search.timestamp ())
+		) {
 
 			criteria.add (
 				Restrictions.ge (
 					"_oxygen8InboundLog.timestamp",
-					oxygen8InboundLogSearch.getTimestampAfter ()));
-
-		}
-
-		if (oxygen8InboundLogSearch.getTimestampBefore () != null) {
+					search.timestamp ().start ()));
 
 			criteria.add (
 				Restrictions.lt (
 					"_oxygen8InboundLog.timestamp",
-					oxygen8InboundLogSearch.getTimestampBefore ()));
+					search.timestamp ().end ()));
 
 		}
 
 		// restrict by details
 
-		if (oxygen8InboundLogSearch.getDetails () != null) {
+		if (
+			isNotNull (
+				search.details ())
+		) {
 
 			criteria.add (
 				Restrictions.ilike (
 					"_oxygen8InboundLog.details",
-					oxygen8InboundLogSearch.getDetails ()));
+					"%" + search.details () + "%"));
+
+		}
+
+		// restrict by type
+
+		if (
+			isNotNull (
+				search.type ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_oxygen8InboundLog.type",
+					search.type ()));
+
+		}
+
+		// restrict by success
+
+		if (
+			isNotNull (
+				search.success ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_oxygen8InboundLog.success",
+					search.success ()));
 
 		}
 
@@ -77,7 +113,8 @@ class Oxygen8InboundLogDaoHibernate
 		criteria
 
 			.addOrder (
-				Order.desc ("id"));
+				Order.desc (
+					"id"));
 
 		// set to return ids only
 

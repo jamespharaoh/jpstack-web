@@ -2,8 +2,14 @@ package wbs.integrations.clockworksms.api;
 
 import static wbs.utils.etc.LogicUtils.not;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.min;
+import static wbs.utils.etc.Misc.toHex;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.string.StringUtils.utf8ToStringSafe;
+
+import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 
 import javax.inject.Provider;
 
@@ -22,6 +28,7 @@ import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.PageNotFoundException;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
@@ -75,6 +82,7 @@ class ClockworkSmsRouteInAction
 	// state
 
 	ClockworkSmsRouteInRequest request;
+	Boolean success = false;
 
 	// implementation
 
@@ -83,20 +91,103 @@ class ClockworkSmsRouteInAction
 	void processRequest (
 			@NonNull FormatWriter debugWriter) {
 
+		// convert request to string
+
+		byte[] requestBytes =
+			requestContext.requestBodyRaw ();
+
+		String requestString;
+
+		try {
+
+			requestString =
+				utf8ToStringSafe (
+					requestBytes);
+
+		} catch (IllegalArgumentException exception) {
+
+			debugWriter.writeLineFormat (
+				"=== DECODE ERROR ===");
+
+			debugWriter.writeNewline ();
+
+			debugWriter.writeLineFormat (
+				"Error decoding unicode data: %s",
+				exception.getMessage ());
+
+			debugWriter.writeNewline ();
+
+			debugWriter.writeLineFormat (
+				"=== RAW REQUEST DATA ===");
+
+			debugWriter.writeNewline ();
+
+			for (
+				int position = 0;
+				position < requestBytes.length;
+				position += 32
+			) {
+
+				byte[] requestBytesChunk =
+					Arrays.copyOfRange (
+						requestBytes,
+						position,
+						min (
+							position + 32,
+							requestBytes.length));
+
+				debugWriter.writeLineFormat (
+					"%s %s",
+					String.format (
+						"%06x",
+						position),
+					toHex (
+						requestBytesChunk));
+				
+			}
+
+			debugWriter.writeLineFormat ();
+
+			throw exception;
+
+		}
+
+		debugWriter.writeLineFormat (
+			"=== REQUEST DATA ===");
+
+		debugWriter.writeNewline ();
+
+		debugWriter.writeString (
+			requestString);
+
+		debugWriter.writeNewline ();
+
+		debugWriter.writeNewline ();
+
 		// decode request
+
+		TaskLogger taskLogger =
+			new TaskLogger (
+				debugWriter);
 
 		DataFromXml dataFromXml =
 			new DataFromXmlBuilder ()
+
+			.taskLogger (
+				taskLogger)
 
 			.registerBuilderClasses (
 				ClockworkSmsRouteInRequest.class)
 
 			.build ();
 
+		taskLogger.makeException ();
+
 		request =
 			(ClockworkSmsRouteInRequest)
 			dataFromXml.readInputStream (
-				requestContext.inputStream (),
+				new ByteArrayInputStream (
+					requestBytes),
 				"clockwork-sms-route-in.xml",
 				ImmutableList.of ());
 
@@ -193,6 +284,8 @@ class ClockworkSmsRouteInAction
 
 		transaction.commit ();
 
+		success = true;
+
 	}
 
 	@Override
@@ -235,6 +328,9 @@ class ClockworkSmsRouteInAction
 
 			.setDetails (
 				debugLog)
+
+			.setSuccess (
+				success)
 
 		);
 

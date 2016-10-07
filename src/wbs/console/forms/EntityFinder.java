@@ -1,6 +1,7 @@
 package wbs.console.forms;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import wbs.framework.entity.record.Record;
 
@@ -13,5 +14,30 @@ interface EntityFinder <Entity extends Record <Entity>> {
 			Long id);
 
 	List <Entity> findAllEntities ();
+
+	default
+	List <Entity> findAllNotDeletedEntities () {
+
+		return findAllEntities ().stream ()
+
+			.filter (
+				this::isNotDeleted)
+
+			.collect (
+				Collectors.toList ());
+
+	}
+
+	Boolean isDeleted (
+			Entity entity);
+
+	default
+	Boolean isNotDeleted (
+			Entity entity) {
+
+		return ! isDeleted (
+			entity);
+
+	}
 
 }

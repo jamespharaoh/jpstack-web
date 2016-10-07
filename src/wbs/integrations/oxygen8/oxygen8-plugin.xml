@@ -25,8 +25,9 @@
 		<component class="api.Oxygen8ApiServletModule"/>
 		<component class="api.Oxygen8InboundFile"/>
 		<component class="api.Oxygen8InboundMmsAction"/>
+
 		<component class="api.Oxygen8InboundSmsAction"/>
-		<component class="api.Oxygen8ReportFile"/>
+		<component class="api.Oxygen8RouteReportAction"/>
 	</layer>
 
 	<layer name="console">

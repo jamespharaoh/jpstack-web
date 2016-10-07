@@ -26,7 +26,6 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FormType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -141,26 +140,33 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		// get a list of options
 
-		Collection <? extends Record <?>> allOptions =
+		Collection <Interface> allOptions =
 			entityFinder.findAllEntities ();
 
 		// filter visible options
 
-		List <Record <?>> filteredOptions =
+		List <Interface> filteredOptions =
 			allOptions.stream ()
 
 			.filter (
 				root.isPresent ()
-					? item -> objectManager.isParent (item, root.get ())
+					? item -> objectManager.isParent (
+						item,
+						root.get ())
 					: item -> true)
 
 			.filter (
 				item ->
 
-				objectManager.canView (
-					item)
+				(
 
-				|| (
+					entityFinder.isNotDeleted (
+						item)
+
+					&& objectManager.canView (
+						item)
+
+				) || (
 
 					optionalIsPresent (
 						interfaceValue)

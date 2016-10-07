@@ -1,6 +1,8 @@
 package wbs.framework.data.tools;
 
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -70,14 +72,6 @@ class DataFromGeneric {
 
 			field.setAccessible (true);
 
-			Object fieldValue =
-				map.get (
-					field.getName ());
-
-			if (fieldValue == null) {
-				continue;
-			}
-
 			DataAttribute dataAttribute =
 				field.getAnnotation (
 					DataAttribute.class);
@@ -87,13 +81,45 @@ class DataFromGeneric {
 					dataAttribute)
 			) {
 
-				doDataAttribute (
-					dataClass,
-					fieldValue,
-					dataValue,
-					field,
-					dataAttribute,
-					fieldValue);
+				String dataName =
+					ifNull (
+						dataAttribute.name (),
+						field.getName ());
+
+				Object fieldValue =
+					map.get (
+						dataName);
+	
+				if (
+
+					dataAttribute.required ()
+
+					&& isNull (
+						fieldValue)
+
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+						"Required field %s.%s not present",
+						dataClass.getSimpleName (),
+						field.getName (),
+						dataName));
+
+				} else if (
+					isNotNull (
+						fieldValue)
+				) {
+
+					doDataAttribute (
+						dataClass,
+						fieldValue,
+						dataValue,
+						field,
+						dataAttribute,
+						fieldValue);
+
+				}
 
 			}
 
@@ -106,6 +132,10 @@ class DataFromGeneric {
 					dataChildren)
 			) {
 
+				Object fieldValue =
+					map.get (
+						field.getName ());
+	
 				doDataChildren (
 					dataClass,
 					fieldValue,

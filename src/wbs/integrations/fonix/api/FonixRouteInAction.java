@@ -1,12 +1,11 @@
 package wbs.integrations.fonix.api;
 
-import static wbs.utils.etc.LogicUtils.not;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.utf8ToString;
 
 import javax.inject.Provider;
 
@@ -81,6 +80,7 @@ class FonixRouteInAction
 	// state
 
 	FonixRouteInRequest request;
+	Boolean success = false;
 
 	// implementation
 
@@ -88,21 +88,6 @@ class FonixRouteInAction
 	protected
 	void processRequest (
 			@NonNull FormatWriter debugWriter) {
-
-		// read and log request
-
-		byte[] requestBytes =
-			requestContext.requestBodyRaw ();
-
-		debugWriter.writeString (
-			"== REQUEST BODY ==\n\n");
-
-		debugWriter.writeString (
-			utf8ToString (
-				requestBytes));
-
-		debugWriter.writeString (
-			"\n\n");
 
 		// decode request
 
@@ -134,7 +119,7 @@ class FonixRouteInAction
 
 		Optional <RouteRec> smsRouteOptional =
 			smsRouteHelper.find (
-				Long.parseLong (
+				parseIntegerRequired (
 					requestContext.requestStringRequired (
 						"smsRouteId")));
 
@@ -143,13 +128,34 @@ class FonixRouteInAction
 			optionalIsNotPresent (
 				smsRouteOptional)
 
-			|| smsRouteOptional.get ().getDeleted ()
-
-			|| not (
-				smsRouteOptional.get ().getCanReceive ())
-
 		) {
-			throw new PageNotFoundException ();
+
+			throw new PageNotFoundException (
+				stringFormat (
+					"Route %s does not exist",
+					requestContext.requestStringRequired (
+						"smsRouteId")));
+
+		}
+		
+		if (smsRouteOptional.get ().getDeleted ()) {
+
+			throw new PageNotFoundException (
+				stringFormat (
+					"Route %s.%s has been deleted",
+					smsRouteOptional.get ().getSlice ().getCode (),
+					smsRouteOptional.get ().getCode ()));
+
+		}
+
+		if (! smsRouteOptional.get ().getCanReceive ()) {
+
+			throw new PageNotFoundException (
+				stringFormat (
+					"Route %s.%s is not configured for inbound messages",
+					smsRouteOptional.get ().getSlice ().getCode (),
+					smsRouteOptional.get ().getCode ()));
+
 		}
 
 		RouteRec smsRoute =
@@ -200,6 +206,8 @@ class FonixRouteInAction
 
 		transaction.commit ();
 
+		success = true;
+
 	}
 
 	@Override
@@ -242,6 +250,9 @@ class FonixRouteInAction
 
 			.setDetails (
 				debugLog)
+
+			.setSuccess (
+				success)
 
 		);
 

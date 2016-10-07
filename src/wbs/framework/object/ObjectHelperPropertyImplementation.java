@@ -361,13 +361,13 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	Boolean getDeleted (
-			@NonNull Record<?> object,
+			@NonNull Record <?> object,
 			boolean checkParents) {
 
-		Record<?> currentObject =
+		Record <?> currentObject =
 			object;
 
-		ObjectHelper<?> currentHelper =
+		ObjectHelper <?> currentHelper =
 			objectHelper;
 
 		for (;;) {

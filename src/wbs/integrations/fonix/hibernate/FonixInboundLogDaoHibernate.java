@@ -33,14 +33,6 @@ class FonixInboundLogDaoHibernate
 				FonixInboundLogRec.class,
 				"_fonixInboundLog");
 
-		// add default order
-
-		criteria
-
-			.addOrder (
-				Order.desc (
-					"id"));
-
 		// restrict by route
 
 		if (
@@ -115,6 +107,14 @@ class FonixInboundLogDaoHibernate
 					search.success ()));
 
 		}
+
+		// add default order
+
+		criteria
+
+			.addOrder (
+				Order.desc (
+					"id"));
 
 		// set to return ids only
 

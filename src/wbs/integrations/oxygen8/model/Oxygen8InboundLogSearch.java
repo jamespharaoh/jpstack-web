@@ -2,14 +2,15 @@ package wbs.integrations.oxygen8.model;
 
 import java.io.Serializable;
 
-import org.joda.time.Instant;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-@Accessors (chain = true)
+import wbs.integrations.fonix.model.FonixInboundLogType;
+import wbs.utils.time.TextualInterval;
+
+@Accessors (fluent = true)
 @Data
 @EqualsAndHashCode
 @ToString
@@ -19,9 +20,12 @@ class Oxygen8InboundLogSearch
 
 	Long routeId;
 
-	Instant timestampAfter;
-	Instant timestampBefore;
+	TextualInterval timestamp;
 
 	String details;
+
+	FonixInboundLogType type;
+
+	Boolean success;
 
 }

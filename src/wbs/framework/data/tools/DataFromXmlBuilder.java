@@ -17,12 +17,20 @@ import javax.inject.Provider;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataParent;
 import wbs.framework.data.tools.DataFromXmlImplementation.DataClassInfo;
+import wbs.framework.logging.TaskLogger;
 
+@Accessors (fluent = true)
 public
 class DataFromXmlBuilder {
+
+	@Setter
+	TaskLogger taskLogger;
 
 	Map <String, List <DataClassInfo>> dataClassesMap =
 		new HashMap<> ();
@@ -219,6 +227,9 @@ class DataFromXmlBuilder {
 	DataFromXml build () {
 
 		return new DataFromXmlImplementation ()
+
+			.taskLogger (
+				taskLogger)
 
 			.dataClassesMap (
 				ImmutableMap.copyOf (

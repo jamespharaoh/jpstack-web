@@ -6,10 +6,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableMap;
 
+import wbs.api.mvc.ApiFile;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.web.PathHandler;
@@ -30,11 +33,12 @@ class Oxygen8ApiServletModule
 
 	@SingletonDependency
 	@Named
-	WebFile oxygen8ReportFile;
-
-	@SingletonDependency
-	@Named
 	WebFile oxygen8InboundFile;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <ApiFile> apiFileProvider;
 
 	// ================================================================ entries
 
@@ -76,7 +80,7 @@ class Oxygen8ApiServletModule
 	public
 	Map <String, PathHandler> paths () {
 
-		return ImmutableMap.<String,PathHandler>builder ()
+		return ImmutableMap. <String, PathHandler> builder ()
 
 			.put (
 				"/oxygen8",
@@ -88,7 +92,7 @@ class Oxygen8ApiServletModule
 
 	@Override
 	public
-	Map<String,WebFile> files () {
+	Map <String, WebFile> files () {
 		return null;
 	}
 
@@ -99,11 +103,16 @@ class Oxygen8ApiServletModule
 	void afterPropertiesSet () {
 
 		defaultFiles =
-			ImmutableMap.<String,WebFile>builder ()
+			ImmutableMap. <String, WebFile> builder ()
 
 			.put (
 				"report",
-				oxygen8ReportFile)
+				apiFileProvider.get ()
+
+					.postActionName (
+						"oxygen8RouteReportAction")
+
+			)
 
 			.put (
 				"in",
