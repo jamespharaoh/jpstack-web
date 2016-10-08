@@ -42,7 +42,7 @@ class MessageTemplateEntryValueFieldsProvider
 
 	// state
 
-	FormFieldSet formFields;
+	FormFieldSet <MessageTemplateEntryValueRec> formFields;
 
 	String mode;
 
@@ -50,7 +50,7 @@ class MessageTemplateEntryValueFieldsProvider
 
 	@Override
 	public
-	FormFieldSet getFieldsForObject (
+	FormFieldSet <MessageTemplateEntryValueRec> getFieldsForObject (
 			@NonNull MessageTemplateEntryValueRec entryValue) {
 
 		List<Object> formFieldSpecs =
@@ -135,8 +135,8 @@ class MessageTemplateEntryValueFieldsProvider
 
 	@Override
 	public
-	FormFieldSet getFieldsForParent (
-			MessageTemplateSetRec parent) {
+	FormFieldSet <MessageTemplateEntryValueRec> getFieldsForParent (
+			@NonNull MessageTemplateSetRec parent) {
 
 		throw new UnsupportedOperationException ();
 
@@ -144,7 +144,7 @@ class MessageTemplateEntryValueFieldsProvider
 
 	@Override
 	public
-	FormFieldSet getStaticFields () {
+	FormFieldSet <MessageTemplateEntryValueRec> getStaticFields () {
 
 		throw new UnsupportedOperationException ();
 
@@ -152,7 +152,7 @@ class MessageTemplateEntryValueFieldsProvider
 
 	public
 	MessageTemplateEntryValueFieldsProvider setFields (
-			@NonNull FormFieldSet fields) {
+			@NonNull FormFieldSet <MessageTemplateEntryValueRec> fields) {
 
 		formFields =
 			fields;
