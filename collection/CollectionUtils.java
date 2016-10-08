@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import com.google.common.collect.ImmutableList;
 
@@ -393,6 +394,14 @@ class CollectionUtils {
 
 		return ImmutableList.copyOf (
 			sortedList);
+
+	}
+
+	public static <Type>
+	Stream <Type> collectionStream (
+			@NonNull Collection <Type> collection) {
+
+		return collection.stream ();
 
 	}
 

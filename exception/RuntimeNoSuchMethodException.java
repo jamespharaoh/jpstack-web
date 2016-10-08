@@ -3,12 +3,12 @@ package wbs.utils.exception;
 import lombok.NonNull;
 
 public
-class RuntimeIllegalAccessException
+class RuntimeNoSuchMethodException
 	extends RuntimeReflectiveOperationException {
 
 	public
-	RuntimeIllegalAccessException (
-			@NonNull IllegalAccessException cause) {
+	RuntimeNoSuchMethodException (
+			@NonNull NoSuchMethodException cause) {
 
 		super (
 			cause);

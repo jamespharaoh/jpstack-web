@@ -916,44 +916,6 @@ class Misc {
 
 	}
 
-	public static
-	Object methodInvoke (
-			@NonNull Method method,
-			@NonNull Object target,
-			@NonNull List<Object> arguments) {
-
-		try {
-
-			return method.invoke (
-				target,
-				arguments.toArray ());
-
-		} catch (InvocationTargetException exception) {
-
-			Throwable targetException =
-				exception.getTargetException ();
-
-			if (targetException instanceof RuntimeException) {
-
-				throw (RuntimeException)
-					targetException;
-
-			} else {
-
-				throw new RuntimeException (
-					targetException);
-
-			}
-
-		} catch (IllegalAccessException exception) {
-
-			throw new RuntimeException (
-				exception);
-
-		}
-
-	}
-
 	public static <Type>
 	Type eitherGetLeft (
 			@NonNull Either<Type,?> either) {

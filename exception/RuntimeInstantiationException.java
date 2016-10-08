@@ -4,7 +4,7 @@ import lombok.NonNull;
 
 public
 class RuntimeInstantiationException
-	extends RuntimeException {
+	extends RuntimeReflectiveOperationException {
 
 	public
 	RuntimeInstantiationException (
