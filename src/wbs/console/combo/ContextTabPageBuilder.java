@@ -105,6 +105,7 @@ class ContextTabPageBuilder <
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
+			container.taskLogger (),
 			container.tabLocation (),
 			contextTab.get ()
 				.name (tabName)

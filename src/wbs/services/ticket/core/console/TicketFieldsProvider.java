@@ -49,7 +49,7 @@ class TicketFieldsProvider
 
 	// state
 
-	FormFieldSet formFields;
+	FormFieldSet <TicketRec> formFields;
 
 	String mode;
 
@@ -57,7 +57,7 @@ class TicketFieldsProvider
 
 	@Override
 	public
-	FormFieldSet getFieldsForObject (
+	FormFieldSet <TicketRec> getFieldsForObject (
 			@NonNull TicketRec ticket) {
 
 		return getFieldsForParent (
@@ -67,18 +67,18 @@ class TicketFieldsProvider
 
 	@Override
 	public
-	FormFieldSet getFieldsForParent (
+	FormFieldSet <TicketRec> getFieldsForParent (
 			@NonNull TicketManagerRec ticketManager) {
 
 		// retrieve existing ticket field types
 
-		Set<TicketFieldTypeRec> ticketFieldTypes =
+		Set <TicketFieldTypeRec> ticketFieldTypes =
 			ticketManager.getTicketFieldTypes ();
 
 		// build form fields
 
-		List<Object> formFieldSpecs =
-			new ArrayList<Object> ();
+		List <Object> formFieldSpecs =
+			new ArrayList<> ();
 
 		for (
 			TicketFieldTypeRec ticketFieldType
@@ -203,7 +203,7 @@ class TicketFieldsProvider
 
 	@Override
 	public
-	FormFieldSet getStaticFields () {
+	FormFieldSet <TicketRec> getStaticFields () {
 
 		throw new UnsupportedOperationException ();
 
@@ -225,7 +225,7 @@ class TicketFieldsProvider
 	class Config {
 
 		@PrototypeDependency
-		Provider<TicketFieldsProvider> ticketFieldsProvider;
+		Provider <TicketFieldsProvider> ticketFieldsProvider;
 
 		@PrototypeComponent ("ticketListFieldsProvider")
 		@Named

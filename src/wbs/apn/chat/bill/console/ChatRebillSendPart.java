@@ -81,23 +81,20 @@ class ChatRebillSendPart
 
 		// get form fields
 
-		@SuppressWarnings ("unchecked")
-		FormFieldSet <ChatRebillSearch> searchFormFieldsTemp =
-			chatRebillConsoleModule.formFieldSets ().get (
-				"search");
-
 		searchFormFields =
-			searchFormFieldsTemp;
+			chatRebillConsoleModule.formFieldSet (
+				"search",
+				ChatRebillSearch.class);
 
 		billResultsFormFields =
-			FormFieldSet.unsafeCast (
-				chatRebillConsoleModule.formFieldSets ().get (
-					"bill-results"));
+			chatRebillConsoleModule.formFieldSet (
+				"bill-results",
+				ChatUserRec.class);
 
 		nonBillResultsFormFields =
-			FormFieldSet.unsafeCast (
-				chatRebillConsoleModule.formFieldSets ().get (
-					"non-bill-results"));
+			chatRebillConsoleModule.formFieldSet (
+				"non-bill-results",
+				ChatRebillNonBillResult.class);
 
 		// get form data
 

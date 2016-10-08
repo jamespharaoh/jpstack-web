@@ -39,10 +39,6 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-settings-page
-				fields="settings"
-				priv-key="imChatConversation.imChatCustomer.imChat.manage"/>
-
 		</object>
 
 	</object-context>

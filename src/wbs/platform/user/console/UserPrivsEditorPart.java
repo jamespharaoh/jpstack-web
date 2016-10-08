@@ -89,7 +89,7 @@ class UserPrivsEditorPart
 
 	@Override
 	public Set <HtmlLink> links () {
-	
+
 		// TODO Auto-generated method stub
 		return super.links ();
 	}

@@ -18,6 +18,7 @@ import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.logging.TaskLogger;
 
 @Log4j
 @SuppressWarnings ("serial")
@@ -331,10 +332,17 @@ class WbsServlet
 
 		}
 
+		TaskLogger taskLogger =
+			new TaskLogger (
+				log);
+
 		requestContext =
 			componentManager.getComponentRequired (
+				taskLogger,
 				"requestContext",
 				RequestContext.class);
+
+		taskLogger.makeException ();
 
 	}
 

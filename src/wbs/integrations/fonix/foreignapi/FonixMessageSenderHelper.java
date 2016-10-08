@@ -42,7 +42,7 @@ class FonixMessageSenderHelper
 	Map <String, String> requestHeaders;
 
 	@Getter
-	Map <String, List <String>> requestParameters; 
+	Map <String, List <String>> requestParameters;
 
 	@Getter
 	String requestBody;
@@ -67,7 +67,7 @@ class FonixMessageSenderHelper
 	// property accessors
 
 	@Override
-	public 
+	public
 	String url () {
 		return request.url ();
 	}
@@ -81,7 +81,7 @@ class FonixMessageSenderHelper
 		checkRequiredProperties (
 			requiredProperties,
 			request);
-	
+
 	}
 
 	@Override

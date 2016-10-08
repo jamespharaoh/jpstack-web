@@ -6,18 +6,11 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import lombok.Cleanup;
+
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import lombok.Cleanup;
-import wbs.imchat.model.ImChatCustomerRec;
-import wbs.imchat.model.ImChatObjectHelper;
-import wbs.imchat.model.ImChatPricePointObjectHelper;
-import wbs.imchat.model.ImChatPurchaseObjectHelper;
-import wbs.imchat.model.ImChatPurchaseRec;
-import wbs.imchat.model.ImChatRec;
-import wbs.imchat.model.ImChatSessionObjectHelper;
-import wbs.imchat.model.ImChatSessionRec;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -28,6 +21,14 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
+import wbs.imchat.model.ImChatCustomerRec;
+import wbs.imchat.model.ImChatObjectHelper;
+import wbs.imchat.model.ImChatPricePointObjectHelper;
+import wbs.imchat.model.ImChatPurchaseObjectHelper;
+import wbs.imchat.model.ImChatPurchaseRec;
+import wbs.imchat.model.ImChatRec;
+import wbs.imchat.model.ImChatSessionObjectHelper;
+import wbs.imchat.model.ImChatSessionRec;
 import wbs.integrations.paypal.logic.PaypalApi;
 import wbs.integrations.paypal.logic.PaypalLogic;
 import wbs.integrations.paypal.model.PaypalAccountRec;
@@ -199,18 +200,31 @@ class ImChatPurchaseConfirmAction
 		PaypalAccountRec paypalAccount =
 			imChat.getPaypalAccount ();
 
-		Map<String,String> expressCheckoutProperties =
+		Map <String, String> expressCheckoutProperties =
 			paypalLogic.expressCheckoutProperties (
 				paypalAccount);
 
-		Boolean checkoutSuccess =
-			paypalApi.doExpressCheckout (
-				paypalPayment.getPaypalToken (),
-				paypalPayment.getPaypalPayerId (),
-				currencyLogic.formatSimple (
-					imChat.getBillingCurrency (),
-					paypalPayment.getValue ()),
-				expressCheckoutProperties);
+		Boolean checkoutSuccess;
+
+		try {
+
+			checkoutSuccess =
+				paypalApi.doExpressCheckout (
+					paypalPayment.getPaypalToken (),
+					paypalPayment.getPaypalPayerId (),
+					currencyLogic.formatSimple (
+						imChat.getBillingCurrency (),
+						paypalPayment.getValue ()),
+					expressCheckoutProperties);
+
+		} catch (InterruptedException interruptedException) {
+
+			Thread.currentThread ().interrupt ();
+
+			throw new RuntimeException (
+				interruptedException);
+
+		}
 
 		if (! checkoutSuccess) {
 

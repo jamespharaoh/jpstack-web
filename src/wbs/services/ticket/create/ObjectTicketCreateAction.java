@@ -125,7 +125,7 @@ class ObjectTicketCreateAction <
 	String createPrivCode;
 
 	@Getter @Setter
-	FormFieldSet formFieldSet;
+	FormFieldSet <TicketRec> fields;
 
 	@Getter @Setter
 	String createTimeFieldName;
@@ -137,14 +137,14 @@ class ObjectTicketCreateAction <
 	String ticketManagerPath;
 
 	@Getter @Setter
-	FieldsProvider<TicketRec,TicketManagerRec> formFieldsProvider;
+	FieldsProvider <TicketRec, TicketManagerRec> formFieldsProvider;
 
 	@Getter @Setter
-	List<ObjectTicketCreateSetFieldSpec> ticketFieldSpecs;
+	List <ObjectTicketCreateSetFieldSpec> ticketFieldSpecs;
 
 	// state
 
-	ConsoleHelper<ParentType> parentHelper;
+	ConsoleHelper <ParentType> parentHelper;
 	TicketManagerRec ticketManager;
 
 	// details
@@ -333,7 +333,7 @@ class ObjectTicketCreateAction <
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
 				requestContext,
-				formFieldSet,
+				fields,
 				ticket,
 				ImmutableMap.of (),
 				"create");
@@ -407,7 +407,7 @@ class ObjectTicketCreateAction <
 		if (ticket instanceof PermanentRecord) {
 
 			formFieldLogic.runUpdateHooks (
-				formFieldSet,
+				fields,
 				updateResultSet,
 				ticket,
 				(PermanentRecord<?>) ticket,
@@ -418,7 +418,7 @@ class ObjectTicketCreateAction <
 		} else {
 
 			formFieldLogic.runUpdateHooks (
-				formFieldSet,
+				fields,
 				updateResultSet,
 				ticket,
 				(PermanentRecord<?>) ticketManager,
@@ -450,7 +450,7 @@ class ObjectTicketCreateAction <
 
 	void prepareFieldSet () {
 
-		formFieldSet =
+		fields =
 			formFieldsProvider.getFieldsForParent (
 				ticketManager);
 

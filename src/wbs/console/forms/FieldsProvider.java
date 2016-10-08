@@ -3,17 +3,17 @@ package wbs.console.forms;
 import wbs.framework.entity.record.Record;
 
 public
-interface FieldsProvider<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+interface FieldsProvider <
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 > {
 
-	FormFieldSet getStaticFields ();
+	FormFieldSet <ObjectType> getStaticFields ();
 
-	FormFieldSet getFieldsForParent (
+	FormFieldSet <ObjectType> getFieldsForParent (
 			ParentType parent);
 
-	FormFieldSet getFieldsForObject (
+	FormFieldSet <ObjectType> getFieldsForObject (
 			ObjectType object);
 
 }

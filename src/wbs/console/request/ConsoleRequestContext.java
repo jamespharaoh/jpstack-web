@@ -1,9 +1,9 @@
 package wbs.console.request;
 
+import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrElse;
-import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
@@ -133,7 +133,24 @@ interface ConsoleRequestContext {
 			String title,
 			TabList tabList);
 
-	TabContext tabContext ();
+	default
+	Optional <TabContext> tabContext () {
+
+		return optionalCast (
+			TabContext.class,
+			request (
+				"tabContext"));
+
+	}
+
+	default
+	TabContext tabContextRequired () {
+
+		return (TabContext)
+			requestRequired (
+				"tabContext");
+
+	}
 
 	void tabContext (
 			String title1,
@@ -222,14 +239,34 @@ interface ConsoleRequestContext {
 
 	ConsoleContextStuff contextStuff ();
 
+	default
 	Object stuff (
-			String key);
+			@NonNull String key) {
 
+		return contextStuff ()
+			.get (key);
+
+	}
+
+	default
 	Long stuffInteger (
-			String key);
+			@NonNull String key) {
 
+		return (Long)
+			contextStuff ().get (
+				key);
+
+	}
+
+	default
 	String stuffString (
-			String key);
+			@NonNull String key) {
+
+		return (String)
+			contextStuff ().get (
+				key);
+
+	}
 
 	boolean canContext (
 			String... privKeys);
@@ -263,7 +300,7 @@ interface ConsoleRequestContext {
 
 	String requestUri ();
 
-	Map<String,List<String>> parameterMap ();
+	Map <String, List <String>> parameterMap ();
 
 	void setHeader (
 			String key,
@@ -272,7 +309,7 @@ interface ConsoleRequestContext {
 	OutputStream outputStream ()
 		throws IOException;
 
-	Optional<String> parameter (
+	Optional <String> parameter (
 			String key);
 
 	String parameterOrDefault (
@@ -281,14 +318,14 @@ interface ConsoleRequestContext {
 
 	String parameterOrElse (
 			String key,
-			Supplier<String> orElse);
+			Supplier <String> orElse);
 
 	Long parameterIntegerRequired (
 			String key);
 
 	String sessionId ();
 
-	Map<String,String> parameterMapSimple ();
+	Map <String, String> parameterMapSimple ();
 
 	RequestDispatcher requestDispatcher (
 			String path);
@@ -315,7 +352,7 @@ interface ConsoleRequestContext {
 
 	boolean isMultipart ();
 
-	List<FileItem> fileItems ();
+	List <FileItem> fileItems ();
 
 	FileItem fileItemFile (
 			 String name);
@@ -325,7 +362,7 @@ interface ConsoleRequestContext {
 
 	// http headers
 
-	Optional<String> header (
+	Optional <String> header (
 			String name);
 
 	// request attributes

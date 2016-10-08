@@ -151,7 +151,7 @@ class TabbedResponder
 		super.prepare ();
 
 		TabContext tabContext =
-			requestContext.tabContext ();
+			requestContext.tabContextRequired ();
 
 		MyLayer myLayer1 = null;
 

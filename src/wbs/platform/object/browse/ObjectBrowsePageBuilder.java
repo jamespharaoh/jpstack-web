@@ -1,5 +1,6 @@
 package wbs.platform.object.browse;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -8,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Provider;
+
+import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -59,7 +62,7 @@ class ObjectBrowsePageBuilder <
 	Provider <ConsoleContextTab> contextTab;
 
 	@PrototypeDependency
-	Provider <ObjectBrowsePart> objectBrowsePart;
+	Provider <ObjectBrowsePart <ObjectType>> objectBrowsePart;
 
 	@PrototypeDependency
 	Provider <TabContextResponder> tabContextResponder;
@@ -77,24 +80,26 @@ class ObjectBrowsePageBuilder <
 
 	// state
 
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	String typeCode;
 
-	FormFieldSet formFieldSet;
+	FormFieldSet <ObjectType> formFieldSet;
 
 	// build
 
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		setDefaults ();
 
-		for (ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
+		for (
+			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
 				: consoleMetaManager.resolveExtensionPoint (
-					container.extensionPointName ())) {
+					container.extensionPointName ())
+		) {
 
 			buildContextTab (
 				resolvedExtensionPoint);
@@ -109,10 +114,10 @@ class ObjectBrowsePageBuilder <
 	}
 
 	void buildContextTab (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
-
+			container.taskLogger (),
 			container.tabLocation (),
 
 			contextTab.get ()
@@ -126,12 +131,12 @@ class ObjectBrowsePageBuilder <
 				.localFile (
 					container.pathPrefix () + ".browse"),
 
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 
 	void buildContextFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextFile (
 
@@ -144,7 +149,7 @@ class ObjectBrowsePageBuilder <
 						"%sBrowseResponder",
 						container.newBeanNamePrefix ())),
 
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 
@@ -207,19 +212,21 @@ class ObjectBrowsePageBuilder <
 			spec.typeCode ();
 
 		formFieldSet =
-			spec.fieldsName () != null
-				? consoleModule.formFieldSets ().get (
-					spec.fieldsName ())
-				: defaultFields ();
+			ifNotNullThenElse (
+				spec.fieldsName (),
+				() -> consoleModule.formFieldSet (
+					spec.fieldsName (),
+					consoleHelper.objectClass ()),
+				() -> defaultFields ());
 
 	}
 
-	FormFieldSet defaultFields () {
+	FormFieldSet <ObjectType> defaultFields () {
 
 		// create spec
 
-		List<Object> formFieldSpecs =
-			new ArrayList<Object> ();
+		List <Object> formFieldSpecs =
+			new ArrayList<> ();
 
 		if (
 			consoleHelper.parentTypeIsFixed ()

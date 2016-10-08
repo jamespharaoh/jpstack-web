@@ -89,7 +89,7 @@ class DataFromGeneric {
 				Object fieldValue =
 					map.get (
 						dataName);
-	
+
 				if (
 
 					dataAttribute.required ()
@@ -135,7 +135,7 @@ class DataFromGeneric {
 				Object fieldValue =
 					map.get (
 						field.getName ());
-	
+
 				doDataChildren (
 					dataClass,
 					fieldValue,

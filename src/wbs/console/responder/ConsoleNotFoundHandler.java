@@ -1,11 +1,14 @@
 package wbs.console.responder;
 
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 
 import javax.inject.Provider;
 import javax.servlet.ServletException;
+
+import com.google.common.base.Optional;
 
 import lombok.extern.log4j.Log4j;
 
@@ -107,10 +110,13 @@ class ConsoleNotFoundHandler
 
 		// show the not found page
 
-		TabContext tabContext =
+		Optional <TabContext> tabContextOptional =
 			requestContext.tabContext ();
 
-		if (tabContext != null) {
+		if (
+			optionalIsPresent (
+				tabContextOptional)
+		) {
 
 			tabbedPageProvider.get ()
 				.tab (notFoundTab)

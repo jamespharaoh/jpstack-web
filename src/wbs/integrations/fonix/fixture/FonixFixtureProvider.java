@@ -490,7 +490,7 @@ class FonixFixtureProvider
 
 		new DefaultNetwork ()
 			.theirCode ("three-uk")
-			.ourCode ("uk_three"),	
+			.ourCode ("uk_three"),
 
 		new DefaultNetwork ()
 			.theirCode ("eeora-uk")

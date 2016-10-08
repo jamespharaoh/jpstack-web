@@ -7,21 +7,24 @@ import com.google.common.base.Optional;
 public
 interface PaypalApi {
 
-	Optional<String> setExpressCheckout (
+	Optional <String> setExpressCheckout (
 			String amount,
 			String returnUrl,
 			String cancelUrl,
 			String checkoutUrl,
-			Map<String,String> expressCheckoutProperties);
+			Map <String, String> expressCheckoutProperties)
+		throws InterruptedException;
 
-	Optional<String> getExpressCheckout (
+	Optional <String> getExpressCheckout (
 			String paypalToken,
-			Map<String,String> expressCheckoutProperties);
+			Map <String, String> expressCheckoutProperties)
+		throws InterruptedException;
 
 	Boolean doExpressCheckout (
 			String paypalToken,
 			String payerId,
 			String amount,
-			Map<String,String> expressCheckoutProperties);
+			Map <String, String> expressCheckoutProperties)
+		throws InterruptedException;
 
 }

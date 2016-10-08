@@ -11,8 +11,6 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 
-import wbs.imchat.console.ImChatCustomerConsoleHelper;
-import wbs.imchat.console.ImChatCustomerCreditConsoleHelper;
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
@@ -87,9 +85,10 @@ class ImChatCustomerCreditAction
 
 		// process form fields
 
-		FormFieldSet formFields =
-			imChatCustomerConsoleModule.formFieldSets ().get (
-				"credit-request");
+		FormFieldSet <ImChatCustomerCreditRequest> formFields =
+			imChatCustomerConsoleModule.formFieldSet (
+				"credit-request",
+				ImChatCustomerCreditRequest.class);
 
 		ImChatCustomerCreditRequest request =
 			ifNotPresent (

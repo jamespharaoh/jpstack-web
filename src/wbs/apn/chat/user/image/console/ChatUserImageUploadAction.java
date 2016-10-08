@@ -17,13 +17,13 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.image.model.ChatUserImageType;
-import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageObjectHelper;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.apn.chat.user.image.model.ChatUserImageType;
+import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
@@ -79,7 +79,7 @@ class ChatUserImageUploadAction
 
 	// state
 
-	FormFieldSet formFieldSet;
+	FormFieldSet <ChatUserImageUploadForm> fields;
 
 	ChatUserImageType chatUserImageType;
 
@@ -99,9 +99,10 @@ class ChatUserImageUploadAction
 	public
 	Responder goReal () {
 
-		formFieldSet =
-			chatUserImageConsoleModule.formFieldSets ().get (
-				"uploadForm");
+		fields =
+			chatUserImageConsoleModule.formFieldSet (
+				"uploadForm",
+				ChatUserImageUploadForm.class);
 
 		chatUserImageType =
 			toEnum (
@@ -115,7 +116,7 @@ class ChatUserImageUploadAction
 
 		formFieldLogic.update (
 			requestContext,
-			formFieldSet,
+			fields,
 			uploadForm,
 			ImmutableMap.of (),
 			"upload");

@@ -71,7 +71,7 @@ class ObjectSettingsPart <
 	String localName;
 
 	@Getter @Setter
-	FormFieldSet formFieldSet;
+	FormFieldSet <ObjectType> formFieldSet;
 
 	@Getter @Setter
 	String removeLocalName;

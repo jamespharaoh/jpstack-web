@@ -8,6 +8,7 @@ import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.equalToZero;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanOne;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -356,10 +357,11 @@ class ComponentRegistryImplementation
 			throw new RuntimeExceptionWithTask (
 				activityManager.currentTask (),
 				stringFormat (
-					"Component definition %s refers to class %s with non-public ",
+					"Component definition %s ",
 					componentDefinition.name (),
+					"refers to class %s ",
 					instantiationClass.getName (),
-					"default constructor"));
+					"with non-public default constructor"));
 
 		}
 
@@ -453,7 +455,8 @@ class ComponentRegistryImplementation
 
 			for (
 				Annotation annotation
-					: componentDefinition.componentClass ().getDeclaredAnnotations ()
+					: componentDefinition.componentClass ()
+						.getDeclaredAnnotations ()
 			) {
 
 				Qualifier qualifierAnnotation =
@@ -702,6 +705,12 @@ class ComponentRegistryImplementation
 			@NonNull InjectedProperty injectedProperty,
 			@NonNull Boolean weak) {
 
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"initInjectedPropertyTargetByQualifier",
+				log);
+
 		@Cleanup
 		HeldLock heldlock =
 			lock.read ();
@@ -726,7 +735,7 @@ class ComponentRegistryImplementation
 					injectedProperty.prototype ()
 						? "prototype"
 						: "singleton",
-					injectedProperty.targetType (),
+					injectedProperty.targetType ().toString (),
 					componentDefinition.name (),
 					injectedProperty.fieldName ());
 
@@ -738,8 +747,9 @@ class ComponentRegistryImplementation
 
 				taskLogger.errorFormat (
 					"Found %s candidate components of type %s for %s.%s",
-					targetComponentDefinitions.size (),
-					injectedProperty.targetType (),
+					integerToDecimalString (
+						targetComponentDefinitions.size ()),
+					injectedProperty.targetType ().toString (),
 					componentDefinition.name (),
 					injectedProperty.fieldName ());
 
@@ -1078,6 +1088,12 @@ class ComponentRegistryImplementation
 			@NonNull Boolean initialized,
 			@NonNull Boolean weak) {
 
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"initInjectedFieldByName",
+				log);
+
 		@Cleanup
 		HeldLock heldlock =
 			lock.read ();
@@ -1163,6 +1179,12 @@ class ComponentRegistryImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Field field,
 			@NonNull InjectedProperty injectedProperty) {
+
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"initInjectedPropertyField",
+				log);
 
 		@Cleanup
 		HeldLock heldlock =
@@ -1271,7 +1293,7 @@ class ComponentRegistryImplementation
 
 				taskLogger.errorFormat (
 					"No type information for provider %s at %s.%s",
-					injectType,
+					injectType.toString (),
 					componentDefinition.name (),
 					field.getName ());
 
@@ -1315,6 +1337,12 @@ class ComponentRegistryImplementation
 			@NonNull InjectedProperty injectedProperty,
 			@NonNull Boolean weak) {
 
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"initInjectedPropertyTargetByClass",
+				log);
+
 		@Cleanup
 		HeldLock heldlock =
 			lock.read ();
@@ -1349,7 +1377,7 @@ class ComponentRegistryImplementation
 					injectedProperty.prototype ()
 						? "prototype"
 						: "singleton",
-					injectedProperty.targetType (),
+					injectedProperty.targetType ().toString (),
 					componentDefinition.name (),
 					field.getName ());
 
@@ -1361,9 +1389,10 @@ class ComponentRegistryImplementation
 
 				taskLogger.errorFormat (
 					"Found %s ",
-					targetComponentDefinitions.size (),
+					integerToDecimalString (
+						targetComponentDefinitions.size ()),
 					"candidate components of type %s ",
-					injectedProperty.targetType (),
+					injectedProperty.targetType ().toString (),
 					"for %s.%s: ",
 					componentDefinition.name (),
 					field.getName (),
@@ -1513,18 +1542,19 @@ class ComponentRegistryImplementation
 			// check for errors
 
 			if (taskLogger.errors ()) {
-
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
-					stringFormat (
-						"Aborting due to %s errors",
-						taskLogger.errorCount ()));
-
+				return null;
 			}
 
 			// initialise
 
-			componentManager.init ();
+			componentManager.init (
+				taskLogger);
+
+			// check for errors
+
+			if (taskLogger.errors ()) {
+				return null;
+			}
 
 			// and return
 
@@ -1538,6 +1568,12 @@ class ComponentRegistryImplementation
 	List <ComponentDefinition> orderByStrongDepedendencies (
 			@NonNull TaskLogger taskLogger,
 			@NonNull List <ComponentDefinition> definitions) {
+
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"orderByStrongDependencies",
+				log);
 
 		List <ComponentDefinition> unorderedDefinitions =
 			new ArrayList<> (
@@ -1582,10 +1618,9 @@ class ComponentRegistryImplementation
 
 				}
 
-				log.debug (
-					stringFormat (
-						"Ordered component definition %s",
-						definition.name ()));
+				taskLogger.debugFormat (
+					"Ordered component definition %s",
+					definition.name ());
 
 				orderedDefinitions.add (
 					definition);

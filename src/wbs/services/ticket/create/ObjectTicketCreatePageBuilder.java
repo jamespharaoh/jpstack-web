@@ -1,6 +1,7 @@
 package wbs.services.ticket.create;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -10,6 +11,7 @@ import java.util.List;
 import javax.inject.Provider;
 
 import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -34,6 +36,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 import wbs.platform.object.criteria.WhereDeletedCriteriaSpec;
@@ -42,6 +45,7 @@ import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
 import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketRec;
 
+@Log4j
 @PrototypeComponent ("objectTicketCreatePageBuilder")
 @ConsoleModuleBuilderHandler
 public
@@ -95,7 +99,7 @@ class ObjectTicketCreatePageBuilder <
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer<ObjectType> container;
+	ConsoleContextBuilderContainer <ObjectType> container;
 
 	@BuilderSource
 	ObjectTicketCreatePageSpec spec;
@@ -105,11 +109,11 @@ class ObjectTicketCreatePageBuilder <
 
 	// state
 
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	String typeCode;
-	FieldsProvider<TicketRec,TicketManagerRec> fieldsProvider;
-	List<ObjectTicketCreateSetFieldSpec> ticketFields;
+	FieldsProvider <TicketRec, TicketManagerRec> fieldsProvider;
+	List <ObjectTicketCreateSetFieldSpec> ticketFields;
 	String name;
 	String tabName;
 	String tabLabel;
@@ -118,7 +122,7 @@ class ObjectTicketCreatePageBuilder <
 	String responderName;
 	String targetContextTypeName;
 	String targetResponderName;
-	FormFieldSet formFieldSet;
+	FormFieldSet <TicketRec> fields;
 	String createTimeFieldName;
 	String createUserFieldName;
 	String createPrivDelegate;
@@ -142,6 +146,7 @@ class ObjectTicketCreatePageBuilder <
 		) {
 
 			buildTab (
+				container.taskLogger (),
 				resolvedExtensionPoint);
 
 			buildFile (
@@ -154,9 +159,11 @@ class ObjectTicketCreatePageBuilder <
 	}
 
 	void buildTab (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextTab (
+			taskLogger,
 			container.tabLocation (),
 			contextTabProvider.get ()
 				.name (tabName)
@@ -201,8 +208,8 @@ class ObjectTicketCreatePageBuilder <
 					.createPrivCode (
 						createPrivCode)
 
-					.formFieldSet (
-						formFieldSet)
+					.fields (
+						fields)
 
 					.formFieldsProvider (
 						fieldsProvider)
@@ -365,15 +372,12 @@ class ObjectTicketCreatePageBuilder <
 
 		if (spec.fieldsProviderName () != null) {
 
-			@SuppressWarnings ("unchecked")
-			FieldsProvider <TicketRec, TicketManagerRec> fieldsProviderTemp =
-				(FieldsProvider <TicketRec, TicketManagerRec>)
-				componentManager.getComponentRequired (
-					spec.fieldsProviderName (),
-					FieldsProvider.class);
-
 			fieldsProvider =
-				fieldsProviderTemp;
+				genericCastUnchecked (
+					componentManager.getComponentRequired (
+						log,
+						spec.fieldsProviderName (),
+						FieldsProvider.class));
 
 		}
 

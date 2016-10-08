@@ -1,11 +1,13 @@
 package wbs.framework.component.tools;
 
-import org.apache.commons.lang3.reflect.MethodUtils;
+import static wbs.utils.etc.ReflectionUtils.methodInvokeByName;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 public
@@ -22,11 +24,11 @@ class MethodComponentFactory
 	Boolean initialized;
 
 	@Override
-	@SneakyThrows (Exception.class)
 	public
-	Object makeComponent () {
+	Object makeComponent (
+			@NonNull TaskLogger taskLogger) {
 
-		return MethodUtils.invokeMethod (
+		return methodInvokeByName (
 			factoryComponent,
 			factoryMethodName);
 

@@ -3,6 +3,9 @@ package wbs.console.helper;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.ReflectionUtils.constructorInvoke;
+import static wbs.utils.etc.ReflectionUtils.getConstructor;
+import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.etc.TypeUtils.classInSafe;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -10,7 +13,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
@@ -23,8 +25,8 @@ import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.forms.EntityFinder;
@@ -42,6 +44,7 @@ import wbs.framework.object.ObjectHelperMethods;
 import wbs.framework.object.ObjectManager;
 import wbs.utils.string.FormatWriter;
 
+@Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleHelperBuilder")
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -92,12 +95,6 @@ class ConsoleHelperBuilder {
 	Class<?> daoMethodsInterface;
 	Object daoImplementation;
 
-	@SneakyThrows ({
-		IllegalAccessException.class,
-		InstantiationException.class,
-		InvocationTargetException.class,
-		NoSuchMethodException.class
-	})
 	public
 	ConsoleHelper<?> build () {
 
@@ -112,8 +109,9 @@ class ConsoleHelperBuilder {
 				consoleHelperClass ().getClassLoader (),
 				consoleHelperClass);
 
-		Constructor<?> constructor =
-			proxyClass.getConstructor (
+		Constructor <?> constructor =
+			getConstructor (
+				proxyClass,
 				InvocationHandler.class);
 
 		consoleHelperImplementation =
@@ -149,6 +147,7 @@ class ConsoleHelperBuilder {
 				isNotNull (
 					extraInterface),
 				() -> componentManager.getComponentRequired (
+					log,
 					extraImplementationBeanName,
 					Object.class),
 				() -> null);
@@ -177,6 +176,7 @@ class ConsoleHelperBuilder {
 				isNotNull (
 					daoMethodsInterface),
 				() -> componentManager.getComponentRequired (
+					log,
 					daoImplementationBeanName,
 					Object.class),
 				() -> null);
@@ -192,6 +192,7 @@ class ConsoleHelperBuilder {
 
 			consoleHooks =
 				componentManager.getComponentRequired (
+					log,
 					consoleHooksBeanName,
 					ConsoleHooks.class);
 
@@ -207,9 +208,10 @@ class ConsoleHelperBuilder {
 		MyInvocationHandler invocationHandler =
 			new MyInvocationHandler ();
 
-		ConsoleHelper<?> consoleHelper =
+		ConsoleHelper <?> consoleHelper =
 			consoleHelperClass ().cast (
-				constructor.newInstance (
+				constructorInvoke (
+					constructor,
 					invocationHandler));
 
 		return consoleHelper;
@@ -470,6 +472,33 @@ class ConsoleHelperBuilder {
 						getDefaultLocalPath (
 							object)),
 					path);
+
+			}
+
+		}
+
+		@Override
+		public
+		ConsoleHelper cast (
+				@NonNull Class objectClass) {
+
+			if (
+				classEqualSafe (
+					objectClass,
+					objectHelper.objectClass ())
+			) {
+
+				return (ConsoleHelper)
+					this;
+
+			} else {
+
+				throw new ClassCastException (
+					stringFormat (
+						"Tried to cast ConsoleHelper <%s> ",
+						objectHelper.objectClass (),
+						"to ConsoleHelper <%s>",
+						objectClass.getSimpleName ()));
 
 			}
 

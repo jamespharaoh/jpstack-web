@@ -1,9 +1,11 @@
 package wbs.platform.object.list;
 
+import static wbs.utils.collection.CollectionUtils.collectionStream;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -26,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -107,17 +110,17 @@ class ObjectListPart <
 
 	// state
 
-	FormFieldSet formFieldSet;
+	FormFieldSet <ObjectType> fields;
 
 	ObsoleteDateField dateField;
 
 	Optional <ObjectListBrowserSpec> currentListBrowserSpec;
 
 	ObjectListTabSpec currentListTabSpec;
-	Record <?> currentObject;
+	ObjectType currentObject;
 
-	List <? extends Record <?>> allObjects;
-	List <Record <?>> selectedObjects;
+	List <ObjectType> allObjects;
+	List <ObjectType> selectedObjects;
 
 	ConsoleContext targetContext;
 	ParentType parent;
@@ -161,7 +164,7 @@ class ObjectListPart <
 
 	void prepareFieldSet () {
 
-		formFieldSet =
+		fields =
 			parent != null
 				? formFieldsProvider.getFieldsForParent (
 					parent)
@@ -405,12 +408,12 @@ class ObjectListPart <
 			try {
 
 				@SuppressWarnings ("unchecked")
-				List <Record <?>> allObjectsTemp =
-					(List <Record <?>>)
-					daoMethod.invoke (
-						consoleHelper,
-						grandParentObject,
-						dateField.date.toInterval ());
+				List <ObjectType> allObjectsTemp =
+					genericCastUnchecked (
+						daoMethod.invoke (
+							consoleHelper,
+							grandParentObject,
+							dateField.date.toInterval ()));
 
 				allObjects =
 					allObjectsTemp;
@@ -449,38 +452,36 @@ class ObjectListPart <
 				parentHelper.findByParent (
 					grandParentGlobalId);
 
-			List <Record <?>> allObjectsTemp =
-				new ArrayList <Record <?>> ();
-
-			for (
-				Record <?> parentObject
-					: parentObjects
-			) {
-
-				GlobalId parentGlobalId =
-					new GlobalId (
-						parentHelper.objectTypeId (),
-						parentObject.getId ());
-
-				if (typeCode != null) {
-
-					allObjectsTemp.addAll (
-						consoleHelper.findByParentAndType (
-							parentGlobalId,
-							typeCode));
-
-				} else {
-
-					allObjectsTemp.addAll (
-						consoleHelper.findByParent (
-							parentGlobalId));
-
-				}
-
-			}
-
 			allObjects =
-				allObjectsTemp;
+				parentObjects.stream ()
+
+				.flatMap (
+					parentObject -> {
+
+					GlobalId parentGlobalId =
+						new GlobalId (
+							parentHelper.objectTypeId (),
+							parentObject.getId ());
+
+					if (typeCode != null) {
+
+						return collectionStream (
+							consoleHelper.findByParentAndType (
+								parentGlobalId,
+								typeCode));
+
+					} else {
+
+						return collectionStream (
+							consoleHelper.findByParent (
+								parentGlobalId));
+
+					}
+
+				})
+
+				.collect (
+					Collectors.toList ());
 
 		}
 
@@ -491,12 +492,12 @@ class ObjectListPart <
 		// select which objects we want to display
 
 		selectedObjects =
-			new ArrayList <Record <?>> ();
+			new ArrayList <ObjectType> ();
 
 	OUTER:
 
 		for (
-			Record <?> object
+			ObjectType object
 				: allObjects
 		) {
 
@@ -667,14 +668,14 @@ class ObjectListPart <
 
 		formFieldLogic.outputTableHeadings (
 			formatWriter,
-			formFieldSet);
+			fields);
 
 		htmlTableRowClose ();
 
 		// render rows
 
 		for (
-			Record <?> object
+			ObjectType object
 				: selectedObjects
 		) {
 
@@ -707,7 +708,7 @@ class ObjectListPart <
 
 			formFieldLogic.outputTableCellsList (
 				formatWriter,
-				formFieldSet,
+				fields,
 				object,
 				ImmutableMap.of (),
 				false);

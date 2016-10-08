@@ -282,6 +282,7 @@ class CoreLogonResponder
 					"username",
 					""),
 				" size=\"32\"",
+				" disabled",
 				">"));
 
 		// password row
@@ -295,6 +296,7 @@ class CoreLogonResponder
 				" name=\"password\"",
 				" value=\"\"",
 				" size=\"32\"",
+				" disabled",
 				">"));
 
 		// table close
@@ -309,6 +311,7 @@ class CoreLogonResponder
 			"<input",
 			" type=\"submit\"",
 			" value=\"log in\"",
+			" disabled",
 			">");
 
 		htmlParagraphClose ();

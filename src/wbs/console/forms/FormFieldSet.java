@@ -1,6 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -23,7 +24,6 @@ import wbs.framework.data.annotations.DataChildrenIndex;
 import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
-@SuppressWarnings ({ "rawtypes", "unchecked" })
 @DataClass ("form-field-set")
 public
 class FormFieldSet <Container> {
@@ -38,13 +38,17 @@ class FormFieldSet <Container> {
 	@Getter @Setter
 	Boolean fileUpload;
 
+	@DataAttribute
+	@Getter @Setter
+	Class <Container> containerClass;
+
 	@DataChildren
 	@Getter
-	List <FormItem> formItems =
+	List <FormItem <Container>> formItems =
 		new ArrayList<> ();
 
 	@Getter
-	List <FormField> formFields =
+	List <FormField <Container, ?, ?, ?>> formFields =
 		new ArrayList<> ();
 
 	@Getter
@@ -54,7 +58,7 @@ class FormFieldSet <Container> {
 
 	@DataChildrenIndex
 	@Getter @Setter
-	Map <String, FormField> formFieldsByName =
+	Map <String, FormField <Container, ?, ?, ?>> formFieldsByName =
 		new HashMap<> ();
 
 	// utility methods
@@ -68,7 +72,7 @@ class FormFieldSet <Container> {
 			new LinkedHashSet<> ();
 
 		for (
-			FormItem formItem
+			FormItem <Container> formItem
 				: formItems
 		) {
 
@@ -82,7 +86,7 @@ class FormFieldSet <Container> {
 	}
 
 	public
-	FormFieldSet addFormItem (
+	FormFieldSet <Container> addFormItem (
 			@NonNull FormItem <Container> formItem) {
 
 		if (
@@ -91,6 +95,7 @@ class FormFieldSet <Container> {
 				formItem)
 		) {
 
+			@SuppressWarnings ("unchecked")
 			FormField <Container, ?, ?, ?> formField =
 				(FormField <Container, ?, ?, ?>)
 				formItem;
@@ -145,7 +150,7 @@ class FormFieldSet <Container> {
 	}
 
 	public
-	FormField formField (
+	FormField <Container, ?, ?, ?> formField (
 			@NonNull String name) {
 
 		return formFieldsByName.get (
@@ -153,16 +158,35 @@ class FormFieldSet <Container> {
 
 	}
 
-	public static <Container>
-	FormFieldSet <Container> unsafeCast (
-			@NonNull FormFieldSet <?> fields) {
+	public <ContainerAgain>
+	FormFieldSet <ContainerAgain> cast (
+			@NonNull Class <?> containerClass) {
 
-		FormFieldSet <Container> fieldsTemp =
-			(FormFieldSet <Container>)
-			fields;
+		if (
+			classEqualSafe (
+				containerClass,
+				this.containerClass)
+		) {
 
-		return fieldsTemp;
+			@SuppressWarnings ("unchecked")
+			FormFieldSet <ContainerAgain> returnTemp =
+				(FormFieldSet <ContainerAgain>)
+				this;
+
+			return returnTemp;
+
+		} else {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Tried to cast FormFieldSet <%s> ",
+					this.containerClass.getSimpleName (),
+					"to FormFieldSet <%s>",
+					containerClass.getSimpleName ()));
+
+		}
 
 	}
+
 
 }

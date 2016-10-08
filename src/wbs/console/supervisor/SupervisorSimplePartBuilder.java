@@ -29,7 +29,7 @@ class SupervisorSimplePartBuilder {
 	// builder
 
 	@BuilderParent
-	SupervisorConfigSpec container;
+	SupervisorBuilderContext context;
 
 	@BuilderSource
 	SupervisorSimplePartSpec spec;
@@ -47,8 +47,9 @@ class SupervisorSimplePartBuilder {
 		String beanName =
 			spec.beanName ();
 
-		Provider<PagePart> pagePartFactory =
+		Provider <PagePart> pagePartFactory =
 			componentManager.getComponentProviderRequired (
+				context.taskLogger (),
 				beanName,
 				PagePart.class);
 

@@ -6,6 +6,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -14,6 +15,7 @@ import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.tools.ComponentFactory;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 public
@@ -40,13 +42,20 @@ class ConsoleModuleFactory
 
 	@Override
 	public
-	Object makeComponent () {
+	Object makeComponent (
+			@NonNull TaskLogger taskLogger) {
 
 		ConsoleModuleImplementation consoleModule =
-			consoleModuleProvider.get ();
+			consoleModuleProvider.get ()
+
+			.name (
+				consoleSpec.name ());
 
 		SimpleConsoleBuilderContainer container =
 			new SimpleConsoleBuilderContainerImplementation ()
+
+			.taskLogger (
+				taskLogger)
 
 			.newBeanNamePrefix (
 				hyphenToCamel (

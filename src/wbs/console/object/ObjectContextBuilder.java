@@ -18,6 +18,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -45,6 +46,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 
+@Log4j
 @PrototypeComponent ("objectContextBuilder")
 @ConsoleModuleBuilderHandler
 public
@@ -147,6 +149,9 @@ class ObjectContextBuilder <
 		ConsoleContextBuilderContainer <ObjectType> listContainer =
 			new ConsoleContextBuilderContainerImplementation <ObjectType> ()
 
+			.taskLogger (
+				container.taskLogger ())
+
 			.consoleHelper (
 				consoleHelper)
 
@@ -180,6 +185,9 @@ class ObjectContextBuilder <
 
 		ConsoleContextBuilderContainer <ObjectType> objectContainer =
 			new ConsoleContextBuilderContainerImplementation <ObjectType> ()
+
+			.taskLogger (
+				container.taskLogger ())
 
 			.consoleHelper (
 				consoleHelper)
@@ -341,6 +349,7 @@ class ObjectContextBuilder <
 	void buildSimpleTabs () {
 
 		consoleModule.addContextTab (
+			container.taskLogger (),
 			"link",
 
 			contextTabProvider.get ()
@@ -354,6 +363,7 @@ class ObjectContextBuilder <
 			ImmutableList.<String> of ());
 
 		consoleModule.addContextTab (
+			container.taskLogger (),
 			"end",
 
 			contextTabProvider.get ()
@@ -469,6 +479,7 @@ class ObjectContextBuilder <
 			ResolvedConsoleContextLink resolvedConsoleContextLink) {
 
 		consoleModule.addContextTab (
+			container.taskLogger (),
 			resolvedConsoleContextLink.tabLocation (),
 
 			contextTabProvider.get ()
@@ -540,6 +551,7 @@ class ObjectContextBuilder <
 		cryptor =
 			spec.cryptorBeanName () != null
 				? componentManager.getComponentRequired (
+					log,
 					spec.cryptorBeanName (),
 					Cryptor.class)
 				: null;

@@ -18,7 +18,8 @@ interface ConsoleObjectManagerMethods {
 	ConsoleHelper <?> findConsoleHelper (
 			Record <?> dataObject);
 
-	ConsoleHelper <?> findConsoleHelper (
+	<ObjectType extends Record <ObjectType>>
+	ConsoleHelper <ObjectType> findConsoleHelper (
 			Class <?> objectClass);
 
 	ConsoleHelper <?> findConsoleHelper (

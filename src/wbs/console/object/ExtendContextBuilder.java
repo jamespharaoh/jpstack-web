@@ -97,6 +97,9 @@ class ExtendContextBuilder <
 		ConsoleContextBuilderContainer <ObjectType> nextBuilderContainer =
 			new ConsoleContextBuilderContainerImplementation <ObjectType> ()
 
+			.taskLogger (
+				container.taskLogger ())
+
 			.consoleHelper (
 				consoleHelper)
 

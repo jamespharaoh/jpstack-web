@@ -33,4 +33,8 @@ interface ConsoleHelperMethods <ObjectType extends Record <ObjectType>> {
 
 	ConsoleHooks <ObjectType> consoleHooks ();
 
+	<ObjectTypeAgain extends Record <ObjectTypeAgain>>
+	ConsoleHelper <ObjectTypeAgain> cast (
+			Class <?> objectClass);
+
 }

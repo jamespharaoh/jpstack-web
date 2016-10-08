@@ -1,8 +1,11 @@
 package wbs.framework.component.tools;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 public
@@ -14,8 +17,11 @@ class SingletonComponentFactory
 
 	@Override
 	public
-	Object makeComponent () {
+	Object makeComponent (
+			@NonNull TaskLogger taskLogger) {
+
 		return object;
+
 	}
 
 }

@@ -1,21 +1,31 @@
 package wbs.framework.logging;
 
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 import static wbs.utils.string.StringUtils.stringSplitNewline;
+import static wbs.utils.string.StringUtils.uppercase;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
-import lombok.Getter;
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
+
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import wbs.framework.exception.ExceptionUtilsImplementation;
@@ -25,29 +35,36 @@ import wbs.utils.string.FormatWriter;
 public
 class TaskLogger {
 
-	// properties
+	// state
 
-	@Getter @Setter
+	private
 	LogTarget logTarget;
 
-	@Getter @Setter
-	long errorCount;
-
-	@Getter @Setter
-	String firstError;
-
-	@Getter @Setter
-	String lastError =
-		"Aborting";
+	private
+	State state;
 
 	// constructors
 
 	public
 	TaskLogger (
-			@NonNull LogTarget logTarget) {
+			@NonNull LogTarget logTarget,
+			@NonNull State state) {
 
 		this.logTarget =
 			logTarget;
+
+		this.state =
+			state;
+
+	}
+
+	public
+	TaskLogger (
+			@NonNull LogTarget logTarget) {
+
+		this (
+			logTarget,
+			new State ());
 
 	}
 
@@ -57,7 +74,8 @@ class TaskLogger {
 
 		this (
 			new LoggerLogTarget (
-				logger));
+				logger),
+			new State ());
 
 	}
 
@@ -74,10 +92,17 @@ class TaskLogger {
 	// accessors
 
 	public
+	long errorCount () {
+
+		return state.errorCount;
+
+	}
+
+	public
 	boolean errors () {
 
 		return moreThanZero (
-			errorCount);
+			state.errorCount);
 
 	}
 
@@ -85,7 +110,7 @@ class TaskLogger {
 	void firstErrorFormat (
 			@NonNull Object ... arguments) {
 
-		firstError =
+		state.firstError =
 			stringFormatArray (
 				arguments);
 
@@ -95,7 +120,7 @@ class TaskLogger {
 	void lastErrorFormat (
 			@NonNull Object ... arguments) {
 
-		lastError =
+		state.lastError =
 			stringFormatArray (
 				arguments);
 
@@ -105,42 +130,109 @@ class TaskLogger {
 
 	public
 	void errorFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
-		if (
+		writeFirstError (
+			Severity.error);
 
-			equalToZero (
-				errorCount)
-
-			&& isNotNull (
-				firstError)
-
-		) {
-
-			logTarget.error (
-				firstError);
-
-		}
-
-		logTarget.error (
+		logTarget.writeToLog (
+			Severity.error,
 			stringFormatArray (
-				arguments));
+				arguments),
+			optionalAbsent ());
 
-		errorCount ++;
+		state.errorCount ++;
 
 	}
 
 	public
 	void errorFormatException (
 			@NonNull Throwable throwable,
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
-		logTarget.error (
+		writeFirstError (
+			Severity.error);
+
+		logTarget.writeToLog (
+			Severity.error,
 			stringFormatArray (
 				arguments),
-			throwable);
+			optionalOf (
+				throwable));
 
-		errorCount ++;
+		state.errorCount ++;
+
+	}
+
+	public
+	void warningFormat (
+			@NonNull String ... arguments) {
+
+		writeFirstError (
+			Severity.warning);
+
+		logTarget.writeToLog (
+			Severity.warning,
+			stringFormatArray (
+				arguments),
+			optionalAbsent ());
+
+		state.warningCount ++;
+
+	}
+
+	public
+	void warningFormatException (
+			@NonNull Throwable throwable,
+			@NonNull String ... arguments) {
+
+		writeFirstError (
+			Severity.warning);
+
+		logTarget.writeToLog (
+			Severity.warning,
+			stringFormatArray (
+				arguments),
+			optionalOf (
+				throwable));
+
+		state.warningCount ++;
+
+	}
+
+	public
+	void debugFormat (
+			@NonNull String ... arguments) {
+
+		writeFirstError (
+			Severity.debug);
+
+		logTarget.writeToLog (
+			Severity.debug,
+			stringFormatArray (
+				arguments),
+			optionalAbsent ());
+
+		state.debugCount ++;
+
+	}
+
+	public
+	void debugFormatException (
+			@NonNull Throwable throwable,
+			@NonNull String ... arguments) {
+
+		writeFirstError (
+			Severity.debug);
+
+		logTarget.writeToLog (
+			Severity.debug,
+			stringFormatArray (
+				arguments),
+			optionalOf (
+				throwable));
+
+		state.debugCount ++;
 
 	}
 
@@ -152,11 +244,13 @@ class TaskLogger {
 			String message =
 				stringFormat (
 					"%s due to %s errors",
-					lastError,
-					errorCount ());
+					state.lastError,
+					state.errorCount);
 
-			logTarget.error (
-				message);
+			logTarget.writeToLog (
+				Severity.error,
+				message,
+				optionalAbsent ());
 
 			throw new LoggedErrorsException (
 				this,
@@ -171,15 +265,152 @@ class TaskLogger {
 
 	}
 
+	public <Type>
+	Type wrap (
+			@NonNull Function <TaskLogger, Type> function) {
+
+		Type returnValue =
+			function.apply (
+				this);
+
+		makeException ();
+
+		return returnValue;
+
+	}
+
+	public
+	TaskLogger nest (
+			@NonNull Object owner,
+			@NonNull String methodName,
+			@NonNull Logger logger) {
+
+		return new TaskLogger (
+			logTarget.nest (
+				logger));
+
+	}
+
+	// private implementation
+
+	private
+	void writeFirstError (
+			@NonNull Severity severity) {
+
+		switch (severity) {
+
+		case error:
+
+			if (
+
+				equalToZero (
+					state.errorCount)
+
+				&& isNotNull (
+					state.firstError)
+
+			) {
+
+				logTarget.writeToLog (
+					Severity.error,
+					state.firstError,
+					optionalAbsent ());
+
+			}
+
+			break;
+
+		case warning:
+
+			if (
+
+				equalToZero (
+					+ state.errorCount
+					+ state.warningCount)
+
+				&& isNotNull (
+					state.firstError)
+
+			) {
+
+				logTarget.writeToLog (
+					Severity.warning,
+					state.firstError,
+					optionalAbsent ());
+
+			}
+
+			break;
+
+		case debug:
+
+			if (
+
+				equalToZero (
+					+ state.errorCount
+					+ state.warningCount
+					+ state.debugCount)
+
+				&& isNotNull (
+					state.firstError)
+
+			) {
+
+				logTarget.writeToLog (
+					Severity.debug,
+					state.firstError,
+					optionalAbsent ());
+
+			}
+
+			break;
+
+		}
+
+	}
+
+	// utilities
+
+	public static <Type>
+	Type wrap (
+			@NonNull Logger logger,
+			@NonNull Function <TaskLogger, Type> function) {
+
+		TaskLogger taskLogger =
+			new TaskLogger (
+				logger);
+
+		return taskLogger.wrap (
+			function);
+
+	}
+
+	// state
+
+	private static
+	class State {
+
+		long errorCount;
+		long warningCount;
+		long debugCount;
+
+		String firstError;
+		String lastError = "Aborting";
+
+	}
+
+	// log target
+
 	public static
 	interface LogTarget {
 
-		void error (
-				String message);
-
-		void error (
+		void writeToLog (
+				Severity severity,
 				String message,
-				Throwable exception);
+				Optional <Throwable> exception);
+
+		LogTarget nest (
+				Logger logger);
 
 	}
 
@@ -200,24 +431,29 @@ class TaskLogger {
 		}
 
 		@Override
-		public 
-		void error (
-				@NonNull String message) {
+		public
+		void writeToLog (
+				@NonNull Severity severity,
+				@NonNull String message,
+				@NonNull Optional <Throwable> exception) {
 
-			logger.error (
-				message);
+			logger.log (
+				mapItemForKeyRequired (
+					severityToLog4jLevel,
+					severity),
+				message,
+				optionalOrNull (
+					exception));
 
 		}
 
 		@Override
 		public
-		void error (
-				@NonNull String message,
-				@NonNull Throwable exception) {
+		LogTarget nest (
+				@NonNull Logger logger) {
 
-			logger.error (
-				message,
-				exception);
+			return new LoggerLogTarget (
+				logger);
 
 		}
 
@@ -240,49 +476,87 @@ class TaskLogger {
 		}
 
 		@Override
-		public 
-		void error (
-				@NonNull String message) {
+		public
+		void writeToLog (
+				@NonNull Severity severity,
+				@NonNull String message,
+				@NonNull Optional <Throwable> exception) {
 
 			formatWriter.writeLineFormat (
-				"ERROR: %s",
+				"%s: %s",
+				uppercase (
+					severity.name ()),
 				message);
-			
+
+			if (
+				optionalIsPresent (
+					exception)
+			) {
+
+				formatWriter.increaseIndent ();
+
+				StringWriter stringWriter =
+					new StringWriter ();
+
+				ExceptionUtilsImplementation.writeThrowable (
+					exception.get (),
+					new PrintWriter (
+						stringWriter));
+
+				List <String> exceptionLines =
+					stringSplitNewline (
+						stringWriter.toString ());
+
+				exceptionLines.forEach (
+					exceptionLine ->
+						formatWriter.writeLineFormat (
+							"%s",
+							exceptionLine));
+
+				formatWriter.decreaseIndent ();
+
+			}
+
 		}
 
 		@Override
-		public void error (
-				@NonNull String message,
-				@NonNull Throwable exception) {
+		public
+		LogTarget nest (
+				@NonNull Logger logger) {
 
-			formatWriter.writeLineFormat (
-				"ERROR: %s",
-				message);
-
-			formatWriter.increaseIndent ();
-
-			StringWriter stringWriter =
-				new StringWriter ();
-
-			ExceptionUtilsImplementation.writeThrowable (
-				exception,
-				new PrintWriter (
-					stringWriter));
-
-			List <String> exceptionLines =
-				stringSplitNewline (
-					stringWriter.toString ());
-
-			exceptionLines.forEach (
-				exceptionLine ->
-					formatWriter.writeLineFormat (
-						"%s",
-						exceptionLine));
-
-			formatWriter.decreaseIndent ();
+			return this;
 
 		}
 
 	}
+
+	// severity
+
+	public static
+	enum Severity {
+		debug,
+		warning,
+		error;
+	}
+
+	// data
+
+	public final static
+	Map <Severity, Level> severityToLog4jLevel =
+		ImmutableMap.<Severity, Level> builder ()
+
+		.put (
+			Severity.error,
+			Level.ERROR)
+
+		.put (
+			Severity.warning,
+			Level.WARN)
+
+		.put (
+			Severity.debug,
+			Level.DEBUG)
+
+		.build ();
 
 }

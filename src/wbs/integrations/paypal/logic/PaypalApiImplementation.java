@@ -4,17 +4,29 @@ import static wbs.utils.string.StringUtils.equalIgnoreCase;
 import static wbs.utils.string.StringUtils.replaceAll;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j;
-
-import wbs.framework.component.annotations.SingletonComponent;
+import javax.xml.parsers.ParserConfigurationException;
 
 import com.google.common.base.Optional;
+import com.paypal.exception.ClientActionRequiredException;
+import com.paypal.exception.HttpErrorException;
+import com.paypal.exception.InvalidCredentialException;
+import com.paypal.exception.InvalidResponseDataException;
+import com.paypal.exception.MissingCredentialException;
+import com.paypal.exception.SSLConfigurationException;
+import com.paypal.sdk.exceptions.OAuthException;
+
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
+
+import org.xml.sax.SAXException;
+
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.utils.io.RuntimeIoException;
 
 import urn.ebay.api.PayPalAPI.DoExpressCheckoutPaymentReq;
 import urn.ebay.api.PayPalAPI.DoExpressCheckoutPaymentRequestType;
@@ -42,14 +54,14 @@ class PaypalApiImplementation
 	implements PaypalApi {
 
 	@Override
-	@SneakyThrows (Exception.class)
 	public
 	Optional<String> setExpressCheckout (
 			@NonNull String amount,
 			@NonNull String returnUrl,
 			@NonNull String cancelUrl,
 			@NonNull String checkoutUrl,
-			@NonNull Map<String,String> expressCheckoutProperties) {
+			@NonNull Map <String, String> expressCheckoutProperties)
+		throws InterruptedException {
 
 		// setup request
 
@@ -101,9 +113,65 @@ class PaypalApiImplementation
 			new PayPalAPIInterfaceServiceService (
 				expressCheckoutProperties);
 
-		SetExpressCheckoutResponseType response =
-			service.setExpressCheckout (
-				checkoutReq);
+		SetExpressCheckoutResponseType response;
+
+		try {
+
+			response =
+				service.setExpressCheckout (
+					checkoutReq);
+
+		} catch (ClientActionRequiredException clientActionRequiredException) {
+
+			throw new RuntimeException (
+				clientActionRequiredException);
+
+		} catch (HttpErrorException httpErrorException) {
+
+			throw new RuntimeException (
+				httpErrorException);
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		} catch (InvalidCredentialException invalidCredentialException) {
+
+			throw new RuntimeException (
+				invalidCredentialException);
+
+		} catch (InvalidResponseDataException invalidResponseDataException) {
+
+			throw new RuntimeException (
+				invalidResponseDataException);
+
+		} catch (MissingCredentialException missingCredentialException) {
+
+			throw new RuntimeException (
+				missingCredentialException);
+
+		} catch (OAuthException oauthException) {
+
+			throw new RuntimeException (
+				oauthException);
+
+		} catch (ParserConfigurationException parserConfigurationException) {
+
+			throw new RuntimeException (
+				parserConfigurationException);
+
+		} catch (SAXException saxException) {
+
+			throw new RuntimeException (
+				saxException);
+
+		} catch (SSLConfigurationException sslConfigurationException) {
+
+			throw new RuntimeException (
+				sslConfigurationException);
+
+		}
 
 		// Accessing response parameters
 
@@ -140,11 +208,11 @@ class PaypalApiImplementation
 	}
 
 	@Override
-	@SneakyThrows (Exception.class)
 	public
-	Optional<String> getExpressCheckout (
+	Optional <String> getExpressCheckout (
 			String paypalToken,
-			Map<String,String> expressCheckoutProperties) {
+			Map <String, String> expressCheckoutProperties)
+		throws InterruptedException {
 
 		// GetExpressCheckoutDetailsReq
 
@@ -164,9 +232,65 @@ class PaypalApiImplementation
 			new PayPalAPIInterfaceServiceService (
 				expressCheckoutProperties);
 
-		GetExpressCheckoutDetailsResponseType responseType =
-			service.getExpressCheckoutDetails (
-				detailsRequest);
+		GetExpressCheckoutDetailsResponseType responseType;
+
+		try {
+
+			responseType =
+				service.getExpressCheckoutDetails (
+					detailsRequest);
+
+		} catch (ClientActionRequiredException clientActionRequiredException) {
+
+			throw new RuntimeException (
+				clientActionRequiredException);
+
+		} catch (HttpErrorException httpErrorException) {
+
+			throw new RuntimeException (
+				httpErrorException);
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		} catch (InvalidCredentialException invalidCredentialException) {
+
+			throw new RuntimeException (
+				invalidCredentialException);
+
+		} catch (InvalidResponseDataException invalidResponseDataException) {
+
+			throw new RuntimeException (
+				invalidResponseDataException);
+
+		} catch (MissingCredentialException missingCredentialException) {
+
+			throw new RuntimeException (
+				missingCredentialException);
+
+		} catch (OAuthException oauthException) {
+
+			throw new RuntimeException (
+				oauthException);
+
+		} catch (ParserConfigurationException parserConfigurationException) {
+
+			throw new RuntimeException (
+				parserConfigurationException);
+
+		} catch (SAXException saxException) {
+
+			throw new RuntimeException (
+				saxException);
+
+		} catch (SSLConfigurationException sslConfigurationException) {
+
+			throw new RuntimeException (
+				sslConfigurationException);
+
+		}
 
 		// Accessing response parameters
 
@@ -202,13 +326,13 @@ class PaypalApiImplementation
 	}
 
 	@Override
-	@SneakyThrows (Exception.class)
 	public
 	Boolean doExpressCheckout (
 			String paypalToken,
 			String payerId,
 			String amount,
-			Map<String,String> expressCheckoutProperties) {
+			Map <String, String> expressCheckoutProperties)
+		throws InterruptedException {
 
 		// DoExpressCheckoutPaymentReq
 
@@ -264,9 +388,65 @@ class PaypalApiImplementation
 			new PayPalAPIInterfaceServiceService (
 				expressCheckoutProperties);
 
-		DoExpressCheckoutPaymentResponseType doExpressCheckoutPaymentResponse =
-			service.doExpressCheckoutPayment (
-				doExpressCheckoutPaymentReq);
+		DoExpressCheckoutPaymentResponseType doExpressCheckoutPaymentResponse;
+
+		try {
+
+			doExpressCheckoutPaymentResponse =
+				service.doExpressCheckoutPayment (
+					doExpressCheckoutPaymentReq);
+
+		} catch (ClientActionRequiredException clientActionRequiredException) {
+
+			throw new RuntimeException (
+				clientActionRequiredException);
+
+		} catch (HttpErrorException httpErrorException) {
+
+			throw new RuntimeException (
+				httpErrorException);
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		} catch (InvalidCredentialException invalidCredentialException) {
+
+			throw new RuntimeException (
+				invalidCredentialException);
+
+		} catch (InvalidResponseDataException invalidResponseDataException) {
+
+			throw new RuntimeException (
+				invalidResponseDataException);
+
+		} catch (MissingCredentialException missingCredentialException) {
+
+			throw new RuntimeException (
+				missingCredentialException);
+
+		} catch (OAuthException oauthException) {
+
+			throw new RuntimeException (
+				oauthException);
+
+		} catch (ParserConfigurationException parserConfigurationException) {
+
+			throw new RuntimeException (
+				parserConfigurationException);
+
+		} catch (SAXException saxException) {
+
+			throw new RuntimeException (
+				saxException);
+
+		} catch (SSLConfigurationException sslConfigurationException) {
+
+			throw new RuntimeException (
+				sslConfigurationException);
+
+		}
 
 		// Accessing response parameters
 

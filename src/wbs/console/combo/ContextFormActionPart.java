@@ -30,7 +30,7 @@ class ContextFormActionPart <FormState>
 	// properties
 
 	@Getter @Setter
-	FormFieldSet formFields;
+	FormFieldSet <FormState> formFields;
 
 	@Getter @Setter
 	ConsoleFormActionHelper <FormState> formActionHelper;

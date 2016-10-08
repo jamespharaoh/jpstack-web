@@ -16,9 +16,9 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import wbs.apn.chat.user.image.model.ChatUserImageType;
-import wbs.console.forms.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormType;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -40,7 +40,7 @@ class ChatUserImageUploadPart
 
 	// state
 
-	FormFieldSet formFieldSet;
+	FormFieldSet <ChatUserImageUploadForm> formFieldSet;
 
 	ChatUserImageType chatUserImageType;
 
@@ -53,13 +53,15 @@ class ChatUserImageUploadPart
 	void prepare () {
 
 		formFieldSet =
-			chatUserImageConsoleModule.formFieldSets ().get (
-				"uploadForm");
+			chatUserImageConsoleModule.formFieldSet (
+				"uploadForm",
+				ChatUserImageUploadForm.class);
 
 		chatUserImageType =
 			toEnum (
 				ChatUserImageType.class,
-				(String) requestContext.stuff ("chatUserImageType"));
+				requestContext.stuffString (
+					"chatUserImageType"));
 
 		uploadForm =
 			new ChatUserImageUploadForm ();

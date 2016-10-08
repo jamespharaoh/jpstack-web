@@ -70,10 +70,10 @@ class SimpleConsoleContextBuilder <
 	// builder
 
 	@BuilderParent
-	SimpleConsoleBuilderContainer simpleContainerSpec;
+	SimpleConsoleBuilderContainer container;
 
 	@BuilderSource
-	SimpleConsoleContextSpec simpleContextSpec;
+	SimpleConsoleContextSpec spec;
 
 	@BuilderTarget
 	ConsoleModuleImplementation consoleModule;
@@ -121,6 +121,9 @@ class SimpleConsoleContextBuilder <
 		ConsoleContextBuilderContainer<ObjectType> nextBuilderContainer =
 			new ConsoleContextBuilderContainerImplementation<ObjectType> ()
 
+			.taskLogger (
+				container.taskLogger ())
+
 			.consoleHelper (
 				null)
 
@@ -148,7 +151,7 @@ class SimpleConsoleContextBuilder <
 
 		builder.descend (
 			nextBuilderContainer,
-			simpleContextSpec.children (),
+			spec.children (),
 			consoleModule,
 			MissingBuilderBehaviour.error);
 
@@ -238,33 +241,34 @@ class SimpleConsoleContextBuilder <
 	}
 
 	void buildResolvedTabs (
-			ResolvedConsoleContextLink resolvedConsoleContextLink) {
+			@NonNull ResolvedConsoleContextLink contextLink) {
 
 		consoleModule.addContextTab (
-			resolvedConsoleContextLink.tabLocation (),
+			container.taskLogger (),
+			contextLink.tabLocation (),
 
 			contextTab.get ()
 
 				.name (
-					resolvedConsoleContextLink.tabName ())
+					contextLink.tabName ())
 
 				.defaultLabel (
-					resolvedConsoleContextLink.tabLabel ())
+					contextLink.tabLabel ())
 
 				.privKeys (
-					resolvedConsoleContextLink.tabPrivKey ())
+					contextLink.tabPrivKey ())
 
 				.localFile (
 					"type:" + name),
 
-			resolvedConsoleContextLink.tabContextTypeNames ());
+			contextLink.tabContextTypeNames ());
 
 	}
 
 	void setDefaults () {
 
 		name =
-			simpleContextSpec.name ();
+			spec.name ();
 
 		structuralName =
 			name;
@@ -277,12 +281,12 @@ class SimpleConsoleContextBuilder <
 
 		typeName =
 			ifNull (
-				simpleContextSpec.typeName (),
+				spec.typeName (),
 				structuralName);
 
 		title =
 			ifNull (
-				simpleContextSpec.title (),
+				spec.title (),
 				capitalise (
 					camelToSpaces (
 						structuralName)));
@@ -292,7 +296,7 @@ class SimpleConsoleContextBuilder <
 		privKeySpecs =
 			ImmutableList.<PrivKeySpec>copyOf (
 				Iterables.filter (
-					simpleContextSpec.children (),
+					spec.children (),
 					PrivKeySpec.class));
 
 	}

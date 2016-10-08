@@ -12,9 +12,9 @@ class FormFieldBuilderContextImplementation
 	implements FormFieldBuilderContext {
 
 	@Getter @Setter
-	Class<?> containerClass;
+	Class <?> containerClass;
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper <?> consoleHelper;
 
 }

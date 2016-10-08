@@ -4,6 +4,8 @@ import java.util.Collections;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
@@ -18,13 +20,12 @@ import wbs.framework.component.annotations.PrototypeDependency;
 @PrototypeComponent ("jqueryScriptRefFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class JqueryScriptRefFormFieldBuilder {
+class JqueryScriptRefFormFieldBuilder <Container> {
 
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ScriptRefFormField>
-	scriptRefFormFieldProvider;
+	Provider <ScriptRefFormField <Container>> scriptRefFormFieldProvider;
 
 	// builder
 
@@ -35,7 +36,7 @@ class JqueryScriptRefFormFieldBuilder {
 	JqueryScriptRefFormFieldSpec spec;
 
 	@BuilderTarget
-	FormFieldSet formFieldSet;
+	FormFieldSet <Container> formFieldSet;
 
 	// state
 
@@ -44,13 +45,13 @@ class JqueryScriptRefFormFieldBuilder {
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		formFieldSet.addFormItem (
 			scriptRefFormFieldProvider.get ()
 
 			.scriptRefs (
-				Collections.<ScriptRef>singleton (
+				Collections.<ScriptRef> singleton (
 					JqueryScriptRef.instance))
 
 		);

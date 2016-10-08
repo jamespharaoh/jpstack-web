@@ -10,8 +10,12 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import wbs.framework.component.manager.ComponentManager;
+import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.logging.TaskLogger;
+
+@Log4j
 public
 class BeanFilterProxy
 	implements Filter {
@@ -55,13 +59,17 @@ class BeanFilterProxy
 			servletContext.getAttribute (
 				"wbs-application-context");
 
+		TaskLogger taskLogger =
+			new TaskLogger (
+				log);
+
 		target =
 			componentManager.getComponentRequired (
+				taskLogger,
 				filterConfig.getFilterName (),
 				Filter.class);
 
-		if (target == null)
-			throw new RuntimeException ();
+		taskLogger.makeException ();
 
 		target.init (
 			filterConfig);

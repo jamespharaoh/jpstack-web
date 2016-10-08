@@ -443,20 +443,8 @@
 			package="wbs.smsapps.manualresponder"/>
 
 		<plugin
-			name="orderer"
-			package="wbs.smsapps.orderer"/>
-
-		<plugin
-			name="photo-grabber"
-			package="wbs.smsapps.photograbber"/>
-
-		<plugin
 			name="subscription"
 			package="wbs.smsapps.subscription"/>
-
-		<plugin
-			name="ticketer"
-			package="wbs.smsapps.ticketer"/>
 
 		<!-- apn -->
 

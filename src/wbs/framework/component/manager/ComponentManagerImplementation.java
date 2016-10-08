@@ -15,6 +15,7 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
@@ -50,7 +51,6 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
@@ -69,6 +69,7 @@ import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.component.tools.EasyReadWriteLock;
 import wbs.framework.component.tools.EasyReadWriteLock.HeldLock;
 import wbs.framework.component.tools.NoSuchComponentException;
+import wbs.framework.logging.TaskLogger;
 import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
@@ -123,6 +124,7 @@ class ComponentManagerImplementation
 	@Override
 	public <ComponentType>
 	Optional <ComponentType> getComponent (
+			@NonNull TaskLogger taskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {
 
@@ -150,6 +152,7 @@ class ComponentManagerImplementation
 		return optionalOf (
 			componentClass.cast (
 				getComponent (
+					taskLogger,
 					componentDefinition,
 					true)));
 
@@ -158,6 +161,7 @@ class ComponentManagerImplementation
 	@Override
 	public <ComponentType>
 	ComponentType getComponentRequired (
+			@NonNull TaskLogger taskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {
 
@@ -187,6 +191,7 @@ class ComponentManagerImplementation
 
 		return componentClass.cast (
 			getComponent (
+				taskLogger,
 				componentDefinition,
 				true));
 
@@ -195,6 +200,7 @@ class ComponentManagerImplementation
 	@Override
 	public <ComponentType>
 	ComponentType getComponentOrElse (
+			@NonNull TaskLogger taskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Supplier <ComponentType> orElse) {
@@ -220,6 +226,7 @@ class ComponentManagerImplementation
 
 		return componentClass.cast (
 			getComponent (
+				taskLogger,
 				componentDefinition,
 				true));
 
@@ -228,6 +235,7 @@ class ComponentManagerImplementation
 	@Override
 	public <ComponentType>
 	Provider <ComponentType> getComponentProviderRequired (
+			@NonNull TaskLogger taskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {
 
@@ -263,9 +271,11 @@ class ComponentManagerImplementation
 
 			throw new NoSuchComponentException (
 				stringFormat (
-					"Component definition with name %s is of type %s instead of %s",
+					"Component definition with name %s ",
 					componentName,
+					"is of type %s ",
 					componentDefinition.componentClass ().getName (),
+					"instead of %s",
 					componentClass.getName ()));
 
 		}
@@ -274,6 +284,7 @@ class ComponentManagerImplementation
 		Provider <ComponentType> componentProvider =
 			(Provider <ComponentType>)
 			getComponentProvider (
+				taskLogger,
 				componentDefinition);
 
 		return componentProvider;
@@ -281,7 +292,8 @@ class ComponentManagerImplementation
 	}
 
 	public
-	Map <String, Object> getAllSingletonComponents () {
+	Map <String, Object> getAllSingletonComponents (
+			@NonNull TaskLogger taskLogger) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -300,13 +312,15 @@ class ComponentManagerImplementation
 					ComponentDefinition::name,
 					componentDefinition ->
 						getComponent (
-						componentDefinition,
-						true)));
+							taskLogger,
+							componentDefinition,
+							true)));
 
 	}
 
 	private
 	Object getComponent (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialize) {
 
@@ -321,6 +335,7 @@ class ComponentManagerImplementation
 		) {
 
 			return instantiateComponent (
+				taskLogger,
 				componentDefinition,
 				initialize);
 
@@ -376,6 +391,7 @@ class ComponentManagerImplementation
 
 				component =
 					instantiateComponent (
+						taskLogger,
 						componentDefinition,
 						true);
 
@@ -414,8 +430,15 @@ class ComponentManagerImplementation
 
 	private
 	Object instantiateComponent (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialize) {
+
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"instantiateComponent",
+				log);
 
 		@Cleanup
 		HeldLock heldlock =
@@ -430,11 +453,10 @@ class ComponentManagerImplementation
 					componentDefinition.name ()),
 				this);
 
-		log.debug (
-			stringFormat (
-				"Instantiating %s (%s)",
-				componentDefinition.name (),
-				componentDefinition.scope ()));
+		taskLogger.debugFormat (
+			"Instantiating %s (%s)",
+			componentDefinition.name (),
+			componentDefinition.scope ());
 
 		// instantiate
 
@@ -451,10 +473,12 @@ class ComponentManagerImplementation
 			protoComponent);
 
 		setComponentReferenceProperties (
+			taskLogger,
 			componentDefinition,
 			protoComponent);
 
 		setComponentInjectedProperties (
+			taskLogger,
 			componentDefinition,
 			protoComponent);
 
@@ -473,7 +497,8 @@ class ComponentManagerImplementation
 				protoComponent;
 
 			component =
-				componentFactory.makeComponent ();
+				componentFactory.makeComponent (
+					taskLogger);
 
 			if (
 				isNull (
@@ -518,6 +543,7 @@ class ComponentManagerImplementation
 		) {
 
 			initializeComponent (
+				taskLogger,
 				componentDefinition,
 				component,
 				componentMetaData);
@@ -526,18 +552,17 @@ class ComponentManagerImplementation
 
 		// and finish
 
-		log.debug (
-			stringFormat (
-				"Component %s instantiated successfully",
-				componentDefinition.name ()));
+		taskLogger.debugFormat (
+			"Component %s instantiated successfully",
+			componentDefinition.name ());
 
 		return component;
 
 	}
 
-	@SneakyThrows (Exception.class)
 	private
 	void initializeComponent (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component,
 			@NonNull ComponentMetaData componentMetaData) {
@@ -585,8 +610,24 @@ class ComponentManagerImplementation
 							componentDefinition.name (),
 							method.getName ()));
 
-					method.invoke (
-						component);
+					if (method.getParameterCount () == 0) {
+
+						methodInvoke (
+							method,
+							component);
+
+					} else if (method.getParameterCount () == 1) {
+
+						methodInvoke (
+							method,
+							component,
+							taskLogger);
+
+					} else {
+
+						throw new RuntimeException ();
+
+					}
 
 				}
 
@@ -675,8 +716,15 @@ class ComponentManagerImplementation
 
 	private
 	void setComponentReferenceProperties (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component) {
+
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"setComponentReferenceProperties",
+				log);
 
 		@Cleanup
 		HeldLock heldlock =
@@ -687,14 +735,14 @@ class ComponentManagerImplementation
 				: componentDefinition.referenceProperties ().entrySet ()
 		) {
 
-			log.debug (
-				stringFormat (
-					"Setting reference property %s.%s",
-					componentDefinition.name (),
-					entry.getKey ()));
+			taskLogger.debugFormat (
+				"Setting reference property %s.%s",
+				componentDefinition.name (),
+				entry.getKey ());
 
 			Object target =
 				getComponentRequired (
+					taskLogger,
 					entry.getValue (),
 					Object.class);
 
@@ -709,6 +757,7 @@ class ComponentManagerImplementation
 
 	private
 	void setComponentInjectedProperties (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component) {
 
@@ -722,6 +771,7 @@ class ComponentManagerImplementation
 		) {
 
 			injectProperty (
+				taskLogger,
 				componentDefinition,
 				component,
 				injectedProperty);
@@ -748,15 +798,21 @@ class ComponentManagerImplementation
 
 	private
 	void injectProperty (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component,
 			@NonNull InjectedProperty injectedProperty) {
 
-		log.debug (
-			stringFormat (
-				"Setting injected property %s.%s",
-				componentDefinition.name (),
-				injectedProperty.fieldName ()));
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"injectProperty",
+				log);
+
+		taskLogger.debugFormat (
+			"Setting injected property %s.%s",
+			componentDefinition.name (),
+			injectedProperty.fieldName ());
 
 		Injection injection =
 			new Injection ();
@@ -885,8 +941,9 @@ class ComponentManagerImplementation
 					throw new RuntimeExceptionWithTask (
 						activityManager.currentTask (),
 						stringFormat (
-							"Trying to inject %s components into a single field %s.%s",
+							"Trying to inject %s ",
 							targetComponents.size (),
+							"components into a single field %s.%s",
 							componentDefinition.name (),
 							injectedProperty.fieldName ()));
 
@@ -934,6 +991,7 @@ class ComponentManagerImplementation
 		) {
 
 			performInjection (
+				taskLogger,
 				injection);
 
 		} else {
@@ -959,6 +1017,7 @@ class ComponentManagerImplementation
 
 	private
 	void performInjection (
+			@NonNull TaskLogger taskLogger,
 			@NonNull Injection injection) {
 
 		List <Pair <ComponentDefinition, Object>> unaggregatedValues =
@@ -968,6 +1027,7 @@ class ComponentManagerImplementation
 						targetComponentDefinition,
 						injection.transformer.apply (
 							getComponentProvider (
+								taskLogger,
 								targetComponentDefinition,
 								injection.injectedProperty.initialized ()))),
 				injection.targetComponents);
@@ -1006,7 +1066,8 @@ class ComponentManagerImplementation
 	}
 
 	public
-	ComponentManager init () {
+	ComponentManager init (
+			@NonNull TaskLogger taskLogger) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -1039,6 +1100,7 @@ class ComponentManagerImplementation
 			}
 
 			getComponentRequired (
+				taskLogger,
 				componentDefinition.name (),
 				Object.class);
 
@@ -1071,6 +1133,7 @@ class ComponentManagerImplementation
 					) {
 
 						performInjection (
+							taskLogger,
 							pendingInjection);
 
 						pendingInjectionIterator.remove ();
@@ -1126,8 +1189,22 @@ class ComponentManagerImplementation
 
 				try {
 
-					method.invoke (
-						component);
+					if (method.getParameterCount () == 0) {
+
+						method.invoke (
+							component);
+
+					} else if (method.getParameterCount () == 1) {
+
+						method.invoke (
+							component,
+							taskLogger);
+
+					} else {
+
+						throw new RuntimeException ();
+
+					}
 
 				} catch (InvocationTargetException invocationTargetException) {
 
@@ -1181,9 +1258,11 @@ class ComponentManagerImplementation
 
 	public
 	Provider <?> getComponentProvider (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition) {
 
 		return getComponentProvider (
+			taskLogger,
 			componentDefinition,
 			true);
 
@@ -1191,8 +1270,9 @@ class ComponentManagerImplementation
 
 	public
 	Provider <?> getComponentProvider (
-			final ComponentDefinition componentDefinition,
-			final Boolean initialized) {
+			@NonNull TaskLogger taskLogger,
+			@NonNull ComponentDefinition componentDefinition,
+			@NonNull Boolean initialized) {
 
 		@Cleanup
 		HeldLock heldlock =
@@ -1205,6 +1285,7 @@ class ComponentManagerImplementation
 			Object get () {
 
 				return getComponent (
+					taskLogger,
 					componentDefinition,
 					initialized);
 

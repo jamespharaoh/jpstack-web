@@ -7,7 +7,6 @@ import java.util.List;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
@@ -27,22 +26,24 @@ class ComponentsSpec {
 	@Getter @Setter
 	List <ComponentsComponentSpec> components;
 
-	@SneakyThrows (Exception.class)
 	public
 	int register (
 			@NonNull ComponentRegistryImplementation registry) {
 
 		int errors = 0;
 
-		for (ComponentsComponentSpec component
-				: components) {
+		for (
+			ComponentsComponentSpec component
+				: components
+		) {
 
-			Class<?> componentClass = null;
+			Class <?> componentClass = null;
 
 			try {
 
 				componentClass =
-					Class.forName (component.className ());
+					Class.forName (
+						component.className ());
 
 			} catch (ClassNotFoundException exception) {
 

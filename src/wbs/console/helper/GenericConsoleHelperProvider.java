@@ -180,6 +180,7 @@ class GenericConsoleHelperProvider
 
 			cryptor (
 				componentManager.getComponentRequired (
+					log,
 					consoleHelperProviderSpec.cryptorBeanName (),
 					Cryptor.class));
 

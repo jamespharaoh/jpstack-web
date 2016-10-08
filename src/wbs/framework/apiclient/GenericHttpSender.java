@@ -388,34 +388,34 @@ class GenericHttpSender <
 						httpResponse.getStatusLine ().getStatusCode (),
 						httpResponse.getStatusLine ().getReasonPhrase ()));
 
-		} else { 
+		} else {
 
 			// decode response
-	
+
 			helper
-	
+
 				.responseStatusCode (
 					fromJavaInteger (
 						httpResponse.getStatusLine ().getStatusCode ()))
-	
+
 				.responseStatusReason (
 					httpResponse.getStatusLine ().getReasonPhrase ())
-	
+
 				.responseHeaders (
 					ImmutableMap.copyOf (
 						Arrays.stream (
 							httpResponse.getAllHeaders ())
-	
+
 					.collect (
 						Collectors.toMap (
 							Header::getName,
 							Header::getValue))
-	
+
 				))
-	
+
 				.responseBody (
 					responseBody)
-	
+
 				.decode ();
 
 		}

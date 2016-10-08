@@ -230,10 +230,7 @@
       <fileset dir="src/wbs/smsapps/broadcast/api/files"/>
       <fileset dir="src/wbs/smsapps/forwarder/api/files"/>
       <fileset dir="src/wbs/smsapps/manualresponder/api/files"/>
-      <fileset dir="src/wbs/smsapps/orderer/api/files"/>
-      <fileset dir="src/wbs/smsapps/photograbber/api/files"/>
       <fileset dir="src/wbs/smsapps/subscription/api/files"/>
-      <fileset dir="src/wbs/smsapps/ticketer/api/files"/>
       <fileset dir="src/wbs/apn/misc/api/files"/>
       <fileset dir="src/wbs/apn/chat/core/api/files"/>
       <fileset dir="src/wbs/apn/chat/ad/api/files"/>
@@ -273,9 +270,7 @@
       <fileset dir="src/wbs/integrations/dialogue/api/files"/>
       <fileset dir="src/wbs/integrations/digitalselect/api/files"/>
       <fileset dir="src/wbs/integrations/fonix/api/files"/>
-      <fileset dir="src/wbs/integrations/hybyte/api/files"/>
       <fileset dir="src/wbs/integrations/mediaburst/api/files"/>
-      <fileset dir="src/wbs/integrations/mig/api/files"/>
       <fileset dir="src/wbs/integrations/oxygen8/api/files"/>
       <fileset dir="src/wbs/integrations/paypal/api/files"/>
       <fileset dir="src/wbs/integrations/smsarena/api/files"/>
@@ -407,10 +402,7 @@
       <fileset dir="src/wbs/smsapps/broadcast/console/files"/>
       <fileset dir="src/wbs/smsapps/forwarder/console/files"/>
       <fileset dir="src/wbs/smsapps/manualresponder/console/files"/>
-      <fileset dir="src/wbs/smsapps/orderer/console/files"/>
-      <fileset dir="src/wbs/smsapps/photograbber/console/files"/>
       <fileset dir="src/wbs/smsapps/subscription/console/files"/>
-      <fileset dir="src/wbs/smsapps/ticketer/console/files"/>
       <fileset dir="src/wbs/apn/misc/console/files"/>
       <fileset dir="src/wbs/apn/chat/core/console/files"/>
       <fileset dir="src/wbs/apn/chat/ad/console/files"/>
@@ -450,9 +442,7 @@
       <fileset dir="src/wbs/integrations/dialogue/console/files"/>
       <fileset dir="src/wbs/integrations/digitalselect/console/files"/>
       <fileset dir="src/wbs/integrations/fonix/console/files"/>
-      <fileset dir="src/wbs/integrations/hybyte/console/files"/>
       <fileset dir="src/wbs/integrations/mediaburst/console/files"/>
-      <fileset dir="src/wbs/integrations/mig/console/files"/>
       <fileset dir="src/wbs/integrations/oxygen8/console/files"/>
       <fileset dir="src/wbs/integrations/paypal/console/files"/>
       <fileset dir="src/wbs/integrations/smsarena/console/files"/>

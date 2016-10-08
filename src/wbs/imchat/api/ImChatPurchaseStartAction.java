@@ -11,22 +11,13 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
-import wbs.imchat.model.ImChatCustomerObjectHelper;
-import wbs.imchat.model.ImChatCustomerRec;
-import wbs.imchat.model.ImChatObjectHelper;
-import wbs.imchat.model.ImChatPricePointObjectHelper;
-import wbs.imchat.model.ImChatPricePointRec;
-import wbs.imchat.model.ImChatPurchaseObjectHelper;
-import wbs.imchat.model.ImChatPurchaseRec;
-import wbs.imchat.model.ImChatRec;
-import wbs.imchat.model.ImChatSessionObjectHelper;
-import wbs.imchat.model.ImChatSessionRec;
+
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -37,7 +28,17 @@ import wbs.framework.web.Action;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.RequestContext;
 import wbs.framework.web.Responder;
+import wbs.imchat.model.ImChatCustomerObjectHelper;
+import wbs.imchat.model.ImChatCustomerRec;
+import wbs.imchat.model.ImChatObjectHelper;
+import wbs.imchat.model.ImChatPricePointObjectHelper;
+import wbs.imchat.model.ImChatPricePointRec;
+import wbs.imchat.model.ImChatPurchaseObjectHelper;
+import wbs.imchat.model.ImChatPurchaseRec;
 import wbs.imchat.model.ImChatPurchaseState;
+import wbs.imchat.model.ImChatRec;
+import wbs.imchat.model.ImChatSessionObjectHelper;
+import wbs.imchat.model.ImChatSessionRec;
 import wbs.integrations.paypal.logic.PaypalApi;
 import wbs.integrations.paypal.logic.PaypalLogic;
 import wbs.integrations.paypal.model.PaypalAccountRec;
@@ -405,13 +406,24 @@ class ImChatPurchaseStartAction
 
 		} else {
 
-			redirectUrl =
-				paypalApi.setExpressCheckout (
-					purchasePriceString,
-					purchaseSuccessUrl,
-					purchaseFailureUrl,
-					purchaseCheckoutUrl,
-					paypalExpressCheckoutProperties);
+			try {
+
+				redirectUrl =
+					paypalApi.setExpressCheckout (
+						purchasePriceString,
+						purchaseSuccessUrl,
+						purchaseFailureUrl,
+						purchaseCheckoutUrl,
+						paypalExpressCheckoutProperties);
+
+			} catch (InterruptedException interruptedException) {
+
+				Thread.currentThread ().interrupt ();
+
+				throw new RuntimeException (
+					interruptedException);
+
+			}
 
 		}
 

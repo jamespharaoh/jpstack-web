@@ -38,7 +38,8 @@ import wbs.framework.web.Responder;
 @ConsoleModuleBuilderHandler
 public
 class ObjectLinksPageBuilder <
-	ObjectType extends Record <ObjectType>
+	ObjectType extends Record <ObjectType>,
+	TargetType extends Record <TargetType>
 > {
 
 	// singleton dependencies
@@ -61,7 +62,7 @@ class ObjectLinksPageBuilder <
 	Provider <ConsoleContextTab> contextTab;
 
 	@PrototypeDependency
-	Provider <ObjectLinksPart> objectLinksPart;
+	Provider <ObjectLinksPart <ObjectType, TargetType>> objectLinksPart;
 
 	@PrototypeDependency
 	Provider <ObjectLinksAction> objectLinksAction;
@@ -93,7 +94,7 @@ class ObjectLinksPageBuilder <
 
 	String pageTitle;
 	ModelField linksField;
-	ConsoleHelper<?> targetConsoleHelper;
+	ConsoleHelper <TargetType> targetConsoleHelper;
 	ModelField targetLinksField;
 	String addEventName;
 	String removeEventName;
@@ -101,7 +102,7 @@ class ObjectLinksPageBuilder <
 	String updateSignalName;
 	String targetUpdateSignalName;
 	String successNotice;
-	FormFieldSet formFieldSet;
+	FormFieldSet <TargetType> targetFields;
 
 	// build
 
@@ -131,21 +132,22 @@ class ObjectLinksPageBuilder <
 	}
 
 	void buildTab (
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
+			container.taskLogger (),
 			container.tabLocation (),
 			contextTab.get ()
 				.name (tabName)
 				.defaultLabel (tabLabel)
 				.localFile (localFile)
 				.privKeys (privKey),
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 
 	void buildFile (
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		Action action =
 			new Action () {
@@ -201,7 +203,7 @@ class ObjectLinksPageBuilder <
 				.getResponderName (responderName)
 				.postAction (action)
 				.privName (privKey),
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 
@@ -218,7 +220,7 @@ class ObjectLinksPageBuilder <
 					.consoleHelper (container.consoleHelper ())
 					.contextLinksField (linksField.name ())
 					.targetHelper (targetConsoleHelper)
-					.formFieldSet (formFieldSet)
+					.targetFields (targetFields)
 					.localFile (localFile);
 
 			}
@@ -313,9 +315,10 @@ class ObjectLinksPageBuilder <
 		successNotice =
 			spec.successNotice ();
 
-		formFieldSet =
-			consoleModule.formFieldSets ().get (
-				spec.fieldsName ());
+		targetFields =
+			consoleModule.formFieldSet (
+				spec.fieldsName (),
+				targetConsoleHelper.objectClass ());
 
 	}
 

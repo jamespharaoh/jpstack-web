@@ -12,8 +12,8 @@ import wbs.framework.component.annotations.PrototypeComponent;
 @Accessors (fluent = true)
 @PrototypeComponent ("scriptRefFormField")
 public
-class ScriptRefFormField
-	implements VirtualFormItem <Object> {
+class ScriptRefFormField <Container>
+	implements VirtualFormItem <Container> {
 
 	@Getter @Setter
 	Set <ScriptRef> scriptRefs;

@@ -119,7 +119,7 @@ class ExceptionStatusLinePart
 
 		formatWriter.writeLineFormatIncreaseIndent (
 			"if (excepRow.className == 'alert_hover') {");
-		
+
 		formatWriter.writeLineFormat (
 			"excepRow.className = 'hover';");
 

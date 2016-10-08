@@ -143,7 +143,7 @@ class ClockworkSmsRouteInAction
 						position),
 					toHex (
 						requestBytesChunk));
-				
+
 			}
 
 			debugWriter.writeLineFormat ();

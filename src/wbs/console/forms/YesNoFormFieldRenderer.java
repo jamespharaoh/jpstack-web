@@ -4,6 +4,8 @@ import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.LogicUtils.booleanToString;
 import static wbs.utils.etc.LogicUtils.booleanToTrueFalseNone;
 import static wbs.utils.etc.LogicUtils.booleanToYesNoNone;
+import static wbs.utils.etc.LogicUtils.parseBooleanTrueFalse;
+import static wbs.utils.etc.LogicUtils.parseBooleanYesNo;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.stringToBoolean;
 import static wbs.utils.etc.Misc.successResult;
@@ -91,14 +93,10 @@ class YesNoFormFieldRenderer <Container>
 			formValuePresent (
 					submission,
 					formName)
-				? Optional.fromNullable (
-					stringToBoolean (
-						formValue (
-							submission,
-							formName),
-						"yes",
-						"no",
-						"none"))
+				? parseBooleanYesNo (
+					formValue (
+						submission,
+						formName))
 				: interfaceValue;
 
 		htmlWriter.writeLineFormat (

@@ -4,6 +4,7 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrDefault;
+import static wbs.utils.etc.TypeUtils.isSubclassOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collection;
@@ -81,16 +82,22 @@ class ConsoleObjectManagerImplementation
 	}
 
 	@Override
-	public
-	ConsoleHelper<?> findConsoleHelper (
+	public <ObjectType extends Record <ObjectType>>
+	ConsoleHelper <ObjectType> findConsoleHelper (
 			@NonNull Class<?> objectClass) {
 
-		Class<?> tempClass =
+		Class <?> tempClass =
 			objectClass;
 
-		while (Record.class.isAssignableFrom (tempClass)) {
+		while (
+			isSubclassOf (
+				Record.class,
+				tempClass)
+		) {
 
-			ConsoleHelper<?> consoleHelper =
+			@SuppressWarnings ("unchecked")
+			ConsoleHelper <ObjectType> consoleHelper =
+				(ConsoleHelper <ObjectType>)
 				consoleHelperRegistry.findByObjectClass (
 					tempClass);
 

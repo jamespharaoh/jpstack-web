@@ -3,6 +3,7 @@ package wbs.utils.string;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.nullIf;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 
 import java.io.UnsupportedEncodingException;
@@ -904,9 +905,15 @@ class StringUtils {
 			@NonNull String singular) {
 
 		if (
+
 			stringEndsWith (
 				"s",
 				singular)
+
+			|| stringEndsWith (
+				"x",
+				singular)
+
 		) {
 
 			return singular + "es";
@@ -1494,10 +1501,9 @@ class StringUtils {
 
 								() -> {
 
-									@SuppressWarnings ("unchecked")
 									Function <Input, ?> function =
-										(Function <Input, ?>)
-										argument;
+										genericCastUnchecked (
+											argument);
 
 									return function.apply (
 										input);

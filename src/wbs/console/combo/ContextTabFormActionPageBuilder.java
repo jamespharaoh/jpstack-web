@@ -6,6 +6,9 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
@@ -28,6 +31,7 @@ import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 
+@Log4j
 @PrototypeComponent ("contextTabFormActionPageBuilder")
 @ConsoleModuleBuilderHandler
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -132,21 +136,23 @@ class ContextTabFormActionPageBuilder {
 
 		formActionHelperProvider =
 			componentManager.getComponentProviderRequired (
+				log,
 				helperBeanName,
 				ConsoleFormActionHelper.class);
 
 	}
 
 	void buildTab (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
+			container.taskLogger (),
 			container.tabLocation (),
 			contextTabProvider.get ()
 				.name (tabName)
 				.defaultLabel (tabLabel)
 				.localFile (localFile),
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 

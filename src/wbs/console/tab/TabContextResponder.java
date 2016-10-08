@@ -9,6 +9,7 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
@@ -20,6 +21,7 @@ import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.web.Responder;
 
+@Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("tabContextResponder")
 @DataClass ("tab-context-responder")
@@ -71,6 +73,7 @@ class TabContextResponder
 
 				Object bean =
 					componentManager.getComponentRequired (
+						log,
 						pagePartName,
 						Object.class);
 

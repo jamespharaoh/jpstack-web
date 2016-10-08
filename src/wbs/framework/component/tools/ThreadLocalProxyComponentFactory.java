@@ -8,8 +8,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 public
@@ -29,7 +32,8 @@ class ThreadLocalProxyComponentFactory
 
 	@Override
 	public
-	Object makeComponent () {
+	Object makeComponent (
+			@NonNull TaskLogger taskLogger) {
 
 		return Proxy.newProxyInstance (
 			componentClass.getClassLoader (),

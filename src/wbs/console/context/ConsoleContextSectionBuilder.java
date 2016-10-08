@@ -105,6 +105,9 @@ class ConsoleContextSectionBuilder <
 		ConsoleContextBuilderContainer<ObjectType> nextContextBuilderContainer =
 			new ConsoleContextBuilderContainerImplementation<ObjectType> ()
 
+			.taskLogger (
+				container.taskLogger ())
+
 			.consoleHelper (
 				consoleHelper)
 
@@ -232,10 +235,10 @@ class ConsoleContextSectionBuilder <
 	}
 
 	void buildContextTabs (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
-
+			container.taskLogger (),
 			container.tabLocation (),
 
 			contextTabProvider.get ()
@@ -249,7 +252,7 @@ class ConsoleContextSectionBuilder <
 				.localFile (
 					tabTarget),
 
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 

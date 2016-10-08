@@ -1,8 +1,8 @@
 package wbs.console.forms;
 
-import java.util.Collections;
-
 import javax.inject.Provider;
+
+import com.google.common.collect.ImmutableSet;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleApplicationScriptRef;
@@ -18,12 +18,12 @@ import wbs.framework.component.annotations.PrototypeDependency;
 @PrototypeComponent ("scriptRefFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ScriptRefFormFieldBuilder {
+class ScriptRefFormFieldBuilder <Container> {
 
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ScriptRefFormField>
+	Provider <ScriptRefFormField <Container>>
 	scriptRefFormFieldProvider;
 
 	// builder
@@ -35,7 +35,7 @@ class ScriptRefFormFieldBuilder {
 	ScriptRefFormFieldSpec spec;
 
 	@BuilderTarget
-	FormFieldSet formFieldSet;
+	FormFieldSet <Container> formFieldSet;
 
 	// state
 
@@ -50,7 +50,7 @@ class ScriptRefFormFieldBuilder {
 			scriptRefFormFieldProvider.get ()
 
 			.scriptRefs (
-				Collections.<ScriptRef>singleton (
+				ImmutableSet.<ScriptRef> of (
 					ConsoleApplicationScriptRef.javascript (
 						spec.path ())))
 

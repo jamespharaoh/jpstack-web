@@ -97,29 +97,29 @@ class ChatBroadcastSendPart
 	void prepare () {
 
 		searchFields =
-			FormFieldSet.unsafeCast (
-				chatBroadcastConsoleModule.formFieldSets ().get (
-					"send-search"));
+			chatBroadcastConsoleModule.formFieldSet (
+				"send-search",
+				ChatBroadcastSendForm.class);
 
 		numbersFields =
-			FormFieldSet.unsafeCast (
-				chatBroadcastConsoleModule.formFieldSets ().get (
-					"send-numbers"));
+			chatBroadcastConsoleModule.formFieldSet (
+				"send-numbers",
+				ChatBroadcastSendForm.class);
 
 		commonFields =
-			FormFieldSet.unsafeCast (
-				chatBroadcastConsoleModule.formFieldSets ().get (
-					"send-common"));
+			chatBroadcastConsoleModule.formFieldSet (
+				"send-common",
+				ChatBroadcastSendForm.class);
 
 		messageUserFields =
-			FormFieldSet.unsafeCast (
-				chatBroadcastConsoleModule.formFieldSets ().get (
-					"send-message-user"));
+			chatBroadcastConsoleModule.formFieldSet (
+				"send-message-user",
+				ChatBroadcastSendForm.class);
 
 		messageMessageFields =
-			FormFieldSet.unsafeCast (
-				chatBroadcastConsoleModule.formFieldSets ().get (
-					"send-message-message"));
+			chatBroadcastConsoleModule.formFieldSet (
+				"send-message-message",
+				ChatBroadcastSendForm.class);
 
 		form =
 			(ChatBroadcastSendForm)

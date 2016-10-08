@@ -1,10 +1,9 @@
 package wbs.console.helper;
 
-import static wbs.utils.string.StringUtils.stringFormat;
-
 import javax.inject.Provider;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
@@ -13,6 +12,7 @@ import wbs.console.module.ConsoleMetaManager;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.tools.ComponentFactory;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 @Accessors (fluent = true)
@@ -53,7 +53,14 @@ class ConsoleHelperFactory
 
 	@Override
 	public
-	Object makeComponent () {
+	Object makeComponent (
+			@NonNull TaskLogger taskLogger) {
+
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"makeComponent",
+				log);
 
 		if (consoleHelperClass == null)
 			throw new NullPointerException ("consoleHelperClass");
@@ -64,10 +71,9 @@ class ConsoleHelperFactory
 
 		if (consoleHelperProvider == null) {
 
-			log.warn (
-				stringFormat (
-					"No console helper provider for %s",
-					objectHelper.objectName ()));
+			taskLogger.warningFormat (
+				"No console helper provider for %s",
+				objectHelper.objectName ());
 
 			consoleHelperProvider =
 				genericConsoleHelperProviderProvider.get ()
@@ -85,11 +91,10 @@ class ConsoleHelperFactory
 
 		}
 
-		log.debug (
-			stringFormat (
-				"Getting console helper %s for %s",
-				consoleHelperProvider.objectName (),
-				consoleHelperProvider.objectClass ().getSimpleName ()));
+		taskLogger.debugFormat (
+			"Getting console helper %s for %s",
+			consoleHelperProvider.objectName (),
+			consoleHelperProvider.objectClass ().getSimpleName ());
 
 		ConsoleHelper <?> consoleHelper =
 			consoleHelperBuilder.get ()

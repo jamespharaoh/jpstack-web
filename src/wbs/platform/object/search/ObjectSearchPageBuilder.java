@@ -1,14 +1,17 @@
 package wbs.platform.object.search;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import java.io.Serializable;
 import java.util.Collections;
 
 import javax.inject.Provider;
@@ -39,6 +42,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.entity.record.IdObject;
 import wbs.framework.entity.record.Record;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
@@ -47,7 +51,9 @@ import wbs.framework.web.Responder;
 @ConsoleModuleBuilderHandler
 public
 class ObjectSearchPageBuilder <
-	ObjectType extends Record <ObjectType>
+	ObjectType extends Record <ObjectType>,
+	SearchType extends Serializable,
+	ResultType extends IdObject
 > {
 
 	// singleton dependencies
@@ -76,13 +82,20 @@ class ObjectSearchPageBuilder <
 	Provider <ObjectSearchGetAction> objectSearchGetAction;
 
 	@PrototypeDependency
-	Provider <ObjectSearchPart> objectSearchPart;
+	Provider <ObjectSearchPart <ObjectType, SearchType>> objectSearchPart;
 
 	@PrototypeDependency
-	Provider <ObjectSearchPostAction> objectSearchPostAction;
+	Provider <
+		ObjectSearchPostAction <
+			ObjectType,
+			SearchType,
+			ResultType
+		>
+	> objectSearchPostAction;
 
 	@PrototypeDependency
-	Provider <ObjectSearchResultsPart> objectSearchResultsPart;
+	Provider <ObjectSearchResultsPart <ObjectType, ResultType>>
+		objectSearchResultsPartProvider;
 
 	// builder
 
@@ -97,14 +110,14 @@ class ObjectSearchPageBuilder <
 
 	// state
 
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
-	Class<?> searchClass;
-	Class<?> resultsClass;
+	Class <SearchType> searchClass;
+	Class <ResultType> resultClass;
 
-	FormFieldSet searchFormFieldSet;
-	FormFieldSet resultsFormFieldSet;
-	FormFieldSet resultsRowsFormFieldSet;
+	FormFieldSet <SearchType> searchFormFieldSet;
+	FormFieldSet <ResultType> resultsFormFieldSet;
+	FormFieldSet <ResultType> resultsRowsFormFieldSet;
 
 	String name;
 	String sessionKey;
@@ -153,10 +166,10 @@ class ObjectSearchPageBuilder <
 	}
 
 	void buildContextTab (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
-
+			container.taskLogger (),
 			"end",
 
 			contextTab.get ()
@@ -175,7 +188,7 @@ class ObjectSearchPageBuilder <
 						? Collections.singletonList (privKey)
 						: Collections.<String>emptyList ()),
 
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 
@@ -290,8 +303,8 @@ class ObjectSearchPageBuilder <
 
 	void buildSearchResponder () {
 
-		Provider<PagePart> searchPartFactory =
-			new Provider<PagePart> () {
+		Provider <PagePart> searchPartFactory =
+			new Provider <PagePart> () {
 
 			@Override
 			public
@@ -308,7 +321,7 @@ class ObjectSearchPageBuilder <
 					.sessionKey (
 						sessionKey)
 
-					.formFieldSet (
+					.fields (
 						searchFormFieldSet)
 
 					.fileName (
@@ -351,7 +364,7 @@ class ObjectSearchPageBuilder <
 			public
 			PagePart get () {
 
-				return objectSearchResultsPart.get ()
+				return objectSearchResultsPartProvider.get ()
 
 					.consoleHelper (
 						consoleHelper)
@@ -366,7 +379,7 @@ class ObjectSearchPageBuilder <
 						resultsRowsFormFieldSet)
 
 					.resultsClass (
-						resultsClass)
+						resultClass)
 
 					.resultsDaoMethodName (
 						spec.resultsDaoMethodName ())
@@ -453,27 +466,34 @@ class ObjectSearchPageBuilder <
 		}
 
 		searchClass =
-			searchClassOptional.get ();
+			genericCastUnchecked (
+				searchClassOptional.get ());
 
-		resultsClass =
-			spec.resultsClassName () != null
-				? classForNameRequired (
-					spec.resultsClassName ())
-				: consoleHelper.objectClass ();
+		resultClass =
+			genericCastUnchecked (
+				ifNotNullThenElse (
+					spec.resultsClassName (),
+					() -> classForNameRequired (
+						spec.resultsClassName ()),
+					() -> consoleHelper.objectClass ()));
 
 		searchFormFieldSet =
-			consoleModule.formFieldSets ().get (
-				spec.searchFieldsName ());
+			consoleModule.formFieldSet (
+				spec.searchFieldsName (),
+				searchClass);
 
 		resultsFormFieldSet =
-			consoleModule.formFieldSets ().get (
-				spec.resultsFieldsName ());
+			consoleModule.formFieldSet (
+				spec.resultsFieldsName (),
+				resultClass);
 
 		resultsRowsFormFieldSet =
-			spec.resultsRowsFieldsName () != null
-				? consoleModule.formFieldSets ().get (
-					spec.resultsRowsFieldsName ())
-				: null;
+			ifNotNullThenElse (
+				spec.resultsRowsFieldsName (),
+				() -> consoleModule.formFieldSet (
+					spec.resultsRowsFieldsName (),
+					resultClass),
+				() -> null);
 
 		name =
 			ifNull (

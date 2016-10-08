@@ -26,7 +26,6 @@ import com.google.common.collect.ImmutableList;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
@@ -126,7 +125,6 @@ class ComponentManagerBuilder {
 
 	}
 
-	@SneakyThrows (Exception.class)
 	public
 	ComponentManager build () {
 
@@ -229,8 +227,7 @@ class ComponentManagerBuilder {
 	}
 
 	private
-	void registerComponents ()
-		throws Exception {
+	void registerComponents () {
 
 		TaskLogger taskLog =
 			new TaskLogger (

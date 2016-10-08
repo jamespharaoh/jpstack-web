@@ -178,8 +178,9 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 				throw new IllegalArgumentException (
 					stringFormat (
-						"Invalid parent global id %s for rooted object in %s.%s",
+						"Invalid parent global id %s ",
 						parentGlobalId,
+						"for rooted object in %s.%s",
 						getClass ().getSimpleName (),
 						"findChildByCode"));
 
@@ -376,8 +377,9 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 				throw new IllegalArgumentException (
 					stringFormat (
-						"Invalid parent global id %s for rooted object in %s.%s",
+						"Invalid parent global id %s ",
 						parentGlobalId,
+						"for rooted object in %s.%s",
 						getClass ().getSimpleName (),
 						"findChildByCode"));
 
@@ -565,8 +567,9 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 				throw new IllegalArgumentException (
 					stringFormat (
-						"Invalid parent global id %s for rooted object in %s.%s",
+						"Invalid parent global id %s ",
 						parentGlobalId,
+						"for rooted object in %s.%s",
 						getClass ().getSimpleName (),
 						"findByParentAndCode"));
 
@@ -799,8 +802,9 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 				throw new IllegalArgumentException (
 					stringFormat (
-						"Invalid parent global id %s for rooted object in %s.%s",
+						"Invalid parent global id %s ",
 						parentGlobalId,
+						"for rooted object in %s.%s",
 						getClass ().getSimpleName (),
 						"findChildren"));
 
@@ -931,8 +935,9 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 				throw new IllegalArgumentException (
 					stringFormat (
-						"Invalid parent global id %s for rooted object in %s.%s",
+						"Invalid parent global id %s ",
 						parentGlobalId,
+						"for rooted object in %s.%s",
 						getClass ().getSimpleName (),
 						"findChildren"));
 
@@ -1201,8 +1206,9 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 				throw new IllegalArgumentException (
 					stringFormat (
-						"Invalid parent global id %s for rooted object in %s.%s",
+						"Invalid parent global id %s ",
 						parentGlobalId,
+						"for rooted object in %s.%s",
 						getClass ().getSimpleName (),
 						"findChildren"));
 

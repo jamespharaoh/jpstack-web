@@ -147,7 +147,7 @@ class ManualResponderRequestPendingSummaryPart
 
 	// state
 
-	FormFieldSet customerDetailsFields;
+	FormFieldSet <SmsCustomerRec> customerDetailsFields;
 
 	ManualResponderRequestRec manualResponderRequest;
 	ManualResponderNumberRec manualResponderNumber;
@@ -195,8 +195,9 @@ class ManualResponderRequestPendingSummaryPart
 	void prepare () {
 
 		customerDetailsFields =
-			manualResponderRequestPendingConsoleModule.formFieldSets ().get (
-				"customer-details");
+			manualResponderRequestPendingConsoleModule.formFieldSet (
+				"customer-details",
+				SmsCustomerRec.class);
 
 		manualResponderRequest =
 			manualResponderRequestHelper.findRequired (

@@ -1,6 +1,10 @@
 package wbs.platform.object.summary;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+
 import javax.inject.Provider;
+
+import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.module.ConsoleModuleBuilder;
@@ -49,11 +53,12 @@ class ObjectSummaryFieldsBuilder <
 	@BuildMethod
 	public
 	void build (
-			Builder builder) {
+			@NonNull Builder builder) {
 
 		objectSummaryPageBuilder.addFieldsPart (
-			objectSummaryPageBuilder.consoleModule.formFieldSets ().get (
-				objectSummaryFieldsSpec.fieldsName ()));
+			genericCastUnchecked (
+				objectSummaryPageBuilder.consoleModule.formFieldSet (
+					objectSummaryFieldsSpec.fieldsName ())));
 
 	}
 

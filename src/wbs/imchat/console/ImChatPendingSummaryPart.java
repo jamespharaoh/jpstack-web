@@ -85,9 +85,9 @@ class ImChatPendingSummaryPart
 
 	// state
 
-	FormFieldSet customerFields;
-	FormFieldSet profileFields;
-	FormFieldSet messageFields;
+	FormFieldSet <ImChatCustomerRec> customerFields;
+	FormFieldSet <ImChatProfileRec> profileFields;
+	FormFieldSet <ImChatMessageRec> messageFields;
 
 	ImChatMessageRec message;
 	ImChatConversationRec conversation;
@@ -148,16 +148,19 @@ class ImChatPendingSummaryPart
 		// get field sets
 
 		customerFields =
-			imChatPendingConsoleModule.formFieldSets ().get (
-				"customerFields");
+			imChatPendingConsoleModule.formFieldSet (
+				"customerFields",
+				ImChatCustomerRec.class);
 
 		profileFields =
-			imChatPendingConsoleModule.formFieldSets ().get (
-				"profileFields");
+			imChatPendingConsoleModule.formFieldSet (
+				"profileFields",
+				ImChatProfileRec.class);
 
 		messageFields =
-			imChatPendingConsoleModule.formFieldSets ().get (
-				"messageFields");
+			imChatPendingConsoleModule.formFieldSet (
+				"messageFields",
+				ImChatMessageRec.class);
 
 		// load data
 

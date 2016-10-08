@@ -1,5 +1,6 @@
 package wbs.platform.object.browse;
 
+import static wbs.utils.collection.CollectionUtils.collectionStream;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
@@ -11,9 +12,9 @@ import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -42,7 +43,7 @@ import wbs.framework.entity.record.Record;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectBrowsePart")
 public
-class ObjectBrowsePart
+class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 	extends AbstractPagePart {
 
 	// singleton dependencies
@@ -62,7 +63,7 @@ class ObjectBrowsePart
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
 	String typeCode;
@@ -71,15 +72,15 @@ class ObjectBrowsePart
 	String localName;
 
 	@Getter @Setter
-	FormFieldSet formFieldSet;
+	FormFieldSet <ObjectType> formFieldSet;
 
 	@Getter @Setter
 	String targetContextTypeName;
 
 	// state
 
-	Record<?> currentObject;
-	List<? extends Record<?>> allObjects;
+	ObjectType currentObject;
+	List <ObjectType> allObjects;
 
 	ConsoleContext targetContext;
 
@@ -87,9 +88,9 @@ class ObjectBrowsePart
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())
@@ -187,40 +188,40 @@ class ObjectBrowsePart
 					grandParentHelper.objectTypeId (),
 					grandParentId);
 
-			List<? extends Record<?>> parentObjects =
+			List <? extends Record<?>> parentObjects =
 				parentHelper.findByParent (
 					grandParentGlobalId);
 
-			List<Record<?>> allObjectsTemp =
-				new ArrayList<Record<?>> ();
-
-			for (Record<?> parentObject
-					: parentObjects) {
-
-				GlobalId parentGlobalId =
-					new GlobalId (
-						parentHelper.objectTypeId (),
-						parentObject.getId ());
-
-				if (typeCode != null) {
-
-					allObjectsTemp.addAll (
-						consoleHelper.findByParentAndType (
-							parentGlobalId,
-							typeCode));
-
-				} else {
-
-					allObjectsTemp.addAll (
-						consoleHelper.findByParent (
-							parentGlobalId));
-
-				}
-
-			}
-
 			allObjects =
-				allObjectsTemp;
+				parentObjects.stream ()
+
+				.flatMap (
+					parentObject -> {
+
+					GlobalId parentGlobalId =
+						new GlobalId (
+							parentHelper.objectTypeId (),
+							parentObject.getId ());
+
+					if (typeCode != null) {
+
+						return collectionStream (
+							consoleHelper.findByParentAndType (
+								parentGlobalId,
+								typeCode));
+
+					} else {
+
+						return collectionStream (
+							consoleHelper.findByParent (
+								parentGlobalId));
+
+					}
+
+				})
+
+				.collect (
+					Collectors.toList ());
 
 			return;
 
@@ -276,7 +277,7 @@ class ObjectBrowsePart
 		// table content
 
 		for (
-			Record<?> object
+			ObjectType object
 				: allObjects
 		) {
 

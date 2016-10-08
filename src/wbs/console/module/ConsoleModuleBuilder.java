@@ -135,15 +135,15 @@ class ConsoleModuleBuilder
 	public
 	void descend (
 			@NonNull Object parentObject,
-			@NonNull List<?> childObjects,
+			@NonNull List <?> childObjects,
 			@NonNull Object targetObject,
 			@NonNull MissingBuilderBehaviour missingBuilderBehaviour) {
 
-		List<Object> firstPass =
-			new ArrayList<Object> ();
+		List <Object> firstPass =
+			new ArrayList<> ();
 
-		List<Object> secondPass =
-			new ArrayList<Object> ();
+		List <Object> secondPass =
+			new ArrayList<> ();
 
 		for (
 			Object childObject

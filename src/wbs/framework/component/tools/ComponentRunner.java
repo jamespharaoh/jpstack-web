@@ -19,6 +19,7 @@ import lombok.extern.log4j.Log4j;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.component.registry.ComponentDefinition;
 import wbs.framework.logging.LoggedErrorsException;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @Log4j
@@ -48,29 +49,40 @@ class ComponentRunner {
 
 	Class <?> runnerClass;
 
-	ComponentManager componentManager;
-
 	public
-	void run ()
+	void run (
+			@NonNull TaskLogger taskLogger)
 		throws Exception {
 
 		runnerClass =
 			Class.forName (
 				runnerName);
 
-		initComponentManager ();
+		try (
 
-		invokeTarget ();
+			ComponentManager componentManager =
+				initComponentManager (
+					taskLogger)
 
-		componentManager.close ();
+		) {
+
+			taskLogger.makeException ();
+
+			invokeTarget (
+				taskLogger,
+				componentManager);
+
+			taskLogger.makeException ();
+
+		}
 
 	}
 
-	void initComponentManager ()
+	ComponentManager initComponentManager (
+			@NonNull TaskLogger taskLogger)
 		throws Exception {
 
-		componentManager =
-			new ComponentManagerBuilder ()
+		return new ComponentManagerBuilder ()
 
 			.primaryProjectName (
 				primaryProjectName)
@@ -105,13 +117,16 @@ class ComponentRunner {
 	}
 
 	public
-	void invokeTarget ()
+	void invokeTarget (
+			@NonNull TaskLogger taskLogger,
+			@NonNull ComponentManager componentManager)
 		throws Exception {
 
 		// find runnable and run it
 
 		Object runner =
 			componentManager.getComponentRequired (
+				taskLogger,
 				uncapitalise (
 					runnerClass.getSimpleName ()),
 				runnerClass);
@@ -180,7 +195,8 @@ class ComponentRunner {
 				.runnerArgs (
 					arguments.subList (6, arguments.size ()))
 
-				.run ();
+				.run (
+					new TaskLogger (log));
 
 		} catch (LoggedErrorsException loggedErrorsException) {
 

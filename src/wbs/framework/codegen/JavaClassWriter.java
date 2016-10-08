@@ -49,6 +49,8 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import org.apache.log4j.Logger;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -570,6 +572,10 @@ class JavaClassWriter
 
 		formatWriter.increaseIndent ();
 
+		writeLogger (
+			imports,
+			formatWriter);
+
 		writeSingletonDependencies (
 			imports,
 			formatWriter);
@@ -598,6 +604,36 @@ class JavaClassWriter
 
 		formatWriter.writeLineFormat (
 			"}");
+
+	}
+
+	public
+	JavaClassWriter writeLogger (
+			@NonNull JavaImportRegistry imports,
+			@NonNull FormatWriter formatWriter) {
+
+		formatWriter.writeLineFormat (
+			"// logger");
+
+		formatWriter.writeNewline ();
+
+		formatWriter.writeLineFormat (
+			"%s logger =",
+			imports.register (
+				Logger.class));
+
+		formatWriter.writeLineFormat (
+			"\t%s.getLogger (",
+			imports.register (
+				Logger.class));
+
+		formatWriter.writeLineFormat (
+			"\t\t%s.class);",
+			className);
+
+		formatWriter.writeNewline ();
+
+		return this;
 
 	}
 

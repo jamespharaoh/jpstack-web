@@ -341,7 +341,7 @@ public class FonixSmsSenderHelper
 		) {
 
 			return new ProcessResponseResult ()
-	
+
 				.status (
 					ProcessResponseStatus.remoteError)
 
@@ -357,13 +357,13 @@ public class FonixSmsSenderHelper
 		} else {
 
 			return new ProcessResponseResult ()
-	
+
 				.status (
 					ProcessResponseStatus.remoteError)
-	
+
 				.statusMessage (
 					"Unknown error")
-	
+
 				.failureType (
 					FailureType.temporary);
 

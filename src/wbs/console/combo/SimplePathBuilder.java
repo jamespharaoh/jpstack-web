@@ -1,5 +1,7 @@
 package wbs.console.combo;
 
+import lombok.extern.log4j.Log4j;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
@@ -13,6 +15,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.web.PathHandler;
 
+@Log4j
 @PrototypeComponent ("simplePathBuilder")
 @ConsoleModuleBuilderHandler
 public
@@ -56,11 +59,9 @@ class SimplePathBuilder {
 
 		PathHandler pathHandler =
 			componentManager.getComponentRequired (
+				log,
 				pathHandlerName,
 				PathHandler.class);
-
-		if (pathHandler == null)
-			throw new RuntimeException ();
 
 		consoleModule.addPath (
 			path,

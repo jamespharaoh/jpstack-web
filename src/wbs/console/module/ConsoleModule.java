@@ -1,9 +1,16 @@
 package wbs.console.module;
 
+import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
+import static wbs.utils.string.StringUtils.stringFormat;
+
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import javax.inject.Provider;
+
+import lombok.NonNull;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
@@ -19,22 +26,56 @@ public
 interface ConsoleModule
 	extends ServletModule {
 
-	List<ConsoleContextType> contextTypes ();
+	String name ();
 
-	List<ConsoleContext> contexts ();
+	List <ConsoleContextType> contextTypes ();
 
-	List<ConsoleContextTab> tabs ();
+	List <ConsoleContext> contexts ();
 
-	Map<String,List<ContextTabPlacement>> tabPlacementsByContextType ();
+	List <ConsoleContextTab> tabs ();
 
-	Map<String,WebFile> contextFiles ();
+	Map <String, List <ContextTabPlacement>> tabPlacementsByContextType ();
 
-	Map<String,List<String>> contextFilesByContextType ();
+	Map <String, WebFile> contextFiles ();
 
-	Map<String,Provider<Responder>> responders ();
+	Map <String, List <String>> contextFilesByContextType ();
 
-	Map<String,FormFieldSet> formFieldSets ();
+	Map <String, Provider <Responder>> responders ();
 
-	Map<String,SupervisorConfig> supervisorConfigs ();
+	Map <String, FormFieldSet <?>> formFieldSets ();
+
+	Map <String, SupervisorConfig> supervisorConfigs ();
+
+	// implementation
+
+	default
+	FormFieldSet <?> formFieldSet (
+			@NonNull String name) {
+
+		return mapItemForKeyOrThrow (
+			formFieldSets (),
+			name,
+			() -> new NoSuchElementException (
+				stringFormat (
+					"Console module '%s' ",
+					name (),
+					"has no field set: %s",
+					name)));
+
+	}
+
+	default <Type>
+	FormFieldSet <Type> formFieldSet (
+			@NonNull String name,
+			@NonNull Class <?> containerClass) {
+
+		FormFieldSet <?> fieldsUncast =
+			formFieldSet (
+				name);
+
+		return fieldsUncast.cast (
+			containerClass);
+
+	}
 
 }

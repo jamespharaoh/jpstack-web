@@ -115,26 +115,27 @@ class SupervisorPageBuilder <
 	}
 
 	void buildContextTab (
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
+			container.taskLogger (),
 			container.tabLocation (),
 			contextTab.get ()
 				.name (tabName)
 				.defaultLabel (tabLabel)
 				.localFile (fileName),
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 
 	void buildContextFile (
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextFile (
 			fileName,
 			consoleFile.get ()
 				.getResponderName (responderName),
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 

@@ -10,6 +10,8 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import lombok.extern.log4j.Log4j;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -23,6 +25,7 @@ import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 import wbs.utils.etc.PropertyUtils;
 
+@Log4j
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("textAreaFormFieldBuilder")
 @ConsoleModuleBuilderHandler
@@ -150,6 +153,7 @@ class TextAreaFormFieldBuilder {
 
 			dataProvider =
 				componentManager.getComponentRequired (
+					log,
 					spec.dataProvider (),
 					FormFieldDataProvider.class);
 
@@ -286,6 +290,7 @@ class TextAreaFormFieldBuilder {
 			updateHookBeanName != null
 
 			? componentManager.getComponentRequired (
+				log,
 				updateHookBeanName,
 				FormFieldUpdateHook.class)
 

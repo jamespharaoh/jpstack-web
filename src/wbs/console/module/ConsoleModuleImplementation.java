@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
@@ -28,12 +29,15 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.PathHandler;
 import wbs.framework.web.Responder;
 import wbs.framework.web.WebFile;
 
+@Log4j
 @Accessors (fluent = true)
 @DataClass ("console-module")
 @PrototypeComponent ("consoleModuleImpl")
@@ -56,71 +60,76 @@ class ConsoleModuleImplementation
 
 	// properties
 
-	@DataChildren
+	@DataAttribute
 	@Getter @Setter
-	List<ConsoleContextType> contextTypes =
-		new ArrayList<ConsoleContextType> ();
+	String name;
 
 	@DataChildren
 	@Getter @Setter
-	List<ConsoleContext> contexts =
-		new ArrayList<ConsoleContext> ();
+	List <ConsoleContextType> contextTypes =
+		new ArrayList<> ();
 
 	@DataChildren
 	@Getter @Setter
-	List<ConsoleContextTab> tabs =
-		new ArrayList<ConsoleContextTab> ();
-
-	Set<String> tabNames =
-		new HashSet<String> ();
+	List <ConsoleContext> contexts =
+		new ArrayList<> ();
 
 	@DataChildren
 	@Getter @Setter
-	Map<String,List<ContextTabPlacement>> tabPlacementsByContextType =
-		new LinkedHashMap<String,List<ContextTabPlacement>> ();
+	List <ConsoleContextTab> tabs =
+		new ArrayList<> ();
+
+	Set <String> tabNames =
+		new HashSet<> ();
 
 	@DataChildren
 	@Getter @Setter
-	Map<String,WebFile> contextFiles =
-		new LinkedHashMap<String,WebFile> ();
+	Map <String, List <ContextTabPlacement>> tabPlacementsByContextType =
+		new LinkedHashMap <> ();
 
 	@DataChildren
 	@Getter @Setter
-	Map<String,List<String>> contextFilesByContextType =
-		new LinkedHashMap<String,List<String>> ();
+	Map <String, WebFile> contextFiles =
+		new LinkedHashMap<> ();
 
 	@DataChildren
 	@Getter @Setter
-	Map<String,Provider<Responder>> responders =
-		new LinkedHashMap<String,Provider<Responder>> ();
+	Map <String, List <String>> contextFilesByContextType =
+		new LinkedHashMap<> ();
 
 	@DataChildren
 	@Getter @Setter
-	Map<String,PathHandler> paths =
-		new LinkedHashMap<String,PathHandler> ();
+	Map <String, Provider <Responder>> responders =
+		new LinkedHashMap<> ();
 
 	@DataChildren
 	@Getter @Setter
-	Map<String,WebFile> files =
-		new LinkedHashMap<String,WebFile> ();
+	Map <String, PathHandler> paths =
+		new LinkedHashMap<> ();
 
 	@DataChildren
 	@Getter @Setter
-	Map<String,FormFieldSet> formFieldSets =
-		new LinkedHashMap<String,FormFieldSet> ();
+	Map <String, WebFile> files =
+		new LinkedHashMap<> ();
 
 	@DataChildren
 	@Getter @Setter
-	Map<String,SupervisorConfig> supervisorConfigs =
-		new LinkedHashMap<String,SupervisorConfig> ();
+	Map <String, FormFieldSet <?>> formFieldSets =
+		new LinkedHashMap<> ();
+
+	@DataChildren
+	@Getter @Setter
+	Map <String, SupervisorConfig> supervisorConfigs =
+		new LinkedHashMap<> ();
 
 	// utils
 
 	public
-	Provider<Responder> beanResponder (
+	Provider <Responder> beanResponder (
 			@NonNull String name) {
 
 		return componentManager.getComponentProviderRequired (
+			log,
 			name,
 			Responder.class);
 
@@ -130,9 +139,16 @@ class ConsoleModuleImplementation
 
 	public
 	void addContextTab (
+			@NonNull TaskLogger taskLogger,
 			@NonNull String tabLocation,
 			@NonNull ConsoleContextTab tab,
-			@NonNull List<String> contextTypes) {
+			@NonNull List <String> contextTypes) {
+
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"addContextTab",
+				log);
 
 		if (tab.name ().isEmpty ())
 			throw new RuntimeException ();
@@ -143,7 +159,13 @@ class ConsoleModuleImplementation
 				tab.name ())
 		) {
 
-			throw new RuntimeException ();
+			taskLogger.errorFormat (
+				"Duplicated tab name '%s' ",
+				tab.name (),
+				"in console module '%s'",
+				name ());
+
+				return;
 
 		}
 
@@ -328,7 +350,7 @@ class ConsoleModuleImplementation
 	public
 	void addFormFieldSet (
 			@NonNull String name,
-			@NonNull FormFieldSet formFieldSet) {
+			@NonNull FormFieldSet <?> formFieldSet) {
 
 		if (formFieldSets.containsKey (
 				name)) {

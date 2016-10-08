@@ -15,7 +15,6 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -139,6 +138,9 @@ class ChatHelpTemplateContextBuilder {
 			new ConsoleContextBuilderContainerImplementation
 				<ChatHelpTemplateRec> ()
 
+			.taskLogger (
+				container.taskLogger ())
+
 			.consoleHelper (
 				chatHelpTemplateHelper)
 
@@ -173,6 +175,9 @@ class ChatHelpTemplateContextBuilder {
 		ConsoleContextBuilderContainer <ChatHelpTemplateRec> objectContainer =
 			new ConsoleContextBuilderContainerImplementation
 				<ChatHelpTemplateRec> ()
+
+			.taskLogger (
+				container.taskLogger ())
 
 			.consoleHelper (
 				chatHelpTemplateHelper)
@@ -297,7 +302,7 @@ class ChatHelpTemplateContextBuilder {
 	void buildParentTab () {
 
 		consoleModule.addContextTab (
-
+			container.taskLogger (),
 			parentContextTabLocation,
 
 			contextTabProvider.get ()

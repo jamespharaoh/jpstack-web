@@ -45,6 +45,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelMethods;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectDatabaseHelper;
 import wbs.framework.object.ObjectHelperImplementation;
 import wbs.framework.object.ObjectHooks;
@@ -307,7 +308,7 @@ class ObjectHelperGenerator {
 			.addClassAnnotation (
 				new JavaAnnotationWriter ()
 
-				.name (
+			.name (
 					"java.lang.SuppressWarnings")
 
 				.addAttributeFormat (
@@ -431,11 +432,11 @@ class ObjectHelperGenerator {
 				imports ->
 					stringFormat (
 						"%s <%s>",
-						imports.register (
-							stringFormat (
-								"wbs.framework.object.ObjectHelper%sImplementation",
-								capitalise (
-									componentName))),
+						imports.registerFormat (
+							"wbs.framework.object.",
+							"ObjectHelper%sImplementation",
+							capitalise (
+								componentName)),
 						imports.register (
 							model.objectClass ())),
 				stringFormat (
@@ -466,11 +467,35 @@ class ObjectHelperGenerator {
 			"public");
 
 		formatWriter.writeLineFormat (
-			"void setup () {");
+			"void setup (");
+
+		formatWriter.writeLineFormat (
+			"\t\t%s taskLogger) {",
+			imports.register (
+				TaskLogger.class));
 
 		formatWriter.writeNewline ();
 
 		formatWriter.increaseIndent ();
+
+		// nest task logger
+
+		formatWriter.writeLineFormat (
+			"taskLogger =");
+
+		formatWriter.writeLineFormat (
+			"\ttaskLogger.nest (");
+
+		formatWriter.writeLineFormat (
+			"\t\tthis,");
+
+		formatWriter.writeLineFormat (
+			"\t\t\"setup\",");
+
+		formatWriter.writeLineFormat (
+			"\t\tlogger);");
+
+		formatWriter.writeNewline ();
 
 		// open transaction
 
@@ -576,6 +601,9 @@ class ObjectHelperGenerator {
 
 		formatWriter.writeLineFormat (
 			"\t\tcomponentManager.getComponent (");
+
+		formatWriter.writeLineFormat (
+			"\t\t\tlogger,");
 
 		formatWriter.writeLineFormat (
 			"\t\t\t\"%s\",",

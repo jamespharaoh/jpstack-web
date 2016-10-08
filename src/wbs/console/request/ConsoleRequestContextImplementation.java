@@ -4,7 +4,6 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.orNull;
 import static wbs.utils.etc.OptionalUtils.ifNotPresent;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalValueEqualSafe;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
@@ -476,20 +475,10 @@ class ConsoleRequestContextImplementation
 			@NonNull String title,
 			@NonNull TabList tabList) {
 
-		tabContext ().add (
+		tabContextRequired ().add (
 			parentTab,
 			title,
 			tabList);
-
-	}
-
-	@Override
-	public
-	TabContext tabContext () {
-
-		return (TabContext)
-			requestRequired (
-				"tabContext");
 
 	}
 
@@ -623,38 +612,6 @@ class ConsoleRequestContextImplementation
 		return (ConsoleContextStuff)
 			requestRequired (
 				"contextStuff");
-
-	}
-
-	@Override
-	public
-	Long stuffInteger (
-			@NonNull String key) {
-
-		return (Long)
-			contextStuff ().get (
-				key);
-
-	}
-
-	@Override
-	public
-	Object stuff (
-			@NonNull String key) {
-
-		return contextStuff ()
-			.get (key);
-
-	}
-
-	@Override
-	public
-	String stuffString (
-			@NonNull String key) {
-
-		return (String)
-			contextStuff ().get (
-				key);
 
 	}
 

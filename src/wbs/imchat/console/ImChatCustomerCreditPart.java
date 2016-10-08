@@ -46,15 +46,15 @@ class ImChatCustomerCreditPart
 
 	// state
 
-	FormFieldSet customerFormFields;
-	FormFieldSet creditFormFields;
-	FormFieldSet creditHistoryFormFields;
+	FormFieldSet <ImChatCustomerRec> customerFormFields;
+	FormFieldSet <ImChatCustomerCreditRequest> creditFormFields;
+	FormFieldSet <ImChatCustomerCreditRec> creditHistoryFormFields;
 
 	ImChatCustomerRec customer;
-	List<ImChatCustomerCreditRec> creditHistory;
+	List <ImChatCustomerCreditRec> creditHistory;
 
 	ImChatCustomerCreditRequest request;
-	Optional<UpdateResultSet> updateResultSet;
+	Optional <UpdateResultSet> updateResultSet;
 
 	// implementation
 
@@ -63,16 +63,19 @@ class ImChatCustomerCreditPart
 	void prepare () {
 
 		customerFormFields =
-			imChatCustomerConsoleModule.formFieldSets ().get (
-				"credit-summary");
+			imChatCustomerConsoleModule.formFieldSet (
+				"credit-summary",
+				ImChatCustomerRec.class);
 
 		creditFormFields =
-			imChatCustomerConsoleModule.formFieldSets ().get (
-				"credit-request");
+			imChatCustomerConsoleModule.formFieldSet (
+				"credit-request",
+				ImChatCustomerCreditRequest.class);
 
 		creditHistoryFormFields =
-			imChatCustomerConsoleModule.formFieldSets ().get (
-				"credit-history");
+			imChatCustomerConsoleModule.formFieldSet (
+				"credit-history",
+				ImChatCustomerCreditRec.class);
 
 		request =
 			ifNotPresent (

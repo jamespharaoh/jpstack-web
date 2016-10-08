@@ -41,7 +41,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.ProxiedRequestComponent;
@@ -425,13 +424,21 @@ class RequestContextImplementation
 	}
 
 	@Override
-	@SneakyThrows (IOException.class)
 	public
 	PrintWriter writer () {
 
 		response ().setCharacterEncoding ("utf-8");
 
-		return response ().getWriter ();
+		try {
+
+			return response ().getWriter ();
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
 
 	}
 
@@ -682,7 +689,6 @@ class RequestContextImplementation
 
 	}
 
-	@SneakyThrows (FileUploadException.class)
 	void processFileItems () {
 
 		if (fileItems != null)
@@ -692,10 +698,21 @@ class RequestContextImplementation
 			new ServletFileUpload (
 				new DiskFileItemFactory ());
 
-		List<FileItem> fileItemsTemp =
-			ImmutableList.<FileItem>copyOf (
-				fileUpload.parseRequest (
-					request ()));
+		List <FileItem> fileItemsTemp;
+
+		try {
+
+			fileItemsTemp =
+				ImmutableList.<FileItem> copyOf (
+					fileUpload.parseRequest (
+						request ()));
+
+		} catch (FileUploadException fileUploadException) {
+
+			throw new RuntimeException (
+				fileUploadException);
+
+		}
 
 		ImmutableMap.Builder<String,FileItem> fileItemFilesBuilder =
 			ImmutableMap.<String,FileItem>builder ();

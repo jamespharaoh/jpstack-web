@@ -3,8 +3,10 @@ package wbs.platform.object.search;
 import static wbs.utils.etc.Misc.getMethodRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
-import static wbs.utils.etc.Misc.methodInvoke;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.ReflectionUtils.methodInvoke;
+import static wbs.utils.etc.TypeUtils.classInstantiate;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.Serializable;
@@ -21,7 +23,6 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
@@ -46,7 +47,11 @@ import wbs.utils.etc.PropertyUtils;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchAction")
 public
-class ObjectSearchPostAction
+class ObjectSearchPostAction <
+	ObjectType extends Record <ObjectType>,
+	SearchType extends Serializable,
+	ResultType
+>
 	extends ConsoleAction {
 
 	// singleton dependencies
@@ -69,15 +74,16 @@ class ObjectSearchPostAction
 	Provider <RedirectResponder> redirectResponderProvider;
 
 	@PrototypeDependency
-	Provider <ObjectSearchCsvResponder> objectSearchCsvResponderProvider;
+	Provider <ObjectSearchCsvResponder <ResultType>>
+		objectSearchCsvResponderProvider;
 
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper <?> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
-	Class <?> searchClass;
+	Class <SearchType> searchClass;
 
 	@Getter @Setter
 	String searchDaoMethodName;
@@ -95,10 +101,10 @@ class ObjectSearchPostAction
 	String parentIdName;
 
 	@Getter @Setter
-	FormFieldSet searchFormFieldSet;
+	FormFieldSet <SearchType> searchFormFieldSet;
 
 	@Getter @Setter
-	List<FormFieldSet> resultsFormFieldSets;
+	List <FormFieldSet <ResultType>> resultsFormFieldSets;
 
 	@Getter @Setter
 	String searchResponderName;
@@ -117,10 +123,6 @@ class ObjectSearchPostAction
 	// implementation
 
 	@Override
-	@SneakyThrows ({
-		IllegalAccessException.class,
-		InstantiationException.class
-	})
 	protected
 	Responder goReal ()
 		throws ServletException {
@@ -187,15 +189,16 @@ class ObjectSearchPostAction
 				"ObjectSearchPostAction.goReal ()",
 				this);
 
-		Serializable search =
-			requestContext.session (
-				sessionKey + "Fields");
+		SearchType search =
+			genericCastUnchecked (
+				requestContext.session (
+					sessionKey + "Fields"));
 
 		if (search == null) {
 
 			search =
-				(Serializable)
-				searchClass.newInstance ();
+				classInstantiate (
+					searchClass);
 
 			requestContext.session (
 				sessionKey + "Fields",
@@ -279,17 +282,12 @@ class ObjectSearchPostAction
 					ImmutableList.<Class<?>>of (
 						searchClass));
 
-			@SuppressWarnings ("unchecked")
-			List<Long> objectIdsTemp =
-				(List<Long>)
-				methodInvoke (
-					method,
-					consoleHelper,
-					ImmutableList.<Object>of (
-						search));
-
 			objectIds =
-				objectIdsTemp;
+				genericCastUnchecked (
+					methodInvoke (
+						method,
+						consoleHelper,
+						search));
 
 		} else {
 

@@ -10,9 +10,9 @@ import javax.inject.Named;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import wbs.console.forms.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormType;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -34,7 +34,7 @@ class SubscriptionNumberAddRemovePart
 
 	// state
 
-	FormFieldSet addRemoveFormFieldSet;
+	FormFieldSet <SubscriptionNumberAddRemoveForm> addRemoveFormFieldSet;
 
 	SubscriptionNumberAddRemoveForm addRemoveForm;
 
@@ -45,8 +45,9 @@ class SubscriptionNumberAddRemovePart
 	void prepare () {
 
 		addRemoveFormFieldSet =
-			subscriptionNumberConsoleModule.formFieldSets ().get (
-				"addRemoveForm");
+			subscriptionNumberConsoleModule.formFieldSet (
+				"addRemoveForm",
+				SubscriptionNumberAddRemoveForm.class);
 
 		addRemoveForm =
 			new SubscriptionNumberAddRemoveForm ();

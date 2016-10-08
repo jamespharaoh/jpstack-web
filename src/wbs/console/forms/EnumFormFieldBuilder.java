@@ -19,6 +19,8 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
+import lombok.extern.log4j.Log4j;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.helper.EnumConsoleHelper;
@@ -32,6 +34,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 
+@Log4j
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("enumFormFieldBuilder")
 @ConsoleModuleBuilderHandler
@@ -173,6 +176,7 @@ class EnumFormFieldBuilder {
 
 		EnumConsoleHelper enumConsoleHelper =
 			componentManager.getComponentOrElse (
+				log,
 				enumConsoleHelperName,
 				EnumConsoleHelper.class,
 				() -> new EnumConsoleHelper ()

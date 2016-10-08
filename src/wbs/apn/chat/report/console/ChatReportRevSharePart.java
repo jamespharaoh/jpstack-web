@@ -155,14 +155,14 @@ class ChatReportRevSharePart
 	void prepare () {
 
 		searchFields =
-			FormFieldSet.unsafeCast (
-				chatReportConsoleModule.formFieldSets ().get (
-					"monthReportSearch"));
+			chatReportConsoleModule.formFieldSet (
+				"monthReportSearch",
+				ChatReportRevShareForm.class);
 	
 		resultsFields =
-			FormFieldSet.unsafeCast (
-				chatReportConsoleModule.formFieldSets ().get (
-					"simpleReportResults"));
+			chatReportConsoleModule.formFieldSet (
+				"simpleReportResults",
+				ChatReportRevShareItem.class);
 
 		// get search form
 

@@ -8,20 +8,20 @@ import wbs.framework.entity.record.Record;
 @PrototypeComponent ("staticFieldsProvider")
 public
 class StaticFieldsProvider<
-	ObjectType extends Record<ObjectType>,
-	ParentType extends Record<ParentType>
+	ObjectType extends Record <ObjectType>,
+	ParentType extends Record <ParentType>
 >
-	implements FieldsProvider<ObjectType,ParentType> {
+	implements FieldsProvider <ObjectType, ParentType> {
 
 	// state
 
-	FormFieldSet formFields;
+	FormFieldSet <ObjectType> fields;
 
 	// implementation
 
 	@Override
 	public
-	FormFieldSet getFieldsForObject (
+	FormFieldSet <ObjectType> getFieldsForObject (
 			@NonNull ObjectType object) {
 
 		return getStaticFields ();
@@ -30,7 +30,7 @@ class StaticFieldsProvider<
 
 	@Override
 	public
-	FormFieldSet getFieldsForParent (
+	FormFieldSet <ObjectType> getFieldsForParent (
 			@NonNull ParentType parent) {
 
 		return getStaticFields ();
@@ -39,17 +39,17 @@ class StaticFieldsProvider<
 
 	@Override
 	public
-	FormFieldSet getStaticFields () {
+	FormFieldSet <ObjectType> getStaticFields () {
 
-		return formFields;
+		return fields;
 
 	}
 
 	public
-	StaticFieldsProvider<ObjectType,ParentType> setFields (
-			@NonNull FormFieldSet fields) {
+	StaticFieldsProvider <ObjectType, ParentType> fields (
+			@NonNull FormFieldSet <ObjectType> fields) {
 
-		formFields =
+		this.fields =
 			fields;
 
 		return this;

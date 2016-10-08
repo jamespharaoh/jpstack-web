@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
+
 import org.hibernate.HibernateException;
 import org.hibernate.property.access.internal.PropertyAccessStrategyBasicImpl;
 import org.hibernate.property.access.spi.PropertyAccess;
@@ -15,13 +17,12 @@ import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.AliasedTupleSubsetResultTransformer;
 import org.hibernate.transform.ResultTransformer;
 
-import com.google.common.collect.ImmutableList;
-
 public
 class AliasToBeanNestedResultTransformer
 	extends AliasedTupleSubsetResultTransformer {
 
-	// adapted from https://github.com/samiandoni/AliasToBeanNestedResultTransformer
+	// adapted from
+	// https://github.com/samiandoni/AliasToBeanNestedResultTransformer
 
 	private final
 	Class<?> resultClass;
@@ -86,16 +87,22 @@ class AliasToBeanNestedResultTransformer
 						subclassToAlias.put (
 							subclass,
 							ImmutableList.of (
-								new ArrayList<Object> (),
-								new ArrayList<String> (),
+								new ArrayList <Object> (),
+								new ArrayList <String> (),
 								fieldName));
 
 					}
 
-					((List<Object>) subclassToAlias.get (subclass).get (0)).add (
+					(
+						(List<Object>)
+						subclassToAlias.get (subclass).get (0)
+					).add (
 						tuple [index]);
 
-					((List<String>) subclassToAlias.get (subclass).get (1)).add (
+					(
+						(List<String>)
+						subclassToAlias.get (subclass).get (1)
+					).add (
 						aliasName);
 
 				}
@@ -170,8 +177,14 @@ class AliasToBeanNestedResultTransformer
 
 			Object subObject =
 				subclassTransformer.transformTuple (
-					((List<Object>) subclassToAlias.get (subclass).get (0)).toArray (),
-					((List<Object>) subclassToAlias.get (subclass).get (1)).toArray (new String [0]));
+					(
+						(List<Object>)
+						subclassToAlias.get (subclass).get (0)
+					).toArray (),
+					(
+						(List<Object>)
+						subclassToAlias.get (subclass).get (1)
+					).toArray (new String [0]));
 
 			PropertyAccess accessStrategy =
 				PropertyAccessStrategyBasicImpl.INSTANCE.buildPropertyAccess (

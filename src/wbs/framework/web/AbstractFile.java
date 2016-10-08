@@ -6,6 +6,8 @@ import java.util.Map;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
+import lombok.extern.log4j.Log4j;
+
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
@@ -16,6 +18,7 @@ import wbs.framework.component.manager.ComponentManager;
  * Many utility functions are provided which create RequestHandlers
  * automatically to delegate to Responders, WebActions and more.
  */
+@Log4j
 public abstract
 class AbstractFile
 	implements WebFile {
@@ -126,6 +129,7 @@ class AbstractFile
 
 				RequestHandler handler =
 					componentManager.getComponentRequired (
+						log,
 						handlerName,
 						RequestHandler.class);
 
@@ -176,6 +180,7 @@ class AbstractFile
 
 				Responder responder =
 					componentManager.getComponentRequired (
+						log,
 						responderName,
 						Responder.class);
 

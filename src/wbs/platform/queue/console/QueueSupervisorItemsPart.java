@@ -103,7 +103,7 @@ class QueueSupervisorItemsPart
 
 		htmlTableDetailsRowWriteRaw (
 			"User",
-			() -> 
+			() ->
 				objectManager.writeTdForObjectMiniLink (
 					user));
 

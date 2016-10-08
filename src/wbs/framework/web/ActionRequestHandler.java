@@ -6,13 +6,16 @@ import javax.inject.Provider;
 import javax.servlet.ServletException;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 
+@Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("actionRequestHandler")
 public
@@ -36,7 +39,7 @@ class ActionRequestHandler
 			final Action action) {
 
 		actionProvider =
-			new Provider<Action> () {
+			new Provider <Action> () {
 
 			@Override
 			public
@@ -52,10 +55,11 @@ class ActionRequestHandler
 
 	public
 	ActionRequestHandler actionName (
-			String actionName) {
+			@NonNull String actionName) {
 
 		return actionProvider (
 			componentManager.getComponentProviderRequired (
+				log,
 				actionName,
 				Action.class));
 

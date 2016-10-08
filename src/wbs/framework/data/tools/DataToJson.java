@@ -1,5 +1,6 @@
 package wbs.framework.data.tools;
 
+import static wbs.utils.etc.ReflectionUtils.fieldGet;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
@@ -8,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.NonNull;
-import lombok.SneakyThrows;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -20,9 +20,6 @@ import wbs.framework.data.annotations.DataClass;
 public
 class DataToJson {
 
-	@SneakyThrows ({
-		IllegalAccessException.class
-	})
 	public
 	Object toJson (
 			@NonNull Object dataValue) {
@@ -109,7 +106,8 @@ class DataToJson {
 				field.setAccessible (true);
 
 				Object fieldValue =
-					field.get (
+					fieldGet (
+						field,
 						dataValue);
 
 				if (fieldValue == null)

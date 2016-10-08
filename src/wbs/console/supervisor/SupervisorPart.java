@@ -27,6 +27,7 @@ import com.google.common.collect.ImmutableSet;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -47,6 +48,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 
+@Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorPart")
 public
@@ -332,6 +334,7 @@ class SupervisorPart
 
 			StatsProvider statsProvider =
 				componentManager.getComponentRequired (
+					log,
 					supervisorDataSetSpec.providerBeanName (),
 					StatsProvider.class);
 

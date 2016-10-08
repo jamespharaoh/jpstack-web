@@ -78,6 +78,14 @@ class NumberUtils {
 
 	}
 
+	public static
+	String integerToDecimalString (
+			@NonNull Integer integerValue) {
+
+		return integerValue.toString ();
+
+	}
+
 	// ---------- java integer (32 bit)
 
 	public static

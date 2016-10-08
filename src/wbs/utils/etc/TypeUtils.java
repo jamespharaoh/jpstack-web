@@ -6,6 +6,7 @@ import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrKey;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualUnsafe;
+import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
@@ -18,6 +19,7 @@ import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Optional;
@@ -276,6 +278,17 @@ class TypeUtils {
 		return classForNameRequired (
 			stringFormatArray (
 				arguments));
+
+	}
+
+	public static
+	Class <?> classForNameOrThrow (
+			@NonNull String className,
+			@NonNull Supplier <RuntimeException> exceptionSupplier) {
+
+		return optionalOrThrow (
+			classForName (className),
+			exceptionSupplier);
 
 	}
 
@@ -560,6 +573,16 @@ class TypeUtils {
 				instantiationException);
 
 		}
+
+	}
+
+	@SuppressWarnings ("unchecked")
+	public static <ToClass>
+	ToClass genericCastUnchecked (
+			@NonNull Object object) {
+
+		return (ToClass)
+			object;
 
 	}
 

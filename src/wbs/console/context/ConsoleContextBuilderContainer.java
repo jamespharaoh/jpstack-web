@@ -16,7 +16,7 @@ interface ConsoleContextBuilderContainer<
 
 	String pathPrefix ();
 
-	ConsoleHelper<ObjectType> consoleHelper ();
+	ConsoleHelper <ObjectType> consoleHelper ();
 
 	String friendlyName ();
 

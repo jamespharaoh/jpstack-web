@@ -1,6 +1,8 @@
 package wbs.platform.object.settings;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -12,6 +14,7 @@ import java.util.List;
 import javax.inject.Provider;
 
 import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -46,6 +49,7 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 
+@Log4j
 @PrototypeComponent ("objectSettingsPageBuilder")
 @ConsoleModuleBuilderHandler
 public
@@ -106,9 +110,9 @@ class ObjectSettingsPageBuilder <
 
 	// state
 
-	ConsoleHelper<ObjectType> consoleHelper;
-	FormFieldSet formFieldSet;
-	FieldsProvider<ObjectType,ParentType> fieldsProvider;
+	ConsoleHelper <ObjectType> consoleHelper;
+	FormFieldSet <ObjectType> formFieldSet;
+	FieldsProvider <ObjectType, ParentType> fieldsProvider;
 
 	String privKey;
 	String name;
@@ -152,9 +156,10 @@ class ObjectSettingsPageBuilder <
 	}
 
 	void buildTab (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
+			container.taskLogger (),
 			"end",
 			contextTab.get ()
 
@@ -168,9 +173,10 @@ class ObjectSettingsPageBuilder <
 					fileName)
 
 				.privKeys (
-					Collections.<String>singletonList (privKey)),
+					Collections.singletonList (
+						privKey)),
 
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 
@@ -406,16 +412,13 @@ class ObjectSettingsPageBuilder <
 
 	void setDefaults () {
 
-		@SuppressWarnings ("unchecked")
-		ConsoleHelper<ObjectType> consoleHelperTemp =
-			spec.objectName () != null
-				? (ConsoleHelper<ObjectType>)
-					consoleHelperRegistry.findByObjectName (
-						spec.objectName ())
-				: container.consoleHelper ();
-
 		consoleHelper =
-			consoleHelperTemp;
+			ifNotNullThenElse (
+				spec.objectName (),
+				() -> genericCastUnchecked (
+					consoleHelperRegistry.findByObjectName (
+						spec.objectName ())),
+				() -> container.consoleHelper ());
 
 		name =
 			spec.name ();
@@ -478,24 +481,23 @@ class ObjectSettingsPageBuilder <
 					consoleHelper.objectName ()));
 
 		formFieldSet =
-			spec.fieldsName () != null
-				? consoleModule.formFieldSets ().get (
-					spec.fieldsName ())
-				: defaultFields ();
+			ifNotNullThenElse (
+				spec.fieldsName (),
+				() -> consoleModule.formFieldSet (
+					spec.fieldsName (),
+					consoleHelper.objectClass ()),
+				() -> defaultFields ());
 
 		// if a provider name is provided
 
 		if (spec.fieldsProviderName () != null) {
 
-			@SuppressWarnings ("unchecked")
-			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
-				(FieldsProvider<ObjectType,ParentType>)
-				componentManager.getComponentRequired (
-					spec.fieldsProviderName (),
-					FieldsProvider.class);
-
 			fieldsProvider =
-				fieldsProviderTemp;
+				genericCastUnchecked (
+					componentManager.getComponentRequired (
+						log,
+						spec.fieldsProviderName (),
+						FieldsProvider.class));
 
 		}
 
@@ -508,10 +510,10 @@ class ObjectSettingsPageBuilder <
 
 	}
 
-	FormFieldSet defaultFields () {
+	FormFieldSet <ObjectType> defaultFields () {
 
-		List<Object> formFieldSpecs =
-			new ArrayList<Object> ();
+		List <Object> formFieldSpecs =
+			new ArrayList<> ();
 
 		formFieldSpecs.add (
 			new IdFormFieldSpec ());

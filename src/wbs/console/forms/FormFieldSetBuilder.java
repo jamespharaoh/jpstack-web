@@ -1,5 +1,6 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.TypeUtils.classForNameOrThrow;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -79,8 +80,8 @@ class FormFieldSetBuilder <Container> {
 
 		}
 
-		ConsoleHelper<?> consoleHelper;
-		Class<?> objectClass;
+		ConsoleHelper <?> consoleHelper;
+		Class <Container> containerClass;
 
 		if (spec.objectName () != null) {
 
@@ -88,31 +89,34 @@ class FormFieldSetBuilder <Container> {
 				consoleHelperRegistry.findByObjectName (
 					spec.objectName ());
 
-			objectClass =
+			@SuppressWarnings ("unchecked")
+			Class <Container> containerClassTemp =
+				(Class <Container>)
 				consoleHelper.objectClass ();
+
+			containerClass =
+				containerClassTemp;
 
 		} else {
 
 			consoleHelper = null;
 
-			try {
+			@SuppressWarnings ("unchecked")
+			Class <Container> containerClassTemp =
+				(Class <Container>)
+				classForNameOrThrow (
+					spec.className (),
+					() -> new RuntimeException (
+						stringFormat (
+							"Error getting object class %s ",
+							spec.className (),
+							"for form field set %s ",
+							spec.name (),
+							"in console module %s",
+							spec.consoleModule ().name ())));
 
-				objectClass =
-					Class.forName (
-						spec.className ());
-
-			} catch (ClassNotFoundException exception) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"Error getting object class %s ",
-						spec.className (),
-						"for form field set %s ",
-						spec.name (),
-						"in console module %s",
-						spec.consoleModule ().name ()));
-
-			}
+			containerClass =
+				containerClassTemp;
 
 		}
 
@@ -120,7 +124,7 @@ class FormFieldSetBuilder <Container> {
 			new FormFieldBuilderContextImplementation ()
 
 			.containerClass (
-				objectClass)
+				containerClass)
 
 			.consoleHelper (
 				consoleHelper);
@@ -131,7 +135,10 @@ class FormFieldSetBuilder <Container> {
 			.name (
 				joinWithFullStop (
 					spec.consoleModule ().name (),
-					spec.name ()));
+					spec.name ()))
+
+			.containerClass (
+				containerClass);
 
 		builder.descend (
 			formFieldBuilderContext,

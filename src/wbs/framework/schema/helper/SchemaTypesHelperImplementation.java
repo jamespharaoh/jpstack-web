@@ -1,7 +1,9 @@
 package wbs.framework.schema.helper;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.TypeUtils.classForName;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.camelToUnderscore;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
@@ -354,7 +356,8 @@ class SchemaTypesHelperImplementation
 
 				taskLog.errorFormat (
 					"Don't know how to handle sql type %s for %s",
-					enumHelper.sqlType (),
+					integerToDecimalString (
+						enumHelper.sqlType ()),
 					helper.getClass ().getName ());
 
 				return;
@@ -412,7 +415,8 @@ class SchemaTypesHelperImplementation
 
 					taskLog.errorFormat (
 						"Don't know how to handle sql type %s for %s",
-						propertyType.getReturnedClass (),
+						classNameSimple (
+							propertyType.getReturnedClass ()),
 						helper.getClass ().getName ());
 
 					return;
@@ -434,7 +438,8 @@ class SchemaTypesHelperImplementation
 
 		taskLog.errorFormat (
 			"Don't know how to handle %s",
-			helper.getClass ());
+			classNameSimple (
+				helper.getClass ()));
 
 		return;
 

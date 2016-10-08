@@ -3,6 +3,8 @@ package wbs.framework.schema.builder;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -339,7 +342,8 @@ class SchemaTableFromModel {
 
 			taskLog.errorFormat (
 				"Can't find model for type %s specified by %s",
-				modelField.valueType ().getSimpleName (),
+				classNameSimple (
+					modelField.valueType ()),
 				modelField.fullName ());
 
 			return;
@@ -417,10 +421,13 @@ class SchemaTableFromModel {
 
 			taskLog.errorFormat (
 				"Expected %s columns for %s at %s, not %s",
-				typeNames.size (),
-				modelField.valueType ().getSimpleName (),
+				integerToDecimalString (
+					typeNames.size ()),
+				classNameSimple (
+					modelField.valueType ()),
 				modelField.fullName (),
-				modelField.columnNames ().size ());
+				integerToDecimalString (
+					modelField.columnNames ().size ()));
 
 			return;
 
@@ -467,7 +474,8 @@ class SchemaTableFromModel {
 
 			taskLog.errorFormat (
 				"Can't find model for type %s specified by %s",
-				modelField.valueType ().getSimpleName (),
+				classNameSimple (
+					modelField.valueType ()),
 				modelField.fullName ());
 
 			return;
@@ -724,7 +732,8 @@ class SchemaTableFromModel {
 
 			taskLog.errorFormat (
 				"Can't find model for type %s specified by %s",
-				componentModelField.valueType ().getSimpleName (),
+				classNameSimple (
+					componentModelField.valueType ()),
 				componentModelField.fullName ());
 
 			return;

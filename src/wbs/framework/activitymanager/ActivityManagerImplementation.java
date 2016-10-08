@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
@@ -33,6 +32,7 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.StringFormatWriter;
 import wbs.utils.string.WriterFormatWriter;
@@ -52,7 +52,7 @@ class ActivityManagerImplementation
 	@Getter @Setter
 	Duration showTaskDuration =
 		Duration.millis (
-			1);
+			5);
 
 	// state
 
@@ -107,30 +107,46 @@ class ActivityManagerImplementation
 
 	}
 
-	@SneakyThrows (IOException.class)
 	int getProcessId () {
 
-		return Integer.parseInt (
-			new File ("/proc/self")
-				.getCanonicalFile ()
-				.getName ());
+		try {
+
+			return Integer.parseInt (
+				new File ("/proc/self")
+					.getCanonicalFile ()
+					.getName ());
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
 
 	}
 
-	@SneakyThrows (IOException.class)
 	String getHostname () {
 
-		Process process =
-			Runtime.getRuntime ().exec ("hostname");
+		try {
 
-		String processOutput =
-			IOUtils.toString (
-				process.getInputStream ());
+			Process process =
+				Runtime.getRuntime ().exec ("hostname");
 
-		String hostname =
-			processOutput.trim ();
+			String processOutput =
+				IOUtils.toString (
+					process.getInputStream ());
 
-		return hostname;
+			String hostname =
+				processOutput.trim ();
+
+			return hostname;
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
 
 	}
 

@@ -109,7 +109,7 @@ class ContextTabResponderPageBuilder <
 			@Nonnull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
-
+			container.taskLogger (),
 			container.tabLocation (),
 
 			contextTab.get ()
