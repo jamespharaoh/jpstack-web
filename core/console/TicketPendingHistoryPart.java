@@ -23,6 +23,7 @@ import wbs.services.ticket.core.model.TicketNoteRec;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketStateObjectHelper;
+import wbs.services.ticket.core.model.TicketStateRec;
 
 @PrototypeComponent ("ticketPendingHistoryPart")
 public
@@ -52,9 +53,9 @@ class TicketPendingHistoryPart
 
 	// state
 
-	FormFieldSet ticketFields;
-	FormFieldSet ticketNoteFields;
-	FormFieldSet ticketStateFields;
+	FormFieldSet <TicketRec> ticketFields;
+	FormFieldSet <TicketNoteRec> ticketNoteFields;
+	FormFieldSet <TicketStateRec> ticketStateFields;
 
 	TicketRec ticket;
 
@@ -67,16 +68,19 @@ class TicketPendingHistoryPart
 		// get field sets
 
 		ticketFields =
-			ticketPendingConsoleModule.formFieldSets ().get (
-				"ticketFields");
+			ticketPendingConsoleModule.formFieldSet (
+				"ticketFields",
+				TicketRec.class);
 
 		ticketNoteFields =
-			ticketPendingConsoleModule.formFieldSets ().get (
-				"ticketNoteFields");
+			ticketPendingConsoleModule.formFieldSet (
+				"ticketNoteFields",
+				TicketNoteRec.class);
 
 		ticketStateFields =
-			ticketPendingConsoleModule.formFieldSets ().get (
-				"ticketStateFields");
+			ticketPendingConsoleModule.formFieldSet (
+				"ticketStateFields",
+				TicketStateRec.class);
 
 		// load data
 

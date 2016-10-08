@@ -77,7 +77,7 @@ class ObjectTicketCreatePart <
 	String localFile;
 
 	@Getter @Setter
-	FieldsProvider<TicketRec,TicketManagerRec> fieldsProvider;
+	FieldsProvider <TicketRec, TicketManagerRec> fieldsProvider;
 
 	@Getter @Setter
 	String ticketManagerPath;
@@ -87,7 +87,7 @@ class ObjectTicketCreatePart <
 	ObjectTicketCreateSetFieldSpec currentTicketFieldSpec;
 	TicketRec ticket;
 	TicketManagerRec ticketManager;
-	FormFieldSet formFieldSet;
+	FormFieldSet <TicketRec> formFieldSet;
 
 	// implementation
 
