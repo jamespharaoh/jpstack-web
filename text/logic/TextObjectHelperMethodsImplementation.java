@@ -55,7 +55,7 @@ class TextObjectHelperMethodsImplementation
 
 			.lookupByIdFunction (
 				textHelper::find)
-					
+
 			.lookupByKeyFunction (
 				textValue ->
 					optionalFromNullable (

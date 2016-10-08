@@ -1,6 +1,8 @@
 package wbs.platform.object.list;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.TypeUtils.classEqualSafe;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -14,6 +16,7 @@ import javax.inject.Provider;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -47,6 +50,7 @@ import wbs.platform.object.criteria.WhereICanManageCriteriaSpec;
 import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
 import wbs.platform.scaffold.model.SliceRec;
 
+@Log4j
 @PrototypeComponent ("objectListPageBuilder")
 @ConsoleModuleBuilderHandler
 public
@@ -105,17 +109,17 @@ class ObjectListPageBuilder <
 
 	// state
 
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	String typeCode;
 
-	FieldsProvider<ObjectType,ParentType> fieldsProvider;
+	FieldsProvider <ObjectType, ParentType> fieldsProvider;
 
-	FormFieldSet formFieldSet;
+	FormFieldSet <ObjectType> formFieldSet;
 
-	Map<String,ObjectListBrowserSpec> listBrowsersByFieldName;
+	Map <String, ObjectListBrowserSpec> listBrowsersByFieldName;
 
-	Map<String,ObjectListTabSpec> listTabsByName;
+	Map <String, ObjectListTabSpec> listTabsByName;
 
 	// build
 
@@ -145,10 +149,10 @@ class ObjectListPageBuilder <
 	}
 
 	void buildContextTab (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
-
+			container.taskLogger (),
 			container.tabLocation (),
 
 			contextTab.get ()
@@ -162,12 +166,12 @@ class ObjectListPageBuilder <
 				.localFile (
 					container.pathPrefix () + ".list"),
 
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 
 	void buildContextFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextFile (
 
@@ -180,7 +184,7 @@ class ObjectListPageBuilder <
 						"%sListResponder",
 						container.newBeanNamePrefix ())),
 
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 
@@ -250,26 +254,24 @@ class ObjectListPageBuilder <
 
 		if (spec.fieldsProviderName () != null) {
 
-			@SuppressWarnings ("unchecked")
-			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
-				(FieldsProvider<ObjectType,ParentType>)
-				componentManager.getComponentRequired (
-					spec.fieldsProviderName (),
-					FieldsProvider.class);
-
 			fieldsProvider =
-				fieldsProviderTemp;
+				genericCastUnchecked (
+					componentManager.getComponentRequired (
+						log,
+						spec.fieldsProviderName (),
+						FieldsProvider.class));
 
 		// if a field name is provided
 
 		} else if (spec.fieldsName () != null) {
 
 			fieldsProvider =
-				new StaticFieldsProvider<ObjectType,ParentType> ()
+				new StaticFieldsProvider <ObjectType, ParentType> ()
 
-				.setFields (
-					consoleModule.formFieldSets ().get (
-						spec.fieldsName ()));
+				.fields (
+					consoleModule.formFieldSet (
+						spec.fieldsName (),
+						consoleHelper.objectClass ()));
 
 		// if nothing is provided
 
@@ -278,7 +280,7 @@ class ObjectListPageBuilder <
 			fieldsProvider =
 				new StaticFieldsProvider<ObjectType,ParentType> ()
 
-				.setFields (
+				.fields (
 					defaultFields ());
 
 		}
@@ -297,15 +299,22 @@ class ObjectListPageBuilder <
 
 	}
 
-	FormFieldSet defaultFields () {
+	FormFieldSet <ObjectType> defaultFields () {
 
 		// create spec
 
-		List<Object> formFieldSpecs =
-			new ArrayList<Object> ();
+		List <Object> formFieldSpecs =
+			new ArrayList<> ();
 
-		if (consoleHelper.parentTypeIsFixed ()
-				&& consoleHelper.parentClass () == SliceRec.class) {
+		if (
+
+			consoleHelper.parentTypeIsFixed ()
+
+			&& classEqualSafe (
+				consoleHelper.parentClass (),
+				SliceRec.class)
+
+		) {
 
 			formFieldSpecs.add (
 				new DescriptionFormFieldSpec ()

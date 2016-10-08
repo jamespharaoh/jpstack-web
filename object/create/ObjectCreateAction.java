@@ -113,7 +113,7 @@ class ObjectCreateAction <
 	String createPrivCode;
 
 	@Getter @Setter
-	FormFieldSet formFieldSet;
+	FormFieldSet <ObjectType> formFieldSet;
 
 	@Getter @Setter
 	String createTimeFieldName;
@@ -122,11 +122,11 @@ class ObjectCreateAction <
 	String createUserFieldName;
 
 	@Getter @Setter
-	FieldsProvider<ObjectType,ParentType> formFieldsProvider;
+	FieldsProvider <ObjectType, ParentType> formFieldsProvider;
 
 	// state
 
-	ConsoleHelper<ParentType> parentHelper;
+	ConsoleHelper <ParentType> parentHelper;
 	ParentType parent;
 
 	ConsoleContext targetContext;

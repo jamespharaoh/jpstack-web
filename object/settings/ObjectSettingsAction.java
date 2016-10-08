@@ -76,7 +76,7 @@ class ObjectSettingsAction <
 	String objectType;
 
 	@Getter @Setter
-	FormFieldSet formFieldSet;
+	FormFieldSet <ObjectType> formFieldSet;
 
 	@Getter @Setter
 	FieldsProvider <ObjectType, ParentType> formFieldsProvider;

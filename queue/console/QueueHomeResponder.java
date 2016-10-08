@@ -230,13 +230,13 @@ class QueueHomeResponder
 					queueInfo ->
 						moreThanZero (
 							queueInfo.availableItems ()))
-	
+
 				.map (
 					queueInfo ->
 						queueInfo.queue ())
 
-				.iterator ()	
-	
+				.iterator ()
+
 			)
 
 			.addAll (

@@ -2,8 +2,9 @@ package wbs.platform.object.search;
 
 import static wbs.utils.etc.Misc.getMethodRequired;
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.methodInvoke;
 import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.ReflectionUtils.methodInvoke;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -165,18 +166,13 @@ class ObjectSearchCsvResponder <RecordType>
 							searchObject.getClass (),
 							List.class));
 
-				@SuppressWarnings ("unchecked")
-				List <RecordType> objectsTemp =
-					(List <RecordType>)
-					methodInvoke (
-						method,
-						consoleHelper,
-						ImmutableList.<Object> of (
+				objects =
+					genericCastUnchecked (
+						methodInvoke (
+							method,
+							consoleHelper,
 							searchObject,
 							batch));
-
-				objects =
-					objectsTemp;
 
 			} else {
 

@@ -85,6 +85,7 @@ class XmlRpcAction
 
 				RpcHandler delegate =
 					componentManager.getComponentRequired (
+						log,
 						name,
 						RpcHandler.class);
 

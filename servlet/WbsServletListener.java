@@ -121,6 +121,7 @@ class WbsServletListener
 			ThreadLocalProxyComponentFactory.Control control =
 				(ThreadLocalProxyComponentFactory.Control)
 				componentManager.getComponentRequired (
+					log,
 					requestBeanName,
 					Object.class);
 
@@ -168,6 +169,7 @@ class WbsServletListener
 				ThreadLocalProxyComponentFactory.Control control =
 					(ThreadLocalProxyComponentFactory.Control)
 					componentManager.getComponentRequired (
+						log,
 						requestBeanName,
 						Object.class);
 
@@ -178,6 +180,7 @@ class WbsServletListener
 
 				Object targetBean =
 					componentManager.getComponentRequired (
+						log,
 						targetBeanName,
 						Object.class);
 
@@ -203,6 +206,7 @@ class WbsServletListener
 					ThreadLocalProxyComponentFactory.Control control =
 						(ThreadLocalProxyComponentFactory.Control)
 						componentManager.getComponentRequired (
+							log,
 							requestBeanName,
 							Object.class);
 

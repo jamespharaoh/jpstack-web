@@ -113,28 +113,29 @@ class ObjectEventsPageBuilder <
 	}
 
 	void buildTab (
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
+			container.taskLogger (),
 			"end",
 			contextTab.get ()
 				.name (tabName)
 				.defaultLabel ("Events")
 				.localFile (fileName)
 				.privKeys (Collections.singletonList (privKey)),
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 
 	void buildFile (
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextFile (
 			fileName,
 			consoleFile.get ()
 				.getResponderName (responderName)
 				.privName (privKey),
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 

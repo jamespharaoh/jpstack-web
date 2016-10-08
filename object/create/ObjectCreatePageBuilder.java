@@ -1,6 +1,8 @@
 package wbs.platform.object.create;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -10,6 +12,7 @@ import java.util.List;
 import javax.inject.Provider;
 
 import lombok.NonNull;
+import lombok.extern.log4j.Log4j;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -41,6 +44,7 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 
+@Log4j
 @PrototypeComponent ("objectCreatePageBuilder")
 @ConsoleModuleBuilderHandler
 public
@@ -92,7 +96,7 @@ class ObjectCreatePageBuilder <
 
 	// state
 
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	String name;
 	String typeCode;
@@ -102,8 +106,8 @@ class ObjectCreatePageBuilder <
 	String responderName;
 	String targetContextTypeName;
 	String targetResponderName;
-	FieldsProvider<ObjectType,ParentType> fieldsProvider;
-	FormFieldSet formFieldSet;
+	FieldsProvider <ObjectType, ParentType> fieldsProvider;
+	FormFieldSet <ObjectType> formFieldSet;
 	String createTimeFieldName;
 	String createUserFieldName;
 	String createPrivDelegate;
@@ -138,10 +142,10 @@ class ObjectCreatePageBuilder <
 	}
 
 	void buildTab (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
-
+			container.taskLogger (),
 			"end",
 
 			contextTabProvider.get ()
@@ -158,7 +162,7 @@ class ObjectCreatePageBuilder <
 				/*.privKeys (
 				 * 	Collections.singletonList (privKey))*/,
 
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 
@@ -345,24 +349,23 @@ class ObjectCreatePageBuilder <
 					consoleHelper.objectTypeCode ()));
 
 		formFieldSet =
-			spec.fieldsName () != null
-				? consoleModule.formFieldSets ().get (
-					spec.fieldsName ())
-				: defaultFields ();
+			ifNotNullThenElse (
+				spec.fieldsName (),
+				() -> consoleModule.formFieldSet (
+					spec.fieldsName (),
+					consoleHelper.objectClass ()),
+				() -> defaultFields ());
 
 		// if a provider name is provided
 
 		if (spec.fieldsProviderName () != null) {
 
-			@SuppressWarnings ("unchecked")
-			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
-				(FieldsProvider<ObjectType,ParentType>)
-				componentManager.getComponentRequired (
-					spec.fieldsProviderName (),
-					FieldsProvider.class);
-
 			fieldsProvider =
-				fieldsProviderTemp;
+				genericCastUnchecked (
+					componentManager.getComponentRequired (
+						log,
+						spec.fieldsProviderName (),
+						FieldsProvider.class));
 
 		}
 
@@ -384,12 +387,12 @@ class ObjectCreatePageBuilder <
 
 	}
 
-	FormFieldSet defaultFields () {
+	FormFieldSet <ObjectType> defaultFields () {
 
 		// parent
 
-		List<Object> formFieldSpecs =
-			new ArrayList<Object> ();
+		List <Object> formFieldSpecs =
+			new ArrayList<> ();
 
 		if (consoleHelper.canGetParent ()) {
 

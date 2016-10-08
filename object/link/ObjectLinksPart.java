@@ -41,7 +41,10 @@ import wbs.utils.web.HtmlTableCheckWriter;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectLinksPart")
 public
-class ObjectLinksPart
+class ObjectLinksPart <
+	ObjectType extends Record <ObjectType>,
+	TargetType extends Record <TargetType>
+>
 	extends AbstractPagePart {
 
 	// singleton dependencies
@@ -63,16 +66,16 @@ class ObjectLinksPart
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
 	String contextLinksField;
 
 	@Getter @Setter
-	ConsoleHelper<?> targetHelper;
+	ConsoleHelper <TargetType> targetHelper;
 
 	@Getter @Setter
-	FormFieldSet formFieldSet;
+	FormFieldSet <TargetType> targetFields;
 
 	@Getter @Setter
 	String localFile;
@@ -82,7 +85,7 @@ class ObjectLinksPart
 	Record <?> contextObject;
 	Set <?> contextLinks;
 
-	List <? extends Record <?>> targetObjects;
+	List <TargetType> targetObjects;
 
 	@Override
 	public
@@ -144,7 +147,7 @@ class ObjectLinksPart
 
 		formFieldLogic.outputTableHeadings (
 			formatWriter,
-			formFieldSet);
+			targetFields);
 
 		htmlTableHeaderCellWrite (
 			"Member");
@@ -154,7 +157,7 @@ class ObjectLinksPart
 		// table content
 
 		for (
-			Record <?> targetObject
+			TargetType targetObject
 				: targetObjects
 		) {
 
@@ -172,7 +175,7 @@ class ObjectLinksPart
 
 			formFieldLogic.outputTableCellsList (
 				formatWriter,
-				formFieldSet,
+				targetFields,
 				targetObject,
 				ImmutableMap.of (),
 				true);

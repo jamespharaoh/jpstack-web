@@ -2,18 +2,20 @@ package wbs.platform.object.search;
 
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.CollectionUtils.listSlice;
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.Misc.getMethodRequired;
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.methodInvoke;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -38,7 +40,6 @@ import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
 import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -77,7 +78,10 @@ import wbs.utils.etc.PropertyUtils;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchResultsPart")
 public
-class ObjectSearchResultsPart
+class ObjectSearchResultsPart <
+	ObjectType extends Record <ObjectType>,
+	ResultType extends IdObject
+>
 	extends AbstractPagePart {
 
 	// singleton dependencies
@@ -97,16 +101,16 @@ class ObjectSearchResultsPart
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper <?> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
-	FormFieldSet formFieldSet;
+	FormFieldSet <ResultType> formFieldSet;
 
 	@Getter @Setter
-	FormFieldSet rowsFormFieldSet;
+	FormFieldSet <ResultType> rowsFormFieldSet;
 
 	@Getter @Setter
-	Class <?> resultsClass;
+	Class <ResultType> resultsClass;
 
 	@Getter @Setter
 	String resultsDaoMethodName;
@@ -123,7 +127,7 @@ class ObjectSearchResultsPart
 	// state
 
 	IdObject currentObject;
-	List <IdObject> objects;
+	List <Optional <ResultType>> objects;
 	Integer totalObjects;
 
 	Boolean singlePage;
@@ -253,35 +257,21 @@ class ObjectSearchResultsPart
 						searchObject.getClass (),
 						List.class));
 
-			@SuppressWarnings ("unchecked")
-			List<IdObject> objectsTemp =
-				(List<IdObject>)
-				methodInvoke (
-					method,
-					consoleHelper,
-					ImmutableList.<Object>of (
+			objects =
+				genericCastUnchecked (
+					methodInvoke (
+						method,
+						consoleHelper,
 						searchObject,
 						pageObjectIds));
-
-			objects =
-				objectsTemp;
 
 		} else {
 
 			objects =
-				new ArrayList<IdObject> ();
-
-			for (
-				Long objectId
-					: pageObjectIds
-			) {
-
-				objects.add (
-					optionalOrNull (
-						consoleHelper.find (
-							objectId)));
-
-			}
+				genericCastUnchecked (
+					iterableMapToList (
+						consoleHelper::find,
+						pageObjectIds));
 
 		}
 
@@ -419,11 +409,14 @@ class ObjectSearchResultsPart
 			new LocalDate (0);
 
 		for (
-			IdObject object
+			Optional <ResultType> resultOptional
 				: objects
 		) {
 
-			if (object == null) {
+			if (
+				optionalIsNotPresent (
+					resultOptional)
+			) {
 
 				htmlTableRowOpen ();
 
@@ -439,13 +432,16 @@ class ObjectSearchResultsPart
 
 			}
 
+			ResultType result =
+				resultOptional.get ();
+
 			if (
 
-				object instanceof Record
+				result instanceof Record
 
 				&& ! consoleHelper.canView (
 					(Record <?>)
-					object)
+					result)
 
 			)  {
 
@@ -476,7 +472,7 @@ class ObjectSearchResultsPart
 				Instant rowTimestamp =
 					(Instant)
 					PropertyUtils.getProperty (
-						object,
+						result,
 						consoleHelper.timestampField ().name ());
 
 				LocalDate rowDate =
@@ -521,7 +517,7 @@ class ObjectSearchResultsPart
 
 			}
 
-			if (object instanceof Record) {
+			if (result instanceof Record) {
 
 				htmlTableRowOpen (
 
@@ -534,14 +530,14 @@ class ObjectSearchResultsPart
 						Optional.of (
 							stringFormat (
 								"search-result-%s",
-								object.getId ())),
+								result.getId ())),
 
 						optionalIf (
-							object == currentObject,
+							result == currentObject,
 							() -> "selected"),
 
 						getListClass (
-							object)
+							result)
 
 					)),
 
@@ -549,13 +545,13 @@ class ObjectSearchResultsPart
 						"rows-class",
 						stringFormat (
 							"search-result-%s",
-							object.getId ())),
+							result.getId ())),
 
 					htmlDataAttribute (
 						"target-href",
 						objectUrl (
 							(Record<?>)
-							object))
+							result))
 
 				);
 
@@ -568,7 +564,7 @@ class ObjectSearchResultsPart
 			formFieldLogic.outputTableCellsList (
 				formatWriter,
 				formFieldSet,
-				object,
+				result,
 				ImmutableMap.of (),
 				false);
 
@@ -592,14 +588,14 @@ class ObjectSearchResultsPart
 						Optional.of (
 							stringFormat (
 								"search-result-%s",
-								object.getId ())),
+								result.getId ())),
 
 						optionalIf (
-							object == currentObject,
+							result == currentObject,
 							() -> "selected"),
 
 						getListClass (
-							object)
+							result)
 
 					))),
 
@@ -607,22 +603,22 @@ class ObjectSearchResultsPart
 						htmlDataAttributeFormat (
 							"rows-class",
 							"search-result-%s",
-							object.getId ())),
+							result.getId ())),
 
 					optionalIf (
-						object instanceof Record,
+						result instanceof Record,
 						() -> htmlDataAttribute (
 							"target-href",
 							objectUrl (
 								(Record <?>)
-								object)))
+								result)))
 
 				));
 
 				formFieldLogic.outputTableRowsList (
 					formatWriter,
 					rowsFormFieldSet,
-					object,
+					result,
 					false,
 					formFieldSet.columns ());
 
@@ -663,30 +659,24 @@ class ObjectSearchResultsPart
 
 	}
 
-	private <ObjectType extends Record<ObjectType>>
-	Optional<String> getListClass (
-			@NonNull IdObject idObject) {
+	private
+	Optional <String> getListClass (
+			@NonNull IdObject object) {
 
 		if (
 			isNotInstanceOf (
 				Record.class,
-				idObject)
+				object)
 		) {
 			return Optional.absent ();
 		}
 
-		@SuppressWarnings ("unchecked")
-		ConsoleHooks<ObjectType> consoleHooks =
-			(ConsoleHooks<ObjectType>)
+		ConsoleHooks <ObjectType> consoleHooks =
 			consoleHelper.consoleHooks ();
 
-		@SuppressWarnings ("unchecked")
-		ObjectType object =
-			(ObjectType)
-			idObject;
-
 		return consoleHooks.getListClass (
-			object);
+			genericCastUnchecked (
+				object));
 
 	}
 

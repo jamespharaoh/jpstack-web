@@ -32,9 +32,9 @@ import com.google.common.collect.ImmutableMap;
 
 import org.joda.time.Duration;
 
-import wbs.console.forms.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormType;
 import wbs.console.helper.ConsoleObjectManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
@@ -90,11 +90,11 @@ class QueueDebugPart
 
 	// state
 
-	FormFieldSet formFields;
+	FormFieldSet <QueueDebugForm> formFields;
 
 	QueueDebugForm form;
 
-	List<QueueInfo> queueInfos;
+	List <QueueInfo> queueInfos;
 
 	// implementation
 
@@ -103,8 +103,9 @@ class QueueDebugPart
 	void prepare () {
 
 		formFields =
-			queueConsoleModule.formFieldSets ().get (
-				"queue-debug-form");
+			queueConsoleModule.formFieldSet (
+				"queue-debug-form",
+				QueueDebugForm.class);
 
 		form =
 			new QueueDebugForm ()
@@ -116,7 +117,7 @@ class QueueDebugPart
 			requestContext,
 			formFields,
 			form,
-			ImmutableMap.<String,Object>of (),
+			ImmutableMap.of (),
 			"search");
 
 		SortedQueueSubjects sortedQueueSubjects =

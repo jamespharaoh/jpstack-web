@@ -305,7 +305,7 @@ class ObjectSummaryPrivPart
 	private void htmlFormOpenGet () {
 
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private

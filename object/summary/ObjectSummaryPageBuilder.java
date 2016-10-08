@@ -1,5 +1,7 @@
 package wbs.platform.object.summary;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -12,6 +14,7 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -45,6 +48,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
 
+@Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSummaryPageBuilder")
 @ConsoleModuleBuilderHandler
@@ -92,7 +96,7 @@ class ObjectSummaryPageBuilder <
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer<ObjectType> container;
+	ConsoleContextBuilderContainer <ObjectType> container;
 
 	@BuilderSource
 	ObjectSummaryPageSpec spec;
@@ -103,16 +107,16 @@ class ObjectSummaryPageBuilder <
 	// state
 
 	@Getter
-	ConsoleHelper<ObjectType> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
-	FormFieldSet formFieldSet;
+	FormFieldSet <ObjectType> formFieldSet;
 
-	FieldsProvider<ObjectType,ParentType> fieldsProvider;
+	FieldsProvider <ObjectType, ParentType> fieldsProvider;
 
 	String privKey;
 
-	List<Provider<PagePart>> pagePartFactories =
-		new ArrayList<Provider<PagePart>> ();
+	List <Provider <PagePart>> pagePartFactories =
+		new ArrayList<> ();
 
 	// build meta
 
@@ -156,10 +160,10 @@ class ObjectSummaryPageBuilder <
 	}
 
 	void buildContextTabs (
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextTab (
-
+			container.taskLogger (),
 			"end",
 
 			contextTabProvider.get ()
@@ -180,12 +184,12 @@ class ObjectSummaryPageBuilder <
 				.privKeys (
 					privKey),
 
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 
 	void buildContextFile (
-			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
 		consoleModule.addContextFile (
 
@@ -205,7 +209,7 @@ class ObjectSummaryPageBuilder <
 						? Collections.singletonList (privKey)
 						: Collections.<String>emptyList ()),
 
-			resolvedExtensionPoint.contextTypeNames ());
+			extensionPoint.contextTypeNames ());
 
 	}
 
@@ -250,11 +254,11 @@ class ObjectSummaryPageBuilder <
 	}
 
 	public
-	ObjectSummaryPageBuilder<ObjectType,ParentType> addFieldsPart (
-			@NonNull final FormFieldSet formFieldSet) {
+	ObjectSummaryPageBuilder <ObjectType, ParentType> addFieldsPart (
+			@NonNull FormFieldSet <ObjectType> formFieldSet) {
 
-		Provider<PagePart> partFactory =
-			new Provider<PagePart> () {
+		Provider <PagePart> partFactory =
+			new Provider <PagePart> () {
 
 			@Override
 			public
@@ -283,7 +287,7 @@ class ObjectSummaryPageBuilder <
 	}
 
 	public
-	ObjectSummaryPageBuilder<ObjectType,ParentType> addHeading (
+	ObjectSummaryPageBuilder <ObjectType, ParentType> addHeading (
 			@NonNull String heading) {
 
 		final
@@ -318,10 +322,10 @@ class ObjectSummaryPageBuilder <
 
 	public
 	ObjectSummaryPageBuilder<ObjectType,ParentType> addPart (
-			@NonNull final String beanName) {
+			@NonNull String beanName) {
 
-		Provider<PagePart> partFactory =
-			new Provider<PagePart> () {
+		Provider <PagePart> partFactory =
+			new Provider <PagePart> () {
 
 			@Override
 			public
@@ -329,6 +333,7 @@ class ObjectSummaryPageBuilder <
 
 				Object object =
 					componentManager.getComponentRequired (
+						log,
 						beanName,
 						Object.class);
 
@@ -365,10 +370,12 @@ class ObjectSummaryPageBuilder <
 			container.consoleHelper ();
 
 		formFieldSet =
-			spec.fieldsName () != null
-				? consoleModule.formFieldSets ().get (
-					spec.fieldsName ())
-				: defaultFields ();
+			ifNotNullThenElse (
+				spec.fieldsName (),
+				() -> consoleModule.formFieldSet (
+					spec.fieldsName (),
+					consoleHelper.objectClass ()),
+				() -> defaultFields ());
 
 		privKey =
 			spec.privKey ();
@@ -384,15 +391,12 @@ class ObjectSummaryPageBuilder <
 
 		if (spec.fieldsProviderName () != null) {
 
-			@SuppressWarnings ("unchecked")
-			FieldsProvider<ObjectType,ParentType> fieldsProviderTemp =
-				(FieldsProvider<ObjectType,ParentType>)
-				componentManager.getComponentRequired (
-					spec.fieldsProviderName (),
-					FieldsProvider.class);
-
 			fieldsProvider =
-				fieldsProviderTemp;
+				genericCastUnchecked (
+					componentManager.getComponentRequired (
+						log,
+						spec.fieldsProviderName (),
+						FieldsProvider.class));
 
 		}
 
@@ -405,10 +409,10 @@ class ObjectSummaryPageBuilder <
 
 	}
 
-	FormFieldSet defaultFields () {
+	FormFieldSet <ObjectType> defaultFields () {
 
-		List<Object> formFieldSpecs =
-			new ArrayList<Object> ();
+		List <Object> formFieldSpecs =
+			new ArrayList<> ();
 
 		formFieldSpecs.add (
 			new IdFormFieldSpec ());

@@ -61,7 +61,7 @@ class ObjectCreatePart <
 	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
-	FormFieldSet formFieldSet;
+	FormFieldSet <ObjectType> formFieldSet;
 
 	@Getter @Setter
 	String parentPrivCode;

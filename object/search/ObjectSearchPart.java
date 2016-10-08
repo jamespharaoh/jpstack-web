@@ -3,6 +3,7 @@ package wbs.platform.object.search;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
@@ -22,13 +23,12 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormType;
 import wbs.console.helper.ConsoleHelper;
 import wbs.console.helper.ConsoleHelperRegistry;
 import wbs.console.html.ScriptRef;
@@ -41,7 +41,10 @@ import wbs.framework.entity.record.Record;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchPart")
 public
-class ObjectSearchPart
+class ObjectSearchPart <
+	ObjectType extends Record <ObjectType>,
+	SearchType
+>
 	extends AbstractPagePart {
 
 	// singleton dependencies
@@ -55,23 +58,23 @@ class ObjectSearchPart
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper <?> consoleHelper;
+	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
-	Class <?> searchClass;
+	Class <SearchType> searchClass;
 
 	@Getter @Setter
 	String sessionKey;
 
 	@Getter @Setter
-	FormFieldSet formFieldSet;
+	FormFieldSet <SearchType> fields;
 
 	@Getter @Setter
 	String fileName;
 
 	// state
 
-	Object search;
+	SearchType search;
 	Optional <UpdateResultSet> updateResultSet;
 	Map <String, Object> formHints;
 
@@ -81,7 +84,7 @@ class ObjectSearchPart
 	public
 	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())
@@ -96,16 +99,13 @@ class ObjectSearchPart
 	// implementation
 
 	@Override
-	@SneakyThrows ({
-		IllegalAccessException.class,
-		InstantiationException.class
-	})
 	public
 	void prepare () {
 
 		search =
-			requestContext.session (
-				sessionKey + "Fields");
+			genericCastUnsafe (
+				requestContext.session (
+					sessionKey + "Fields"));
 
 		if (
 			isNull (
@@ -113,7 +113,8 @@ class ObjectSearchPart
 		) {
 
 			search =
-				searchClass.newInstance ();
+				classInstantiate (
+					searchClass);
 
 			requestContext.session (
 				sessionKey + "Fields",
@@ -164,6 +165,13 @@ class ObjectSearchPart
 
 	}
 
+	private SearchType genericCastUnsafe (
+			Serializable session) {
+
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	@Override
 	public
 	void renderHtmlBodyContent () {
@@ -181,7 +189,7 @@ class ObjectSearchPart
 		formFieldLogic.outputFormRows (
 			requestContext,
 			formatWriter,
-			formFieldSet,
+			fields,
 			updateResultSet,
 			search,
 			formHints,
@@ -222,7 +230,7 @@ class ObjectSearchPart
 
 		formFieldLogic.outputFormReset (
 			formatWriter,
-			formFieldSet,
+			fields,
 			FormType.search,
 			search,
 			formHints,
