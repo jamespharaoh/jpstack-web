@@ -26,7 +26,7 @@ class QueueTypesBuilder {
 	QueueTypesSpec spec;
 
 	@BuilderTarget
-	Model model;
+	Model <?> model;
 
 	// build
 

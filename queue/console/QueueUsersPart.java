@@ -27,7 +27,7 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import org.joda.time.Instant;
 
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;

@@ -59,7 +59,7 @@ class AffiliateTypeBuilder {
 	AffiliateTypeSpec spec;
 
 	@BuilderTarget
-	Model model;
+	Model <?> model;
 
 	// build
 

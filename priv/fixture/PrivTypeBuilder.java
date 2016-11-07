@@ -37,7 +37,7 @@ class PrivTypeBuilder {
 	// singleton dependencies
 
 	@SingletonDependency
-	Database database ;
+	Database database;
 
 	@SingletonDependency
 	EntityHelper entityHelper;
@@ -57,7 +57,7 @@ class PrivTypeBuilder {
 	PrivTypeSpec spec;
 
 	@BuilderTarget
-	Model model;
+	Model <?> model;
 
 	// build
 

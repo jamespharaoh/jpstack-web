@@ -25,8 +25,8 @@ import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.IdFormFieldSpec;
 import wbs.console.forms.NameFormFieldSpec;
-import wbs.console.helper.ConsoleHelper;
-import wbs.console.helper.ConsoleHelperRegistry;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
@@ -63,9 +63,6 @@ class ObjectSettingsPageBuilder <
 	@SingletonDependency
 	ComponentManager componentManager;
 
-	@WeakSingletonDependency
-	ConsoleHelperRegistry consoleHelperRegistry;
-
 	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
@@ -74,6 +71,9 @@ class ObjectSettingsPageBuilder <
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@WeakSingletonDependency
+	ConsoleObjectManager objectManager;
 
 	// prototype dependencies
 
@@ -416,7 +416,7 @@ class ObjectSettingsPageBuilder <
 			ifNotNullThenElse (
 				spec.objectName (),
 				() -> genericCastUnchecked (
-					consoleHelperRegistry.findByObjectName (
+					objectManager.findConsoleHelper (
 						spec.objectName ())),
 				() -> container.consoleHelper ());
 

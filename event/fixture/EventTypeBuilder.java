@@ -51,7 +51,7 @@ class EventTypeBuilder {
 	EventTypeSpec spec;
 
 	@BuilderTarget
-	Model model;
+	Model <?> model;
 
 	// build
 

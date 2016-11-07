@@ -26,7 +26,7 @@ class EventTypesBuilder {
 	EventTypesSpec spec;
 
 	@BuilderTarget
-	Model model;
+	Model <?> model;
 
 	// build
 

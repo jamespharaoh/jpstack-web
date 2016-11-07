@@ -26,7 +26,7 @@ class PrivTypesBuilder {
 	PrivTypesSpec spec;
 
 	@BuilderTarget
-	Model model;
+	Model <?> model;
 
 	// build
 

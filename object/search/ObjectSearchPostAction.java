@@ -30,8 +30,8 @@ import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.forms.FormFieldSet;
-import wbs.console.helper.ConsoleHelper;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.RedirectResponder;
@@ -356,7 +356,7 @@ class ObjectSearchPostAction <
 
 					.targetUrl (
 						requestContext.resolveLocalUrl (
-							consoleHelper.getDefaultLocalPath (
+							consoleHelper.getDefaultLocalPathGeneric (
 								object)));
 
 

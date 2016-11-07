@@ -3,6 +3,7 @@ package wbs.platform.object.list;
 import static wbs.utils.collection.CollectionUtils.collectionStream;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -46,8 +47,8 @@ import wbs.console.context.ConsoleContextType;
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
-import wbs.console.helper.ConsoleHelper;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ObsoleteDateField;
 import wbs.console.html.ObsoleteDateLinks;
@@ -191,7 +192,8 @@ class ObjectListPart <
 
 			dateField =
 				ObsoleteDateField.parse (
-					requestContext.parameterOrNull ("date"));
+					requestContext.parameterOrNull (
+						"date"));
 
 			if (dateField.date == null) {
 
@@ -245,11 +247,10 @@ class ObjectListPart <
 
 		if (consoleHelper.parentTypeIsFixed ()) {
 
-			@SuppressWarnings ("unchecked")
-			ConsoleHelper<ParentType> parentHelper =
-				(ConsoleHelper<ParentType>)
-				objectManager.findConsoleHelper (
-					consoleHelper.parentClass ());
+			ConsoleHelper <ParentType> parentHelper =
+				genericCastUnchecked (
+					objectManager.findConsoleHelper (
+						consoleHelper.parentClass ()));
 
 			Long parentId =
 				(Long)
@@ -374,7 +375,8 @@ class ObjectListPart <
 						stringFormat (
 							"Can't find grand parent object %s with id %s",
 							grandParentHelper.objectName (),
-							grandParentId)));
+							integerToDecimalString (
+								grandParentId))));
 
 			String daoMethodName =
 				stringFormat (
@@ -407,7 +409,6 @@ class ObjectListPart <
 
 			try {
 
-				@SuppressWarnings ("unchecked")
 				List <ObjectType> allObjectsTemp =
 					genericCastUnchecked (
 						daoMethod.invoke (
