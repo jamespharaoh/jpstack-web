@@ -1,7 +1,7 @@
 package wbs.services.ticket.core.console;
 
 import wbs.console.context.ConsoleContext;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;

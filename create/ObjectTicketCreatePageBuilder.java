@@ -18,7 +18,7 @@ import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldSet;
-import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
 import wbs.console.module.ConsoleModuleImplementation;
@@ -35,7 +35,6 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
-import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
@@ -49,10 +48,7 @@ import wbs.services.ticket.core.model.TicketRec;
 @PrototypeComponent ("objectTicketCreatePageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectTicketCreatePageBuilder <
-	ObjectType extends Record <ObjectType>,
-	ParentType extends Record <ParentType>
-> {
+class ObjectTicketCreatePageBuilder {
 
 	// singleton dependencies
 
@@ -77,11 +73,11 @@ class ObjectTicketCreatePageBuilder <
 	Provider <ObjectTicketCreateSetFieldSpec> ticketCreateSetFieldSpecProvider;
 
 	@PrototypeDependency
-	Provider <ObjectTicketCreatePart <ObjectType, ParentType>>
+	Provider <ObjectTicketCreatePart <TicketRec, TicketManagerRec>>
 	objectTicketCreatePartProvider;
 
 	@PrototypeDependency
-	Provider <ObjectTicketCreateAction <ObjectType, ParentType>>
+	Provider <ObjectTicketCreateAction <TicketRec, TicketManagerRec>>
 	objectTicketCreateActionProvider;
 
 	@PrototypeDependency
@@ -99,7 +95,7 @@ class ObjectTicketCreatePageBuilder <
 	// builder
 
 	@BuilderParent
-	ConsoleContextBuilderContainer <ObjectType> container;
+	ConsoleContextBuilderContainer <TicketRec> container;
 
 	@BuilderSource
 	ObjectTicketCreatePageSpec spec;
@@ -109,7 +105,7 @@ class ObjectTicketCreatePageBuilder <
 
 	// state
 
-	ConsoleHelper <ObjectType> consoleHelper;
+	ConsoleHelper <TicketRec> consoleHelper;
 
 	String typeCode;
 	FieldsProvider <TicketRec, TicketManagerRec> fieldsProvider;
