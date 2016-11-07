@@ -52,7 +52,7 @@ class HtmlTableCheckWriter {
 
 		this.name =
 			optionalOf (
-				name);	
+				name);
 
 		return this;
 
@@ -71,7 +71,7 @@ class HtmlTableCheckWriter {
 
 		this.label =
 			optionalOf (
-				label);	
+				label);
 
 		return this;
 
@@ -90,7 +90,7 @@ class HtmlTableCheckWriter {
 
 		this.value =
 			optionalOf (
-				value);	
+				value);
 
 		return this;
 
@@ -109,7 +109,7 @@ class HtmlTableCheckWriter {
 
 		this.columnSpan =
 			optionalOf (
-				columnSpan);	
+				columnSpan);
 
 		return this;
 

@@ -193,10 +193,10 @@ class HtmlAttributeUtils {
 		} else {
 
 			return new HtmlAttribute ()
-	
+
 				.name (
 					"colspan")
-	
+
 				.value (
 					integerToDecimalString (
 						value));
@@ -226,10 +226,10 @@ class HtmlAttributeUtils {
 		} else {
 
 			return new HtmlAttribute ()
-	
+
 				.name (
 					"rowspan")
-	
+
 				.value (
 					integerToDecimalString (
 						value));
@@ -352,7 +352,7 @@ class HtmlAttributeUtils {
 		new ToHtmlAttribute () {
 
 		@Override
-		public 
+		public
 		Optional <HtmlAttribute> htmlAttribute () {
 
 			return optionalAbsent ();

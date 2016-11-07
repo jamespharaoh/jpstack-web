@@ -1026,13 +1026,43 @@ class StringUtils {
 
 	public static
 	String stringFormat (
-			Object... arguments) {
+			String ... arguments) {
 
 		return StringFormatter.standardArray (
 			arguments);
 
 	}
 
+	public static
+	String stringFormatArray (
+			String[] arguments) {
+
+		return stringFormat (
+			arguments);
+
+	}
+
+	public static
+	String stringFormatList (
+			List <String> arguments) {
+
+		return stringFormat (
+			arguments.toArray (
+				new Object [] {}));
+
+	}
+
+	@Deprecated
+	public static
+	String stringFormat (
+			Object ... arguments) {
+
+		return StringFormatter.standardArray (
+			arguments);
+
+	}
+
+	@Deprecated
 	public static
 	String stringFormatArray (
 			Object[] args) {
@@ -1042,8 +1072,9 @@ class StringUtils {
 
 	}
 
+	@Deprecated
 	public static
-	String stringFormatList (
+	String stringFormatListGeneric (
 			List <?> arguments) {
 
 		return stringFormat (
@@ -1466,62 +1497,6 @@ class StringUtils {
 		return subject.replaceAll (
 			fromPattern,
 			to);
-
-	}
-
-	public static <Input>
-	Function <Input, String> stringFormatLaterArray (
-			@Nonnull Object[] arguments) {
-
-		return new Function <Input, String> () {
-
-			@Override
-			public
-			String apply (
-					@NonNull Input input) {
-
-				return stringFormatList (
-					Arrays.stream (
-						arguments)
-
-					.map (
-						argument ->
-							ifThenElse (
-
-							() -> isInstanceOf (
-								String.class,
-								argument),
-
-								() ->
-									argument,
-
-							() -> isInstanceOf (
-								Function.class,
-								argument),
-
-								() -> {
-
-									Function <Input, ?> function =
-										genericCastUnchecked (
-											argument);
-
-									return function.apply (
-										input);
-
-								},
-
-							() -> {
-								throw new RuntimeException ();
-							}))
-
-					.collect (
-						Collectors.toList ())
-
-				);
-
-			}
-
-		};
 
 	}
 

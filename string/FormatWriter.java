@@ -3,10 +3,13 @@ package wbs.utils.string;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 
+import java.io.Closeable;
+
 import lombok.NonNull;
 
 public
-interface FormatWriter {
+interface FormatWriter
+	extends Closeable {
 
 	// necessary methods
 
@@ -16,6 +19,12 @@ interface FormatWriter {
 	void writeCharacter (
 			int character);
 
+	default
+	void commit () {
+		close ();
+	}
+
+	@Override
 	void close ();
 
 	String indentString ();
@@ -64,14 +73,14 @@ interface FormatWriter {
 		) {
 
 			writeIndent ();
-	
+
 			writeString (
 				lineContent);
-	
+
 			writeNewline ();
 
 		}
-	
+
 	}
 
 	default

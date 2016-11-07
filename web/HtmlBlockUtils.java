@@ -130,7 +130,7 @@ class HtmlBlockUtils {
 	void htmlSpanOpen (
 			@NonNull HtmlAttribute ... attributes) {
 
-		htmlSpanOpen (	
+		htmlSpanOpen (
 			currentFormatWriter (),
 			attributes);
 
@@ -150,7 +150,7 @@ class HtmlBlockUtils {
 	public static
 	void htmlSpanClose () {
 
-		htmlSpanClose (	
+		htmlSpanClose (
 			currentFormatWriter ());
 
 	}
@@ -242,7 +242,7 @@ class HtmlBlockUtils {
 	void htmlParagraphOpen (
 			@NonNull HtmlAttribute ... attributes) {
 
-		htmlParagraphOpen (	
+		htmlParagraphOpen (
 			currentFormatWriter (),
 			attributes);
 
@@ -262,7 +262,7 @@ class HtmlBlockUtils {
 	public static
 	void htmlParagraphClose () {
 
-		htmlParagraphClose (	
+		htmlParagraphClose (
 			currentFormatWriter ());
 
 	}

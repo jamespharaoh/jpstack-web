@@ -49,7 +49,7 @@ class FormatWriterUtils {
 				formatWriter)
 		) {
 			throw new IllegalStateException ();
-		} 
+		}
 
 		currentFormatWriterThreadLocal.remove ();
 

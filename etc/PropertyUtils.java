@@ -513,6 +513,6 @@ class PropertyUtils {
 		notNull,
 		notEmptyCollection,
 		notEmptyString;
-	}			
+	}
 
 }
