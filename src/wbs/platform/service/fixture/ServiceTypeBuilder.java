@@ -59,7 +59,7 @@ class ServiceTypeBuilder {
 	ServiceTypeSpec spec;
 
 	@BuilderTarget
-	Model model;
+	Model <?> model;
 
 	// build
 

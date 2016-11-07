@@ -6,37 +6,82 @@ import java.util.stream.Collectors;
 import wbs.framework.entity.record.Record;
 
 public
-interface EntityFinder <Entity extends Record <Entity>> {
+interface EntityFinder <
+	EntityType extends Record <EntityType>
+> {
 
-	Class <Entity> entityClass ();
+	Class <EntityType> entityClass ();
 
-	Entity findEntity (
+	EntityType findEntity (
 			Long id);
 
-	List <Entity> findAllEntities ();
+	List <EntityType> findAllEntities ();
 
 	default
-	List <Entity> findAllNotDeletedEntities () {
+	List <EntityType> findAllNotDeletedEntities () {
 
 		return findAllEntities ().stream ()
 
 			.filter (
-				this::isNotDeleted)
+				this::getNotDeletedCheckParents)
 
 			.collect (
 				Collectors.toList ());
 
 	}
 
-	Boolean isDeleted (
-			Entity entity);
+	Boolean getDeleted (
+			EntityType entity,
+			boolean checkParents);
 
 	default
-	Boolean isNotDeleted (
-			Entity entity) {
+	Boolean getDeletedCheckParents (
+			EntityType entity) {
 
-		return ! isDeleted (
-			entity);
+		return getDeleted (
+			entity,
+			true);
+
+	}
+
+	default
+	Boolean getDeletedNoCheckParents (
+			EntityType entity) {
+
+		return getDeleted (
+			entity,
+			false);
+
+	}
+
+	default
+	Boolean getNotDeleted (
+			EntityType entity,
+			boolean checkParents) {
+
+		return ! getDeleted (
+			entity,
+			checkParents);
+
+	}
+
+	default
+	Boolean getNotDeletedCheckParents (
+			EntityType entity) {
+
+		return ! getDeleted (
+			entity,
+			true);
+
+	}
+
+	default
+	Boolean getNotDeletedNoCheckParents (
+			EntityType entity) {
+
+		return ! getDeleted (
+			entity,
+			false);
 
 	}
 

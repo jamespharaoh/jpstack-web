@@ -1,4 +1,4 @@
-package wbs.console.helper;
+package wbs.console.helper.core;
 
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;

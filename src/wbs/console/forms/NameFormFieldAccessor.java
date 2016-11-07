@@ -9,7 +9,7 @@ import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 
 import com.google.common.base.Optional;
 
-import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.utils.etc.PropertyUtils;
 

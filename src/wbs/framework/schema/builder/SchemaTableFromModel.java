@@ -18,7 +18,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -57,10 +56,10 @@ class SchemaTableFromModel {
 	TaskLogger taskLog;
 
 	@Getter @Setter
-	Map <Class <?>, Model> modelsByClass;
+	Map <Class <?>, Model <?>> modelsByClass;
 
 	@Getter @Setter
-	Model model;
+	Model <?> model;
 
 	// state
 
@@ -235,7 +234,7 @@ class SchemaTableFromModel {
 			throw new RuntimeException (
 				stringFormat (
 					"Unrecognised type %s for model field %s",
-					modelField.type (),
+					modelField.type ().name (),
 					modelField.fullName ()));
 
 		}
@@ -334,7 +333,7 @@ class SchemaTableFromModel {
 
 		}
 
-		Model targetModel =
+		Model <?> targetModel =
 			modelsByClass.get (
 				foreignModelField.valueType ());
 
@@ -466,7 +465,7 @@ class SchemaTableFromModel {
 	void forReference (
 			@NonNull ModelField modelField) {
 
-		Model targetModel =
+		Model <?> targetModel =
 			modelsByClass.get (
 				modelField.valueType ());
 
@@ -557,7 +556,7 @@ class SchemaTableFromModel {
 			throw new RuntimeException (
 				stringFormat (
 					"Don't know how to map field of type %s at %s",
-					compositeIdModelField.type (),
+					compositeIdModelField.type ().name (),
 					compositeIdModelField.fullName ()));
 
 		}
@@ -568,7 +567,7 @@ class SchemaTableFromModel {
 			@NonNull ModelField modelField,
 			@NonNull ModelField compositeIdModelField) {
 
-		Model targetModel =
+		Model <?> targetModel =
 			modelsByClass.get (
 				compositeIdModelField.valueType ());
 
@@ -667,7 +666,7 @@ class SchemaTableFromModel {
 				throw new RuntimeException (
 					stringFormat (
 						"Don't know how to map field of type %s at %s",
-						componentModelField.type (),
+						componentModelField.type ().name (),
 						componentModelField.fullName ()));
 
 			}
@@ -689,7 +688,7 @@ class SchemaTableFromModel {
 			throw new RuntimeException (
 				stringFormat (
 					"Don't know how to map %s at %s",
-					componentModelField.valueType (),
+					componentModelField.valueType ().getName (),
 					componentModelField.fullName ()));
 
 		}
@@ -699,7 +698,7 @@ class SchemaTableFromModel {
 			throw new RuntimeException (
 				stringFormat (
 					"Don't know how to map %s at %s",
-					componentModelField.valueType (),
+					componentModelField.valueType ().getName (),
 					componentModelField.fullName ()));
 
 		}
@@ -724,7 +723,7 @@ class SchemaTableFromModel {
 			@NonNull ModelField modelField,
 			@NonNull ModelField componentModelField) {
 
-		Model targetModel =
+		Model <?> targetModel =
 			modelsByClass.get (
 				componentModelField.valueType ());
 

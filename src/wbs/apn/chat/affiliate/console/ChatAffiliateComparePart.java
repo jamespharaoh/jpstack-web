@@ -254,7 +254,7 @@ class ChatAffiliateComparePart
 			return;
 		}
 
-		htmlTableOpenList (); 
+		htmlTableOpenList ();
 
 		htmlTableHeaderRowWrite (
 			"Scheme",

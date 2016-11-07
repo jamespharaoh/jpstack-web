@@ -554,7 +554,7 @@ class HtmlStyleUtils {
 
 			return optionalOf (
 				this);
-		
+
 		}
 
 	}

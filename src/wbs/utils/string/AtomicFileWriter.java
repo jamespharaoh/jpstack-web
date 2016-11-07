@@ -89,9 +89,8 @@ class AtomicFileWriter
 
 	}
 
-	@Override
 	public
-	void close () {
+	void commit () {
 
 		String newContents =
 			stringBuilder.toString ();
@@ -115,6 +114,12 @@ class AtomicFileWriter
 				exception);
 
 		}
+
+	}
+
+	@Override
+	public
+	void close () {
 
 	}
 

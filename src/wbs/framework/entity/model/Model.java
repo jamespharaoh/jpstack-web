@@ -1,7 +1,9 @@
 package wbs.framework.entity.model;
 
+import wbs.framework.entity.record.Record;
+
 public
-interface Model
-	extends ModelMethods {
+interface Model <ObjectType extends Record <ObjectType>>
+	extends ModelMethods <ObjectType> {
 
 }

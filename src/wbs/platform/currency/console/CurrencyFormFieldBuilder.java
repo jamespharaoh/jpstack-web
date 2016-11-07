@@ -37,7 +37,7 @@ import wbs.console.forms.RequiredFormFieldValueValidator;
 import wbs.console.forms.TextFormFieldRenderer;
 import wbs.console.forms.TextualRangeFormFieldInterfaceMapping;
 import wbs.console.forms.UpdatableFormField;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;

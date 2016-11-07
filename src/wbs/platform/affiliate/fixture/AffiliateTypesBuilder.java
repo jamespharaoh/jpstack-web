@@ -28,7 +28,7 @@ class AffiliateTypesBuilder {
 	AffiliateTypesSpec spec;
 
 	@BuilderTarget
-	Model model;
+	Model <?> model;
 
 	// build
 

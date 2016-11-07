@@ -134,10 +134,12 @@ class ComponentRunner {
 		Method runMethod =
 			runnerClass.getMethod (
 				methodName,
+				TaskLogger.class,
 				List.class);
 
 		runMethod.invoke (
 			runner,
+			taskLogger,
 			(Object) runnerArgs);
 
 	}

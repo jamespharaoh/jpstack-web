@@ -64,7 +64,7 @@ class HtmlTableLinkCellWriter {
 
 		nameOptional =
 			optionalOf (
-				name);	
+				name);
 
 		return this;
 
@@ -83,7 +83,7 @@ class HtmlTableLinkCellWriter {
 
 		valueOptional =
 			optionalOf (
-				value);	
+				value);
 
 		return this;
 
@@ -102,7 +102,7 @@ class HtmlTableLinkCellWriter {
 
 		labelOptional =
 			optionalOf (
-				label);	
+				label);
 
 		return this;
 
@@ -121,7 +121,7 @@ class HtmlTableLinkCellWriter {
 
 		selectedOptional =
 			optionalOf (
-				selected);	
+				selected);
 
 		return this;
 

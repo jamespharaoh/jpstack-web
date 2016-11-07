@@ -37,9 +37,9 @@ import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContext.PathSupply;
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.helper.ConsoleHelperProvider;
-import wbs.console.helper.ConsoleHelperProviderRegistry;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.helper.provider.ConsoleHelperProvider;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.supervisor.SupervisorConfig;
 import wbs.console.tab.ConsoleContextTab;
@@ -69,14 +69,11 @@ class ConsoleManagerImplementation
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleHelperProviderRegistry consoleHelperProviderRegistry;
-
-	@SingletonDependency
 	@Getter
 	Map <String, ConsoleModule> consoleModules;
 
 	@SingletonDependency
-	ConsoleObjectManager consoleObjectManager;
+	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
 	Database database;
@@ -1163,16 +1160,15 @@ class ConsoleManagerImplementation
 			@NonNull String name,
 			@NonNull ConsoleContextStuff contextStuff) {
 
-		ConsoleHelperProvider<?> consoleHelperProvider =
-			consoleHelperProviderRegistry.findByObjectName (
+		ConsoleHelper <?> consoleHelper =
+			objectManager.findConsoleHelper (
 				name);
 
-		if (consoleHelperProvider != null) {
+		ConsoleHelperProvider <?> consoleHelperProvider =
+			consoleHelper.consoleHelperProvider ();
 
-			consoleHelperProvider.postProcess (
-				contextStuff);
-
-		}
+		consoleHelperProvider.postProcess (
+			contextStuff);
 
 	}
 

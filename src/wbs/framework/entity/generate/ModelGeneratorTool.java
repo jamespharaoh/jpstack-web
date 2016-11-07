@@ -1,5 +1,6 @@
 package wbs.framework.entity.generate;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
+import wbs.framework.logging.TaskLogger;
 
 @Log4j
 public
@@ -38,11 +40,18 @@ class ModelGeneratorTool {
 
 	public
 	void generateModels (
+			@NonNull TaskLogger taskLogger,
 			@NonNull List <String> params) {
 
-		log.info (
-			stringFormat (
-				"About to generate %s models",
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"generateModels",
+				log);
+
+		taskLogger.noticeFormat (
+			"About to generate %s models",
+			integerToDecimalString (
 				modelMetaLoader.modelMetas ().size ()));
 
 		StatusCounters statusCounters =
@@ -68,7 +77,8 @@ class ModelGeneratorTool {
 					.modelMeta (
 						modelMeta)
 
-					.generateRecord ();
+					.generateRecord (
+						taskLogger);
 
 				statusCounters.recordSuccessCount ++;
 
@@ -96,7 +106,8 @@ class ModelGeneratorTool {
 						.modelMeta (
 							modelMeta)
 
-						.generateInterfaces ();
+						.generateInterfaces (
+							taskLogger);
 
 					statusCounters.interfacesSuccessCount ++;
 
@@ -116,10 +127,11 @@ class ModelGeneratorTool {
 
 		}
 
-		log.info (
-			stringFormat (
-				"Successfully generated %s records and %s interfaces",
-				statusCounters.recordSuccessCount,
+		taskLogger.noticeFormat (
+			"Successfully generated %s records and %s interfaces",
+			integerToDecimalString (
+				statusCounters.recordSuccessCount),
+			integerToDecimalString (
 				statusCounters.interfacesSuccessCount));
 
 		if (
@@ -127,9 +139,9 @@ class ModelGeneratorTool {
 			|| statusCounters.interfacesErrorCount > 0
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Aborting due to %s errors",
+			taskLogger.errorFormat (
+				"Aborting due to %s errors",
+				integerToDecimalString (
 					+ statusCounters.recordErrorCount
 					+ statusCounters.interfacesErrorCount));
 

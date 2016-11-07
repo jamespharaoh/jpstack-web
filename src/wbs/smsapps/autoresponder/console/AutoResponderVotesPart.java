@@ -184,7 +184,7 @@ class AutoResponderVotesPart
 			timePeriodString,
 			">");
 
-		formatWriter.writeLineFormat ( 
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" value=\"ok\"",
@@ -231,7 +231,7 @@ class AutoResponderVotesPart
 	private void htmlFormOpenGet () {
 
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

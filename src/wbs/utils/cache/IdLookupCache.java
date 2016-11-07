@@ -172,7 +172,7 @@ class IdLookupCache <Key, Id, Value>
 	}
 
 	@Override
-	public 
+	public
 	Value findOrCreate (
 			@NonNull Key key) {
 
@@ -194,7 +194,7 @@ class IdLookupCache <Key, Id, Value>
 				key);
 
 		}
-	
+
 	}
 
 }

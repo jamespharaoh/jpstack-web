@@ -14,8 +14,8 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.helper.ConsoleHelper;
-import wbs.console.helper.ConsoleHelperRegistry;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -24,7 +24,6 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.object.ObjectManager;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("nameFormFieldBuilder")
@@ -35,13 +34,10 @@ class NameFormFieldBuilder {
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleHelperRegistry consoleHelperRegistry;
-
-	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
 
 	@SingletonDependency
-	ObjectManager objectManager;
+	ConsoleObjectManager objectManager;
 
 	// prototype dependencies
 
@@ -122,7 +118,7 @@ class NameFormFieldBuilder {
 							spec.delegate ())));
 
 			thatConsoleHelper =
-				consoleHelperRegistry.findByObjectClass (
+				objectManager.findConsoleHelper (
 					thatClass);
 
 		} else {

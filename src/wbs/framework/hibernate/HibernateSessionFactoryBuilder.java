@@ -4,6 +4,7 @@ import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -154,7 +155,8 @@ class HibernateSessionFactoryBuilder {
 			throw new RuntimeException (
 				stringFormat (
 					"Failed to find %s types",
-					errorTypes));
+					integerToDecimalString (
+						errorTypes)));
 
 		}
 
@@ -351,7 +353,8 @@ class HibernateSessionFactoryBuilder {
 		log.info (
 			stringFormat (
 				"Session factory built in %s seconds",
-				buildSeconds.getSeconds ()));
+				integerToDecimalString (
+					buildSeconds.getSeconds ())));
 
 		return sessionFactory;
 
@@ -399,14 +402,16 @@ class HibernateSessionFactoryBuilder {
 		log.info (
 			stringFormat (
 				"Configuration loaded in %s seconds",
-				buildSeconds.getSeconds ()));
+				integerToDecimalString (
+					buildSeconds.getSeconds ())));
 
 		if (errorClasses > 0) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Failed to configure %s entities",
-					errorClasses));
+					integerToDecimalString (
+						errorClasses)));
 
 		}
 
@@ -416,7 +421,7 @@ class HibernateSessionFactoryBuilder {
 			@NonNull Configuration config) {
 
 		for (
-			Model model
+			Model <?> model
 				: entityHelper.models ()
 		) {
 
@@ -431,7 +436,7 @@ class HibernateSessionFactoryBuilder {
 	public
 	void configureModel (
 			@NonNull Configuration config,
-			@NonNull Model model) {
+			@NonNull Model <?> model) {
 
 		log.debug (
 			stringFormat (
@@ -582,7 +587,7 @@ class HibernateSessionFactoryBuilder {
 				log.error (
 					stringFormat (
 						"Don't know how to map %s for %s",
-						modelField.type (),
+						modelField.type ().name (),
 						modelField.fullName ()));
 
 				classErrors ++;
@@ -621,7 +626,7 @@ class HibernateSessionFactoryBuilder {
 			log.warn (
 				stringFormat (
 					"Error writing %s",
-					outputFile));
+					outputFile.getAbsolutePath ()));
 
 		}
 
@@ -633,7 +638,8 @@ class HibernateSessionFactoryBuilder {
 				stringFormat (
 					"Skipping %s due to %s errors",
 					model.objectName (),
-					classErrors));
+					integerToDecimalString (
+						classErrors)));
 
 			errorClasses ++;
 
@@ -649,7 +655,7 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureAssignedId (
-			Model model,
+			Model <?> model,
 			ModelField modelField,
 			Element classElement) {
 
@@ -683,7 +689,7 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureForeignId (
-			@NonNull Model model,
+			@NonNull Model <?> model,
 			@NonNull ModelField modelField,
 			@NonNull Element classElement) {
 
@@ -730,7 +736,7 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureGeneratedId (
-			Model model,
+			Model <?> model,
 			ModelField modelField,
 			Element classElement) {
 
@@ -801,7 +807,7 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureValue (
-			Model model,
+			Model <?> model,
 			ModelField modelField,
 			Element classElement) {
 
@@ -910,7 +916,7 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureReference (
-			Model model,
+			Model <?> model,
 			ModelField modelField,
 			Element classElement) {
 
@@ -937,7 +943,7 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configurePartner (
-			Model model,
+			Model <?> model,
 			ModelField modelField,
 			Element classElement) {
 
@@ -957,7 +963,7 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureCollection (
-			Model model,
+			Model <?> model,
 			ModelField modelField,
 			Element classElement) {
 
@@ -997,7 +1003,7 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureCollectionSet (
-			Model model,
+			Model <?> model,
 			ModelField modelField,
 			Element classElement) {
 
@@ -1114,7 +1120,7 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureCollectionList (
-			Model model,
+			Model <?> model,
 			ModelField modelField,
 			Element classElement) {
 
@@ -1267,7 +1273,7 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureCollectionMap (
-			Model model,
+			Model <?> model,
 			ModelField modelField,
 			Element classElement) {
 
@@ -1368,7 +1374,7 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureLink (
-			Model model,
+			Model <?> model,
 			ModelField modelField,
 			Element classElement) {
 
@@ -1643,7 +1649,7 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureCompositeId (
-			Model model,
+			Model <?> model,
 			ModelField modelField,
 			Element classElement) {
 
@@ -1725,7 +1731,7 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureComponent (
-			Model model,
+			Model <?> model,
 			ModelField modelField,
 			Element classElement) {
 

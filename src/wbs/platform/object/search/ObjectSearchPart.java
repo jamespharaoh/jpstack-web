@@ -29,8 +29,8 @@ import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormType;
-import wbs.console.helper.ConsoleHelper;
-import wbs.console.helper.ConsoleHelperRegistry;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
@@ -50,10 +50,10 @@ class ObjectSearchPart <
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleHelperRegistry consoleHelperRegistry;
+	FormFieldLogic formFieldLogic;
 
 	@SingletonDependency
-	FormFieldLogic formFieldLogic;
+	ConsoleObjectManager objectManager;
 
 	// properties
 
@@ -135,7 +135,7 @@ class ObjectSearchPart <
 		if (consoleHelper.parentExists ()) {
 
 			ConsoleHelper <?> parentHelper =
-				consoleHelperRegistry.findByObjectClass (
+				objectManager.findConsoleHelper (
 					consoleHelper.parentClass ());
 
 			Long parentId =

@@ -6,6 +6,7 @@ import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.lessThan;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
@@ -18,33 +19,39 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Optional;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperIdImplementation")
 public
-class ObjectHelperIdImplementation <RecordType extends Record <RecordType>>
+class ObjectHelperIdImplementation <
+	RecordType extends Record <RecordType>
+>
 	implements
 		ObjectHelperComponent <RecordType>,
 		ObjectHelperIdMethods <RecordType> {
 
-	// properties
+	// singleton dependencies
 
-	@Setter
-	ObjectModel <RecordType> model;
-
-	@Setter
-	ObjectHelper <RecordType> objectHelper;
-
-	@Setter
+	@WeakSingletonDependency
 	ObjectManager objectManager;
 
-	@Setter
+	// properties
+
+	@Getter @Setter
+	ObjectModel <RecordType> objectModel;
+
+	@Getter @Setter
+	ObjectHelper <RecordType> objectHelper;
+
+	@Getter @Setter
 	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
 
 	// public implementation
@@ -79,8 +86,9 @@ class ObjectHelperIdImplementation <RecordType extends Record <RecordType>>
 					"%s with id %s not found",
 					capitalise (
 						camelToSpaces (
-							model.objectName ())),
-					id));
+							objectModel.objectName ())),
+					integerToDecimalString (
+						id)));
 
 		}
 
@@ -172,8 +180,9 @@ class ObjectHelperIdImplementation <RecordType extends Record <RecordType>>
 				stringFormat (
 					"No such %s with id %s",
 					camelToSpaces (
-						model.objectName ()),
-					missingIds.get (0)));
+						objectModel.objectName ()),
+					integerToDecimalString (
+						missingIds.get (0))));
 
 		} else if (
 			lessThan (
@@ -186,7 +195,7 @@ class ObjectHelperIdImplementation <RecordType extends Record <RecordType>>
 				stringFormat (
 					"No such %s with ids %s",
 					camelToSpaces (
-						model.objectName ()),
+						objectModel.objectName ()),
 					joinWithCommaAndSpace (
 						missingIds.stream ()
 							.map (longValue -> longValue.toString ())
@@ -198,12 +207,13 @@ class ObjectHelperIdImplementation <RecordType extends Record <RecordType>>
 				stringFormat (
 					"No such %s with ids %s (and %s others)",
 					camelToSpaces (
-						model.objectName ()),
+						objectModel.objectName ()),
 					joinWithCommaAndSpace (
 						missingIds.subList (0, 5).stream ()
 							.map (longValue -> longValue.toString ())
 							.collect (Collectors.toList ())),
-					missingIds.size () - 5));
+					integerToDecimalString (
+						missingIds.size () - 5)));
 
 		}
 

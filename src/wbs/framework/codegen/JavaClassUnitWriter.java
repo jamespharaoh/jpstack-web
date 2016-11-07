@@ -26,6 +26,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.logging.TaskLogger;
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.NullFormatWriter;
 
@@ -79,7 +80,8 @@ class JavaClassUnitWriter {
 	// implementation
 
 	public
-	void write () {
+	void write (
+			@NonNull TaskLogger taskLogger) {
 
 		formatWriter.writeLineFormat (
 			"package %s;",

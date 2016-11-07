@@ -301,7 +301,7 @@ class ManualResponderRequestPendingFormResponder
 		formatWriter.writeLineFormatDecreaseIndent (
 			"}, 1);\n");
 
-		htmlScriptBlockClose (); 
+		htmlScriptBlockClose ();
 
 	}
 

@@ -1,5 +1,6 @@
-package wbs.console.helper;
+package wbs.console.helper.spec;
 
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -26,7 +27,8 @@ class ConsoleHelperProviderSpec {
 
 	// attributes
 
-	@DataAttribute
+	@DataAttribute (
+		required = true)
 	String objectName;
 
 	@DataAttribute
@@ -58,14 +60,14 @@ class ConsoleHelperProviderSpec {
 	@DataChildren (
 		direct = true,
 		childElement = "context-stuff")
-	List<ConsoleContextStuffSpec> contextStuffs =
-		new ArrayList<ConsoleContextStuffSpec> ();
+	List <ConsoleContextStuffSpec> contextStuffs =
+		new ArrayList<> ();
 
 	@DataChildren (
 		direct = true,
 		childElement = "run-post-processor")
-	List<RunPostProcessorSpec> runPostProcessors =
-		new ArrayList<RunPostProcessorSpec> ();
+	List <RunPostProcessorSpec> runPostProcessors =
+		new ArrayList<> ();
 
 	// defaults
 

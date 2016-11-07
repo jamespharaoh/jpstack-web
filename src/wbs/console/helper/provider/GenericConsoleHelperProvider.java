@@ -1,4 +1,4 @@
-package wbs.console.helper;
+package wbs.console.helper.provider;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
@@ -22,6 +22,11 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.context.ConsoleContextStuffSpec;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.helper.spec.ConsoleHelperProviderSpec;
+import wbs.console.helper.spec.PrivKeySpec;
+import wbs.console.helper.spec.RunPostProcessorSpec;
 import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
@@ -39,18 +44,16 @@ import wbs.utils.string.StringSubstituter;
 @Accessors (fluent = true)
 @Log4j
 @PrototypeComponent ("genericConsoleHelperProvider")
-@SuppressWarnings ({ "rawtypes" })
 public
-class GenericConsoleHelperProvider
-	implements ConsoleHelperProvider {
+class GenericConsoleHelperProvider <
+	RecordType extends Record <RecordType>
+>
+	implements ConsoleHelperProvider <RecordType> {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	ComponentManager componentManager;
-
-	@WeakSingletonDependency
-	ConsoleHelperProviderRegistry consoleHelperProviderRegistry;
 
 	@WeakSingletonDependency
 	ConsoleManager consoleManager;
@@ -73,15 +76,15 @@ class GenericConsoleHelperProvider
 	ConsoleHelperProviderSpec consoleHelperProviderSpec;
 
 	@Getter @Setter
-	ObjectHelper objectHelper;
+	ObjectHelper <RecordType> objectHelper;
 
 	@Getter @Setter
-	Class consoleHelperClass;
+	Class <ConsoleHelper <RecordType>> consoleHelperClass;
 
 	// console helper properties
 
 	@Getter @Setter
-	Class<? extends Record<?>> objectClass;
+	Class <RecordType> objectClass;
 
 	@Getter @Setter
 	String objectName;
@@ -111,7 +114,7 @@ class GenericConsoleHelperProvider
 	// init
 
 	public
-	GenericConsoleHelperProvider init () {
+	GenericConsoleHelperProvider <RecordType> init () {
 
 		// check required properties
 
@@ -218,11 +221,6 @@ class GenericConsoleHelperProvider
 
 		}
 
-		// register
-
-		consoleHelperProviderRegistry.register (
-			this);
-
 		// and return
 
 		return this;
@@ -308,9 +306,9 @@ class GenericConsoleHelperProvider
 				: consoleHelperProviderSpec.privKeys ()
 		) {
 
-			Record<?> privObject =
+			Record <?> privObject =
 				privKeySpec.delegateName () != null
-					? (Record) objectManager.dereference (
+					? (Record <?>) objectManager.dereference (
 						object,
 						privKeySpec.delegateName ())
 					: object;
@@ -365,7 +363,7 @@ class GenericConsoleHelperProvider
 	@Override
 	public
 	String getDefaultContextPath (
-			@NonNull Record object) {
+			@NonNull RecordType object) {
 
 		StringSubstituter stringSubstituter =
 			new StringSubstituter ();
@@ -405,7 +403,7 @@ class GenericConsoleHelperProvider
 	@Override
 	public
 	String localPath (
-			@NonNull Record object) {
+			@NonNull RecordType object) {
 
 		String urlTemplate =
 
@@ -437,7 +435,7 @@ class GenericConsoleHelperProvider
 	@Override
 	public
 	boolean canView (
-			@NonNull Record object) {
+			@NonNull RecordType object) {
 
 		// types are always visible
 
@@ -463,9 +461,9 @@ class GenericConsoleHelperProvider
 					: viewPrivKeySpecs
 			) {
 
-				Record privObject =
+				Record <?> privObject =
 					privKeySpec.delegateName () != null
-						? (Record) objectManager.dereference (
+						? (Record <?>) objectManager.dereference (
 							object,
 							privKeySpec.delegateName ())
 						: object;
@@ -498,7 +496,7 @@ class GenericConsoleHelperProvider
 			}
 
 			Record <?> delegate =
-				(Record)
+				(Record <?>)
 				objectManager.dereference (
 					object,
 					viewDelegateField);
@@ -515,7 +513,7 @@ class GenericConsoleHelperProvider
 					consoleObjectManager.findConsoleHelper (
 						delegate);
 
-				return delegateHelper.canView (
+				return delegateHelper.canViewGeneric (
 					delegate);
 
 			}
@@ -531,7 +529,7 @@ class GenericConsoleHelperProvider
 
 	@Override
 	public
-	Record <?> lookupObject (
+	RecordType lookupObject (
 			@NonNull ConsoleContextStuff contextStuff) {
 
 		Long objectId =
@@ -539,14 +537,12 @@ class GenericConsoleHelperProvider
 			contextStuff.get (
 				idKey);
 
-		Record <?> object =
+		return objectClass ().cast (
 			optionalOrNull (
 				optionalCast (
 					Record.class,
 					objectHelper.find (
-						objectId)));
-
-		return object;
+						objectId))));
 
 	}
 

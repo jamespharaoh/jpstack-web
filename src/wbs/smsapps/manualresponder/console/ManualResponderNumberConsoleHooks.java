@@ -2,7 +2,7 @@ package wbs.smsapps.manualresponder.console;
 
 import lombok.NonNull;
 
-import wbs.console.helper.ConsoleHooks;
+import wbs.console.helper.core.ConsoleHooks;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;

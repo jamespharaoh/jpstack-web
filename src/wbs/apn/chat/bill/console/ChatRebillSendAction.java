@@ -113,21 +113,21 @@ class ChatRebillSendAction
 						"chatId"));
 
 			// process form submission
-	
+
 			formFields =
 				chatRebillConsoleModule.formFieldSets ().get (
 					"search");
-	
+
 			formValues =
 				new ChatRebillSearch ();
-	
+
 			formHints =
 				ImmutableMap.<String, Object> builder ()
-	
+
 				.put (
 					"chat",
 					chat)
-	
+
 				.build ();
 
 			formUpdates =
@@ -137,15 +137,15 @@ class ChatRebillSendAction
 					formValues,
 					formHints,
 					"rebill");
-	
+
 			requestContext.request (
 				"formValues",
 				formValues);
-	
+
 			requestContext.request (
 				"formUpdates",
 				formUpdates);
-	
+
 			if (formUpdates.errors ()) {
 				return null;
 			}
@@ -295,7 +295,7 @@ class ChatRebillSendAction
 		}
 
 		return null;
-	
+
 	}
 
 }

@@ -30,7 +30,7 @@ class ChatRebillLogDaoHibernate
 			createCriteria (
 				ChatRebillLogRec.class,
 				"_chatRebillLog");
-	
+
 		// timestamp
 
 		if (
@@ -168,7 +168,7 @@ class ChatRebillLogDaoHibernate
 			"searchIds (chatRebillLogSearch)",
 			Long.class,
 			criteria);
-	
+
 	}
 
 }

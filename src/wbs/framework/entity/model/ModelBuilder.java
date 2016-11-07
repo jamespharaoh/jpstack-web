@@ -30,7 +30,7 @@ import wbs.framework.schema.helper.SchemaTypesHelper;
 @Accessors (fluent = true)
 @PrototypeComponent ("modelBuilder")
 public
-class ModelBuilder {
+class ModelBuilder <RecordType extends Record <RecordType>> {
 
 	// singleton dependencies
 
@@ -53,20 +53,20 @@ class ModelBuilder {
 	PluginModelSpec pluginModel;
 	PluginSpec plugin;
 
-	ModelImplementation model;
+	ModelImplementation <?> model;
 
 	String recordClassName;
 	String recordClassNameFull;
-	Class<? extends Record<?>> recordClass;
+	Class <RecordType> recordClass;
 
 	String objectHelperClassName;
 	String objectHelperClassNameFull;
-	Class<? extends ObjectHelper<?>> objectHelperClass;
+	Class <ObjectHelper <RecordType>> objectHelperClass;
 
 	// implementation
 
 	public
-	Model build () {
+	Model <?> build () {
 
 		try {
 
@@ -85,7 +85,7 @@ class ModelBuilder {
 	}
 
 	private
-	Model buildReal () {
+	Model <?> buildReal () {
 
 		plugin =
 			modelMeta.plugin ();
@@ -105,8 +105,8 @@ class ModelBuilder {
 				recordClassName);
 
 		@SuppressWarnings ("unchecked")
-		Class <? extends Record <?>> recordClassTemp =
-			(Class <? extends Record <?>>)
+		Class <RecordType> recordClassTemp =
+			(Class <RecordType>)
 			classForNameRequired (
 				recordClassNameFull);
 
@@ -128,8 +128,8 @@ class ModelBuilder {
 				objectHelperClassName);
 
 		@SuppressWarnings ("unchecked")
-		Class<? extends ObjectHelper<?>> objectHelperClassTemp =
-			(Class<? extends ObjectHelper<?>>)
+		Class <ObjectHelper <RecordType>> objectHelperClassTemp =
+			(Class <ObjectHelper <RecordType>>)
 			classForNameRequired (
 				objectHelperClassNameFull);
 
@@ -139,7 +139,7 @@ class ModelBuilder {
 		// model
 
 		model =
-			new ModelImplementation ()
+			new ModelImplementation <RecordType> ()
 
 			.objectClass (
 				recordClass)

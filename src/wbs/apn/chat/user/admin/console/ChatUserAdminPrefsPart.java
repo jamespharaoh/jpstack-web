@@ -107,9 +107,9 @@ class ChatUserAdminPrefsPart
 					"female",
 					false,
 					"female");
-	
+
 			} else if (chatUser.getGender () == Gender.female) {
-	
+
 				htmlOptionWrite (
 					"male",
 					false,
@@ -119,9 +119,9 @@ class ChatUserAdminPrefsPart
 					"female",
 					true,
 					"female");
-	
+
 			} else if (chatUser.getGender () == null) {
-	
+
 				htmlOptionWrite (
 					"male",
 					false,
@@ -131,14 +131,14 @@ class ChatUserAdminPrefsPart
 					"female",
 					false,
 					"female");
-	
+
 			} else {
 
-				shouldNeverHappen ();	
-	
+				shouldNeverHappen ();
+
 			}
 
-			htmlSelectClose ();	
+			htmlSelectClose ();
 
 		});
 
@@ -159,9 +159,9 @@ class ChatUserAdminPrefsPart
 
 				htmlOptionWrite (
 					"straight");
-	
+
 			} else if (chatUser.getOrient () == Orient.bi) {
-	
+
 				htmlOptionWrite (
 					"gay");
 
@@ -170,9 +170,9 @@ class ChatUserAdminPrefsPart
 
 				htmlOptionWrite (
 					"straight");
-	
+
 			} else if (chatUser.getOrient () == Orient.straight) {
-	
+
 				htmlOptionWrite (
 					"gay");
 
@@ -181,9 +181,9 @@ class ChatUserAdminPrefsPart
 
 				htmlOptionWriteSelected (
 					"straight");
-	
+
 			} else {
-	
+
 				htmlOptionWrite (
 					"—");
 

@@ -1,7 +1,5 @@
 package wbs.imchat.logic;
 
-import org.apache.commons.io.output.StringBuilderWriter;
-
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
@@ -11,23 +9,23 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
-import wbs.imchat.model.ImChatConversationRec;
-import wbs.imchat.model.ImChatCustomerRec;
-import wbs.imchat.model.ImChatMessageRec;
-import wbs.imchat.model.ImChatProfileRec;
-import wbs.imchat.model.ImChatRec;
+
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.imchat.model.ImChatConversationRec;
+import wbs.imchat.model.ImChatCustomerRec;
+import wbs.imchat.model.ImChatMessageRec;
+import wbs.imchat.model.ImChatProfileRec;
+import wbs.imchat.model.ImChatRec;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.model.UserRec;
 import wbs.utils.email.EmailLogic;
 import wbs.utils.random.RandomLogic;
-import wbs.utils.string.FormatWriter;
-import wbs.utils.string.WriterFormatWriter;
+import wbs.utils.string.StringFormatWriter;
 import wbs.utils.time.TimeFormatter;
 
 @SingletonComponent ("imChatLogic")
@@ -116,74 +114,75 @@ class ImChatLogicImplementation
 
 		// construct email content
 
-		StringBuilder stringBuilder =
-			new StringBuilder ();
+		try (
 
-		FormatWriter formatWriter =
-			new WriterFormatWriter (
-				new StringBuilderWriter (
-					stringBuilder));
+			StringFormatWriter formatWriter =
+				new StringFormatWriter ();
 
-		formatWriter.writeFormat (
-			"Thanks for using the psychic chat service. For your future ",
-			"reference, we have included a transcript of your recent ",
-			"conversation with %s.\n",
-			profile.getPublicName ());
-
-		formatWriter.writeFormat (
-			"\n");
-
-		for (
-			ImChatMessageRec message
-				: conversation.getMessages ()
 		) {
 
 			formatWriter.writeFormat (
-				"%s %s:\n",
-				timeFormatter.timeString (
-					timeFormatter.timezone (
-						ifNull (
-							imChat.getSlice ().getDefaultTimezone (),
-							wbsConfig.defaultTimezone ())),
-					message.getTimestamp ()),
-				message.getSenderUser () != null
-					? profile.getPublicName ()
-					: "Me");
-
-			formatWriter.writeFormat (
-				"%s\n",
-				message.getMessageText ());
-
-			if (
-				isNotNull (
-					message.getPrice ())
-			) {
-
-				formatWriter.writeFormat (
-					"(you were charged %s for this message)\n",
-					currencyLogic.formatText (
-						imChat.getCreditCurrency (),
-						message.getPrice ()));
-
-			}
+				"Thanks for using the psychic chat service. For your future ",
+				"reference, we have included a transcript of your recent ",
+				"conversation with %s.\n",
+				profile.getPublicName ());
 
 			formatWriter.writeFormat (
 				"\n");
 
+			for (
+				ImChatMessageRec message
+					: conversation.getMessages ()
+			) {
+
+				formatWriter.writeFormat (
+					"%s %s:\n",
+					timeFormatter.timeString (
+						timeFormatter.timezone (
+							ifNull (
+								imChat.getSlice ().getDefaultTimezone (),
+								wbsConfig.defaultTimezone ())),
+						message.getTimestamp ()),
+					message.getSenderUser () != null
+						? profile.getPublicName ()
+						: "Me");
+
+				formatWriter.writeFormat (
+					"%s\n",
+					message.getMessageText ());
+
+				if (
+					isNotNull (
+						message.getPrice ())
+				) {
+
+					formatWriter.writeFormat (
+						"(you were charged %s for this message)\n",
+						currencyLogic.formatText (
+							imChat.getCreditCurrency (),
+							message.getPrice ()));
+
+				}
+
+				formatWriter.writeFormat (
+					"\n");
+
+			}
+
+			// send email
+
+			emailLogic.sendEmail (
+				imChat.getEmailFromName (),
+				imChat.getEmailFromAddress (),
+				imChat.getEmailReplyToAddress (),
+				ImmutableList.<String>of (
+					customer.getEmail ()),
+				stringFormat (
+					"Your recent conversation with %s",
+					profile.getPublicName ()),
+				formatWriter.toString ());
+
 		}
-
-		// send email
-
-		emailLogic.sendEmail (
-			imChat.getEmailFromName (),
-			imChat.getEmailFromAddress (),
-			imChat.getEmailReplyToAddress (),
-			ImmutableList.<String>of (
-				customer.getEmail ()),
-			stringFormat (
-				"Your recent conversation with %s",
-				profile.getPublicName ()),
-			stringBuilder.toString ());
 
 	}
 

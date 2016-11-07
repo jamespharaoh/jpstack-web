@@ -4,11 +4,15 @@ import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.naivePluralise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.CommonRecord;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.EventRecord;
@@ -20,52 +24,52 @@ import wbs.framework.entity.record.TypeRecord;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperModelImplementation")
 public
-class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
+class ObjectHelperModelImplementation <
+	RecordType extends Record <RecordType>
+>
 	implements
 		ObjectHelperComponent <RecordType>,
 		ObjectHelperModelMethods <RecordType> {
 
 	// singleton dependencies
 
+	@WeakSingletonDependency
+	ObjectManager objectManager;
+
 	@SingletonDependency
 	ObjectTypeRegistry objectTypeRegistry;
 
 	// properties
 
-	@Setter
-	ObjectModel <RecordType> model;
+	@Getter @Setter
+	ObjectModel <RecordType> objectModel;
 
-	@Setter
+	@Getter @Setter
 	ObjectHelper <RecordType> objectHelper;
 
-	@Setter
+	@Getter @Setter
 	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
-
-	@Setter
-	ObjectManager objectManager;
 
 	// public implementation
 
 	@Override
 	public
 	String objectName () {
-		return model.objectName ();
+		return objectModel.objectName ();
 	}
 
 	@Override
 	public
 	Long objectTypeId () {
-		return model.objectTypeId ();
+		return objectModel.objectTypeId ();
 	}
 
 	@Override
 	public
-	Class<RecordType> objectClass () {
+	Class <RecordType> objectClass () {
 
-		@SuppressWarnings ("unchecked")
-		Class<RecordType> objectClass =
-			(Class<RecordType>)
-			model.objectClass ();
+		Class <RecordType> objectClass =
+			objectModel.objectClass ();
 
 		return objectClass;
 
@@ -75,7 +79,7 @@ class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 	public
 	String objectTypeCode () {
 
-		return model.objectTypeCode ();
+		return objectModel.objectTypeCode ();
 
 	}
 
@@ -83,13 +87,13 @@ class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 	public
 	Class <? extends Record <?>> parentClass () {
 
-		if (model.isRooted ()) {
+		if (objectModel.isRooted ()) {
 
 			return objectTypeRegistry.rootRecordClass ();
 
 		} else {
 
-			return model.parentClass ();
+			return objectModel.parentClass ();
 
 		}
 
@@ -97,76 +101,94 @@ class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 
 	@Override
 	public
+	ModelField parentField () {
+		return objectModel.parentField ();
+	}
+
+	@Override
+	public
 	String parentFieldName () {
-		return model.parentField ().name ();
+		return objectModel.parentField ().name ();
 	}
 
 	@Override
 	public
 	String parentLabel () {
-		return model.parentField ().label ();
+		return objectModel.parentField ().label ();
 	}
 
 	@Override
 	public
 	Boolean parentExists () {
-		return model.parentField () != null;
+		return objectModel.parentField () != null;
+	}
+
+	@Override
+	public
+	ModelField codeField () {
+		return objectModel.codeField ();
 	}
 
 	@Override
 	public
 	String codeFieldName () {
 
-		if (model.codeField () == null) {
+		if (objectModel.codeField () == null) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Object type %s has no code field",
-					model.objectName ()));
+					objectModel.objectName ()));
 
 		}
 
-		return model.codeField ().name ();
+		return objectModel.codeField ().name ();
 
+	}
+
+	@Override
+	public
+	ModelField typeCodeField () {
+		return objectModel.typeCodeField ();
 	}
 
 	@Override
 	public
 	String typeCodeLabel () {
 
-		if (model.typeCodeField () == null) {
+		if (objectModel.typeCodeField () == null) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Object type %s has no type code field",
-					model.objectName ()));
+					objectModel.objectName ()));
 
 		}
 
-		return model.typeCodeField ().label ();
+		return objectModel.typeCodeField ().label ();
 
 	}
 
 	@Override
 	public
 	Boolean typeCodeExists () {
-		return model.typeCodeField () != null;
+		return objectModel.typeCodeField () != null;
 	}
 
 	@Override
 	public
 	String typeCodeFieldName () {
 
-		if (model.typeCodeField () == null) {
+		if (objectModel.typeCodeField () == null) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Object type %s has no type code field",
-					model.objectName ()));
+					objectModel.objectName ()));
 
 		}
 
-		return model.typeCodeField ().name ();
+		return objectModel.typeCodeField ().name ();
 
 	}
 
@@ -174,39 +196,45 @@ class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 	public
 	String codeLabel () {
 
-		if (model.codeField () == null) {
+		if (objectModel.codeField () == null) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Object type %s has no code field",
-					model.objectName ()));
+					objectModel.objectName ()));
 
 		}
 
-		return model.codeField ().label ();
+		return objectModel.codeField ().label ();
 
 	}
 
 	@Override
 	public
 	Boolean codeExists () {
-		return model.codeField () != null;
+		return objectModel.codeField () != null;
+	}
+
+	@Override
+	public
+	ModelField indexField () {
+		return objectModel.indexField ();
 	}
 
 	@Override
 	public
 	String indexFieldName () {
 
-		if (model.indexField () == null) {
+		if (objectModel.indexField () == null) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Object type %s has no index field",
-					model.objectName ()));
+					objectModel.objectName ()));
 
 		}
 
-		return model.indexField ().name ();
+		return objectModel.indexField ().name ();
 
 	}
 
@@ -214,45 +242,51 @@ class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 	public
 	String indexLabel () {
 
-		if (model.indexField () == null) {
+		if (objectModel.indexField () == null) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Object type %s has no index field",
-					model.objectName ()));
+					objectModel.objectName ()));
 
 		}
 
-		return model.indexField ().label ();
+		return objectModel.indexField ().label ();
 
 	}
 
 	@Override
 	public
 	Boolean indexExists () {
-		return model.indexField () != null;
+		return objectModel.indexField () != null;
 	}
 
 	@Override
 	public
 	String indexCounterFieldName () {
-		return model.indexField ().indexCounterFieldName ();
+		return objectModel.indexField ().indexCounterFieldName ();
+	}
+
+	@Override
+	public
+	ModelField nameField () {
+		return objectModel.nameField ();
 	}
 
 	@Override
 	public
 	String nameFieldName () {
 
-		if (model.nameField () == null) {
+		if (objectModel.nameField () == null) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Object type %s has no name field",
-					model.objectName ()));
+					objectModel.objectName ()));
 
 		}
 
-		return model.nameField ().name ();
+		return objectModel.nameField ().name ();
 
 	}
 
@@ -260,55 +294,67 @@ class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 	public
 	String nameLabel () {
 
-		if (model.nameField () == null) {
+		if (objectModel.nameField () == null) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Object type %s has no name field",
-					model.objectName ()));
+					objectModel.objectName ()));
 
 		}
 
-		return model.nameField ().label ();
+		return objectModel.nameField ().label ();
 	}
 
 	@Override
 	public
 	Boolean nameExists () {
-		return model.nameField () != null;
+		return objectModel.nameField () != null;
 	}
 
 	@Override
 	public
 	Boolean nameIsCode () {
 
-		return model.nameField () == null
-				&& model.codeField () != null;
+		return objectModel.nameField () == null
+				&& objectModel.codeField () != null;
 
+	}
+
+	@Override
+	public
+	ModelField deletedField () {
+		return objectModel.deletedField ();
 	}
 
 	@Override
 	public
 	Boolean deletedExists () {
 
-		return model.deletedField () != null;
+		return objectModel.deletedField () != null;
 
+	}
+
+	@Override
+	public
+	ModelField descriptionField () {
+		return objectModel.descriptionField ();
 	}
 
 	@Override
 	public
 	String descriptionFieldName () {
 
-		if (model.descriptionField () == null) {
+		if (objectModel.descriptionField () == null) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Object type %s has no description field",
-					model.objectName ()));
+					objectModel.objectName ()));
 
 		}
 
-		return model.descriptionField ().name ();
+		return objectModel.descriptionField ().name ();
 
 	}
 
@@ -316,16 +362,16 @@ class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 	public
 	String deletedFieldName () {
 
-		if (model.deletedField () == null) {
+		if (objectModel.deletedField () == null) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Object type %s has no deleted field",
-					model.objectName ()));
+					objectModel.objectName ()));
 
 		}
 
-		return model.deletedField ().name ();
+		return objectModel.deletedField ().name ();
 
 	}
 
@@ -333,16 +379,16 @@ class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 	public
 	String deletedLabel () {
 
-		if (model.deletedField () == null) {
+		if (objectModel.deletedField () == null) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Object type %s has no deleted field",
-					model.objectName ()));
+					objectModel.objectName ()));
 
 		}
 
-		return model.deletedField ().label ();
+		return objectModel.deletedField ().label ();
 
 	}
 
@@ -350,23 +396,23 @@ class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 	public
 	String descriptionLabel () {
 
-		if (model.descriptionField () == null) {
+		if (objectModel.descriptionField () == null) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Object type %s has no description field",
-					model.objectName ()));
+					objectModel.objectName ()));
 
 		}
 
-		return model.descriptionField ().label ();
+		return objectModel.descriptionField ().label ();
 
 	}
 
 	@Override
 	public
 	Boolean descriptionExists () {
-		return model.descriptionField () != null;
+		return objectModel.descriptionField () != null;
 	}
 
 	@Override
@@ -439,10 +485,56 @@ class ObjectHelperModelImplementation <RecordType extends Record <RecordType>>
 
 	@Override
 	public
+	ModelField field (
+			@NonNull String name) {
+
+		return objectModel.field (
+			name);
+
+	}
+
+	@Override
+	public
 	String shortNamePlural () {
 
 		return friendlyNamePlural ();
 
+	}
+
+	@Override
+	public
+	boolean isRoot () {
+		return objectModel.isRoot ();
+	}
+
+	@Override
+	public
+	boolean isRooted () {
+		return objectModel.isRooted ();
+	}
+
+	@Override
+	public
+	boolean canGetParent () {
+		return objectModel.canGetParent ();
+	}
+
+	@Override
+	public
+	boolean parentTypeIsFixed () {
+		return objectModel.parentTypeIsFixed ();
+	}
+
+	@Override
+	public
+	ModelField timestampField () {
+		return objectModel.timestampField ();
+	}
+
+	@Override
+	public
+	String timestampFieldName () {
+		return objectModel.timestampField ().name ();
 	}
 
 }

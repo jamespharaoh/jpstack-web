@@ -1,4 +1,4 @@
-package wbs.console.helper;
+package wbs.console.helper.enums;
 
 import lombok.Getter;
 import lombok.NonNull;

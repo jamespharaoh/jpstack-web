@@ -5,6 +5,7 @@ import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
@@ -110,8 +111,8 @@ class ObjectManagerImplementation
 		objectHelpers.forEach (
 			objectHelper -> {
 
-			ObjectHelperImplementation objectHelperImplementation =
-				(ObjectHelperImplementation)
+			ObjectHelperImplementation <?> objectHelperImplementation =
+				(ObjectHelperImplementation <?>)
 				objectHelper;
 
 			objectHelperImplementation.objectManager (
@@ -163,15 +164,16 @@ class ObjectManagerImplementation
 	}
 
 	@Override
-	public <ChildType extends Record<ChildType>>
-	List<ChildType> getChildren (
-			@NonNull Record<?> object,
-			@NonNull Class<ChildType> childClass) {
+	public <ChildType extends Record <ChildType>>
+	List <ChildType> getChildren (
+			@NonNull Record <?> object,
+			@NonNull Class <ChildType> childClass) {
 
 		ObjectHelper<?> objectHelper =
-			objectHelperForObjectRequired (object);
+			objectHelperForObjectRequired (
+				object);
 
-		return objectHelper.getChildren (
+		return objectHelper.getChildrenGeneric (
 			object,
 			childClass);
 
@@ -179,14 +181,14 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	Record<?> getParent (
-			@NonNull Record<?> object) {
+	Record <?> getParent (
+			@NonNull Record <?> object) {
 
-		ObjectHelper<?> objectHelper =
+		ObjectHelper <?> objectHelper =
 			objectHelperForClassRequired (
 				object.getClass ());
 
-		return objectHelper.getParent (
+		return objectHelper.getParentGeneric (
 			object);
 
 	}
@@ -273,34 +275,37 @@ class ObjectManagerImplementation
 	@Override
 	public
 	String objectPath (
-			Record<?> object,
-			@NonNull Optional<Record<?>> assumedRoot,
+			Record <?> object,
+			@NonNull Optional <Record <?>> assumedRoot,
 			boolean mini,
 			boolean preload) {
 
 		if (object == null)
 			return "-";
 
-		ObjectHelper<?> objectHelper =
-			objectHelperForObjectRequired (object);
+		ObjectHelper <?> objectHelper =
+			objectHelperForObjectRequired (
+				object);
 
 		if (objectHelper.isRoot ())
 			return "root";
 
-		List<String> partsToReturn =
-			new ArrayList<String>();
+		List <String> partsToReturn =
+			new ArrayList<> ();
 
-		ObjectHelper<?> specificObjectHelper = null;
+		ObjectHelper <?> specificObjectHelper = null;
 
 		do {
 
 			// get some stuff
 
-			Record<?> parent =
-				objectHelper.getParent (object);
+			Record <?> parent =
+				objectHelper.getParentGeneric (
+					object);
 
-			ObjectHelper<?> parentHelper =
-				objectHelperForObjectRequired (parent);
+			ObjectHelper <?> parentHelper =
+				objectHelperForObjectRequired (
+					parent);
 
 			// work out this part
 
@@ -425,19 +430,21 @@ class ObjectManagerImplementation
 		return stringFormat (
 			"%s#%s",
 			objectHelper.objectTypeCode (),
-			object.getId ());
+			integerToDecimalString (
+				object.getId ()));
 
 	}
 
 	@Override
 	public
 	GlobalId getGlobalId (
-			@NonNull Record<?> object) {
+			@NonNull Record <?> object) {
 
-		ObjectHelper<?> objectHelper =
-			objectHelperForObjectRequired (object);
+		ObjectHelper <?> objectHelper =
+			objectHelperForObjectRequired (
+				object);
 
-		return objectHelper.getGlobalId (
+		return objectHelper.getGlobalIdGeneric (
 			object);
 
 	}
@@ -445,13 +452,14 @@ class ObjectManagerImplementation
 	@Override
 	public
 	GlobalId getParentGlobalId (
-			@NonNull Record<?> object) {
+			@NonNull Record <?> object) {
 
-		ObjectHelper<?> objectHelper =
-			objectHelperForObjectRequired (object);
+		ObjectHelper <?> objectHelper =
+			objectHelperForObjectRequired (
+				object);
 
-		return objectHelper
-			.getParentGlobalId (object);
+		return objectHelper.getParentGlobalIdGeneric (
+			object);
 
 	}
 
@@ -501,13 +509,13 @@ class ObjectManagerImplementation
 	@Override
 	public
 	String getCode (
-			@NonNull Record<?> object) {
+			@NonNull Record <?> object) {
 
 		ObjectHelper <?> objectHelper =
 			objectHelperForClassRequired (
 				object.getClass ());
 
-		return objectHelper.getCode (
+		return objectHelper.getCodeGeneric (
 			object);
 
 	}
@@ -530,12 +538,12 @@ class ObjectManagerImplementation
 	@Override
 	public
 	List<Record<?>> getMinorChildren (
-			@NonNull Record<?> parent) {
+			@NonNull Record <?> parent) {
 
 		ObjectHelper<?> objectHelper =
 			objectHelperForObjectRequired (parent);
 
-		return objectHelper.getMinorChildren (
+		return objectHelper.getMinorChildrenGeneric (
 			parent);
 
 	}
@@ -624,16 +632,17 @@ class ObjectManagerImplementation
 	}
 
 	@Override
-	public <ParentType extends Record<?>>
+	public <ParentType extends Record <?>>
 	ParentType firstParent (
-			Record<?> object,
-			Set<ParentType> parents) {
+			Record <?> object,
+			Set <ParentType> parents) {
 
-		Record<?> current =
+		Record <?> current =
 			object;
 
-		ObjectHelper<?> currentHelper =
-			objectHelperForObjectRequired (current);
+		ObjectHelper <?> currentHelper =
+			objectHelperForObjectRequired (
+				current);
 
 		for (;;) {
 
@@ -651,10 +660,12 @@ class ObjectManagerImplementation
 				return null;
 
 			current =
-				currentHelper.getParent (current);
+				currentHelper.getParentGeneric (
+					current);
 
 			currentHelper =
-				objectHelperForObjectRequired (current);
+				objectHelperForObjectRequired (
+					current);
 
 		}
 

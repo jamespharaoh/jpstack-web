@@ -55,6 +55,7 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.entity.record.RecordComponent;
 import wbs.framework.entity.record.RootRecord;
 import wbs.framework.entity.record.TypeRecord;
+import wbs.framework.logging.TaskLogger;
 import wbs.utils.string.AtomicFileWriter;
 import wbs.utils.string.FormatWriter;
 
@@ -83,7 +84,8 @@ class ModelRecordGenerator {
 	// implementation
 
 	public
-	void generateRecord () {
+	void generateRecord (
+			@NonNull TaskLogger taskLogger) {
 
 		if (modelMeta.type ().record ()) {
 
@@ -200,7 +202,18 @@ class ModelRecordGenerator {
 		classUnitWriter.addBlock (
 			modelWriter);
 
-		classUnitWriter.write ();
+		if (taskLogger.errors ()) {
+			return;
+		}
+
+		classUnitWriter.write (
+			taskLogger);
+
+		if (taskLogger.errors ()) {
+			return;
+		}
+
+		formatWriter.commit ();
 
 	}
 

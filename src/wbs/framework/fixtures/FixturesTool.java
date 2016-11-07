@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
@@ -20,6 +19,7 @@ import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.component.tools.BackgroundProcess;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 
 @Log4j
 public
@@ -45,19 +45,24 @@ class FixturesTool {
 
 	public
 	void runFixtureProviders (
+			@NonNull TaskLogger taskLogger,
 			@NonNull List <String> arguments) {
 
-		log.info (
-			stringFormat (
-				"Disabling background processes"));
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"runFixtureProviders",
+				log);
+
+		taskLogger.noticeFormat (
+			"Disabling background processes");
 
 		backgroundProcesses.forEach (process ->
 			process.runAutomatically (
 				false));
 
-		log.info (
-			stringFormat (
-				"About to run fixture providers"));
+		taskLogger.noticeFormat (
+			"About to run fixture providers");
 
 		for (
 			PluginSpec plugin
@@ -69,11 +74,10 @@ class FixturesTool {
 					: plugin.fixtures ()
 			) {
 
-				log.info (
-					stringFormat (
-						"About to run fixture provider %s from %s",
-						fixture.name (),
-						plugin.name ()));
+				taskLogger.noticeFormat (
+					"About to run fixture provider %s from %s",
+					fixture.name (),
+					plugin.name ());
 
 				String fixtureProviderClassName =
 					stringFormat (
@@ -92,14 +96,15 @@ class FixturesTool {
 
 				} catch (ClassNotFoundException exception) {
 
-					throw new RuntimeException (
-						stringFormat (
-							"Can't find fixture provider of type %s for ",
-							fixtureProviderClassName,
-							"fixture %s ",
-							fixture.name (),
-							"from %s",
-							plugin.name ()));
+					taskLogger.errorFormat (
+						"Can't find fixture provider of type %s for ",
+						fixtureProviderClassName,
+						"fixture %s ",
+						fixture.name (),
+						"from %s",
+						plugin.name ());
+
+					continue;
 
 				}
 
@@ -110,13 +115,14 @@ class FixturesTool {
 				FixtureProvider fixtureProvider =
 					fixtureProviderProvider.get ();
 
-				try {
+				try (
 
-					@Cleanup
 					Transaction transaction =
 						database.beginReadWrite (
 							"FixturesTool.runFixtureProviders (arguments)",
 							this);
+
+				) {
 
 					fixtureProvider.createFixtures ();
 
@@ -124,12 +130,11 @@ class FixturesTool {
 
 				} catch (Exception exception) {
 
-					throw new RuntimeException (
-						stringFormat (
-							"Error creating fixture %s from %s",
-							fixture.name (),
-							plugin.name ()),
-						exception);
+					taskLogger.errorFormatException (
+						exception,
+						"Error creating fixture %s from %s",
+						fixture.name (),
+						plugin.name ());
 
 				}
 
@@ -137,9 +142,8 @@ class FixturesTool {
 
 		}
 
-		log.info (
-			stringFormat (
-				"All fixtures providers run successfully"));
+		taskLogger.noticeFormat (
+			"All fixtures providers run successfully");
 
 	}
 

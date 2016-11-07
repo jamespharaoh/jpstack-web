@@ -13,7 +13,7 @@ import javax.inject.Named;
 
 import com.google.common.collect.ImmutableMap;
 
-import wbs.console.helper.EnumConsoleHelper;
+import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;

@@ -124,41 +124,41 @@ class ChatUserAdminBarringPart
 				() -> {
 
 				if (chatUser.getBarred ()) {
-	
+
 					htmlTableCheckWriterProvider.get ()
-	
+
 						.name (
 							"bar_off")
-	
+
 						.label (
 							"remove bar")
-	
+
 						.value (
 							false)
-	
+
 						.write (
 							formatWriter);
-	
+
 				} else {
-	
+
 					htmlTableCheckWriterProvider.get ()
-	
+
 						.name (
 							"bar_on")
-	
+
 						.label (
 							"bar user")
-	
+
 						.value (
 							false)
-	
+
 						.write (
 							formatWriter);
-	
+
 				}
 
 			});
-			
+
 			htmlTableDetailsRowWriteHtml (
 				"Reason",
 				() -> formatWriter.writeFormat (

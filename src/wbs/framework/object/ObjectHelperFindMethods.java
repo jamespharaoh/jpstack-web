@@ -6,28 +6,30 @@ import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 
 public
-interface ObjectHelperFindMethods<RecordType extends Record<RecordType>> {
+interface ObjectHelperFindMethods <
+	RecordType extends Record <RecordType>
+> {
 
-	List<RecordType> findAll ();
+	List <RecordType> findAll ();
 
-	List<RecordType> findByParent (
-			Record<?> parent);
+	List <RecordType> findByParent (
+			Record <?> parent);
 
-	List<RecordType> findByParent (
+	List <RecordType> findByParent (
 			GlobalId parentGlobalId);
 
-	List<RecordType> findByParentAndType (
-			Record<?> parent,
+	List <RecordType> findByParentAndType (
+			Record <?> parent,
 			String typeCode);
 
-	List<RecordType> findByParentAndType (
+	List <RecordType> findByParentAndType (
 			GlobalId parentGlobalId,
 			String typeCode);
 
-	List<RecordType> search (
+	List <RecordType> search (
 			Object search);
 
-	List<Long> searchIds (
+	List <Long> searchIds (
 			Object search);
 
 }

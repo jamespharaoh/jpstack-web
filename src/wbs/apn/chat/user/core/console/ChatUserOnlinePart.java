@@ -124,7 +124,7 @@ class ChatUserOnlinePart
 					"/style/chat-user-online.css"))
 
 			.build ();
-	
+
 	}
 
 	// implementation

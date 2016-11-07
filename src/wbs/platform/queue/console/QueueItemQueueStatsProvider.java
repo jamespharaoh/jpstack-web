@@ -12,7 +12,7 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsDatum;

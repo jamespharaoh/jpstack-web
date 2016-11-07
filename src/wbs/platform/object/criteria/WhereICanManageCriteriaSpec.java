@@ -2,7 +2,7 @@ package wbs.platform.object.criteria;
 
 import lombok.experimental.Accessors;
 
-import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleModuleData;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;

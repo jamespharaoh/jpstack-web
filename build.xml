@@ -7,21 +7,21 @@
     <pathelement path="work/bin"/>
   </path>
   <target name="clean" depends="just-clean"/>
-  <target name="build" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest"/>
+  <target name="build" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest"/>
   <target name="framework-jar" depends="just-build-framework, just-framework-jar"/>
-  <target name="api-deploy" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest, just-api-deploy"/>
-  <target name="api-auto" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest, just-api-deploy, just-api-restart"/>
-  <target name="console-deploy" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest, just-console-deploy"/>
-  <target name="console-auto" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest, just-console-deploy, just-console-restart"/>
-  <target name="daemon-deploy" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest, just-daemon-deploy"/>
-  <target name="daemon-auto" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest, just-daemon-deploy, just-daemon-restart"/>
-  <target name="all-auto" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest, just-api-deploy, just-console-deploy, just-daemon-deploy, just-api-restart, just-console-restart, just-daemon-restart"/>
+  <target name="api-deploy" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-api-deploy"/>
+  <target name="api-auto" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-api-deploy, just-api-restart"/>
+  <target name="console-deploy" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-console-deploy"/>
+  <target name="console-auto" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-console-deploy, just-console-restart"/>
+  <target name="daemon-deploy" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-daemon-deploy"/>
+  <target name="daemon-auto" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-daemon-deploy, just-daemon-restart"/>
+  <target name="all-auto" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-api-deploy, just-console-deploy, just-daemon-deploy, just-api-restart, just-console-restart, just-daemon-restart"/>
   <target name="javadoc" depends="just-javadoc"/>
-  <target name="fixtures" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data, just-fixtures"/>
-  <target name="tomcat-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest, just-api-deploy, just-console-deploy, just-daemon-deploy, just-tomcat-test"/>
-  <target name="daemon-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers, just-build-rest, just-daemon-deploy, just-daemon-test"/>
+  <target name="fixtures" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data, just-fixtures"/>
+  <target name="tomcat-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-api-deploy, just-console-deploy, just-daemon-deploy, just-tomcat-test"/>
+  <target name="daemon-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-daemon-deploy, just-daemon-test"/>
   <target name="generate-records" depends="just-build-framework, just-build-meta, just-generate-records"/>
-  <target name="generate-helpers" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-helpers"/>
+  <target name="generate-helpers" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers"/>
   <target name="just-clean">
     <delete includeEmptyDirs="true" failonerror="false">
       <fileset dir="work/bin" includes="**/*"/>
@@ -608,7 +608,7 @@
       <arg value="generateModels"/>
     </java>
   </target>
-  <target name="just-generate-helpers">
+  <target name="just-generate-object-helpers">
     <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
@@ -616,6 +616,16 @@
       <arg value=""/>
       <arg value="wbs.framework.entity.generate.ObjectHelperGeneratorTool"/>
       <arg value="generateObjectHelpers"/>
+    </java>
+  </target>
+  <target name="just-generate-console-helpers">
+    <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
+      <arg value="wbs-test"/>
+      <arg value="wbs.test"/>
+      <arg value="entity,generate,model,model-meta,object-generate,schema,utils"/>
+      <arg value=""/>
+      <arg value="wbs.console.helper.generate.ConsoleHelperGeneratorTool"/>
+      <arg value="generateConsoleHelpers"/>
     </java>
   </target>
   <target name="just-schema-create">

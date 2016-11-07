@@ -8,31 +8,33 @@ import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 
 public
-interface ObjectHelperIndexMethods<RecordType> {
+interface ObjectHelperIndexMethods <
+	RecordType extends Record <RecordType>
+> {
 
-	Optional<RecordType> findByIndex (
-			Record<?> parent,
+	Optional <RecordType> findByIndex (
+			Record <?> parent,
 			Long index);
 
 	RecordType findByIndexRequired (
-			Record<?> parent,
+			Record <?> parent,
 			Long index);
 
 	@Deprecated
 	RecordType findByIndexOrNull (
-			Record<?> parent,
+			Record <?> parent,
 			Long index);
 
 	RecordType findByIndex (
 			GlobalId parentGlobalId,
 			Long index);
 
-	List<RecordType> findByIndexRange (
-			Record<?> parent,
+	List <RecordType> findByIndexRange (
+			Record <?> parent,
 			Long indexStart,
 			Long indexEnd);
 
-	List<RecordType> findByIndexRange (
+	List <RecordType> findByIndexRange (
 			GlobalId parentGlobalId,
 			Long indexStart,
 			Long indexEnd);

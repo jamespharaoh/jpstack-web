@@ -5,6 +5,7 @@ import java.util.Map;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.model.ModelImplementation;
 
@@ -13,9 +14,9 @@ import wbs.framework.entity.model.ModelImplementation;
 public
 class ModelFieldBuilderTarget {
 
-	ModelImplementation model;
+	ModelImplementation <?> model;
 
-	List<ModelField> fields;
-	Map<String,ModelField> fieldsByName;
+	List <ModelField> fields;
+	Map <String, ModelField> fieldsByName;
 
 }

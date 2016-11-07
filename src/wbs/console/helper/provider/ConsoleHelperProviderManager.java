@@ -1,4 +1,4 @@
-package wbs.console.helper;
+package wbs.console.helper.provider;
 
 import static wbs.utils.string.StringUtils.stringFormat;
 

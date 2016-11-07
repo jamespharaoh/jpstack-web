@@ -2,23 +2,31 @@
 	name="console-helper"
 	package="wbs.console.helper">
 
-	<layer name="console">
-		<component class="ConsoleObjectManagerImplementation"/>
-		<component class="ConsoleHelperBuilder"/>
-		<component class="ConsoleHelperProviderBuilder"/>
-		<component class="ConsoleHelperProviderManager"/>
-		<component class="ConsoleHelperProviderMetaBuilder"/>
-		<component class="ConsoleHelperProviderRegistry"/>
-		<component class="ConsoleHelperProviderSpec"/>
-		<component class="ConsoleHelperRegistry"/>
-		<component class="GenericConsoleHelperProvider"/>
-		<component class="PrivKeyBuilder"/>
-		<component class="PrivKeySpec"/>
-		<component class="RunPostProcessorSpec"/>
+	<layer name="object-generate">
+
+		<component class="generate.ConsoleHelperGenerator"/>
+
 	</layer>
 
-	<layer name="compiler">
-		<component class="ConsoleHelperCompiler"/>
+	<layer name="console">
+
+		<component class="builder.PrivKeyBuilder"/>
+
+		<component class="core.ConsoleHelperImplementation"/>
+
+		<component class="manager.ConsoleObjectManagerImplementation"/>
+
+		<component class="provider.ConsoleHelperProviderBuilder"/>
+		<component class="provider.ConsoleHelperProviderManager"/>
+		<component class="provider.ConsoleHelperProviderMetaBuilder"/>
+		<component class="provider.ConsoleHelperProviderRegistry"/>
+		<component class="provider.GenericConsoleHelperProvider"/>
+
+		<component class="spec.ConsoleHelperProviderSpec"/>
+		<component class="spec.ConsoleHelperProviderSpecManager"/>
+		<component class="spec.PrivKeySpec"/>
+		<component class="spec.RunPostProcessorSpec"/>
+
 	</layer>
 
 </plugin>

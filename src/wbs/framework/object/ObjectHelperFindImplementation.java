@@ -10,11 +10,13 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 
@@ -26,18 +28,20 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 		ObjectHelperComponent <RecordType>,
 		ObjectHelperFindMethods <RecordType> {
 
-	// properties
+	// singleton dependencies
 
-	@Setter
-	ObjectModel <RecordType> model;
-
-	@Setter
-	ObjectHelper <RecordType> objectHelper;
-
-	@Setter
+	@WeakSingletonDependency
 	ObjectManager objectManager;
 
-	@Setter
+	// properties
+
+	@Getter @Setter
+	ObjectModel <RecordType> objectModel;
+
+	@Getter @Setter
+	ObjectHelper <RecordType> objectHelper;
+
+	@Getter @Setter
 	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
 
 	// public implementation
@@ -130,7 +134,7 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 
 		Method searchIdsMethod =
 			getMethodRequired (
-				model.daoImplementation ().getClass (),
+				objectModel.daoImplementation ().getClass (),
 				"searchIds",
 				ImmutableList.of (
 					searchClass));
@@ -141,7 +145,7 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 			List <Long> objectIds =
 				(List <Long>)
 				searchIdsMethod.invoke (
-					model.daoImplementation (),
+					objectModel.daoImplementation (),
 					search);
 
 			return objectIds;
@@ -176,16 +180,16 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 	@Override
 	public
 	List <RecordType> findByParent (
-			@NonNull Record<?> parent) {
+			@NonNull Record <?> parent) {
 
 		ObjectHelper <?> parentHelper =
 			objectManager.objectHelperForClassRequired (
 				parent.getClass ());
 
 		List <?> objectsUncast =
-			parentHelper.getChildren (
+			parentHelper.getChildrenGeneric (
 				parent,
-				model.objectClass ());
+				objectModel.objectClass ());
 
 		@SuppressWarnings ("unchecked")
 		List <RecordType> objects =

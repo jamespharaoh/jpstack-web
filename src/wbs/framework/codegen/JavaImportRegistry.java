@@ -23,7 +23,7 @@ interface JavaImportRegistry {
 
 	default
 	String registerFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		return register (
 			stringFormatArray (

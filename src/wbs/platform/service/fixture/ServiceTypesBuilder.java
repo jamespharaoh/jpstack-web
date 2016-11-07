@@ -26,7 +26,7 @@ class ServiceTypesBuilder {
 	ServiceTypesSpec spec;
 
 	@BuilderTarget
-	Model model;
+	Model <?> model;
 
 	// build
 

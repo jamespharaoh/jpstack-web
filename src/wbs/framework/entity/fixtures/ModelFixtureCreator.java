@@ -20,6 +20,7 @@ import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
+import wbs.framework.logging.TaskLogger;
 
 @Log4j
 public
@@ -82,7 +83,14 @@ class ModelFixtureCreator {
 
 	public
 	void runModelFixtureCreators (
+			@NonNull TaskLogger taskLogger,
 			@NonNull List <String> arguments) {
+
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"runModelFixtureCreators",
+				log);
 
 		log.info (
 			stringFormat (
@@ -93,7 +101,7 @@ class ModelFixtureCreator {
 				: modelMetaLoader.modelMetas ().values ()
 		) {
 
-			Model model =
+			Model <?> model =
 				entityHelper.modelsByName ().get (
 					spec.name ());
 

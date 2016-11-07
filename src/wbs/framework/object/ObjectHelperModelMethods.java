@@ -1,9 +1,16 @@
 package wbs.framework.object;
 
+import wbs.framework.codegen.DoNotDelegate;
+import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.Record;
 
 public
-interface ObjectHelperModelMethods <RecordType extends Record <RecordType>> {
+interface ObjectHelperModelMethods <
+	RecordType extends Record <RecordType>
+> {
+
+	@DoNotDelegate
+	ObjectModel <RecordType> objectModel ();
 
 	Class <RecordType> objectClass ();
 	String objectName ();
@@ -16,36 +23,49 @@ interface ObjectHelperModelMethods <RecordType extends Record <RecordType>> {
 	String shortName ();
 	String shortNamePlural ();
 
+	ModelField field (
+			String name);
+
 	Class <? extends Record <?>> parentClass ();
+	ModelField parentField ();
 	String parentFieldName ();
 	String parentLabel ();
 	Boolean parentExists ();
 
+	ModelField typeCodeField ();
 	String typeCodeFieldName ();
 	String typeCodeLabel ();
 	Boolean typeCodeExists ();
 
+	ModelField codeField ();
 	String codeFieldName ();
 	String codeLabel ();
 	Boolean codeExists ();
 
+	ModelField indexField ();
 	String indexFieldName ();
 	String indexLabel ();
 	Boolean indexExists ();
 	String indexCounterFieldName ();
 
+	ModelField deletedField ();
 	String deletedFieldName ();
 	String deletedLabel ();
 	Boolean deletedExists ();
 
+	ModelField descriptionField ();
 	String descriptionFieldName ();
 	String descriptionLabel ();
 	Boolean descriptionExists ();
 
+	ModelField nameField ();
 	String nameFieldName ();
 	String nameLabel ();
 	Boolean nameExists ();
 	Boolean nameIsCode ();
+
+	ModelField timestampField ();
+	String timestampFieldName ();
 
 	boolean common ();
 	boolean ephemeral ();
@@ -53,5 +73,10 @@ interface ObjectHelperModelMethods <RecordType extends Record <RecordType>> {
 	boolean major ();
 	boolean minor ();
 	boolean type ();
+
+	boolean isRoot ();
+	boolean isRooted ();
+	boolean canGetParent ();
+	boolean parentTypeIsFixed ();
 
 }

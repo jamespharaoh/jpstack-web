@@ -5,8 +5,8 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
 import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
@@ -124,17 +124,17 @@ class PostgresqlActivityPart
 
 			htmlTableRowOpen ();
 
-			htmlTableHeaderCellWrite (
+			htmlTableCellWrite (
 				integerToDecimalString (
 					statActivity.getId ()));
 
-			htmlTableHeaderCellWrite (
+			htmlTableCellWrite (
 				statActivity.getDatabaseName ());
 
-			htmlTableHeaderCellWrite (
+			htmlTableCellWrite (
 				statActivity.getUserName ());
 
-			htmlTableHeaderCellWrite (
+			htmlTableCellWrite (
 				statActivity.getCurrentQuery ());
 
 			htmlTableRowClose ();

@@ -6,7 +6,7 @@ import wbs.apn.chat.contact.model.ChatUserInitiationLogSearch;
 import wbs.apn.chat.contact.model.ChatUserInitiationLogRec;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.model.ChatRec;
-import wbs.console.helper.ConsoleHooks;
+import wbs.console.helper.core.ConsoleHooks;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;

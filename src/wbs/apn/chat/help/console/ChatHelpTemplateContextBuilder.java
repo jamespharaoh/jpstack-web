@@ -21,7 +21,7 @@ import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ConsoleContextBuilderContainerImplementation;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.context.SimpleConsoleContext;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.object.ObjectContext;
 import wbs.console.tab.ConsoleContextTab;

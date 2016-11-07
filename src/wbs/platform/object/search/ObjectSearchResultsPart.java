@@ -60,9 +60,9 @@ import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
-import wbs.console.helper.ConsoleHelper;
-import wbs.console.helper.ConsoleHooks;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.core.ConsoleHooks;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
@@ -378,7 +378,8 @@ class ObjectSearchResultsPart <
 			htmlLinkWrite (
 				stringFormat (
 					"?page=%h",
-					page),
+					integerToDecimalString (
+						page)),
 				integerToDecimalString (
 					page + 1),
 				presentInstances (
@@ -439,7 +440,7 @@ class ObjectSearchResultsPart <
 
 				result instanceof Record
 
-				&& ! consoleHelper.canView (
+				&& ! consoleHelper.canViewGeneric (
 					(Record <?>)
 					result)
 
@@ -473,7 +474,7 @@ class ObjectSearchResultsPart <
 					(Instant)
 					PropertyUtils.getProperty (
 						result,
-						consoleHelper.timestampField ().name ());
+						consoleHelper.timestampFieldName ());
 
 				LocalDate rowDate =
 					rowTimestamp.toDateTime ().toLocalDate ();
@@ -530,7 +531,8 @@ class ObjectSearchResultsPart <
 						Optional.of (
 							stringFormat (
 								"search-result-%s",
-								result.getId ())),
+								integerToDecimalString (
+									result.getId ()))),
 
 						optionalIf (
 							result == currentObject,
@@ -545,7 +547,8 @@ class ObjectSearchResultsPart <
 						"rows-class",
 						stringFormat (
 							"search-result-%s",
-							result.getId ())),
+							integerToDecimalString (
+								result.getId ()))),
 
 					htmlDataAttribute (
 						"target-href",
@@ -588,7 +591,8 @@ class ObjectSearchResultsPart <
 						Optional.of (
 							stringFormat (
 								"search-result-%s",
-								result.getId ())),
+								integerToDecimalString (
+									result.getId ()))),
 
 						optionalIf (
 							result == currentObject,
@@ -646,13 +650,13 @@ class ObjectSearchResultsPart <
 					"%s",
 					targetContext.get ().pathPrefix (),
 					"/%s",
-					consoleHelper.getPathId (
+					consoleHelper.getPathIdGeneric (
 						object)));
 
 		} else {
 
 			return requestContext.resolveLocalUrl (
-				consoleHelper.getDefaultLocalPath (
+				consoleHelper.getDefaultLocalPathGeneric (
 					object));
 
 		}

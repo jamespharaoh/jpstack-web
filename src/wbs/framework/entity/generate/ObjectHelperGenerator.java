@@ -8,14 +8,13 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.utils.etc.TypeUtils.classPackageName;
+import static wbs.utils.io.FileUtils.directoryCreateWithParents;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitFullStop;
 import static wbs.utils.string.StringUtils.uncapitalise;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,13 +23,10 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import org.apache.commons.io.FileUtils;
 
 import wbs.framework.codegen.JavaAnnotationWriter;
 import wbs.framework.codegen.JavaClassUnitWriter;
@@ -56,7 +52,6 @@ import wbs.framework.object.ObjectModelMethods;
 import wbs.framework.object.ObjectTypeEntry;
 import wbs.framework.object.ObjectTypeRegistry;
 import wbs.utils.etc.OptionalUtils;
-import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.AtomicFileWriter;
 import wbs.utils.string.FormatWriter;
 
@@ -73,11 +68,13 @@ class ObjectHelperGenerator {
 	// properties
 
 	@Getter @Setter
-	Model model;
+	Model <?> model;
 
 	// state
 
-	Model parentModel;
+	Model <?> parentModel;
+
+	String filename;
 
 	String packageName;
 	String recordClassName;
@@ -103,7 +100,20 @@ class ObjectHelperGenerator {
 	// implementation
 
 	public
-	void generateHelper () {
+	void generateHelper (
+			@NonNull TaskLogger taskLogger) {
+
+		init (
+			taskLogger);
+
+		writeClass (
+			taskLogger);
+
+	}
+
+	private
+	void init (
+			@NonNull TaskLogger taskLogger) {
 
 		if (model.parentTypeIsFixed ()) {
 
@@ -263,29 +273,22 @@ class ObjectHelperGenerator {
 				"work/generated/%s/logic",
 				packageName.replace ('.', '/'));
 
-		try {
+		directoryCreateWithParents (
+			directory);
 
-			FileUtils.forceMkdir (
-				new File (
-					directory));
-
-		} catch (IOException exception) {
-
-			throw new RuntimeIoException (
-				exception);
-
-		}
-
-		// write class
-
-		String filename =
+		filename =
 			stringFormat (
 				"%s/%s.java",
 				directory,
 				objectHelperImplementationName);
 
-		@Cleanup
-		FormatWriter formatWriter =
+	}
+
+	private
+	void writeClass (
+			@NonNull TaskLogger taskLogger) {
+
+		AtomicFileWriter formatWriter =
 			new AtomicFileWriter (
 				filename);
 
@@ -308,7 +311,7 @@ class ObjectHelperGenerator {
 			.addClassAnnotation (
 				new JavaAnnotationWriter ()
 
-			.name (
+				.name (
 					"java.lang.SuppressWarnings")
 
 				.addAttributeFormat (
@@ -330,7 +333,7 @@ class ObjectHelperGenerator {
 				"RecordType",
 				model.objectClass ().getSimpleName ());
 
-		addDependencies (
+		addSingletonDependencies (
 			classWriter);
 
 		addState (
@@ -345,14 +348,27 @@ class ObjectHelperGenerator {
 		addDelegations (
 			classWriter);
 
+		// write it out
+
+		if (taskLogger.errors ()) {
+			return;
+		}
+
 		classUnitWriter.addBlock (
 			classWriter);
 
-		classUnitWriter.write ();
+		classUnitWriter.write (
+			taskLogger);
+
+		if (taskLogger.errors ()) {
+			return;
+		}
+
+		formatWriter.commit ();
 
 	}
 
-	void addDependencies (
+	void addSingletonDependencies (
 			@NonNull JavaClassWriter classWriter) {
 
 		classWriter.addSingletonDependency (
@@ -413,15 +429,19 @@ class ObjectHelperGenerator {
 
 		classWriter.addState (
 			ObjectModel.class,
-			"objectModel");;
+			"objectModel");
 
 		classWriter.addState (
 			ObjectDatabaseHelper.class,
-			"databaseHelper");;
+			"databaseHelper",
+			true,
+			false);
 
 		classWriter.addState (
 			ObjectHooks.class,
-			"hooksImplementation");
+			"hooksImplementation",
+			true,
+			false);
 
 		for (
 			String componentName
@@ -441,7 +461,9 @@ class ObjectHelperGenerator {
 							model.objectClass ())),
 				stringFormat (
 					"%sImplementation",
-					componentName));
+					componentName),
+				true,
+				false);
 
 		}
 
@@ -619,9 +641,7 @@ class ObjectHelperGenerator {
 		// object model
 
 		formatWriter.writeLineFormat (
-			"%s objectModel =",
-			imports.register (
-				ObjectModel.class));
+			"objectModel =");
 
 		formatWriter.writeLineFormat (
 			"\tnew %s ()",
@@ -724,7 +744,7 @@ class ObjectHelperGenerator {
 		formatWriter.writeNewline ();
 
 		formatWriter.writeLineFormat (
-			"\t.model (");
+			"\t.objectModel (");
 
 		formatWriter.writeLineFormat (
 			"\t\tobjectModel);");
@@ -768,7 +788,7 @@ class ObjectHelperGenerator {
 			formatWriter.writeNewline ();
 
 			formatWriter.writeLineFormat (
-				"\t.model (");
+				"\t.objectModel (");
 
 			formatWriter.writeLineFormat (
 				"\t\tobjectModel);");
@@ -835,6 +855,7 @@ class ObjectHelperGenerator {
 				: componentNames
 		) {
 
+/*
 			formatWriter.writeLineFormat (
 				"%sImplementation.objectManager (",
 				componentName);
@@ -843,6 +864,7 @@ class ObjectHelperGenerator {
 				"\tobjectManager);");
 
 			formatWriter.writeNewline ();
+*/
 
 			formatWriter.writeLineFormat (
 				"%sImplementation.setup ();",
@@ -904,10 +926,6 @@ class ObjectHelperGenerator {
 		javaWriter.addDelegation (
 			ObjectModelMethods.class,
 			"objectModel");
-
-		javaWriter.addDelegation (
-			ModelMethods.class,
-			"model");
 
 	}
 

@@ -26,7 +26,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
@@ -160,7 +160,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 				(
 
-					entityFinder.isNotDeleted (
+					entityFinder.getNotDeletedCheckParents (
 						item)
 
 					&& objectManager.canView (
@@ -262,7 +262,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 				! selected
 
-				&& objectHelper.getDeleted (
+				&& objectHelper.getDeletedGeneric (
 					optionValue,
 					true)
 

@@ -25,9 +25,8 @@ import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ConsoleContextBuilderContainerImplementation;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.context.SimpleConsoleContext;
-import wbs.console.helper.ConsoleHelper;
-import wbs.console.helper.ConsoleHelperRegistry;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.ResolvedConsoleContextLink;
@@ -58,9 +57,6 @@ class ObjectContextBuilder <
 
 	@SingletonDependency
 	ComponentManager componentManager;
-
-	@SingletonDependency
-	ConsoleHelperRegistry consoleHelperRegistry;
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
@@ -507,7 +503,7 @@ class ObjectContextBuilder <
 		@SuppressWarnings ("unchecked")
 		ConsoleHelper <ObjectType> consoleHelperTemp =
 			(ConsoleHelper <ObjectType>)
-			consoleHelperRegistry.findByObjectName (
+			objectManager.findConsoleHelper (
 				spec.objectName ());
 
 		consoleHelper =

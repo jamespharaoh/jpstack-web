@@ -145,10 +145,6 @@ class FonixMessageSenderHelper
 	public
 	void decode () {
 
-debugFormat (
-	"BODY: %s",
-	responseBody);
-
 		JSONObject jsonObject =
 			(JSONObject)
 			JSONValue.parse (

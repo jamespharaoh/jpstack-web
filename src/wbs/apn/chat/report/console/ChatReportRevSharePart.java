@@ -158,7 +158,7 @@ class ChatReportRevSharePart
 			chatReportConsoleModule.formFieldSet (
 				"monthReportSearch",
 				ChatReportRevShareForm.class);
-	
+
 		resultsFields =
 			chatReportConsoleModule.formFieldSet (
 				"simpleReportResults",

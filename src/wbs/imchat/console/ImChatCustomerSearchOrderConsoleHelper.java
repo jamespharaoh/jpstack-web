@@ -1,6 +1,6 @@
 package wbs.imchat.console;
 
-import wbs.console.helper.EnumConsoleHelper;
+import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.imchat.model.ImChatCustomerSearch;
 

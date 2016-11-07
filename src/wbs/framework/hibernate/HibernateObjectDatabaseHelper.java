@@ -5,6 +5,7 @@ import static wbs.utils.etc.LogicUtils.notEqualSafe;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -59,7 +60,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	// properties
 
 	@Getter @Setter
-	ObjectModel <RecordType> model;
+	ObjectModel <RecordType> objectModel;
 
 	// public implementation
 
@@ -71,11 +72,9 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 		Session session =
 			hibernateDatabase.currentSession ();
 
-		@SuppressWarnings ("unchecked")
 		RecordType object =
-			(RecordType)
 			session.get (
-				model.objectClass (),
+				objectModel.objectClass (),
 				id);
 
 		return object;
@@ -105,7 +104,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 		Criteria criteria =
 			session.createCriteria (
-				model.objectClass ());
+				objectModel.objectClass ());
 
 		criteria.add (
 			Restrictions.in (
@@ -158,7 +157,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 		if (
 			isNotNull (
-				model.typeCodeField ())
+				objectModel.typeCodeField ())
 		) {
 
 			throw new UnsupportedOperationException (
@@ -168,7 +167,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 		}
 
-		if (model.isRooted ()) {
+		if (objectModel.isRooted ()) {
 
 			if (
 				notEqualSafe (
@@ -179,7 +178,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				throw new IllegalArgumentException (
 					stringFormat (
 						"Invalid parent global id %s ",
-						parentGlobalId,
+						parentGlobalId.toString (),
 						"for rooted object in %s.%s",
 						getClass ().getSimpleName (),
 						"findChildByCode"));
@@ -192,12 +191,12 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s = :code",
-					model.objectName (),
-					model.codeField ().name ()))
+					objectModel.objectName (),
+					objectModel.codeField ().name ()))
 
 				.setString (
 					"code",
@@ -218,7 +217,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 			return object;
 
-		} else if (model.parentTypeIsFixed ()) {
+		} else if (objectModel.parentTypeIsFixed ()) {
 
 			/*
 			if (parentGlobalId.getTypeId ()
@@ -235,13 +234,13 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 			if (
 				isNull (
-					model.parentField ())
+					objectModel.parentField ())
 			) {
 
 				throw new UnsupportedOperationException (
 					stringFormat (
 						"%sObjectHelper.findByParentAndCode (...)",
-						model.objectName ()));
+						objectModel.objectName ()));
 
 			}
 
@@ -251,16 +250,16 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s.id = :parentId ",
-					model.objectName (),
-					model.parentField ().name (),
+					objectModel.objectName (),
+					objectModel.parentField ().name (),
 
 					"AND _%s.%s = :code",
-					model.objectName (),
-					model.codeField ().name ()))
+					objectModel.objectName (),
+					objectModel.codeField ().name ()))
 
 				.setLong (
 					"parentId",
@@ -293,20 +292,20 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s.id = :parentTypeId ",
-					model.objectName (),
-					model.parentTypeField ().name (),
+					objectModel.objectName (),
+					objectModel.parentTypeField ().name (),
 
 					"AND _%s.%s = :parentId ",
-					model.objectName (),
-					model.parentIdField ().name (),
+					objectModel.objectName (),
+					objectModel.parentIdField ().name (),
 
 					"AND _%s.%s = :code",
-					model.objectName (),
-					model.codeField ().name ()))
+					objectModel.objectName (),
+					objectModel.codeField ().name ()))
 
 				.setLong (
 					"parentTypeId",
@@ -350,7 +349,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 		if (
 			isNotNull (
-				model.typeCodeField ())
+				objectModel.typeCodeField ())
 		) {
 
 			throw new UnsupportedOperationException (
@@ -367,7 +366,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				parentGlobalId.toString (),
 				index.toString ());
 
-		if (model.isRooted ()) {
+		if (objectModel.isRooted ()) {
 
 			if (
 				notEqualSafe (
@@ -378,7 +377,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				throw new IllegalArgumentException (
 					stringFormat (
 						"Invalid parent global id %s ",
-						parentGlobalId,
+						parentGlobalId.toString (),
 						"for rooted object in %s.%s",
 						getClass ().getSimpleName (),
 						"findChildByCode"));
@@ -391,12 +390,12 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s = :index",
-					model.objectName (),
-					model.indexField ().name ()))
+					objectModel.objectName (),
+					objectModel.indexField ().name ()))
 
 				.setLong (
 					"index",
@@ -417,7 +416,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 			return object;
 
-		} else if (model.parentTypeIsFixed ()) {
+		} else if (objectModel.parentTypeIsFixed ()) {
 
 			/*
 			if (parentGlobalId.getTypeId ()
@@ -438,16 +437,16 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s.id = :parentId ",
-					model.objectName (),
-					model.parentField ().name (),
+					objectModel.objectName (),
+					objectModel.parentField ().name (),
 
 					"AND _%s.%s = :index",
-					model.objectName (),
-					model.indexField ().name ()))
+					objectModel.objectName (),
+					objectModel.indexField ().name ()))
 
 				.setLong (
 					"parentId",
@@ -480,20 +479,20 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s.id = :parentTypeId ",
-					model.objectName (),
-					model.parentTypeField ().name (),
+					objectModel.objectName (),
+					objectModel.parentTypeField ().name (),
 
 					"AND _%s.%s = :parentId ",
-					model.objectName (),
-					model.parentIdField ().name (),
+					objectModel.objectName (),
+					objectModel.parentIdField ().name (),
 
 					"AND _%s.%s = :index",
-					model.objectName (),
-					model.indexField ().name ()))
+					objectModel.objectName (),
+					objectModel.indexField ().name ()))
 
 				.setLong (
 					"parentTypeId",
@@ -535,13 +534,13 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 		if (
 			isNull (
-				model.typeCodeField ())
+				objectModel.typeCodeField ())
 		) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Cannot call findAllByParentAndType for '%s', ",
-					model.objectName (),
+					objectModel.objectName (),
 					"because it has no type code field"));
 
 		}
@@ -557,7 +556,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 		Session session =
 			hibernateDatabase.currentSession ();
 
-		if (model.isRooted ()) {
+		if (objectModel.isRooted ()) {
 
 			if (
 				notEqualSafe (
@@ -568,7 +567,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				throw new IllegalArgumentException (
 					stringFormat (
 						"Invalid parent global id %s ",
-						parentGlobalId,
+						parentGlobalId.toString (),
 						"for rooted object in %s.%s",
 						getClass ().getSimpleName (),
 						"findByParentAndCode"));
@@ -581,25 +580,25 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s = :%s ",
-					model.objectName (),
-					model.typeCodeField ().name (),
-					model.typeCodeField ().name (),
+					objectModel.objectName (),
+					objectModel.typeCodeField ().name (),
+					objectModel.typeCodeField ().name (),
 
 					"AND _%s.%s = :%s",
-					model.objectName (),
-					model.codeField ().name (),
-					model.codeField ().name ()))
+					objectModel.objectName (),
+					objectModel.codeField ().name (),
+					objectModel.codeField ().name ()))
 
 				.setString (
-					model.typeCodeField ().name (),
+					objectModel.typeCodeField ().name (),
 					typeCode)
 
 				.setString (
-					model.codeField ().name (),
+					objectModel.codeField ().name (),
 					code)
 
 				.setFlushMode (
@@ -617,7 +616,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 			return object;
 
-		} else if (model.parentTypeIsFixed ()) {
+		} else if (objectModel.parentTypeIsFixed ()) {
 
 			/*
 			if (parentGlobalId.getTypeId ()
@@ -638,33 +637,33 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s.id = :parentId ",
-					model.objectName (),
-					model.parentField ().name (),
+					objectModel.objectName (),
+					objectModel.parentField ().name (),
 
 					"AND _%s.%s = :%s ",
-					model.objectName (),
-					model.typeCodeField ().name (),
-					model.typeCodeField ().name (),
+					objectModel.objectName (),
+					objectModel.typeCodeField ().name (),
+					objectModel.typeCodeField ().name (),
 
 					"AND _%s.%s = :%s",
-					model.objectName (),
-					model.codeField ().name (),
-					model.codeField ().name ()))
+					objectModel.objectName (),
+					objectModel.codeField ().name (),
+					objectModel.codeField ().name ()))
 
 				.setLong (
 					"parentId",
 					parentGlobalId.objectId ())
 
 				.setString (
-					model.typeCodeField ().name (),
+					objectModel.typeCodeField ().name (),
 					typeCode)
 
 				.setString (
-					model.codeField ().name (),
+					objectModel.codeField ().name (),
 					code)
 
 				.setFlushMode (
@@ -690,25 +689,25 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s.id = :parentTypeId ",
-					model.objectName (),
-					model.parentTypeField ().name (),
+					objectModel.objectName (),
+					objectModel.parentTypeField ().name (),
 
 					"AND _%s.%s = :parentId ",
-					model.objectName (),
-					model.parentIdField ().name (),
+					objectModel.objectName (),
+					objectModel.parentIdField ().name (),
 
 					"AND _%s.%s = :%s ",
-					model.objectName (),
-					model.typeCodeField ().name (),
-					model.typeCodeField ().name (),
+					objectModel.objectName (),
+					objectModel.typeCodeField ().name (),
+					objectModel.typeCodeField ().name (),
 
 					"AND _%s.%s = :code",
-					model.objectName (),
-					model.codeField ().name ()))
+					objectModel.objectName (),
+					objectModel.codeField ().name ()))
 
 				.setLong (
 					"parentTypeId",
@@ -719,11 +718,11 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 					parentGlobalId.objectId ())
 
 				.setString (
-					model.typeCodeField ().name (),
+					objectModel.typeCodeField ().name (),
 					typeCode)
 
 				.setString (
-					model.codeField ().name (),
+					objectModel.codeField ().name (),
 					code)
 
 				.setFlushMode (
@@ -762,7 +761,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 			stringFormat (
 				"FROM %s",
-				model.objectClass ().getSimpleName ()))
+				objectModel.objectClass ().getSimpleName ()))
 
 			.setFlushMode (
 				FlushMode.MANUAL)
@@ -792,7 +791,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 		Session session =
 			hibernateDatabase.currentSession ();
 
-		if (model.isRooted ()) {
+		if (objectModel.isRooted ()) {
 
 			if (
 				notEqualSafe (
@@ -803,7 +802,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				throw new IllegalArgumentException (
 					stringFormat (
 						"Invalid parent global id %s ",
-						parentGlobalId,
+						parentGlobalId.toString (),
 						"for rooted object in %s.%s",
 						getClass ().getSimpleName (),
 						"findChildren"));
@@ -815,7 +814,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 				stringFormat (
 					"FROM %s",
-					model.objectClass ().getSimpleName ()))
+					objectModel.objectClass ().getSimpleName ()))
 
 				.setFlushMode (
 					FlushMode.MANUAL)
@@ -829,7 +828,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 			return objects;
 
-		} else if (model.canGetParent ()) {
+		} else if (objectModel.canGetParent ()) {
 
 			/*
 
@@ -854,12 +853,12 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s.id = :parentId",
-					model.objectName (),
-					model.parentField ().name ()))
+					objectModel.objectName (),
+					objectModel.parentField ().name ()))
 
 				.setLong (
 					"parentId",
@@ -885,16 +884,16 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s.id = :parentTypeId ",
-					model.objectName (),
-					model.parentTypeField ().name (),
+					objectModel.objectName (),
+					objectModel.parentTypeField ().name (),
 
 					"AND _%s.%s = :parentId",
-					model.objectName (),
-					model.parentIdField ().name ()))
+					objectModel.objectName (),
+					objectModel.parentIdField ().name ()))
 
 				.setLong (
 					"parentTypeId",
@@ -925,7 +924,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			@NonNull Criteria criteria,
 			@NonNull GlobalId parentGlobalId) {
 
-		if (model.isRooted ()) {
+		if (objectModel.isRooted ()) {
 
 			if (
 				notEqualSafe (
@@ -936,14 +935,14 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				throw new IllegalArgumentException (
 					stringFormat (
 						"Invalid parent global id %s ",
-						parentGlobalId,
+						parentGlobalId.toString (),
 						"for rooted object in %s.%s",
 						getClass ().getSimpleName (),
 						"findChildren"));
 
 			}
 
-		} else if (model.canGetParent ()) {
+		} else if (objectModel.canGetParent ()) {
 
 			/*
 
@@ -966,8 +965,8 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				Restrictions.eq (
 					stringFormat (
 						"_%s.%s.id",
-						model.objectName (),
-						model.parentField ().name ()),
+						objectModel.objectName (),
+						objectModel.parentField ().name ()),
 					parentGlobalId.objectId ()));
 
 		} else {
@@ -976,16 +975,16 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				Restrictions.eq (
 					stringFormat (
 						"_%s.%s.id",
-						model.objectName (),
-						model.parentTypeField ().name ()),
+						objectModel.objectName (),
+						objectModel.parentTypeField ().name ()),
 					parentGlobalId.typeId ()));
 
 			criteria.add (
 				Restrictions.eq (
 					stringFormat (
 						"_%s.%s",
-						model.objectName (),
-						model.parentIdField ().name ()),
+						objectModel.objectName (),
+						objectModel.parentIdField ().name ()),
 					parentGlobalId.objectId ()));
 
 		}
@@ -1012,8 +1011,8 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 		Criteria criteria =
 			session.createCriteria (
-				model.objectClass (),
-				"_" + model.objectName ());
+				objectModel.objectClass (),
+				"_" + objectModel.objectName ());
 
 		// apply parent restriction
 
@@ -1027,16 +1026,16 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			Restrictions.ge (
 				stringFormat (
 					"_%s.%s",
-					model.objectName (),
-					model.indexField ().name ()),
+					objectModel.objectName (),
+					objectModel.indexField ().name ()),
 				indexStart));
 
 		criteria.add (
 			Restrictions.lt (
 				stringFormat (
 					"_%s.%s",
-					model.objectName (),
-					model.indexField ().name ()),
+					objectModel.objectName (),
+					objectModel.indexField ().name ()),
 				indexEnd));
 
 		// order by index ascending
@@ -1045,8 +1044,8 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			Order.asc (
 				stringFormat (
 					"_%s.%s",
-					model.objectName (),
-					model.indexField ().name ())));
+					objectModel.objectName (),
+					objectModel.indexField ().name ())));
 
 		// manual flush mode
 
@@ -1078,7 +1077,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				"insert",
 				"...");
 
-		model.hooks ().beforeInsert (
+		objectModel.hooks ().beforeInsert (
 			object);
 
 		Session session =
@@ -1087,7 +1086,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 		session.save (
 			object);
 
-		model.hooks ().afterInsert (
+		objectModel.hooks ().afterInsert (
 			object);
 
 		return object;
@@ -1105,9 +1104,10 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				"insertSpecial",
 				stringFormat (
 					"id = %s",
-					object.getId ()));
+					integerToDecimalString (
+						object.getId ())));
 
-		model.hooks ().beforeInsert (
+		objectModel.hooks ().beforeInsert (
 			object);
 
 		Session session =
@@ -1117,7 +1117,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			object,
 			ReplicationMode.EXCEPTION);
 
-		model.hooks ().afterInsert (
+		objectModel.hooks ().afterInsert (
 			object);
 
 		return object;
@@ -1135,9 +1135,10 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				"update",
 				stringFormat (
 					"id = %s",
-					object.getId()));
+					integerToDecimalString (
+						object.getId ())));
 
-		model.hooks ().beforeUpdate (
+		objectModel.hooks ().beforeUpdate (
 			object);
 
 		return object;
@@ -1155,7 +1156,8 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				"remove",
 				stringFormat (
 					"id = %s",
-					object.getId ()));
+					integerToDecimalString (
+						object.getId ())));
 
 		Session session =
 			hibernateDatabase.currentSession ();
@@ -1175,13 +1177,13 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 		if (
 			isNull (
-				model.typeCodeField ())
+				objectModel.typeCodeField ())
 		) {
 
 			throw new UnsupportedOperationException (
 				stringFormat (
 					"Cannot call findAllByParentAndType for '%s', ",
-					model.objectName (),
+					objectModel.objectName (),
 					"because it has no type code field"));
 
 		}
@@ -1196,7 +1198,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 		Session session =
 			hibernateDatabase.currentSession ();
 
-		if (model.isRooted ()) {
+		if (objectModel.isRooted ()) {
 
 			if (
 				notEqualSafe (
@@ -1207,7 +1209,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				throw new IllegalArgumentException (
 					stringFormat (
 						"Invalid parent global id %s ",
-						parentGlobalId,
+						parentGlobalId.toString (),
 						"for rooted object in %s.%s",
 						getClass ().getSimpleName (),
 						"findChildren"));
@@ -1220,16 +1222,16 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s = :%s",
-					model.objectName (),
-					model.typeCodeField ().name (),
-					model.typeCodeField ().name ()))
+					objectModel.objectName (),
+					objectModel.typeCodeField ().name (),
+					objectModel.typeCodeField ().name ()))
 
 				.setString (
-					model.typeCodeField ().name (),
+					objectModel.typeCodeField ().name (),
 					typeCode)
 
 				.setFlushMode (
@@ -1246,20 +1248,22 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 		}
 
-		if (model.canGetParent ()) {
+		if (objectModel.canGetParent ()) {
 
 			if (
 				integerNotEqualSafe (
 					parentGlobalId.typeId (),
-					model.parentTypeId ())
+					objectModel.parentTypeId ())
 			) {
 
 				throw new IllegalArgumentException (
 					stringFormat (
 						"Invalid parent type id %s for %s (should be %s)",
-						parentGlobalId.typeId (),
-						model.objectName (),
-						model.parentTypeId ()));
+						integerToDecimalString (
+							parentGlobalId.typeId ()),
+						objectModel.objectName (),
+						integerToDecimalString (
+							objectModel.parentTypeId ())));
 
 			}
 
@@ -1269,24 +1273,24 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s.id = :parentId ",
-					model.objectName (),
-					model.parentField ().name (),
+					objectModel.objectName (),
+					objectModel.parentField ().name (),
 
 					"AND _%s.%s = :%s",
-					model.objectName (),
-					model.typeCodeField ().name (),
-					model.typeCodeField ().name ()))
+					objectModel.objectName (),
+					objectModel.typeCodeField ().name (),
+					objectModel.typeCodeField ().name ()))
 
 				.setLong (
 					"parentId",
 					parentGlobalId.objectId ())
 
 				.setString (
-					model.typeCodeField ().name (),
+					objectModel.typeCodeField ().name (),
 					typeCode)
 
 				.setFlushMode (
@@ -1309,21 +1313,21 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				stringFormat (
 
 					"FROM %s _%s ",
-					model.objectClass ().getSimpleName (),
-					model.objectName (),
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
 
 					"WHERE _%s.%s.id = :parentTypeId ",
-					model.objectName (),
-					model.parentTypeField ().name (),
+					objectModel.objectName (),
+					objectModel.parentTypeField ().name (),
 
 					"AND _%s.%s = :parentId",
-					model.objectName (),
-					model.parentIdField ().name (),
+					objectModel.objectName (),
+					objectModel.parentIdField ().name (),
 
 					"AND _%s.%s = :%s",
-					model.objectName (),
-					model.typeCodeField ().name (),
-					model.typeCodeField ().name ()))
+					objectModel.objectName (),
+					objectModel.typeCodeField ().name (),
+					objectModel.typeCodeField ().name ()))
 
 				.setLong (
 					"parentTypeId",
@@ -1334,7 +1338,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 					parentGlobalId.objectId ())
 
 				.setString (
-					model.typeCodeField ().name (),
+					objectModel.typeCodeField ().name (),
 					typeCode)
 
 				.setFlushMode (
@@ -1364,7 +1368,8 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				"lock",
 				stringFormat (
 					"id = %s",
-					object.getId ()));
+					integerToDecimalString (
+						object.getId ())));
 
 		Session session =
 			hibernateDatabase.currentSession ();
@@ -1388,7 +1393,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			"hibernate",
 			stringFormat (
 				"%sHelperProvider.%s (%s)",
-				model.objectName (),
+				objectModel.objectName (),
 				methodName,
 				joinWithCommaAndSpace (
 					arguments)),

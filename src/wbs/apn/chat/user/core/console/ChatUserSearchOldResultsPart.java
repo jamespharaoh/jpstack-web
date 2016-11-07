@@ -33,7 +33,7 @@ import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.helper.EnumConsoleHelper;
+import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;

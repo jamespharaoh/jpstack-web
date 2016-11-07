@@ -1,20 +1,22 @@
 package wbs.framework.object;
 
 import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.etc.TypeUtils.dynamicCast;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.utils.etc.PropertyUtils;
@@ -31,38 +33,31 @@ class ObjectHelperPropertyImplementation <
 
 	// singleton dependencies
 
+	@WeakSingletonDependency
+	ObjectManager objectManager;
+
 	@SingletonDependency
 	ObjectTypeRegistry objectTypeRegistry;
 
 	// properties
 
-	@Setter
-	ObjectModel <RecordType> model;
+	@Getter @Setter
+	ObjectModel <RecordType> objectModel;
 
-	@Setter
+	@Getter @Setter
 	ObjectHelper <RecordType> objectHelper;
 
-	@Setter
+	@Getter @Setter
 	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
-
-	@Setter
-	ObjectManager objectManager;
 
 	// public implementation
 
 	@Override
 	public
 	String getName (
-			@NonNull Record<?> objectUncast) {
+			@NonNull RecordType object) {
 
-		@SuppressWarnings ("unchecked")
-		RecordType object =
-			(RecordType)
-			dynamicCast (
-				model.objectClass (),
-				objectUncast);
-
-		return model.getName (
+		return objectModel.getName (
 			object);
 
 	}
@@ -70,16 +65,9 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	String getTypeCode (
-			@NonNull Record<?> objectUncast) {
+			@NonNull RecordType object) {
 
-		@SuppressWarnings ("unchecked")
-		RecordType object =
-			(RecordType)
-			dynamicCast (
-				model.objectClass (),
-				objectUncast);
-
-		return model.getTypeCode (
+		return objectModel.getTypeCode (
 			object);
 
 	}
@@ -87,16 +75,9 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	String getCode (
-			@NonNull Record<?> objectUncast) {
+			@NonNull RecordType object) {
 
-		@SuppressWarnings ("unchecked")
-		RecordType object =
-			(RecordType)
-			dynamicCast (
-				model.objectClass (),
-				objectUncast);
-
-		return model.getCode (
+		return objectModel.getCode (
 			object);
 
 	}
@@ -104,33 +85,19 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	String getDescription (
-			@NonNull Record<?> objectUncast) {
+			@NonNull RecordType object) {
 
-		@SuppressWarnings ("unchecked")
-		RecordType object =
-			(RecordType)
-			dynamicCast (
-				model.objectClass (),
-				objectUncast);
-
-		return model.getDescription (
+		return objectModel.getDescription (
 			object);
 
 	}
 
 	@Override
 	public
-	Record<?> getParentObjectType (
-			@NonNull Record<?> objectUncast) {
+	Record <?> getParentType (
+			@NonNull RecordType object) {
 
-		@SuppressWarnings ("unchecked")
-		RecordType object =
-			(RecordType)
-			dynamicCast (
-				model.objectClass (),
-				objectUncast);
-
-		return model.getParentType (
+		return objectModel.getParentType (
 			object);
 
 	}
@@ -138,27 +105,27 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	Long getParentTypeId (
-			@NonNull Record<?> object) {
+			@NonNull RecordType object) {
 
 		if (
-			! model.objectClass ().isInstance (
+			! objectModel.objectClass ().isInstance (
 				object)
 		) {
 
 			throw new IllegalArgumentException ();
 
-		} else if (model.isRoot ()) {
+		} else if (objectModel.isRoot ()) {
 
 			throw new UnsupportedOperationException ();
 
-		} else if (model.parentTypeId () != null) {
+		} else if (objectModel.parentTypeId () != null) {
 
-			return model.parentTypeId ();
+			return objectModel.parentTypeId ();
 
 		} else {
 
-			Record<?> parentType =
-				model.getParentType (
+			Record <?> parentType =
+				objectModel.getParentType (
 					object);
 
 			return parentType.getId ();
@@ -170,25 +137,25 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	Long getParentId (
-			@NonNull Record <?> object) {
+			@NonNull RecordType object) {
 
 		if (
 			isNotInstanceOf (
-				model.objectClass (),
+				objectModel.objectClass (),
 				object)
 		) {
 
 			throw new IllegalArgumentException ();
 
-		} else if (model.isRoot ()) {
+		} else if (objectModel.isRoot ()) {
 
 			throw new UnsupportedOperationException ();
 
-		} else if (model.isRooted ()) {
+		} else if (objectModel.isRooted ()) {
 
 			return 0l;
 
-		} else if (model.canGetParent ()) {
+		} else if (objectModel.canGetParent ()) {
 
 			Record <?> parent =
 				getParent (
@@ -201,7 +168,7 @@ class ObjectHelperPropertyImplementation <
 			return (Long)
 				PropertyUtils.getProperty (
 					object,
-					model.parentIdField ().name ());
+					objectModel.parentIdField ().name ());
 
 		}
 
@@ -210,19 +177,12 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	void setParent (
-			@NonNull Record<?> objectUncast,
-			@NonNull Record<?> parent) {
-
-		@SuppressWarnings ("unchecked")
-		RecordType object =
-			(RecordType)
-			dynamicCast (
-				model.objectClass (),
-				objectUncast);
+			@NonNull RecordType object,
+			@NonNull Record <?> parent) {
 
 		PropertyUtils.setProperty (
 			object,
-			model.parentField ().name (),
+			objectModel.parentField ().name (),
 			parent);
 
 		// TODO grand parent etc
@@ -232,9 +192,9 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	GlobalId getParentGlobalId (
-			@NonNull Record <?> object) {
+			@NonNull RecordType object) {
 
-		if (model.isRoot ()) {
+		if (objectModel.isRoot ()) {
 
 			return null;
 
@@ -253,13 +213,13 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	Record <?> getParent (
-			@NonNull Record <?> object) {
+			@NonNull RecordType object) {
 
-		if (model.isRoot ()) {
+		if (objectModel.isRoot ()) {
 
 			return null;
 
-		} else if (model.isRooted ()) {
+		} else if (objectModel.isRooted ()) {
 
 			ObjectHelper <?> rootHelper =
 				objectManager.objectHelperForClassRequired (
@@ -268,10 +228,10 @@ class ObjectHelperPropertyImplementation <
 			return rootHelper.findRequired (
 				0l);
 
-		} else if (model.canGetParent ()) {
+		} else if (objectModel.canGetParent ()) {
 
 			Record <?> parent =
-				model.getParent (
+				objectModel.getParent (
 					object);
 
 			if (parent == null) {
@@ -279,8 +239,9 @@ class ObjectHelperPropertyImplementation <
 				throw new RuntimeException (
 					stringFormat (
 						"Failed to get parent of %s with id %s",
-						model.objectName (),
-						object.getId ()));
+						objectModel.objectName (),
+						integerToDecimalString (
+							object.getId ())));
 
 			}
 
@@ -290,11 +251,11 @@ class ObjectHelperPropertyImplementation <
 
 			Record <?> parentObjectType =
 				(Record <?>)
-				model.getParentType (
+				objectModel.getParentType (
 					object);
 
 			Long parentObjectId =
-				model.getParentId (
+				objectModel.getParentId (
 					object);
 
 			if (parentObjectId == null) {
@@ -302,8 +263,9 @@ class ObjectHelperPropertyImplementation <
 				throw new RuntimeException (
 					stringFormat (
 						"Failed to get parent id of %s with id %s",
-						model.objectName (),
-						object.getId ()));
+						objectModel.objectName (),
+						integerToDecimalString (
+							object.getId ())));
 
 			}
 
@@ -316,10 +278,12 @@ class ObjectHelperPropertyImplementation <
 				throw new RuntimeException (
 					stringFormat (
 						"No object helper provider for %s, ",
-						parentObjectType.getId (),
+						integerToDecimalString (
+							parentObjectType.getId ()),
 						"parent of %s (%s)",
-						model.objectName (),
-						object.getId ()));
+						objectModel.objectName (),
+						integerToDecimalString (
+							object.getId ())));
 
 			}
 
@@ -336,7 +300,8 @@ class ObjectHelperPropertyImplementation <
 					stringFormat (
 						"Can't find %s with id %s",
 						parentHelper.objectName (),
-						parentObjectId));
+						integerToDecimalString (
+							parentObjectId)));
 
 			}
 
@@ -350,10 +315,10 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	GlobalId getGlobalId (
-			@NonNull Record<?> object) {
+			@NonNull RecordType object) {
 
 		return new GlobalId (
-			model.objectTypeId (),
+			objectModel.objectTypeId (),
 			object.getId ());
 
 	}
@@ -361,7 +326,7 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	Boolean getDeleted (
-			@NonNull Record <?> object,
+			@NonNull RecordType object,
 			boolean checkParents) {
 
 		Record <?> currentObject =
@@ -411,7 +376,7 @@ class ObjectHelperPropertyImplementation <
 			if (currentHelper.canGetParent ()) {
 
 				currentObject =
-					currentHelper.getParent (
+					currentHelper.getParentGeneric (
 						currentObject);
 
 				currentHelper =
@@ -420,13 +385,13 @@ class ObjectHelperPropertyImplementation <
 
 			} else {
 
-				Record<?> parentType =
-					(Record<?>)
-					objectHelper.getParentType (
+				Record <?> parentType =
+					(Record <?>)
+					objectHelper.getParentTypeGeneric (
 						currentObject);
 
 				Long parentObjectId =
-					getParentId (
+					getParentIdGeneric (
 						currentObject);
 
 				currentHelper =
@@ -446,17 +411,10 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	Object getDynamic (
-			@NonNull Record<?> objectUncast,
+			@NonNull RecordType object,
 			@NonNull String name) {
 
-		@SuppressWarnings ("unchecked")
-		RecordType object =
-			(RecordType)
-			dynamicCast (
-				model.objectClass (),
-				objectUncast);
-
-		return model.hooks ().getDynamic (
+		return objectModel.hooks ().getDynamic (
 			 object,
 			 name);
 
@@ -465,18 +423,11 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	void setDynamic (
-			@NonNull Record <?> objectUncast,
+			@NonNull RecordType object,
 			@NonNull String name,
 			@NonNull Optional <?> valueOptional) {
 
-		@SuppressWarnings ("unchecked")
-		RecordType object =
-			(RecordType)
-			dynamicCast (
-				model.objectClass (),
-				objectUncast);
-
-		model.hooks ().setDynamic (
+		objectModel.hooks ().setDynamic (
 			object,
 			name,
 			valueOptional);

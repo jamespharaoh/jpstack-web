@@ -45,7 +45,7 @@ class HtmlTableUtils {
 
 				currentColumnSpan = 1;
 
-			} else if (headerLabel == null) { 
+			} else if (headerLabel == null) {
 
 				// null value continue previous column
 
@@ -63,7 +63,7 @@ class HtmlTableUtils {
 						currentLabel);
 
 				} else {
-	
+
 					formatWriter.writeLineFormat (
 						"<th>%h</th>",
 						currentLabel);
@@ -622,7 +622,7 @@ class HtmlTableUtils {
 			">%s</td>",
 			content);
 
-		formatWriter.writeNewline (); 
+		formatWriter.writeNewline ();
 
 	}
 

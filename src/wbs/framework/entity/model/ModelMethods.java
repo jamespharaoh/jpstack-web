@@ -7,12 +7,12 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 
 public
-interface ModelMethods {
+interface ModelMethods <RecordType extends Record <RecordType>> {
 
 	// identity
 
 	String objectName ();
-	Class <? extends Record <?>> objectClass ();
+	Class <RecordType> objectClass ();
 	String objectTypeCode ();
 
 	String tableName ();
@@ -53,24 +53,63 @@ interface ModelMethods {
 	// property accessors
 
 	Record <?> getParent (
-			Record <?> object);
+			RecordType object);
+
+	default
+	Record <?> getParentGeneric (
+			Record <?> object) {
+
+		return getParent (
+			objectClass ().cast (
+				object));
+
+	}
 
 	Record <?> getParentType (
-			Record <?> object);
+			RecordType object);
+
+	default
+	Record <?> getParentTypeGeneric (
+			Record <?> object) {
+
+		return objectClass ().cast (
+			object);
+
+	}
 
 	Long getParentId (
-			Record <?> object);
+			RecordType object);
 
 	String getTypeCode (
-			Record <?> record);
+			RecordType object);
+
+	default
+	String getTypeCodeGeneric (
+			Record <?> object) {
+
+		return getTypeCode (
+			objectClass ().cast (
+				object));
+
+	}
 
 	String getCode (
-			Record <?> record);
+			RecordType record);
+
+	default
+	String getCodeGeneric (
+			Record <?> record) {
+
+		return getCode (
+			objectClass ().cast (
+				record));
+
+	}
 
 	String getName (
-			Record <?> record);
+			RecordType record);
 
 	String getDescription (
-			Record <?> record);
+			RecordType record);
 
 }

@@ -9,7 +9,7 @@ class DebugUtils {
 
 	public static
 	void debugFormat (
-			@NonNull Object... arguments) {
+			@NonNull String ... arguments) {
 
 		System.err.print (
 			"====== ");

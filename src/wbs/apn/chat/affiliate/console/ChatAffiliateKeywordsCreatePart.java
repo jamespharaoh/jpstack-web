@@ -12,7 +12,7 @@ import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
 import javax.inject.Named;
 
 import wbs.apn.chat.core.console.ChatKeywordJoinTypeConsoleHelper;
-import wbs.console.helper.EnumConsoleHelper;
+import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;

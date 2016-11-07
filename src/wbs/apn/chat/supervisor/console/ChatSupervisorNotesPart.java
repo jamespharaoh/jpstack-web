@@ -16,7 +16,7 @@ import wbs.apn.chat.contact.model.ChatContactNoteObjectHelper;
 import wbs.apn.chat.contact.model.ChatContactNoteRec;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.model.ChatRec;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.reporting.StatsPeriod;
 import wbs.framework.component.annotations.PrototypeComponent;

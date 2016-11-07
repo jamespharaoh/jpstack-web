@@ -13,13 +13,13 @@ import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
 public
-class ObjectModelImplementation<RecordType extends Record<RecordType>>
-	implements ObjectModel<RecordType> {
+class ObjectModelImplementation <RecordType extends Record <RecordType>>
+	implements ObjectModel <RecordType> {
 
 	// properties
 
 	@Getter @Setter
-	Model model;
+	Model <RecordType> model;
 
 	// object model properties
 
@@ -33,13 +33,13 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 	Long parentTypeId;
 
 	@Getter @Setter
-	Class<Record<?>> parentClass;
+	Class <Record <?>> parentClass;
 
 	@Getter @Setter
 	Object daoImplementation;
 
 	@Getter @Setter
-	Class<?> daoInterface;
+	Class <?> daoInterface;
 
 	@Getter @Setter
 	ObjectHooks<RecordType> hooks;
@@ -54,7 +54,7 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 
 	@Override
 	public
-	Class<? extends Record<?>> objectClass () {
+	Class <RecordType> objectClass () {
 		return model.objectClass ();
 	}
 
@@ -179,7 +179,7 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	Record <?> getParent (
-			@NonNull Record<?> object) {
+			@NonNull RecordType object) {
 
 		return model.getParent (
 			object);
@@ -189,7 +189,7 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	Record<?> getParentType (
-			@NonNull Record <?> object) {
+			@NonNull RecordType object) {
 
 		return model.getParentType (
 			object);
@@ -199,7 +199,7 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	Long getParentId (
-			@NonNull Record <?> object) {
+			@NonNull RecordType object) {
 
 		return model.getParentId (
 			object);
@@ -209,7 +209,7 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	String getTypeCode (
-			@NonNull Record <?> record) {
+			@NonNull RecordType record) {
 
 		return model.getTypeCode (
 			record);
@@ -219,7 +219,7 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	String getCode (
-			@NonNull Record <?> record) {
+			@NonNull RecordType record) {
 
 		return model.getCode (
 			record);
@@ -229,7 +229,7 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	String getName (
-			@NonNull Record <?> record) {
+			@NonNull RecordType record) {
 
 		return model.getName (
 			record);
@@ -239,7 +239,7 @@ class ObjectModelImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	String getDescription (
-			@NonNull Record <?> record) {
+			@NonNull RecordType record) {
 
 		return model.getDescription (
 			record);

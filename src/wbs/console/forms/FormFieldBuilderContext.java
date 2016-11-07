@@ -1,6 +1,6 @@
 package wbs.console.forms;
 
-import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.core.ConsoleHelper;
 
 public
 interface FormFieldBuilderContext {

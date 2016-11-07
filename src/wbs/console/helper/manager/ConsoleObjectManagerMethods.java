@@ -1,4 +1,4 @@
-package wbs.console.helper;
+package wbs.console.helper.manager;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -8,6 +8,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.framework.entity.record.Record;
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.StringFormatWriter;

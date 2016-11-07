@@ -7,16 +7,16 @@ import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 
 public
-interface ObjectDatabaseHelper<RecordType extends Record<RecordType>> {
+interface ObjectDatabaseHelper <RecordType extends Record <RecordType>> {
 
 	// getters
 
-	ObjectModel <RecordType> model ();
+	ObjectModel <RecordType> objectModel ();
 
 	// setters
 
-	ObjectDatabaseHelper <RecordType> model (
-			ObjectModel <RecordType> model);
+	ObjectDatabaseHelper <RecordType> objectModel (
+			ObjectModel <RecordType> objectModel);
 
 	// database
 

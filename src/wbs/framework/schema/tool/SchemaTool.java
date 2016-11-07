@@ -1,5 +1,6 @@
 package wbs.framework.schema.tool;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -15,6 +16,7 @@ import javax.inject.Provider;
 import javax.sql.DataSource;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -52,7 +54,6 @@ class SchemaTool {
 
 	// state
 
-	TaskLogger taskLog;
 	Schema schema;
 	List <String> sqlStatements;
 
@@ -60,26 +61,32 @@ class SchemaTool {
 
 	public
 	void schemaCreate (
-			List <String> args) {
+			@NonNull TaskLogger taskLogger,
+			@NonNull List <String> arguments) {
 
-		taskLog =
-			new TaskLogger (
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"schemaCreate",
 				log);
 
-		defineTables ();
+		defineTables (
+			taskLogger);
+
 		createSchemaSqlScript ();
 		executeSchemaSqlScript ();
 		createObjectTypes ();
 
 	}
 
-	void defineTables () {
+	void defineTables (
+			@NonNull TaskLogger taskLogger) {
 
 		schema =
 			schemaFromModel.get ()
 
 			.taskLog (
-				taskLog)
+				taskLogger)
 
 			.enumTypes (
 				schemaTypesHelper.enumTypes ())
@@ -89,12 +96,13 @@ class SchemaTool {
 
 			.build ();
 
-		if (taskLog.errors ()) {
+		if (taskLogger.errors ()) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Aborting due to %s errors",
-					taskLog.errorCount ()));
+					integerToDecimalString (
+						taskLogger.errorCount ())));
 
 		}
 
@@ -198,7 +206,8 @@ class SchemaTool {
 				log.error (
 					stringFormat (
 						"Additional %s errors not shown",
-						errors - 100));
+						integerToDecimalString (
+							errors - 100)));
 
 			}
 
@@ -207,7 +216,8 @@ class SchemaTool {
 				throw new RuntimeException (
 					stringFormat (
 						"Aborting due to %s errors",
-						errors));
+						integerToDecimalString (
+							errors)));
 
 			}
 
@@ -261,7 +271,7 @@ class SchemaTool {
 				"Creating object types");
 
 			for (
-				Model model
+				Model <?> model
 					: entityHelper.models ()
 			) {
 

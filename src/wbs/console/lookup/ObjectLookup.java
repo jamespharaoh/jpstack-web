@@ -3,9 +3,9 @@ package wbs.console.lookup;
 import wbs.console.context.ConsoleContextStuff;
 
 public
-interface ObjectLookup<Type> {
+interface ObjectLookup <ObjectType> {
 
-	Type lookupObject (
+	ObjectType lookupObject (
 			ConsoleContextStuff contextStuff);
 
 }

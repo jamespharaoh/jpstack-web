@@ -21,7 +21,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.forms.FormType;
-import wbs.console.helper.EnumConsoleHelper;
+import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.utils.string.FormatWriter;
 

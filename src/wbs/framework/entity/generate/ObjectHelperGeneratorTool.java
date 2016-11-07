@@ -1,7 +1,7 @@
 package wbs.framework.entity.generate;
 
 import static wbs.utils.collection.CollectionUtils.collectionSize;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 
 import java.util.List;
 
@@ -14,6 +14,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
+import wbs.framework.logging.TaskLogger;
 
 @Log4j
 public
@@ -33,14 +34,21 @@ class ObjectHelperGeneratorTool {
 
 	public
 	void generateObjectHelpers (
+			@NonNull TaskLogger taskLogger,
 			@NonNull List <String> params) {
 
-		List <Model> models =
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"generateObjectHelpers",
+				log);
+
+		List <Model <?>> models =
 			entityHelper.models ();
 
-		log.info (
-			stringFormat (
-				"About to generate %s object helpers",
+		taskLogger.noticeFormat (
+			"About to generate %s object helpers",
+			integerToDecimalString (
 				collectionSize (
 					models)));
 
@@ -48,7 +56,7 @@ class ObjectHelperGeneratorTool {
 		long numFailures = 0;
 
 		for (
-			Model model
+			Model <?> model
 				: models
 		) {
 
@@ -59,17 +67,17 @@ class ObjectHelperGeneratorTool {
 					.model (
 						model)
 
-					.generateHelper ();
+					.generateHelper (
+						taskLogger);
 
 				numSuccess ++;
 
 			} catch (Exception exception) {
 
-				log.error (
-					stringFormat (
-						"Error writing object helper for %s",
-						model.objectName ()),
-					exception);
+				taskLogger.errorFormatException (
+					exception,
+					"Error writing object helper for %s",
+					model.objectName ());
 
 				numFailures ++;
 
@@ -77,16 +85,16 @@ class ObjectHelperGeneratorTool {
 
 		}
 
-		log.info (
-			stringFormat (
-				"Successfully generated %s object helpers",
+		taskLogger.noticeFormat (
+			"Successfully generated %s object helpers",
+			integerToDecimalString (
 				numSuccess));
 
 		if (numFailures > 0) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Aborting due to %s errors",
+			taskLogger.errorFormat (
+				"Aborting due to %s errors",
+				integerToDecimalString (
 					numFailures));
 
 		}

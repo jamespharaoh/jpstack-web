@@ -7,11 +7,13 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.entity.record.UnsavedRecordDetector;
@@ -19,24 +21,28 @@ import wbs.framework.entity.record.UnsavedRecordDetector;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperUpdateImplementation")
 public
-class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
+class ObjectHelperUpdateImplementation <
+	RecordType extends Record <RecordType>
+>
 	implements
-		ObjectHelperComponent<RecordType>,
-		ObjectHelperUpdateMethods<RecordType> {
+		ObjectHelperComponent <RecordType>,
+		ObjectHelperUpdateMethods <RecordType> {
+
+	// singleton dependencies
+
+	@WeakSingletonDependency
+	ObjectManager objectManager;
 
 	// properties
 
-	@Setter
-	ObjectModel<RecordType> model;
+	@Getter @Setter
+	ObjectModel <RecordType> objectModel;
 
-	@Setter
-	ObjectHelper<RecordType> objectHelper;
+	@Getter @Setter
+	ObjectHelper <RecordType> objectHelper;
 
-	@Setter
-	ObjectManager objectManager;
-
-	@Setter
-	ObjectDatabaseHelper<RecordType> objectDatabaseHelper;
+	@Getter @Setter
+	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
 
 	// public implementation
 
@@ -46,7 +52,7 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 			@NonNull RecordTypeAgain objectUncast) {
 
 		if (
-			! model.objectClass ().isInstance (
+			! objectModel.objectClass ().isInstance (
 				objectUncast)
 		) {
 
@@ -54,7 +60,7 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 				stringFormat (
 					"Can't insert %s as %s",
 					objectUncast.getClass ().getSimpleName (),
-					model.objectClass ().getSimpleName ()));
+					objectModel.objectClass ().getSimpleName ()));
 
 		}
 
@@ -90,7 +96,7 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 			@NonNull RecordTypeAgain objectUncast) {
 
 		if (
-			! model.objectClass ().isInstance (
+			! objectModel.objectClass ().isInstance (
 				objectUncast)
 		) {
 
@@ -98,7 +104,7 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 				stringFormat (
 					"Can't insert %s as %s",
 					objectUncast.getClass ().getSimpleName (),
-					model.objectClass ().getSimpleName ()));
+					objectModel.objectClass ().getSimpleName ()));
 
 		}
 
@@ -134,7 +140,7 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 			@NonNull RecordTypeAgain objectUncast) {
 
 		if (
-			! model.objectClass ().isInstance (
+			! objectModel.objectClass ().isInstance (
 				objectUncast)
 		) {
 
@@ -142,7 +148,7 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 				stringFormat (
 					"Can't update %s as %s",
 					objectUncast.getClass ().getSimpleName (),
-					model.objectClass ().getSimpleName ()));
+					objectModel.objectClass ().getSimpleName ()));
 
 		}
 
@@ -175,7 +181,7 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 			@NonNull ObjectHelper<?> parentHelper,
 			@NonNull Record<?> parentObject) {
 
-		model.hooks ().createSingletons (
+		objectModel.hooks ().createSingletons (
 			objectHelper,
 			parentHelper,
 			parentObject);
@@ -187,11 +193,10 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 	RecordTypeAgain remove (
 			@NonNull RecordTypeAgain objectUncast) {
 
-		@SuppressWarnings ("unchecked")
 		EphemeralRecord <RecordType> object =
 			(EphemeralRecord <RecordType>)
 			dynamicCast (
-				model.objectClass (),
+				objectModel.objectClass (),
 				objectUncast);
 
 		objectDatabaseHelper.remove (
@@ -207,10 +212,8 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 
 		try {
 
-			@SuppressWarnings ("unchecked")
-			Constructor<RecordType> constructor =
-				(Constructor<RecordType>)
-				model.objectClass ().getDeclaredConstructor ();
+			Constructor <RecordType> constructor =
+				objectModel.objectClass ().getDeclaredConstructor ();
 
 			constructor.setAccessible (
 				true);
@@ -271,11 +274,9 @@ class ObjectHelperUpdateImplementation<RecordType extends Record<RecordType>>
 	RecordTypeAgain lock (
 			@NonNull RecordTypeAgain objectUncast) {
 
-		@SuppressWarnings ("unchecked")
 		RecordType object =
-			(RecordType)
 			dynamicCast (
-				model.objectClass (),
+				objectModel.objectClass (),
 				objectUncast);
 
 		objectDatabaseHelper.lock (

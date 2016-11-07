@@ -1,5 +1,6 @@
-package wbs.console.helper;
+package wbs.console.helper.manager;
 
+import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
@@ -18,7 +19,9 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.EphemeralRecord;
@@ -43,9 +46,6 @@ class ConsoleObjectManagerImplementation
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleHelperRegistry consoleHelperRegistry;
-
-	@SingletonDependency
 	ObjectManager objectManager;
 
 	@SingletonDependency
@@ -53,9 +53,31 @@ class ConsoleObjectManagerImplementation
 
 	// collection dependencies
 
-	// (force instantiation)
 	@SingletonDependency
 	List <ConsoleHelper <?>> consoleHelpers;
+
+	// state
+
+	Map <Class <?>, ConsoleHelper <?>> consoleHelpersByObjectClass;
+	Map <String, ConsoleHelper <?>> consoleHelpersByObjectName;
+
+	// life cycle
+
+	@NormalLifecycleSetup
+	public
+	void setup () {
+
+		consoleHelpersByObjectClass =
+			mapWithDerivedKey (
+				consoleHelpers,
+				ConsoleHelper::objectClass);
+
+		consoleHelpersByObjectName =
+			mapWithDerivedKey (
+				consoleHelpers,
+				ConsoleHelper::objectName);
+
+	}
 
 	// implementation
 
@@ -98,7 +120,7 @@ class ConsoleObjectManagerImplementation
 			@SuppressWarnings ("unchecked")
 			ConsoleHelper <ObjectType> consoleHelper =
 				(ConsoleHelper <ObjectType>)
-				consoleHelperRegistry.findByObjectClass (
+				consoleHelpersByObjectClass.get (
 					tempClass);
 
 			if (
@@ -124,7 +146,7 @@ class ConsoleObjectManagerImplementation
 	ConsoleHelper<?> findConsoleHelper (
 			@NonNull String objectTypeName) {
 
-		return consoleHelperRegistry.findByObjectName (
+		return consoleHelpersByObjectName.get (
 			objectTypeName);
 
 	}
@@ -161,7 +183,7 @@ class ConsoleObjectManagerImplementation
 
 				.href (
 					requestContext.resolveLocalUrl (
-						objectHelper.getDefaultLocalPath (
+						objectHelper.getDefaultLocalPathGeneric (
 							object)))
 
 				.target (
@@ -216,7 +238,7 @@ class ConsoleObjectManagerImplementation
 			findConsoleHelper (
 				object);
 
-		objectHelper.writeHtml (
+		objectHelper.writeHtmlGeneric (
 			formatWriter,
 			object,
 			assumedRootOptional,
@@ -282,7 +304,7 @@ class ConsoleObjectManagerImplementation
 			findConsoleHelper (
 				object);
 
-		return objectHelper.canView (
+		return objectHelper.canViewGeneric (
 			object);
 
 	}
@@ -290,7 +312,7 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String contextName (
-			Record<?> object) {
+			Record <?> object) {
 
 		ConsoleHelper<?> objectHelper =
 			findConsoleHelper (object);
@@ -300,7 +322,8 @@ class ConsoleObjectManagerImplementation
 			return stringFormat (
 				"%s_%s",
 				objectHelper.objectName (),
-				objectHelper.getTypeCode (object));
+				objectHelper.getTypeCodeGeneric (
+					object));
 
 		} else {
 
@@ -319,7 +342,8 @@ class ConsoleObjectManagerImplementation
 			findConsoleHelper (object);
 
 		return requestContext.resolveContextUrl (
-			objectHelper.getDefaultContextPath (object));
+			objectHelper.getDefaultContextPathGeneric (
+				object));
 
 	}
 
@@ -332,7 +356,8 @@ class ConsoleObjectManagerImplementation
 			findConsoleHelper (object);
 
 		return requestContext.resolveLocalUrl (
-			objectHelper.getDefaultLocalPath (object));
+			objectHelper.getDefaultLocalPathGeneric (
+				object));
 
 	}
 

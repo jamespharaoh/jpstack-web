@@ -15,7 +15,7 @@ import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;

@@ -7,7 +7,7 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.console.responder.ConsoleFile;

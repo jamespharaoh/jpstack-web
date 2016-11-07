@@ -1,4 +1,4 @@
-package wbs.console.helper;
+package wbs.console.helper.manager;
 
 import wbs.framework.object.ObjectManagerMethods;
 

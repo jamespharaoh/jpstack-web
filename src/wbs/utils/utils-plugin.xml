@@ -4,8 +4,8 @@
 
 	<layer name="console">
 
-		<component class="web.HtmlTableCellWriter"/> 
-		<component class="web.HtmlTableCheckWriter"/> 
+		<component class="web.HtmlTableCellWriter"/>
+		<component class="web.HtmlTableCheckWriter"/>
 
 	</layer>
 

@@ -238,8 +238,8 @@ class JavaClassWriter
 		singletonDependencies.add (
 			new Dependency ()
 
-			.className (
-				typeName)
+			.classNameSupplier (
+				imports -> typeName)
 
 			.memberName (
 				variableName)
@@ -307,8 +307,8 @@ class JavaClassWriter
 		prototypeDependencies.add (
 			new Dependency ()
 
-			.className (
-				typeName)
+			.classNameSupplier (
+				imports -> typeName)
 
 			.memberName (
 				variableName)
@@ -348,31 +348,64 @@ class JavaClassWriter
 	}
 
 	public
-	JavaClassWriter addState (
-			@NonNull Class <?> classObject,
-			@NonNull String memberName) {
+	JavaClassWriter addPrototypeDependency (
+			@NonNull Function <JavaImportRegistry, String> classNameSupplier,
+			@NonNull String variableName,
+			@NonNull Boolean named) {
 
-		return addState (
-			classObject.getName (),
-			memberName);
+		prototypeDependencies.add (
+			new Dependency ()
+
+			.classNameSupplier (
+				classNameSupplier)
+
+			.memberName (
+				variableName)
+
+			.named (
+				named)
+
+		);
+
+		return this;
 
 	}
 
 	public
+	JavaClassWriter addPrototypeDependency (
+			@NonNull Function <JavaImportRegistry, String> classNameSupplier,
+			@NonNull String variableName) {
+
+		return addPrototypeDependency (
+			classNameSupplier,
+			variableName,
+			false);
+
+	}
+
+	// ==================== addState
+
+	public
 	JavaClassWriter addState (
-			@NonNull String typeName,
-			@NonNull String memberName) {
+			@NonNull Function <JavaImportRegistry, String> typeNameSupplier,
+			@NonNull String memberName,
+			@NonNull Boolean getter,
+			@NonNull Boolean setter) {
 
 		states.add (
 			new State ()
 
 			.typeNameSupplier (
-				imports ->
-					imports.register (
-						typeName))
+				typeNameSupplier)
 
 			.memberName (
 				memberName)
+
+			.getter (
+				getter)
+
+			.setter (
+				setter)
 
 		);
 
@@ -385,18 +418,75 @@ class JavaClassWriter
 			@NonNull Function <JavaImportRegistry, String> typeNameSupplier,
 			@NonNull String memberName) {
 
-		states.add (
-			new State ()
+		return addState (
+			typeNameSupplier,
+			memberName,
+			false,
+			false);
 
-			.typeNameSupplier (
-				typeNameSupplier)
+	}
 
-			.memberName (
-				memberName)
+	public
+	JavaClassWriter addState (
+			@NonNull Class <?> classObject,
+			@NonNull String memberName,
+			@NonNull Boolean getter,
+			@NonNull Boolean setter) {
 
-		);
+		return addState (
+			imports ->
+				imports.register (
+					classObject),
+			memberName,
+			getter,
+			setter);
 
-		return this;
+	}
+
+	public
+	JavaClassWriter addState (
+			@NonNull Class <?> classObject,
+			@NonNull String memberName) {
+
+		return addState (
+			imports ->
+				imports.register (
+					classObject),
+			memberName,
+			false,
+			false);
+
+	}
+
+	public
+	JavaClassWriter addState (
+			@NonNull String typeName,
+			@NonNull String memberName,
+			@NonNull Boolean getter,
+			@NonNull Boolean setter) {
+
+		return addState (
+			imports ->
+				imports.register (
+					typeName),
+			memberName,
+			getter,
+			setter);
+
+	}
+
+	public
+	JavaClassWriter addState (
+			@NonNull String typeName,
+			@NonNull String memberName) {
+
+		return addState (
+			imports ->
+				imports.register (
+					typeName),
+			memberName,
+			false,
+			false);
 
 	}
 
@@ -666,8 +756,8 @@ class JavaClassWriter
 
 			formatWriter.writeLineFormat (
 				"%s %s;",
-				imports.register (
-					dependency.className),
+				dependency.classNameSupplier ().apply (
+					imports),
 				dependency.memberName);
 
 			formatWriter.writeNewline ();
@@ -709,8 +799,8 @@ class JavaClassWriter
 				"%s <%s> %sProvider;",
 				imports.register (
 					Provider.class),
-				imports.register (
-					dependency.className),
+				dependency.classNameSupplier ().apply (
+					imports),
 				dependency.memberName);
 
 			formatWriter.writeNewline ();
@@ -753,6 +843,79 @@ class JavaClassWriter
 
 		formatWriter.writeNewline ();
 
+		for (
+			State state
+				: states
+		) {
+
+			if (state.getter ()) {
+
+				formatWriter.writeLineFormat (
+					"public");
+
+				formatWriter.writeLineFormat (
+					"%s %s () {",
+					state.typeNameSupplier.apply (
+						imports),
+					state.memberName ());
+
+				formatWriter.writeNewline ();
+
+				formatWriter.writeLineFormat (
+					"\treturn %s;",
+					state.memberName ());
+
+				formatWriter.writeNewline ();
+
+				formatWriter.writeLineFormat (
+					"}");
+
+				formatWriter.writeNewline ();
+
+			}
+
+			if (state.setter ()) {
+
+				formatWriter.writeLineFormat (
+					"public");
+
+				formatWriter.writeLineFormat (
+					"%s %s (",
+					className,
+					state.memberName ());
+
+				formatWriter.writeLineFormat (
+					"\t%s %s) {",
+					state.typeNameSupplier.apply (
+						imports),
+					state.memberName ());
+
+				formatWriter.writeNewline ();
+
+				formatWriter.writeLineFormat (
+					"\tthis.%s =",
+					state.memberName ());
+
+				formatWriter.writeLineFormat (
+					"\t\t%s;",
+					state.memberName ());
+
+				formatWriter.writeNewline ();
+
+				formatWriter.writeLineFormat (
+					"return this");
+
+				formatWriter.writeNewline ();
+
+				formatWriter.writeLineFormat (
+					"}");
+
+				formatWriter.writeNewline ();
+
+			}
+
+		}
+
 		return this;
 
 	}
@@ -787,7 +950,12 @@ class JavaClassWriter
 
 			List <Method> sortedMethods =
 				Arrays.stream (
-					delegateInterface.getMethods ())
+					delegateInterface.getDeclaredMethods ())
+
+				.filter (
+					method -> isNull (
+						method.getAnnotation (
+							DoNotDelegate.class)))
 
 				.map (
 					method -> Pair.of (
@@ -1053,7 +1221,7 @@ class JavaClassWriter
 	public static
 	class Dependency {
 
-		String className;
+		Function <JavaImportRegistry, String> classNameSupplier;
 		String memberName;
 		Boolean named = false;
 

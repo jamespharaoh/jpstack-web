@@ -1,5 +1,6 @@
 package wbs.console.object;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -11,8 +12,8 @@ import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ConsoleContextBuilderContainerImplementation;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
-import wbs.console.helper.ConsoleHelper;
-import wbs.console.helper.ConsoleHelperRegistry;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
@@ -37,7 +38,7 @@ class ExtendContextBuilder <
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleHelperRegistry consoleHelperRegistry;
+	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
@@ -147,11 +148,13 @@ class ExtendContextBuilder <
 
 		@SuppressWarnings ("unchecked")
 		ConsoleHelper <ObjectType> consoleHelperTemp =
-			spec.objectName () != null
-				? (ConsoleHelper <ObjectType>)
-				consoleHelperRegistry.findByObjectName (
-					spec.objectName ())
-				: null;
+			ifNotNullThenElse (
+				spec.objectName (),
+				() ->
+					(ConsoleHelper <ObjectType>)
+					objectManager.findConsoleHelper (
+						spec.objectName ()),
+				() -> null);
 
 		consoleHelper =
 			consoleHelperTemp;

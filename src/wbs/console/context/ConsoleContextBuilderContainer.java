@@ -1,6 +1,6 @@
 package wbs.console.context;
 
-import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.framework.entity.record.Record;
 

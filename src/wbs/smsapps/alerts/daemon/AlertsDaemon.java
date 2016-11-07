@@ -4,6 +4,7 @@ import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.earlierThan;
 
@@ -201,7 +202,8 @@ class AlertsDaemon
 				log.error (
 					stringFormat (
 						"Error checking alerts for %s",
-						alertsSettingsId),
+						integerToDecimalString (
+							alertsSettingsId)),
 					exception);
 
 				exceptionLogger.logThrowable (
@@ -224,7 +226,8 @@ class AlertsDaemon
 		log.debug (
 			stringFormat (
 				"checking if we should send an alert for %s",
-				alertsSettingsId));
+				integerToDecimalString (
+					alertsSettingsId)));
 
 		// begin transaction
 

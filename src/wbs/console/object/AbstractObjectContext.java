@@ -8,7 +8,7 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.lookup.StringLookup;
 import wbs.console.module.ConsoleManager;

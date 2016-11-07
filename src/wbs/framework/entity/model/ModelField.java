@@ -1,6 +1,7 @@
 package wbs.framework.entity.model;
 
 import static wbs.utils.etc.EnumUtils.enumInSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.ParameterizedType;
@@ -28,7 +29,7 @@ public
 class ModelField {
 
 	@DataAncestor
-	Model model;
+	Model <?> model;
 
 	@DataParent
 	ModelField parentField;
@@ -129,7 +130,8 @@ class ModelField {
 				stringFormat (
 					"Field %s has %s columns",
 					fullName (),
-					columnNames.size ()));
+					integerToDecimalString (
+						columnNames.size ())));
 
 		}
 

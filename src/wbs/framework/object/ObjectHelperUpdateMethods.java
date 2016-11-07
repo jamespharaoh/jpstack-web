@@ -3,7 +3,9 @@ package wbs.framework.object;
 import wbs.framework.entity.record.Record;
 
 public
-interface ObjectHelperUpdateMethods<RecordType extends Record<RecordType>> {
+interface ObjectHelperUpdateMethods <
+	RecordType extends Record <RecordType>
+> {
 
 	RecordType createInstance ();
 

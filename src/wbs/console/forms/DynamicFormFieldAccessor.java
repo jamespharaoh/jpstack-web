@@ -10,8 +10,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.helper.ConsoleHelper;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
@@ -53,7 +53,7 @@ class DynamicFormFieldAccessor <
 				container);
 
 		Object nativeObject =
-			consoleHelper.getDynamic (
+			consoleHelper.getDynamicGeneric (
 				container,
 				name);
 
@@ -116,11 +116,11 @@ class DynamicFormFieldAccessor <
 
 		// set property
 
-		ConsoleHelper<?> consoleHelper =
+		ConsoleHelper <?> consoleHelper =
 			consoleObjectManager.findConsoleHelper(
 				container);
 
-		consoleHelper.setDynamic (
+		consoleHelper.setDynamicGeneric (
 			container,
 			name,
 			nativeValueOptional);

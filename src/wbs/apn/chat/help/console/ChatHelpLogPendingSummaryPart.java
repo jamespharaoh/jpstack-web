@@ -28,7 +28,7 @@ import wbs.apn.chat.core.console.ChatConsoleLogic;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;

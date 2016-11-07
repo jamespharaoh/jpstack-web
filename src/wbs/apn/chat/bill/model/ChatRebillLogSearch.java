@@ -11,7 +11,7 @@ import wbs.utils.time.TextualInterval;
 
 @Accessors (fluent = true)
 @Data
-public 
+public
 class ChatRebillLogSearch
 	implements Serializable {
 
@@ -24,7 +24,7 @@ class ChatRebillLogSearch
 	Range <Long> minimumCreditOwed;
 
 	Boolean includeBlocked;
-	Boolean includeFailed; 
+	Boolean includeFailed;
 
 	Range <Long> numChatUsers;
 

@@ -15,24 +15,17 @@ import wbs.console.forms.FormFieldBuilderContextImplementation;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormFieldSetSpec;
 import wbs.console.forms.FormItem;
-import wbs.console.helper.ConsoleHelper;
-import wbs.console.helper.ConsoleHelperRegistry;
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.SingletonDependency;
 
 @SingletonComponent ("consoleModuleBuilder")
 public
 class ConsoleModuleBuilder
 	implements Builder {
-
-	// singleton dependencies
-
-	@SingletonDependency
-	ConsoleHelperRegistry consoleHelperRegistry;
 
 	// prototype dependencies
 

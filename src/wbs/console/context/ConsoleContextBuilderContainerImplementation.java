@@ -3,7 +3,7 @@ package wbs.console.context;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
 

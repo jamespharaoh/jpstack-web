@@ -15,7 +15,7 @@ public
 class ModelToXml {
 
 	@Getter @Setter
-	Model model;
+	Model <?> model;
 
 	public
 	Document build () {

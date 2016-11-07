@@ -5,9 +5,8 @@ import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.helper.ConsoleHelper;
-import wbs.console.helper.ConsoleHelperRegistry;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.framework.builder.Builder;
@@ -25,9 +24,6 @@ public
 class FormFieldSetBuilder <Container> {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	ConsoleHelperRegistry consoleHelperRegistry;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -86,7 +82,7 @@ class FormFieldSetBuilder <Container> {
 		if (spec.objectName () != null) {
 
 			consoleHelper =
-				consoleHelperRegistry.findByObjectName (
+				objectManager.findConsoleHelper (
 					spec.objectName ());
 
 			@SuppressWarnings ("unchecked")

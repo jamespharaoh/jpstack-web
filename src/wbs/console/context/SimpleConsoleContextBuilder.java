@@ -15,8 +15,8 @@ import com.google.common.collect.Iterables;
 import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.helper.ConsoleObjectManager;
-import wbs.console.helper.PrivKeySpec;
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.helper.spec.PrivKeySpec;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.ResolvedConsoleContextLink;

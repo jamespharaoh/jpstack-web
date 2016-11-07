@@ -35,7 +35,7 @@ class SchemaFromModel {
 	Map<String,List<String>> enumTypes;
 
 	@Getter @Setter
-	Map<Class<?>,Model> modelsByClass;
+	Map <Class <?>, Model <?>> modelsByClass;
 
 	public
 	Schema build () {
@@ -44,8 +44,10 @@ class SchemaFromModel {
 			new Schema ()
 				.enumTypes (enumTypes);
 
-		for (Model model
-				: modelsByClass.values ()) {
+		for (
+			Model <?> model
+				: modelsByClass.values ()
+		) {
 
 			SchemaTable schemaTable =
 				schemaTableFromModel.get ()

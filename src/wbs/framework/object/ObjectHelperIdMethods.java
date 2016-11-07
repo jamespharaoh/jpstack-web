@@ -10,9 +10,11 @@ import com.google.common.base.Optional;
 import wbs.framework.entity.record.Record;
 
 public
-interface ObjectHelperIdMethods<RecordType extends Record<RecordType>> {
+interface ObjectHelperIdMethods <
+	RecordType extends Record <RecordType>
+> {
 
-	Optional<RecordType> find (
+	Optional <RecordType> find (
 			Long id);
 
 	@Nonnull
@@ -25,9 +27,9 @@ interface ObjectHelperIdMethods<RecordType extends Record<RecordType>> {
 
 	RecordType findOrThrow (
 			Long id,
-			Supplier<? extends RuntimeException> orThrow);
+			Supplier <? extends RuntimeException> orThrow);
 
-	List<RecordType> findManyRequired (
-			List<Long> ids);
+	List <RecordType> findManyRequired (
+			List <Long> ids);
 
 }

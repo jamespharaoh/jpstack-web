@@ -22,7 +22,7 @@ import lombok.experimental.Accessors;
 
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
-import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.PrototypeComponent;

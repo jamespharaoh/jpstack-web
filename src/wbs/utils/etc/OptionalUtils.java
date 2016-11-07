@@ -5,6 +5,7 @@ import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -918,6 +919,20 @@ class OptionalUtils {
 		} else {
 
 			return falseSupplier.get ();
+
+		}
+
+	}
+
+	public static <Type>
+	void optionalDo (
+			@NonNull Optional <Type> optional,
+			@NonNull Consumer <Type> consumer) {
+
+		if (optional.isPresent ()) {
+
+			consumer.accept (
+				optional.get ());
 
 		}
 

@@ -1,6 +1,6 @@
 package wbs.platform.object.criteria;
 
-import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.framework.entity.record.Record;
 
 public

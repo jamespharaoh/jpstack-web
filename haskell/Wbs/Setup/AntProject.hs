@@ -61,7 +61,8 @@ writeBuildFile world = do
 				"build-meta",
 				"generate-records",
 				"build-entity",
-				"generate-helpers",
+				"generate-object-helpers",
+				"generate-console-helpers",
 				"build-rest"
 
 			],
@@ -79,7 +80,8 @@ writeBuildFile world = do
 				"build-meta",
 				"generate-records",
 				"build-entity",
-				"generate-helpers",
+				"generate-object-helpers",
+				"generate-console-helpers",
 				"build-rest",
 
 				"api-deploy"
@@ -92,7 +94,8 @@ writeBuildFile world = do
 				"build-meta",
 				"generate-records",
 				"build-entity",
-				"generate-helpers",
+				"generate-object-helpers",
+				"generate-console-helpers",
 				"build-rest",
 
 				"api-deploy",
@@ -106,7 +109,8 @@ writeBuildFile world = do
 				"build-meta",
 				"generate-records",
 				"build-entity",
-				"generate-helpers",
+				"generate-object-helpers",
+				"generate-console-helpers",
 				"build-rest",
 
 				"console-deploy"
@@ -119,7 +123,8 @@ writeBuildFile world = do
 				"build-meta",
 				"generate-records",
 				"build-entity",
-				"generate-helpers",
+				"generate-object-helpers",
+				"generate-console-helpers",
 				"build-rest",
 
 				"console-deploy",
@@ -133,7 +138,8 @@ writeBuildFile world = do
 				"build-meta",
 				"generate-records",
 				"build-entity",
-				"generate-helpers",
+				"generate-object-helpers",
+				"generate-console-helpers",
 				"build-rest",
 
 				"daemon-deploy"
@@ -146,7 +152,8 @@ writeBuildFile world = do
 				"build-meta",
 				"generate-records",
 				"build-entity",
-				"generate-helpers",
+				"generate-object-helpers",
+				"generate-console-helpers",
 				"build-rest",
 
 				"daemon-deploy",
@@ -160,7 +167,8 @@ writeBuildFile world = do
 				"build-meta",
 				"generate-records",
 				"build-entity",
-				"generate-helpers",
+				"generate-object-helpers",
+				"generate-console-helpers",
 				"build-rest",
 
 				"api-deploy",
@@ -185,7 +193,8 @@ writeBuildFile world = do
 				"build-meta",
 				"generate-records",
 				"build-entity",
-				"generate-helpers",
+				"generate-object-helpers",
+				"generate-console-helpers",
 				"build-rest",
 
 				"db-drop",
@@ -203,7 +212,8 @@ writeBuildFile world = do
 				"build-meta",
 				"generate-records",
 				"build-entity",
-				"generate-helpers",
+				"generate-object-helpers",
+				"generate-console-helpers",
 				"build-rest",
 
 				"api-deploy",
@@ -220,7 +230,8 @@ writeBuildFile world = do
 				"build-meta",
 				"generate-records",
 				"build-entity",
-				"generate-helpers",
+				"generate-object-helpers",
+				"generate-console-helpers",
 				"build-rest",
 
 				"daemon-deploy",
@@ -242,7 +253,8 @@ writeBuildFile world = do
 				"build-meta",
 				"generate-records",
 				"build-entity",
-				"generate-helpers"
+				"generate-object-helpers",
+				"generate-console-helpers"
 
 			]
 
@@ -847,7 +859,7 @@ writeBuildFile world = do
 
 			],
 
-			makeSimpleTarget "generate-helpers" [
+			makeSimpleTarget "generate-object-helpers" [
 
 				mkelem "java" [
 					sattr "classname"
@@ -858,14 +870,35 @@ writeBuildFile world = do
 					makeArgValue "wbs-test",
 					makeArgValue "wbs.test",
 					makeArgValue (
-						"entity,generate,model,model-meta,object-generate,schema,utils"
-					),
+						"entity,generate,model,model-meta," ++
+						"object-generate,schema,utils"),
 					makeArgValue "",
 					makeArgValue (
 						"wbs.framework.entity.generate" ++
-						".ObjectHelperGeneratorTool"
-					),
+						".ObjectHelperGeneratorTool"),
 					makeArgValue "generateObjectHelpers"
+				]
+
+			],
+
+			makeSimpleTarget "generate-console-helpers" [
+
+				mkelem "java" [
+					sattr "classname"
+						"wbs.framework.component.tools.ComponentRunner",
+					sattr "classpathref" "classpath",
+					sattr "failonerror" "true"
+				] [
+					makeArgValue "wbs-test",
+					makeArgValue "wbs.test",
+					makeArgValue (
+						"entity,generate,model,model-meta," ++
+						"object-generate,schema,utils"),
+					makeArgValue "",
+					makeArgValue (
+						"wbs.console.helper.generate" ++
+						".ConsoleHelperGeneratorTool"),
+					makeArgValue "generateConsoleHelpers"
 				]
 
 			]
@@ -885,7 +918,9 @@ writeBuildFile world = do
 				] [
 					makeArgValue "wbs-test",
 					makeArgValue "wbs.test",
-					makeArgValue "utils,config,data,entity,model-meta,schema,sql,schema-tool",
+					makeArgValue (
+						"utils,config,data,entity,model-meta,schema,sql," ++
+						"schema-tool"),
 					makeArgValue "",
 					makeArgValue "wbs.framework.schema.tool.SchemaTool",
 					makeArgValue "schemaCreate"
@@ -911,7 +946,8 @@ writeBuildFile world = do
 					makeArgValue ("utils,config,data,entity,schema,sql," ++
 						"model,model-meta,hibernate,object,logic,fixture"),
 					makeArgValue "",
-					makeArgValue "wbs.framework.entity.fixtures.ModelFixtureCreator",
+					makeArgValue (
+						"wbs.framework.entity.fixtures.ModelFixtureCreator"),
 					makeArgValue "runModelFixtureCreators"
 				],
 

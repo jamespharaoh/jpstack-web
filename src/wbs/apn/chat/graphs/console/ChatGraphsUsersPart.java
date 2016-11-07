@@ -94,7 +94,7 @@ class ChatGraphsUsersPart
 
 		htmlParagraphClose ();
 
-		htmlFormClose (); 
+		htmlFormClose ();
 
 		if (
 			isNotNull (
@@ -113,7 +113,7 @@ class ChatGraphsUsersPart
 					timeFormatter.dateString (
 						date.minusWeeks (1))),
 				"Prev week");
-				
+
 			htmlLinkWrite (
 				stringFormat (
 					"?date=%h",

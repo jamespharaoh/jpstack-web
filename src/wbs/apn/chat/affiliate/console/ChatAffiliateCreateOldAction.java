@@ -26,7 +26,7 @@ import wbs.apn.chat.scheme.model.ChatSchemeKeywordRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.priv.UserPrivDataLoader;

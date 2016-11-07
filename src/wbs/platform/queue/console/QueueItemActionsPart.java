@@ -8,7 +8,7 @@ import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
 import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
 import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
 
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;

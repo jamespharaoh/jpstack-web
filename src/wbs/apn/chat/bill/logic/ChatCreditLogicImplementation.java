@@ -670,7 +670,7 @@ class ChatCreditLogicImplementation
 	Optional <String> userBillCheck (
 			@NonNull ChatUserRec chatUser,
 			@NonNull BillCheckOptions options) {
-	
+
 		Transaction transaction =
 			database.currentTransaction ();
 

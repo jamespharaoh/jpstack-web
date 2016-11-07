@@ -10,6 +10,7 @@ import java.util.Map;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataChildrenIndex;
@@ -25,13 +26,13 @@ import wbs.utils.etc.PropertyUtils;
 @Data
 @DataClass
 public
-class ModelImplementation
-	implements Model {
+class ModelImplementation <RecordType extends Record <RecordType>>
+	implements Model <RecordType> {
 
 	// identity
 
 	@DataAttribute
-	Class<? extends Record<?>> objectClass;
+	Class <RecordType> objectClass;
 
 	@DataName
 	String objectName;
@@ -117,7 +118,7 @@ class ModelImplementation
 	@Override
 	public
 	String getTypeCode (
-			@NonNull Record<?> object) {
+			@NonNull RecordType object) {
 
 		return (String)
 			PropertyUtils.getProperty (
@@ -129,7 +130,7 @@ class ModelImplementation
 	@Override
 	public
 	String getCode (
-			@NonNull Record<?> object) {
+			@NonNull RecordType object) {
 
 		if (codeField != null) {
 
@@ -149,7 +150,7 @@ class ModelImplementation
 	@Override
 	public
 	String getName (
-			@NonNull Record<?> object) {
+			@NonNull RecordType object) {
 
 		return (String)
 			PropertyUtils.getProperty (
@@ -161,7 +162,7 @@ class ModelImplementation
 	@Override
 	public
 	String getDescription (
-			@NonNull Record<?> object) {
+			@NonNull RecordType object) {
 
 		return (String)
 			PropertyUtils.getProperty (
@@ -207,8 +208,8 @@ class ModelImplementation
 
 	@Override
 	public
-	Record<?> getParent (
-			@NonNull Record<?> object) {
+	Record <?> getParent (
+			@NonNull RecordType object) {
 
 		if (! canGetParent ()) {
 
@@ -229,7 +230,7 @@ class ModelImplementation
 	@Override
 	public
 	Long getParentId (
-			@NonNull Record<?> object) {
+			@NonNull RecordType object) {
 
 		if (parentTypeIsFixed ()) {
 
@@ -249,8 +250,8 @@ class ModelImplementation
 
 	@Override
 	public
-	Record<?> getParentType (
-			@NonNull Record <?> object) {
+	Record <?> getParentType (
+			@NonNull RecordType object) {
 
 		if (parentTypeIsFixed ()) {
 

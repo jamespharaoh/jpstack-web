@@ -5,42 +5,48 @@ import static wbs.utils.etc.TypeUtils.classNotEqual;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperChildrenImplementation")
 public
-class ObjectHelperChildrenImplementation<RecordType extends Record<RecordType>>
+class ObjectHelperChildrenImplementation <
+	RecordType extends Record <RecordType>
+>
 	implements
-		ObjectHelperChildrenMethods<RecordType>,
-		ObjectHelperComponent<RecordType> {
+		ObjectHelperChildrenMethods <RecordType>,
+		ObjectHelperComponent <RecordType> {
+
+	// singleton dependencies
+
+	@WeakSingletonDependency
+	ObjectManager objectManager;
 
 	// properties
 
-	@Setter
-	ObjectModel<RecordType> model;
+	@Getter @Setter
+	ObjectModel <RecordType> objectModel;
 
-	@Setter
-	ObjectHelper<RecordType> objectHelper;
+	@Getter @Setter
+	ObjectHelper <RecordType> objectHelper;
 
-	@Setter
+	@Getter @Setter
 	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
-
-	@Setter
-	ObjectManager objectManager;
 
 	// implementation
 
 	@Override
 	public <ChildType extends Record <?>>
 	List <ChildType> getChildren (
-			@NonNull Record <?> object,
+			@NonNull RecordType object,
 			@NonNull Class <ChildType> childClass) {
 
 		ObjectHelper <?> childHelper =
@@ -49,7 +55,7 @@ class ObjectHelperChildrenImplementation<RecordType extends Record<RecordType>>
 
 		List <?> childrenTemp =
 			childHelper.findByParent (
-				objectHelper.getGlobalId (
+				objectHelper.getGlobalIdGeneric (
 					object));
 
 		@SuppressWarnings ("unchecked")
@@ -65,7 +71,7 @@ class ObjectHelperChildrenImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	List <Record <?>> getMinorChildren (
-			@NonNull Record <?> object) {
+			@NonNull RecordType object) {
 
 		List <Record <?>> children =
 			new ArrayList <Record <?>> ();
@@ -88,7 +94,7 @@ class ObjectHelperChildrenImplementation<RecordType extends Record<RecordType>>
 
 				&& classNotEqual (
 					childHelper.parentClass (),
-					model.objectClass ())
+					objectHelper ().objectClass ())
 
 			) {
 				continue;
@@ -107,7 +113,7 @@ class ObjectHelperChildrenImplementation<RecordType extends Record<RecordType>>
 	@Override
 	public
 	List <Record <?>> getChildren (
-			@NonNull Record <?> object) {
+			@NonNull RecordType object) {
 
 		List <Record <?>> children =
 			new ArrayList <Record <?>> ();

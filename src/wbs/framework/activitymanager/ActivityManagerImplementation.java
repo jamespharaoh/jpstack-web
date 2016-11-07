@@ -5,6 +5,7 @@ import static wbs.utils.etc.LogicUtils.referenceNotEqualSafe;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.max;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.roundToIntegerRequired;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -87,7 +88,8 @@ class ActivityManagerImplementation
 		log.debug (
 			stringFormat (
 				"Next task id is %s",
-				nextTaskId));
+				integerToDecimalString (
+					nextTaskId)));
 
 		hostname =
 			getHostname ();
@@ -103,7 +105,8 @@ class ActivityManagerImplementation
 		log.debug (
 			stringFormat (
 				"Process ID is %s",
-				processId));
+				integerToDecimalString (
+					processId)));
 
 	}
 
@@ -255,11 +258,13 @@ class ActivityManagerImplementation
 			throw new RuntimeException (
 				stringFormat (
 					"End task %s (%s, %s) ",
-					task.taskId (),
+					integerToDecimalString (
+						task.taskId ()),
 					task.taskType (),
 					task.summary (),
 					"but current task is %s (%s, %s)",
-					currentTask.get ().taskId (),
+					integerToDecimalString (
+						currentTask.get ().taskId ()),
 					currentTask.get ().taskType (),
 					currentTask.get ().summary ()));
 

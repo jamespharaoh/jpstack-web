@@ -1,5 +1,6 @@
-package wbs.console.helper;
+package wbs.console.helper.provider;
 
+import static wbs.utils.etc.TypeUtils.classForNameRequired;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -11,6 +12,8 @@ import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
 import wbs.console.context.ConsoleContextMetaBuilderContainer;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.spec.ConsoleHelperProviderSpec;
 import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -20,13 +23,16 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
 
 @PrototypeComponent ("consoleHelperProviderMetaBuilder")
 @ConsoleMetaModuleBuilderHandler
 public
-class ConsoleHelperProviderMetaBuilder {
+class ConsoleHelperProviderMetaBuilder <
+	RecordType extends Record <RecordType>
+> {
 
 	// singleton dependencies
 
@@ -36,7 +42,7 @@ class ConsoleHelperProviderMetaBuilder {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <GenericConsoleHelperProvider>
+	Provider <GenericConsoleHelperProvider <RecordType>>
 	genericConsoleHelperProviderProvider;
 
 	// builder
@@ -57,7 +63,9 @@ class ConsoleHelperProviderMetaBuilder {
 	void build (
 			Builder builder) {
 
-		ObjectHelper <?> objectHelper =
+		@SuppressWarnings ("unchecked")
+		ObjectHelper <RecordType> objectHelper =
+			(ObjectHelper <RecordType>)
 			objectManager.objectHelperForObjectNameRequired (
 				consoleHelperProviderSpec.objectName ());
 
@@ -75,20 +83,11 @@ class ConsoleHelperProviderMetaBuilder {
 				capitalise (
 					objectHelper.objectName ()));
 
-		Class <?> consoleHelperClass;
-
-		try {
-
-			consoleHelperClass =
-				Class.forName (
-					consoleHelperClassName);
-
-		} catch (ClassNotFoundException exception) {
-
-			throw new RuntimeException (
-				exception);
-
-		}
+		@SuppressWarnings ("unchecked")
+		Class <ConsoleHelper <RecordType>> consoleHelperClass =
+			(Class <ConsoleHelper <RecordType>>)
+			classForNameRequired (
+				consoleHelperClassName);
 
 		genericConsoleHelperProviderProvider.get ()
 

@@ -11,8 +11,9 @@ import java.util.List;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.helper.ConsoleHelper;
-import wbs.console.helper.ConsoleHelperRegistry;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.module.ConsoleManager;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -21,6 +22,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("parentFormFieldBuilder")
@@ -30,11 +32,14 @@ class ParentFormFieldBuilder {
 
 	// dependencies
 
-	@SingletonDependency
-	ConsoleHelperRegistry consoleHelperRegistry;
+	@WeakSingletonDependency
+	ConsoleManager consoleManager;
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
+
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
 
 	// prototype dependencies
 
@@ -118,7 +123,7 @@ class ParentFormFieldBuilder {
 
 		ConsoleHelper<?> parentHelper =
 			consoleHelper.parentTypeIsFixed ()
-				? consoleHelperRegistry.findByObjectClass (
+				? objectManager.findConsoleHelper (
 					consoleHelper.parentClass ())
 				: null;
 

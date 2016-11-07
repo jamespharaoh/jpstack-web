@@ -37,10 +37,10 @@ class DummyCache <Key, Value>
 	}
 
 	@Override
-	public 
+	public
 	Value findOrCreate (
 			@NonNull Key key) {
-	
+
 		throw new UnsupportedOperationException ();
 
 	}

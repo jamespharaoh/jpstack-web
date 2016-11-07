@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.helper.PrivKeySpec;
+import wbs.console.helper.spec.PrivKeySpec;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.framework.component.annotations.PrototypeComponent;

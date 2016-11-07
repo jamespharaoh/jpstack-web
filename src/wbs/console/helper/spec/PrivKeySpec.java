@@ -1,4 +1,4 @@
-package wbs.console.helper;
+package wbs.console.helper.spec;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -10,13 +10,23 @@ import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("run-post-processor")
-@PrototypeComponent ("runPostProcessorSpec")
+@DataClass ("priv-key")
+@PrototypeComponent ("privKeySpec")
 @ConsoleModuleData
 public
-class RunPostProcessorSpec {
+class PrivKeySpec {
 
-	@DataAttribute
+	@DataAttribute (
+		required = true)
 	String name;
+
+	@DataAttribute (
+		name = "priv",
+		required = true)
+	String privName;
+
+	@DataAttribute (
+		name = "delegate")
+	String delegateName;
 
 }

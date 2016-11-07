@@ -4,7 +4,7 @@ import lombok.NonNull;
 
 import com.google.common.base.Optional;
 
-import wbs.console.helper.ConsoleHooks;
+import wbs.console.helper.core.ConsoleHooks;
 import wbs.platform.text.model.TextRec;
 import wbs.utils.web.HtmlUtils;
 

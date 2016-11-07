@@ -79,7 +79,7 @@ import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryEditableScriptRef;
 import wbs.console.misc.JqueryScriptRef;
@@ -495,7 +495,7 @@ class ChatMonitorInboxSummaryPart
 			userChatUser,
 			chat);
 
-		htmlTableRowClose (); 
+		htmlTableRowClose ();
 
 	}
 

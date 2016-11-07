@@ -1,4 +1,4 @@
-package wbs.console.helper;
+package wbs.console.helper.enums;
 
 import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.camelToSpaces;

@@ -103,7 +103,7 @@ class SimulatorSessionConsolePart
 			.build ();
 
 	}
-	
+
 	// implementation
 
 	@Override

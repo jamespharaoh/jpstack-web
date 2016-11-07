@@ -3,8 +3,10 @@ package wbs.framework.logging;
 import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.equalToZero;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalDo;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
@@ -38,23 +40,31 @@ class TaskLogger {
 	// state
 
 	private
-	LogTarget logTarget;
+	Optional <TaskLogger> parent;
 
 	private
-	State state;
+	LogTarget logTarget;
+
+	long errorCount;
+	long warningCount;
+	long noticeCount;
+	long debugCount;
+
+	String firstError;
+	String lastError = "Aborting";
 
 	// constructors
 
 	public
 	TaskLogger (
-			@NonNull LogTarget logTarget,
-			@NonNull State state) {
+			@NonNull Optional <TaskLogger> parent,
+			@NonNull LogTarget logTarget) {
+
+		this.parent =
+			parent;
 
 		this.logTarget =
 			logTarget;
-
-		this.state =
-			state;
 
 	}
 
@@ -63,8 +73,8 @@ class TaskLogger {
 			@NonNull LogTarget logTarget) {
 
 		this (
-			logTarget,
-			new State ());
+			optionalAbsent (),
+			logTarget);
 
 	}
 
@@ -73,9 +83,9 @@ class TaskLogger {
 			@NonNull Logger logger) {
 
 		this (
+			optionalAbsent (),
 			new LoggerLogTarget (
-				logger),
-			new State ());
+				logger));
 
 	}
 
@@ -94,7 +104,7 @@ class TaskLogger {
 	public
 	long errorCount () {
 
-		return state.errorCount;
+		return errorCount;
 
 	}
 
@@ -102,15 +112,15 @@ class TaskLogger {
 	boolean errors () {
 
 		return moreThanZero (
-			state.errorCount);
+			errorCount);
 
 	}
 
 	public
 	void firstErrorFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
-		state.firstError =
+		firstError =
 			stringFormatArray (
 				arguments);
 
@@ -118,9 +128,9 @@ class TaskLogger {
 
 	public
 	void lastErrorFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
-		state.lastError =
+		lastError =
 			stringFormatArray (
 				arguments);
 
@@ -141,7 +151,51 @@ class TaskLogger {
 				arguments),
 			optionalAbsent ());
 
-		state.errorCount ++;
+		increaseErrorCount ();
+
+	}
+
+	private
+	void increaseErrorCount () {
+
+		errorCount ++;
+
+		optionalDo (
+			parent,
+			TaskLogger::increaseErrorCount);
+
+	}
+
+	private
+	void increaseWarningCount () {
+
+		warningCount ++;
+
+		optionalDo (
+			parent,
+			TaskLogger::increaseWarningCount);
+
+	}
+
+	private
+	void increaseNoticeCount () {
+
+		noticeCount ++;
+
+		optionalDo (
+			parent,
+			TaskLogger::increaseNoticeCount);
+
+	}
+
+	private
+	void increaseDebugCount () {
+
+		debugCount ++;
+
+		optionalDo (
+			parent,
+			TaskLogger::increaseDebugCount);
 
 	}
 
@@ -160,7 +214,7 @@ class TaskLogger {
 			optionalOf (
 				throwable));
 
-		state.errorCount ++;
+		increaseErrorCount ();
 
 	}
 
@@ -177,7 +231,7 @@ class TaskLogger {
 				arguments),
 			optionalAbsent ());
 
-		state.warningCount ++;
+		increaseWarningCount ();
 
 	}
 
@@ -196,7 +250,43 @@ class TaskLogger {
 			optionalOf (
 				throwable));
 
-		state.warningCount ++;
+		increaseWarningCount ();
+
+	}
+
+	public
+	void noticeFormat (
+			@NonNull String ... arguments) {
+
+		writeFirstError (
+			Severity.notice);
+
+		logTarget.writeToLog (
+			Severity.notice,
+			stringFormatArray (
+				arguments),
+			optionalAbsent ());
+
+		increaseNoticeCount ();
+
+	}
+
+	public
+	void noticeFormatException (
+			@NonNull Throwable throwable,
+			@NonNull String ... arguments) {
+
+		writeFirstError (
+			Severity.notice);
+
+		logTarget.writeToLog (
+			Severity.notice,
+			stringFormatArray (
+				arguments),
+			optionalOf (
+				throwable));
+
+		increaseNoticeCount ();
 
 	}
 
@@ -213,7 +303,7 @@ class TaskLogger {
 				arguments),
 			optionalAbsent ());
 
-		state.debugCount ++;
+		increaseDebugCount ();
 
 	}
 
@@ -232,20 +322,26 @@ class TaskLogger {
 			optionalOf (
 				throwable));
 
-		state.debugCount ++;
+		increaseDebugCount ();
 
 	}
 
 	public
 	RuntimeException makeException () {
 
+debugFormat (
+	"MAKE EXCEPTION %s",
+	integerToDecimalString (
+		errorCount ()));
+
 		if (errors ()) {
 
 			String message =
 				stringFormat (
 					"%s due to %s errors",
-					state.lastError,
-					state.errorCount);
+					lastError,
+					integerToDecimalString (
+						errorCount));
 
 			logTarget.writeToLog (
 				Severity.error,
@@ -297,6 +393,18 @@ class TaskLogger {
 	void writeFirstError (
 			@NonNull Severity severity) {
 
+		if (
+			optionalIsPresent (
+				parent)
+		) {
+
+			parent.get ().writeFirstError (
+				severity);
+
+			return;
+
+		}
+
 		switch (severity) {
 
 		case error:
@@ -304,16 +412,16 @@ class TaskLogger {
 			if (
 
 				equalToZero (
-					state.errorCount)
+					errorCount)
 
 				&& isNotNull (
-					state.firstError)
+					firstError)
 
 			) {
 
 				logTarget.writeToLog (
 					Severity.error,
-					state.firstError,
+					firstError,
 					optionalAbsent ());
 
 			}
@@ -325,17 +433,40 @@ class TaskLogger {
 			if (
 
 				equalToZero (
-					+ state.errorCount
-					+ state.warningCount)
+					+ errorCount
+					+ warningCount)
 
 				&& isNotNull (
-					state.firstError)
+					firstError)
 
 			) {
 
 				logTarget.writeToLog (
 					Severity.warning,
-					state.firstError,
+					firstError,
+					optionalAbsent ());
+
+			}
+
+			break;
+
+		case notice:
+
+			if (
+
+				equalToZero (
+					+ errorCount
+					+ warningCount
+					+ noticeCount)
+
+				&& isNotNull (
+					firstError)
+
+			) {
+
+				logTarget.writeToLog (
+					Severity.notice,
+					firstError,
 					optionalAbsent ());
 
 			}
@@ -347,18 +478,19 @@ class TaskLogger {
 			if (
 
 				equalToZero (
-					+ state.errorCount
-					+ state.warningCount
-					+ state.debugCount)
+					+ errorCount
+					+ warningCount
+					+ noticeCount
+					+ debugCount)
 
 				&& isNotNull (
-					state.firstError)
+					firstError)
 
 			) {
 
 				logTarget.writeToLog (
 					Severity.debug,
-					state.firstError,
+					firstError,
 					optionalAbsent ());
 
 			}
@@ -382,20 +514,6 @@ class TaskLogger {
 
 		return taskLogger.wrap (
 			function);
-
-	}
-
-	// state
-
-	private static
-	class State {
-
-		long errorCount;
-		long warningCount;
-		long debugCount;
-
-		String firstError;
-		String lastError = "Aborting";
 
 	}
 
@@ -535,6 +653,7 @@ class TaskLogger {
 	public static
 	enum Severity {
 		debug,
+		notice,
 		warning,
 		error;
 	}
@@ -552,6 +671,10 @@ class TaskLogger {
 		.put (
 			Severity.warning,
 			Level.WARN)
+
+		.put (
+			Severity.notice,
+			Level.INFO)
 
 		.put (
 			Severity.debug,

@@ -29,7 +29,7 @@ class ConsoleModuleSpec {
 
 	@DataChildren (
 		direct = true)
-	List<Object> builders =
-		new ArrayList<Object> ();
+	List <Object> builders =
+		new ArrayList<> ();
 
 }

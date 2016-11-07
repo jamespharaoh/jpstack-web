@@ -16,6 +16,7 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -24,6 +25,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.utils.cache.AdvancedCache;
@@ -37,6 +39,11 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 		ObjectHelperCodeMethods <RecordType>,
 		ObjectHelperComponent <RecordType> {
 
+	// singleton dependencies
+
+	@WeakSingletonDependency
+	ObjectManager objectManager;
+
 	// prototype dependencies
 
 	@PrototypeDependency
@@ -45,17 +52,14 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 
 	// properties
 
-	@Setter
-	ObjectModel <RecordType> model;
+	@Getter @Setter
+	ObjectModel <RecordType> objectModel;
 
-	@Setter
+	@Getter @Setter
 	ObjectHelper <RecordType> objectHelper;
 
-	@Setter
+	@Getter @Setter
 	ObjectDatabaseHelper <RecordType> objectDatabaseHelper;
-
-	@Setter
-	ObjectManager objectManager;
 
 	// state
 
@@ -70,16 +74,16 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 		// parent id and code
 
 		if (allOf (
-			() -> isNotNull (model.parentField ()),
-			() -> isNotNull (model.codeField ())
+			() -> isNotNull (objectModel.parentField ()),
+			() -> isNotNull (objectModel.codeField ())
 		)) {
 
 			parentIdAndCodeCache =
 				idCacheBuilderProvider.get ()
 
 				.dummy (! allOf (
-					() -> model.parentField ().cacheable (),
-					() -> model.codeField ().cacheable ()
+					() -> objectModel.parentField ().cacheable (),
+					() -> objectModel.codeField ().cacheable ()
 				))
 
 				.cacheNegatives (
@@ -96,7 +100,7 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 						Optional.fromNullable (
 							objectDatabaseHelper.findByParentAndCode (
 								new GlobalId (
-									model.parentTypeId (),
+									objectModel.parentTypeId (),
 									key.getLeft ()),
 								key.getRight ())))
 
@@ -135,7 +139,7 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 
 			ObjectHelper <?> parentHelper =
 				objectManager.objectHelperForClassRequired (
-					model.parentClass ());
+					objectModel.parentClass ());
 
 			Record <?> parent =
 				parentHelper.findByCodeRequired (
@@ -181,7 +185,7 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 			throw new RuntimeException (
 				stringFormat (
 					"No such %s with parent %s and code %s",
-					model.objectName (),
+					objectModel.objectName (),
 					objectManager.objectPath (
 						objectManager.findObject (
 							ancestorGlobalId)),

@@ -13,8 +13,8 @@ import lombok.experimental.Accessors;
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
-import wbs.console.helper.ConsoleHelper;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -99,14 +99,15 @@ class ObjectRemoveAction
 		objectHelper.remove (
 			ephemeralObject);
 
-		Record<?> parentObject =
-			objectHelper.getParent (
+		Record <?> parentObject =
+			objectHelper.getParentGeneric (
 				ephemeralObject);
 
 		eventLogic.createEvent (
 			"object_removed_in",
 			userConsoleLogic.userRequired (),
-			objectHelper.getCode (ephemeralObject),
+			objectHelper.getCodeGeneric (
+				ephemeralObject),
 			objectHelper.shortName (),
 			parentObject);
 

@@ -1,10 +1,12 @@
-package wbs.console.helper;
+package wbs.console.helper.provider;
 
 import wbs.console.context.ConsoleContextStuff;
 import wbs.framework.entity.record.Record;
 
 public
-interface ConsoleHelperProvider <ConcreteType extends Record <ConcreteType>> {
+interface ConsoleHelperProvider <
+	RecordType extends Record <RecordType>
+> {
 
 	String objectName ();
 
@@ -12,18 +14,18 @@ interface ConsoleHelperProvider <ConcreteType extends Record <ConcreteType>> {
 			Long objectId);
 
 	String getDefaultContextPath (
-			Record <?> object);
+			RecordType object);
 
 	String localPath (
-			Record <?> object);
+			RecordType object);
 
 	boolean canView (
-			Record <?> object);
+			RecordType object);
 
-	Record <?> lookupObject (
+	RecordType lookupObject (
 			ConsoleContextStuff contextStuff);
 
-	Class <ConcreteType> objectClass ();
+	Class <RecordType> objectClass ();
 
 	String idKey ();
 

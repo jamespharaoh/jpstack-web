@@ -16,7 +16,7 @@ import com.google.common.collect.Iterables;
 import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.tab.ConsoleContextTab;

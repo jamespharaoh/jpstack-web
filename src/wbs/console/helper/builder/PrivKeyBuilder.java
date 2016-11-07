@@ -1,7 +1,7 @@
-package wbs.console.helper;
+package wbs.console.helper.builder;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
-import wbs.console.module.ConsoleModuleImplementation;
+import wbs.console.helper.spec.PrivKeySpec;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -9,18 +9,11 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.object.ObjectManager;
 
-@PrototypeComponent ("consoleHelperProviderBuilder")
+@PrototypeComponent ("privKeyBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ConsoleHelperProviderBuilder {
-
-	// singleton dependencies
-
-	@SingletonDependency
-	ObjectManager objectManager;
+class PrivKeyBuilder {
 
 	// builder
 
@@ -28,10 +21,10 @@ class ConsoleHelperProviderBuilder {
 	SimpleConsoleBuilderContainer container;
 
 	@BuilderSource
-	ConsoleHelperProviderSpec spec;
+	PrivKeySpec spec;
 
 	@BuilderTarget
-	ConsoleModuleImplementation consoleModule;
+	Object target;
 
 	// build
 

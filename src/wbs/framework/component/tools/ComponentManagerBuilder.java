@@ -2,6 +2,7 @@ package wbs.framework.component.tools;
 
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.TypeUtils.classForName;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
@@ -33,9 +34,8 @@ import wbs.api.module.ApiModule;
 import wbs.api.module.ApiModuleFactory;
 import wbs.api.module.ApiModuleSpec;
 import wbs.api.module.ApiModuleSpecFactory;
-import wbs.console.helper.ConsoleHelperFactory;
-import wbs.console.helper.EnumConsoleHelper;
-import wbs.console.helper.EnumConsoleHelperFactory;
+import wbs.console.helper.enums.EnumConsoleHelper;
+import wbs.console.helper.enums.EnumConsoleHelperFactory;
 import wbs.console.module.ConsoleMetaModule;
 import wbs.console.module.ConsoleMetaModuleFactory;
 import wbs.console.module.ConsoleModule;
@@ -249,7 +249,8 @@ class ComponentManagerBuilder {
 			throw new RuntimeException (
 				stringFormat (
 					"Aborting due to %s errors",
-					taskLog.errorCount ()));
+					integerToDecimalString (
+						taskLog.errorCount ())));
 
 		}
 
@@ -1242,31 +1243,28 @@ class ComponentManagerBuilder {
 			@NonNull TaskLogger taskLog,
 			@NonNull PluginModelSpec model) {
 
-		String objectHelperComponentName =
-			stringFormat (
-				"%sObjectHelper",
-				model.name ());
-
 		String consoleHelperComponentName =
 			stringFormat (
 				"%sConsoleHelper",
 				model.name ());
 
+		// console helper
+
 		String consoleHelperClassName =
 			stringFormat (
 				"%s.console.%sConsoleHelper",
 				model.plugin ().packageName (),
-				capitalise (model.name ()));
+				capitalise (
+					model.name ()));
 
-		Class<?> consoleHelperClass;
+		Optional <Class <?>> consoleHelperClassOptional =
+			classForName (
+				consoleHelperClassName);
 
-		try {
-
-			consoleHelperClass =
-				Class.forName (
-					consoleHelperClassName);
-
-		} catch (ClassNotFoundException exception) {
+		if (
+			optionalIsNotPresent (
+				consoleHelperClassOptional)
+		) {
 
 			taskLog.errorFormat (
 				"No such class %s",
@@ -1276,6 +1274,37 @@ class ComponentManagerBuilder {
 
 		}
 
+		// console helper implemenation
+
+		String consoleHelperImplementationClassName =
+			stringFormat (
+				"%s.console.%sConsoleHelperImplementation",
+				model.plugin ().packageName (),
+				capitalise (
+					model.name ()));
+
+		Optional <Class <?>> consoleHelperImplementationClassOptional =
+			classForName (
+				consoleHelperImplementationClassName);
+
+		if (
+			optionalIsNotPresent (
+				consoleHelperImplementationClassOptional)
+		) {
+
+			taskLog.errorFormat (
+				"No such class %s",
+				consoleHelperImplementationClassName);
+
+			return;
+
+		}
+
+		Class <?> consoleHelperImplementationClass =
+			consoleHelperImplementationClassOptional.get ();
+
+		// component definition
+
 		componentRegistry.registerDefinition (
 			new ComponentDefinition ()
 
@@ -1283,21 +1312,10 @@ class ComponentManagerBuilder {
 				consoleHelperComponentName)
 
 			.componentClass (
-				consoleHelperClass)
-
-			.factoryClass (
-				ConsoleHelperFactory.class)
+				consoleHelperImplementationClass)
 
 			.scope (
 				"singleton")
-
-			.addReferenceProperty (
-				"objectHelper",
-				objectHelperComponentName)
-
-			.addValueProperty (
-				"consoleHelperClass",
-				consoleHelperClass)
 
 		);
 

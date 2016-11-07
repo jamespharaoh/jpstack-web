@@ -7,8 +7,10 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.extern.log4j.Log4j;
 
 import wbs.framework.codegen.JavaClassUnitWriter;
 import wbs.framework.codegen.JavaInterfaceWriter;
@@ -16,9 +18,10 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.scaffold.PluginModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
+import wbs.framework.logging.TaskLogger;
 import wbs.utils.string.AtomicFileWriter;
-import wbs.utils.string.FormatWriter;
 
+@Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("modelInterfacesGenerator")
 public
@@ -50,14 +53,20 @@ class ModelInterfacesGenerator {
 	// implementation
 
 	public
-	void generateInterfaces () {
+	void generateInterfaces (
+			@NonNull TaskLogger taskLogger) {
 
 		setup ();
 		findRelated ();
 
-		generateDaoInterface ();
-		generateObjectHelperInterface ();
-		generateConsoleHelperInterface ();
+		generateDaoInterface (
+			taskLogger);
+
+		generateObjectHelperInterface (
+			taskLogger);
+
+		generateConsoleHelperInterface (
+			taskLogger);
 
 	}
 
@@ -122,7 +131,14 @@ class ModelInterfacesGenerator {
 	}
 
 	private
-	void generateObjectHelperInterface () {
+	void generateObjectHelperInterface (
+			@NonNull TaskLogger taskLogger) {
+
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"generateObjectHelperInterface",
+				log);
 
 		// create directory
 
@@ -142,74 +158,91 @@ class ModelInterfacesGenerator {
 				directory,
 				objectHelperName);
 
-		@Cleanup
-		FormatWriter formatWriter =
-			new AtomicFileWriter (
-				filename);
+		try (
 
-		JavaClassUnitWriter classUnitWriter =
-			new JavaClassUnitWriter ()
+			AtomicFileWriter formatWriter =
+				new AtomicFileWriter (
+					filename);
 
-			.formatWriter (
-				formatWriter)
+		) {
 
-			.packageNameFormat (
-				"%s.model",
-				plugin.packageName ());
+			JavaClassUnitWriter classUnitWriter =
+				new JavaClassUnitWriter ()
 
-		JavaInterfaceWriter objectHelperWriter =
-			new JavaInterfaceWriter ()
+				.formatWriter (
+					formatWriter)
 
-			.interfaceName (
-				objectHelperName)
+				.packageNameFormat (
+					"%s.model",
+					plugin.packageName ());
 
-			.addInterfaceModifier (
-				"public");
+			JavaInterfaceWriter objectHelperWriter =
+				new JavaInterfaceWriter ()
 
-		if (gotObjectHelperMethods) {
+				.interfaceName (
+					objectHelperName)
+
+				.addInterfaceModifier (
+					"public");
+
+			if (gotObjectHelperMethods) {
+
+				objectHelperWriter
+
+					.addInterfaceFormat (
+						"%s.model.%s",
+						plugin.packageName (),
+						objectHelperMethodsName);
+
+			}
+
+			if (gotDaoMethods) {
+
+				objectHelperWriter
+
+					.addInterfaceFormat (
+						"%s.model.%s",
+						plugin.packageName (),
+						daoMethodsName);
+
+			}
 
 			objectHelperWriter
 
-				.addInterfaceFormat (
-					"%s.model.%s",
-					plugin.packageName (),
-					objectHelperMethodsName);
+				.addInterface (
+					imports ->
+						stringFormat (
+							"%s <%s>",
+							imports.register (
+								"wbs.framework.object.ObjectHelper"),
+							imports.registerFormat (
+								"%s.model.%s",
+								plugin.packageName (),
+								recordName)));
+
+			classUnitWriter.addBlock (
+				objectHelperWriter);
+
+			if (taskLogger.errors ()) {
+				return;
+			}
+
+			classUnitWriter.write (
+				taskLogger);
+
+			if (taskLogger.errors ()) {
+				return;
+			}
+
+			formatWriter.commit ();
 
 		}
-
-		if (gotDaoMethods) {
-
-			objectHelperWriter
-
-				.addInterfaceFormat (
-					"%s.model.%s",
-					plugin.packageName (),
-					daoMethodsName);
-
-		}
-
-		objectHelperWriter
-
-			.addInterface (
-				imports ->
-					stringFormat (
-						"%s <%s>",
-						imports.register (
-							"wbs.framework.object.ObjectHelper"),
-						imports.registerFormat (
-							"%s.model.%s",
-							plugin.packageName (),
-							recordName)));
-
-		classUnitWriter.addBlock (
-			objectHelperWriter);
-
-		classUnitWriter.write ();
 
 	}
 
 	private
-	void generateDaoInterface () {
+	void generateDaoInterface (
+			@NonNull TaskLogger taskLogger) {
 
 		if (! gotDaoMethods) {
 			return;
@@ -235,50 +268,73 @@ class ModelInterfacesGenerator {
 
 		// write interface
 
-		@Cleanup
-		FormatWriter formatWriter =
-			new AtomicFileWriter (
-				filename);
+		try (
 
-		JavaClassUnitWriter classUnitWriter =
-			new JavaClassUnitWriter ()
+			AtomicFileWriter formatWriter =
+				new AtomicFileWriter (
+					filename);
 
-			.formatWriter (
-				formatWriter)
+		) {
 
-			.packageNameFormat (
-				"%s.model",
-				plugin.packageName ());
+			JavaClassUnitWriter classUnitWriter =
+				new JavaClassUnitWriter ()
 
-		JavaInterfaceWriter daoWriter =
-			new JavaInterfaceWriter ()
+				.formatWriter (
+					formatWriter)
 
-			.interfaceName (
-				daoName)
+				.packageNameFormat (
+					"%s.model",
+					plugin.packageName ());
 
-			.addInterfaceModifier (
-				"public");
+			JavaInterfaceWriter daoWriter =
+				new JavaInterfaceWriter ()
 
-		if (gotDaoMethods) {
+				.interfaceName (
+					daoName)
 
-			daoWriter
+				.addInterfaceModifier (
+					"public");
 
-				.addInterfaceFormat (
-					"%s.model.%s",
-					plugin.packageName (),
-					daoMethodsName);
+			if (gotDaoMethods) {
+
+				daoWriter
+
+					.addInterfaceFormat (
+						"%s.model.%s",
+						plugin.packageName (),
+						daoMethodsName);
+
+			}
+
+			classUnitWriter.addBlock (
+				daoWriter);
+
+			if (taskLogger.errors ()) {
+				return;
+			}
+
+			classUnitWriter.write (
+				taskLogger);
+
+			if (taskLogger.errors ()) {
+				return;
+			}
+
+			formatWriter.commit ();
 
 		}
-
-		classUnitWriter.addBlock (
-			daoWriter);
-
-		classUnitWriter.write ();
 
 	}
 
 	private
-	void generateConsoleHelperInterface () {
+	void generateConsoleHelperInterface (
+			@NonNull TaskLogger taskLogger) {
+
+		taskLogger =
+			taskLogger.nest (
+				this,
+				"generateConsoleHelperInterface",
+				log);
 
 		// create directory
 
@@ -301,7 +357,7 @@ class ModelInterfacesGenerator {
 		// write interface
 
 		@Cleanup
-		FormatWriter formatWriter =
+		AtomicFileWriter formatWriter =
 			new AtomicFileWriter (
 				filename);
 
@@ -353,7 +409,7 @@ class ModelInterfacesGenerator {
 					stringFormat (
 						"%s <%s>",
 						imports.register (
-							"wbs.console.helper.ConsoleHelper"),
+							"wbs.console.helper.core.ConsoleHelper"),
 						imports.registerFormat (
 							"%s.model.%s",
 							plugin.packageName (),
@@ -362,7 +418,18 @@ class ModelInterfacesGenerator {
 		classUnitWriter.addBlock (
 			consoleHelperWriter);
 
-		classUnitWriter.write ();
+		if (taskLogger.errors ()) {
+			return;
+		}
+
+		classUnitWriter.write (
+			taskLogger);
+
+		if (taskLogger.errors ()) {
+			return;
+		}
+
+		formatWriter.commit ();
 
 	}
 

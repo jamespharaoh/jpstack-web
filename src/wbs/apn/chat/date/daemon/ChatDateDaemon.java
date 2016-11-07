@@ -386,19 +386,19 @@ class ChatDateDaemon
 
 					if (chatUser.getNumber () == null)
 						continue;
-	
+
 					if (chatUser.getNumber ().getNetwork ().getId () == 0)
 						continue;
-	
+
 					ChatCreditCheckResult creditCheckResult =
 						chatCreditLogic.userSpendCreditCheck (
 							chatUser,
 							false,
 							Optional.<Long>absent ());
-	
+
 					if (creditCheckResult.failed ())
 						continue;
-	
+
 					chatData.otherUserInfos.add (
 						new DatingUserInfo (
 							chatUser));
@@ -453,7 +453,7 @@ class ChatDateDaemon
 					ChatUserRec chatUser =
 						chatUserHelper.findRequired (
 							chatUserId);
-	
+
 					chatData.otherUserInfos.add (
 						new DatingUserInfo (
 							chatUser));
@@ -496,98 +496,98 @@ class ChatDateDaemon
 				) {
 
 					if (chatUser.getType () != ChatUserType.user) {
-	
+
 						log.debug (
 							stringFormat (
 								"Ignoring %s ",
 								chatUser.getId (),
 								"(user type)"));
-	
+
 						continue;
-	
+
 					}
-	
+
 					chatData.numUsers ++;
-	
+
 					ChatCreditCheckResult creditCheckResult =
 						chatCreditLogic.userSpendCreditCheck (
 							chatUser,
 							false,
 							Optional.<Long>absent ());
-	
+
 					if (creditCheckResult.failed ()) {
-	
+
 						chatData.numCredit ++;
-	
+
 						log.info (
 							stringFormat (
 								"Ignoring %s ",
 								chatUser,
 								"(%s)",
 								creditCheckResult.details ()));
-	
+
 						continue;
-	
+
 					}
-	
+
 					if (
 						! checkHours (
 							hour,
 							chatUser.getDateStartHour (),
 							chatUser.getDateEndHour ())
 					) {
-	
+
 						chatData.numHours ++;
-	
+
 						log.debug (
 							stringFormat (
 								"Ignoring %s ",
 								chatUser.getId (),
 								"(time)"));
-	
+
 						continue;
-	
+
 					}
-	
+
 					if (chatUser.getOnline ()) {
-	
+
 						chatData.numOnline ++;
-	
+
 						log.info (
 							stringFormat (
 								"Ignoring %s (online)",
 								chatUser.getId ()));
-	
+
 						continue;
-	
+
 					}
-	
+
 					if (allOf (
-	
+
 						() -> isNotNull (
 							chatUser.getDateDailyDate ()),
-	
+
 						() -> equalSafe (
 							chatUser.getDateDailyDate (),
 							today),
-	
+
 						() -> lessThanOne (
 							chatUser.getDateDailyCount ())
-	
+
 					)) {
-	
+
 						chatData.numSent ++;
-	
+
 						log.debug (
 							"Ignoring " + chatUser.getId () + " (daily limit)");
-	
+
 						continue;
-	
+
 					}
-	
+
 					log.debug (
 						"Including " + chatUser.getId ());
-	
+
 					chatData.datingUserIds.add (
 						chatUser.getId ());
 

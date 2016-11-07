@@ -45,7 +45,7 @@ import org.apache.commons.fileupload.FileItem;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.priv.UserPrivDataLoader;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;

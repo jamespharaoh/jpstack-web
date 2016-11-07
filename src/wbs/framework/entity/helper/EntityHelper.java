@@ -11,8 +11,8 @@ interface EntityHelper {
 	List <String> entityClassNames ();
 	List <Class <?>> entityClasses ();
 
-	List <Model> models ();
-	Map <Class <?>, Model> modelsByClass ();
-	Map <String, Model> modelsByName ();
+	List <Model <?>> models ();
+	Map <Class <?>, Model <?>> modelsByClass ();
+	Map <String, Model <?>> modelsByName ();
 
 }

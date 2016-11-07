@@ -26,7 +26,7 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.IdFormFieldSpec;
 import wbs.console.forms.NameFormFieldSpec;
 import wbs.console.forms.ParentFormFieldSpec;
-import wbs.console.helper.ConsoleHelper;
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.console.module.ConsoleModuleBuilder;

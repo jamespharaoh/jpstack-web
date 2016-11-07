@@ -1,5 +1,6 @@
 package wbs.framework.entity.helper;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -46,7 +47,7 @@ class EntityHelperImplementation
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ModelBuilder> modelBuilder;
+	Provider <ModelBuilder <?>> modelBuilder;
 
 	// properties
 
@@ -57,13 +58,13 @@ class EntityHelperImplementation
 	List <Class <?>> entityClasses;
 
 	@Getter
-	List <Model> models;
+	List <Model <?>> models;
 
 	@Getter
-	Map <Class <?>, Model> modelsByClass;
+	Map <Class <?>, Model <?>> modelsByClass;
 
 	@Getter
-	Map <String, Model> modelsByName;
+	Map <String, Model <?>> modelsByName;
 
 	// life cycle
 
@@ -148,7 +149,8 @@ class EntityHelperImplementation
 			throw new RuntimeException (
 				stringFormat (
 					"Aborting due to %s classes not found",
-					errors));
+					integerToDecimalString (
+						errors)));
 
 		}
 
@@ -177,13 +179,13 @@ class EntityHelperImplementation
 
 		}
 
-		ImmutableList.Builder <Model> modelsBuilder =
+		ImmutableList.Builder <Model <?>> modelsBuilder =
 			ImmutableList.builder ();
 
-		ImmutableMap.Builder <Class <?>, Model> modelsByClassBuilder =
+		ImmutableMap.Builder <Class <?>, Model <?>> modelsByClassBuilder =
 			ImmutableMap.builder ();
 
-		ImmutableMap.Builder <String, Model> modelsByNameBuilder =
+		ImmutableMap.Builder <String, Model <?>> modelsByNameBuilder =
 			ImmutableMap.builder ();
 
 		int errors = 0;
@@ -197,7 +199,7 @@ class EntityHelperImplementation
 				continue;
 			}
 
-			Model model =
+			Model <?> model =
 				modelBuilder.get ()
 
 				.modelMeta (

@@ -40,7 +40,7 @@ import lombok.NonNull;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
-import wbs.console.helper.ConsoleObjectManager;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryEditableScriptRef;

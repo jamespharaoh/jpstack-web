@@ -174,7 +174,7 @@ class ChatConsoleLogicImplementation
 		} else {
 
 			switch (chatUser.getGender ()) {
-	
+
 			case male:
 
 				htmlTableCellWrite (
@@ -184,7 +184,7 @@ class ChatConsoleLogicImplementation
 						"gender-male"));
 
 				break;
-	
+
 			case female:
 
 				htmlTableCellWrite (

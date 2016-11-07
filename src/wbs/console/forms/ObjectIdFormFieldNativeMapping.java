@@ -6,7 +6,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import wbs.console.helper.ConsoleHelper;
+
+import wbs.console.helper.core.ConsoleHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.Record;
 
