@@ -73,7 +73,6 @@
 		<component class="ParentFormFieldConstraintValidator"/>
 		<component class="ParentFormFieldSpec"/>
 		<component class="RangeFormFieldInterfaceMapping"/>
-		<component class="RangeFormFieldRenderer"/>
 		<component class="ReadOnlyFormField"/>
 		<component class="RequiredFormFieldValueValidator"/>
 		<component class="ScriptRefFormField"/>

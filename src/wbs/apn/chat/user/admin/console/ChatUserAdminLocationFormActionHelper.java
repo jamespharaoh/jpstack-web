@@ -1,5 +1,8 @@
 package wbs.apn.chat.user.admin.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+
 import com.google.common.base.Optional;
 
 import lombok.Data;
@@ -10,6 +13,7 @@ import wbs.apn.chat.user.admin.console.ChatUserAdminLocationFormActionHelper.Cha
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.console.combo.AbstractConsoleFormActionHelper;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -80,7 +84,7 @@ class ChatUserAdminLocationFormActionHelper
 
 	@Override
 	public
-	Optional<Responder> processFormSubmission (
+	Optional <Responder> processFormSubmission (
 			@NonNull Transaction transaction,
 			@NonNull ChatUserAdminLocationForm formState) {
 
@@ -91,7 +95,7 @@ class ChatUserAdminLocationFormActionHelper
 			requestContext.addWarning (
 				"Please specify a location");
 
-			return Optional.<Responder>absent ();
+			return optionalAbsent ();
 
 		}
 
@@ -106,8 +110,8 @@ class ChatUserAdminLocationFormActionHelper
 			chatUserLogic.setPlace (
 				chatUser,
 				formState.newLocationName (),
-				Optional.<MessageRec>absent (),
-				Optional.of (
+				optionalAbsent (),
+				optionalOf (
 					userConsoleLogic.userRequired ()));
 
 		// handle location not found
@@ -117,7 +121,7 @@ class ChatUserAdminLocationFormActionHelper
 			requestContext.addError (
 				"That location could not be found");
 
-			return Optional.<Responder>absent ();
+			return optionalAbsent ();
 
 		}
 
@@ -128,7 +132,7 @@ class ChatUserAdminLocationFormActionHelper
 		requestContext.addNotice (
 			"Location updated successfully");
 
-		return Optional.<Responder>absent ();
+		return optionalAbsent ();
 
 	}
 

@@ -75,6 +75,17 @@ interface ObjectHelperPropertyMethods <
 	String getDescription (
 			RecordType object);
 
+	default
+	String getDescriptionGeneric (
+			Record <?> object) {
+
+		return getDescription (
+			dynamicCast (
+				objectHelper ().objectClass (),
+				object));
+
+	}
+
 	Record <?> getParentType (
 			RecordType object);
 
@@ -82,7 +93,7 @@ interface ObjectHelperPropertyMethods <
 	Record <?> getParentTypeGeneric (
 			Record <?> object) {
 
-		return getParentTypeGeneric (
+		return getParentType (
 			dynamicCast (
 				objectHelper ().objectClass (),
 				object));

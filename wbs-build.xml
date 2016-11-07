@@ -443,6 +443,10 @@
 			package="wbs.smsapps.manualresponder"/>
 
 		<plugin
+			name="send-sms"
+			package="wbs.smsapps.sendsms"/>
+
+		<plugin
 			name="subscription"
 			package="wbs.smsapps.subscription"/>
 

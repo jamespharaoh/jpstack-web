@@ -54,8 +54,10 @@ interface ConsoleHooks <RecordType extends Record <RecordType>> {
 	}
 
 	public static
-	class DefaultImplementation<RecordType extends Record<RecordType>>
-		implements ConsoleHooks<RecordType> {
+	class DefaultImplementation <
+		RecordType extends Record <RecordType>
+	>
+		implements ConsoleHooks <RecordType> {
 
 	}
 

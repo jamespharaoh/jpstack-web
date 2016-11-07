@@ -38,4 +38,8 @@ class ContextTabFormActionPageSpec {
 	@DataAttribute
 	String submitLabel;
 
+	@DataAttribute (
+		name = "helper")
+	String helperName;
+
 }

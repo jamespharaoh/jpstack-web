@@ -54,6 +54,7 @@ import wbs.framework.object.ObjectHelperMethods;
 import wbs.framework.object.ObjectModel;
 import wbs.framework.object.ObjectModelMethods;
 import wbs.framework.object.ObjectTypeRegistry;
+import wbs.utils.etc.OptionalUtils;
 import wbs.utils.string.AtomicFileWriter;
 import wbs.utils.string.FormatWriter;
 
@@ -594,13 +595,10 @@ class ConsoleHelperGenerator {
 					model.objectName ()))
 
 			.write (
-				formatWriter,
-				imports);
+				formatWriter);
 
-		formatWriter.writeLineFormat (
+		formatWriter.writeLineFormatIncreaseIndent (
 			"if (consoleHelperProviderSpec == null) {");
-
-		formatWriter.increaseIndent ();
 
 		formatWriter.writeNewline ();
 
@@ -625,8 +623,7 @@ class ConsoleHelperGenerator {
 				model.objectName ())
 
 			.write (
-				formatWriter,
-				imports);
+				formatWriter);
 
 		formatWriter.writeLineFormatDecreaseIndent (
 			"}");
@@ -671,8 +668,51 @@ class ConsoleHelperGenerator {
 				"init")
 
 			.write (
-				formatWriter,
-				imports);
+				formatWriter);
+
+		// hooks
+
+		new JavaAssignmentWriter ()
+
+			.variableName (
+				"consoleHooksImplementation")
+
+			.valueFormat (
+				"%s.%s (%s (%s, \"%s\", %s.class))",
+				imports.register (
+					OptionalUtils.class),
+				"optionalOrNull",
+				"componentManager.getComponent",
+				"taskLogger",
+				consoleHooksComponentName,
+				imports.register (
+					ConsoleHooks.class))
+
+			.write (
+				formatWriter);
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"if (consoleHooksImplementation == null) {");
+
+		formatWriter.writeNewline ();
+
+		new JavaAssignmentWriter ()
+
+			.variableName (
+				"consoleHooksImplementation")
+
+			.valueFormat (
+				"new %s.DefaultImplementation ()",
+				imports.register (
+					ConsoleHooks.class))
+
+			.write (
+				formatWriter);
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"}");
+
+		formatWriter.writeNewline ();
 
 		// console helper implementation
 
@@ -692,9 +732,12 @@ class ConsoleHelperGenerator {
 				"consoleHelperProvider",
 				"consoleHelperProvider")
 
+			.property (
+				"consoleHooks",
+				"consoleHooksImplementation")
+
 			.write (
-				formatWriter,
-				imports);
+				formatWriter);
 
 		// components
 

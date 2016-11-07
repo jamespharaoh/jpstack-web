@@ -104,8 +104,7 @@ class JavaAssignmentWriter {
 
 	public
 	void write (
-			@NonNull FormatWriter formatWriter,
-			@NonNull JavaImportRegistry imports) {
+			@NonNull FormatWriter formatWriter) {
 
 		formatWriter.writeLineFormat (
 			"%s =",

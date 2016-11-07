@@ -19,7 +19,6 @@
 		<component class="provider.ConsoleHelperProviderBuilder"/>
 		<component class="provider.ConsoleHelperProviderManager"/>
 		<component class="provider.ConsoleHelperProviderMetaBuilder"/>
-		<component class="provider.ConsoleHelperProviderRegistry"/>
 		<component class="provider.GenericConsoleHelperProvider"/>
 
 		<component class="spec.ConsoleHelperProviderSpec"/>

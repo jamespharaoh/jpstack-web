@@ -1,5 +1,6 @@
 package wbs.console.combo;
 
+import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -265,7 +266,9 @@ class ContextTabFormActionPageBuilder {
 				"%s%sFormActionHelper",
 				container.newBeanNamePrefix (),
 				capitalise (
-					name));
+					ifNull (
+						spec.helperName (),
+						name)));
 
 		tabName =
 			stringFormat (
