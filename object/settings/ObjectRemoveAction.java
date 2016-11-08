@@ -103,7 +103,7 @@ class ObjectRemoveAction
 			ephemeralObject);
 
 		Record <?> parentObject =
-			objectHelper.getParentGeneric (
+			objectHelper.getParentOrNullGeneric (
 				ephemeralObject);
 
 		eventLogic.createEvent (

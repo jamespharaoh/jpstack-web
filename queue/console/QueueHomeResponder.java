@@ -492,7 +492,7 @@ class QueueHomeResponder
 				queueInfo.queue ();
 
 			Record <?> parent =
-				objectManager.getParent (
+				objectManager.getParentOrNull (
 					queue);
 
 			Optional <SliceRec> slice =
@@ -609,7 +609,7 @@ class QueueHomeResponder
 
 			if (
 				privChecker.canRecursive (
-					objectManager.getParent (
+					objectManager.getParentOrNull (
 						queueInfo.queue ()),
 					"supervisor")
 			) {
@@ -731,7 +731,7 @@ class QueueHomeResponder
 
 			htmlTableCellWrite (
 				objectManager.objectPath (
-					objectManager.getParent (
+					objectManager.getParentOrNull (
 						queue),
 					userConsoleLogic.sliceRequired ()));
 

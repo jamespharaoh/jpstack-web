@@ -57,7 +57,7 @@ class QueueItemConsoleHooks
 		) {
 
 			Record<?> queueParent =
-				objectManager.getParent (
+				objectManager.getParentOrNull (
 					queue);
 
 			 if (

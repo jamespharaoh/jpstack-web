@@ -226,7 +226,7 @@ class PrivDataLoaderImplementation
 
 				try {
 
-					objectManager.getParent (
+					objectManager.getParentOrNull (
 						priv);
 
 					privs.add (
@@ -319,7 +319,7 @@ class PrivDataLoaderImplementation
 			) {
 
 				Record<?> parent =
-					objectManager.getParent (
+					objectManager.getParentOrNull (
 						priv);
 
 				try {
@@ -327,7 +327,7 @@ class PrivDataLoaderImplementation
 					// do chainedPrivIds
 
 					Record<?> grandParent =
-						objectManager.getParent (
+						objectManager.getParentOrNull (
 							parent);
 
 					if (grandParent != null) {
@@ -456,7 +456,7 @@ class PrivDataLoaderImplementation
 				}
 
 				object =
-					objectManager.getParent (
+					objectManager.getParentOrNull (
 						object);
 
 			}

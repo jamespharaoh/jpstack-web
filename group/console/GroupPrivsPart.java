@@ -116,7 +116,7 @@ class GroupPrivsPart
 			}
 
 			Record<?> parentObject =
-				objectManager.getParent (priv);
+				objectManager.getParentOrNull (priv);
 
 			PrivsNode parentNode =
 				findNode (parentObject);
@@ -175,7 +175,7 @@ class GroupPrivsPart
 		// find the parent node by recursion
 
 		Record<?> parent =
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				object);
 
 		PrivsNode parentNode =

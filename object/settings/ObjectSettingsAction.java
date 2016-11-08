@@ -187,7 +187,7 @@ class ObjectSettingsAction <
 
 			PermanentRecord <?> linkObject =
 				(PermanentRecord <?>)
-				objectManager.getParent (
+				objectManager.getParentOrNull (
 					object);
 
 			Object objectRef =

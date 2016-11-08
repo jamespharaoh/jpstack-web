@@ -144,7 +144,7 @@ class QueueSupervisorItemsPart
 					() -> queueItem.getQueue ());
 
 			Record <?> parent =
-				objectManager.getParent (
+				objectManager.getParentOrNull (
 					queue);
 
 			// open table row

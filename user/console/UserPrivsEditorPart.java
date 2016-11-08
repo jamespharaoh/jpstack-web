@@ -113,7 +113,7 @@ class UserPrivsEditorPart
 				continue;
 
 			Record <?> parentObject =
-				objectManager.getParent (
+				objectManager.getParentOrNull (
 					priv);
 
 			PrivsEditorNode parentNode =
@@ -199,7 +199,7 @@ class UserPrivsEditorPart
 		// find the parent node by recursion
 
 		Record<?> parent =
-			objectManager.getParent (object);
+			objectManager.getParentOrNull (object);
 
 		PrivsEditorNode parentNode =
 			findNode (parent);
