@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -29,6 +30,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
@@ -160,16 +162,8 @@ class ObjectTicketCreateAction <
 
 	@Override
 	protected
-	Responder goReal () {
-
-		@SuppressWarnings ("unchecked")
-		ConsoleHelper <ParentType> parentHelperTemp =
-			(ConsoleHelper <ParentType>)
-			objectManager.findConsoleHelper (
-				consoleHelper.parentClass ());
-
-		parentHelper =
-			parentHelperTemp;
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// begin transaction
 

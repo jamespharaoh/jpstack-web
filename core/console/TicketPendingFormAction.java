@@ -1,8 +1,10 @@
 package wbs.services.ticket.core.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import org.joda.time.Instant;
 
@@ -12,6 +14,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.queue.logic.QueueLogic;
@@ -64,7 +67,8 @@ class TicketPendingFormAction
 
 	@Override
 	public
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// begin transaction
 
@@ -114,7 +118,8 @@ class TicketPendingFormAction
 			requestContext.parameterRequired (
 				stringFormat (
 					"timestamp-%s",
-					template.getTicketState ().getId ()));
+					integerToDecimalString (
+						template.getTicketState ().getId ())));
 
 		Integer timestamp =
 			Integer.parseInt (
