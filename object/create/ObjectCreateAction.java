@@ -3,6 +3,7 @@ package wbs.platform.object.create;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.instantToDateNullSafe;
@@ -14,6 +15,7 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -37,6 +39,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
@@ -144,16 +147,13 @@ class ObjectCreateAction <
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
-		@SuppressWarnings ("unchecked")
-		ConsoleHelper<ParentType> parentHelperTemp =
-			(ConsoleHelper<ParentType>)
-			objectManager.findConsoleHelper (
-				consoleHelper.parentClass ());
-
-		parentHelper =
-			parentHelperTemp;
+		ConsoleHelper <ParentType> parentHelper =
+			genericCastUnchecked (
+				objectManager.findConsoleHelper (
+					consoleHelper.parentClass ()));
 
 		// begin transaction
 

@@ -3,6 +3,7 @@ package wbs.platform.core.console;
 import javax.inject.Provider;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -11,6 +12,7 @@ import wbs.console.lookup.BooleanLookup;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 
 @Accessors (fluent = true)
@@ -43,7 +45,8 @@ class CoreAuthAction
 
 	@Override
 	public
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		if (! lookup.lookup (
 				requestContext.contextStuff ())) {

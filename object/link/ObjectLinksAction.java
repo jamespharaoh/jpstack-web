@@ -5,6 +5,7 @@ import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.regex.Pattern;
 
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -26,6 +28,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.updatelog.logic.UpdateManager;
@@ -109,7 +112,8 @@ class ObjectLinksAction
 
 	@Override
 	public
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		@Cleanup
 		Transaction transaction =
@@ -121,18 +125,18 @@ class ObjectLinksAction
 			contextHelper.lookupObject (
 				requestContext.contextStuff ());
 
-		@SuppressWarnings ("unchecked")
-		Set<Record<?>> contextLinks =
-			(Set<Record<?>>)
-			PropertyUtils.getProperty (
-				contextObject,
-				contextLinkField);
+		Set <Record <?>> contextLinks =
+			genericCastUnchecked (
+				PropertyUtils.getProperty (
+					contextObject,
+					contextLinkField));
 
-		List<String> params =
-			requestContext.getParameterValues ("old_link");
+		List <String> params =
+			requestContext.getParameterValues (
+				"old_link");
 
-		List<Record<?>> updatedTargetObjects =
-			new ArrayList<Record<?>> ();
+		List <Record <?>> updatedTargetObjects =
+			new ArrayList<> ();
 
 		for (
 			String param

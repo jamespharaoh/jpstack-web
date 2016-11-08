@@ -1,5 +1,6 @@
 package wbs.platform.core.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringInSafe;
 
@@ -13,6 +14,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -56,7 +58,8 @@ class CoreLogonAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// get params
 
@@ -131,7 +134,8 @@ class CoreLogonAction
 				"Successful logon for %s.%s (%s)",
 				slice,
 				username,
-				userId));
+				integerToDecimalString (
+					userId)));
 
 		userConsoleLogic.login (
 			userId);

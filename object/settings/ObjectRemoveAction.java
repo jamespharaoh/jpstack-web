@@ -7,6 +7,7 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -22,6 +23,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -84,7 +86,8 @@ class ObjectRemoveAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		@Cleanup
 		Transaction transaction =
@@ -92,7 +95,7 @@ class ObjectRemoveAction
 				"ObjectRemoveAction.goReal ()",
 				this);
 
-		Record<?> ephemeralObject =
+		Record <?> ephemeralObject =
 			objectHelper.lookupObject (
 				requestContext.contextStuff ());
 
