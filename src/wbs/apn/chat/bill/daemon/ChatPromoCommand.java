@@ -145,7 +145,7 @@ class ChatPromoCommand
 
 		ChatPromoRec chatPromo =
 			(ChatPromoRec) (Object)
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				command);
 
 		ChatRec chat =

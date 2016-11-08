@@ -109,7 +109,7 @@ class ChatCheckCreditCommand
 
 		ChatRec chat =
 			(ChatRec)
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				command);
 
 		ServiceRec defaultService =

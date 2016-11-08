@@ -178,10 +178,10 @@ class ObjectModelImplementation <RecordType extends Record <RecordType>>
 
 	@Override
 	public
-	Record <?> getParent (
+	Record <?> getParentOrNull (
 			@NonNull RecordType object) {
 
-		return model.getParent (
+		return model.getParentOrNull (
 			object);
 
 	}

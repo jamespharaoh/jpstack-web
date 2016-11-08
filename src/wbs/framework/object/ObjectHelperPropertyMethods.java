@@ -1,12 +1,21 @@
 package wbs.framework.object;
 
+import static wbs.utils.etc.Misc.successOrThrowRuntimeException;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.TypeUtils.dynamicCast;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.base.Optional;
+
+import lombok.NonNull;
 
 import wbs.framework.codegen.DoNotDelegate;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+
+import fj.data.Either;
 
 public
 interface ObjectHelperPropertyMethods <
@@ -142,34 +151,92 @@ interface ObjectHelperPropertyMethods <
 
 	}
 
-	Record <?> getParent (
+	Either <Optional <Record <?>>, String> getParentOrError (
 			RecordType object);
 
 	default
-	Record <?> getParentGeneric (
-			Record <?> object) {
+	Either <Optional <Record <?>>, String> getParentOrErrorGeneric (
+			@NonNull Record <?> object) {
 
-		return getParent (
+		return getParentOrError (
 			dynamicCast (
 				objectHelper ().objectClass (),
 				object));
 
 	}
 
-	Boolean getDeleted (
+	default
+	Optional <Record <?>> getParent (
+			RecordType object) {
+
+		return successOrThrowRuntimeException (
+			getParentOrError (
+				object));
+
+	}
+
+	default
+	Record <?> getParentRequired (
+			RecordType object) {
+
+		return optionalGetRequired (
+			successOrThrowRuntimeException (
+				getParentOrError (
+					object)));
+
+	}
+
+	@Deprecated
+	default
+	Record <?> getParentOrNull (
+			RecordType object) {
+
+		return optionalOrNull (
+			successOrThrowRuntimeException (
+				getParentOrError (
+					object)));
+
+	}
+
+	@Deprecated
+	default
+	Record <?> getParentOrNullGeneric (
+			Record <?> object) {
+
+		return getParentOrNull (
+			dynamicCast (
+				objectHelper ().objectClass (),
+				object));
+
+	}
+
+	Either <Boolean, String> getDeletedOrError (
 			RecordType object,
-			boolean checkParents);
+			Boolean checkParents);
+
+	default
+	Boolean getDeleted (
+			@Nonnull RecordType object,
+			@NonNull Boolean checkParents) {
+
+		return successOrThrowRuntimeException (
+			getDeletedOrError (
+				object,
+				checkParents));
+
+	}
 
 	default
 	Boolean getDeletedGeneric (
 			Record <?> object,
 			boolean checkParents) {
 
-		return getDeleted (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object),
-			checkParents);
+		return successOrThrowRuntimeException (
+			getDeletedOrError (
+				dynamicCast (
+					objectHelper ().objectClass (),
+					object),
+				checkParents));
 
 	}
 

@@ -43,7 +43,7 @@ class ChatNumberLookupHelper
 
 		ChatRec chat =
 			(ChatRec)
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				numberLookup);
 
 		if (

@@ -147,7 +147,7 @@ class QueueManager {
 			@NonNull QueueRec queue) {
 
 		Record<?> queueParent =
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				queue);
 
 		QueueTypeSpec queueTypeSpec =

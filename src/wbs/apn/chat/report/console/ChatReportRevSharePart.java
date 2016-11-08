@@ -555,7 +555,7 @@ class ChatReportRevSharePart
 			return existingReport;
 
 		Object affiliateParent =
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				affiliate);
 
 		ChatReportRevShareItem newReport;

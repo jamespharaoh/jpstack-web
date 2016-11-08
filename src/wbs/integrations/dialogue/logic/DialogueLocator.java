@@ -109,7 +109,7 @@ class DialogueLocator
 
 		DialogueLocatorRec dialogueLocator =
 			(DialogueLocatorRec)
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				locator);
 
 		locatorInfo.url =

@@ -187,7 +187,7 @@ class QueueListActivePart
 
 			htmlTableCellWrite (
 				objectManager.objectPath (
-					objectManager.getParent (
+					objectManager.getParentOrNull (
 						queue)));
 
 			htmlTableCellWrite (

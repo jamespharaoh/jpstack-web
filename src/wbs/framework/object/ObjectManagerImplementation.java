@@ -6,10 +6,12 @@ import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.etc.TypeUtils.isSubclassOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -42,6 +44,8 @@ import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.utils.etc.PropertyUtils;
+
+import fj.data.Either;
 
 @Accessors (fluent = true)
 @SingletonComponent ("objectManager")
@@ -181,14 +185,14 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	Record <?> getParent (
+	Either <Optional <Record <?>>, String> getParentOrError (
 			@NonNull Record <?> object) {
 
 		ObjectHelper <?> objectHelper =
 			objectHelperForClassRequired (
 				object.getClass ());
 
-		return objectHelper.getParentGeneric (
+		return objectHelper.getParentOrErrorGeneric (
 			object);
 
 	}
@@ -300,7 +304,7 @@ class ObjectManagerImplementation
 			// get some stuff
 
 			Record <?> parent =
-				objectHelper.getParentGeneric (
+				objectHelper.getParentOrNullGeneric (
 					object);
 
 			ObjectHelper <?> parentHelper =
@@ -600,7 +604,36 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	ObjectHelper <?> objectHelperForTypeId (
+	Optional <ObjectHelper <?>> objectHelperForTypeId (
+			@NonNull Long typeId) {
+
+		return optionalFromNullable  (
+			objectHelpersByTypeId.get (
+				typeId));
+
+	}
+
+	@Override
+	public
+	ObjectHelper <?> objectHelperForTypeIdRequired (
+			@NonNull Long typeId) {
+
+		return optionalOrThrow (
+			optionalFromNullable (
+				objectHelpersByTypeId.get (
+					typeId)),
+			() -> new NoSuchElementException (
+				stringFormat (
+					"No object helper with type id %s",
+					integerToDecimalString (
+						typeId))));
+
+	}
+
+	@Override
+	@Deprecated
+	public
+	ObjectHelper <?> objectHelperForTypeIdOrNull (
 			@NonNull Long typeId) {
 
 		return objectHelpersByTypeId.get (
@@ -660,7 +693,7 @@ class ObjectManagerImplementation
 				return null;
 
 			current =
-				currentHelper.getParentGeneric (
+				currentHelper.getParentOrNullGeneric (
 					current);
 
 			currentHelper =
@@ -755,7 +788,7 @@ class ObjectManagerImplementation
 			) {
 
 				object =
-					getParent (
+					getParentOrNull (
 						(Record <?>) object);
 
 			} else if (
@@ -765,8 +798,8 @@ class ObjectManagerImplementation
 			) {
 
 				object =
-					getParent (
-					getParent (
+					getParentOrNull (
+					getParentOrNull (
 						(Record <?>)
 						object));
 
@@ -777,9 +810,9 @@ class ObjectManagerImplementation
 			) {
 
 				object =
-					getParent (
-					getParent (
-					getParent (
+					getParentOrNull (
+					getParentOrNull (
+					getParentOrNull (
 						(Record <?>)
 						object)));
 
@@ -940,7 +973,7 @@ class ObjectManagerImplementation
 			// iterate via parent
 
 			object =
-				getParent (
+				getParentOrNull (
 					object);
 
 		}

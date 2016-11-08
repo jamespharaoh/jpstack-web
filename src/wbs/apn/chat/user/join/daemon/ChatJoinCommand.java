@@ -119,7 +119,7 @@ class ChatJoinCommand
 	InboxAttemptRec handle () {
 
 		Object parent =
-			objectManager.getParent (command);
+			objectManager.getParentOrNull (command);
 
 		if (parent instanceof ChatRec) {
 

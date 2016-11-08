@@ -165,7 +165,7 @@ class ManualResponderCommand
 			database.currentTransaction ();
 
 		Record<?> commandParent =
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				command);
 
 		if (commandParent instanceof ManualResponderRec) {

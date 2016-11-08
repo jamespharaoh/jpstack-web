@@ -4,6 +4,7 @@ import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.requiredSuccess;
+import static wbs.utils.etc.Misc.successOrElse;
 import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.NumberUtils.moreThanOne;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
@@ -160,8 +161,10 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 				(
 
-					entityFinder.getNotDeletedCheckParents (
-						item)
+					successOrElse (
+						entityFinder.getNotDeletedOrErrorCheckParents (
+							item),
+						error -> false)
 
 					&& objectManager.canView (
 						item)

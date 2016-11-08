@@ -90,7 +90,7 @@ class ChatMagicCommand
 
 		ChatRec chat =
 			(ChatRec)
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				command);
 
 		// look for a single keyword

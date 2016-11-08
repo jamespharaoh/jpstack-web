@@ -1,7 +1,9 @@
 package wbs.framework.object;
 
+import static wbs.utils.etc.Misc.successOrThrowRuntimeException;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,13 +20,27 @@ import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 
+import fj.data.Either;
+
 public
 interface ObjectManagerMethods {
 
 	// navigation
 
-	Record <?> getParent (
-			Record <?> dataObject);
+	Either <Optional <Record <?>>, String> getParentOrError (
+			Record <?> object);
+
+	@Deprecated
+	default
+	Record <?> getParentOrNull (
+			@NonNull Record <?> object) {
+
+		return optionalOrNull (
+			successOrThrowRuntimeException (
+				getParentOrError (
+					object)));
+
+	}
 
 	GlobalId getGlobalId (
 			Record <?> object);
@@ -79,7 +95,14 @@ interface ObjectManagerMethods {
 	ObjectHelper <?> objectHelperForTypeCodeRequired (
 			String typeCode);
 
-	ObjectHelper <?> objectHelperForTypeId (
+	Optional <ObjectHelper <?>> objectHelperForTypeId (
+			Long typeId);
+
+	ObjectHelper <?> objectHelperForTypeIdRequired (
+			Long typeId);
+
+	@Deprecated
+	ObjectHelper <?> objectHelperForTypeIdOrNull (
 			Long typeId);
 
 	Long objectClassToTypeId (

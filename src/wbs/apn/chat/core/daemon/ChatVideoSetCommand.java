@@ -107,7 +107,7 @@ class ChatVideoSetCommand
 
 		ChatRec chat =
 			(ChatRec) (Object)
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				command);
 
 		ServiceRec defaultService =

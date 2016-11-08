@@ -115,7 +115,7 @@ class ChatSetPhotoCommand
 		ChatSchemeRec chatScheme;
 
 		Object parent =
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				command);
 
 		if (parent instanceof ChatRec) {

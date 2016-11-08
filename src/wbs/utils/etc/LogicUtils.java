@@ -10,6 +10,7 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.google.common.base.Optional;
@@ -767,6 +768,11 @@ class LogicUtils {
 				right),
 			Ordering.more);
 
+	}
+
+	public static
+	Function <Boolean, Boolean> booleanInverseFunction () {
+		return value -> ! value;
 	}
 
 }

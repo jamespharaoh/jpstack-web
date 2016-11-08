@@ -32,6 +32,8 @@ import wbs.framework.object.ObjectManager;
 import wbs.utils.string.FormatWriter;
 import wbs.utils.web.HtmlTableCellWriter;
 
+import fj.data.Either;
+
 /**
  * Performs console-relevant operations on DataObjects such as resolving names
  * and checking privs. At the back end this delegates to ObjectHelper objects
@@ -336,10 +338,11 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String contextLink (
-			Record<?> object) {
+			Record <?> object) {
 
-		ConsoleHelper<?> objectHelper =
-			findConsoleHelper (object);
+		ConsoleHelper <?> objectHelper =
+			findConsoleHelper (
+				object);
 
 		return requestContext.resolveContextUrl (
 			objectHelper.getDefaultContextPathGeneric (
@@ -350,10 +353,11 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String localLink (
-			Record<?> object) {
+			Record <?> object) {
 
-		ConsoleHelper<?> objectHelper =
-			findConsoleHelper (object);
+		ConsoleHelper <?> objectHelper =
+			findConsoleHelper (
+				object);
 
 		return requestContext.resolveLocalUrl (
 			objectHelper.getDefaultLocalPathGeneric (
@@ -365,11 +369,11 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForTypeCodeRequired (
+	ObjectHelper <?> objectHelperForTypeCodeRequired (
 			String typeCode) {
 
-		return objectManager
-			.objectHelperForTypeCodeRequired (typeCode);
+		return objectManager.objectHelperForTypeCodeRequired (
+			typeCode);
 
 	}
 
@@ -384,31 +388,30 @@ class ConsoleObjectManagerImplementation
 	}
 
 	@Override
-	public <ObjectType extends Record<ObjectType>>
-	List<ObjectType> getChildren (
+	public <ObjectType extends Record <ObjectType>>
+	List <ObjectType> getChildren (
 			Record<?> object,
-			Class<ObjectType> childClass) {
+			Class <ObjectType> childClass) {
 
-		return objectManager
-			.getChildren (
-				object,
-				childClass);
-
-	}
-
-	@Override
-	public
-	Record<?> getParent (
-			Record<?> object) {
-
-		return objectManager
-			.getParent (object);
+		return objectManager.getChildren (
+			object,
+			childClass);
 
 	}
 
 	@Override
 	public
-	Class<?> objectClassForTypeCodeRequired (
+	Either <Optional <Record <?>>, String> getParentOrError (
+			Record <?> object) {
+
+		return objectManager.getParentOrError (
+			object);
+
+	}
+
+	@Override
+	public
+	Class <?> objectClassForTypeCodeRequired (
 			String typeCode) {
 
 		return objectManager.objectClassForTypeCodeRequired (
@@ -419,7 +422,7 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String objectPath (
-			Record<?> dataObject) {
+			Record <?> dataObject) {
 
 		return objectManager.objectPath (
 			dataObject);
@@ -429,8 +432,8 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String objectPath (
-			Record<?> dataObject,
-			Optional<Record<?>> root) {
+			Record <?> dataObject,
+			Optional <Record <?>> root) {
 
 		return objectManager.objectPath (
 			dataObject,
@@ -611,10 +614,31 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	ObjectHelper<?> objectHelperForTypeId (
+	Optional <ObjectHelper <?>> objectHelperForTypeId (
 			@NonNull Long typeId) {
 
 		return objectManager.objectHelperForTypeId (
+			typeId);
+
+	}
+
+	@Override
+	public
+	ObjectHelper<?> objectHelperForTypeIdRequired (
+			@NonNull Long typeId) {
+
+		return objectManager.objectHelperForTypeIdRequired (
+			typeId);
+
+	}
+
+	@Override
+	@Deprecated
+	public
+	ObjectHelper <?> objectHelperForTypeIdOrNull (
+			@NonNull Long typeId) {
+
+		return objectManager.objectHelperForTypeIdOrNull (
 			typeId);
 
 	}

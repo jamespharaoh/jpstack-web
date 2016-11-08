@@ -118,7 +118,7 @@ class ChatUserImageUploadCommand
 
 		ChatRec chat =
 			(ChatRec)
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				command);
 
 		ChatUserRec chatUser =

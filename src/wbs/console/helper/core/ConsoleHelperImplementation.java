@@ -24,6 +24,8 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.utils.string.FormatWriter;
 
+import fj.data.Either;
+
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleHelperImplementation")
 public
@@ -186,6 +188,18 @@ class ConsoleHelperImplementation <
 	List <RecordType> findAllEntities () {
 
 		return objectHelper.findAll ();
+
+	}
+
+	@Override
+	public
+	Either <Boolean, String> getDeletedOrError (
+			@NonNull RecordType entity,
+			boolean checkParents) {
+
+		return objectHelper.getDeletedOrError (
+			entity,
+			checkParents);
 
 	}
 

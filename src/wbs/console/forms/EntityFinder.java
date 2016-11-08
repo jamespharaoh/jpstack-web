@@ -1,9 +1,14 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.LogicUtils.booleanInverseFunction;
+import static wbs.utils.etc.Misc.mapSuccess;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 import wbs.framework.entity.record.Record;
+
+import fj.data.Either;
 
 public
 interface EntityFinder <
@@ -27,6 +32,54 @@ interface EntityFinder <
 
 			.collect (
 				Collectors.toList ());
+
+	}
+
+	Either <Boolean, String> getDeletedOrError (
+			EntityType entity,
+			boolean checkParents);
+
+	default
+	Either <Boolean, String> getDeletedOrErrorCheckParents (
+			EntityType entity) {
+
+		return getDeletedOrError (
+			entity,
+			true);
+
+	}
+
+	default
+	Either <Boolean, String> getDeletedOrErrorNoCheckParents (
+			EntityType entity) {
+
+		return getDeletedOrError (
+			entity,
+			false);
+
+	}
+
+	default
+	Either <Boolean, String> getNotDeletedOrErrorCheckParents (
+			EntityType entity) {
+
+		return mapSuccess (
+			getDeletedOrError (
+				entity,
+				true),
+			booleanInverseFunction ());
+
+	}
+
+	default
+	Either <Boolean, String> getNotDeletedOrErrorNoCheckParents (
+			EntityType entity) {
+
+		return mapSuccess (
+			getDeletedOrError (
+				entity,
+				false),
+			booleanInverseFunction ());
 
 	}
 

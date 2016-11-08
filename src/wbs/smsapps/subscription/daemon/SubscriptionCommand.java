@@ -460,7 +460,7 @@ class SubscriptionCommand
 	void findCommand () {
 
 		Record<?> commandParent =
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				command);
 
 		if (((Object) commandParent) instanceof SubscriptionRec) {

@@ -135,7 +135,7 @@ class TicketHooks
 					ticketFieldValue.getIntegerValue ();
 
 				ObjectHelper <?> objectHelper =
-					objectManager.objectHelperForTypeId (
+					objectManager.objectHelperForTypeIdOrNull (
 						objectType.getId ());
 
 				Object object =

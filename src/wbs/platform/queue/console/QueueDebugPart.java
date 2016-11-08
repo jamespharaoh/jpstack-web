@@ -195,7 +195,7 @@ class QueueDebugPart
 			}
 
 			Record<?> queueParent =
-				objectManager.getParent (
+				objectManager.getParentOrNull (
 					queueInfo.queue ());
 
 			ObjectTypeRec queueParentType =

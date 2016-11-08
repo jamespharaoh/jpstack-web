@@ -208,7 +208,7 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 
 	@Override
 	public
-	Record <?> getParent (
+	Record <?> getParentOrNull (
 			@NonNull RecordType object) {
 
 		if (! canGetParent ()) {

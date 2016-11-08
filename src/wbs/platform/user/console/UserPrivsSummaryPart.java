@@ -92,7 +92,7 @@ class UserPrivsSummaryPart
 				new PrivStuff ();
 
 			Record<?> parent =
-				objectManager.getParent (
+				objectManager.getParentOrNull (
 					priv);
 
 			privStuff.path =
@@ -136,7 +136,7 @@ class UserPrivsSummaryPart
 						new PrivStuff ();
 
 					Record<?> parent =
-						objectManager.getParent (
+						objectManager.getParentOrNull (
 							priv);
 
 					privStuff.path =

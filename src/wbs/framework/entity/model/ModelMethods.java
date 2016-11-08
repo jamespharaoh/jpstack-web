@@ -52,14 +52,14 @@ interface ModelMethods <RecordType extends Record <RecordType>> {
 
 	// property accessors
 
-	Record <?> getParent (
+	Record <?> getParentOrNull (
 			RecordType object);
 
 	default
-	Record <?> getParentGeneric (
+	Record <?> getParentOrNullGeneric (
 			Record <?> object) {
 
-		return getParent (
+		return getParentOrNull (
 			objectClass ().cast (
 				object));
 

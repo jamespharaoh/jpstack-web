@@ -102,7 +102,7 @@ class QueueItemUserStatsProvider
 					: queueItem.getQueue ();
 
 			Record<?> parent =
-				objectManager.getParent (queue);
+				objectManager.getParentOrNull (queue);
 
 			if (
 				! privChecker.canRecursive (

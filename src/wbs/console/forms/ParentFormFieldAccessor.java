@@ -34,7 +34,7 @@ class ParentFormFieldAccessor <
 
 		return Optional.of (
 			(Parent)
-			objectManager.getParent (
+			objectManager.getParentOrNull (
 				container));
 
 	}
