@@ -1,5 +1,8 @@
 package wbs.utils.etc;
 
+import static wbs.utils.string.StringUtils.camelToHyphen;
+import static wbs.utils.string.StringUtils.camelToSpaces;
+
 import lombok.NonNull;
 
 public
@@ -702,6 +705,32 @@ class EnumUtils {
 			&& value != example6
 			&& value != example7
 		);
+
+	}
+
+	public static
+	String enumName (
+			@NonNull Enum <?> enumValue) {
+
+		return enumValue.name ();
+
+	}
+
+	public static
+	String enumNameSpaces (
+			@NonNull Enum <?> enumValue) {
+
+		return camelToSpaces (
+			enumValue.name ());
+
+	}
+
+	public static
+	String enumNameHyphens (
+			@NonNull Enum <?> enumValue) {
+
+		return camelToHyphen (
+			enumValue.name ());
 
 	}
 
