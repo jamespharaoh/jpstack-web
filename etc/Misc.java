@@ -5,6 +5,7 @@ import static wbs.utils.string.StringUtils.bytesToString;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -28,6 +29,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -981,6 +983,16 @@ class Misc {
 
 	}
 
+	public static <LeftType>
+	Either <LeftType, String> errorResultFormat (
+			@NonNull String ... arguments) {
+
+		return Either.<LeftType, String> right (
+			stringFormatArray (
+				arguments));
+
+	}
+
 	public static
 	boolean isError (
 			@NonNull Either<?,?> either) {
@@ -1010,6 +1022,79 @@ class Misc {
 			@NonNull Either<Left,Right> either) {
 
 		return either.right ().value ();
+
+	}
+
+	public static <ValueType, ErrorType>
+	ValueType successOrElse (
+			@NonNull Either <ValueType, ErrorType> result,
+			@NonNull Function <ErrorType, ValueType> orElse) {
+
+		if (result.isLeft ()) {
+
+			return result.left ().value ();
+
+		} else {
+
+			return orElse.apply (
+				result.right ().value ());
+
+		}
+
+	}
+
+	public static <ValueType, ErrorType>
+	ValueType successOrThrow (
+			@NonNull Either <ValueType, ErrorType> result,
+			@NonNull Function <ErrorType, RuntimeException> orThrow) {
+
+		if (result.isLeft ()) {
+
+			return result.left ().value ();
+
+		} else {
+
+			throw orThrow.apply (
+				result.right ().value ());
+
+		}
+
+	}
+
+	public static <ValueType>
+	ValueType successOrThrowRuntimeException (
+			@NonNull Either <ValueType, String> result) {
+
+		if (result.isLeft ()) {
+
+			return result.left ().value ();
+
+		} else {
+
+			throw new RuntimeException (
+				result.right ().value ());
+
+		}
+
+	}
+
+	public static <OldValueType, NewValueType, ErrorType>
+	Either <NewValueType, ErrorType> mapSuccess (
+			@NonNull Either <OldValueType, ErrorType> result,
+			@NonNull Function <OldValueType, NewValueType> mapping) {
+
+		if (result.isLeft ()) {
+
+			return Either.left (
+				mapping.apply (
+					result.left ().value ()));
+
+		} else {
+
+			return errorResult (
+				result.right ().value ());
+
+		}
 
 	}
 
