@@ -235,7 +235,8 @@ class ChatMessagePendingFormResponder
 				stringFormat (
 					"/chatMessage.pending",
 					"/%u",
-					chatMessage.getId (),
+					integerToDecimalString (
+						chatMessage.getId ()),
 					"/chatMessage.pending.form")));
 
 		formatWriter.writeLineFormat (

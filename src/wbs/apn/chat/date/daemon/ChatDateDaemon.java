@@ -2,15 +2,18 @@ package wbs.apn.chat.date.daemon;
 
 import static wbs.utils.etc.LogicUtils.allOf;
 import static wbs.utils.etc.LogicUtils.equalSafe;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.min;
-import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.lessThanOne;
 import static wbs.utils.etc.NumberUtils.roundToIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -54,10 +57,12 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.daemon.AbstractDaemonService;
 import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.locator.model.LongLat;
+import wbs.utils.time.TimeFormatter;
 
 @Log4j
 @SingletonComponent ("chatDateDaemon")
@@ -99,6 +104,9 @@ class ChatDateDaemon
 
 	@SingletonDependency
 	ObjectManager objectManager;
+
+	@SingletonDependency
+	TimeFormatter timeFormatter;
 
 	// properties
 
@@ -158,10 +166,14 @@ class ChatDateDaemon
 
 	void doRun () {
 
-		log.info (
+		TaskLogger taskLogger =
+			new TaskLogger (
+				log);
+
+		taskLogger.noticeFormat (
 			"Dating batch started");
 
-		log.debug (
+		taskLogger.debugFormat (
 			"Retrieving list of chats");
 
 		@Cleanup
@@ -182,13 +194,18 @@ class ChatDateDaemon
 		transaction.close ();
 
 		chatIds.forEach (
-			this::doChat);
+			chatId ->
+				doChat (
+					taskLogger,
+					chatId));
 
-		log.info ("Dating batch complete!");
+		taskLogger.noticeFormat (
+			"Dating batch complete!");
 
 	}
 
 	void doChat (
+			@NonNull TaskLogger taskLogger,
 			@NonNull Long chatId) {
 
 		Optional<ChatData> chatDataOptional =
@@ -208,20 +225,25 @@ class ChatDateDaemon
 
 		// output some info
 
-		log.info (
-			stringFormat (
-				"Got %s otherUserInfos users available to send",
+		taskLogger.noticeFormat (
+			"Got %s otherUserInfos users available to send",
+			integerToDecimalString (
 				chatData.otherUserInfos.size ()));
 
-		log.info (
-			stringFormat (
-				"Trying %s out of %s users ",
-				chatData.datingUserIds.size (),
-				chatData.numUsers,
-				"(%s credit, %s hours, %s online and %s sent already)",
-				chatData.numCredit,
-				chatData.numHours,
-				chatData.numOnline,
+		taskLogger.noticeFormat (
+			"Trying %s out of %s users ",
+			integerToDecimalString (
+				chatData.datingUserIds.size ()),
+			integerToDecimalString (
+				chatData.numUsers),
+			"(%s credit, %s hours, %s online and %s sent already)",
+			integerToDecimalString (
+				chatData.numCredit),
+			integerToDecimalString (
+				chatData.numHours),
+			integerToDecimalString (
+				chatData.numOnline),
+			integerToDecimalString (
 				chatData.numSent));
 
 		// then process each user
@@ -238,6 +260,7 @@ class ChatDateDaemon
 
 				if (
 					doUser (
+						taskLogger,
 						chatData.otherUserInfos,
 						thisUserId)
 				) {
@@ -278,9 +301,11 @@ class ChatDateDaemon
 			database.beginReadOnly (
 				stringFormat (
 					"%s.%s (%s)",
-					getClass ().getSimpleName (),
+					classNameSimple (
+						getClass ()),
 					"getChatData",
-					chatId),
+					integerToDecimalString (
+						chatId)),
 				this);
 
 		ChatRec chat;
@@ -445,7 +470,8 @@ class ChatDateDaemon
 							"iteration",
 							stringFormat (
 								"chat user %s",
-								chatUserId),
+								integerToDecimalString (
+									chatUserId)),
 							this);
 
 				) {
@@ -500,7 +526,8 @@ class ChatDateDaemon
 						log.debug (
 							stringFormat (
 								"Ignoring %s ",
-								chatUser.getId (),
+								integerToDecimalString (
+									chatUser.getId ()),
 								"(user type)"));
 
 						continue;
@@ -522,7 +549,8 @@ class ChatDateDaemon
 						log.info (
 							stringFormat (
 								"Ignoring %s ",
-								chatUser,
+								integerToDecimalString (
+									chatUser.getId ()),
 								"(%s)",
 								creditCheckResult.details ()));
 
@@ -542,7 +570,8 @@ class ChatDateDaemon
 						log.debug (
 							stringFormat (
 								"Ignoring %s ",
-								chatUser.getId (),
+								integerToDecimalString (
+									chatUser.getId ()),
 								"(time)"));
 
 						continue;
@@ -556,7 +585,8 @@ class ChatDateDaemon
 						log.info (
 							stringFormat (
 								"Ignoring %s (online)",
-								chatUser.getId ()));
+								integerToDecimalString (
+									chatUser.getId ())));
 
 						continue;
 
@@ -603,12 +633,13 @@ class ChatDateDaemon
 	}
 
 	boolean doUser (
-			@NonNull Collection<DatingUserInfo> otherUserInfos,
+			@NonNull TaskLogger taskLogger,
+			@NonNull Collection <DatingUserInfo> otherUserInfos,
 			@NonNull Long thisUserId) {
 
-		log.info (
-			stringFormat (
-				"Doing user %s",
+		taskLogger.noticeFormat (
+			"Doing user %s",
+			integerToDecimalString (
 				thisUserId));
 
 		boolean status = false;
@@ -674,18 +705,25 @@ class ChatDateDaemon
 			.setDateDailyDate (
 				today);
 
-		log.debug (
-			stringFormat (
+		taskLogger.debugFormat (
 
-				"Updated %d: ",
-				thisUser.getId (),
+			"Updated %d: ",
+			integerToDecimalString (
+				thisUser.getId ()),
 
-				"dailyCount %d to %d, ",
-				oldDailyCount,
-				thisUser.getDateDailyCount (),
+			"dailyCount %d to %d, ",
+			integerToDecimalString (
+				oldDailyCount),
+			integerToDecimalString (
+				thisUser.getDateDailyCount ()),
 
-				"dailyDate %s to %s",
-				ifNull (oldDailyDate, "none"),
+			"dailyDate %s to %s",
+			ifNotNullThenElse (
+				oldDailyDate,
+				() -> timeFormatter.dateString (
+					oldDailyDate),
+				() -> "none"),
+			timeFormatter.dateString (
 				thisUser.getDateDailyDate ()));
 
 		// check the user still wants a date message
@@ -703,16 +741,16 @@ class ChatDateDaemon
 			chatCreditLogic.userSpendCreditCheck (
 				thisUser,
 				false,
-				Optional.<Long>absent ());
+				optionalAbsent ());
 
 		if (creditCheckResult.failed ()) {
 
-			log.debug (
-				stringFormat (
-					"Ignoring %s ",
-					thisUserId,
-					"(%s)",
-					creditCheckResult.details ()));
+			taskLogger.debugFormat (
+				"Ignoring %s ",
+				integerToDecimalString (
+					thisUserId),
+				"(%s)",
+				creditCheckResult.details ());
 
 			return false;
 
@@ -741,11 +779,11 @@ class ChatDateDaemon
 
 		if (thisUser.getDateMode () == ChatUserDateMode.none) {
 
-			log.debug (
-				stringFormat (
-					"Ignoring %s ",
-					thisUserId,
-					"(dating mode check failed)"));
+			taskLogger.debugFormat (
+				"Ignoring %s ",
+				integerToDecimalString (
+					thisUserId),
+				"(dating mode check failed)");
 
 			return false;
 
@@ -758,6 +796,7 @@ class ChatDateDaemon
 			if (
 
 				sendSingleLot (
+					taskLogger,
 					thisUser,
 					otherUserInfos,
 					true,
@@ -766,6 +805,7 @@ class ChatDateDaemon
 					3)
 
 				|| sendSingleLot (
+					taskLogger,
 					thisUser,
 					otherUserInfos,
 					false,
@@ -781,6 +821,7 @@ class ChatDateDaemon
 
 			if (
 				sendSingleLot (
+					taskLogger,
 					thisUser,
 					otherUserInfos,
 					false,
@@ -800,6 +841,7 @@ class ChatDateDaemon
 	}
 
 	boolean sendSingleLot (
+			@NonNull TaskLogger taskLogger,
 			ChatUserRec thisUser,
 			Collection<DatingUserInfo> otherUserInfos,
 			boolean sendPhoto,
@@ -832,17 +874,24 @@ class ChatDateDaemon
 				prospectiveUserDistances.add (dateUserDistance);
 		}
 
-		log.info (
-			stringFormat (
-				"Dating user %s: %d blocked, %d incompatible, %d no photo, %d" +
-				" already sent, %d no location, %d too far, %d remain",
-				thisUser.getId (),
-				dateUserStats.numBlocked,
-				dateUserStats.numIncompatible,
-				dateUserStats.numNoPhoto,
-				dateUserStats.numAlreadySent,
-				dateUserStats.numNoLocation,
-				dateUserStats.numTooFar,
+		taskLogger.noticeFormat (
+			"Dating user %s: %d blocked, %d incompatible, %d no photo, %d" +
+			" already sent, %d no location, %d too far, %d remain",
+			integerToDecimalString (
+				thisUser.getId ()),
+			integerToDecimalString (
+				dateUserStats.numBlocked),
+			integerToDecimalString (
+				dateUserStats.numIncompatible),
+			integerToDecimalString (
+				dateUserStats.numNoPhoto),
+			integerToDecimalString (
+				dateUserStats.numAlreadySent),
+			integerToDecimalString (
+				dateUserStats.numNoLocation),
+			integerToDecimalString (
+				dateUserStats.numTooFar),
+			integerToDecimalString (
 				dateUserStats.numOk));
 
 		// now pick the closest few, check they have info

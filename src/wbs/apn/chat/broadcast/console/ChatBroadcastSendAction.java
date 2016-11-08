@@ -5,6 +5,7 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.orNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -22,11 +23,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import org.apache.commons.lang3.Range;
-
-import org.apache.log4j.Level;
 
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.broadcast.logic.ChatBroadcastLogic;
@@ -47,8 +46,8 @@ import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.forms.FormFieldSet;
+import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -56,6 +55,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogSeverity;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.service.console.ServiceConsoleHelper;
@@ -76,7 +77,6 @@ import wbs.sms.number.format.logic.WbsNumberFormatException;
 import wbs.utils.etc.ProfileLogger;
 import wbs.utils.time.TextualInterval;
 
-@Log4j
 @PrototypeComponent ("chatBroadcastSendAction")
 public
 class ChatBroadcastSendAction
@@ -183,7 +183,8 @@ class ChatBroadcastSendAction
 
 	@Override
 	public
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		boolean verify =
 			requestContext.formIsPresent (
@@ -195,8 +196,8 @@ class ChatBroadcastSendAction
 
 		ProfileLogger profileLogger =
 			new ProfileLogger (
-				log,
-				Level.DEBUG,
+				taskLogger,
+				LogSeverity.debug,
 				"Broadcast send");
 
 		try {
@@ -489,9 +490,9 @@ class ChatBroadcastSendAction
 						chatUserHelper.searchIds (
 							search);
 
-					log.debug (
-						stringFormat (
-							"Search returned %d users",
+					taskLogger.debugFormat (
+						"Search returned %d users",
+						integerToDecimalString (
 							allChatUserIds.size ()));
 
 				}
@@ -632,18 +633,18 @@ class ChatBroadcastSendAction
 
 					if (includeBlocked) {
 
-						requestContext.addNotice (
-							stringFormat (
-								"Purged %d numbers due to barring",
+						requestContext.addNoticeFormat (
+							"Purged %d numbers due to barring",
+							integerToDecimalString (
 								removedNumbers));
 
 					} else {
 
-						requestContext.addNotice (
-							stringFormat (
-								"Purged %d numbers ",
-								removedNumbers,
-								"due to blocking and/or barring"));
+						requestContext.addNoticeFormat (
+							"Purged %d numbers ",
+							integerToDecimalString (
+								removedNumbers),
+							"due to blocking and/or barring");
 
 					}
 
@@ -844,9 +845,9 @@ class ChatBroadcastSendAction
 
 				profileLogger.end ();
 
-				requestContext.addNotice (
-					stringFormat (
-						"Message sent to %d users",
+				requestContext.addNoticeFormat (
+					"Message sent to %d users",
+					integerToDecimalString (
 						remainingChatUserIds.size ()));
 
 				requestContext.request (

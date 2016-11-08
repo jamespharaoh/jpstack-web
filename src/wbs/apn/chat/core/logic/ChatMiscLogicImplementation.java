@@ -1,6 +1,7 @@
 package wbs.apn.chat.core.logic;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.earlierThan;
 
@@ -24,22 +25,22 @@ import org.joda.time.Duration;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
+import wbs.apn.chat.contact.model.ChatContactRec;
 import wbs.apn.chat.contact.model.ChatMessageMethod;
+import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.date.logic.ChatDateLogic;
 import wbs.apn.chat.help.logic.ChatHelpLogic;
 import wbs.apn.chat.help.logic.ChatHelpTemplateLogic;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.logic.ChatUserLogic.UserDistance;
 import wbs.apn.chat.user.core.model.ChatUserDateMode;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserSessionObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
-import wbs.apn.chat.contact.model.ChatContactRec;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.apn.chat.user.core.model.ChatUserSessionObjectHelper;
 import wbs.apn.chat.user.info.model.ChatUserNameObjectHelper;
 import wbs.apn.chat.user.info.model.ChatUserNameRec;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -505,7 +506,8 @@ class ChatMiscLogicImplementation
 							throw new IllegalStateException (
 								stringFormat (
 									"Chat user %s not in transaction",
-									chatUser.getId ()));
+									integerToDecimalString (
+										chatUser.getId ())));
 
 						}
 
@@ -539,7 +541,7 @@ class ChatMiscLogicImplementation
 						stringFormat (
 							"Got location for %s: %s",
 							chatUser.getCode (),
-							longLat));
+							longLat.toString ()));
 
 				}
 

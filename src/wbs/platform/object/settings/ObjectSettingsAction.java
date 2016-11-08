@@ -9,8 +9,10 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FieldsProvider;
 import wbs.console.forms.FormFieldLogic;
@@ -26,6 +28,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.utils.etc.PropertyUtils;
 
@@ -98,7 +101,8 @@ class ObjectSettingsAction <
 
 	@Override
 	public
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// check access
 

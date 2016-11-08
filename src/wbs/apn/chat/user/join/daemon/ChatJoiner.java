@@ -6,6 +6,7 @@ import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.equalToZero;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringLongerThan;
@@ -19,44 +20,46 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import wbs.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.apn.chat.contact.model.ChatMessageMethod;
+import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
+import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.core.daemon.ChatPatterns;
 import wbs.apn.chat.core.logic.ChatLogicHooks;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.core.model.ChatObjectHelper;
+import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.date.logic.ChatDateLogic;
 import wbs.apn.chat.help.logic.ChatHelpLogLogic;
 import wbs.apn.chat.keyword.model.ChatKeywordJoinType;
+import wbs.apn.chat.scheme.model.ChatSchemeObjectHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserDateMode;
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
-import wbs.apn.chat.user.info.logic.ChatInfoLogic;
-import wbs.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageRec;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.scheme.model.ChatSchemeObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserDobFailureObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.Log4jLogContext;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.event.logic.EventLogic;
@@ -79,10 +82,14 @@ import wbs.utils.random.RandomLogic;
 import wbs.utils.time.TimeFormatter;
 
 @Accessors (fluent = true)
-@Log4j
 @PrototypeComponent ("chatJoiner")
 public
 class ChatJoiner {
+
+	private final
+	LogContext logContext =
+		Log4jLogContext.forClass (
+			ChatJoiner.class);
 
 	// singleton dependencies
 
@@ -211,7 +218,47 @@ class ChatJoiner {
 	DeliveryRec delivery;
 	boolean gotPlace;
 
-	// implementation
+	// public implementation
+
+	public
+	void handleSimple () {
+
+		TaskLogger taskLogger =
+			logContext.createTaskLogger ();
+
+		handleWithState (
+			taskLogger);
+
+	}
+
+	public
+	InboxAttemptRec handleInbox (
+			@NonNull CommandRec command) {
+
+		TaskLogger taskLogger =
+			logContext.createTaskLogger ();
+
+		handleWithState (
+			taskLogger);
+
+		ServiceRec defaultService =
+			serviceHelper.findByCodeRequired (
+				chat,
+				"default");
+
+		AffiliateRec affiliate =
+			chatUserLogic.getAffiliate (
+				chatUser);
+
+		return smsInboxLogic.inboxProcessed (
+			inbox,
+			Optional.of (defaultService),
+			Optional.of (affiliate),
+			command);
+
+	}
+
+	// private implementation
 
 	/**
 	 * Checks the message for user prefs and updates the user's details with
@@ -383,7 +430,8 @@ class ChatJoiner {
 					"\n",
 
 					"Message ID:   %s\n",
-					message.getId (),
+					integerToDecimalString (
+						message.getId ()),
 					"Route:        %s.%s\n",
 					message.getRoute ().getSlice ().getCode (),
 					message.getRoute ().getCode (),
@@ -994,17 +1042,20 @@ class ChatJoiner {
 	}
 
 	private
-	void handleReal () {
+	void handleReal (
+			@NonNull TaskLogger taskLogger) {
 
 		if (! joinPart1 ())
 			return;
 
-		joinPart2 ();
+		joinPart2 (
+			taskLogger);
 
 	}
 
 	private
-	void handleWithState () {
+	void handleWithState (
+			@NonNull TaskLogger taskLogger) {
 
 		if (state != State.created) {
 
@@ -1017,7 +1068,8 @@ class ChatJoiner {
 
 			state = State.inProgress;
 
-			handleReal ();
+			handleReal (
+				taskLogger);
 
 			state = State.completed;
 
@@ -1028,36 +1080,6 @@ class ChatJoiner {
 			}
 
 		}
-
-	}
-
-	public
-	void handleSimple () {
-
-		handleWithState ();
-
-	}
-
-	public
-	InboxAttemptRec handleInbox (
-			@NonNull CommandRec command) {
-
-		handleWithState ();
-
-		ServiceRec defaultService =
-			serviceHelper.findByCodeRequired (
-				chat,
-				"default");
-
-		AffiliateRec affiliate =
-			chatUserLogic.getAffiliate (
-				chatUser);
-
-		return smsInboxLogic.inboxProcessed (
-			inbox,
-			Optional.of (defaultService),
-			Optional.of (affiliate),
-			command);
 
 	}
 
@@ -1151,28 +1173,27 @@ class ChatJoiner {
 	}
 
 	private
-	boolean joinPart2 () {
+	boolean joinPart2 (
+			@NonNull TaskLogger taskLogger) {
 
 		Transaction transaction =
 			database.currentTransaction ();
 
-		log.debug (
-			stringFormat (
-				"Checking location for chat user %s",
-				objectManager.objectPathMini (
-					chatUser)));
+		taskLogger.debugFormat (
+			"Checking location for chat user %s",
+			objectManager.objectPathMini (
+				chatUser));
 
 		// check we have a location of some sort
 
 		if (! checkLocation ())
 			return false;
 
-		log.debug (
-			stringFormat (
-				"Location ok for chat user %s (%s)",
-				objectManager.objectPathMini (
-					chatUser),
-				chatUser.getLocationLongLat ()));
+		taskLogger.debugFormat (
+			"Location ok for chat user %s (%s)",
+			objectManager.objectPathMini (
+				chatUser),
+			chatUser.getLocationLongLat ().toString ());
 
 		// bring the user online if appropriate
 
@@ -1460,7 +1481,7 @@ class ChatJoiner {
 		throw new IllegalArgumentException (
 			stringFormat (
 				"Unrecognised join type: %s",
-				joinType));
+				joinType.toString ()));
 
 	}
 
@@ -1495,7 +1516,7 @@ class ChatJoiner {
 				throw new RuntimeException (
 					stringFormat (
 						"Uknown keyword join type %s",
-						chatKeywordJoinType));
+						chatKeywordJoinType.toString ()));
 
 		}
 

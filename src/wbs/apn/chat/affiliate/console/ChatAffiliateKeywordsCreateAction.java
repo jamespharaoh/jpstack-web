@@ -6,17 +6,17 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
-import wbs.apn.chat.keyword.model.ChatKeywordJoinType;
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
-import wbs.apn.chat.affiliate.console.ChatAffiliateConsoleHelper;
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.keyword.console.ChatKeywordConsoleHelper;
+import wbs.apn.chat.keyword.model.ChatKeywordJoinType;
 import wbs.apn.chat.keyword.model.ChatKeywordRec;
 import wbs.apn.chat.scheme.console.ChatSchemeKeywordConsoleHelper;
 import wbs.apn.chat.scheme.model.ChatSchemeKeywordRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
@@ -24,6 +24,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.sms.keyword.logic.KeywordLogic;
 
@@ -67,7 +68,8 @@ class ChatAffiliateKeywordsCreateAction
 
 	@Override
 	public
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		String keyword =
 			requestContext

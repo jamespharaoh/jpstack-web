@@ -1,14 +1,16 @@
 package wbs.smsapps.broadcast.console;
 
+import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
@@ -18,6 +20,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleHelper;
@@ -90,7 +93,8 @@ class BroadcastNumbersAction
 
 	@Override
 	protected
-	Responder goReal ()
+	Responder goReal (
+			@NonNull TaskLogger taskLogger)
 		throws ServletException {
 
 		// begin transaction
@@ -141,9 +145,9 @@ class BroadcastNumbersAction
 
 		if (broadcast.getState () != BroadcastState.unsent) {
 
-			requestContext.addError (
-				stringFormat (
-					"Can't modify numbers for broadcast in %s state",
+			requestContext.addErrorFormat (
+				"Can't modify numbers for broadcast in %s state",
+				enumNameSpaces (
 					broadcast.getState ()));
 
 			return null;
@@ -301,54 +305,54 @@ class BroadcastNumbersAction
 
 		if (addResult.numAlreadyAdded () > 0) {
 
-			requestContext.addWarning (
-				stringFormat (
-					"%s numbers already added",
+			requestContext.addWarningFormat (
+				"%s numbers already added",
+				integerToDecimalString (
 					addResult.numAlreadyAdded ()));
 
 		}
 
 		if (addResult.numAlreadyRejected () > 0) {
 
-			requestContext.addWarning (
-				stringFormat (
-					"%s numbers already rejected",
+			requestContext.addWarningFormat (
+				"%s numbers already rejected",
+				integerToDecimalString (
 					addResult.numAlreadyRejected ()));
 
 		}
 
 		if (addResult.numAdded () > 0) {
 
-			requestContext.addNotice (
-				stringFormat (
-					"%s numbers added",
+			requestContext.addNoticeFormat (
+				"%s numbers added",
+				integerToDecimalString (
 					addResult.numAdded ()));
 
 		}
 
 		if (addResult.numRejected () > 0) {
 
-			requestContext.addWarning (
-				stringFormat (
-					"%s numbers rejected",
+			requestContext.addWarningFormat (
+				"%s numbers rejected",
+				integerToDecimalString (
 					addResult.numRejected ()));
 
 		}
 
 		if (numAlreadyRemoved > 0) {
 
-			requestContext.addWarning (
-				stringFormat (
-					"%s numbers already removed or never added",
+			requestContext.addWarningFormat (
+				"%s numbers already removed or never added",
+				integerToDecimalString (
 					numAlreadyRemoved));
 
 		}
 
 		if (numRemoved > 0) {
 
-			requestContext.addNotice (
-				stringFormat (
-					"%s numbers removed",
+			requestContext.addNoticeFormat (
+				"%s numbers removed",
+				integerToDecimalString (
 					numRemoved));
 
 		}

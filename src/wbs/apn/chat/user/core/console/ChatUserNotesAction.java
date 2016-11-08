@@ -4,8 +4,8 @@ import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserNoteObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
@@ -14,6 +14,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
@@ -64,7 +65,8 @@ class ChatUserNotesAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		@Cleanup
 		Transaction transaction =

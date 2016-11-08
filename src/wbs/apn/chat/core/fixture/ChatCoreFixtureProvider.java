@@ -1,5 +1,6 @@
 package wbs.apn.chat.core.fixture;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -589,7 +590,8 @@ class ChatCoreFixtureProvider
 				textHelper.findOrCreate (
 					stringFormat (
 						"Chat message user to user %s",
-						index));
+						integerToDecimalString (
+							index)));
 
 			chatMessageHelper.insert (
 				chatMessageHelper.createInstance ()
@@ -645,7 +647,8 @@ class ChatCoreFixtureProvider
 				textHelper.findOrCreate (
 					stringFormat (
 						"Chat message to monitor %s",
-						index));
+						integerToDecimalString (
+							index)));
 
 			chatMessageHelper.insert (
 				chatMessageHelper.createInstance ()
@@ -698,7 +701,8 @@ class ChatCoreFixtureProvider
 				textHelper.findOrCreate (
 					stringFormat (
 						"Chat message from monitor %s",
-						index));
+						integerToDecimalString (
+							index)));
 
 			chatMessageHelper.insert (
 				chatMessageHelper.createInstance ()

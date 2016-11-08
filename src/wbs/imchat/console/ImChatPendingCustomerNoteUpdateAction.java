@@ -7,11 +7,8 @@ import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
-import wbs.imchat.console.ImChatMessageConsoleHelper;
-import wbs.imchat.model.ImChatConversationRec;
-import wbs.imchat.model.ImChatCustomerRec;
-import wbs.imchat.model.ImChatMessageRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -19,7 +16,11 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
+import wbs.imchat.model.ImChatConversationRec;
+import wbs.imchat.model.ImChatCustomerRec;
+import wbs.imchat.model.ImChatMessageRec;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.text.console.TextConsoleHelper;
 import wbs.platform.text.model.TextRec;
@@ -71,7 +72,8 @@ class ImChatPendingCustomerNoteUpdateAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// get params
 

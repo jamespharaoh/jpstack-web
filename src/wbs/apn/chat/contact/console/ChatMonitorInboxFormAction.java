@@ -2,26 +2,26 @@ package wbs.apn.chat.contact.console;
 
 import static wbs.sms.gsm.GsmUtils.gsmStringLength;
 import static wbs.utils.etc.Misc.lessThan;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThan;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
-import wbs.apn.chat.contact.model.ChatMessageStatus;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.contact.console.ChatContactNoteConsoleHelper;
-import wbs.apn.chat.contact.console.ChatMessageConsoleHelper;
 import wbs.apn.chat.contact.model.ChatBlockObjectHelper;
 import wbs.apn.chat.contact.model.ChatBlockRec;
 import wbs.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.apn.chat.contact.model.ChatContactRec;
 import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.contact.model.ChatMessageStatus;
 import wbs.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
@@ -30,6 +30,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -109,7 +110,8 @@ class ChatMonitorInboxFormAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// get stuff
 
@@ -217,7 +219,8 @@ class ChatMonitorInboxFormAction
 				requestContext.addError (
 					stringFormat (
 						"Message text is too short (minimum %d)",
-						chat.getMinMonitorMessageLength ()));
+						integerToDecimalString (
+							chat.getMinMonitorMessageLength ())));
 
 				return null;
 

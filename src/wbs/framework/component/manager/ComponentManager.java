@@ -10,6 +10,7 @@ import com.google.common.base.Optional;
 
 import org.apache.log4j.Logger;
 
+import wbs.framework.logging.Log4jLogTarget;
 import wbs.framework.logging.TaskLogger;
 
 public
@@ -28,7 +29,7 @@ interface ComponentManager
 			String componentName,
 			Class <ComponentType> componentClass) {
 
-		return TaskLogger.wrap (
+		return Log4jLogTarget.wrap (
 			logger,
 			taskLogger ->
 				getComponent (
@@ -50,7 +51,7 @@ interface ComponentManager
 			String componentName,
 			Class <ComponentType> componentClass) {
 
-		return TaskLogger.wrap (
+		return Log4jLogTarget.wrap (
 			logger,
 			taskLogger ->
 				getComponentRequired (
@@ -74,7 +75,7 @@ interface ComponentManager
 			Class <ComponentType> componentClass,
 			Supplier <ComponentType> orElse) {
 
-		return TaskLogger.wrap (
+		return Log4jLogTarget.wrap (
 			logger,
 			taskLogger ->
 				getComponentOrElse (
@@ -97,7 +98,7 @@ interface ComponentManager
 			String componentName,
 			Class <ComponentType> componentClass) {
 
-		return TaskLogger.wrap (
+		return Log4jLogTarget.wrap (
 			logger,
 			taskLogger ->
 				getComponentProviderRequired (

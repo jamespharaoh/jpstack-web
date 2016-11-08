@@ -1,73 +1,41 @@
-package wbs.console.request;
+package wbs.console.notice;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletRequest;
 
+import com.google.common.collect.ImmutableList;
+
 import lombok.NonNull;
 
 import wbs.utils.string.FormatWriter;
 
 public
-class Notices {
+class ConsoleNotices {
 
-	static
-	class Notice {
-
-		String html;
-		String type;
-
-		public
-		Notice (
-				String html,
-				String type) {
-
-			this.html = html;
-			this.type = type;
-
-		}
-
-		@Override
-		public
-		String toString () {
-
-			return stringFormat (
-				"<p class=\"%h\">%s</p>",
-				type,
-				html);
-
-		}
-
-	}
-
-	List <Notice> notices =
+	List <ConsoleNotice> notices =
 		new ArrayList<> ();
 
 	public
-	void add (
-			String notice,
-			String type) {
+	List <ConsoleNotice> notices () {
 
-		if (notice == null)
-			return;
-
-		notices.add (
-			new Notice (
-				notice,
-				type));
+		return ImmutableList.copyOf (
+			notices);
 
 	}
 
 	public
 	void add (
-			String notice) {
+			@NonNull ConsoleNoticeType type,
+			@NonNull String notice) {
 
-		add (
-			notice,
-			"notice");
+		notices.add (
+			new ConsoleNotice (
+				type,
+				notice));
 
 	}
 
@@ -76,7 +44,7 @@ class Notices {
 			@NonNull FormatWriter formatWriter) {
 
 		for (
-			Notice notice
+			ConsoleNotice notice
 				: notices
 		) {
 
@@ -90,17 +58,36 @@ class Notices {
 
 	}
 
+	public
+	void noticeFormat (
+			@NonNull String ... arguments) {
+
+		notices.add (
+			new ConsoleNotice (
+				ConsoleNoticeType.notice,
+				stringFormatArray (
+					arguments)));
+
+	}
+
 	@Override
 	public
 	String toString () {
 
-		StringBuffer str =
-			new StringBuffer ();
+		StringBuilder stringBuilder =
+			new StringBuilder ();
 
-		for (Notice notice : notices)
-			str.append (notice.toString ());
+		for (
+			ConsoleNotice notice
+				: notices
+		) {
 
-		return str.toString ();
+			stringBuilder.append (
+				notice.toString ());
+
+		}
+
+		return stringBuilder.toString ();
 
 	}
 
@@ -108,17 +95,17 @@ class Notices {
 	void add (
 			ServletRequest request,
 			String notice,
-			String type) {
+			ConsoleNoticeType type) {
 
-		Notices notices =
-			(Notices)
+		ConsoleNotices notices =
+			(ConsoleNotices)
 			request.getAttribute (
 				"wbs.notices");
 
 		if (notices == null) {
 
 			notices =
-				new Notices ();
+				new ConsoleNotices ();
 
 			request.setAttribute (
 				"wbs.notices",
@@ -127,8 +114,8 @@ class Notices {
 		}
 
 		notices.add (
-			notice,
-			type);
+			type,
+			notice);
 
 	}
 
@@ -140,19 +127,7 @@ class Notices {
 		add (
 			request,
 			notice,
-			"notice");
-
-	}
-
-	public static
-	void addError (
-			@NonNull ServletRequest request,
-			@NonNull String notice) {
-
-		add (
-			request,
-			notice,
-			"error");
+			ConsoleNoticeType.notice);
 
 	}
 
@@ -164,7 +139,20 @@ class Notices {
 		add (
 			request,
 			notice,
-			"warning");
+			ConsoleNoticeType.warning);
 
 	}
+
+	public static
+	void addError (
+			@NonNull ServletRequest request,
+			@NonNull String notice) {
+
+		add (
+			request,
+			notice,
+			ConsoleNoticeType.error);
+
+	}
+
 }

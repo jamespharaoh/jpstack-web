@@ -5,6 +5,7 @@ import static wbs.sms.gsm.GsmUtils.gsmStringIsNotValid;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.lessThan;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -150,11 +151,14 @@ class ClockworkSmsSenderHelper
 				.statusMessage (
 					stringFormat (
 						"Message has length %s ",
-						gsmLength,
+						integerToDecimalString (
+							gsmLength),
 						"and so would be split into %s parts ",
-						gsmParts,
+						integerToDecimalString (
+							gsmParts),
 						"but the maximum configured for this route is %s",
-						clockworkSmsRouteOut.getMaxParts ()));
+						integerToDecimalString (
+							clockworkSmsRouteOut.getMaxParts ())));
 
 		}
 
@@ -220,7 +224,8 @@ class ClockworkSmsSenderHelper
 					stringFormat (
 						"%s/clockwork-sms/route/%s/report",
 						wbsConfig.apiUrl (),
-						smsRoute.getId ()))
+						integerToDecimalString (
+							smsRoute.getId ())))
 
 				.uniqueId (
 					1l)
@@ -415,7 +420,8 @@ class ClockworkSmsSenderHelper
 				.statusMessage (
 					stringFormat (
 						"Server error %s: %s",
-						clockworkSmsResponse.errNo (),
+						integerToDecimalString (
+							clockworkSmsResponse.errNo ()),
 						clockworkSmsResponse.errDesc ()))
 
 				.failureType (

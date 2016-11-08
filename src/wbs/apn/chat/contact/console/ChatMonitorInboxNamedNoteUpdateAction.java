@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import javax.inject.Provider;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
@@ -25,6 +26,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
@@ -93,7 +95,8 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// get params
 

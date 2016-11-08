@@ -3,6 +3,7 @@ package wbs.apn.chat.user.admin.console;
 import java.util.List;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import org.joda.time.Instant;
 import org.joda.time.Interval;
@@ -20,6 +21,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
@@ -67,7 +69,8 @@ class ChatUserAdminBillAction
 
 	@Override
 	public
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		if (! requestContext.canContext ("chat.userCredit")) {
 			requestContext.addError ("Access denied");

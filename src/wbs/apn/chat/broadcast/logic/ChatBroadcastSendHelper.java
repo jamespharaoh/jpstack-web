@@ -1,6 +1,7 @@
 package wbs.apn.chat.broadcast.logic;
 
 import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -14,17 +15,17 @@ import lombok.NonNull;
 import org.joda.time.Instant;
 
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
-import wbs.apn.chat.broadcast.model.ChatBroadcastNumberState;
-import wbs.apn.chat.broadcast.model.ChatBroadcastState;
-import wbs.apn.chat.contact.model.ChatMessageStatus;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.broadcast.model.ChatBroadcastNumberObjectHelper;
 import wbs.apn.chat.broadcast.model.ChatBroadcastNumberRec;
+import wbs.apn.chat.broadcast.model.ChatBroadcastNumberState;
 import wbs.apn.chat.broadcast.model.ChatBroadcastObjectHelper;
 import wbs.apn.chat.broadcast.model.ChatBroadcastRec;
+import wbs.apn.chat.broadcast.model.ChatBroadcastState;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
+import wbs.apn.chat.contact.model.ChatMessageStatus;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -139,7 +140,7 @@ class ChatBroadcastSendHelper
 
 	@Override
 	public
-	List<ChatBroadcastRec> findScheduledJobs (
+	List <ChatBroadcastRec> findScheduledJobs (
 			@NonNull Instant now) {
 
 		return chatBroadcastHelper.findScheduled (
@@ -149,7 +150,7 @@ class ChatBroadcastSendHelper
 
 	@Override
 	public
-	List<ChatBroadcastNumberRec> findItemsLimit (
+	List <ChatBroadcastNumberRec> findItemsLimit (
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast,
 			int maxResults) {
@@ -436,9 +437,11 @@ class ChatBroadcastSendHelper
 			throw new IllegalStateException (
 				stringFormat (
 					"Unable to complete send to chat broadcast %s ",
-					chatBroadcast.getId (),
+					integerToDecimalString (
+						chatBroadcast.getId ()),
 					"with %s numbers accepted",
-					chatBroadcast.getNumAccepted ()));
+					integerToDecimalString (
+						chatBroadcast.getNumAccepted ())));
 
 		}
 

@@ -31,36 +31,36 @@ import lombok.extern.log4j.Log4j;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.apn.chat.approval.model.ChatApprovalRegexpObjectHelper;
+import wbs.apn.chat.approval.model.ChatApprovalRegexpRec;
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
-import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.contact.model.ChatMessageSearch;
-import wbs.apn.chat.contact.model.ChatMessageStatus;
-import wbs.apn.chat.contact.model.ChatUserInitiationReason;
-import wbs.apn.chat.help.logic.ChatHelpLogic;
-import wbs.apn.chat.help.logic.ChatHelpTemplateLogic;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserOperatorLabel;
-import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.approval.model.ChatApprovalRegexpObjectHelper;
-import wbs.apn.chat.approval.model.ChatApprovalRegexpRec;
 import wbs.apn.chat.contact.model.ChatBlockObjectHelper;
 import wbs.apn.chat.contact.model.ChatBlockRec;
 import wbs.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.apn.chat.contact.model.ChatContactRec;
+import wbs.apn.chat.contact.model.ChatMessageMethod;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.contact.model.ChatMessageSearch;
+import wbs.apn.chat.contact.model.ChatMessageStatus;
 import wbs.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
+import wbs.apn.chat.contact.model.ChatUserInitiationReason;
 import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.help.logic.ChatHelpLogic;
+import wbs.apn.chat.help.logic.ChatHelpTemplateLogic;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
+import wbs.apn.chat.user.core.model.ChatUserOperatorLabel;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
+import wbs.apn.chat.user.core.model.Gender;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -393,7 +393,8 @@ class ChatMessageLogicImplementation
 				log.info (
 					stringFormat (
 						"Cancelling previously queued message %d",
-						oldMessage.getId ()));
+						integerToDecimalString (
+							oldMessage.getId ())));
 
 				oldMessage
 					.setStatus (ChatMessageStatus.signupReplaced);
@@ -899,7 +900,8 @@ class ChatMessageLogicImplementation
 			throw new RuntimeException (
 				stringFormat (
 					"No delivery method for user %s",
-					toUser.getId ()));
+					integerToDecimalString (
+						toUser.getId ())));
 
 		}
 	}
@@ -1079,7 +1081,8 @@ class ChatMessageLogicImplementation
 		log.info (
 			stringFormat (
 				"Call to urban airship (prod) took %sns",
-				urbanEnd - urbanStart));
+				integerToDecimalString (
+					urbanEnd - urbanStart)));
 
 		urbanStart = System.nanoTime ();
 		try {
@@ -1117,7 +1120,8 @@ class ChatMessageLogicImplementation
 		log.info (
 			stringFormat (
 				"Call to urban airship (dev) took %sns",
-				urbanEnd - urbanStart));
+				integerToDecimalString (
+					urbanEnd - urbanStart)));
 
 		return success;
 
@@ -1267,9 +1271,8 @@ class ChatMessageLogicImplementation
 		} catch (IllegalArgumentException exception) {
 
 			log.error (
-				stringFormat (
-					"MessageSplitter.split threw exception: %s",
-					exception));
+				"MessageSplitter.split threw exception",
+				exception);
 
 			exceptionLogger.logSimple (
 				"unknown",
@@ -1284,10 +1287,12 @@ class ChatMessageLogicImplementation
 					"\n",
 
 					"fromUser.id = %s\n",
-					fromUser.getId (),
+					integerToDecimalString (
+						fromUser.getId ()),
 
 					"toUser.id = %s\n",
-					toUser.getId (),
+					integerToDecimalString (
+						toUser.getId ()),
 
 					"text = '%s'\n",
 					text,

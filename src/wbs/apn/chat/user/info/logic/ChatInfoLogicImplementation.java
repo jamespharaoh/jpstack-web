@@ -1,6 +1,7 @@
 package wbs.apn.chat.user.info.logic;
 
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.roundToIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -26,22 +27,22 @@ import org.joda.time.Instant;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
-import wbs.apn.chat.help.logic.ChatHelpTemplateLogic;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.apn.chat.contact.model.ChatContactRec;
 import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.help.logic.ChatHelpTemplateLogic;
 import wbs.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
 import wbs.apn.chat.infosite.model.ChatInfoSiteRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.user.info.model.ChatUserInfoObjectHelper;
 import wbs.apn.chat.user.info.model.ChatUserInfoRec;
+import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -232,9 +233,8 @@ class ChatInfoLogicImplementation
 		} catch (IllegalArgumentException exception) {
 
 			log.error (
-				stringFormat (
-					"MessageSplitter.split threw exception: %s",
-					exception));
+				"Error splitting message",
+				exception);
 
 			exceptionLogger.logSimple (
 				"unknown",
@@ -513,7 +513,8 @@ class ChatInfoLogicImplementation
 		String link =
 			stringFormat (
 				"http://txtit.com/is/%s/%s",
-				chatInfoSite.getId (),
+				integerToDecimalString (
+					chatInfoSite.getId ()),
 				chatInfoSite.getToken ());
 
 		String messageText =

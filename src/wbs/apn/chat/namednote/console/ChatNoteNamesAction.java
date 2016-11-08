@@ -15,6 +15,7 @@ import java.util.List;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
@@ -26,6 +27,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 
 @PrototypeComponent ("chatNoteNamesAction")
@@ -59,7 +61,8 @@ class ChatNoteNamesAction
 
 	@Override
 	protected
-	Responder goReal ()
+	Responder goReal (
+			@NonNull TaskLogger taskLogger)
 		throws ServletException {
 
 		List<String> notices =

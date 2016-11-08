@@ -1,6 +1,8 @@
 package wbs.apn.chat.contact.daemon;
 
 import static wbs.sms.gsm.GsmUtils.gsmStringSimplifyAllowNonGsm;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -19,21 +21,21 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
-import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.join.daemon.ChatJoiner;
-import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.apn.chat.contact.model.ChatBlockObjectHelper;
 import wbs.apn.chat.contact.model.ChatBlockRec;
+import wbs.apn.chat.contact.model.ChatMessageMethod;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.keyword.model.ChatKeywordObjectHelper;
 import wbs.apn.chat.keyword.model.ChatKeywordRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserDao;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.join.daemon.ChatJoiner;
+import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -262,9 +264,11 @@ class ChatChatCommand
 			log.warn (
 				stringFormat (
 					"Message %d ",
-					inbox.getId (),
+					integerToDecimalString (
+						inbox.getId ()),
 					"ignored as recipient user id %d ",
-					commandRef.get (),
+					integerToDecimalString (
+						commandRef.get ()),
 					"does not exist"));
 
 			return smsInboxLogic.inboxProcessed (
@@ -377,10 +381,15 @@ class ChatChatCommand
 
 	}
 
-	Optional<InboxAttemptRec> tryJoin () {
+	Optional <InboxAttemptRec> tryJoin () {
 
-		if (chatUserLogic.getAffiliateId (fromChatUser) != null)
-			return Optional.<InboxAttemptRec>absent ();
+		if (
+			isNotNull (
+				chatUserLogic.getAffiliateId (
+					fromChatUser))
+		) {
+			return optionalAbsent ();
+		}
 
 		// TODO the scheme is set randomly here
 
@@ -391,7 +400,8 @@ class ChatChatCommand
 		log.warn (
 			stringFormat (
 				"Chat request from unjoined user %d",
-				fromChatUser.getId ()));
+				integerToDecimalString (
+					fromChatUser.getId ())));
 
 		ChatSchemeRec chatScheme =
 			chat.getChatSchemes ().iterator ().next ();

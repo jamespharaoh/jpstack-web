@@ -3,6 +3,7 @@ package wbs.smsapps.manualresponder.console;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.lessThan;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThan;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -25,6 +26,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -117,7 +119,8 @@ class ManualResponderRequestPendingFormAction
 
 	@Override
 	public
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		Long manualResponderRequestId =
 			requestContext.stuffInteger (
@@ -161,7 +164,8 @@ class ManualResponderRequestPendingFormAction
 					"goIgnore",
 					stringFormat (
 						"manualResponderRequestId = %s",
-						manualResponderRequestId)),
+						integerToDecimalString (
+							manualResponderRequestId))),
 				this);
 
 		ManualResponderRequestRec manualResponderRequest =
@@ -321,11 +325,12 @@ class ManualResponderRequestPendingFormAction
 
 		) {
 
-			requestContext.addError (
-				stringFormat (
-					"Message is too short at %s parts, ",
-					effectiveParts,
-					"minimum is %s parts",
+			requestContext.addErrorFormat (
+				"Message is too short at %s parts, ",
+				integerToDecimalString (
+					effectiveParts),
+				"minimum is %s parts",
+				integerToDecimalString (
 					template.getMinimumMessageParts ()));
 
 			return null;
@@ -345,11 +350,12 @@ class ManualResponderRequestPendingFormAction
 
 		) {
 
-			requestContext.addError (
-				stringFormat (
-					"Message is too long at %s parts, ",
-					messageParts.size (),
-					"minimum is %s parts",
+			requestContext.addErrorFormat (
+				"Message is too long at %s parts, ",
+				integerToDecimalString (
+					messageParts.size ()),
+				"minimum is %s parts",
+				integerToDecimalString (
 					template.getMaximumMessages ()));
 
 			return null;

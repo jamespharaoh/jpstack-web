@@ -6,16 +6,17 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.Seconds;
 
-import wbs.apn.chat.contact.model.ChatUserInitiationReason;
 import wbs.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
+import wbs.apn.chat.contact.model.ChatUserInitiationReason;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
@@ -27,6 +28,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
@@ -84,8 +86,9 @@ class ChatMonitorInboxAlarmAction
 
 	@Override
 	protected
-	Responder goReal ()
-			throws ServletException {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger)
+		throws ServletException {
 
 		// start transaction
 

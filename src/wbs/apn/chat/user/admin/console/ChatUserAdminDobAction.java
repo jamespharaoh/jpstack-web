@@ -3,6 +3,7 @@ package wbs.apn.chat.user.admin.console;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import org.joda.time.LocalDate;
 
@@ -14,6 +15,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -56,7 +58,8 @@ class ChatUserAdminDobAction
 
 	@Override
 	public
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// get stuff
 

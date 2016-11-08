@@ -5,9 +5,9 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
-import wbs.apn.chat.contact.console.ChatContactNoteConsoleHelper;
 import wbs.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.core.model.ChatRec;
@@ -18,6 +18,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
@@ -60,11 +61,13 @@ class ChatMonitorInboxAddNoteAction
 
 	@Override
 	protected
-	Responder goReal ()
+	Responder goReal (
+			@NonNull TaskLogger taskLogger)
 		throws ServletException {
 
 		String newNote =
-			requestContext.parameterRequired ("moreNotes");
+			requestContext.parameterRequired (
+				"moreNotes");
 
 		@Cleanup
 		Transaction transaction =

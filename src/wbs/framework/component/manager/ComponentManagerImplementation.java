@@ -10,6 +10,7 @@ import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -942,7 +943,8 @@ class ComponentManagerImplementation
 						activityManager.currentTask (),
 						stringFormat (
 							"Trying to inject %s ",
-							targetComponents.size (),
+							integerToDecimalString (
+								targetComponents.size ()),
 							"components into a single field %s.%s",
 							componentDefinition.name (),
 							injectedProperty.fieldName ()));

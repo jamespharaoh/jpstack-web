@@ -15,6 +15,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import org.joda.time.Instant;
 import org.json.simple.JSONValue;
@@ -28,6 +29,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.web.JsonResponder;
 import wbs.framework.web.Responder;
@@ -124,7 +126,8 @@ class SimulatorSessionCreateEventAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		try {
 

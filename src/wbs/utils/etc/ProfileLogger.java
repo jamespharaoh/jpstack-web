@@ -1,15 +1,18 @@
 package wbs.utils.etc;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import lombok.NonNull;
+
+import wbs.framework.logging.LogSeverity;
+import wbs.framework.logging.TaskLogger;
 
 public
 class ProfileLogger {
 
-	Logger logger;
-	Level logLevel;
+	TaskLogger taskLogger;
+	LogSeverity severity;
 
 	long startTime;
 	long lapTime;
@@ -19,19 +22,23 @@ class ProfileLogger {
 
 	public
 	ProfileLogger (
-			Logger logger,
-			Level logLevel,
-			String name) {
+			@NonNull TaskLogger taskLogger,
+			@NonNull LogSeverity severity,
+			@NonNull String name) {
 
-		this.logger = logger;
-		this.logLevel = logLevel;
-		this.name = name;
+		this.taskLogger =
+			taskLogger;
 
-		logger.log (
-			logLevel,
-			stringFormat (
-				"---------- %s starting",
-				name));
+		this.severity =
+			severity;
+
+		this.name =
+			name;
+
+		taskLogger.logFormat (
+			severity,
+			"---------- %s starting",
+			name);
 
 		startTime =
 			System.currentTimeMillis ();
@@ -55,11 +62,10 @@ class ProfileLogger {
 
 		lapTime = now;
 
-		logger.log (
-			logLevel,
-			stringFormat (
-				"-- %s starting",
-				lapName));
+		taskLogger.logFormat (
+			severity,
+			"-- %s starting",
+			lapName);
 
 	}
 
@@ -69,11 +75,11 @@ class ProfileLogger {
 		if (lapName == null)
 			return;
 
-		logger.log (
-			logLevel,
-			stringFormat (
-				"-- %s complete %dms",
-				lapName,
+		taskLogger.logFormat (
+			severity,
+			"-- %s complete %dms",
+			lapName,
+			integerToDecimalString (
 				now - lapTime));
 
 	}
@@ -86,11 +92,11 @@ class ProfileLogger {
 
 		endLap (now);
 
-		logger.log (
-			logLevel,
-			stringFormat (
-				"---------- %s complete %dms",
-				name,
+		taskLogger.logFormat (
+			severity,
+			"---------- %s complete %dms",
+			name,
+			integerToDecimalString (
 				now - startTime));
 
 	}
@@ -103,12 +109,12 @@ class ProfileLogger {
 
 		endLap (now);
 
-		logger.error (
-			stringFormat (
-				"---------- %s aborted %dms",
-				name,
-				now - startTime),
-			exception);
+		taskLogger.errorFormatException (
+			exception,
+			"---------- %s aborted %dms",
+			name,
+			integerToDecimalString (
+				now - startTime));
 
 	}
 

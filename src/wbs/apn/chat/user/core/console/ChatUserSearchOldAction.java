@@ -21,16 +21,17 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.apn.chat.user.core.model.ChatUserDateMode;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
@@ -47,6 +48,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.utils.etc.NumberUtils;
 
@@ -84,7 +86,8 @@ class ChatUserSearchOldAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		@Cleanup
 		Transaction transaction =

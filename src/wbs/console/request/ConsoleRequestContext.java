@@ -32,6 +32,8 @@ import org.apache.commons.fileupload.FileItem;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
+import wbs.console.notice.ConsoleNoticeType;
+import wbs.console.notice.ConsoleNotices;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;
 import wbs.console.tab.TabList;
@@ -50,31 +52,100 @@ interface ConsoleRequestContext {
 
 	String servletPath ();
 
+	// ========== notices
+
+	void addNotice (
+			ConsoleNoticeType type,
+			String message);
+
+	void addNotices (
+			ConsoleNotices notices);
+
+	default
+	void addNoticeFormat (
+			@NonNull ConsoleNoticeType type,
+			@NonNull String ... arguments) {
+
+		addNotice (
+			type,
+			stringFormatArray (
+				arguments));
+
+	}
+
+	default
+	void addNotice (
+			@NonNull String message) {
+
+		addNotice (
+			ConsoleNoticeType.notice,
+			message);
+
+	}
+
+	default
+	void addNoticeFormat (
+			@NonNull String ... arguments) {
+
+		addNoticeFormat (
+			ConsoleNoticeType.notice,
+			arguments);
+
+	}
+
+	default
+	void addWarning (
+			@NonNull String message) {
+
+		addNotice (
+			ConsoleNoticeType.warning,
+			message);
+
+	}
+
+	default
+	void addWarningFormat (
+			@NonNull String ... arguments) {
+
+		addNoticeFormat (
+			ConsoleNoticeType.warning,
+			arguments);
+
+	}
+
+	default
 	void addError (
-			String message);
+			@NonNull String message) {
 
-	void addNotice (
-			String message);
+		addNotice (
+			message);
 
-	void addNotice (
-			String message,
-			String type);
+	}
+
+	default
+	void addErrorFormat (
+			@NonNull String ... arguments) {
+
+		addNoticeFormat (
+			ConsoleNoticeType.error,
+			arguments);
+
+	}
+
+	// =========== scripts
 
 	void addScript (
 			String script);
 
 	default
 	void addScriptFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		addScript (
 			stringFormatArray (
 				arguments));
 
 	}
-
-	void addWarning (
-			String message);
 
 	String applicationPathPrefix ();
 

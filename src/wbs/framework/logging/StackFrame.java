@@ -6,8 +6,8 @@ public
 class StackFrame {
 
 	static
-	ThreadLocal<StackFrame> stackFrameThreadLocal =
-		new ThreadLocal<StackFrame> ();
+	ThreadLocal <StackFrame> stackFrameThreadLocal =
+		new ThreadLocal<> ();
 
 	StackFrame parentFrame;
 	Object[] args;

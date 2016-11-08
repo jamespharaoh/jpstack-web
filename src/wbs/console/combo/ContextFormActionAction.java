@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -19,6 +20,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 
 @PrototypeComponent ("contextFormActionAction")
@@ -62,7 +64,8 @@ class ContextFormActionAction <FormState>
 
 	@Override
 	protected
-	Responder goReal ()
+	Responder goReal (
+			@NonNull TaskLogger taskLogger)
 		throws ServletException {
 
 		FormState formState =

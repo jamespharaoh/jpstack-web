@@ -1,5 +1,6 @@
 package wbs.apn.chat.contact.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
@@ -95,7 +96,7 @@ class ChatMonitorInboxFormResponder
 	public
 	void prepare () {
 
-		Optional<ChatMonitorInboxRec> chatMonitorInboxOptional =
+		Optional <ChatMonitorInboxRec> chatMonitorInboxOptional =
 			chatMonitorInboxHelper.find (
 				requestContext.stuffInteger (
 					"chatMonitorInboxId"));
@@ -110,9 +111,10 @@ class ChatMonitorInboxFormResponder
 
 			log.error (
 				stringFormat (
-					"Chat monitor inbox not found: %d",
-					requestContext.stuffInteger (
-						"chatMonitorInboxId")));
+					"Chat monitor inbox not found: %s",
+					integerToDecimalString (
+						requestContext.stuffInteger (
+							"chatMonitorInboxId"))));
 
 			return;
 
@@ -165,7 +167,8 @@ class ChatMonitorInboxFormResponder
 							true)
 						.pathPrefix (),
 					"/%u",
-					chatMonitorInbox.getId (),
+					integerToDecimalString (
+						chatMonitorInbox.getId ()),
 					"/chatMonitorInbox.summary")));
 
 		// script block close
@@ -244,7 +247,7 @@ class ChatMonitorInboxFormResponder
 		htmlHeadingTwoWrite (
 			stringFormat (
 				"Send message as %s",
-				userChatUser.getOperatorLabel ()));
+				userChatUser.getOperatorLabel ().toString ()));
 
 		// form open
 
@@ -258,7 +261,8 @@ class ChatMonitorInboxFormResponder
 							true)
 						.pathPrefix (),
 					"/%u",
-					chatMonitorInbox.getId (),
+					integerToDecimalString (
+						chatMonitorInbox.getId ()),
 					"/chatMonitorInbox.form")));
 
 		// table open
@@ -292,14 +296,16 @@ class ChatMonitorInboxFormResponder
 				stringFormat (
 					"gsmCharCountMultiple2 (this, %s, %d);",
 					"document.getElementById ('chars')",
-					ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
-						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES),
+					integerToDecimalString (
+						ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
+						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES)),
 				" onfocus=\"%h\"",
 				stringFormat (
 					"gsmCharCountMultiple2 (this, %s, %d);",
 					"document.getElementById ('chars')",
-					ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
-						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES),
+					integerToDecimalString (
+						ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
+						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES)),
 				"></textarea>"));
 
 		// chars

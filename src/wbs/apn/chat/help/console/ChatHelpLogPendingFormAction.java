@@ -5,9 +5,9 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.apn.chat.help.logic.ChatHelpLogic;
-import wbs.apn.chat.help.console.ChatHelpLogConsoleHelper;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
@@ -16,6 +16,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -62,7 +63,8 @@ class ChatHelpLogPendingFormAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// get params
 

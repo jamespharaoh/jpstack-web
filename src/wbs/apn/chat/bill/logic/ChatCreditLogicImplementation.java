@@ -2,10 +2,12 @@ package wbs.apn.chat.bill.logic;
 
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.LogicUtils.notEqualSafe;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.sum;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -55,6 +57,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.misc.MapStringSubstituter;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -62,6 +65,7 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.utils.time.TimeFormatter;
 
 @Log4j
 @SingletonComponent ("chatCreditLogic")
@@ -93,6 +97,9 @@ class ChatCreditLogicImplementation
 	ChatUserLogic chatUserLogic;
 
 	@SingletonDependency
+	CurrencyLogic currencyLogic;
+
+	@SingletonDependency
 	Database database;
 
 	@SingletonDependency
@@ -103,6 +110,9 @@ class ChatCreditLogicImplementation
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
+
+	@SingletonDependency
+	TimeFormatter timeFormatter;
 
 	// prototype dependencies
 
@@ -446,10 +456,10 @@ class ChatCreditLogicImplementation
 		log.debug (
 			stringFormat (
 				"userSpendCheck (%s, %s, %s)",
-				chatUser.getId (),
-				userActed
-					? "yes"
-					: "no",
+				integerToDecimalString (
+					chatUser.getId ()),
+				booleanToYesNo (
+					userActed),
 				threadId.isPresent ()
 					? threadId.get ().toString ()
 					: "null"));
@@ -530,7 +540,8 @@ class ChatCreditLogicImplementation
 		log.debug (
 			stringFormat (
 				"userCreditOk (%s)",
-				chatUser.getId ()));
+				integerToDecimalString (
+					chatUser.getId ())));
 
 		// monitors always pass
 
@@ -703,7 +714,8 @@ class ChatCreditLogicImplementation
 			return optionalOf (
 				stringFormat (
 					"Ignoring credit request for %s ",
-					chatUser.getId (),
+					integerToDecimalString (
+						chatUser.getId ()),
 					"due to repeated billed message failure"));
 
 		}
@@ -719,7 +731,8 @@ class ChatCreditLogicImplementation
 			return optionalOf (
 				stringFormat (
 					"Ignoring credit request for %s because permanent failure",
-					chatUser.getId ()));
+					integerToDecimalString (
+						chatUser.getId ())));
 
 		}
 
@@ -739,7 +752,8 @@ class ChatCreditLogicImplementation
 			return optionalOf (
 				stringFormat (
 					"Ignoring credit request for %s because block all",
-					chatUser.getId ()));
+					integerToDecimalString (
+						chatUser.getId ())));
 
 		}
 
@@ -754,9 +768,10 @@ class ChatCreditLogicImplementation
 			return optionalOf (
 				stringFormat (
 					"Ignoring credit request for %s ",
-					chatUser.getId (),
+					integerToDecimalString (
+						chatUser.getId ()),
 					"as their credit mode is %s",
-					chatUser.getCreditMode ()));
+					chatUser.getCreditMode ().toString ()));
 
 		}
 
@@ -767,8 +782,11 @@ class ChatCreditLogicImplementation
 			return optionalOf (
 				stringFormat (
 					"Ignoring credit request for %s as their credit is %s",
-					chatUser.getId (),
-					chatUser.getCredit ()));
+					integerToDecimalString (
+						chatUser.getId ()),
+					currencyLogic.formatText (
+						chatUser.getChat ().getCurrency (),
+						chatUser.getCredit ())));
 
 		}
 
@@ -782,7 +800,8 @@ class ChatCreditLogicImplementation
 			return optionalOf (
 				stringFormat (
 					"Ignoring credit request for %s ",
-					chatUser.getId (),
+					integerToDecimalString (
+						chatUser.getId ()),
 					"as credit is revoked and retry is disabled"));
 
 		}
@@ -828,8 +847,10 @@ class ChatCreditLogicImplementation
 			return optionalOf (
 				stringFormat (
 					"Rejecting bill for user %s because last sent %s",
-					chatUser.getId (),
-					chatUser.getLastBillSent ()));
+					integerToDecimalString (
+						chatUser.getId ()),
+					timeFormatter.timestampSecondStringIso (
+						chatUser.getLastBillSent ())));
 
 		}
 
@@ -889,7 +910,8 @@ class ChatCreditLogicImplementation
 		log.debug (
 			stringFormat (
 				"Doing credit for user %s",
-				chatUser.getId ()));
+				integerToDecimalString (
+					chatUser.getId ())));
 
 		// sanity check on the route
 
@@ -898,8 +920,10 @@ class ChatCreditLogicImplementation
 			throw new RuntimeException (
 				stringFormat (
 					"Can't use route %s as billed for chat scheme %s because ",
-					route.getId (),
-					chatScheme.getId (),
+					integerToDecimalString (
+						route.getId ()),
+					integerToDecimalString (
+						chatScheme.getId ()),
 					"delivery reports are disabled"));
 
 		}
@@ -909,8 +933,10 @@ class ChatCreditLogicImplementation
 			throw new RuntimeException (
 				stringFormat (
 					"Can't use route %s as billed for chat scheme %s because ",
-					route.getId (),
-					chatScheme.getId (),
+					integerToDecimalString (
+						route.getId ()),
+					integerToDecimalString (
+						chatScheme.getId ()),
 					"no expiry time is configured"));
 
 		}
@@ -1081,8 +1107,10 @@ class ChatCreditLogicImplementation
 		log.info (
 			stringFormat (
 				"Billed message sent to chat user %s %s",
-				chatUser.getId (),
-				userCreditDebug (chatUser)));
+				integerToDecimalString (
+					chatUser.getId ()),
+				userCreditDebug (
+					chatUser)));
 
 	}
 
@@ -1222,7 +1250,7 @@ class ChatCreditLogicImplementation
 
 			// send message as appropriate
 
-			Optional<ChatNetworkRec> chatNetworkOptional =
+			Optional <ChatNetworkRec> chatNetworkOptional =
 				chatNetworkHelper.forUser (
 					chatUser);
 
@@ -1231,7 +1259,8 @@ class ChatCreditLogicImplementation
 				log.warn (
 					stringFormat (
 						"Not sending credit hint to %s ",
-						chatUser.getId (),
+						integerToDecimalString (
+							chatUser.getId ()),
 						"because no network settings found"));
 
 				return;
@@ -1398,25 +1427,37 @@ class ChatCreditLogicImplementation
 		return stringFormat (
 
 			"mode:%s ",
-			chatUser.getCreditMode (),
+			chatUser.getCreditMode ().toString (),
 
 			"credit:%s ",
-			chatUser.getCredit (),
+			currencyLogic.formatText (
+				chatUser.getChat ().getCurrency (),
+				chatUser.getCredit ()),
 
 			"pending:%s ",
-			chatUser.getCreditPending (),
+			currencyLogic.formatSimple (
+				chatUser.getChat ().getCurrency (),
+				chatUser.getCreditPending ()),
 
 			"strict:%s ",
-			chatUser.getCreditPendingStrict (),
+			currencyLogic.formatSimple (
+				chatUser.getChat ().getCurrency (),
+				chatUser.getCreditPendingStrict ()),
 
 			"sent:%s ",
-			chatUser.getCreditSent (),
+			currencyLogic.formatText (
+				chatUser.getChat ().getCurrency (),
+				chatUser.getCreditSent ()),
 
 			"revoked:%s ",
-			chatUser.getCreditRevoked (),
+			currencyLogic.formatText (
+				chatUser.getChat ().getCurrency (),
+				chatUser.getCreditRevoked ()),
 
 			"retried:%s",
-			chatUser.getCreditRetried ());
+			currencyLogic.formatText (
+				chatUser.getChat ().getCurrency (),
+				chatUser.getCreditRetried ()));
 
 	}
 

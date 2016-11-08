@@ -1,6 +1,7 @@
 package wbs.utils.web;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -225,7 +226,8 @@ class HtmlTableCheckWriter {
 
 		requestContext.addScriptFormat (
 			"tdcheck_update ('%j');",
-			name);
+			optionalGetRequired (
+				name));
 
 	}
 

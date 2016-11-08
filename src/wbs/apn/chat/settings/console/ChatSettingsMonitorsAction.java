@@ -1,18 +1,20 @@
 package wbs.apn.chat.settings.console;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 
 @PrototypeComponent ("chatSettingsMonitorsAction")
@@ -44,7 +46,8 @@ class ChatSettingsMonitorsAction
 
 	@Override
 	public
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		if (! requestContext.canContext ("chat.manage")) {
 

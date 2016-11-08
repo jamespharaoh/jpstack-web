@@ -6,6 +6,7 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.List;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
@@ -13,6 +14,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimRec;
@@ -58,7 +60,8 @@ class QueueUsersAction
 
 	@Override
 	public
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// get params
 

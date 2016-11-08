@@ -1,11 +1,11 @@
 package wbs.apn.chat.contact.console;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import wbs.apn.chat.contact.model.ChatContactNoteObjectHelper;
 import wbs.apn.chat.contact.model.ChatContactNoteRec;
@@ -18,12 +18,12 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 
-@Log4j
 @PrototypeComponent ("chatMonitorInboxUpdateNoteAction")
 public
 class ChatMonitorInboxUpdateNoteAction
@@ -65,7 +65,8 @@ class ChatMonitorInboxUpdateNoteAction
 
 	@Override
 	protected
-	Responder goReal ()
+	Responder goReal (
+			@NonNull TaskLogger taskLogger)
 		throws ServletException {
 
 		@Cleanup
@@ -92,10 +93,9 @@ class ChatMonitorInboxUpdateNoteAction
 				"deleteNote")
 		) {
 
-			log.info (
-				stringFormat (
-					"deleting note from %s",
-					monitorChatUser.getName ()));
+			taskLogger.noticeFormat (
+				"deleting note from %s",
+				monitorChatUser.getName ());
 
 			objectManager.remove (
 				note);
@@ -115,10 +115,11 @@ class ChatMonitorInboxUpdateNoteAction
 
 			transaction.commit ();
 
-			log.info (
-				stringFormat (
-					"User %s pegged chat user contact note %s",
-					userConsoleLogic.userIdRequired (),
+			taskLogger.noticeFormat (
+				"User %s pegged chat user contact note %s",
+				integerToDecimalString (
+					userConsoleLogic.userIdRequired ()),
+				integerToDecimalString (
 					note.getId ()));
 
 			requestContext.addNotice (
@@ -133,10 +134,11 @@ class ChatMonitorInboxUpdateNoteAction
 
 			transaction.commit ();
 
-			log.info (
-				stringFormat (
-					"User %s unpegged chat user contact note %s",
-					userConsoleLogic.userIdRequired (),
+			taskLogger.noticeFormat (
+				"User %s unpegged chat user contact note %s",
+				integerToDecimalString (
+					userConsoleLogic.userIdRequired ()),
+				integerToDecimalString (
 					note.getId ()));
 
 			requestContext.addNotice (

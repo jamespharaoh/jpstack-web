@@ -5,6 +5,7 @@ import static wbs.utils.etc.LogicUtils.booleanNotEqual;
 import static wbs.utils.etc.LogicUtils.parseBooleanTrueFalseRequired;
 import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.pluralise;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -20,6 +21,7 @@ import javax.servlet.ServletException;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
@@ -28,6 +30,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleHelper;
@@ -86,7 +89,8 @@ class AlertsSettingsNumbersAction
 
 	@Override
 	protected
-	Responder goReal ()
+	Responder goReal (
+			@NonNull TaskLogger taskLogger)
 		throws ServletException {
 
 		if (! requestContext.canContext ("alertsSettings.manage")) {
@@ -138,7 +142,8 @@ class AlertsSettingsNumbersAction
 				requestContext.formIsPresent (
 					stringFormat (
 						"delete_%d",
-						alertsNumber.getId ()))
+						integerToDecimalString (
+							alertsNumber.getId ())))
 			) {
 
 				alertsNumberHelper.remove (
@@ -166,7 +171,8 @@ class AlertsSettingsNumbersAction
 				requestContext.formOrEmptyString (
 					stringFormat (
 						"name_%d",
-						alertsNumber.getId ()));
+						integerToDecimalString (
+							alertsNumber.getId ())));
 
 			if (newName == null)
 				continue;
@@ -198,7 +204,8 @@ class AlertsSettingsNumbersAction
 				requestContext.formRequired (
 					stringFormat (
 						"number_%s",
-						alertsNumber.getId ()));
+						integerToDecimalString (
+							alertsNumber.getId ())));
 
 			if (
 				stringNotEqualSafe (
@@ -250,7 +257,8 @@ class AlertsSettingsNumbersAction
 					requestContext.formRequired (
 						stringFormat (
 							"enabled_%s",
-							alertsNumber.getId ())));
+							integerToDecimalString (
+								alertsNumber.getId ()))));
 
 			if (
 				booleanNotEqual (

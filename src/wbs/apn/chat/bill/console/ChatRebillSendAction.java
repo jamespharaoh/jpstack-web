@@ -3,6 +3,7 @@ package wbs.apn.chat.bill.console;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -16,6 +17,8 @@ import javax.inject.Named;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+
+import lombok.NonNull;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -34,6 +37,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
 
@@ -91,7 +95,8 @@ class ChatRebillSendAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// begin transaction
 
@@ -284,9 +289,9 @@ class ChatRebillSendAction
 
 				transaction.commit ();
 
-				requestContext.addNotice (
-					stringFormat (
-						"Rebilled %s users",
+				requestContext.addNoticeFormat (
+					"Rebilled %s users",
+					integerToDecimalString (
 						collectionSize (
 							billChatUsers)));
 

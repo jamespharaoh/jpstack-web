@@ -1,5 +1,7 @@
 package wbs.console.action;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
@@ -7,7 +9,6 @@ import javax.servlet.ServletException;
 import javax.validation.ConstraintViolationException;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.hibernate.exception.LockAcquisitionException;
 
@@ -18,13 +19,20 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.Log4jLogContext;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Action;
 import wbs.framework.web.Responder;
 
-@Log4j
 public abstract
 class ConsoleAction
 	implements Action {
+
+	private final static
+	LogContext logContext =
+		Log4jLogContext.forClass (
+			ConsoleAction.class);
 
 	// singleton dependencies
 
@@ -61,7 +69,8 @@ class ConsoleAction
 	// implementation
 
 	protected
-	Responder goReal ()
+	Responder goReal (
+			@NonNull TaskLogger taskLogger)
 		throws ServletException {
 
 		return null;
@@ -72,10 +81,14 @@ class ConsoleAction
 	public final
 	Responder handle () {
 
+		TaskLogger taskLogger =
+			logContext.createTaskLogger ();
+
 		try {
 
 			Responder responder =
-				goWithRetry ();
+				goWithRetry (
+					taskLogger);
 
 			if (responder != null)
 				return responder;
@@ -97,6 +110,7 @@ class ConsoleAction
 		} catch (Exception exception) {
 
 			return handleException (
+				taskLogger,
 				exception);
 
 		}
@@ -104,7 +118,8 @@ class ConsoleAction
 	}
 
 	private
-	Responder goWithRetry ()
+	Responder goWithRetry (
+			@NonNull TaskLogger taskLogger)
 		throws ServletException {
 
 		int triesRemaining =
@@ -118,7 +133,8 @@ class ConsoleAction
 
 			try {
 
-				return goReal ();
+				return goReal (
+					taskLogger);
 
 			} catch (ConstraintViolationException exception) {
 
@@ -136,22 +152,26 @@ class ConsoleAction
 
 			triesRemaining --;
 
-			log.warn (
-				stringFormat (
-					"%s: caught %s, retrying, %s remaining",
-					getClass ().getSimpleName (),
-					caught.getClass ().getSimpleName (),
+			taskLogger.warningFormat (
+				"%s: caught %s, retrying, %s remaining",
+				classNameSimple (
+					getClass ()),
+				classNameSimple (
+					caught.getClass ()),
+				integerToDecimalString (
 					triesRemaining));
 
 		}
 
 		// last try without catch
 
-		return goReal ();
+		return goReal (
+			taskLogger);
 
 	}
 
 	Responder handleException (
+			@NonNull TaskLogger taskLogger,
 			@NonNull Throwable throwable) {
 
 		// if we have no backup page just die
@@ -190,11 +210,10 @@ class ConsoleAction
 
 		// record the exception
 
-		log.error (
-			stringFormat (
-				"generated exception: %s",
-				requestContext.requestPath ()),
-			throwable);
+		taskLogger.errorFormatException (
+			throwable,
+			"generated exception: %s",
+			requestContext.requestPath ());
 
 		exceptionLogger.logThrowable (
 			"console",
@@ -215,7 +234,7 @@ class ConsoleAction
 	}
 
 	protected
-	Provider<Responder> reusableResponder (
+	Provider <Responder> reusableResponder (
 			@NonNull String responderName) {
 
 		return consoleManager.responder (
@@ -228,7 +247,7 @@ class ConsoleAction
 	Responder responder (
 			@NonNull String responderName) {
 
-		Provider<Responder> responderProvider =
+		Provider <Responder> responderProvider =
 			consoleManager.responder (
 				responderName,
 				true);

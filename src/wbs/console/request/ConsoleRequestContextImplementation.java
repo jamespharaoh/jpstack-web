@@ -46,6 +46,8 @@ import org.apache.commons.fileupload.FileItem;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.notice.ConsoleNoticeType;
+import wbs.console.notice.ConsoleNotices;
 import wbs.console.priv.UserPrivDataLoader;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;
@@ -114,36 +116,27 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	void addError (
+	void addNotice (
+			@NonNull ConsoleNoticeType type,
 			@NonNull String message) {
 
-		Notices.addError (
-			requestContext.request (),
-			message);
-
-	}
-
-	@Override
-	public
-	void addNotice (
-			@NonNull String message) {
-
-		Notices.addNotice (
-			requestContext.request (),
-			message);
-
-	}
-
-	@Override
-	public
-	void addNotice (
-			@NonNull String message,
-			@NonNull String type) {
-
-		Notices.add (
+		ConsoleNotices.add (
 			requestContext.request (),
 			message,
 			type);
+
+	}
+
+	@Override
+	public
+	void addNotices (
+			@NonNull ConsoleNotices notices) {
+
+		notices.notices ().forEach (
+			notice ->
+				addNotice (
+					notice.type (),
+					notice.html ()));
 
 	}
 
@@ -180,7 +173,7 @@ class ConsoleRequestContextImplementation
 	void addWarning (
 			@NonNull String message) {
 
-		Notices.addWarning (
+		ConsoleNotices.addWarning (
 			requestContext.request (),
 			message);
 
@@ -347,8 +340,8 @@ class ConsoleRequestContextImplementation
 	void flushNotices (
 			@NonNull FormatWriter formatWriter) {
 
-		Notices notices =
-			(Notices)
+		ConsoleNotices notices =
+			(ConsoleNotices)
 			requestContext.request ().getAttribute (
 				"wbs.notices");
 

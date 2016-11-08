@@ -8,17 +8,18 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
-import wbs.apn.chat.contact.model.ChatMessageStatus;
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.help.logic.ChatHelpLogic;
 import wbs.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.apn.chat.contact.model.ChatContactRec;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.contact.model.ChatMessageStatus;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.help.logic.ChatHelpLogic;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
@@ -26,6 +27,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.exception.logic.ExceptionLogLogic;
 import wbs.platform.queue.logic.QueueLogic;
@@ -87,7 +89,8 @@ class ChatMessagePendingFormAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// get the message id
 

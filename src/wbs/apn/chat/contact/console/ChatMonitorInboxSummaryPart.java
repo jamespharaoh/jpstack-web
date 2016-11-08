@@ -10,6 +10,7 @@ import static wbs.utils.etc.LogicUtils.ifThenElseEmDash;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.ifPresentThenElse;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
@@ -622,9 +623,10 @@ class ChatMonitorInboxSummaryPart
 					"%s (%s)",
 					timeFormatter.dateString (
 						monitorChatUser.getDob ()),
-					chatUserLogic.getAgeInYears (
-						monitorChatUser,
-						now))));
+					integerToDecimalString (
+						chatUserLogic.getAgeInYears (
+							monitorChatUser,
+							now)))));
 
 		htmlTableCellWrite (
 			ifNotNullThenElseEmDash (
@@ -633,9 +635,10 @@ class ChatMonitorInboxSummaryPart
 					"%s (%s)",
 					timeFormatter.dateString (
 						userChatUser.getDob ()),
-					chatUserLogic.getAgeInYears (
-						userChatUser,
-						now))));
+					integerToDecimalString (
+						chatUserLogic.getAgeInYears (
+							userChatUser,
+							now)))));
 
 		htmlTableRowClose ();
 
@@ -731,7 +734,8 @@ class ChatMonitorInboxSummaryPart
 		String key =
 			stringFormat (
 				"namedNote%d%s",
-				noteName.getId (),
+				integerToDecimalString (
+					noteName.getId ()),
 				type);
 
 		return namedNote != null

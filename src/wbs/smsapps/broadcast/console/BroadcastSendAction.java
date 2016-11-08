@@ -1,11 +1,12 @@
 package wbs.smsapps.broadcast.console;
 
 import static wbs.utils.etc.EnumUtils.enumInSafe;
+import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import org.joda.time.Instant;
 
@@ -15,6 +16,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleHelper;
@@ -62,7 +64,8 @@ class BroadcastSendAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		@Cleanup
 		Transaction transaction =
@@ -90,9 +93,9 @@ class BroadcastSendAction
 					BroadcastState.unsent)
 			) {
 
-				requestContext.addError (
-					stringFormat (
-						"Cannot send broadcast in state %s",
+				requestContext.addErrorFormat (
+					"Cannot send broadcast in state \"%s\"",
+					enumNameSpaces (
 						broadcast.getState ()));
 
 				return null;
@@ -145,9 +148,9 @@ class BroadcastSendAction
 
 			if (broadcast.getState () != BroadcastState.unsent) {
 
-				requestContext.addError (
-					stringFormat (
-						"Cannot send broadcast in state %s",
+				requestContext.addErrorFormat (
+					"Cannot send broadcast in state \"%s\"",
+					enumNameSpaces (
 						broadcast.getState ()));
 
 				return null;
@@ -215,9 +218,9 @@ class BroadcastSendAction
 
 			if (broadcast.getState () != BroadcastState.scheduled) {
 
-				requestContext.addError (
-					stringFormat (
-						"Cannot unschedule broadcast in state %s",
+				requestContext.addErrorFormat (
+					"Cannot unschedule broadcast in state \"%s\"",
+					enumNameSpaces (
 						broadcast.getState ()));
 
 				return null;

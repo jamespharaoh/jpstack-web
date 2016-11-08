@@ -1,6 +1,7 @@
 package wbs.apn.chat.bill.daemon;
 
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.platform.daemon.SleepingDaemonService;
+import wbs.utils.time.TimeFormatter;
 
 @Log4j
 @SingletonComponent ("chatCreditDaemon")
@@ -43,6 +45,9 @@ class ChatCreditDaemon
 
 	@SingletonDependency
 	Database database;
+
+	@SingletonDependency
+	TimeFormatter timeFormatter;
 
 	// details
 
@@ -119,7 +124,8 @@ class ChatCreditDaemon
 					"doChat",
 					stringFormat (
 						"chatId = %s",
-						chatId)),
+						integerToDecimalString (
+							chatId))),
 				this);
 
 		ChatRec chat =
@@ -134,7 +140,8 @@ class ChatCreditDaemon
 		log.debug (
 			stringFormat (
 				"Chat billing after %s",
-				cutoffTime));
+				timeFormatter.timestampSecondStringIso (
+					cutoffTime)));
 
 		List <Long> chatUserIds =
 			iterableMapToList (
@@ -148,7 +155,8 @@ class ChatCreditDaemon
 		log.debug (
 			stringFormat (
 				"Found %s users",
-				chatUserIds.size ()));
+				integerToDecimalString (
+					chatUserIds.size ())));
 
 		chatUserIds.forEach (
 			this::doUserCredit);
@@ -168,7 +176,8 @@ class ChatCreditDaemon
 					"doUserCredit",
 					stringFormat (
 						"chatUserId = %s",
-						chatUserId)),
+						integerToDecimalString (
+							chatUserId))),
 				this);
 
 		ChatUserRec chatUser =

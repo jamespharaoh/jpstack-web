@@ -127,7 +127,8 @@ class ChatHelpLogPendingFormResponder
 				stringFormat (
 					"/chatHelpLog.pending",
 					"/%u",
-					chatHelpLog.getId (),
+					integerToDecimalString (
+						chatHelpLog.getId ()),
 					"/chatHelpLog.pending.summary")));
 
 		formatWriter.writeLineFormat (

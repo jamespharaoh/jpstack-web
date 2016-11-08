@@ -5,17 +5,19 @@ import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.apn.chat.contact.model.ChatMessageMethod;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.action.ConsoleAction;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -54,7 +56,8 @@ class ChatUserAdminOnlineAction
 
 	@Override
 	public
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		if (! requestContext.canContext ("chat.userAdmin")) {
 			requestContext.addError ("Access denied");

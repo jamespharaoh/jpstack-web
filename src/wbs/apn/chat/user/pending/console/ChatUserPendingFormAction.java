@@ -2,6 +2,7 @@ package wbs.apn.chat.user.pending.console;
 
 import static wbs.sms.gsm.GsmUtils.gsmStringLength;
 import static wbs.utils.etc.EnumUtils.enumInSafe;
+import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
@@ -11,8 +12,8 @@ import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.moreThan;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
@@ -21,23 +22,23 @@ import com.google.common.base.Optional;
 import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.apn.chat.contact.console.ChatMessageConsoleHelper;
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.contact.model.ChatMessageStatus;
-import wbs.apn.chat.help.logic.ChatHelpLogLogic;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.logic.ChatUserLogic.PendingMode;
-import wbs.apn.chat.user.image.model.ChatUserImageType;
-import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
-import wbs.apn.chat.contact.console.ChatMessageConsoleHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.contact.model.ChatMessageStatus;
 import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.help.logic.ChatHelpLogLogic;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.apn.chat.user.core.logic.ChatUserLogic.PendingMode;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.apn.chat.user.info.model.ChatUserInfoRec;
+import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.apn.chat.user.info.model.ChatUserNameRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.manager.ConsoleObjectManager;
@@ -46,6 +47,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -137,7 +139,8 @@ class ChatUserPendingFormAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// delegate appropriately
 
@@ -503,9 +506,9 @@ class ChatUserPendingFormAction
 
 		if (chatUserImage == null) {
 
-			requestContext.addError (
-				stringFormat (
-					"No %s to approve",
+			requestContext.addErrorFormat (
+				"No %s to approve",
+				enumNameSpaces (
 					mode));
 
 			return nextResponder (
@@ -515,12 +518,11 @@ class ChatUserPendingFormAction
 
 		// update the chat user and stuff
 
-		@SuppressWarnings ("unchecked")
-		List<ChatUserImageRec> list =
-			(List<ChatUserImageRec>)
-			PropertyUtils.getProperty (
-				chatUser,
-				mode.listProperty ());
+		List <ChatUserImageRec> list =
+			genericCastUnchecked (
+				PropertyUtils.getProperty (
+					chatUser,
+					mode.listProperty ()));
 
 		if (
 			enumNotEqualSafe (

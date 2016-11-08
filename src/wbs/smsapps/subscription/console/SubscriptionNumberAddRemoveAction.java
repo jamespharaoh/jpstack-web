@@ -3,9 +3,9 @@ package wbs.smsapps.subscription.console;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +15,7 @@ import javax.inject.Named;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
@@ -25,6 +26,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.sms.number.core.model.NumberObjectHelper;
@@ -93,7 +95,8 @@ class SubscriptionNumberAddRemoveAction
 
 	@Override
 	protected
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		@Cleanup
 		Transaction transaction =
@@ -279,18 +282,18 @@ class SubscriptionNumberAddRemoveAction
 
 			if (numAdded > 0) {
 
-				requestContext.addNotice (
-					stringFormat (
-						"%s numbers added",
+				requestContext.addNoticeFormat (
+					"%s numbers added",
+					integerToDecimalString (
 						numAdded));
 
 			}
 
 			if (numAlreadyAdded > 0) {
 
-				requestContext.addWarning (
-					stringFormat (
-						"%s numbers already added",
+				requestContext.addWarningFormat (
+					"%s numbers already added",
+					integerToDecimalString (
 						numAlreadyAdded));
 
 			}
@@ -387,9 +390,9 @@ class SubscriptionNumberAddRemoveAction
 					numRemoved)
 			) {
 
-				requestContext.addNotice (
-					stringFormat (
-						"%s numbers removed",
+				requestContext.addNoticeFormat (
+					"%s numbers removed",
+					integerToDecimalString (
 						numRemoved));
 
 			}
@@ -399,9 +402,9 @@ class SubscriptionNumberAddRemoveAction
 					numAlreadyRemoved)
 			) {
 
-				requestContext.addWarning (
-					stringFormat (
-						"%s numbers already removed",
+				requestContext.addWarningFormat (
+					"%s numbers already removed",
+					integerToDecimalString (
 						numAlreadyRemoved));
 
 			}

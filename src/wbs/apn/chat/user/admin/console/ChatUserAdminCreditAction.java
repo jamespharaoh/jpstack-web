@@ -1,12 +1,13 @@
 package wbs.apn.chat.user.admin.console;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.apn.chat.bill.model.ChatUserCreditObjectHelper;
 import wbs.apn.chat.bill.model.ChatUserCreditRec;
@@ -22,6 +23,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
@@ -66,7 +68,8 @@ class ChatUserAdminCreditAction
 
 	@Override
 	public
-	Responder goReal () {
+	Responder goReal (
+			@NonNull TaskLogger taskLogger) {
 
 		// check privs
 
@@ -156,9 +159,9 @@ class ChatUserAdminCreditAction
 
 		requestContext.setEmptyFormData ();
 
-		requestContext.addNotice (
-			stringFormat (
-				"Credit adjusted, reference = %h",
+		requestContext.addNoticeFormat (
+			"Credit adjusted, reference = %h",
+			integerToDecimalString (
 				chatUserCredit.getId ()));
 
 		return null;

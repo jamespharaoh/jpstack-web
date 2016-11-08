@@ -3,12 +3,14 @@ package wbs.platform.queue.console;
 import javax.servlet.ServletException;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.web.Responder;
 
 @PrototypeComponent ("queueSubjectActionsAction")
@@ -36,7 +38,8 @@ class QueueSubjectActionsAction
 
 	@Override
 	protected
-	Responder goReal ()
+	Responder goReal (
+			@NonNull TaskLogger taskLogger)
 		throws ServletException {
 
 		// begin transaction

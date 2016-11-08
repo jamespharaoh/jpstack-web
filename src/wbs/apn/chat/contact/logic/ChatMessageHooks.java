@@ -2,6 +2,7 @@ package wbs.apn.chat.contact.logic;
 
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.NonNull;
@@ -56,8 +57,10 @@ class ChatMessageHooks
 			throw new RuntimeException (
 				stringFormat (
 					"From user's chat %s does not match to user's %s",
-					fromChatUser.getChat (),
-					toChatUser.getChat ()));
+					integerToDecimalString (
+						fromChatUser.getChat ().getId ()),
+					integerToDecimalString (
+						toChatUser.getChat ().getId ())));
 
 		}
 
