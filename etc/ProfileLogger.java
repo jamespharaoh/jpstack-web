@@ -77,7 +77,7 @@ class ProfileLogger {
 
 		taskLogger.logFormat (
 			severity,
-			"-- %s complete %dms",
+			"-- %s complete %sms",
 			lapName,
 			integerToDecimalString (
 				now - lapTime));
@@ -94,7 +94,7 @@ class ProfileLogger {
 
 		taskLogger.logFormat (
 			severity,
-			"---------- %s complete %dms",
+			"---------- %s complete %sms",
 			name,
 			integerToDecimalString (
 				now - startTime));
@@ -111,7 +111,7 @@ class ProfileLogger {
 
 		taskLogger.errorFormatException (
 			exception,
-			"---------- %s aborted %dms",
+			"---------- %s aborted %sms",
 			name,
 			integerToDecimalString (
 				now - startTime));

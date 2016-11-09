@@ -263,7 +263,7 @@ class TypeUtils {
 
 	public static
 	Optional <Class <?>> classForNameFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		return classForName (
 			stringFormatArray (
@@ -273,7 +273,7 @@ class TypeUtils {
 
 	public static
 	Class <?> classForNameFormatRequired (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		return classForNameRequired (
 			stringFormatArray (

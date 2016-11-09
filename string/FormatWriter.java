@@ -41,7 +41,7 @@ interface FormatWriter
 
 	default
 	void writeFormat (
-			Object ... arguments) {
+			String ... arguments) {
 
 		writeString (
 			stringFormatArray (
@@ -51,7 +51,7 @@ interface FormatWriter
 
 	default
 	void writeFormatArray (
-			Object[] arguments) {
+			String [] arguments) {
 
 		writeString (
 			stringFormatArray (
@@ -61,7 +61,7 @@ interface FormatWriter
 
 	default
 	void writeLineFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		String lineContent =
 			stringFormatArray (
@@ -85,7 +85,7 @@ interface FormatWriter
 
 	default
 	void writeLineFormatIncreaseIndent (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		writeIndent ();
 
@@ -101,7 +101,7 @@ interface FormatWriter
 
 	default
 	void writeLineFormatDecreaseIndent (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		decreaseIndent ();
 
@@ -117,7 +117,7 @@ interface FormatWriter
 
 	default
 	void writeLineFormatDecreaseIncreaseIndent (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		decreaseIndent ();
 
@@ -135,7 +135,7 @@ interface FormatWriter
 
 	default
 	void writeLineFormatArray (
-			Object[] arguments) {
+			String [] arguments) {
 
 		writeIndent ();
 

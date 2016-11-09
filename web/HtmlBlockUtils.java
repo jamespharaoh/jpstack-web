@@ -11,6 +11,7 @@ import lombok.NonNull;
 
 import wbs.utils.string.FormatWriter;
 import wbs.utils.web.HtmlAttributeUtils.HtmlAttribute;
+import wbs.utils.web.HtmlAttributeUtils.ToHtmlAttribute;
 
 public
 class HtmlBlockUtils {
@@ -218,7 +219,7 @@ class HtmlBlockUtils {
 	public static
 	void htmlParagraphOpen (
 			@NonNull FormatWriter formatWriter,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		formatWriter.writeIndent ();
 
@@ -271,7 +272,7 @@ class HtmlBlockUtils {
 	void htmlParagraphWrite (
 			@NonNull FormatWriter formatWriter,
 			@NonNull String content,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlParagraphOpen (
 			formatWriter,
@@ -289,7 +290,7 @@ class HtmlBlockUtils {
 	public static
 	void htmlParagraphWrite (
 			@NonNull String content,
-			@NonNull HtmlAttribute ... attributes) {
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlParagraphWrite (
 			currentFormatWriter (),
@@ -301,7 +302,7 @@ class HtmlBlockUtils {
 	public static
 	void htmlParagraphWriteFormat (
 			@NonNull FormatWriter formatWriter,
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		htmlParagraphOpen (
 			formatWriter);
@@ -318,7 +319,7 @@ class HtmlBlockUtils {
 
 	public static
 	void htmlParagraphWriteFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		htmlParagraphWriteFormat (
 			currentFormatWriter (),
@@ -329,7 +330,7 @@ class HtmlBlockUtils {
 	public static
 	void htmlParagraphWriteFormatWarning (
 			@NonNull FormatWriter formatWriter,
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		htmlParagraphWrite (
 			formatWriter,
@@ -342,7 +343,7 @@ class HtmlBlockUtils {
 
 	public static
 	void htmlParagraphWriteFormatWarning (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		htmlParagraphWrite (
 			currentFormatWriter (),
@@ -356,7 +357,7 @@ class HtmlBlockUtils {
 	public static
 	void htmlParagraphWriteFormatError (
 			@NonNull FormatWriter formatWriter,
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		htmlParagraphWrite (
 			formatWriter,
@@ -369,7 +370,7 @@ class HtmlBlockUtils {
 
 	public static
 	void htmlParagraphWriteFormatError (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		htmlParagraphWrite (
 			currentFormatWriter (),
