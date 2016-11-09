@@ -1,6 +1,7 @@
 package wbs.platform.updatelog.logic;
 
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.HashMap;
@@ -80,10 +81,12 @@ class UpdateManager {
 
 		log.debug (
 			stringFormat (
-				"getDatabaseVersion (\"%s\", %d) = %d",
+				"getDatabaseVersion (\"%s\", %s) = %s",
 				table,
-				ref,
-				ret));
+				integerToDecimalString (
+					ref),
+				integerToDecimalString (
+					ret)));
 
 		return ret;
 

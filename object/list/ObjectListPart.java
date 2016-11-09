@@ -249,7 +249,7 @@ class ObjectListPart <
 
 			ConsoleHelper <ParentType> parentHelper =
 				genericCastUnchecked (
-					objectManager.findConsoleHelper (
+					objectManager.findConsoleHelperRequired (
 						consoleHelper.parentClass ()));
 
 			Long parentId =
@@ -282,12 +282,11 @@ class ObjectListPart <
 			) {
 
 				ConsoleHelper<?> grandParentHelper =
-					objectManager.findConsoleHelper (
+					objectManager.findConsoleHelperRequired (
 						parentHelper.parentClass ());
 
 				Long grandParentId =
-					(Long)
-					requestContext.stuff (
+					requestContext.stuffInteger (
 						grandParentHelper.idKey ());
 
 				if (grandParentId != null) {

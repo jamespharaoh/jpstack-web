@@ -1,6 +1,7 @@
 package wbs.platform.object.settings;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import javax.inject.Provider;
 
@@ -186,9 +187,9 @@ class ObjectSettingsAction <
 		} else {
 
 			PermanentRecord <?> linkObject =
-				(PermanentRecord <?>)
-				objectManager.getParentOrNull (
-					object);
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						object));
 
 			Object objectRef =
 				PropertyUtils.getProperty (
@@ -221,10 +222,8 @@ class ObjectSettingsAction <
 
 	void prepareParent () {
 
-		@SuppressWarnings ("unchecked")
 		ConsoleHelper <ParentType> parentHelper =
-			(ConsoleHelper <ParentType>)
-			objectManager.findConsoleHelper (
+			objectManager.findConsoleHelperRequired (
 				consoleHelper.parentClass ());
 
 		if (parentHelper.isRoot ()) {

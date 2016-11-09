@@ -7,6 +7,10 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Optional;
+
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -18,7 +22,6 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 import org.joda.time.Interval;
 
-import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.platform.queue.model.QueueItemDao;
 import wbs.platform.queue.model.QueueItemRec;
@@ -179,8 +182,8 @@ class QueueItemDaoHibernate
 
 	@Override
 	public
-	List<QueueItemRec> find (
-			@NonNull List<QueueItemState> states) {
+	List <QueueItemRec> find (
+			@NonNull List <QueueItemState> states) {
 
 		return findMany (
 			"findActive ()",
@@ -228,7 +231,7 @@ class QueueItemDaoHibernate
 
 	@Override
 	public
-	List<QueueItemRec> findByCreatedTime (
+	List <QueueItemRec> findByCreatedTime (
 			@NonNull QueueRec queue,
 			@NonNull Interval createdTime) {
 
@@ -332,6 +335,10 @@ class QueueItemDaoHibernate
 			searchCriteria (
 				search);
 
+		criteria.add (
+			Restrictions.isNotNull (
+				"_queueItem.processedUser"));
+
 		criteria.setProjection (
 			Projections.projectionList ()
 
@@ -393,6 +400,10 @@ class QueueItemDaoHibernate
 			searchCriteria (
 				search);
 
+		criteria.add (
+			Restrictions.isNotNull (
+				"_queueItem.processedUser"));
+
 		criteria.setProjection (
 			Projections.projectionList ()
 
@@ -430,7 +441,7 @@ class QueueItemDaoHibernate
 
 	@Override
 	public
-	List<UserQueueReport> searchUserQueueReports (
+	List <Optional <UserQueueReport>> searchUserQueueReports (
 			@NonNull QueueItemSearch search,
 			@NonNull List<Long> objectIds) {
 

@@ -2,6 +2,8 @@ package wbs.platform.queue.model;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import org.hibernate.Criteria;
 import org.joda.time.Interval;
 
@@ -13,33 +15,33 @@ interface QueueItemDaoMethods {
 	Criteria searchCriteria (
 			QueueItemSearch search);
 
-	List<Long> searchIds (
+	List <Long> searchIds (
 			QueueItemSearch search);
 
 	Criteria searchUserQueueReportCriteria (
 			QueueItemSearch search);
 
-	List<Long> searchUserQueueReportIds (
+	List <Long> searchUserQueueReportIds (
 			QueueItemSearch search);
 
-	List<UserQueueReport> searchUserQueueReports (
+	List <Optional <UserQueueReport>> searchUserQueueReports (
 			QueueItemSearch search,
-			List<Long> ids);
+			List <Long> ids);
 
-	List<QueueItemRec> find (
-			List<QueueItemState> state);
+	List <QueueItemRec> find (
+			List <QueueItemState> state);
 
-	List<QueueItemRec> findByCreatedTime (
+	List <QueueItemRec> findByCreatedTime (
 			Interval createdTimeInterval);
 
-	List<QueueItemRec> findByCreatedTime (
+	List <QueueItemRec> findByCreatedTime (
 			QueueRec queue,
 			Interval createdTimeInterval);
 
-	List<QueueItemRec> findByProcessedTime (
+	List <QueueItemRec> findByProcessedTime (
 			Interval processedTimeInterval);
 
-	List<QueueItemRec> findByProcessedTime (
+	List <QueueItemRec> findByProcessedTime (
 			UserRec user,
 			Interval processedTimeInterval);
 

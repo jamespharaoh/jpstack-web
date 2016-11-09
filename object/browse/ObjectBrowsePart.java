@@ -137,8 +137,8 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 		// locate via parent
 
-		ConsoleHelper<?> parentHelper =
-			objectManager.findConsoleHelper (
+		ConsoleHelper <?> parentHelper =
+			objectManager.findConsoleHelperRequired (
 				consoleHelper.parentClass ());
 
 		Long parentId =
@@ -173,8 +173,8 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 		// locate via grand parent
 
-		ConsoleHelper<?> grandParentHelper =
-			objectManager.findConsoleHelper (
+		ConsoleHelper <?> grandParentHelper =
+			objectManager.findConsoleHelperRequired (
 				parentHelper.parentClass ());
 
 		Long grandParentId =

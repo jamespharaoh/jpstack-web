@@ -140,9 +140,9 @@ class ObjectSearchResultsPart <
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> builder ()
 
 			.addAll (
 				super.scriptRefs ())
@@ -195,12 +195,11 @@ class ObjectSearchResultsPart <
 
 		// get search results for page
 
-		@SuppressWarnings ("unchecked")
-		List<Long> allObjectIds =
-			(List<Long>)
-			requiredValue (
-				requestContext.session (
-					sessionKey + "Results"));
+		List <Long> allObjectIds =
+			genericCastUnchecked (
+				requiredValue (
+					requestContext.session (
+						sessionKey + "Results")));
 
 		totalObjects =
 			allObjectIds.size ();
@@ -253,7 +252,7 @@ class ObjectSearchResultsPart <
 				getMethodRequired (
 					consoleHelper.getClass (),
 					resultsDaoMethodName,
-					ImmutableList.<Class<?>>of (
+					ImmutableList.<Class <?>> of (
 						searchObject.getClass (),
 						List.class));
 
@@ -344,7 +343,8 @@ class ObjectSearchResultsPart <
 
 		htmlParagraphWriteFormat (
 			"Search returned %h items",
-			totalObjects);
+			integerToDecimalString (
+				totalObjects));
 
 	}
 
@@ -607,7 +607,8 @@ class ObjectSearchResultsPart <
 						htmlDataAttributeFormat (
 							"rows-class",
 							"search-result-%s",
-							result.getId ())),
+							integerToDecimalString (
+								result.getId ()))),
 
 					optionalIf (
 						result instanceof Record,
@@ -638,7 +639,7 @@ class ObjectSearchResultsPart <
 
 	private
 	String objectUrl (
-			@NonNull Record<?> object) {
+			@NonNull Record <?> object) {
 
 		if (
 			optionalIsPresent (

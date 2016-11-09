@@ -1,6 +1,7 @@
 package wbs.platform.media.console;
 
 import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.bytesToString;
 import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -130,8 +131,9 @@ class MediaConsoleLogicImplementation
 					"width: 300px",
 					"height: 225px;"),
 
-				" id=\"player%d\"",
-				playerCount,
+				" id=\"player%h\"",
+				integerToDecimalString (
+					playerCount),
 
 				"></a>");
 
@@ -142,8 +144,9 @@ class MediaConsoleLogicImplementation
 				stringFormat (
 					"flowplayer ('%j', '%j', {});\n",
 					stringFormat (
-						"player%d'",
-						playerCount),
+						"player%s'",
+						integerToDecimalString (
+							playerCount)),
 					"/flowplayer-3.1.2.swf"));
 
 			requestContext.request (
@@ -184,15 +187,17 @@ class MediaConsoleLogicImplementation
 					"width: 300px",
 					"height: 60px;"),
 
-				" id=\"player%d\"",
-					playerCount,
+				" id=\"player%s\"",
+				integerToDecimalString (
+					playerCount),
 
 				"></a>");
 
 			formatWriter.writeFormat (
 				"<script type=\"text/javascript\">\n",
-				"  flowplayer ('player%d', '/flowplayer-3.1.2.swf', {\n",
-				playerCount,
+				"  flowplayer ('player%s', '/flowplayer-3.1.2.swf', {\n",
+				integerToDecimalString (
+					playerCount),
 				"    plugins: {\n",
 				"      audio: {\n",
 				"        url: '/flowplayer.audio-3.1.2.swf'\n",
@@ -270,9 +275,11 @@ class MediaConsoleLogicImplementation
 				media),
 			"/media.imageScale",
 			"?width=%u",
-			width,
+			integerToDecimalString (
+				width),
 			"&height=%u",
-			height);
+			integerToDecimalString (
+				height));
 
 	}
 

@@ -1,6 +1,7 @@
 package wbs.platform.group.console;
 
 import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.web.HtmlAttributeUtils.htmlAttributeFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
@@ -115,11 +116,13 @@ class GroupPrivsPart
 				continue;
 			}
 
-			Record<?> parentObject =
-				objectManager.getParentOrNull (priv);
+			Record <?> parentObject =
+				objectManager.getParentRequired (
+					priv);
 
 			PrivsNode parentNode =
-				findNode (parentObject);
+				findNode (
+					parentObject);
 
 			parentNode.privs.put (
 				priv.getCode (),
@@ -174,12 +177,13 @@ class GroupPrivsPart
 
 		// find the parent node by recursion
 
-		Record<?> parent =
-			objectManager.getParentOrNull (
+		Record <?> parent =
+			objectManager.getParentRequired (
 				object);
 
 		PrivsNode parentNode =
-			findNode(parent);
+			findNode (
+				parent);
 
 		// lookup or create the map containing this node's children of this
 		// type
@@ -428,7 +432,8 @@ class GroupPrivsPart
 			formatWriter.writeLineFormat (
 				"[pr, 0, '%j', %s, %s],",
 				priv.getCode (),
-				priv.getId (),
+				integerToDecimalString (
+					priv.getId ()),
 				ifThenElse (
 					canPrivIds.contains (
 						priv.getId ()),
