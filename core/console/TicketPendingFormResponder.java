@@ -1,7 +1,6 @@
 package wbs.services.ticket.core.console;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
 import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
@@ -108,15 +107,15 @@ class TicketPendingFormResponder
 			ticket.getTicketState ();
 
 		summaryUrl =
-			requestContext.resolveApplicationUrl (
-				stringFormat (
-					"/ticket.pending",
-					"/%u",
-					ticket.getId (),
-					"/ticket.pending.history"));
+			requestContext.resolveApplicationUrlFormat (
+				"/ticket.pending",
+				"/%u",
+				integerToDecimalString (
+					ticket.getId ()),
+				"/ticket.pending.history");
 
-		ImmutableList.Builder<TicketTemplateRec> templatesBuilder =
-			ImmutableList.<TicketTemplateRec>builder ();
+		ImmutableList.Builder <TicketTemplateRec> templatesBuilder =
+			ImmutableList.<TicketTemplateRec> builder ();
 
 		for (
 			TicketTemplateRec template
@@ -226,12 +225,12 @@ class TicketPendingFormResponder
 		// form open
 
 		htmlFormOpenPostAction (
-			requestContext.resolveApplicationUrl (
-				stringFormat (
-					"/ticket.pending",
-					"/%u",
-					ticket.getId (),
-					"/ticket.pending.form")));
+			requestContext.resolveApplicationUrlFormat (
+				"/ticket.pending",
+				"/%u",
+				integerToDecimalString (
+					ticket.getId ()),
+				"/ticket.pending.form"));
 
 		// table open
 
@@ -378,7 +377,8 @@ class TicketPendingFormResponder
 			"<input",
 
 			" id=\"timestamp-%h\"",
-			template.getId (),
+			integerToDecimalString (
+				template.getId ()),
 
 			" type=\"textarea\"",
 
@@ -387,8 +387,9 @@ class TicketPendingFormResponder
 			template.getTicketState ().getState ().toString (),
 			*/
 
-			" value=\"%d\"",
-			template.getTicketState ().getMinimum (),
+			" value=\"%h\"",
+			integerToDecimalString (
+				template.getTicketState ().getMinimum ()),
 
 			">");
 
