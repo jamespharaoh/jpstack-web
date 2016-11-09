@@ -5,6 +5,10 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -13,10 +17,9 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 
-import lombok.NonNull;
+import wbs.framework.hibernate.HibernateDao;
 import wbs.imchat.model.ImChatMessageDao;
 import wbs.imchat.model.ImChatMessageRec;
-import wbs.framework.hibernate.HibernateDao;
 import wbs.imchat.model.ImChatMessageSearch;
 import wbs.imchat.model.ImChatOperatorReport;
 
@@ -191,9 +194,9 @@ class ImChatMessageDaoHibernate
 
 	@Override
 	public
-	List<ImChatOperatorReport> findOperatorReports (
+	List <Optional <ImChatOperatorReport>> findOperatorReports (
 			@NonNull ImChatMessageSearch search,
-			@NonNull List<Long> ids) {
+			@NonNull List <Long> ids) {
 
 		Criteria criteria =
 			searchOperatorReportCriteria (

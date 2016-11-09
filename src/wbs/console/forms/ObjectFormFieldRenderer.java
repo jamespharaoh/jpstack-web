@@ -6,6 +6,7 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.requiredSuccess;
 import static wbs.utils.etc.Misc.successOrElse;
 import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanOne;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -89,7 +90,8 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			name (),
 			" value=\"%h\"",
 			interfaceValue.isPresent ()
-				? interfaceValue.get ().getId ()
+				? integerToDecimalString (
+					interfaceValue.get ().getId ())
 				: "none",
 			">\n");
 
@@ -276,7 +278,8 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			formatWriter.writeLineFormat (
 				"<option",
 				" value=\"%h\"",
-				optionValue.getId (),
+				integerToDecimalString (
+					optionValue.getId ()),
 				selected
 					? " selected"
 					: "",
@@ -323,7 +326,8 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 				formName,
 				name,
 				interfaceValue.isPresent ()
-					? interfaceValue.get ().getId ()
+					? integerToDecimalString (
+						interfaceValue.get ().getId ())
 					: "none");
 
 		} else {
@@ -354,7 +358,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 	@Override
 	public
-	Either<Optional<Interface>,String> formToInterface (
+	Either <Optional <Interface>, String> formToInterface (
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
@@ -505,7 +509,8 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 			formatWriter.writeLineFormat (
 				"<td colspan=\"%h\">—</td>",
-				columnSpan);
+				integerToDecimalString (
+					columnSpan));
 
 		} else {
 
@@ -576,7 +581,8 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 			formatWriter.writeLineFormat (
 				"<td colspan=\"%h\">—</td>",
-				columnSpan);
+				integerToDecimalString (
+					columnSpan));
 
 		} else {
 

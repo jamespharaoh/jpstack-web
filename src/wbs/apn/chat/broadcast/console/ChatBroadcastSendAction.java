@@ -491,7 +491,7 @@ class ChatBroadcastSendAction
 							search);
 
 					taskLogger.debugFormat (
-						"Search returned %d users",
+						"Search returned %s users",
 						integerToDecimalString (
 							allChatUserIds.size ()));
 
@@ -634,14 +634,14 @@ class ChatBroadcastSendAction
 					if (includeBlocked) {
 
 						requestContext.addNoticeFormat (
-							"Purged %d numbers due to barring",
+							"Purged %s numbers due to barring",
 							integerToDecimalString (
 								removedNumbers));
 
 					} else {
 
 						requestContext.addNoticeFormat (
-							"Purged %d numbers ",
+							"Purged %s numbers ",
 							integerToDecimalString (
 								removedNumbers),
 							"due to blocking and/or barring");
@@ -846,7 +846,7 @@ class ChatBroadcastSendAction
 				profileLogger.end ();
 
 				requestContext.addNoticeFormat (
-					"Message sent to %d users",
+					"Message sent to %s users",
 					integerToDecimalString (
 						remainingChatUserIds.size ()));
 

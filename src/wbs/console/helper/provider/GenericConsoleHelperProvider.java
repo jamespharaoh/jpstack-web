@@ -510,7 +510,7 @@ class GenericConsoleHelperProvider <
 			} else {
 
 				ConsoleHelper <?> delegateHelper =
-					consoleObjectManager.findConsoleHelper (
+					consoleObjectManager.findConsoleHelperRequired (
 						delegate);
 
 				return delegateHelper.canViewGeneric (

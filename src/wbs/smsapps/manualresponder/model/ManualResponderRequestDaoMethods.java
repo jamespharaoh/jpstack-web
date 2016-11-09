@@ -2,6 +2,8 @@ package wbs.smsapps.manualresponder.model;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import org.hibernate.Criteria;
 
 import wbs.sms.number.core.model.NumberRec;
@@ -9,7 +11,7 @@ import wbs.sms.number.core.model.NumberRec;
 public
 interface ManualResponderRequestDaoMethods {
 
-	List<ManualResponderRequestRec> findRecentLimit (
+	List <ManualResponderRequestRec> findRecentLimit (
 			ManualResponderRec manualResponder,
 			NumberRec number,
 			Long maxResults);
@@ -17,7 +19,7 @@ interface ManualResponderRequestDaoMethods {
 	Criteria searchCriteria (
 			ManualResponderRequestSearch search);
 
-	List<Long> searchIds (
+	List <Long> searchIds (
 			ManualResponderRequestSearch search);
 
 	// service report
@@ -25,29 +27,29 @@ interface ManualResponderRequestDaoMethods {
 	Criteria searchServiceReportCriteria (
 			ManualResponderRequestSearch search);
 
-	List<Long> searchServiceReportIds (
+	List <Long> searchServiceReportIds (
 			ManualResponderRequestSearch search);
 
-	List<ManualResponderServiceReport> searchServiceReports (
+	List <ManualResponderServiceReport> searchServiceReports (
 			ManualResponderRequestSearch search);
 
-	List<ManualResponderServiceReport> searchServiceReports (
+	List <Optional <ManualResponderServiceReport>> searchServiceReports (
 			ManualResponderRequestSearch search,
-			List<Long> ids);
+			List <Long> ids);
 
 	// operator report
 
 	Criteria searchOperatorReportCriteria (
 			ManualResponderRequestSearch search);
 
-	List<Long> searchOperatorReportIds (
+	List <Long> searchOperatorReportIds (
 			ManualResponderRequestSearch search);
 
-	List<ManualResponderOperatorReport> searchOperatorReports (
+	List <ManualResponderOperatorReport> searchOperatorReports (
 			ManualResponderRequestSearch search);
 
-	List<ManualResponderOperatorReport> searchOperatorReports (
+	List <Optional <ManualResponderOperatorReport>> searchOperatorReports (
 			ManualResponderRequestSearch search,
-			List<Long> ids);
+			List <Long> ids);
 
 }

@@ -5,6 +5,7 @@ import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
@@ -195,7 +196,7 @@ class QueueDebugPart
 			}
 
 			Record<?> queueParent =
-				objectManager.getParentOrNull (
+				objectManager.getParentRequired (
 					queueInfo.queue ());
 
 			ObjectTypeRec queueParentType =
@@ -470,7 +471,8 @@ class QueueDebugPart
 
 				formatWriter.writeLineFormat (
 					"Priority: %h<br>",
-					subjectInfo.priority ());
+					integerToDecimalString (
+						subjectInfo.priority ()));
 
 				formatWriter.writeLineFormat (
 					"Created time: %h<br>",

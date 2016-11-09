@@ -2,6 +2,7 @@ package wbs.console.supervisor;
 
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -506,7 +507,8 @@ class SupervisorPart
 
 			formatWriter.writeLineFormat (
 				"This day contains %h ",
-				hoursInDay,
+				integerToDecimalString (
+					hoursInDay),
 				"hours due to a time change from %h ",
 				consoleUserHelper.timezoneString (
 					startTime),

@@ -108,7 +108,8 @@ class ChatMessagePendingFormResponder
 
 			formatWriter.writeLineFormat (
 				"helpTemplates [%s] = '%j';",
-				chatHelpTemplate.getId (),
+				integerToDecimalString (
+					chatHelpTemplate.getId ()),
 				chatHelpTemplate.getText ());
 
 		}
@@ -244,7 +245,8 @@ class ChatMessagePendingFormResponder
 			" type=\"hidden\"",
 			" name=\"chat_message_id\"",
 			" value=\"%h\"",
-			chatMessage.getId (),
+			integerToDecimalString (
+				chatMessage.getId ()),
 			">");
 
 		// table open

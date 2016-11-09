@@ -1,5 +1,6 @@
 package wbs.apn.chat.user.image.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
@@ -68,7 +69,8 @@ class ChatUserImageRotatePart
 			" type=\"hidden\"",
 			" name=\"chatUserImageId\"",
 			" value=\"%h\"",
-			chatUser.getChatUserImageList ().get (0).getId (),
+			integerToDecimalString (
+				chatUser.getChatUserImageList ().get (0).getId ()),
 			">");
 
 		htmlTableOpenList ();

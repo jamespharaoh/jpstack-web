@@ -421,14 +421,10 @@ class ObjectSearchPageBuilder <
 				spec.objectTypeName ())
 		) {
 
-			@SuppressWarnings ("unchecked")
-			ConsoleHelper<ObjectType> consoleHelperTemp =
-				(ConsoleHelper<ObjectType>)
-				objectManager.findConsoleHelper (
-					spec.objectTypeName ());
-
 			consoleHelper =
-				consoleHelperTemp;
+				genericCastUnchecked (
+					objectManager.findConsoleHelperRequired (
+						spec.objectTypeName ()));
 
 		} else {
 

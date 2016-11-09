@@ -1,6 +1,7 @@
 package wbs.console.object;
 
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -146,14 +147,12 @@ class ExtendContextBuilder <
 		extensionPointName =
 			spec.extensionPointName ();
 
-		@SuppressWarnings ("unchecked")
 		ConsoleHelper <ObjectType> consoleHelperTemp =
 			ifNotNullThenElse (
 				spec.objectName (),
-				() ->
-					(ConsoleHelper <ObjectType>)
-					objectManager.findConsoleHelper (
-						spec.objectName ()),
+				() -> genericCastUnchecked (
+					objectManager.findConsoleHelperRequired (
+						spec.objectName ())),
 				() -> null);
 
 		consoleHelper =

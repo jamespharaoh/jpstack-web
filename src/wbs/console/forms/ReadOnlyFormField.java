@@ -172,7 +172,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -206,7 +206,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			name (),
 			" value=\"%h\"",
 			interfaceValue.isPresent ()
-				? interfaceValue.get ()
+				? interfaceValue.get ().toString ()
 				: "",
 			">\n");
 

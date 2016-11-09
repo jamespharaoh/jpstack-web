@@ -392,7 +392,7 @@ class ChatMessageLogicImplementation
 
 				log.info (
 					stringFormat (
-						"Cancelling previously queued message %d",
+						"Cancelling previously queued message %s",
 						integerToDecimalString (
 							oldMessage.getId ())));
 

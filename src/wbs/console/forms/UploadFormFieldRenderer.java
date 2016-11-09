@@ -2,6 +2,7 @@ package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -174,8 +175,8 @@ class UploadFormFieldRenderer <Container>
 	void renderHtmlSimple (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<FileUpload> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <FileUpload> interfaceValue,
 			boolean link) {
 
 		if (interfaceValue.isPresent ()) {
@@ -183,7 +184,8 @@ class UploadFormFieldRenderer <Container>
 			htmlWriter.writeFormat (
 				"%h (%h bytes)",
 				interfaceValue.get ().name (),
-				interfaceValue.get ().data ().length);
+				integerToDecimalString (
+					interfaceValue.get ().data ().length));
 
 		}
 

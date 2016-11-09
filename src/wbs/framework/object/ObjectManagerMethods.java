@@ -2,6 +2,7 @@ package wbs.framework.object;
 
 import static wbs.utils.etc.Misc.successOrThrowRuntimeException;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
@@ -29,6 +30,17 @@ interface ObjectManagerMethods {
 
 	Either <Optional <Record <?>>, String> getParentOrError (
 			Record <?> object);
+
+	default
+	Record <?> getParentRequired (
+			@NonNull Record <?> object) {
+
+		return optionalGetRequired (
+			successOrThrowRuntimeException (
+				getParentOrError (
+					object)));
+
+	}
 
 	@Deprecated
 	default

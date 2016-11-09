@@ -4,6 +4,7 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.mapEntry;
 import static wbs.utils.etc.NumberUtils.equalToZero;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
 
 import java.util.LinkedHashMap;
@@ -106,7 +107,8 @@ class IntegerStatsFormatter
 
 			formatWriter.writeFormat (
 				"<td style=\"text-align: right\">%h</td>\n",
-				value);
+				integerToDecimalString (
+					value));
 
 			return;
 
@@ -166,7 +168,8 @@ class IntegerStatsFormatter
 
 		formatWriter.writeFormat (
 			"%h</td>\n",
-			value);
+			integerToDecimalString (
+				value));
 
 	}
 
@@ -196,7 +199,8 @@ class IntegerStatsFormatter
 				"<td",
 				" style=\"text-align: right\"",
 				">%h</td>\n",
-				value);
+				integerToDecimalString (
+					value));
 
 		}
 

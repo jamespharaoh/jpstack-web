@@ -76,10 +76,8 @@ class ObjectSummaryFieldsPart <
 
 	void prepareParent () {
 
-		@SuppressWarnings ("unchecked")
-		ConsoleHelper<ParentType> parentHelper =
-			(ConsoleHelper<ParentType>)
-			objectManager.findConsoleHelper (
+		ConsoleHelper <ParentType> parentHelper =
+			objectManager.findConsoleHelperRequired (
 				consoleHelper.parentClass ());
 
 		if (parentHelper.isRoot ()) {

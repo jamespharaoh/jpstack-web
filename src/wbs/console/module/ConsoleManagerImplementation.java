@@ -1161,7 +1161,7 @@ class ConsoleManagerImplementation
 			@NonNull ConsoleContextStuff contextStuff) {
 
 		ConsoleHelper <?> consoleHelper =
-			objectManager.findConsoleHelper (
+			objectManager.findConsoleHelperRequired (
 				name);
 
 		ConsoleHelperProvider <?> consoleHelperProvider =

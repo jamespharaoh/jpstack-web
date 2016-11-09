@@ -114,7 +114,7 @@ class HtmlAttributeUtils {
 	public static
 	HtmlAttribute htmlAttributeFormat (
 			@NonNull String name,
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		return new HtmlAttribute ()
 
@@ -145,7 +145,7 @@ class HtmlAttributeUtils {
 
 	public static
 	HtmlAttribute htmlIdAttributeFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		return new HtmlAttribute ()
 
@@ -320,7 +320,7 @@ class HtmlAttributeUtils {
 	public static
 	HtmlAttribute htmlDataAttributeFormat (
 			@NonNull String name,
-			@NonNull Object ... value) {
+			@NonNull String ... value) {
 
 		return new HtmlAttribute ()
 

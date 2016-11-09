@@ -2,6 +2,7 @@ package wbs.framework.hibernate;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.sql.Connection;
@@ -10,16 +11,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.Hibernate;
-import org.hibernate.Session;
-import org.hibernate.jdbc.ReturningWork;
-import org.joda.time.Instant;
-
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
+
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.jdbc.ReturningWork;
+import org.joda.time.Instant;
+
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.database.Transaction;
 import wbs.framework.database.WbsConnection;
@@ -111,8 +113,9 @@ class HibernateTransaction
 
 		log.debug (
 			stringFormat (
-				"BEGIN %d %s",
-				id,
+				"BEGIN %s %s",
+				integerToDecimalString (
+					id),
 				isReadWrite
 					? "rw"
 					: "ro"));
@@ -235,8 +238,9 @@ class HibernateTransaction
 
 		log.debug (
 			stringFormat (
-				"COMMIT %d %s",
-				id,
+				"COMMIT %s %s",
+				integerToDecimalString (
+					id),
 				isReadWrite
 					? "rw"
 					: "ro"));
@@ -314,8 +318,9 @@ class HibernateTransaction
 
 				log.debug (
 					stringFormat (
-						"ROLLBACK %d %s",
-						id,
+						"ROLLBACK %s %s",
+						integerToDecimalString (
+							id),
 						isReadWrite
 							? "rw"
 							: "ro"));

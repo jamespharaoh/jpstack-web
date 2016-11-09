@@ -135,7 +135,7 @@ class ObjectSearchPart <
 		if (consoleHelper.parentExists ()) {
 
 			ConsoleHelper <?> parentHelper =
-				objectManager.findConsoleHelper (
+				objectManager.findConsoleHelperRequired (
 					consoleHelper.parentClass ());
 
 			Long parentId =

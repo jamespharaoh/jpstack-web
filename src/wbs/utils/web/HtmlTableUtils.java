@@ -1,5 +1,6 @@
 package wbs.utils.web;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 import static wbs.utils.web.HtmlAttributeUtils.htmlAttributesWrite;
@@ -59,7 +60,8 @@ class HtmlTableUtils {
 
 					formatWriter.writeLineFormat (
 						"<th colspan=\"%h\">%h</th>",
-						currentColumnSpan,
+						integerToDecimalString (
+							currentColumnSpan),
 						currentLabel);
 
 				} else {
@@ -87,7 +89,8 @@ class HtmlTableUtils {
 
 			formatWriter.writeLineFormat (
 				"<th colspan=\"%h\">%h</th>",
-				currentColumnSpan,
+				integerToDecimalString (
+					currentColumnSpan),
 				currentLabel);
 
 		} else {
@@ -584,7 +587,7 @@ class HtmlTableUtils {
 	public static
 	void htmlTableCellWriteFormat (
 			@NonNull FormatWriter formatWriter,
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		formatWriter.writeLineFormat (
 			"<td>%s</td>",
@@ -595,7 +598,7 @@ class HtmlTableUtils {
 
 	public static
 	void htmlTableCellWriteFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		htmlTableCellWriteFormat (
 			currentFormatWriter (),

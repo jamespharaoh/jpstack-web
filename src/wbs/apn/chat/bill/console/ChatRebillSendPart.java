@@ -4,6 +4,7 @@ import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -248,8 +249,9 @@ class ChatRebillSendPart
 
 		htmlParagraphWriteFormat (
 			"Found %s users who qualify for rebilling under the criteria ",
-			collectionSize (
-				billSearchResults.get ()),
+			integerToDecimalString (
+				collectionSize (
+					billSearchResults.get ())),
 			"specified. Please note that these results are not saved and so ",
 			"the list of actual users billed may be slightly different.");
 
@@ -265,8 +267,9 @@ class ChatRebillSendPart
 
 			htmlParagraphWriteFormat (
 				"Another %s users who did not meet the requirements for ",
-				collectionSize (
-					nonBillSearchResults.get ()),
+				integerToDecimalString (
+					collectionSize (
+						nonBillSearchResults.get ())),
 				"rebilling are shown further down the page.");
 
 		}
@@ -299,8 +302,9 @@ class ChatRebillSendPart
 
 		htmlParagraphWriteFormat (
 			"Found %s users who match the search criteria but who are not ",
-			collectionSize (
-				nonBillSearchResults.get ()),
+			integerToDecimalString (
+				collectionSize (
+					nonBillSearchResults.get ())),
 			"able to be be billed at this time, due to restrictions that are ",
 			"built into the system. Some of these may be bypassed with ",
 			"settings on the search form.");

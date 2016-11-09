@@ -707,11 +707,11 @@ class ChatDateDaemon
 
 		taskLogger.debugFormat (
 
-			"Updated %d: ",
+			"Updated %s: ",
 			integerToDecimalString (
 				thisUser.getId ()),
 
-			"dailyCount %d to %d, ",
+			"dailyCount %s to %s, ",
 			integerToDecimalString (
 				oldDailyCount),
 			integerToDecimalString (
@@ -875,22 +875,27 @@ class ChatDateDaemon
 		}
 
 		taskLogger.noticeFormat (
-			"Dating user %s: %d blocked, %d incompatible, %d no photo, %d" +
-			" already sent, %d no location, %d too far, %d remain",
+			"Dating user %s: %s blocked, ",
 			integerToDecimalString (
 				thisUser.getId ()),
 			integerToDecimalString (
 				dateUserStats.numBlocked),
+			"%s incompatible, ",
 			integerToDecimalString (
 				dateUserStats.numIncompatible),
+			"%s no photo, ",
 			integerToDecimalString (
-				dateUserStats.numNoPhoto),
+				dateUserStats.numIncompatible),
+			"%s already sent, ",
 			integerToDecimalString (
-				dateUserStats.numAlreadySent),
+				dateUserStats.numIncompatible),
+			"%s no location, ",
 			integerToDecimalString (
-				dateUserStats.numNoLocation),
+				dateUserStats.numIncompatible),
+			"%s too far, ",
 			integerToDecimalString (
-				dateUserStats.numTooFar),
+				dateUserStats.numIncompatible),
+			"%s remain",
 			integerToDecimalString (
 				dateUserStats.numOk));
 

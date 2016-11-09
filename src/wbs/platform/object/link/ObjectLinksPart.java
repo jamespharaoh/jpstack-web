@@ -1,5 +1,7 @@
 package wbs.platform.object.link;
 
+import static wbs.utils.etc.LogicUtils.booleanToTrueFalse;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
@@ -237,10 +239,11 @@ class ObjectLinksPart <
 				" type=\"hidden\"",
 				" name=\"old_link\"",
 				" value=\"%h,%h\"",
-				targetObject.getId (),
-				contextLinks.contains (targetObject)
-					? "true"
-					: "false",
+				integerToDecimalString (
+					targetObject.getId ()),
+				booleanToTrueFalse (
+					contextLinks.contains (
+						targetObject)),
 				">");
 
 		}

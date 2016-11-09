@@ -10,7 +10,7 @@ class StackFrame {
 		new ThreadLocal<> ();
 
 	StackFrame parentFrame;
-	Object[] args;
+	String [] args;
 
 	public
 	void close () {
@@ -42,7 +42,7 @@ class StackFrame {
 
 	public static
 	StackFrame enter (
-			Object... args) {
+			String ... args) {
 
 		StackFrame oldFrame =
 			stackFrameThreadLocal.get ();

@@ -1,5 +1,6 @@
 package wbs.platform.user.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.web.HtmlAttributeUtils.htmlAttributeFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
@@ -113,7 +114,7 @@ class UserPrivsEditorPart
 				continue;
 
 			Record <?> parentObject =
-				objectManager.getParentOrNull (
+				objectManager.getParentRequired (
 					priv);
 
 			PrivsEditorNode parentNode =
@@ -198,8 +199,9 @@ class UserPrivsEditorPart
 
 		// find the parent node by recursion
 
-		Record<?> parent =
-			objectManager.getParentOrNull (object);
+		Record <?> parent =
+			objectManager.getParentRequired (
+				object);
 
 		PrivsEditorNode parentNode =
 			findNode (parent);
@@ -480,7 +482,8 @@ class UserPrivsEditorPart
 				groupPrivIds.contains (priv.getId ())
 					? "1"
 					: "0",
-				priv.getId ());
+				integerToDecimalString (
+					priv.getId ()));
 
 		}
 

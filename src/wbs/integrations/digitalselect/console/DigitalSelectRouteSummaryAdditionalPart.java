@@ -1,6 +1,7 @@
 package wbs.integrations.digitalselect.console;
 
 import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
@@ -94,8 +95,9 @@ class DigitalSelectRouteSummaryAdditionalPart
 					wbsConfig.apiUrl (),
 					"/digitalselect",
 					"/route",
-					"/%d",
-					route.getId (),
+					"/%s",
+					integerToDecimalString (
+						route.getId ()),
 					"/report"));
 
 		}

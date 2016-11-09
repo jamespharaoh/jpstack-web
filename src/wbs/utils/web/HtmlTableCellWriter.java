@@ -1,5 +1,6 @@
 package wbs.utils.web;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanOne;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -140,7 +141,8 @@ class HtmlTableCellWriter {
 
 			formatWriter.writeFormat (
 				" colspan=\"%h\"",
-				columnSpan.get ());
+				integerToDecimalString (
+					columnSpan.get ()));
 
 		}
 

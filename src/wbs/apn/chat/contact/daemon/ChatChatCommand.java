@@ -263,10 +263,10 @@ class ChatChatCommand
 
 			log.warn (
 				stringFormat (
-					"Message %d ",
+					"Message %s ",
 					integerToDecimalString (
 						inbox.getId ()),
-					"ignored as recipient user id %d ",
+					"ignored as recipient user id %s ",
 					integerToDecimalString (
 						commandRef.get ()),
 					"does not exist"));
@@ -399,7 +399,7 @@ class ChatChatCommand
 
 		log.warn (
 			stringFormat (
-				"Chat request from unjoined user %d",
+				"Chat request from unjoined user %s",
 				integerToDecimalString (
 					fromChatUser.getId ())));
 

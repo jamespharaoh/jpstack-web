@@ -2,6 +2,7 @@ package wbs.console.object;
 
 import static wbs.utils.etc.Misc.maybeList;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
@@ -500,14 +501,10 @@ class ObjectContextBuilder <
 
 	void setDefaults () {
 
-		@SuppressWarnings ("unchecked")
-		ConsoleHelper <ObjectType> consoleHelperTemp =
-			(ConsoleHelper <ObjectType>)
-			objectManager.findConsoleHelper (
-				spec.objectName ());
-
 		consoleHelper =
-			consoleHelperTemp;
+			genericCastUnchecked (
+				objectManager.findConsoleHelperRequired (
+					spec.objectName ()));
 
 		name =
 			spec.name ();

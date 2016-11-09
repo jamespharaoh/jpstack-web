@@ -1,6 +1,7 @@
 package wbs.apn.chat.broadcast.console;
 
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.web.HtmlBlockUtils.htmlHeadingThreeWrite;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
@@ -351,8 +352,9 @@ class ChatBroadcastVerifyPart
 		htmlParagraphOpen ();
 
 		formatWriter.writeLineFormat (
-			"%d recipients in total.",
-			chatUserIds.size ());
+			"%s recipients in total.",
+			integerToDecimalString (
+				chatUserIds.size ()));
 
 		if (form.search ()) {
 

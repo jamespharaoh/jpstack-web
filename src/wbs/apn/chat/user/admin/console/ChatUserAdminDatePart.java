@@ -230,8 +230,10 @@ class ChatUserAdminDatePart
 
 			htmlTableCellWriteFormat (
 				"%s–%s",
-				chatUserDateLogRec.getStartHour (),
-				chatUserDateLogRec.getEndHour ());
+				integerToDecimalString (
+					chatUserDateLogRec.getStartHour ()),
+				integerToDecimalString (
+					chatUserDateLogRec.getEndHour ()));
 
 			htmlTableCellWrite (
 				integerToDecimalString (

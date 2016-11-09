@@ -218,7 +218,7 @@ class ChatMonitorInboxFormAction
 
 				requestContext.addError (
 					stringFormat (
-						"Message text is too short (minimum %d)",
+						"Message text is too short (minimum %s)",
 						integerToDecimalString (
 							chat.getMinMonitorMessageLength ())));
 

@@ -3,6 +3,7 @@ package wbs.imchat.console;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -313,8 +314,9 @@ class ImChatPendingSummaryPart
 						: "")),
 			htmlIdAttribute (
 				stringFormat (
-					"im-chat-customer-note-%d",
-					customer.getId ())),
+					"im-chat-customer-note-%s",
+					integerToDecimalString (
+						customer.getId ()))),
 			htmlClassAttribute (
 				"im-chat-customer-note-editable"));
 

@@ -40,13 +40,13 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 
 	@Override
 	public
-	Optional<Native> read (
+	Optional <Native> read (
 			@NonNull Container container) {
 
 		// get field name
 
-		ConsoleHelper<?> consoleHelper =
-			objectManager.findConsoleHelper (
+		ConsoleHelper <?> consoleHelper =
+			objectManager.findConsoleHelperRequired (
 				container);
 
 		ModelField modelField =
@@ -107,8 +107,8 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 
 		// get field name
 
-		ConsoleHelper<?> consoleHelper =
-			objectManager.findConsoleHelper (
+		ConsoleHelper <?> consoleHelper =
+			objectManager.findConsoleHelperRequired (
 				container);
 
 		ModelField modelField =

@@ -1,6 +1,7 @@
 package wbs.apn.chat.user.core.console;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.Misc.sum;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -265,9 +266,9 @@ class ChatUserSearchOldResultsPart
 
 			pageBuilder.writer ().writeFormat (
 				"<td>%h</td>\n",
-				ifNull (
+				ifNotNullThenElseEmDash (
 					chatUser.getInfoText (),
-					"-"));
+					() -> chatUser.getInfoText ().getText ()));
 
 			pageBuilder.writer ().writeFormat (
 				"</tr>\n");
@@ -347,12 +348,12 @@ class ChatUserSearchOldResultsPart
 				"<tr",
 				" class=\"magic-table-row\"",
 				" data-target-href=\"%h\"",
-				requestContext.resolveContextUrl (
-					stringFormat (
-						"/chatUser",
-						"/%u",
-						chatUser.getId (),
-						"/chatUser.summary")),
+				requestContext.resolveContextUrlFormat (
+					"/chatUser",
+					"/%u",
+					integerToDecimalString (
+						chatUser.getId ()),
+					"/chatUser.summary"),
 				">\n");
 
 			pageBuilder.writer ().writeFormat (
@@ -417,19 +418,23 @@ class ChatUserSearchOldResultsPart
 
 			pageBuilder.writer ().writeFormat (
 				"<td style=\"text-align: right\">%h</td>\n",
-				percentagerIterator.next ());
+				integerToDecimalString (
+					percentagerIterator.next ()));
 
 			pageBuilder.writer ().writeFormat (
 				"<td style=\"text-align: right\">%h</td>\n",
-				percentagerIterator.next ());
+				integerToDecimalString (
+					percentagerIterator.next ()));
 
 			pageBuilder.writer ().writeFormat (
 				"<td style=\"text-align: right\">%h</td>\n",
-				percentagerIterator.next ());
+				integerToDecimalString (
+					percentagerIterator.next ()));
 
 			pageBuilder.writer ().writeFormat (
 				"<td style=\"text-align: right\">%h</td>\n",
-				percentagerIterator.next ());
+				integerToDecimalString (
+					percentagerIterator.next ()));
 
 			pageBuilder.writer ().writeFormat (
 				"</tr>\n");

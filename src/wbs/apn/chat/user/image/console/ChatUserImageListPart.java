@@ -1,5 +1,7 @@
 package wbs.apn.chat.user.image.console;
 
+import static wbs.utils.etc.EnumUtils.enumName;
+import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.toEnum;
@@ -106,7 +108,8 @@ class ChatUserImageListPart
 			throw new RuntimeException (
 				stringFormat (
 					"Unknown chat user image type: %s",
-					type));
+					enumNameSpaces (
+						type)));
 
 		}
 
@@ -186,9 +189,11 @@ class ChatUserImageListPart
 				requestContext.resolveLocalUrl (
 					stringFormat (
 						"/chatUser.%u.view",
-						type.toString (),
+						enumName (
+							type),
 						"?chatUserImageId=%u",
-						chatUserImage.getId ())),
+						integerToDecimalString (
+							chatUserImage.getId ()))),
 				() -> ifNotNullThenElse (
 					chatUserImage.getMedia (),
 					() -> mediaConsoleLogic.writeMediaThumb100 (
@@ -216,7 +221,8 @@ class ChatUserImageListPart
 				"<input",
 				" type=\"submit\"",
 				" name=\"remove_%h\"",
-				index,
+				integerToDecimalString (
+					index),
 				" value=\"X\"",
 				">");
 
@@ -224,7 +230,8 @@ class ChatUserImageListPart
 				"<input",
 				" type=\"submit\"",
 				" name=\"rotate_ccw_%h\"",
-				index,
+				integerToDecimalString (
+					index),
 				" value=\"&#x21b6;\"",
 				">");
 
@@ -232,7 +239,8 @@ class ChatUserImageListPart
 				"<input",
 				" type=\"submit\"",
 				" name=\"rotate_cw_%h\"",
-				index,
+				integerToDecimalString (
+					index),
 				" value=\"&#x21b7;\"",
 				">");
 
@@ -240,7 +248,8 @@ class ChatUserImageListPart
 				"<input",
 				" type=\"submit\"",
 				" name=\"move_up_%h\"",
-				index,
+				integerToDecimalString (
+					index),
 				" value=\"&#x2191;\"",
 				">");
 
@@ -248,7 +257,8 @@ class ChatUserImageListPart
 				"<input",
 				" type=\"submit\"",
 				" name=\"move_down_%h\"",
-				index,
+				integerToDecimalString (
+					index),
 				" value=\"&#x2193;\"",
 				">");
 
@@ -256,7 +266,8 @@ class ChatUserImageListPart
 				"<input",
 				" type=\"submit\"",
 				" name=\"select_%h\"",
-				index,
+				integerToDecimalString (
+					index),
 				" value=\"S\"",
 				">");
 

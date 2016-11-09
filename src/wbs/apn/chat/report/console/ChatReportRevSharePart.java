@@ -1,5 +1,6 @@
 package wbs.apn.chat.report.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
@@ -316,10 +317,10 @@ class ChatReportRevSharePart
 					errorRoutes.add (
 						route.getId ());
 
-					consoleRequestContext.addError (
-						stringFormat (
-							"Unknown route: %s (%d)",
-							route.getCode (),
+					consoleRequestContext.addErrorFormat (
+						"Unknown route: %s (%s)",
+						route.getCode (),
+						integerToDecimalString (
 							route.getId ()));
 
 				}

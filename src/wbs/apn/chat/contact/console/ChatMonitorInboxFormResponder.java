@@ -294,14 +294,14 @@ class ChatMonitorInboxFormResponder
 				" rows=\"4\"",
 				" onkeyup=\"%h\"",
 				stringFormat (
-					"gsmCharCountMultiple2 (this, %s, %d);",
+					"gsmCharCountMultiple2 (this, %s, %s);",
 					"document.getElementById ('chars')",
 					integerToDecimalString (
 						ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH
 						* ChatMonitorInboxConsoleLogic.MAX_OUT_MONITOR_MESSAGES)),
 				" onfocus=\"%h\"",
 				stringFormat (
-					"gsmCharCountMultiple2 (this, %s, %d);",
+					"gsmCharCountMultiple2 (this, %s, %s);",
 					"document.getElementById ('chars')",
 					integerToDecimalString (
 						ChatMonitorInboxConsoleLogic.SINGLE_MESSAGE_LENGTH

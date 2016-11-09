@@ -212,8 +212,9 @@ class ChatUserPendingFormResponder
 		) {
 
 			formatWriter.writeLineFormat (
-				"chatHelpTemplates[%s] = '%j';",
-				chatHelpTemplate.getId (),
+				"chatHelpTemplates [%s] = '%j';",
+				integerToDecimalString (
+					chatHelpTemplate.getId ()),
 				chatHelpTemplate.getText ());
 
 		}

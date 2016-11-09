@@ -3,8 +3,11 @@ package wbs.console.helper.manager;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrDefault;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isSubclassOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -84,31 +87,19 @@ class ConsoleObjectManagerImplementation
 	// implementation
 
 	@Override
-	public
-	ConsoleHelper <?> findConsoleHelper (
+	public <RecordType extends Record <RecordType>>
+	Optional <ConsoleHelper <RecordType>> findConsoleHelper (
 			@NonNull Record <?> dataObject) {
 
-		ConsoleHelper <?> objectHelper =
-			findConsoleHelper (
-				dataObject.getClass ());
-
-		if (objectHelper == null) {
-
-			throw new IllegalArgumentException (
-				stringFormat (
-					"No console object helper for %s",
-					dataObject.getClass ().getName ()));
-
-		}
-
-		return objectHelper;
+		return findConsoleHelper (
+			dataObject.getClass ());
 
 	}
 
 	@Override
-	public <ObjectType extends Record <ObjectType>>
-	ConsoleHelper <ObjectType> findConsoleHelper (
-			@NonNull Class<?> objectClass) {
+	public <RecordType extends Record <RecordType>>
+	Optional <ConsoleHelper <RecordType>> findConsoleHelper (
+			@NonNull Class <?> objectClass) {
 
 		Class <?> tempClass =
 			objectClass;
@@ -119,9 +110,7 @@ class ConsoleObjectManagerImplementation
 				tempClass)
 		) {
 
-			@SuppressWarnings ("unchecked")
-			ConsoleHelper <ObjectType> consoleHelper =
-				(ConsoleHelper <ObjectType>)
+			ConsoleHelper <?> consoleHelper =
 				consoleHelpersByObjectClass.get (
 					tempClass);
 
@@ -130,7 +119,9 @@ class ConsoleObjectManagerImplementation
 					consoleHelper)
 			) {
 
-				return consoleHelper;
+				return optionalOf (
+					genericCastUnchecked (
+						consoleHelper));
 
 			}
 
@@ -139,17 +130,18 @@ class ConsoleObjectManagerImplementation
 
 		}
 
-		return null;
+		return optionalAbsent ();
 
 	}
 
 	@Override
 	public
-	ConsoleHelper<?> findConsoleHelper (
+	Optional <ConsoleHelper <?>> findConsoleHelper (
 			@NonNull String objectTypeName) {
 
-		return consoleHelpersByObjectName.get (
-			objectTypeName);
+		return optionalFromNullable (
+			consoleHelpersByObjectName.get (
+				objectTypeName));
 
 	}
 
@@ -164,7 +156,7 @@ class ConsoleObjectManagerImplementation
 			@NonNull Long colspan) {
 
 		ConsoleHelper <?> objectHelper =
-			findConsoleHelper (
+			findConsoleHelperRequired (
 				object);
 
 		String path =
@@ -237,7 +229,7 @@ class ConsoleObjectManagerImplementation
 		}
 
 		ConsoleHelper <?> objectHelper =
-			findConsoleHelper (
+			findConsoleHelperRequired (
 				object);
 
 		objectHelper.writeHtmlGeneric (
@@ -300,10 +292,10 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	boolean canView (
-			Record<?> object) {
+			@NonNull Record <?> object) {
 
-		ConsoleHelper<?> objectHelper =
-			findConsoleHelper (
+		ConsoleHelper <?> objectHelper =
+			findConsoleHelperRequired (
 				object);
 
 		return objectHelper.canViewGeneric (
@@ -314,10 +306,11 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String contextName (
-			Record <?> object) {
+			@NonNull Record <?> object) {
 
 		ConsoleHelper<?> objectHelper =
-			findConsoleHelper (object);
+			findConsoleHelperRequired (
+				object);
 
 		if (objectHelper.typeCodeExists ()) {
 
@@ -338,10 +331,10 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String contextLink (
-			Record <?> object) {
+			@NonNull Record <?> object) {
 
 		ConsoleHelper <?> objectHelper =
-			findConsoleHelper (
+			findConsoleHelperRequired (
 				object);
 
 		return requestContext.resolveContextUrl (
@@ -353,10 +346,10 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String localLink (
-			Record <?> object) {
+			@NonNull Record <?> object) {
 
 		ConsoleHelper <?> objectHelper =
-			findConsoleHelper (
+			findConsoleHelperRequired (
 				object);
 
 		return requestContext.resolveLocalUrl (

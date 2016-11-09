@@ -1,21 +1,14 @@
 package wbs.utils.string;
 
-import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NullUtils.nullIf;
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.etc.TypeUtils.isInstanceOf;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
 
 import com.google.common.base.Optional;
 
@@ -1059,16 +1052,6 @@ class StringUtils {
 
 		return StringFormatter.standardArray (
 			arguments);
-
-	}
-
-	@Deprecated
-	public static
-	String stringFormatArray (
-			Object[] args) {
-
-		return stringFormat (
-			args);
 
 	}
 

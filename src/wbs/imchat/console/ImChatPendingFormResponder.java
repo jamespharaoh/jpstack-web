@@ -492,12 +492,14 @@ class ImChatPendingFormResponder
 		formatWriter.writeLineFormat (
 			"<input",
 			" id=\"radio-template-%h\"",
-			template.getId (),
+			integerToDecimalString (
+				template.getId ()),
 			" class=\"template-radio\"",
 			" type=\"radio\"",
 			" name=\"template\"",
 			" value=\"%h\"",
-			template.getId (),
+			integerToDecimalString (
+				template.getId ()),
 			">");
 
 		htmlTableCellClose ();

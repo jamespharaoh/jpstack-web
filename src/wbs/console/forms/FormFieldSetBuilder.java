@@ -1,6 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.TypeUtils.classForNameOrThrow;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -82,13 +83,12 @@ class FormFieldSetBuilder <Container> {
 		if (spec.objectName () != null) {
 
 			consoleHelper =
-				objectManager.findConsoleHelper (
+				objectManager.findConsoleHelperRequired (
 					spec.objectName ());
 
-			@SuppressWarnings ("unchecked")
 			Class <Container> containerClassTemp =
-				(Class <Container>)
-				consoleHelper.objectClass ();
+				genericCastUnchecked (
+					consoleHelper.objectClass ());
 
 			containerClass =
 				containerClassTemp;

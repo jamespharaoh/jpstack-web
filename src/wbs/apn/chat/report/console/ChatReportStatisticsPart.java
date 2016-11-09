@@ -188,7 +188,8 @@ class ChatReportStatisticsPart
 
 			htmlParagraphWriteFormat (
 				"Number of affiliates: %h",
-				numAffiliates);
+				integerToDecimalString (
+					numAffiliates));
 
 		}
 

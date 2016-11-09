@@ -289,8 +289,8 @@ class ObjectLinksPageBuilder <
 				spec.linksFieldName ());
 
 		targetConsoleHelper =
-			objectManager.findConsoleHelper (
-				(Class<?>)
+			objectManager.findConsoleHelperRequired (
+				(Class <?>)
 				linksField.collectionValueType ());
 
 		targetLinksField =

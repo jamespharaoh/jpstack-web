@@ -11,7 +11,6 @@ import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
 import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
@@ -19,6 +18,7 @@ import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
 import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
 import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
 import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
@@ -248,12 +248,12 @@ class ManualResponderRequestPendingFormResponder
 		}
 
 		summaryUrl =
-			requestContext.resolveApplicationUrl (
-				stringFormat (
-					"/manualResponderRequest.pending",
-					"/%u",
-					request.getId (),
-					"/manualResponderRequest.pending.summary"));
+			requestContext.resolveApplicationUrlFormat (
+				"/manualResponderRequest.pending",
+				"/%u",
+				integerToDecimalString (
+					request.getId ()),
+				"/manualResponderRequest.pending.summary");
 
 		manager =
 			privChecker.canRecursive (
@@ -362,12 +362,12 @@ class ManualResponderRequestPendingFormResponder
 		// form open
 
 		htmlFormOpenPostAction (
-			requestContext.resolveApplicationUrl (
-				stringFormat (
-					"/manualResponderRequest.pending",
-					"/%u",
-					request.getId (),
-					"/manualResponderRequest.pending.form")),
+			requestContext.resolveApplicationUrlFormat (
+				"/manualResponderRequest.pending",
+				"/%u",
+				integerToDecimalString (
+					request.getId ()),
+				"/manualResponderRequest.pending.form"),
 			htmlClassAttribute (
 				"manual-responder-request-pending-form"));
 
@@ -548,7 +548,8 @@ class ManualResponderRequestPendingFormResponder
 			" type=\"radio\"",
 			" name=\"template-id\"",
 			" value=\"%h\"",
-			template.getId (),
+			integerToDecimalString (
+				template.getId ()),
 			selected
 				? " checked"
 				: "",
@@ -588,7 +589,8 @@ class ManualResponderRequestPendingFormResponder
 				" style=\"display: none\"",
 
 				" name=\"message-%h\"",
-				template.getId (),
+				integerToDecimalString (
+					template.getId ()),
 
 				" rows=\"3\"",
 				" cols=\"48\"",
@@ -701,7 +703,7 @@ class ManualResponderRequestPendingFormResponder
 	private
 	void goNoTemplates () {
 
-		htmlParagraphWriteFormat (
+		htmlParagraphWrite (
 			"No templates specified for this manual responder",
 			htmlClassAttribute (
 				"error"));

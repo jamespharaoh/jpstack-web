@@ -2,6 +2,7 @@ package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalValueEqualSafe;
@@ -152,8 +153,8 @@ class ObjectFormFieldBuilder {
 		) {
 
 			consoleHelper =
-				Optional.fromNullable (
-					objectManager.findConsoleHelper (
+				optionalOf (
+					objectManager.findConsoleHelperRequired (
 						spec.objectTypeName ()));
 
 			if (
@@ -171,7 +172,7 @@ class ObjectFormFieldBuilder {
 		} else {
 
 			consoleHelper =
-				Optional.<ConsoleHelper<?>>absent ();
+				optionalAbsent ();
 
 		}
 

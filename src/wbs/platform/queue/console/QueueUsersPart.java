@@ -90,13 +90,17 @@ class QueueUsersPart
 			QueueRec queue =
 				queueItem.getQueue ();
 
-			Record<?> parent =
-				objectManager.getParentOrNull (queue);
+			Record <?> parent =
+				objectManager.getParentRequired (
+					queue);
 
-			if (! privChecker.canRecursive (
+			if (
+				! privChecker.canRecursive (
 					parent,
-					"manage"))
+					"manage")
+			) {
 				continue;
+			}
 
 			Instant createdTime =
 				queueItem.getCreatedTime ();
@@ -188,7 +192,8 @@ class QueueUsersPart
 					" type=\"hidden\"",
 					" name=\"userId\"",
 					" value=\"%h\"",
-					userData.user.getId (),
+					integerToDecimalString (
+						userData.user.getId ()),
 					">");
 
 				formatWriter.writeLineFormat (
@@ -215,7 +220,8 @@ class QueueUsersPart
 				" type=\"hidden\"",
 				" name=\"userId\"",
 				" value=\"%h\"",
-				userData.user.getId (),
+				integerToDecimalString (
+					userData.user.getId ()),
 				">");
 
 			formatWriter.writeLineFormat (

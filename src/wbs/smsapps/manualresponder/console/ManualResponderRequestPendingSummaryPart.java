@@ -6,6 +6,7 @@ import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
 import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
@@ -598,8 +599,9 @@ class ManualResponderRequestPendingSummaryPart
 			"<p",
 			" id=\"%h\"",
 			stringFormat (
-				"manualResponderNumberNote%d",
-				manualResponderRequest.getNumber ().getId ()),
+				"manualResponderNumberNote%s",
+				integerToDecimalString (
+					manualResponderRequest.getNumber ().getId ())),
 			" class=\"mrNumberNoteEditable\"",
 			">%s</p>",
 			HtmlUtils.newlineToBr (

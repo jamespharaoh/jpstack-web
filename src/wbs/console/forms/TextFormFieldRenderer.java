@@ -3,6 +3,7 @@ package wbs.console.forms;
 import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
 import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -139,7 +140,8 @@ class TextFormFieldRenderer <Container>
 				: interfaceValue.or (
 					""),
 			" size=\"%h\"",
-			size,
+			integerToDecimalString (
+				size),
 			">");
 
 		if (

@@ -101,7 +101,7 @@ class ConsoleHelperImplementation <
 	String getDefaultLocalPath (
 			@NonNull RecordType object) {
 
-		return consoleHelperProvider.getDefaultContextPath (
+		return consoleHelperProvider.localPath (
 			object);
 
 	}

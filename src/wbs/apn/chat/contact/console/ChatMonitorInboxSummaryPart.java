@@ -1,6 +1,7 @@
 package wbs.apn.chat.contact.console;
 
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.LogicUtils.ifNotEmptyThenElse;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
@@ -9,7 +10,6 @@ import static wbs.utils.etc.LogicUtils.ifNullThenEmDash;
 import static wbs.utils.etc.LogicUtils.ifThenElseEmDash;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
-import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.ifPresentThenElse;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
@@ -418,7 +418,8 @@ class ChatMonitorInboxSummaryPart
 				"<p style=\"background: #ff99cc;\">This user is NOT adult ",
 				"verified. Please do not send them any adult content. ",
 				"%h rejections.</p>",
-				userChatUser.getRejectionCount ());
+				integerToDecimalString (
+					userChatUser.getRejectionCount ()));
 
 		}
 
@@ -463,19 +464,31 @@ class ChatMonitorInboxSummaryPart
 
 		htmlTableCellWriteFormat (
 			"%s %s (%s)",
-			ifNull (monitorChatUser.getOrient (), "unknown"),
-			ifNull (monitorChatUser.getGender (), "something"),
-			monitorChatUser.getCategory () != null
-				? monitorChatUser.getCategory ().getName ()
-				: "no category");
+			ifNotNullThenElseEmDash (
+				monitorChatUser.getOrient (),
+				() -> enumName (
+					monitorChatUser.getOrient ())),
+			ifNotNullThenElseEmDash (
+				monitorChatUser.getGender (),
+				() -> enumName (
+					monitorChatUser.getGender ())),
+			ifNotNullThenElseEmDash (
+				monitorChatUser.getCategory (),
+				() -> monitorChatUser.getCategory ().getName ()));
 
 		htmlTableCellWriteFormat (
 			"%s %s (%s)",
-			ifNull (userChatUser.getOrient (), "unknown"),
-			ifNull (userChatUser.getGender (), "something"),
-			userChatUser.getCategory () != null
-				? userChatUser.getCategory ().getName ()
-				: "no category");
+			ifNotNullThenElseEmDash (
+				userChatUser.getOrient (),
+				() -> enumName (
+					userChatUser.getOrient ())),
+			ifNotNullThenElseEmDash (
+				userChatUser.getGender (),
+				() -> enumName (
+					userChatUser.getOrient ())),
+			ifNotNullThenElseEmDash (
+				userChatUser.getCategory (),
+				() -> userChatUser.getCategory ().getName ()));
 
 		htmlTableRowClose ();
 
@@ -733,7 +746,7 @@ class ChatMonitorInboxSummaryPart
 
 		String key =
 			stringFormat (
-				"namedNote%d%s",
+				"namedNote%s%s",
 				integerToDecimalString (
 					noteName.getId ()),
 				type);
@@ -837,7 +850,8 @@ class ChatMonitorInboxSummaryPart
 				" type=\"hidden\"",
 				" name=\"id\"",
 				" value=\"%h\"",
-				note.getId (),
+				integerToDecimalString (
+					note.getId ()),
 				">");
 
 			formatWriter.writeLineFormat (

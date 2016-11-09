@@ -569,7 +569,8 @@ class QueueHomeResponder
 				" type=\"hidden\"",
 				" name=\"queue_id\"",
 				" value=\"%h\"",
-				queue.getId (),
+				integerToDecimalString (
+					queue.getId ()),
 				">");
 
 			formatWriter.writeLineFormat (
@@ -609,7 +610,7 @@ class QueueHomeResponder
 
 			if (
 				privChecker.canRecursive (
-					objectManager.getParentOrNull (
+					objectManager.getParentRequired (
 						queueInfo.queue ()),
 					"supervisor")
 			) {
@@ -692,15 +693,16 @@ class QueueHomeResponder
 					"magic-table-row",
 					stringFormat (
 						"queue-%h",
-						queue.getId ())),
+						integerToDecimalString (
+							queue.getId ()))),
 
 				htmlDataAttribute (
 					"target-href",
-					requestContext.resolveApplicationUrl (
-						stringFormat (
-							"/queues",
-							"/queue.item",
-							"?id=%s",
+					requestContext.resolveApplicationUrlFormat (
+						"/queues",
+						"/queue.item",
+						"?id=%s",
+						integerToDecimalString (
 							queueItem.getId ())))
 
 			);
@@ -716,7 +718,8 @@ class QueueHomeResponder
 				" type=\"hidden\"",
 				" name=\"queueItemId\"",
 				" value=\"%h\"",
-				queueItem.getId (),
+				integerToDecimalString (
+					queueItem.getId ()),
 				">");
 
 			formatWriter.writeLineFormat (
@@ -731,7 +734,7 @@ class QueueHomeResponder
 
 			htmlTableCellWrite (
 				objectManager.objectPath (
-					objectManager.getParentOrNull (
+					objectManager.getParentRequired (
 						queue),
 					userConsoleLogic.sliceRequired ()));
 

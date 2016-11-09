@@ -1,6 +1,7 @@
 package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.time.TimeUtils.millisToInstant;
 import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
@@ -173,7 +174,8 @@ class ChatUserAdminBillPart
 
 			formatWriter.writeLineFormat (
 				"%h admin rebills have been actioned today</p>",
-				todayBillLogs.size ());
+				integerToDecimalString (
+					todayBillLogs.size ()));
 
 		}
 

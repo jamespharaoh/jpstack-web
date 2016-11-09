@@ -118,6 +118,7 @@ interface ConsoleRequestContext {
 			@NonNull String message) {
 
 		addNotice (
+			ConsoleNoticeType.error,
 			message);
 
 	}
@@ -152,8 +153,28 @@ interface ConsoleRequestContext {
 	String resolveApplicationUrl (
 			String applicationUrl);
 
+	default
+	String resolveApplicationUrlFormat (
+			@NonNull String ... arguments) {
+
+		return resolveApplicationUrl (
+			stringFormatArray (
+				arguments));
+
+	}
+
 	String resolveContextUrl (
 			String contextUrl);
+
+	default
+	String resolveContextUrlFormat (
+			@NonNull String ... arguments) {
+
+		return resolveContextUrl (
+			stringFormatArray (
+				arguments));
+
+	}
 
 	@Deprecated
 	String parameterOrNull (
@@ -229,6 +250,16 @@ interface ConsoleRequestContext {
 
 	String resolveLocalUrl (
 			String wantedPath);
+
+	default
+	String resolveLocalUrlFormat (
+			@NonNull String ... arguments) {
+
+		return resolveLocalUrl (
+			stringFormatArray (
+				arguments));
+
+	}
 
 	void formData (
 			Map <String, String> newFormData);

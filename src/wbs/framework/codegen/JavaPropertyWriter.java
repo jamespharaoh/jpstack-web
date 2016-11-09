@@ -58,7 +58,7 @@ class JavaPropertyWriter
 
 	public
 	JavaPropertyWriter thisClassNameFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		return thisClassName (
 			stringFormatArray (
@@ -108,7 +108,7 @@ class JavaPropertyWriter
 
 	public
 	JavaPropertyWriter typeNameFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		return typeName (
 			stringFormatArray (
@@ -158,7 +158,7 @@ class JavaPropertyWriter
 
 	public
 	JavaPropertyWriter setterTypeNameFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		return setterTypeName (
 			stringFormatArray (
@@ -179,7 +179,7 @@ class JavaPropertyWriter
 
 	public
 	JavaPropertyWriter setterConversionFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		if (setterConversion != null) {
 			throw new IllegalStateException ();
@@ -226,7 +226,7 @@ class JavaPropertyWriter
 
 	public
 	JavaPropertyWriter propertyNameFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		return propertyName (
 			stringFormatArray (
@@ -266,7 +266,7 @@ class JavaPropertyWriter
 
 	public
 	JavaPropertyWriter defaultValueFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		return defaultValue (
 			stringFormatArray (

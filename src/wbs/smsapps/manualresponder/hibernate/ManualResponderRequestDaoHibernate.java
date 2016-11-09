@@ -7,6 +7,10 @@ import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Optional;
+
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -15,7 +19,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 
-import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderOperatorReport;
@@ -32,7 +35,7 @@ class ManualResponderRequestDaoHibernate
 
 	@Override
 	public
-	List<ManualResponderRequestRec> findRecentLimit (
+	List <ManualResponderRequestRec> findRecentLimit (
 			@NonNull ManualResponderRec manualResponder,
 			@NonNull NumberRec number,
 			@NonNull Long maxResults) {
@@ -246,7 +249,7 @@ class ManualResponderRequestDaoHibernate
 
 	@Override
 	public
-	List<Long> searchIds (
+	List <Long> searchIds (
 			@NonNull ManualResponderRequestSearch search) {
 
 		Criteria criteria =
@@ -332,7 +335,7 @@ class ManualResponderRequestDaoHibernate
 
 	@Override
 	public
-	List<Long> searchServiceReportIds (
+	List <Long> searchServiceReportIds (
 			@NonNull ManualResponderRequestSearch search) {
 
 		Criteria criteria =
@@ -392,9 +395,9 @@ class ManualResponderRequestDaoHibernate
 
 	@Override
 	public
-	List<ManualResponderServiceReport> searchServiceReports (
+	List <Optional <ManualResponderServiceReport>> searchServiceReports (
 			@NonNull ManualResponderRequestSearch search,
-			@NonNull List<Long> objectIds) {
+			@NonNull List <Long> objectIds) {
 
 		Criteria criteria =
 			searchServiceReportCriteria (
@@ -515,9 +518,9 @@ class ManualResponderRequestDaoHibernate
 
 	@Override
 	public
-	List<ManualResponderOperatorReport> searchOperatorReports (
+	List <Optional <ManualResponderOperatorReport>> searchOperatorReports (
 			@NonNull ManualResponderRequestSearch search,
-			@NonNull List<Long> objectIds) {
+			@NonNull List <Long> objectIds) {
 
 		Criteria criteria =
 			searchOperatorReportCriteria (

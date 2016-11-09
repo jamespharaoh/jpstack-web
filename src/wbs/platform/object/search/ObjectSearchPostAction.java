@@ -1,13 +1,17 @@
 package wbs.platform.object.search;
 
+import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.etc.DebugUtils.debugFormat;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.Misc.getMethodRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -271,7 +275,7 @@ class ObjectSearchPostAction <
 
 		// perform search
 
-		List<Long> objectIds;
+		List <Long> objectIds;
 
 		if (
 			isNotNull (
@@ -282,7 +286,7 @@ class ObjectSearchPostAction <
 				getMethodRequired (
 					consoleHelper.getClass (),
 					searchDaoMethodName,
-					ImmutableList.<Class<?>>of (
+					ImmutableList.<Class <?>> of (
 						searchClass));
 
 			objectIds =
@@ -326,7 +330,7 @@ class ObjectSearchPostAction <
 					consoleHelper.objectName () + ":combo",
 					true);
 
-			Optional<ConsoleContext> targetContext =
+			Optional <ConsoleContext> targetContext =
 				consoleManager.relatedContext (
 					requestContext.consoleContext (),
 					targetContextType);
@@ -339,18 +343,17 @@ class ObjectSearchPostAction <
 				return redirectResponderProvider.get ()
 
 					.targetUrl (
-						requestContext.resolveContextUrl (
-							stringFormat (
-								"%s",
-								targetContext.get ().pathPrefix (),
-								"/%s",
-								consoleHelper.getPathId (
-									objectIds.get (
-										0)))));
+						requestContext.resolveContextUrlFormat (
+							"%s",
+							targetContext.get ().pathPrefix (),
+							"/%s",
+							consoleHelper.getPathId (
+								objectIds.get (
+									0))));
 
 			} else {
 
-				Record<?> object =
+				Record <?> object =
 					consoleHelper.findRequired (
 						objectIds.get (
 							0));
@@ -381,13 +384,6 @@ class ObjectSearchPostAction <
 						"/" + fileName));
 
 		}
-
-		/*
-		return responder (
-			stringFormat (
-				"%sSearchResultsResponder",
-				consoleHelper.objectName ()));
-		*/
 
 	}
 

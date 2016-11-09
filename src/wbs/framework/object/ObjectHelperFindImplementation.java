@@ -2,6 +2,7 @@ package wbs.framework.object;
 
 import static wbs.utils.etc.Misc.getMethodRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -115,7 +116,7 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 
 	@Override
 	public
-	List<Long> searchIds (
+	List <Long> searchIds (
 			@NonNull Object search) {
 
 		Class <?> searchClass;
@@ -141,12 +142,11 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 
 		try {
 
-			@SuppressWarnings ("unchecked")
 			List <Long> objectIds =
-				(List <Long>)
-				searchIdsMethod.invoke (
-					objectModel.daoImplementation (),
-					search);
+				genericCastUnchecked (
+					searchIdsMethod.invoke (
+						objectModel.daoImplementation (),
+						search));
 
 			return objectIds;
 

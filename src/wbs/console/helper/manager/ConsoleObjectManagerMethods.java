@@ -1,8 +1,14 @@
 package wbs.console.helper.manager;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
+import static wbs.utils.string.StringUtils.stringFormat;
+
+import java.util.NoSuchElementException;
 
 import com.google.common.base.Optional;
 
@@ -16,15 +22,52 @@ import wbs.utils.string.StringFormatWriter;
 public
 interface ConsoleObjectManagerMethods {
 
-	ConsoleHelper <?> findConsoleHelper (
-			Record <?> dataObject);
+	<RecordType extends Record <RecordType>>
+	Optional <ConsoleHelper <RecordType>> findConsoleHelper (
+			Record <?> object);
+
+	default
+	ConsoleHelper <?> findConsoleHelperRequired (
+			@NonNull Record <?> object) {
+
+		return optionalGetRequired (
+			findConsoleHelper (
+				object));
+
+	}
 
 	<ObjectType extends Record <ObjectType>>
-	ConsoleHelper <ObjectType> findConsoleHelper (
+	Optional <ConsoleHelper <ObjectType>> findConsoleHelper (
 			Class <?> objectClass);
 
-	ConsoleHelper <?> findConsoleHelper (
+	default
+	<ObjectType extends Record <ObjectType>>
+	ConsoleHelper <ObjectType> findConsoleHelperRequired (
+			@NonNull Class <?> objectClass) {
+
+		return optionalOrThrow (
+			findConsoleHelper (
+				objectClass),
+			() -> new NoSuchElementException (
+				stringFormat (
+					"No console helper for %s",
+					classNameSimple (
+						objectClass))));
+
+	}
+
+	Optional <ConsoleHelper <?>> findConsoleHelper (
 			String objectTypeName);
+
+	default
+	ConsoleHelper <?> findConsoleHelperRequired (
+			@NonNull String objectTypeName) {
+
+		return optionalGetRequired (
+			findConsoleHelper (
+				objectTypeName));
+
+	}
 
 	void writeTdForObject (
 			FormatWriter formatWriter,

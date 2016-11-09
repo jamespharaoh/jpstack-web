@@ -2,6 +2,7 @@ package wbs.apn.chat.namednote.console;
 
 import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
@@ -101,8 +102,9 @@ class ChatNoteNamesAction
 
 				String formKey =
 					stringFormat (
-						"noteName%d",
-						noteName.getId ());
+						"noteName%s",
+						integerToDecimalString (
+							noteName.getId ()));
 
 				String newName =
 					optionalOrNull (
@@ -129,15 +131,20 @@ class ChatNoteNamesAction
 
 			}
 
-			if (numUpdated == 1)
-				notices.add ("Note name updated");
+			if (numUpdated == 1) {
+
+				notices.add (
+					"Note name updated");
+
+			}
 
 			if (numUpdated > 1) {
 
 				notices.add (
 					stringFormat (
-						"%d note names updated",
-						numUpdated));
+						"%s note names updated",
+						integerToDecimalString (
+							numUpdated)));
 
 			}
 
@@ -177,13 +184,16 @@ class ChatNoteNamesAction
 
 			}
 
-		} else for (ChatNoteNameRec chatNoteName
-				: chatNoteNames) {
+		} else for (
+			ChatNoteNameRec chatNoteName
+				: chatNoteNames
+		) {
 
 			String noteMoveUpKey =
 				stringFormat (
-					"noteMoveUp%d",
-					chatNoteName.getId ());
+					"noteMoveUp%s",
+					integerToDecimalString (
+						chatNoteName.getId ()));
 
 			if (
 
@@ -232,8 +242,9 @@ class ChatNoteNamesAction
 
 			String noteMoveDownKey =
 				stringFormat (
-					"noteMoveDown%d",
-					chatNoteName.getId ());
+					"noteMoveDown%s",
+					integerToDecimalString (
+						chatNoteName.getId ()));
 
 			if (
 
@@ -277,8 +288,9 @@ class ChatNoteNamesAction
 
 			String noteDeleteKey =
 				stringFormat (
-					"noteDelete%d",
-					chatNoteName.getId ());
+					"noteDelete%s",
+					integerToDecimalString (
+						chatNoteName.getId ()));
 
 			if (
 				requestContext.formIsPresent (

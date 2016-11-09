@@ -1,5 +1,6 @@
 package wbs.apn.chat.namednote.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
@@ -101,13 +102,15 @@ class ChatNoteNamesPart
 			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"text\"",
-				" name=\"noteName%d\"",
-				noteName.getId (),
+				" name=\"noteName%s\"",
+				integerToDecimalString (
+					noteName.getId ()),
 				" value=\"%h\"",
 				requestContext.formOrDefault (
 					stringFormat (
-						"noteName%d",
-						noteName.getId ()),
+						"noteName%s",
+						integerToDecimalString (
+							noteName.getId ())),
 					noteName.getName ()),
 				">");
 
@@ -118,24 +121,27 @@ class ChatNoteNamesPart
 			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"submit\"",
-				" name=\"noteMoveUp%d\"",
-				noteName.getId (),
+				" name=\"noteMoveUp%s\"",
+				integerToDecimalString (
+					noteName.getId ()),
 				" value=\"&uarr;\"",
 				">");
 
 			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"submit\"",
-				" name=\"noteMoveDown%d\"",
-				noteName.getId (),
+				" name=\"noteMoveDown%s\"",
+				integerToDecimalString (
+					noteName.getId ()),
 				" value=\"&darr;\"",
 				">");
 
 			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"submit\"",
-				" name=\"noteDelete%d\"",
-				noteName.getId (),
+				" name=\"noteDelete%s\"",
+				integerToDecimalString (
+					noteName.getId ()),
 				" value=\"&times;\"",
 				">");
 

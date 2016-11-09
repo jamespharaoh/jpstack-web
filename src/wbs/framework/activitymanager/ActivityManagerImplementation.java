@@ -304,7 +304,7 @@ class ActivityManagerImplementation
 			formatWriter.writeFormat (
 				"Slow %s task took %s: %s\n",
 					task.taskType (),
-					taskDuration,
+					taskDuration.toString (),
 					task.summary ());
 
 			writeTaskRecursive (
@@ -409,7 +409,8 @@ class ActivityManagerImplementation
 			indent,
 			task.taskType (),
 			task.summary (),
-			task.duration ().getMillis (),
+			integerToDecimalString (
+				task.duration ().getMillis ()),
 			new String (
 				meterCharacters));
 

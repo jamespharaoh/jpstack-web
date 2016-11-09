@@ -48,8 +48,7 @@ class DynamicFormFieldAccessor <
 		// get native object
 
 		ConsoleHelper <?> consoleHelper =
-			consoleObjectManager.findConsoleHelper (
-				(Container)
+			consoleObjectManager.findConsoleHelperRequired (
 				container);
 
 		Object nativeObject =
@@ -91,7 +90,7 @@ class DynamicFormFieldAccessor <
 	public
 	void write (
 			@NonNull Container container,
-			@NonNull Optional<Native> nativeValueOptional) {
+			@NonNull Optional <Native> nativeValueOptional) {
 
 		// sanity check native type
 
@@ -117,7 +116,7 @@ class DynamicFormFieldAccessor <
 		// set property
 
 		ConsoleHelper <?> consoleHelper =
-			consoleObjectManager.findConsoleHelper(
+			consoleObjectManager.findConsoleHelperRequired (
 				container);
 
 		consoleHelper.setDynamicGeneric (

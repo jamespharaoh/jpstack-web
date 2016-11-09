@@ -121,9 +121,9 @@ class ParentFormFieldBuilder {
 				spec.readOnly (),
 				! consoleHelper.parentTypeIsFixed ());
 
-		ConsoleHelper<?> parentHelper =
+		ConsoleHelper <?> parentHelper =
 			consoleHelper.parentTypeIsFixed ()
-				? objectManager.findConsoleHelper (
+				? objectManager.findConsoleHelperRequired (
 					consoleHelper.parentClass ())
 				: null;
 

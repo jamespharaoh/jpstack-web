@@ -4,13 +4,17 @@ import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveOneEleme
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.etc.Misc.isNull;
-import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
@@ -257,10 +261,12 @@ class HibernateDao {
 			throw new RuntimeException (
 				stringFormat (
 					"%s.%s (...) ",
-					getClass ().getSimpleName (),
+					classNameSimple (
+						getClass ()),
 					methodName,
 					"should only find zero or one results but found %s",
-					objectList.size ()));
+					integerToDecimalString (
+						objectList.size ())));
 
 		}
 
@@ -387,10 +393,10 @@ class HibernateDao {
 	}
 
 	protected <RowType extends IdObject>
-	List<RowType> findOrdered (
-			@NonNull Class<RowType> rowTypeClass,
-			@NonNull List<Long> objectIds,
-			@NonNull List<?> unorderedList) {
+	List <Optional <RowType>> findOrdered (
+			@NonNull Class <RowType> rowTypeClass,
+			@NonNull List <Long> objectIds,
+			@NonNull List <?> unorderedList) {
 
 		HashMap<Long,RowType> indexedList =
 			new HashMap<Long,RowType> ();
@@ -424,8 +430,8 @@ class HibernateDao {
 
 		}
 
-		List<RowType> orderedList =
-			new ArrayList<RowType> ();
+		List <Optional <RowType>> orderedList =
+			new ArrayList<> ();
 
 		for (
 			Long objectId
@@ -445,14 +451,14 @@ class HibernateDao {
 					stringFormat (
 						"%s with id %s not found",
 						rowTypeClass.getSimpleName (),
-						ifNull (
-							objectId,
-							"null")));
+						integerToDecimalString (
+							objectId)));
 
 			}
 
 			orderedList.add (
-				object);
+				optionalFromNullable (
+					object));
 
 		}
 

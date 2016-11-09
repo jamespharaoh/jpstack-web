@@ -29,6 +29,7 @@ class ConsolePrintResponder
 
 	// implenentation
 
+	@SuppressWarnings ("resource")
 	@Override
 	protected
 	void setup ()
@@ -58,7 +59,7 @@ class ConsolePrintResponder
 	@Deprecated
 	protected
 	void printFormat (
-			@NonNull Object ... arguments) {
+			@NonNull String ... arguments) {
 
 		formatWriter.writeFormatArray (
 			arguments);

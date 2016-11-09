@@ -150,9 +150,9 @@ class ObjectCreateAction <
 	Responder goReal (
 			@NonNull TaskLogger taskLogger) {
 
-		ConsoleHelper <ParentType> parentHelper =
+		parentHelper =
 			genericCastUnchecked (
-				objectManager.findConsoleHelper (
+				objectManager.findConsoleHelperRequired (
 					consoleHelper.parentClass ()));
 
 		// begin transaction

@@ -189,13 +189,13 @@ class ChatMainCommand
 				smsMessage);
 
 		taskLogger.debugFormat (
-			"message %d: full text \"%s\"",
+			"message %s: full text \"%s\"",
 			integerToDecimalString (
 				inbox.getId ()),
 			smsMessage.getText ().getText ());
 
 		taskLogger.debugFormat (
-			"message %d: rest \"%s\"",
+			"message %s: rest \"%s\"",
 			integerToDecimalString (
 				inbox.getId ()),
 			rest);
@@ -230,7 +230,7 @@ class ChatMainCommand
 		) {
 
 			taskLogger.debugFormat (
-				"message %d: trying keyword \"%s\"",
+				"message %s: trying keyword \"%s\"",
 				integerToDecimalString (
 					inbox.getId ()),
 				match.simpleKeyword ());
@@ -266,7 +266,7 @@ class ChatMainCommand
 			if (chat.getErrorOnUnrecognised ()) {
 
 				taskLogger.debugFormat (
-					"message %d: ",
+					"message %s: ",
 					integerToDecimalString (
 						inbox.getId ()),
 					"no keyword found, new user, sending error");
@@ -300,7 +300,7 @@ class ChatMainCommand
 			} else {
 
 				taskLogger.debugFormat (
-					"message %d: ",
+					"message %s: ",
 					integerToDecimalString (
 						inbox.getId ()),
 					"no keyword found, new user, joining");
@@ -330,7 +330,7 @@ class ChatMainCommand
 		} else {
 
 			taskLogger.debugFormat (
-				"message %d: ",
+				"message %s: ",
 				integerToDecimalString (
 					inbox.getId ()),
 				"no keyword found, existing user, sent to help");
@@ -378,7 +378,7 @@ class ChatMainCommand
 		) {
 
 			taskLogger.debugFormat (
-				"message %d: ignoring invalid user code %s",
+				"message %s: ignoring invalid user code %s",
 				integerToDecimalString (
 					inbox.getId ()),
 				code);
@@ -497,7 +497,7 @@ class ChatMainCommand
 		if (chatSchemeKeyword.getJoinType () != null) {
 
 			taskLogger.debugFormat (
-				"message %d: chat scheme keyword \"%s\" is join type %s",
+				"message %s: chat scheme keyword \"%s\" is join type %s",
 				integerToDecimalString (
 					inbox.getId ()),
 				keyword,
@@ -560,7 +560,7 @@ class ChatMainCommand
 		if (chatSchemeKeyword.getCommand () != null) {
 
 			taskLogger.debugFormat (
-				"message %d: ",
+				"message %s: ",
 				integerToDecimalString (
 					inbox.getId ()),
 				"chat scheme keyword \"%s\" ",
@@ -592,7 +592,7 @@ class ChatMainCommand
 		// this keyword does nothing?
 
 		taskLogger.warningFormat (
-			"message %d: chat scheme keyword \"%s\" does nothing",
+			"message %s: chat scheme keyword \"%s\" does nothing",
 			integerToDecimalString (
 				inbox.getId ()),
 			keyword);
@@ -617,7 +617,7 @@ class ChatMainCommand
 		) {
 
 			taskLogger.debugFormat (
-				"message %d: no chat keyword \"%s\"",
+				"message %s: no chat keyword \"%s\"",
 				integerToDecimalString (
 					inbox.getId ()),
 				keyword);
@@ -632,7 +632,7 @@ class ChatMainCommand
 		if (chatKeyword.getJoinType () != null) {
 
 			taskLogger.debugFormat (
-				"message %d: ",
+				"message %s: ",
 				integerToDecimalString (
 					inbox.getId ()),
 				"chat keyword \"%s\" ",
@@ -694,7 +694,7 @@ class ChatMainCommand
 		if (chatKeyword.getCommand () != null) {
 
 			taskLogger.debugFormat (
-				"message %d: chat keyword \"%s\" is command %d",
+				"message %s: chat keyword \"%s\" is command %s",
 				integerToDecimalString (
 					inbox.getId ()),
 				keyword,
@@ -713,7 +713,7 @@ class ChatMainCommand
 		// this keyword does nothing
 
 		taskLogger.warningFormat (
-			"message %d: ",
+			"message %s: ",
 			integerToDecimalString (
 				inbox.getId ()),
 			"chat keyword \"%s\" ",
@@ -811,14 +811,14 @@ class ChatMainCommand
 			@NonNull TaskLogger taskLogger) {
 
 		taskLogger.debugFormat (
-			"message %d: performing credit check",
+			"message %s: performing credit check",
 			integerToDecimalString (
 				inbox.getId ()));
 
 		if (fromChatUser.getNumber ().getNetwork ().getId () == 0) {
 
 			taskLogger.debugFormat (
-				"message %d: network unknown, ignoring",
+				"message %s: network unknown, ignoring",
 				integerToDecimalString (
 					inbox.getId ()));
 
@@ -849,7 +849,7 @@ class ChatMainCommand
 		if (creditCheckResult.failed ()) {
 
 			taskLogger.debugFormat (
-				"message %d: ",
+				"message %s: ",
 				integerToDecimalString (
 					inbox.getId ()),
 				"credit check failed, sending to help");
@@ -876,7 +876,7 @@ class ChatMainCommand
 		}
 
 		taskLogger.debugFormat (
-			"message %d: ",
+			"message %s: ",
 			integerToDecimalString (
 				inbox.getId ()),
 			"not performing credit check");

@@ -125,16 +125,6 @@ class AbstractPagePart
 	void renderHtmlBodyContent () {
 	}
 
-	@Deprecated
-	public
-	void printFormat (
-			@NonNull Object ... arguments) {
-
-		formatWriter.writeFormatArray (
-			arguments);
-
-	}
-
 	@Override
 	public
 	void cleanup () {

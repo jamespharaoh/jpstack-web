@@ -141,7 +141,7 @@ class AlertsSettingsNumbersAction
 			if (
 				requestContext.formIsPresent (
 					stringFormat (
-						"delete_%d",
+						"delete_%s",
 						integerToDecimalString (
 							alertsNumber.getId ())))
 			) {
@@ -170,7 +170,7 @@ class AlertsSettingsNumbersAction
 			String newName =
 				requestContext.formOrEmptyString (
 					stringFormat (
-						"name_%d",
+						"name_%s",
 						integerToDecimalString (
 							alertsNumber.getId ())));
 

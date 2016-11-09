@@ -56,7 +56,7 @@ class FloatingPointFieldWriter {
 
 			propertyWriter.defaultValueFormat (
 				"%s",
-				spec.defaultValue ());
+				spec.defaultValue ().toString ());
 
 		}
 

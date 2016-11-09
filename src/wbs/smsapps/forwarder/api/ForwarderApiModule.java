@@ -3,6 +3,7 @@ package wbs.smsapps.forwarder.api;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -1257,15 +1258,18 @@ class ForwarderApiModule
 				SendExMessageChain sendExMessageChain =
 					messageChains.get (index);
 
-				for (String error
-						: sendExMessageChain.sendTemplate.errors) {
+				for (
+					String error
+						: sendExMessageChain.sendTemplate.errors
+				) {
 
 					sendExMessageChain.errors.add (error);
 
 					errors.add (
-						String.format (
-							"Chain %d: %s",
-							index,
+						stringFormat (
+							"Chain %s: %s",
+							integerToDecimalString (
+								index),
 							error));
 
 				}

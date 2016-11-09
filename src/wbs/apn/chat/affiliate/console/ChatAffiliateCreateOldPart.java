@@ -272,7 +272,8 @@ class ChatAffiliateCreateOldPart
 				"<input",
 				" type=\"text\"",
 				" name=\"keyword%h\"",
-				index,
+				integerToDecimalString (
+					index),
 				" value=\"%h\"",
 				requestContext.formOrEmptyString (
 					"keyword" + index),

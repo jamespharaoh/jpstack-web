@@ -48,7 +48,7 @@ class ChatUserSearchOldPart
 	public
 	void renderHtmlHeadContent () {
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<script type=\"text/javascript\">\n",
 
 			"var inputDefaults = {\n",
@@ -90,7 +90,7 @@ class ChatUserSearchOldPart
 
 		);
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<form",
 			" method=\"post\"",
 			" action=\"%h\"",
@@ -98,20 +98,20 @@ class ChatUserSearchOldPart
 				"/chatUser.search.old"),
 			">\n");
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<p><input",
 			" type=\"submit\"",
 			" value=\"search\"",
 			">\n");
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<input",
 			" type=\"button\"",
 			" value=\"clear form\"",
 			" onclick=\"clearForm ();\"",
 			"></p>\n");
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<table class=\"details\">\n");
 
 		htmlTableDetailsRowWriteHtml (
@@ -124,7 +124,7 @@ class ChatUserSearchOldPart
 						"type"),
 					"")));
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<tr>\n",
 			"<th>User number</th>\n",
 
@@ -164,7 +164,7 @@ class ChatUserSearchOldPart
 							"orient"),
 						""))));
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<tr>\n",
 			"<th>Mobile number</th>\n",
 
@@ -195,7 +195,7 @@ class ChatUserSearchOldPart
 
 			"</tr>\n");
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<tr>\n",
 			"<th>Name</th>\n",
 
@@ -213,7 +213,7 @@ class ChatUserSearchOldPart
 
 			"</tr>\n");
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<tr>\n",
 			"<th>Info</th>\n",
 
@@ -231,7 +231,7 @@ class ChatUserSearchOldPart
 
 			"</tr>\n");
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<tr>\n",
 			"<th>Location</th>\n",
 
@@ -288,7 +288,7 @@ class ChatUserSearchOldPart
 						"creditMode"),
 					"")));
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<tr>\n",
 			"<th>Credit failed</th>\n",
 
@@ -316,7 +316,7 @@ class ChatUserSearchOldPart
 
 			"</tr>\n");
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<tr>\n",
 			"<th>Credit no reports</th>\n",
 
@@ -344,7 +344,7 @@ class ChatUserSearchOldPart
 
 			"</tr>\n");
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<tr> <th>Total spent</th> <td>",
 			"<input type=\"text\" id=\"valueSinceEverGte\" name=\"valueSinceEverGte\" size=\"8\" value=\"%h\"> to ",
 			emptyStringIfNull (
@@ -353,7 +353,7 @@ class ChatUserSearchOldPart
 			emptyStringIfNull (
 				params.get ("valueSinceEverLte")));
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<tr> <th>First join</th> <td>",
 			"<input type=\"text\" id=\"firstJoinGte\" name=\"firstJoinGte\" size=\"16\" value=\"%h\"> to ",
 			emptyStringIfNull (
@@ -397,7 +397,7 @@ class ChatUserSearchOldPart
 					params.get (
 						"order"))));
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<tr>\n",
 			"<th>Max results</th>\n",
 
@@ -416,10 +416,10 @@ class ChatUserSearchOldPart
 
 			"</tr>\n");
 
-		printFormat (
+		formatWriter.writeFormat (
 			"</table>\n");
 
-		printFormat (
+		formatWriter.writeFormat (
 			"<p><input",
 			" type=\"submit\"",
 			" value=\"search\"",
@@ -431,7 +431,7 @@ class ChatUserSearchOldPart
 			" onclick=\"clearForm ();\"",
 			"></p>\n");
 
-		printFormat (
+		formatWriter.writeFormat (
 			"</form>\n");
 
 	}

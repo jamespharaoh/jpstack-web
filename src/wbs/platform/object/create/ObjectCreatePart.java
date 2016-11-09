@@ -17,10 +17,10 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.forms.FieldsProvider;
-import wbs.console.forms.FormType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormType;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
@@ -143,10 +143,8 @@ class ObjectCreatePart <
 
 	void prepareParents () {
 
-		@SuppressWarnings ("unchecked")
-		ConsoleHelper<ParentType> parentHelperTemp =
-			(ConsoleHelper<ParentType>)
-			objectManager.findConsoleHelper (
+		ConsoleHelper <ParentType> parentHelperTemp =
+			objectManager.findConsoleHelperRequired (
 				consoleHelper.parentClass ());
 
 		parentHelper =
@@ -183,8 +181,8 @@ class ObjectCreatePart <
 
 		}
 
-		ConsoleHelper<?> grandParentHelper =
-			objectManager.findConsoleHelper (
+		ConsoleHelper <?> grandParentHelper =
+			objectManager.findConsoleHelperRequired (
 				parentHelper.parentClass ());
 
 		Long grandParentId =

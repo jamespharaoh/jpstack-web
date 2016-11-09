@@ -2,6 +2,8 @@ package wbs.imchat.model;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import org.hibernate.Criteria;
 
 public
@@ -16,7 +18,7 @@ interface ImChatMessageDaoMethods {
 	List <Long> searchOperatorReportIds (
 			ImChatMessageSearch search);
 
-	List <ImChatOperatorReport> findOperatorReports (
+	List <Optional <ImChatOperatorReport>> findOperatorReports (
 			ImChatMessageSearch search,
 			List <Long> ids);
 

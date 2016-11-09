@@ -3,6 +3,7 @@ package wbs.console.forms;
 import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
@@ -109,9 +110,11 @@ class TextAreaFormFieldRenderer <Container, Parent>
 			formName,
 			name (),
 			" rows=\"%h\"",
-			rows (),
+			integerToDecimalString (
+				rows ()),
 			" cols=\"%h\"",
-			cols (),
+			integerToDecimalString (
+				cols ()),
 			" name=\"%h-%h\"",
 			formName,
 			name ());
@@ -305,7 +308,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 					"<span",
 					" class=\"templatechars\"",
 					">",
-					"Your template has %d characters. ",
+					"Your template has %s characters. ",
 					messageLength,
 					"(Min. Length: %s - ",
 					dataMap.get("minimumTemplateLength"),

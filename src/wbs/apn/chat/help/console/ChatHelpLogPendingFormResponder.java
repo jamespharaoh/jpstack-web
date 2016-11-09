@@ -141,7 +141,8 @@ class ChatHelpLogPendingFormResponder
 
 			formatWriter.writeLineFormat (
 				"helpTemplates [%s] = '%j';",
-				chatHelpTemplate.getId (),
+				integerToDecimalString (
+					chatHelpTemplate.getId ()),
 				chatHelpTemplate.getText ());
 
 		}
