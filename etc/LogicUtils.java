@@ -528,7 +528,10 @@ class LogicUtils {
 
 		}
 
-		throw new IllegalArgumentException ();
+		throw new IllegalArgumentException (
+			stringFormat (
+				"Unexpected value for boolean: \"%s\"",
+				string));
 
 	}
 
