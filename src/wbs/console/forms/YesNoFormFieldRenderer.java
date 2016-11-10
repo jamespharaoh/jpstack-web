@@ -4,12 +4,9 @@ import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.LogicUtils.booleanToString;
 import static wbs.utils.etc.LogicUtils.booleanToTrueFalseNone;
 import static wbs.utils.etc.LogicUtils.booleanToYesNoNone;
-import static wbs.utils.etc.LogicUtils.parseBooleanTrueFalse;
 import static wbs.utils.etc.LogicUtils.parseBooleanYesNo;
 import static wbs.utils.etc.Misc.doNothing;
-import static wbs.utils.etc.Misc.stringToBoolean;
 import static wbs.utils.etc.Misc.successResult;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -23,9 +20,9 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.utils.string.FormatWriter;
 
 import fj.data.Either;
+import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("yesNoFormFieldRenderer")
@@ -123,7 +120,7 @@ class YesNoFormFieldRenderer <Container>
 
 			htmlWriter.writeLineFormat (
 				"<option",
-				" value=\"none\"",
+				" value=\"\"",
 				currentValue.isPresent ()
 					? ""
 					: " selected",
@@ -235,12 +232,8 @@ class YesNoFormFieldRenderer <Container>
 				formName);
 
 		return successResult (
-			optionalFromNullable (
-				stringToBoolean (
-					formValue,
-					"yes",
-					"no",
-					"none")));
+			parseBooleanYesNo (
+				formValue));
 
 	}
 

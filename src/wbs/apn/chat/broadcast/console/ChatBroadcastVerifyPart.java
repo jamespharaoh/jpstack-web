@@ -152,7 +152,7 @@ class ChatBroadcastVerifyPart
 		verifyUserFields =
 			chatBroadcastConsoleModule.formFieldSet (
 				"verify-user",
-				ChatBroadcastSendForm.class);
+				ChatUserRec.class);
 
 		form =
 			(ChatBroadcastSendForm)
