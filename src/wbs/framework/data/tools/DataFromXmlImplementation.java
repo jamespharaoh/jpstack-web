@@ -1,7 +1,7 @@
 package wbs.framework.data.tools;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
-import static wbs.utils.etc.LogicUtils.parseBooleanYesNo;
+import static wbs.utils.etc.LogicUtils.parseBooleanYesNoEmpty;
 import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.toEnumGeneric;
@@ -679,7 +679,7 @@ class DataFromXmlImplementation
 					object,
 					field.getName (),
 					optionalOrNull (
-						parseBooleanYesNo (
+						parseBooleanYesNoEmpty (
 							stringValue)));
 
 				return true;
