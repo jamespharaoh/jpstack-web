@@ -501,7 +501,7 @@ class LogicUtils {
 	}
 
 	public static
-	Optional <Boolean> parseBooleanYesNo (
+	Optional <Boolean> parseBooleanYesNoEmpty (
 			@NonNull String string) {
 
 		if (string.isEmpty ()) {
@@ -516,6 +516,42 @@ class LogicUtils {
 			return Optional.of (
 				true);
 
+		}
+
+		if (
+			string.equals (
+				"no")
+		) {
+
+			return Optional.of (
+				false);
+
+		}
+
+		throw new IllegalArgumentException (
+			stringFormat (
+				"Unexpected value for boolean: \"%s\"",
+				string));
+
+	}
+
+	public static
+	Optional <Boolean> parseBooleanYesNoNone (
+			@NonNull String string) {
+
+		if (
+			string.equals (
+				"none")
+		) {
+			return Optional.absent ();
+		}
+
+		if (
+			string.equals (
+				"yes")
+		) {
+			return Optional.of (
+				true);
 		}
 
 		if (
