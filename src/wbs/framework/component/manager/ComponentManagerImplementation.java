@@ -70,6 +70,8 @@ import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.component.tools.EasyReadWriteLock;
 import wbs.framework.component.tools.EasyReadWriteLock.HeldLock;
 import wbs.framework.component.tools.NoSuchComponentException;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.utils.etc.PropertyUtils;
 
@@ -78,6 +80,11 @@ import wbs.utils.etc.PropertyUtils;
 public
 class ComponentManagerImplementation
 	implements ComponentManager {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			ComponentManagerImplementation.class);
 
 	// properties
 
@@ -431,15 +438,14 @@ class ComponentManagerImplementation
 
 	private
 	Object instantiateComponent (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialize) {
 
-		taskLogger =
-			taskLogger.nest (
-				this,
-				"instantiateComponent",
-				log);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"instantiateComponent");
 
 		@Cleanup
 		HeldLock heldlock =
@@ -717,15 +723,14 @@ class ComponentManagerImplementation
 
 	private
 	void setComponentReferenceProperties (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component) {
 
-		taskLogger =
-			taskLogger.nest (
-				this,
-				"setComponentReferenceProperties",
-				log);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setComponentReferenceProperties");
 
 		@Cleanup
 		HeldLock heldlock =
@@ -799,16 +804,15 @@ class ComponentManagerImplementation
 
 	private
 	void injectProperty (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component,
 			@NonNull InjectedProperty injectedProperty) {
 
-		taskLogger =
-			taskLogger.nest (
-				this,
-				"injectProperty",
-				log);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"injectProperty");
 
 		taskLogger.debugFormat (
 			"Setting injected property %s.%s",

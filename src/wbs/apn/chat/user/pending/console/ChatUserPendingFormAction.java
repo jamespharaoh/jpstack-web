@@ -48,7 +48,6 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
@@ -60,6 +59,7 @@ import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.gsm.GsmUtils;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.utils.etc.PropertyUtils;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatUserPendingFormAction")
 public

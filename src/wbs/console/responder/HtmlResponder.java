@@ -5,11 +5,14 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
+import lombok.NonNull;
+
 import org.joda.time.Instant;
 
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 import wbs.utils.time.TimeFormatter;
 
 public abstract
@@ -185,24 +188,30 @@ class HtmlResponder
 	}
 
 	protected
-	void renderHtmlHeadContents () {
+	void renderHtmlHeadContents (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		renderHtmlTitle ();
+
 		renderHtmlScriptRefs ();
+
 		renderHtmlLinks ();
+
 		goMeta ();
 
 	}
 
 	protected
-	void renderHtmlHead () {
+	void renderHtmlHead (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		formatWriter.writeLineFormat (
 			"<head>");
 
 		formatWriter.increaseIndent ();
 
-		renderHtmlHeadContents ();
+		renderHtmlHeadContents (
+				parentTaskLogger);
 
 		formatWriter.decreaseIndent ();
 
@@ -212,18 +221,22 @@ class HtmlResponder
 	}
 
 	protected
-	void renderHtmlBodyContents () {
+	void renderHtmlBodyContents (
+			@NonNull TaskLogger taskLogger) {
+
 	}
 
 	protected
-	void renderHtmlBody () {
+	void renderHtmlBody (
+			@NonNull TaskLogger taskLogger) {
 
 		formatWriter.writeLineFormat (
 			"<body>");
 
 		formatWriter.increaseIndent ();
 
-		renderHtmlBodyContents ();
+		renderHtmlBodyContents (
+			taskLogger);
 
 		formatWriter.decreaseIndent ();
 
@@ -234,15 +247,19 @@ class HtmlResponder
 
 	@Override
 	protected
-	void render () {
+	void render (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		renderHtmlDoctype ();
 
 		formatWriter.writeLineFormat (
 			"<html>");
 
-		renderHtmlHead ();
-		renderHtmlBody ();
+		renderHtmlHead (
+			parentTaskLogger);
+
+		renderHtmlBody (
+			parentTaskLogger);
 
 		formatWriter.writeLineFormat (
 			"</html>");

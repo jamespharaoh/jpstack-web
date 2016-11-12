@@ -4,10 +4,11 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("staticFieldsProvider")
 public
-class StaticFieldsProvider<
+class StaticFieldsProvider <
 	ObjectType extends Record <ObjectType>,
 	ParentType extends Record <ParentType>
 >
@@ -22,6 +23,7 @@ class StaticFieldsProvider<
 	@Override
 	public
 	FormFieldSet <ObjectType> getFieldsForObject (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ObjectType object) {
 
 		return getStaticFields ();
@@ -31,6 +33,7 @@ class StaticFieldsProvider<
 	@Override
 	public
 	FormFieldSet <ObjectType> getFieldsForParent (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ParentType parent) {
 
 		return getStaticFields ();

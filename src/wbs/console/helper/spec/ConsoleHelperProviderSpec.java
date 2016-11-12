@@ -1,6 +1,5 @@
 package wbs.console.helper.spec;
 
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;

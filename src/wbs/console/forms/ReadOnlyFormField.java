@@ -11,11 +11,11 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitColon;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.LinkedHashSet;
 import java.util.List;

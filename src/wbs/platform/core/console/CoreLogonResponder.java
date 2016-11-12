@@ -6,24 +6,26 @@ import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringSplitFullStop;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingOneWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingOneWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
+
+import lombok.NonNull;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
@@ -34,6 +36,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.scaffold.console.SliceConsoleHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleHelper;
@@ -96,7 +99,8 @@ class CoreLogonResponder
 
 	@Override
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		Optional <String> sliceCode =
 			requestContext.header (
@@ -124,7 +128,8 @@ class CoreLogonResponder
 
 	@Override
 	public
-	void renderHtmlBodyContents () {
+	void renderHtmlBodyContents (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlHeadingOneWrite (
 			wbsConfig.consoleTitle ());

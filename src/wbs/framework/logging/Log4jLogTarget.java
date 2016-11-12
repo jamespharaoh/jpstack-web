@@ -4,7 +4,6 @@ import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.util.Map;
-import java.util.function.Function;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -72,27 +71,9 @@ class Log4jLogTarget
 
 	@Override
 	public
-	LogTarget nest (
-			@NonNull Logger logger) {
+	boolean debugEnabled () {
 
-		return new Log4jLogTarget (
-			logger);
-
-	}
-
-	// utilities
-
-	public static <Type>
-	Type wrap (
-			@NonNull Logger logger,
-			@NonNull Function <TaskLogger, Type> function) {
-
-		TaskLogger taskLogger =
-			new TaskLogger (
-				logger);
-
-		return taskLogger.wrap (
-			function);
+		return logger.isDebugEnabled ();
 
 	}
 

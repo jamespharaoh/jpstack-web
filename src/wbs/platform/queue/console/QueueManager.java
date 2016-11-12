@@ -1,5 +1,6 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -10,30 +11,34 @@ import java.util.Map;
 import javax.inject.Provider;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.queue.metamodel.QueueTypeSpec;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.queue.model.QueueTypeRec;
+import wbs.web.responder.Responder;
 
-@Log4j
 @SingletonComponent ("queueManager")
 public
 class QueueManager {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -56,7 +61,13 @@ class QueueManager {
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void init (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"init");
 
 		// initialise queuePageFactories by querying each factory
 
@@ -84,20 +95,20 @@ class QueueManager {
 					queueTypeCode,
 					queueHelper);
 
-				log.debug (
-					stringFormat (
-						"Adding queue page factory %s from %s",
-						queueTypeCode,
-						beanName));
+				taskLogger.debugFormat (
+					"Adding queue page factory %s from %s",
+					queueTypeCode,
+					beanName);
 
 			}
 
 		}
 
-		log.info (
-			stringFormat (
-				"Added %s queue page factories for %s queue types",
-				queueHelpersByBeanName.size (),
+		taskLogger.noticeFormat (
+			"Added %s queue page factories for %s queue types",
+			integerToDecimalString (
+				queueHelpersByBeanName.size ()),
+			integerToDecimalString (
 				queueHelpers.size ()));
 
 	}
@@ -106,8 +117,14 @@ class QueueManager {
 
 	public
 	Responder getItemResponder (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleRequestContext  requestContext,
 			@NonNull QueueItemRec queueItem) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getItemResponder");
 
 		QueueSubjectRec queueSubject =
 			queueItem.getQueueSubject ();
@@ -138,6 +155,7 @@ class QueueManager {
 		}
 
 		return queuePageFactory.makeResponder (
+			taskLogger,
 			queueItem);
 
 	}
@@ -146,8 +164,8 @@ class QueueManager {
 	Duration getPreferredUserDelay (
 			@NonNull QueueRec queue) {
 
-		Record<?> queueParent =
-			objectManager.getParentOrNull (
+		Record <?> queueParent =
+			objectManager.getParentRequired (
 				queue);
 
 		QueueTypeSpec queueTypeSpec =

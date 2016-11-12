@@ -1,6 +1,7 @@
 package wbs.smsapps.manualresponder.console;
 
 import static wbs.utils.etc.EnumUtils.enumInSafe;
+import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
@@ -8,28 +9,28 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlDivClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlDivOpen;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingThreeWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWriteHtml;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteRaw;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenLayout;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
-import static wbs.utils.web.HtmlUtils.htmlLinkWriteHtml;
+import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlDivClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlDivOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingThreeWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteRaw;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenLayout;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowSeparatorWrite;
+import static wbs.web.utils.HtmlUtils.htmlLinkWriteHtml;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,8 +44,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Data;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
@@ -61,8 +62,11 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.media.logic.MediaLogic;
@@ -90,9 +94,8 @@ import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
 import wbs.utils.time.TextualInterval;
-import wbs.utils.web.HtmlUtils;
+import wbs.web.utils.HtmlUtils;
 
-@Log4j
 @PrototypeComponent ("manualResponderRequestPendingSummaryPart")
 public
 class ManualResponderRequestPendingSummaryPart
@@ -111,6 +114,9 @@ class ManualResponderRequestPendingSummaryPart
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ManualResponderNumberObjectHelper manualResponderNumberHelper;
@@ -193,7 +199,13 @@ class ManualResponderRequestPendingSummaryPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		customerDetailsFields =
 			manualResponderRequestPendingConsoleModule.formFieldSet (
@@ -330,9 +342,9 @@ class ManualResponderRequestPendingSummaryPart
 						MessageStatus.delivered)
 				) {
 
-					log.error (
-						stringFormat (
-							"Counting message in unknown state %s",
+					taskLogger.errorFormat (
+						"Counting message in unknown state \"%s\"",
+						enumNameSpaces (
 							message.getStatus ()));
 
 				}
@@ -388,7 +400,8 @@ class ManualResponderRequestPendingSummaryPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		if (manualResponderRequest == null) {
 
@@ -764,7 +777,8 @@ class ManualResponderRequestPendingSummaryPart
 				"<p class=\"warning\">%h</p>",
 				stringFormat (
 					"Only showing the first %s results.",
-					maxResults));
+					integerToDecimalString (
+						maxResults)));
 
 		}
 

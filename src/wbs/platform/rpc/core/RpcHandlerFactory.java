@@ -3,6 +3,9 @@ package wbs.platform.rpc.core;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import lombok.NonNull;
+
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.rpc.web.ReusableRpcHandler;
 
 public
@@ -41,12 +44,14 @@ class RpcHandlerFactory
 	@Override
 	public
 	RpcResult handle (
-			RpcSource source) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull RpcSource source) {
 
 		RpcHandler handler =
 			createHandler ();
 
 		return handler.handle (
+			parentTaskLogger,
 			source);
 
 	}

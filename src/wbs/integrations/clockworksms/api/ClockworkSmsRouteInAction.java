@@ -1,9 +1,11 @@
 package wbs.integrations.clockworksms.api;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.LogicUtils.not;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.min;
 import static wbs.utils.etc.Misc.toHex;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.utf8ToStringSafe;
@@ -28,10 +30,9 @@ import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.PageNotFoundException;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
 import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogType;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteInObjectHelper;
@@ -42,11 +43,19 @@ import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.utils.string.FormatWriter;
+import wbs.web.context.RequestContext;
+import wbs.web.exceptions.HttpNotFoundException;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("clockworkSmsRouteInAction")
 public
 class ClockworkSmsRouteInAction
 	extends ApiLoggingAction {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			ClockworkSmsRouteInAction.class);
 
 	// singleton dependencies
 
@@ -89,7 +98,13 @@ class ClockworkSmsRouteInAction
 	@Override
 	protected
 	void processRequest (
+			@NonNull TaskLogger taskLogger,
 			@NonNull FormatWriter debugWriter) {
+
+		taskLogger =
+			logContext.nestTaskLogger (
+				taskLogger,
+				"processRequest");
 
 		// convert request to string
 
@@ -166,10 +181,6 @@ class ClockworkSmsRouteInAction
 
 		// decode request
 
-		TaskLogger taskLogger =
-			new TaskLogger (
-				debugWriter);
-
 		DataFromXml dataFromXml =
 			new DataFromXmlBuilder ()
 
@@ -195,7 +206,8 @@ class ClockworkSmsRouteInAction
 
 	@Override
 	protected
-	void updateDatabase () {
+	void updateDatabase (
+			@NonNull TaskLogger taskLogger) {
 
 		// begin transaction
 
@@ -224,7 +236,11 @@ class ClockworkSmsRouteInAction
 				smsRouteOptional.get ().getCanReceive ())
 
 		) {
-			throw new PageNotFoundException ();
+
+			throw new HttpNotFoundException (
+				optionalAbsent (),
+				emptyList ());
+
 		}
 
 		RouteRec smsRoute =
@@ -245,7 +261,11 @@ class ClockworkSmsRouteInAction
 			|| clockworkSmsRouteInOptional.get ().getDeleted ()
 
 		) {
-			throw new PageNotFoundException ();
+
+			throw new HttpNotFoundException (
+				optionalAbsent (),
+				emptyList ());
+
 		}
 
 		@SuppressWarnings ("unused")
@@ -291,6 +311,7 @@ class ClockworkSmsRouteInAction
 	@Override
 	protected
 	Responder createResponse (
+			@NonNull TaskLogger taskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		return textResponderProvider.get ()
@@ -303,6 +324,7 @@ class ClockworkSmsRouteInAction
 	@Override
 	protected
 	void storeLog (
+			@NonNull TaskLogger taskLogger,
 			@NonNull String debugLog) {
 
 		@Cleanup

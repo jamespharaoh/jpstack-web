@@ -5,13 +5,15 @@ import java.io.IOException;
 import javax.inject.Provider;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("redirectResponder")
@@ -35,7 +37,8 @@ class RedirectResponder
 
 	@Override
 	public
-	void execute ()
+	void execute (
+			@NonNull TaskLogger parentTaskLogger)
 		throws IOException {
 
 		requestContext.sendRedirect (

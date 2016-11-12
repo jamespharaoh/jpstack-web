@@ -384,6 +384,9 @@ writeBuildFile world = do
 					mkelem "include" [
 						sattr "name" "wbs/utils/**"
 					] [],
+					mkelem "include" [
+						sattr "name" "wbs/web/**"
+					] [],
 
 					mkelem "src" [
 						sattr "path" "src"
@@ -409,6 +412,9 @@ writeBuildFile world = do
 					] [],
 					mkelem "include" [
 						sattr "name" "wbs/utils/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/web/**"
 					] [],
 
 					mkelem "service" [
@@ -441,6 +447,9 @@ writeBuildFile world = do
 					] [],
 					mkelem "include" [
 						sattr "name" "wbs/utils/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/web/**"
 					] [],
 
 					mkelem "include" [
@@ -484,6 +493,9 @@ writeBuildFile world = do
 					] [],
 					mkelem "include" [
 						sattr "name" "wbs/utils/**"
+					] [],
+					mkelem "include" [
+						sattr "name" "wbs/web/**"
 					] [],
 
 					mkelem "include" [

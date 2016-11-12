@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import org.joda.time.Instant;
 
@@ -16,8 +17,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.WebFile;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
@@ -25,6 +25,8 @@ import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.web.context.RequestContext;
+import wbs.web.file.WebFile;
 
 @PrototypeComponent ("g8waveInFile")
 public
@@ -55,18 +57,21 @@ class G8waveInFile
 
 	@Override
 	public
-	void doGet ()
+	void doGet (
+			@NonNull TaskLogger taskLogger)
 		throws
 			ServletException,
 			IOException {
 
-		doPost ();
+		doPost (
+			taskLogger);
 
 	}
 
 	@Override
 	public
-	void doPost ()
+	void doPost (
+			@NonNull TaskLogger taskLogger)
 		throws
 			ServletException,
 			IOException {
@@ -166,7 +171,8 @@ class G8waveInFile
 
 	@Override
 	public
-	void doOptions ()
+	void doOptions (
+			@NonNull TaskLogger taskLogger)
 		throws
 			ServletException,
 			IOException {

@@ -1,7 +1,6 @@
 package wbs.framework.entity.generate;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
@@ -10,20 +9,23 @@ import javax.inject.Provider;
 import com.google.common.collect.Iterables;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-@Log4j
 public
 class ModelGeneratorTool {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ModelMetaLoader modelMetaLoader;
@@ -40,14 +42,13 @@ class ModelGeneratorTool {
 
 	public
 	void generateModels (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <String> params) {
 
-		taskLogger =
-			taskLogger.nest (
-				this,
-				"generateModels",
-				log);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"generateModels");
 
 		taskLogger.noticeFormat (
 			"About to generate %s models",
@@ -84,11 +85,10 @@ class ModelGeneratorTool {
 
 			} catch (Exception exception) {
 
-				log.error (
-					stringFormat (
-						"Error writing model record for %s",
-						modelMeta.name ()),
-					exception);
+				taskLogger.errorFormatException (
+					exception,
+					"Error writing model record for %s",
+					modelMeta.name ());
 
 				statusCounters.recordErrorCount ++;
 
@@ -113,11 +113,10 @@ class ModelGeneratorTool {
 
 				} catch (Exception exception) {
 
-					log.error (
-						stringFormat (
-							"Error writing model interfaces for %s",
-							modelMeta.name ()),
-						exception);
+					taskLogger.errorFormatException (
+						exception,
+						"Error writing model interfaces for %s",
+						modelMeta.name ());
 
 					statusCounters.interfacesErrorCount ++;
 

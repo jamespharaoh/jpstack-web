@@ -13,10 +13,13 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("privCheckerBuilder")
@@ -24,6 +27,9 @@ public
 class UserPrivCheckerBuilder {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	UserPrivDataLoader privDataLoader;
@@ -36,12 +42,14 @@ class UserPrivCheckerBuilder {
 	// builder
 
 	public
-	UserPrivChecker build () {
+	UserPrivChecker build (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return new Implementation ()
 
 			.userPrivData (
 				privDataLoader.getUserPrivData (
+					parentTaskLogger,
 					userId));
 
 	}
@@ -251,7 +259,8 @@ class UserPrivCheckerBuilder {
 
 		@Override
 		public
-		void refresh () {
+		void refresh (
+				@NonNull TaskLogger parentTaskLogger) {
 
 			throw new UnsupportedOperationException ();
 

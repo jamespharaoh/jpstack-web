@@ -1,5 +1,6 @@
 package wbs.integrations.fonix.api;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -23,9 +24,7 @@ import wbs.framework.data.tools.DataFromGeneric;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.web.PageNotFoundException;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.TaskLogger;
 import wbs.integrations.fonix.logic.FonixLogic;
 import wbs.integrations.fonix.model.FonixInboundLogObjectHelper;
 import wbs.integrations.fonix.model.FonixInboundLogType;
@@ -37,6 +36,9 @@ import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.utils.string.FormatWriter;
+import wbs.web.context.RequestContext;
+import wbs.web.exceptions.HttpNotFoundException;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("fonixRouteInAction")
 public
@@ -87,6 +89,7 @@ class FonixRouteInAction
 	@Override
 	protected
 	void processRequest (
+			@NonNull TaskLogger taskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		// decode request
@@ -102,7 +105,8 @@ class FonixRouteInAction
 
 	@Override
 	protected
-	void updateDatabase () {
+	void updateDatabase (
+			@NonNull TaskLogger taskLogger) {
 
 		// begin transaction
 
@@ -130,31 +134,37 @@ class FonixRouteInAction
 
 		) {
 
-			throw new PageNotFoundException (
-				stringFormat (
-					"Route %s does not exist",
-					requestContext.requestStringRequired (
-						"smsRouteId")));
+			throw new HttpNotFoundException (
+				optionalOf (
+					stringFormat (
+						"Route %s does not exist",
+						requestContext.requestStringRequired (
+							"smsRouteId"))),
+				emptyList ());
 
 		}
 
 		if (smsRouteOptional.get ().getDeleted ()) {
 
-			throw new PageNotFoundException (
-				stringFormat (
-					"Route %s.%s has been deleted",
-					smsRouteOptional.get ().getSlice ().getCode (),
-					smsRouteOptional.get ().getCode ()));
+			throw new HttpNotFoundException (
+				optionalOf (
+					stringFormat (
+						"Route %s.%s has been deleted",
+						smsRouteOptional.get ().getSlice ().getCode (),
+						smsRouteOptional.get ().getCode ())),
+				emptyList ());
 
 		}
 
 		if (! smsRouteOptional.get ().getCanReceive ()) {
 
-			throw new PageNotFoundException (
-				stringFormat (
-					"Route %s.%s is not configured for inbound messages",
-					smsRouteOptional.get ().getSlice ().getCode (),
-					smsRouteOptional.get ().getCode ()));
+			throw new HttpNotFoundException (
+				optionalOf (
+					stringFormat (
+						"Route %s.%s is not configured for inbound messages",
+						smsRouteOptional.get ().getSlice ().getCode (),
+						smsRouteOptional.get ().getCode ())),
+				emptyList ());
 
 		}
 
@@ -176,7 +186,11 @@ class FonixRouteInAction
 			|| fonixRouteInOptional.get ().getDeleted ()
 
 		) {
-			throw new PageNotFoundException ();
+
+			throw new HttpNotFoundException (
+				optionalAbsent (),
+				emptyList ());
+
 		}
 
 		@SuppressWarnings ("unused")
@@ -213,6 +227,7 @@ class FonixRouteInAction
 	@Override
 	protected
 	Responder createResponse (
+			@NonNull TaskLogger taskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		return textResponderProvider.get ()
@@ -225,6 +240,7 @@ class FonixRouteInAction
 	@Override
 	protected
 	void storeLog (
+			@NonNull TaskLogger taskLogger,
 			@NonNull String debugLog) {
 
 		@Cleanup

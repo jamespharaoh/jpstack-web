@@ -8,23 +8,31 @@ import java.util.regex.Matcher;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.api.mvc.ApiFile;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.PathHandler;
-import wbs.framework.web.RegexpPathHandler;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.ServletModule;
-import wbs.framework.web.WebFile;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.context.RequestContext;
+import wbs.web.file.WebFile;
+import wbs.web.pathhandler.PathHandler;
+import wbs.web.pathhandler.RegexpPathHandler;
+import wbs.web.responder.WebModule;
 
 @SingletonComponent ("chatInfoSiteApiModule")
 public
 class ChatInfoSiteApiModule
-	implements ServletModule {
+	implements WebModule {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RequestContext requestContext;
@@ -45,12 +53,23 @@ class ChatInfoSiteApiModule
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void init (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"init");
 
 		infoSiteFile =
 			apiFile.get ()
-				.getActionName ("chatInfoSiteViewAction")
-				.postActionName ("chatInfoSiteRespondAction");
+
+			.getActionName (
+				taskLogger,
+				"chatInfoSiteViewAction")
+
+			.postActionName (
+				"chatInfoSiteRespondAction");
 
 		infoSiteImageFile =
 			apiFile.get ()

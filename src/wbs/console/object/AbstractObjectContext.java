@@ -1,10 +1,13 @@
 package wbs.console.object;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
 
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextStuff;
@@ -14,12 +17,14 @@ import wbs.console.lookup.StringLookup;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.request.Cryptor;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.Record;
-import wbs.framework.web.PageNotFoundException;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.exceptions.HttpNotFoundException;
 
-@Log4j
 public abstract
 class AbstractObjectContext
 	extends ConsoleContext {
@@ -28,6 +33,9 @@ class AbstractObjectContext
 
 	@WeakSingletonDependency
 	ConsoleManager consoleManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -133,8 +141,14 @@ class AbstractObjectContext
 	@Override
 	public
 	void initContext (
-			PathSupply pathParts,
-			ConsoleContextStuff contextStuff) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull PathSupply pathParts,
+			@NonNull ConsoleContextStuff contextStuff) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initContext");
 
 		Long localId =
 			decodeId (
@@ -150,9 +164,14 @@ class AbstractObjectContext
 
 		if (object == null) {
 
-			log.warn ("Can't find object with id " + localId);
+			taskLogger.warningFormat (
+				"Can't find object with id %s",
+				integerToDecimalString (
+					localId));
 
-			throw new PageNotFoundException ();
+			throw new HttpNotFoundException (
+				optionalAbsent (),
+				emptyList ());
 
 		}
 
@@ -174,8 +193,9 @@ class AbstractObjectContext
 		if (postProcessorName () != null) {
 
 			consoleManager.runPostProcessors (
-					postProcessorName (),
-					contextStuff);
+				taskLogger,
+				postProcessorName (),
+				contextStuff);
 
 		}
 

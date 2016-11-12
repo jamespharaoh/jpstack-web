@@ -25,26 +25,34 @@ import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("contextTabActionPageBuider")
 @ConsoleModuleBuilderHandler
 public
 class ContextTabActionPageBuilder <
 	ObjectType extends Record <ObjectType>
-> {
+>
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -84,9 +92,16 @@ class ContextTabActionPageBuilder <
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		setDefaults ();
 
@@ -100,6 +115,7 @@ class ContextTabActionPageBuilder <
 				resolvedExtensionPoint);
 
 			buildFile (
+				taskLogger,
 				resolvedExtensionPoint);
 
 		}
@@ -137,6 +153,7 @@ class ContextTabActionPageBuilder <
 	}
 
 	void buildFile (
+			@NonNull TaskLogger taskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint
 				resolvedExtensionPoint) {
 
@@ -148,6 +165,7 @@ class ContextTabActionPageBuilder <
 					responderName)
 
 				.postActionName (
+					taskLogger,
 					actionName)
 
 				.privKeys (

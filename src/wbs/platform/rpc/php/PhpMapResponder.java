@@ -8,21 +8,22 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.php.PhpEntity;
 import wbs.platform.php.PhpFormatter;
 import wbs.platform.php.PhpSerializer;
 import wbs.platform.php.PhpUnserializer;
+import wbs.web.context.RequestContext;
+import wbs.web.misc.HttpStatus;
+import wbs.web.responder.Responder;
 
 @Log4j
 @Accessors (fluent = true)
@@ -42,14 +43,15 @@ class PhpMapResponder
 	Map <?,?> map;
 
 	@Getter @Setter
-	int status =
-		HttpServletResponse.SC_OK;
+	long status =
+		HttpStatus.httpOk;
 
 	// implementation
 
 	@Override
 	public
-	void execute ()
+	void execute (
+			@NonNull TaskLogger parentTaskLogger)
 		throws IOException {
 
 		requestContext.status (

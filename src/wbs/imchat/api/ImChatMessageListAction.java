@@ -7,12 +7,21 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.Cleanup;
+import lombok.NonNull;
+
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.data.tools.DataFromJson;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.imchat.model.ImChatConversationObjectHelper;
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerRec;
@@ -20,16 +29,10 @@ import wbs.imchat.model.ImChatMessageObjectHelper;
 import wbs.imchat.model.ImChatMessageRec;
 import wbs.imchat.model.ImChatSessionObjectHelper;
 import wbs.imchat.model.ImChatSessionRec;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.PrototypeDependency;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.data.tools.DataFromJson;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.web.Action;
-import wbs.framework.web.JsonResponder;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.web.action.Action;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.JsonResponder;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("imChatMessageListAction")
 public
@@ -65,7 +68,8 @@ class ImChatMessageListAction
 
 	@Override
 	public
-	Responder handle () {
+	Responder handle (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		DataFromJson dataFromJson =
 			new DataFromJson ();

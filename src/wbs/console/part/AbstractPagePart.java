@@ -17,6 +17,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.utils.string.FormatWriter;
 
 public
@@ -112,17 +113,23 @@ class AbstractPagePart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
 	}
 
 	@Override
 	public
-	void renderHtmlHeadContent () {
+	void renderHtmlHeadContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
 	}
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
 	}
 
 	@Override

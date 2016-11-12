@@ -2,6 +2,7 @@ package wbs.console.helper.provider;
 
 import wbs.console.context.ConsoleContextStuff;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 public
 interface ConsoleHelperProvider <
@@ -30,6 +31,7 @@ interface ConsoleHelperProvider <
 	String idKey ();
 
 	void postProcess (
+			TaskLogger taskLogger,
 			ConsoleContextStuff contextStuff);
 
 }

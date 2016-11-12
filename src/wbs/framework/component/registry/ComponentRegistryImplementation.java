@@ -2,6 +2,7 @@ package wbs.framework.component.registry;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.IterableUtils.iterableCount;
+import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
@@ -14,6 +15,8 @@ import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.etc.TypeUtils.classNameFull;
+import static wbs.utils.etc.TypeUtils.classNotEqual;
 import static wbs.utils.etc.TypeUtils.classNotInSafe;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
@@ -60,6 +63,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.activitymanager.RuntimeExceptionWithTask;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.UninitializedDependency;
@@ -79,6 +83,9 @@ import wbs.framework.component.xml.ComponentsValuePropertySpec;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.data.tools.DataToXml;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.LogContextComponentFactory;
 import wbs.framework.logging.TaskLogger;
 
 @Log4j
@@ -86,6 +93,11 @@ import wbs.framework.logging.TaskLogger;
 public
 class ComponentRegistryImplementation
 	implements ComponentRegistry {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			ComponentRegistryImplementation.class);
 
 	// properties
 
@@ -228,7 +240,136 @@ class ComponentRegistryImplementation
 
 	}
 
-	// implementation
+	// public implementation
+
+	@Override
+	public
+	ComponentManager build () {
+
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"build");
+
+		try (
+
+			ActiveTask activeTask =
+				activityManager.start (
+					"component-registry",
+					"build ()",
+					this);
+
+		) {
+
+			// create component manager
+
+			@SuppressWarnings ("resource")
+			ComponentManagerImplementation componentManager =
+				new ComponentManagerImplementation ()
+
+				.registry (
+					this)
+
+				.activityManager (
+					activityManager);
+
+			// automatic components
+
+			registerUnmanagedSingleton (
+				"componentManager",
+				componentManager);
+
+			registerUnmanagedSingleton (
+				"activityManager",
+				activityManager);
+
+			// register scoped singletons
+
+			for (
+				ComponentDefinition componentDefinition
+					: ImmutableList.copyOf (
+						definitions)
+			) {
+
+				registerScopedSingletons (
+					taskLogger,
+					componentDefinition);
+
+			}
+
+			// work out dependencies
+
+			for (
+				ComponentDefinition componentDefinition
+					: definitions
+			) {
+
+				initComponentDefinition (
+					taskLogger,
+					componentDefinition);
+
+			}
+
+			// check dependencies exist
+
+			for (
+				ComponentDefinition componentDefinition
+					: definitions
+			) {
+
+				for (
+					String dependency
+						: componentDefinition.strongDependencies ()
+				) {
+
+					if (
+						! byName.containsKey (
+							dependency)
+					) {
+
+						taskLogger.errorFormat (
+							"Can't provide dependency %s for %s",
+							dependency,
+							componentDefinition.name ());
+
+					}
+
+				}
+
+			}
+
+			// order component definitions
+
+			singletons =
+				ImmutableList.copyOf (
+					orderByStrongDepedendencies (
+						taskLogger,
+						singletons));
+
+			// output component definitions
+
+			if (outputPath != null) {
+
+				outputComponentDefinitions (
+					outputPath);
+
+			}
+
+			taskLogger.makeException ();
+
+			// initialise
+
+			componentManager.init (
+				taskLogger);
+
+			taskLogger.makeException ();
+
+			// and return
+
+			return componentManager;
+
+		}
+
+	}
 
 	@Override
 	public
@@ -256,7 +397,7 @@ class ComponentRegistryImplementation
 				activityManager.currentTask (),
 				stringFormat (
 					"Component definition %s has no component class",
-					componentDefinition.componentClass ()));
+					componentDefinition.name ()));
 
 		}
 
@@ -632,6 +773,89 @@ class ComponentRegistryImplementation
 
 	}
 
+	public
+	void outputComponentDefinitions (
+			@NonNull String outputPath) {
+
+		@Cleanup
+		HeldLock heldlock =
+			lock.read ();
+
+		log.info (
+			stringFormat (
+				"Writing component definitions to %s",
+				outputPath));
+
+		try {
+
+			FileUtils.deleteDirectory (
+				new File (outputPath));
+
+			FileUtils.forceMkdir (
+				new File (outputPath));
+
+		} catch (IOException exception) {
+
+			log.warn (
+				stringFormat (
+					"Error deleting contents of %s",
+					outputPath),
+				exception);
+
+		}
+
+		for (
+			ComponentDefinition componentDefinition
+				: definitions
+		) {
+
+			String outputFile =
+				stringFormat (
+					"%s/%s.xml",
+					outputPath,
+					componentDefinition.name ());
+
+			try {
+
+				new DataToXml ().writeToFile (
+					outputFile,
+					componentDefinition);
+
+			} catch (Exception exception) {
+
+				log.warn (
+					stringFormat (
+						"Error writing %s",
+						outputFile),
+					exception);
+
+			}
+
+		}
+
+		String orderedSingletonsFile =
+			stringFormat (
+				"%s/singleton-component-list.xml",
+				outputPath);
+
+		try {
+
+			new DataToXml ().writeToFile (
+				orderedSingletonsFile,
+				singletons);
+
+		} catch (Exception exception) {
+
+			log.warn (
+				stringFormat (
+					"Error writing %s",
+					orderedSingletonsFile),
+				exception);
+
+		}
+
+	}
+
 	// private implementation
 
 	private
@@ -706,10 +930,9 @@ class ComponentRegistryImplementation
 			@NonNull Boolean weak) {
 
 		taskLogger =
-			taskLogger.nest (
-				this,
-				"initInjectedPropertyTargetByQualifier",
-				log);
+			logContext.nestTaskLogger (
+				taskLogger,
+				"initInjectedPropertyTargetByQualifier");
 
 		@Cleanup
 		HeldLock heldlock =
@@ -807,90 +1030,90 @@ class ComponentRegistryImplementation
 
 	}
 
-	public
-	void outputComponentDefinitions (
-			@NonNull String outputPath) {
+	private
+	void registerScopedSingletons (
+			@NonNull TaskLogger taskLogger,
+			@NonNull ComponentDefinition componentDefinition) {
 
 		@Cleanup
 		HeldLock heldlock =
-			lock.read ();
+			lock.write ();
 
-		log.info (
-			stringFormat (
-				"Writing component definitions to %s",
-				outputPath));
-
-		try {
-
-			FileUtils.deleteDirectory (
-				new File (outputPath));
-
-			FileUtils.forceMkdir (
-				new File (outputPath));
-
-		} catch (IOException exception) {
-
-			log.warn (
-				stringFormat (
-					"Error deleting contents of %s",
-					outputPath),
-				exception);
-
-		}
+		Class <?> instantiateClass =
+			ifNull (
+				componentDefinition.factoryClass (),
+				componentDefinition.componentClass ());
 
 		for (
-			ComponentDefinition componentDefinition
-				: definitions
+			Field field
+				: FieldUtils.getAllFields (
+					instantiateClass)
 		) {
 
-			String outputFile =
-				stringFormat (
-					"%s/%s.xml",
-					outputPath,
-					componentDefinition.name ());
+			ClassSingletonDependency classSingletonDependencyAnnotation =
+				field.getAnnotation (
+					ClassSingletonDependency.class);
 
-			try {
-
-				new DataToXml ().writeToFile (
-					outputFile,
-					componentDefinition);
-
-			} catch (Exception exception) {
-
-				log.warn (
-					stringFormat (
-						"Error writing %s",
-						outputFile),
-					exception);
-
+			if (
+				isNull (
+					classSingletonDependencyAnnotation)
+			) {
+				continue;
 			}
 
-		}
+			if (
+				classNotEqual (
+					field.getType (),
+					LogContext.class)
+			) {
+				throw new RuntimeException ();
+			}
 
-		String orderedSingletonsFile =
-			stringFormat (
-				"%s/singleton-component-list.xml",
-				outputPath);
-
-		try {
-
-			new DataToXml ().writeToFile (
-				orderedSingletonsFile,
-				singletons);
-
-		} catch (Exception exception) {
-
-			log.warn (
+			String scopedComponentName =
 				stringFormat (
-					"Error writing %s",
-					orderedSingletonsFile),
-				exception);
+					"%s:%s",
+					classNameFull (
+						field.getDeclaringClass ()),
+					classNameFull (
+						LogContext.class));
+
+			if (
+				mapContainsKey (
+					byName,
+					scopedComponentName)
+			) {
+				continue;
+			}
+
+			registerDefinition (
+				new ComponentDefinition ()
+
+				.name (
+					scopedComponentName)
+
+				.scope (
+					"singleton")
+
+				.componentClass (
+					LogContext.class)
+
+				.factoryClass (
+					LogContextComponentFactory.class)
+
+				.hide (
+					true)
+
+				.addValueProperty (
+					"componentClass",
+					componentDefinition.componentClass ())
+
+			);
 
 		}
 
 	}
 
-	public
+	private
 	void initComponentDefinition (
 			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition) {
@@ -921,6 +1144,10 @@ class ComponentRegistryImplementation
 				field.getAnnotation (
 					SingletonDependency.class);
 
+			ClassSingletonDependency classSingletonDependencyAnnotation =
+				field.getAnnotation (
+					ClassSingletonDependency.class);
+
 			WeakSingletonDependency weakSingletonDependencyAnnotation =
 				field.getAnnotation (
 					WeakSingletonDependency.class);
@@ -936,6 +1163,8 @@ class ComponentRegistryImplementation
 							prototypeDependencyAnnotation),
 						optionalFromNullable (
 							singletonDependencyAnnotation),
+						optionalFromNullable (
+							classSingletonDependencyAnnotation),
 						optionalFromNullable (
 							weakSingletonDependencyAnnotation),
 						optionalFromNullable (
@@ -964,6 +1193,10 @@ class ComponentRegistryImplementation
 				|| isNotNull (
 					uninitializedDependencyAnnotation);
 
+			Boolean scoped =
+				isNotNull (
+					classSingletonDependencyAnnotation);
+
 			Boolean initialized =
 				isNull (
 					uninitializedDependencyAnnotation);
@@ -981,10 +1214,39 @@ class ComponentRegistryImplementation
 					namedAnnotation)
 			) {
 
+				if (scoped) {
+					throw new RuntimeException ();
+				}
+
+				String targetComponentName =
+					ifNull (
+						nullIfEmptyString (
+							namedAnnotation.value ()),
+						field.getName ());
+
 				initInjectedFieldByName (
 					taskLogger,
 					componentDefinition,
-					namedAnnotation,
+					targetComponentName,
+					field,
+					prototype,
+					initialized,
+					weak);
+
+			} else if (scoped) {
+
+				String targetComponentName =
+					stringFormat (
+						"%s:%s",
+						classNameFull (
+							field.getDeclaringClass ()),
+						classNameFull (
+							field.getType ()));
+
+				initInjectedFieldByName (
+					taskLogger,
+					componentDefinition,
+					targetComponentName,
 					field,
 					prototype,
 					initialized,
@@ -1082,17 +1344,16 @@ class ComponentRegistryImplementation
 	void initInjectedFieldByName (
 			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition,
-			@NonNull Named namedAnnotation,
+			@NonNull String targetComponentName,
 			@NonNull Field field,
 			@NonNull Boolean prototype,
 			@NonNull Boolean initialized,
 			@NonNull Boolean weak) {
 
 		taskLogger =
-			taskLogger.nest (
-				this,
-				"initInjectedFieldByName",
-				log);
+			logContext.nestTaskLogger (
+				taskLogger,
+				"initInjectedFieldByName");
 
 		@Cleanup
 		HeldLock heldlock =
@@ -1100,16 +1361,10 @@ class ComponentRegistryImplementation
 
 		// TODO merge this
 
-		String targetComponentDefinitionName =
-			ifNull (
-				nullIfEmptyString (
-					namedAnnotation.value ()),
-				field.getName ());
-
 		Optional <ComponentDefinition> targetComponentDefinitionOptional =
 			optionalFromNullable (
 				byName.get (
-					targetComponentDefinitionName));
+					targetComponentName));
 
 		if (
 			optionalIsNotPresent (
@@ -1118,7 +1373,7 @@ class ComponentRegistryImplementation
 
 			taskLogger.errorFormat (
 				"Named component %s does not exist for %s.%s",
-				targetComponentDefinitionName,
+				targetComponentName,
 				componentDefinition.name (),
 				field.getName ());
 
@@ -1162,7 +1417,7 @@ class ComponentRegistryImplementation
 
 			.targetComponentNames (
 				Collections.singletonList (
-					targetComponentDefinitionName))
+					targetComponentName))
 
 			.weak (
 				weak)
@@ -1181,10 +1436,9 @@ class ComponentRegistryImplementation
 			@NonNull InjectedProperty injectedProperty) {
 
 		taskLogger =
-			taskLogger.nest (
-				this,
-				"initInjectedPropertyField",
-				log);
+			logContext.nestTaskLogger (
+				taskLogger,
+				"initInjectedPropertyField");
 
 		@Cleanup
 		HeldLock heldlock =
@@ -1338,10 +1592,9 @@ class ComponentRegistryImplementation
 			@NonNull Boolean weak) {
 
 		taskLogger =
-			taskLogger.nest (
-				this,
-				"initInjectedPropertyTargetByClass",
-				log);
+			logContext.nestTaskLogger (
+				taskLogger,
+				"initInjectedPropertyTargetByClass");
 
 		@Cleanup
 		HeldLock heldlock =
@@ -1441,139 +1694,15 @@ class ComponentRegistryImplementation
 
 	}
 
-	@Override
-	public
-	ComponentManager build () {
-
-		TaskLogger taskLogger =
-			new TaskLogger (
-				log);
-
-		try (
-
-			ActiveTask activeTask =
-				activityManager.start (
-					"component-registry",
-					"build ()",
-					this);
-
-		) {
-
-			// create component manager
-
-			@SuppressWarnings ("resource")
-			ComponentManagerImplementation componentManager =
-				new ComponentManagerImplementation ()
-
-				.registry (
-					this)
-
-				.activityManager (
-					activityManager);
-
-			// automatic components
-
-			registerUnmanagedSingleton (
-				"componentManager",
-				componentManager);
-
-			registerUnmanagedSingleton (
-				"activityManager",
-				activityManager);
-
-			// work out dependencies
-
-			for (
-				ComponentDefinition componentDefinition
-					: definitions
-			) {
-
-				initComponentDefinition (
-					taskLogger,
-					componentDefinition);
-
-			}
-
-			// check dependencies exist
-
-			for (
-				ComponentDefinition componentDefinition
-					: definitions
-			) {
-
-				for (
-					String dependency
-						: componentDefinition.strongDependencies ()
-				) {
-
-					if (
-						! byName.containsKey (
-							dependency)
-					) {
-
-						taskLogger.errorFormat (
-							"Can't provide dependency %s for %s",
-							dependency,
-							componentDefinition.name ());
-
-					}
-
-				}
-
-			}
-
-			// order component definitions
-
-			singletons =
-				ImmutableList.copyOf (
-					orderByStrongDepedendencies (
-						taskLogger,
-						singletons));
-
-			// output component definitions
-
-			if (outputPath != null) {
-
-				outputComponentDefinitions (
-					outputPath);
-
-			}
-
-			// check for errors
-
-			if (taskLogger.errors ()) {
-				return null;
-			}
-
-			// initialise
-
-			componentManager.init (
-				taskLogger);
-
-			// check for errors
-
-			if (taskLogger.errors ()) {
-				return null;
-			}
-
-			// and return
-
-			return componentManager;
-
-		}
-
-	}
-
 	private
 	List <ComponentDefinition> orderByStrongDepedendencies (
 			@NonNull TaskLogger taskLogger,
 			@NonNull List <ComponentDefinition> definitions) {
 
 		taskLogger =
-			taskLogger.nest (
-				this,
-				"orderByStrongDependencies",
-				log);
+			logContext.nestTaskLogger (
+				taskLogger,
+				"orderByStrongDependencies");
 
 		List <ComponentDefinition> unorderedDefinitions =
 			new ArrayList<> (

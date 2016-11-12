@@ -1,20 +1,22 @@
 package wbs.apn.chat.supervisor.console;
 
-import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+
+import lombok.NonNull;
 
 import org.joda.time.Interval;
 
@@ -30,6 +32,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
@@ -94,7 +97,8 @@ class ChatSupervisorMessagesPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		chat =
 			chatHelper.findRequired (
@@ -124,7 +128,8 @@ class ChatSupervisorMessagesPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// table open
 
@@ -150,12 +155,13 @@ class ChatSupervisorMessagesPart
 					"magic-table-row"),
 				htmlDataAttribute (
 					"target-href",
-					requestContext.resolveLocalUrl (
-						stringFormat (
-							"/chat.supervisorConversation",
-							"?chatUserId1=%u",
-							chatMessage.getToUser ().getId (),
-							"&chatUserId2=%u",
+					requestContext.resolveLocalUrlFormat (
+						"/chat.supervisorConversation",
+						"?chatUserId1=%u",
+						integerToDecimalString (
+							chatMessage.getToUser ().getId ()),
+						"&chatUserId2=%u",
+						integerToDecimalString (
 							chatMessage.getFromUser ().getId ()))));
 
 			htmlTableCellWrite (

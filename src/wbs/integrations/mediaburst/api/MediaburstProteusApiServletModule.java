@@ -18,38 +18,43 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.AbstractWebFile;
-import wbs.framework.web.PathHandler;
-import wbs.framework.web.RegexpPathHandler;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.ServletModule;
-import wbs.framework.web.WebFile;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.web.context.RequestContext;
+import wbs.web.file.AbstractWebFile;
+import wbs.web.file.WebFile;
+import wbs.web.pathhandler.PathHandler;
+import wbs.web.pathhandler.RegexpPathHandler;
+import wbs.web.responder.WebModule;
 
 import nu.xom.Builder;
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Nodes;
 
-@Log4j
 @SingletonComponent ("mediaburstProteusApiServletModule")
 public
 class MediaburstProteusApiServletModule
-	implements ServletModule {
+	implements WebModule {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SmsDeliveryReportLogic reportLogic;
@@ -107,12 +112,20 @@ class MediaburstProteusApiServletModule
 
 		@Override
 		public
-		void doPost ()
+		void doPost (
+				@NonNull TaskLogger parentTaskLogger)
 			throws ServletException,
 				IOException {
 
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"reportFile.doPost");
+
 			ReportRequestResult reportRequestResult =
 				processReportRequest (
+
+					taskLogger,
 					requestContext.inputStream ());
 
 			if (
@@ -168,8 +181,9 @@ class MediaburstProteusApiServletModule
 
 	}
 
-	static ReportRequestResult processReportRequest (
-			InputStream in) {
+	ReportRequestResult processReportRequest (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull InputStream in) {
 
 		try {
 
@@ -183,9 +197,6 @@ class MediaburstProteusApiServletModule
 
 			Document document =
 				builder.build (in);
-
-			log.debug (
-				document.toXML ());
 
 			// save stuff
 

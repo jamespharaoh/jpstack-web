@@ -16,7 +16,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
@@ -25,6 +24,7 @@ import wbs.console.supervisor.SupervisorConfig;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.ContextTabPlacement;
 import wbs.console.tab.TabContextResponder;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -32,12 +32,12 @@ import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.PathHandler;
-import wbs.framework.web.Responder;
-import wbs.framework.web.WebFile;
+import wbs.web.file.WebFile;
+import wbs.web.pathhandler.PathHandler;
+import wbs.web.responder.Responder;
 
-@Log4j
 @Accessors (fluent = true)
 @DataClass ("console-module")
 @PrototypeComponent ("consoleModuleImpl")
@@ -49,6 +49,9 @@ class ConsoleModuleImplementation
 
 	@SingletonDependency
 	ComponentManager componentManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -126,10 +129,11 @@ class ConsoleModuleImplementation
 
 	public
 	Provider <Responder> beanResponder (
+			@NonNull TaskLogger taskLogger,
 			@NonNull String name) {
 
 		return componentManager.getComponentProviderRequired (
-			log,
+			taskLogger,
 			name,
 			Responder.class);
 
@@ -139,16 +143,15 @@ class ConsoleModuleImplementation
 
 	public
 	void addContextTab (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String tabLocation,
 			@NonNull ConsoleContextTab tab,
 			@NonNull List <String> contextTypes) {
 
-		taskLogger =
-			taskLogger.nest (
-				this,
-				"addContextTab",
-				log);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"addContextTab");
 
 		if (tab.name ().isEmpty ())
 			throw new RuntimeException ();

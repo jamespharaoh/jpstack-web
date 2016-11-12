@@ -6,37 +6,39 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingOneWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlInputUtils.htmlOptionWrite;
-import static wbs.utils.web.HtmlInputUtils.htmlSelectClose;
-import static wbs.utils.web.HtmlInputUtils.htmlSelectOpen;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlStyleAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingOneWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlInputUtils.htmlOptionWrite;
+import static wbs.web.utils.HtmlInputUtils.htmlSelectClose;
+import static wbs.web.utils.HtmlInputUtils.htmlSelectOpen;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+
+import lombok.NonNull;
 
 import wbs.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
@@ -52,9 +54,12 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.media.console.MediaConsoleLogic;
 
 @PrototypeComponent ("chatUserPendingFormResponder")
@@ -73,14 +78,17 @@ class ChatUserPendingFormResponder
 	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
+	MediaConsoleLogic mediaConsoleLogic;
+
 	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
-	MediaConsoleLogic mediaConsoleLogic;
 
 	// state
 
@@ -117,7 +125,8 @@ class ChatUserPendingFormResponder
 
 	@Override
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUser =
 			chatUserHelper.findRequired (
@@ -190,9 +199,16 @@ class ChatUserPendingFormResponder
 
 	@Override
 	public
-	void renderHtmlHeadContents () {
+	void renderHtmlHeadContents (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.renderHtmlHeadContents ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlHeadContents");
+
+		super.renderHtmlHeadContents (
+			taskLogger);
 
 		renderScriptBlock ();
 
@@ -224,12 +240,12 @@ class ChatUserPendingFormResponder
 
 		formatWriter.writeLineFormat (
 			"top.frames ['main'].location = '%j';",
-			requestContext.resolveApplicationUrl (
-				stringFormat (
-					"/chatUser.pending",
-					"/%u",
-					chatUser.getId (),
-					"/chatUser.pending.summary")));
+			requestContext.resolveApplicationUrlFormat (
+				"/chatUser.pending",
+				"/%u",
+				integerToDecimalString (
+					chatUser.getId ()),
+				"/chatUser.pending.summary"));
 
 		htmlScriptBlockClose ();
 
@@ -237,7 +253,8 @@ class ChatUserPendingFormResponder
 
 	@Override
 	protected
-	void renderHtmlBodyContents () {
+	void renderHtmlBodyContents (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlHeadingOneWrite (
 			"Chat user—approve info");
@@ -248,12 +265,12 @@ class ChatUserPendingFormResponder
 		// form open
 
 		htmlFormOpenPostAction (
-			requestContext.resolveApplicationUrl (
-				stringFormat (
-					"/chatUser.pending",
-					"/%u",
-					chatUser.getId (),
-					"/chatUser.pending.form")));
+			requestContext.resolveApplicationUrlFormat (
+				"/chatUser.pending",
+				"/%u",
+				integerToDecimalString (
+					chatUser.getId ()),
+				"/chatUser.pending.form"));
 
 		if (mode == PendingMode.none) {
 

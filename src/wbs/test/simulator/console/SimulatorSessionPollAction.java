@@ -24,11 +24,11 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.JsonResponder;
-import wbs.framework.web.Responder;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.test.simulator.model.SimulatorEventObjectHelper;
 import wbs.test.simulator.model.SimulatorEventRec;
+import wbs.web.responder.JsonResponder;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("simulatorSessionPollAction")
 public

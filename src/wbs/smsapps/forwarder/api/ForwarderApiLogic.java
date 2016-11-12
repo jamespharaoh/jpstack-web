@@ -3,13 +3,13 @@ package wbs.smsapps.forwarder.api;
 import java.util.List;
 import java.util.Map;
 
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
 import wbs.platform.rpc.core.RpcSource;
 import wbs.smsapps.forwarder.logic.ForwarderNotFoundException;
 import wbs.smsapps.forwarder.logic.IncorrectPasswordException;
 import wbs.smsapps.forwarder.logic.ReportableException;
 import wbs.smsapps.forwarder.model.ForwarderRec;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.Responder;
 
 public
 interface ForwarderApiLogic {

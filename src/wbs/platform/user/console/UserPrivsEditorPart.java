@@ -1,14 +1,14 @@
 package wbs.platform.user.console;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.web.HtmlAttributeUtils.htmlAttributeFormat;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockWrite;
+import static wbs.web.utils.HtmlAttributeUtils.htmlAttributeFormat;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockWrite;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +19,8 @@ import java.util.TreeMap;
 
 import com.google.common.collect.ImmutableSet;
 
+import lombok.NonNull;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
@@ -28,6 +30,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.console.PrivConsoleHelper;
@@ -97,7 +100,8 @@ class UserPrivsEditorPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// build the privs tree
 
@@ -252,9 +256,11 @@ class UserPrivsEditorPart
 
 	@Override
 	public
-	void renderHtmlHeadContent () {
+	void renderHtmlHeadContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.renderHtmlHeadContent ();
+		super.renderHtmlHeadContent (
+			parentTaskLogger);
 
 		renderScriptBlock ();
 
@@ -605,7 +611,8 @@ class UserPrivsEditorPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// form open
 

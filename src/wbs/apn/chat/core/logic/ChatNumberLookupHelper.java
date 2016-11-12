@@ -1,16 +1,19 @@
 package wbs.apn.chat.core.logic;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
+
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.object.ObjectManager;
+
+import wbs.sms.number.core.model.NumberRec;
+import wbs.sms.number.lookup.logic.NumberLookupHelper;
+import wbs.sms.number.lookup.model.NumberLookupRec;
 
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.object.ObjectManager;
-import wbs.sms.number.core.model.NumberRec;
-import wbs.sms.number.lookup.logic.NumberLookupHelper;
-import wbs.sms.number.lookup.model.NumberLookupRec;
 
 @SingletonComponent ("chatNumberLookupHelper")
 public
@@ -42,9 +45,9 @@ class ChatNumberLookupHelper
 			NumberRec number) {
 
 		ChatRec chat =
-			(ChatRec)
-			objectManager.getParentOrNull (
-				numberLookup);
+			genericCastUnchecked (
+				objectManager.getParentRequired (
+					numberLookup));
 
 		if (
 			stringEqualSafe (

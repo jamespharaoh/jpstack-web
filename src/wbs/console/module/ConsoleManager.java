@@ -1,5 +1,7 @@
 package wbs.console.module;
 
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
@@ -9,12 +11,14 @@ import wbs.console.context.ConsoleContextStuff;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.supervisor.SupervisorConfig;
 import wbs.console.tab.ConsoleContextTab;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.responder.Responder;
 
 public
 interface ConsoleManager {
 
 	void changeContext (
+			TaskLogger taskLogger,
 			ConsoleContext context,
 			String contextPartSuffix);
 
@@ -35,6 +39,7 @@ interface ConsoleManager {
 			boolean required);
 
 	void runPostProcessors (
+			TaskLogger taskLogger,
 			String name,
 			ConsoleContextStuff contextStuff);
 
@@ -66,18 +71,41 @@ interface ConsoleManager {
 			ConsoleContext consoleContext,
 			String localFile);
 
-	Optional<ConsoleContext> relatedContext (
+	Optional <ConsoleContext> relatedContext (
+			TaskLogger taskLogger,
 			ConsoleContext sourceContext,
 			ConsoleContextType targetContextType,
 			boolean required);
 
-	Optional<ConsoleContext> relatedContext (
+	default
+	Optional <ConsoleContext> relatedContext (
+			TaskLogger taskLogger,
 			ConsoleContext sourceContext,
-			ConsoleContextType targetContextType);
+			ConsoleContextType targetContextType) {
 
+		return relatedContext (
+			taskLogger,
+			sourceContext,
+			targetContextType,
+			false);
+
+	}
+
+	default
 	ConsoleContext relatedContextRequired (
+			TaskLogger taskLogger,
 			ConsoleContext sourceContext,
-			ConsoleContextType targetContextType);
+			ConsoleContextType targetContextType) {
+
+		return optionalGetRequired (
+			relatedContext (
+				taskLogger,
+				sourceContext,
+				targetContextType,
+				true));
+
+	}
+
 
 	SupervisorConfig supervisorConfig (
 			String name);

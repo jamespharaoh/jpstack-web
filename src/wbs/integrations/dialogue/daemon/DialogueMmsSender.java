@@ -2,6 +2,7 @@ package wbs.integrations.dialogue.daemon;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 
@@ -36,9 +37,12 @@ import org.xml.sax.helpers.DefaultHandler;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+
 import wbs.integrations.dialogue.model.DialogueMmsRouteObjectHelper;
 import wbs.integrations.dialogue.model.DialogueMmsRouteRec;
+
 import wbs.platform.media.model.MediaRec;
+
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
 import wbs.sms.message.outbox.model.OutboxRec;
@@ -223,7 +227,8 @@ class DialogueMmsSender
 					wbsConfig.apiUrl (),
 					"/dialogueMMS/route",
 					"/%u",
-					smsMessage.getRoute ().getId (),
+					integerToDecimalString (
+						smsMessage.getRoute ().getId ()),
 					"/report"));
 
 		}

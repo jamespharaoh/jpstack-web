@@ -1,5 +1,6 @@
 package wbs.platform.rpc.php;
 
+import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -15,19 +16,20 @@ import java.util.Map;
 import javax.inject.Provider;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.LocalDate;
 
 import wbs.api.mvc.WebApiAction;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.php.PhpEntity;
 import wbs.platform.php.PhpFormatter;
 import wbs.platform.php.PhpUnserializeException;
@@ -39,8 +41,9 @@ import wbs.platform.rpc.core.RpcHandler;
 import wbs.platform.rpc.core.RpcResult;
 import wbs.platform.rpc.core.RpcSource;
 import wbs.platform.rpc.web.ReusableRpcHandler;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.Responder;
 
-@Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("phpRpcAction")
 public
@@ -51,6 +54,9 @@ class PhpRpcAction
 
 	@SingletonDependency
 	ComponentManager componentManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RequestContext requestContext;
@@ -75,15 +81,17 @@ class PhpRpcAction
 			@Override
 			public
 			RpcResult handle (
-					RpcSource source) {
+					@NonNull TaskLogger parentTaskLogger,
+					@NonNull RpcSource source) {
 
 				RpcHandler delegate =
 					componentManager.getComponentRequired (
-						log,
+						parentTaskLogger,
 						name,
 						RpcHandler.class);
 
 				return delegate.handle (
+					parentTaskLogger,
 					source);
 
 			}
@@ -105,23 +113,36 @@ class PhpRpcAction
 
 	@Override
 	public
-	Responder go ()
+	Responder go (
+			@NonNull TaskLogger parentTaskLogger)
 		throws IOException {
 
 		RpcResult ret =
-			realGo ();
+			realGo (
+				parentTaskLogger);
 
 		return ret != null
 			? phpMapResponderProvider.get ()
-				.map (ret.getStruct ().getNative ())
-				.status (ret.getHttpStatus ())
+
+				.map (
+					ret.getStruct ().getNative ())
+
+				.status (
+					ret.getHttpStatus ())
+
 			: null;
 
 	}
 
 	public
-	RpcResult realGo ()
+	RpcResult realGo (
+			@NonNull TaskLogger parentTaskLogger)
 		throws IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"realGo");
 
 		// process input
 
@@ -166,11 +187,11 @@ class PhpRpcAction
 
 		}
 
-		log.debug (
-			stringFormat (
-				"PHP RPC request to %s\n%s",
-				requestContext.requestUri (),
-				PhpFormatter.DEFAULT.format (input)));
+		taskLogger.debugFormat (
+			"PHP RPC request to %s\n%s",
+			requestContext.requestUri (),
+			PhpFormatter.DEFAULT.format (
+				input));
 
 		// get and validate encoding
 
@@ -195,9 +216,17 @@ class PhpRpcAction
 		// hand off to the handler
 
 		try {
-			return rpcHandler.handle(new PhpRpcSource(encoding, input));
+
+			return rpcHandler.handle (
+				taskLogger,
+				new PhpRpcSource (
+					encoding,
+					input));
+
 		} catch (RpcException e) {
+
 			return e.getRpcResult();
+
 		}
 
 	}
@@ -394,7 +423,8 @@ class PhpRpcAction
 		throw new RuntimeException (
 			stringFormat (
 				"Unrecognised RPC type %s",
-				rpcDefition.type ()));
+				enumName (
+					rpcDefition.type ())));
 
 	}
 

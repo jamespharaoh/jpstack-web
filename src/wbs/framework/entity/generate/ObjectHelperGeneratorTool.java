@@ -8,15 +8,15 @@ import java.util.List;
 import javax.inject.Provider;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-@Log4j
 public
 class ObjectHelperGeneratorTool {
 
@@ -24,6 +24,9 @@ class ObjectHelperGeneratorTool {
 
 	@SingletonDependency
 	EntityHelper entityHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -34,14 +37,13 @@ class ObjectHelperGeneratorTool {
 
 	public
 	void generateObjectHelpers (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <String> params) {
 
-		taskLogger =
-			taskLogger.nest (
-				this,
-				"generateObjectHelpers",
-				log);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"generateObjectHelpers");
 
 		List <Model <?>> models =
 			entityHelper.models ();

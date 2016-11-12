@@ -8,11 +8,14 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.context.ConsoleContextMetaBuilderContainer;
+
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.tools.ComponentFactory;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -24,6 +27,9 @@ class ConsoleMetaModuleFactory
 
 	@SingletonDependency
 	ConsoleMetaModuleBuilder consoleMetaModuleBuilder;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -43,7 +49,12 @@ class ConsoleMetaModuleFactory
 	@Override
 	public
 	Object makeComponent (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"makeComponent");
 
 		ConsoleMetaModuleImplementation consoleMetaModule =
 			consoleMetaModuleProvider.get ();
@@ -52,6 +63,7 @@ class ConsoleMetaModuleFactory
 			new ConsoleContextMetaBuilderContainer ();
 
 		consoleMetaModuleBuilder.descend (
+			taskLogger,
 			contextMetaBuilderContainer,
 			consoleSpec.builders (),
 			consoleMetaModule,

@@ -3,7 +3,7 @@ package wbs.console.combo;
 import com.google.common.base.Optional;
 
 import wbs.framework.database.Transaction;
-import wbs.framework.web.Responder;
+import wbs.web.responder.Responder;
 
 public
 interface ConsoleFormActionHelper<FormState> {

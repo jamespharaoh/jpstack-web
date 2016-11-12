@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Provider;
+
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
@@ -23,7 +25,9 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import wbs.framework.codegen.JavaClassUnitWriter;
 import wbs.framework.codegen.JavaClassWriter;
 import wbs.framework.codegen.JavaImportRegistry;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
@@ -55,7 +59,9 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.entity.record.RecordComponent;
 import wbs.framework.entity.record.RootRecord;
 import wbs.framework.entity.record.TypeRecord;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.string.AtomicFileWriter;
 import wbs.utils.string.FormatWriter;
 
@@ -66,8 +72,19 @@ class ModelRecordGenerator {
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ModelWriterManager modelWriterBuilder;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <JavaClassWriter> javaClassWriterProvider;
+
+	@PrototypeDependency
+	Provider <JavaClassUnitWriter> javaClassUnitWriterProvider;
 
 	// properties
 
@@ -85,7 +102,12 @@ class ModelRecordGenerator {
 
 	public
 	void generateRecord (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"generateRecord");
 
 		if (modelMeta.type ().record ()) {
 
@@ -131,7 +153,7 @@ class ModelRecordGenerator {
 				filename);
 
 		JavaClassUnitWriter classUnitWriter =
-			new JavaClassUnitWriter ()
+			javaClassUnitWriterProvider.get ()
 
 			.formatWriter (
 				formatWriter)
@@ -141,7 +163,7 @@ class ModelRecordGenerator {
 				plugin.packageName ());
 
 		JavaClassWriter modelWriter =
-			new JavaClassWriter ()
+			javaClassWriterProvider.get ()
 
 			.className (
 				recordClassName)
@@ -257,6 +279,7 @@ class ModelRecordGenerator {
 
 	public
 	void writeConstructor (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
 
@@ -296,8 +319,14 @@ class ModelRecordGenerator {
 
 	private
 	void writeFields (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeFields");
 
 		if (modelMeta.fields ().isEmpty ()) {
 			return;
@@ -327,6 +356,7 @@ class ModelRecordGenerator {
 				formatWriter);
 
 		modelWriterBuilder.write (
+			taskLogger,
 			nextContext,
 			modelMeta.fields (),
 			nextTarget);
@@ -335,8 +365,14 @@ class ModelRecordGenerator {
 
 	private
 	void writeCollections (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeCollections");
 
 		if (modelMeta.collections ().isEmpty ()) {
 			return;
@@ -366,6 +402,7 @@ class ModelRecordGenerator {
 				formatWriter);
 
 		modelWriterBuilder.write (
+			taskLogger,
 			nextContext,
 			modelMeta.collections (),
 			nextTarget);
@@ -374,6 +411,7 @@ class ModelRecordGenerator {
 
 	private
 	void writeEquals (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
 
@@ -588,6 +626,7 @@ class ModelRecordGenerator {
 	}
 
 	void writeCompareTo (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
 
@@ -1076,6 +1115,7 @@ class ModelRecordGenerator {
 
 	public
 	void writeToString (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
 

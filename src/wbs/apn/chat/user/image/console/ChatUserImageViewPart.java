@@ -1,8 +1,12 @@
 package wbs.apn.chat.user.image.console;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+
+import lombok.NonNull;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserDao;
@@ -12,8 +16,9 @@ import wbs.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.PageNotFoundException;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.media.console.MediaConsoleLogic;
+import wbs.web.exceptions.HttpNotFoundException;
 
 @PrototypeComponent ("chatUserImageViewPart")
 public
@@ -43,7 +48,8 @@ class ChatUserImageViewPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUser =
 			chatUserHelper.findRequired (
@@ -61,14 +67,19 @@ class ChatUserImageViewPart
 				image.getChatUser (),
 				chatUser)
 		) {
-			throw new PageNotFoundException ();
+
+			throw new HttpNotFoundException (
+				optionalAbsent (),
+				emptyList ());
+
 		}
 
 	}
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlParagraphOpen ();
 

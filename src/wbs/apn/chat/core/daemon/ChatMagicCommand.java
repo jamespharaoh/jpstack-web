@@ -3,22 +3,24 @@ package wbs.apn.chat.core.daemon;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import com.google.common.base.Optional;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.keyword.model.ChatKeywordObjectHelper;
-import wbs.apn.chat.keyword.model.ChatKeywordRec;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.core.logic.KeywordFinder;
@@ -26,6 +28,11 @@ import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.daemon.CommandManager;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
+
+import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.keyword.model.ChatKeywordObjectHelper;
+import wbs.apn.chat.keyword.model.ChatKeywordRec;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatMagicCommand")
@@ -52,6 +59,9 @@ class ChatMagicCommand
 
 	@SingletonDependency
 	KeywordFinder keywordFinder;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -86,12 +96,18 @@ class ChatMagicCommand
 
 	@Override
 	public
-	InboxAttemptRec handle () {
+	InboxAttemptRec handle (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		ChatRec chat =
-			(ChatRec)
-			objectManager.getParentOrNull (
-				command);
+			genericCastUnchecked (
+				objectManager.getParentRequired (
+					command));
 
 		// look for a single keyword
 
@@ -121,6 +137,7 @@ class ChatMagicCommand
 			) {
 
 				return commandManager.handle (
+					taskLogger,
 					inbox,
 					chatKeywordOptional.get ().getCommand (),
 					optionalAbsent (),
@@ -137,6 +154,7 @@ class ChatMagicCommand
 				commandRef.get ());
 
 		return commandManager.handle (
+			taskLogger,
 			inbox,
 			defaultCommand,
 			optionalAbsent (),

@@ -1,6 +1,5 @@
 package wbs.integrations.fonix.foreignapi;
 
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.PropertyUtils.checkRequiredProperties;
@@ -21,8 +20,8 @@ import org.json.simple.JSONValue;
 import wbs.framework.apiclient.GenericHttpSenderHelper;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.tools.DataFromJson;
-import wbs.framework.web.UrlParams;
 import wbs.utils.etc.PropertyUtils.RequiredProperty;
+import wbs.web.misc.UrlParams;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("fonixMessageSenderHelper")

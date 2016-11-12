@@ -4,10 +4,15 @@ import static wbs.utils.etc.Misc.doNothing;
 
 import java.io.IOException;
 
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.responder.Responder;
 
 public abstract
 class ConsoleResponder
@@ -17,6 +22,9 @@ class ConsoleResponder
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// state
 
@@ -31,7 +39,9 @@ class ConsoleResponder
 	}
 
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
 	}
 
 	protected
@@ -40,8 +50,9 @@ class ConsoleResponder
 	}
 
 	protected
-	void render ()
-		throws IOException {
+	void render (
+			@NonNull TaskLogger parentTaskLogger) {
+
 	}
 
 	protected
@@ -51,8 +62,14 @@ class ConsoleResponder
 
 	@Override
 	public final
-	void execute ()
+	void execute (
+			@NonNull TaskLogger parentTaskLogger)
 		throws IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"execute");
 
 		try (
 
@@ -67,9 +84,14 @@ class ConsoleResponder
 				transaction;
 
 			setup ();
-			prepare ();
+
+			prepare (
+				taskLogger);
+
 			setHtmlHeaders ();
-			render ();
+
+			render (
+				taskLogger);
 
 		} finally {
 

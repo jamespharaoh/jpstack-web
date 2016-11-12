@@ -16,15 +16,18 @@ import lombok.NonNull;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.join.daemon.ChatJoiner;
-import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.join.daemon.ChatJoiner;
+import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
@@ -53,6 +56,9 @@ class ChatAdultDeliveryHandler
 	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// prototype dependencies
 
 	@PrototypeDependency
@@ -63,8 +69,14 @@ class ChatAdultDeliveryHandler
 	@Override
 	public
 	void handle (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long deliveryId,
 			@NonNull Long ref) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		@Cleanup
 		Transaction transaction =
@@ -182,7 +194,8 @@ class ChatAdultDeliveryHandler
 			.joinType (
 				joinType)
 
-			.handleSimple ();
+			.handleSimple (
+				taskLogger);
 
 		deliveryHelper.remove (
 			delivery);

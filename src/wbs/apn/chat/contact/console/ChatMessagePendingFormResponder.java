@@ -5,25 +5,27 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingOneWrite;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlInputUtils.htmlOptionWrite;
-import static wbs.utils.web.HtmlInputUtils.htmlSelectClose;
-import static wbs.utils.web.HtmlInputUtils.htmlSelectOpen;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingOneWrite;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlInputUtils.htmlOptionWrite;
+import static wbs.web.utils.HtmlInputUtils.htmlSelectClose;
+import static wbs.web.utils.HtmlInputUtils.htmlSelectOpen;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.List;
+
+import lombok.NonNull;
 
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
@@ -31,8 +33,11 @@ import wbs.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("chatMessagePendingFormResponder")
 public
@@ -47,6 +52,9 @@ class ChatMessagePendingFormResponder
 	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
@@ -60,7 +68,8 @@ class ChatMessagePendingFormResponder
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		chatMessage =
 			chatMessageHelper.findRequired (
@@ -76,9 +85,16 @@ class ChatMessagePendingFormResponder
 
 	@Override
 	public
-	void renderHtmlHeadContents () {
+	void renderHtmlHeadContents (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.renderHtmlHeadContents ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlHeadContents");
+
+		super.renderHtmlHeadContents (
+			taskLogger);
 
 		// script open
 
@@ -223,7 +239,8 @@ class ChatMessagePendingFormResponder
 
 	@Override
 	public
-	void renderHtmlBodyContents () {
+	void renderHtmlBodyContents (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlHeadingOneWrite (
 			"Chat message to approve");

@@ -8,19 +8,23 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.spec.PrivKeySpec;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.tab.ConsoleContextTab;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.GlobalId;
-import wbs.framework.web.WebFile;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.file.WebFile;
 
 @Accessors (fluent = true)
 @DataClass ("simple-context")
@@ -30,6 +34,9 @@ class SimpleConsoleContext
 	extends ConsoleContext {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
@@ -120,8 +127,14 @@ class SimpleConsoleContext
 	@Override
 	public
 	void initContext (
-			PathSupply pathParts,
-			ConsoleContextStuff contextStuff) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull PathSupply pathParts,
+			@NonNull ConsoleContextStuff contextStuff) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initContext");
 
 		// set privs
 
@@ -177,6 +190,7 @@ class SimpleConsoleContext
 		if (parentContext != null) {
 
 			parentContext.initContext (
+				taskLogger,
 				pathParts,
 				contextStuff);
 
@@ -187,6 +201,7 @@ class SimpleConsoleContext
 		if (postProcessorName () != null) {
 
 			consoleManager.runPostProcessors (
+				taskLogger,
 				postProcessorName (),
 				contextStuff);
 

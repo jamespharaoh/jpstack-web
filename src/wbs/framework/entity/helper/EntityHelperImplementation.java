@@ -1,12 +1,11 @@
 package wbs.framework.entity.helper;
 
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.io.FileUtils.deleteDirectory;
+import static wbs.utils.io.FileUtils.forceMkdir;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -16,11 +15,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
-import org.apache.commons.io.FileUtils;
-
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -31,15 +29,19 @@ import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelBuilder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
-@Log4j
 @SingletonComponent ("entityHelper")
 public
 class EntityHelperImplementation
 	implements EntityHelper {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ModelMetaLoader modelMetaLoader;
@@ -70,12 +72,21 @@ class EntityHelperImplementation
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void init (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"init");
 
 		initEntityClassNames ();
-		initEntityClasses ();
 
-		initModels ();
+		initEntityClasses (
+			taskLogger);
+
+		initModels (
+			taskLogger);
 
 	}
 
@@ -110,12 +121,16 @@ class EntityHelperImplementation
 
 	}
 
-	void initEntityClasses () {
+	void initEntityClasses (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initEntityClasses");
 
 		ImmutableList.Builder <Class <?>> entityClassesBuilder =
 			ImmutableList.builder ();
-
-		int errors = 0;
 
 		for (
 			String entityClassName
@@ -133,49 +148,42 @@ class EntityHelperImplementation
 
 			} catch (ClassNotFoundException exception) {
 
-				log.error (
-					stringFormat (
-						"No such class %s",
-						entityClassName));
-
-				errors ++;
+				taskLogger.errorFormat (
+					"No such class %s",
+					entityClassName);
 
 			}
 
 		}
 
-		if (errors > 0) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Aborting due to %s classes not found",
-					integerToDecimalString (
-						errors)));
-
-		}
+		taskLogger.makeException ();
 
 		entityClasses =
 			entityClassesBuilder.build ();
 
 	}
 
-	void initModels () {
+	void initModels (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initModels");
 
 		try {
 
-			FileUtils.deleteDirectory (
-				new File (
-					"work/model"));
+			deleteDirectory (
+				"work/model");
 
-			FileUtils.forceMkdir (
-				new File (
-					"work/model"));
+			forceMkdir (
+				"work/model");
 
-		} catch (IOException exception) {
+		} catch (RuntimeException exception) {
 
-			log.error (
-				"Error deleting contents of work/model",
-				exception);
+			taskLogger.errorFormat (
+				"Error deleting contents of work/model: %s",
+				exception.getMessage ());
 
 		}
 
@@ -205,7 +213,8 @@ class EntityHelperImplementation
 				.modelMeta (
 					modelMeta)
 
-				.build ();
+				.build (
+					taskLogger);
 
 			if (model == null) {
 
@@ -240,10 +249,9 @@ class EntityHelperImplementation
 
 			} catch (Exception exception) {
 
-				log.warn (
-					stringFormat (
-						"Error writing %s",
-						outputFilename));
+				taskLogger.warningFormat (
+					"Error writing %s",
+					outputFilename);
 
 			}
 

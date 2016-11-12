@@ -24,6 +24,7 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -31,13 +32,16 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.console.UserConsoleLogic;
+
+import wbs.utils.etc.PropertyUtils;
+
 import wbs.services.ticket.core.console.TicketConsoleHelper;
 import wbs.services.ticket.core.console.TicketFieldValueConsoleHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
@@ -45,7 +49,7 @@ import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketFieldValueRec;
 import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketRec;
-import wbs.utils.etc.PropertyUtils;
+import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectTicketCreateAction")
@@ -321,7 +325,10 @@ class ObjectTicketCreateAction <
 		// perform updates
 
 		if (formFieldsProvider != null) {
-			prepareFieldSet();
+
+			prepareFieldSet (
+				taskLogger);
+
 		}
 
 		UpdateResultSet updateResultSet =
@@ -442,10 +449,12 @@ class ObjectTicketCreateAction <
 
 	}
 
-	void prepareFieldSet () {
+	void prepareFieldSet (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		fields =
 			formFieldsProvider.getFieldsForParent (
+				parentTaskLogger,
 				ticketManager);
 
 	}

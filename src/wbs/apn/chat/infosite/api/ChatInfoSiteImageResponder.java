@@ -12,9 +12,9 @@ import wbs.apn.chat.infosite.model.ChatInfoSiteRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.AbstractResponder;
-import wbs.framework.web.RequestContext;
 import wbs.platform.media.model.MediaRec;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.AbstractResponder;
 
 @PrototypeComponent ("chatInfoSiteImageResponder")
 public

@@ -2,20 +2,22 @@ package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.LogicUtils.booleanToString;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteRaw;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteRaw;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.util.Set;
 
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableSet;
+
+import lombok.NonNull;
 
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -26,7 +28,8 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.utils.web.HtmlTableCheckWriter;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.utils.HtmlTableCheckWriter;
 
 @PrototypeComponent ("chatUserAdminBarringPart")
 public
@@ -72,7 +75,8 @@ class ChatUserAdminBarringPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUser =
 			chatUserHelper.findRequired (
@@ -83,7 +87,8 @@ class ChatUserAdminBarringPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		if (
 			enumEqualSafe (

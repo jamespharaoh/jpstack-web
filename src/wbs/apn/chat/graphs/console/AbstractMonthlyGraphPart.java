@@ -1,14 +1,15 @@
 package wbs.apn.chat.graphs.console;
 
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenGetAction;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenGetAction;
 
 import java.util.Collections;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -16,6 +17,7 @@ import org.joda.time.YearMonth;
 
 import wbs.console.html.ObsoleteDateLinks;
 import wbs.console.part.AbstractPagePart;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 public abstract
@@ -38,7 +40,8 @@ class AbstractMonthlyGraphPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		yearMonth =
 			YearMonth.parse (
@@ -49,7 +52,8 @@ class AbstractMonthlyGraphPart
 
 	@Override
 	public
-	void renderHtmlBodyContent ()  {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger)  {
 
 		htmlFormOpenGetAction (
 			requestContext.resolveLocalUrl (

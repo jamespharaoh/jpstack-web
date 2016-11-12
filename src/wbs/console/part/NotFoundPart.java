@@ -1,11 +1,14 @@
 package wbs.console.part;
 
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteHtml;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteHtml;
+
+import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("notFoundPart")
 public
@@ -14,7 +17,8 @@ class NotFoundPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlParagraphWrite (
 			"Page not found",

@@ -23,6 +23,7 @@ import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -30,8 +31,10 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
+
 import wbs.utils.etc.PropertyUtils;
+
+import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSettingsAction")
@@ -135,7 +138,8 @@ class ObjectSettingsAction <
 
 			prepareParent ();
 
-			prepareFieldSet ();
+			prepareFieldSet (
+				taskLogger);
 
 		}
 
@@ -254,10 +258,12 @@ class ObjectSettingsAction <
 
 	}
 
-	void prepareFieldSet () {
+	void prepareFieldSet (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		formFieldSet =
 			formFieldsProvider.getFieldsForObject (
+				parentTaskLogger,
 				object);
 
 	}

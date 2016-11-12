@@ -1,17 +1,19 @@
 package wbs.console.helper.provider;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.TypeUtils.classNameFull;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @SingletonComponent ("consoleHelperProviderManager")
 public
 class ConsoleHelperProviderManager {
@@ -19,8 +21,10 @@ class ConsoleHelperProviderManager {
 	// singleton dependencies
 
 	@SingletonDependency
-	Map <String, ConsoleHelperProvider <?>>
-	consoleHelperProvidersByBeanName;
+	Map <String, ConsoleHelperProvider <?>> consoleHelperProvidersByBeanName;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// state
 
@@ -31,7 +35,13 @@ class ConsoleHelperProviderManager {
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void init (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"init");
 
 		for (
 			Map.Entry <String, ConsoleHelperProvider <?>> entry
@@ -48,9 +58,9 @@ class ConsoleHelperProviderManager {
 					consoleHelperProvider.objectClass ())
 			) {
 
-				log.error (
-					stringFormat (
-						"Ignoring duplicate helper provider for class %s",
+				taskLogger.errorFormat (
+					"Ignoring duplicate helper provider for class %s",
+					classNameFull (
 						consoleHelperProvider.objectClass ()));
 
 				continue;

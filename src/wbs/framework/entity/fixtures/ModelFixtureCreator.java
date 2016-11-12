@@ -1,18 +1,16 @@
 package wbs.framework.entity.fixtures;
 
-import static wbs.utils.string.StringUtils.stringFormat;
-
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Provider;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -20,19 +18,22 @@ import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-@Log4j
 public
 class ModelFixtureCreator {
 
 	// singleton dependencies
 
 	@SingletonDependency
-	ModelMetaLoader modelMetaLoader;
+	EntityHelper entityHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
-	EntityHelper entityHelper;
+	ModelMetaLoader modelMetaLoader;
 
 	// prototype dependencies
 
@@ -83,18 +84,16 @@ class ModelFixtureCreator {
 
 	public
 	void runModelFixtureCreators (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <String> arguments) {
 
-		taskLogger =
-			taskLogger.nest (
-				this,
-				"runModelFixtureCreators",
-				log);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runModelFixtureCreators");
 
-		log.info (
-			stringFormat (
-				"About to create model fixtures"));
+		taskLogger.noticeFormat (
+			"About to create model fixtures");
 
 		for (
 			ModelMetaSpec spec
@@ -106,6 +105,7 @@ class ModelFixtureCreator {
 					spec.name ());
 
 			fixtureBuilder.descend (
+				taskLogger,
 				spec,
 				spec.children (),
 				model,
@@ -113,9 +113,8 @@ class ModelFixtureCreator {
 
 		}
 
-		log.info (
-			stringFormat (
-				"All model fixtures created successfully"));
+		taskLogger.noticeFormat (
+			"All model fixtures created successfully");
 
 	}
 

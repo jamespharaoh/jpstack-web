@@ -16,7 +16,6 @@ import javax.inject.Provider;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -32,32 +31,37 @@ import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.object.criteria.WhereDeletedCriteriaSpec;
 import wbs.platform.object.criteria.WhereICanManageCriteriaSpec;
 import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
 import wbs.platform.scaffold.model.SliceRec;
 
-@Log4j
 @PrototypeComponent ("objectListPageBuilder")
 @ConsoleModuleBuilderHandler
 public
 class ObjectListPageBuilder <
 	ObjectType extends Record <ObjectType>,
 	ParentType extends Record <ParentType>
-> {
+>
+	implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -69,6 +73,9 @@ class ObjectListPageBuilder <
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -124,11 +131,19 @@ class ObjectListPageBuilder <
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		setDefaults ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
+
+		setDefaults (
+			taskLogger);
 
 		for (
 			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
@@ -190,12 +205,13 @@ class ObjectListPageBuilder <
 
 	void buildResponder () {
 
-		Provider<PagePart> partFactory =
-			new Provider<PagePart> () {
+		PagePartFactory partFactory =
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return objectListPart.get ()
 
@@ -242,7 +258,8 @@ class ObjectListPageBuilder <
 
 	// defaults
 
-	void setDefaults () {
+	void setDefaults (
+			@NonNull TaskLogger taskLogger) {
 
 		consoleHelper =
 			container.consoleHelper ();
@@ -257,7 +274,7 @@ class ObjectListPageBuilder <
 			fieldsProvider =
 				genericCastUnchecked (
 					componentManager.getComponentRequired (
-						log,
+						taskLogger,
 						spec.fieldsProviderName (),
 						FieldsProvider.class));
 
@@ -281,7 +298,8 @@ class ObjectListPageBuilder <
 				new StaticFieldsProvider<ObjectType,ParentType> ()
 
 				.fields (
-					defaultFields ());
+					defaultFields (
+						taskLogger));
 
 		}
 
@@ -289,7 +307,7 @@ class ObjectListPageBuilder <
 		listBrowsersByFieldName =
 			ifNull (
 				spec.listBrowsersByFieldName (),
-				Collections.<String,ObjectListBrowserSpec>emptyMap ());
+				Collections.emptyMap ());
 
 		listTabsByName =
 			spec.listTabsByName () != null
@@ -299,7 +317,13 @@ class ObjectListPageBuilder <
 
 	}
 
-	FormFieldSet <ObjectType> defaultFields () {
+	FormFieldSet <ObjectType> defaultFields (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"defaultFields");
 
 		// create spec
 
@@ -356,6 +380,7 @@ class ObjectListPageBuilder <
 				consoleHelper.objectName ());
 
 		return consoleModuleBuilder.buildFormFieldSet (
+			taskLogger,
 			consoleHelper,
 			fieldSetName,
 			formFieldSpecs);

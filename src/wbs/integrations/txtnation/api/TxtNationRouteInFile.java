@@ -1,5 +1,6 @@
 package wbs.integrations.txtnation.api;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
@@ -9,16 +10,17 @@ import java.util.Collections;
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.AbstractWebFile;
-import wbs.framework.web.RequestContext;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.integrations.txtnation.model.TxtNationRouteInObjectHelper;
 import wbs.integrations.txtnation.model.TxtNationRouteInRec;
 import wbs.platform.media.model.MediaRec;
@@ -28,8 +30,9 @@ import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
 import wbs.utils.string.StringFormatter;
+import wbs.web.context.RequestContext;
+import wbs.web.file.AbstractWebFile;
 
-@Log4j
 @SingletonComponent ("txtNationRouteInFile")
 public
 class TxtNationRouteInFile
@@ -40,14 +43,17 @@ class TxtNationRouteInFile
 	@SingletonDependency
 	Database database;
 
-	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	NumberFormatLogic numberFormatLogic;
 
 	@SingletonDependency
 	RequestContext requestContext;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -59,7 +65,13 @@ class TxtNationRouteInFile
 
 	@Override
 	public
-	void doPost () {
+	void doPost (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doPost");
 
 		Long routeId =
 			requestContext.requestIntegerRequired (
@@ -102,7 +114,7 @@ class TxtNationRouteInFile
 		// debugging
 
 		requestContext.debugDump (
-			log);
+			taskLogger);
 
 		// start transaction
 
@@ -118,7 +130,8 @@ class TxtNationRouteInFile
 				() -> new RuntimeException (
 					stringFormat (
 						"No txtNation inbound route info for route %s",
-						routeId)));
+						integerToDecimalString (
+							routeId))));
 
 		// sanity checks
 

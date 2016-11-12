@@ -25,8 +25,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
 import wbs.sms.keyword.logic.KeywordLogic;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatAffiliateKeywordsCreateAction")
 public

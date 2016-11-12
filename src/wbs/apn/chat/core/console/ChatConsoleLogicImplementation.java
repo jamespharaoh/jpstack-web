@@ -2,9 +2,9 @@ package wbs.apn.chat.core.console;
 
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlInputUtils.htmlSelect;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlInputUtils.htmlSelect;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

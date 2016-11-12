@@ -23,24 +23,30 @@ import wbs.console.module.ResolvedConsoleContextLink;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.console.object.ObjectContext;
 import wbs.console.tab.ConsoleContextTab;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("simpleConsoleContextBuilder")
 @ConsoleModuleBuilderHandler
 public
 class SimpleConsoleContextBuilder <
 	ObjectType extends Record <ObjectType>
-> {
+>
+	implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -49,6 +55,9 @@ class SimpleConsoleContextBuilder <
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -92,9 +101,16 @@ class SimpleConsoleContextBuilder <
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		setDefaults ();
 
@@ -150,6 +166,7 @@ class SimpleConsoleContextBuilder <
 					structuralName));
 
 		builder.descend (
+			taskLogger,
 			nextBuilderContainer,
 			spec.children (),
 			consoleModule,

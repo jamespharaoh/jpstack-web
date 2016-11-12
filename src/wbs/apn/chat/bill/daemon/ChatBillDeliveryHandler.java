@@ -1,7 +1,8 @@
 package wbs.apn.chat.bill.daemon;
 
+import static wbs.utils.etc.EnumUtils.enumNameSpaces;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,7 +11,6 @@ import javax.inject.Named;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -21,10 +21,13 @@ import wbs.apn.chat.bill.logic.ChatCreditLogic.BillCheckOptions;
 import wbs.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.misc.SymbolicLock;
 import wbs.platform.misc.SymbolicLock.HeldLock;
 import wbs.sms.message.core.model.MessageRec;
@@ -35,7 +38,6 @@ import wbs.sms.message.delivery.model.DeliveryRec;
 import wbs.sms.message.delivery.model.DeliveryTypeRec;
 
 @PrototypeComponent ("chatBillDeliveryHandler")
-@Log4j
 public
 class ChatBillDeliveryHandler
 	implements DeliveryHandler {
@@ -46,6 +48,10 @@ class ChatBillDeliveryHandler
 	ChatCreditLogic chatCreditLogic;
 
 	@SingletonDependency
+	@Named
+	SymbolicLock <Long> chatUserDeliveryLocks;
+
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
 	@SingletonDependency
@@ -54,9 +60,8 @@ class ChatBillDeliveryHandler
 	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
-	@SingletonDependency
-	@Named
-	SymbolicLock <Long> chatUserDeliveryLocks;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// details
 
@@ -154,8 +159,14 @@ class ChatBillDeliveryHandler
 	@Override
 	public
 	void handle (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long deliveryId,
 			@NonNull Long ref) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		@Cleanup
 		HeldLock lock =
@@ -281,14 +292,18 @@ class ChatBillDeliveryHandler
 
 		}
 
-		log.info (
-			stringFormat (
-				"Delivery report processed for message %s %s ",
-				message.getId (),
-				delivery.getNewMessageStatus (),
-				"for chat user %s %s",
-				chatUser.getId (),
-				chatCreditLogic.userCreditDebug (chatUser)));
+		taskLogger.noticeFormat (
+			"Delivery report processed for message %s ",
+			integerToDecimalString (
+				message.getId ()),
+			"in state \"%s\" ",
+			enumNameSpaces (
+				delivery.getNewMessageStatus ()),
+			"for chat user %s %s",
+			integerToDecimalString (
+				chatUser.getId ()),
+			chatCreditLogic.userCreditDebug (
+				chatUser));
 
 		transaction.commit ();
 

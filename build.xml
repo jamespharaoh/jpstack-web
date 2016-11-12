@@ -41,6 +41,7 @@
       <include name="wbs/console/**"/>
       <include name="wbs/framework/**"/>
       <include name="wbs/utils/**"/>
+      <include name="wbs/web/**"/>
       <src path="src"/>
     </javac>
   </target>
@@ -50,6 +51,7 @@
       <include name="wbs/console/**"/>
       <include name="wbs/framework/**"/>
       <include name="wbs/utils/**"/>
+      <include name="wbs/web/**"/>
       <service type="javax.annotation.processing.Processor" provider="wbs.framework.object.ObjectHelperAnnotationProcessor"/>
     </jar>
   </target>
@@ -62,6 +64,7 @@
       <include name="wbs/console/**"/>
       <include name="wbs/framework/**"/>
       <include name="wbs/utils/**"/>
+      <include name="wbs/web/**"/>
       <include name="wbs/**/generate/**"/>
       <include name="wbs/**/metamodel/**"/>
     </javac>
@@ -83,6 +86,7 @@
       <include name="wbs/console/**"/>
       <include name="wbs/framework/**"/>
       <include name="wbs/utils/**"/>
+      <include name="wbs/web/**"/>
       <include name="wbs/**/generate/**"/>
       <include name="wbs/**/hibernate/**"/>
       <include name="wbs/**/metamodel/**"/>
@@ -127,6 +131,7 @@
       <fileset dir="src/wbs/utils/api/files"/>
       <fileset dir="src/activitymanager/api/files"/>
       <fileset dir="src/wbs/framework/builder/api/files"/>
+      <fileset dir="src/wbs/framework/codegen/api/files"/>
       <fileset dir="src/wbs/framework/database/api/files"/>
       <fileset dir="src/wbs/framework/entity/api/files"/>
       <fileset dir="src/wbs/framework/fixtures/api/files"/>
@@ -135,7 +140,6 @@
       <fileset dir="src/wbs/framework/object/api/files"/>
       <fileset dir="src/wbs/framework/schema/api/files"/>
       <fileset dir="src/wbs/framework/sql/api/files"/>
-      <fileset dir="src/wbs/framework/web/api/files"/>
       <fileset dir="src/wbs/framework/component/config/api/files"/>
       <fileset dir="src/wbs/api/misc/files"/>
       <fileset dir="src/wbs/api/module/files"/>
@@ -230,6 +234,7 @@
       <fileset dir="src/wbs/smsapps/broadcast/api/files"/>
       <fileset dir="src/wbs/smsapps/forwarder/api/files"/>
       <fileset dir="src/wbs/smsapps/manualresponder/api/files"/>
+      <fileset dir="src/wbs/smsapps/sendsms/api/files"/>
       <fileset dir="src/wbs/smsapps/subscription/api/files"/>
       <fileset dir="src/wbs/apn/misc/api/files"/>
       <fileset dir="src/wbs/apn/chat/core/api/files"/>
@@ -279,6 +284,7 @@
       <fileset dir="src/wbs/integrations/urbanairship/api/files"/>
       <fileset dir="src/wbs/test/simulator/api/files"/>
       <fileset dir="src/wbs/test/common/api/files"/>
+      <fileset dir="src/wbs/web/api/files"/>
     </copy>
     <copy todir="work/api/root/WEB-INF/classes">
       <fileset dir="work/bin"/>
@@ -299,6 +305,7 @@
       <fileset dir="src/wbs/utils/console/files"/>
       <fileset dir="src/activitymanager/console/files"/>
       <fileset dir="src/wbs/framework/builder/console/files"/>
+      <fileset dir="src/wbs/framework/codegen/console/files"/>
       <fileset dir="src/wbs/framework/database/console/files"/>
       <fileset dir="src/wbs/framework/entity/console/files"/>
       <fileset dir="src/wbs/framework/fixtures/console/files"/>
@@ -307,7 +314,6 @@
       <fileset dir="src/wbs/framework/object/console/files"/>
       <fileset dir="src/wbs/framework/schema/console/files"/>
       <fileset dir="src/wbs/framework/sql/console/files"/>
-      <fileset dir="src/wbs/framework/web/console/files"/>
       <fileset dir="src/wbs/framework/component/config/console/files"/>
       <fileset dir="src/wbs/api/misc/console/files"/>
       <fileset dir="src/wbs/api/module/console/files"/>
@@ -402,6 +408,7 @@
       <fileset dir="src/wbs/smsapps/broadcast/console/files"/>
       <fileset dir="src/wbs/smsapps/forwarder/console/files"/>
       <fileset dir="src/wbs/smsapps/manualresponder/console/files"/>
+      <fileset dir="src/wbs/smsapps/sendsms/console/files"/>
       <fileset dir="src/wbs/smsapps/subscription/console/files"/>
       <fileset dir="src/wbs/apn/misc/console/files"/>
       <fileset dir="src/wbs/apn/chat/core/console/files"/>
@@ -451,6 +458,7 @@
       <fileset dir="src/wbs/integrations/urbanairship/console/files"/>
       <fileset dir="src/wbs/test/simulator/console/files"/>
       <fileset dir="src/wbs/test/common/console/files"/>
+      <fileset dir="src/wbs/web/console/files"/>
     </copy>
     <copy todir="work/console/root/WEB-INF/classes">
       <fileset dir="work/bin"/>

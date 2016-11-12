@@ -10,17 +10,17 @@ import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenGetAction;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenGetAction;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -57,10 +57,15 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.object.criteria.CriteriaSpec;
 
 @Accessors (fluent = true)
@@ -78,10 +83,13 @@ class ObjectListPart <
 	ConsoleManager consoleManager;
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
+	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
-	FormFieldLogic formFieldLogic;
+	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
@@ -151,23 +159,35 @@ class ObjectListPart <
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		prepareBrowserSpec ();
 		prepareTabSpec ();
 		prepareCurrentObject ();
 		prepareAllObjects ();
 		prepareSelectedObjects ();
-		prepareTargetContext ();
-		prepareFieldSet ();
+
+		prepareTargetContext (
+			taskLogger);
+
+		prepareFieldSet (
+			taskLogger);
 
 	}
 
-	void prepareFieldSet () {
+	void prepareFieldSet (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		fields =
 			parent != null
 				? formFieldsProvider.getFieldsForParent (
+					parentTaskLogger,
 					parent)
 				: formFieldsProvider.getStaticFields ();
 
@@ -543,7 +563,8 @@ class ObjectListPart <
 
 	}
 
-	void prepareTargetContext () {
+	void prepareTargetContext (
+			@NonNull TaskLogger taskLogger) {
 
 		ConsoleContextType targetContextType =
 			consoleManager.contextType (
@@ -552,6 +573,7 @@ class ObjectListPart <
 
 		targetContext =
 			consoleManager.relatedContextRequired (
+				taskLogger,
 				requestContext.consoleContext (),
 				targetContextType);
 
@@ -559,7 +581,8 @@ class ObjectListPart <
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		goBrowser ();
 		goTabs ();

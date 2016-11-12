@@ -2,7 +2,7 @@ package wbs.platform.object.create;
 
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -13,6 +13,7 @@ import java.util.Set;
 import com.google.common.base.Optional;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -26,10 +27,15 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.scaffold.model.RootObjectHelper;
 
 @Accessors (fluent = true)
@@ -45,6 +51,9 @@ class ObjectCreatePart <
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -103,14 +112,23 @@ class ObjectCreatePart <
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		prepareParents ();
 
 		// if a field provider was provided
 
 		if (formFieldsProvider != null) {
-			prepareFieldSet ();
+
+			prepareFieldSet (
+				taskLogger);
+
 		}
 
 		// get update results
@@ -239,11 +257,13 @@ class ObjectCreatePart <
 
 	}
 
-	void prepareFieldSet () {
+	void prepareFieldSet (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		formFieldSet =
 			parent != null
 				? formFieldsProvider.getFieldsForParent (
+					parentTaskLogger,
 					parent)
 				: formFieldsProvider.getStaticFields ();
 
@@ -251,7 +271,8 @@ class ObjectCreatePart <
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlParagraphWriteFormat (
 			"Please enter the details for the new %h",

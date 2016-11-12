@@ -9,8 +9,8 @@ import java.util.Map;
 import javax.inject.Provider;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginFixtureSpec;
@@ -19,9 +19,9 @@ import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.component.tools.BackgroundProcess;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-@Log4j
 public
 class FixturesTool {
 
@@ -32,6 +32,9 @@ class FixturesTool {
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	PluginManager pluginManager;
@@ -45,14 +48,13 @@ class FixturesTool {
 
 	public
 	void runFixtureProviders (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <String> arguments) {
 
-		taskLogger =
-			taskLogger.nest (
-				this,
-				"runFixtureProviders",
-				log);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runFixtureProviders");
 
 		taskLogger.noticeFormat (
 			"Disabling background processes");

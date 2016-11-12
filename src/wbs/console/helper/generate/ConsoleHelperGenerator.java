@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -37,23 +39,28 @@ import wbs.console.helper.provider.GenericConsoleHelperProvider;
 import wbs.console.helper.spec.ConsoleHelperProviderSpec;
 import wbs.console.helper.spec.ConsoleHelperProviderSpecManager;
 import wbs.console.lookup.ObjectLookup;
+
 import wbs.framework.codegen.JavaAssignmentWriter;
 import wbs.framework.codegen.JavaClassUnitWriter;
 import wbs.framework.codegen.JavaClassWriter;
 import wbs.framework.codegen.JavaImportRegistry;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.database.Database;
 import wbs.framework.entity.generate.ObjectHelperGenerator;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelperMethods;
 import wbs.framework.object.ObjectModel;
 import wbs.framework.object.ObjectModelMethods;
 import wbs.framework.object.ObjectTypeRegistry;
+
 import wbs.utils.etc.OptionalUtils;
 import wbs.utils.string.AtomicFileWriter;
 import wbs.utils.string.FormatWriter;
@@ -63,10 +70,24 @@ import wbs.utils.string.FormatWriter;
 public
 class ConsoleHelperGenerator {
 
-	// dependencies
+	// singleton dependencies
 
 	@SingletonDependency
 	EntityHelper entityHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <JavaAssignmentWriter> javaAssignmentWriterProvider;
+
+	@PrototypeDependency
+	Provider <JavaClassWriter> javaClassWriterProvider;
+
+	@PrototypeDependency
+	Provider <JavaClassUnitWriter> javaClassUnitWriterProvider;
 
 	// properties
 
@@ -318,7 +339,7 @@ class ConsoleHelperGenerator {
 		) {
 
 			JavaClassUnitWriter classUnitWriter =
-				new JavaClassUnitWriter ()
+				javaClassUnitWriterProvider.get ()
 
 				.formatWriter (
 					formatWriter)
@@ -328,7 +349,7 @@ class ConsoleHelperGenerator {
 					packageName);
 
 			classWriter =
-				new JavaClassWriter ()
+				javaClassWriterProvider.get ()
 
 				.className (
 					consoleHelperImplementationName)
@@ -417,19 +438,21 @@ class ConsoleHelperGenerator {
 		classWriter.addSingletonDependency (
 			EntityHelper.class);
 
+		classWriter.addClassSingletonDependency (
+			LogContext.class);
+
 		classWriter.addSingletonDependency (
 			ObjectTypeRegistry.class);
 
 		classWriter.addSingletonDependency (
 			ConsoleHelperProviderSpecManager.class);
 
-		classWriter.addSingletonDependency (
+		classWriter.addNamedSingletonDependency (
 			stringFormat (
 				"%s.logic.%s",
 				packageName,
 				objectHelperImplementationName),
-			"objectHelper",
-			true);
+			"objectHelper");
 
 		if (hasDao) {
 
@@ -522,8 +545,15 @@ class ConsoleHelperGenerator {
 	}
 
 	void writeLifecycle (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
+
+		@SuppressWarnings ("unused")
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeLifecycle");
 
 		formatWriter.writeLineFormat (
 			"// lifecycle");
@@ -544,7 +574,7 @@ class ConsoleHelperGenerator {
 			"void setup (");
 
 		formatWriter.writeLineFormat (
-			"\t\t%s taskLogger) {",
+			"\t\t%s parentTaskLogger) {",
 			imports.register (
 				TaskLogger.class));
 
@@ -555,19 +585,16 @@ class ConsoleHelperGenerator {
 		// nest task logger
 
 		formatWriter.writeLineFormat (
-			"taskLogger =");
+			"TaskLogger taskLogger =");
 
 		formatWriter.writeLineFormat (
-			"\ttaskLogger.nest (");
+			"\tlogContext.nestTaskLogger (");
 
 		formatWriter.writeLineFormat (
-			"\t\tthis,");
+			"\t\tparentTaskLogger,");
 
 		formatWriter.writeLineFormat (
-			"\t\t\"setup\",");
-
-		formatWriter.writeLineFormat (
-			"\t\tlogger);");
+			"\t\t\"setup\");");
 
 		formatWriter.writeNewline ();
 
@@ -583,7 +610,7 @@ class ConsoleHelperGenerator {
 
 		// console helper provider spec
 
-		new JavaAssignmentWriter ()
+		javaAssignmentWriterProvider.get ()
 
 			.variableName (
 				"consoleHelperProviderSpec")
@@ -602,7 +629,7 @@ class ConsoleHelperGenerator {
 
 		formatWriter.writeNewline ();
 
-		new JavaAssignmentWriter ()
+		javaAssignmentWriterProvider.get ()
 
 			.variableName (
 				"consoleHelperProviderSpec")
@@ -632,7 +659,7 @@ class ConsoleHelperGenerator {
 
 		// console helper provider
 
-		new JavaAssignmentWriter ()
+		javaAssignmentWriterProvider.get ()
 
 			.variableName (
 				"consoleHelperProvider")
@@ -665,14 +692,15 @@ class ConsoleHelperGenerator {
 					consoleHelperInterfaceName))
 
 			.call (
-				"init")
+				"init",
+				"taskLogger")
 
 			.write (
 				formatWriter);
 
 		// hooks
 
-		new JavaAssignmentWriter ()
+		javaAssignmentWriterProvider.get ()
 
 			.variableName (
 				"consoleHooksImplementation")
@@ -696,7 +724,7 @@ class ConsoleHelperGenerator {
 
 		formatWriter.writeNewline ();
 
-		new JavaAssignmentWriter ()
+		javaAssignmentWriterProvider.get ()
 
 			.variableName (
 				"consoleHooksImplementation")
@@ -716,7 +744,7 @@ class ConsoleHelperGenerator {
 
 		// console helper implementation
 
-		new JavaAssignmentWriter ()
+		javaAssignmentWriterProvider.get ()
 
 			.variableName (
 				"consoleHelperImplementation")

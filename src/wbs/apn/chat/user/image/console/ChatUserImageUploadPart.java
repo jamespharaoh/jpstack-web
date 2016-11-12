@@ -2,18 +2,20 @@ package wbs.apn.chat.user.image.console;
 
 import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostActionMultipart;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostActionMultipart;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+
+import lombok.NonNull;
 
 import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.console.forms.FormFieldLogic;
@@ -23,6 +25,7 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("chatUserImageUploadPart")
 public
@@ -50,7 +53,8 @@ class ChatUserImageUploadPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		formFieldSet =
 			chatUserImageConsoleModule.formFieldSet (
@@ -81,7 +85,8 @@ class ChatUserImageUploadPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlParagraphWrite (
 			"Please upload the photo or video.");

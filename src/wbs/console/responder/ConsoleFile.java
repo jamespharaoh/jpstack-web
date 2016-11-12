@@ -1,5 +1,11 @@
 package wbs.console.responder;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -8,7 +14,10 @@ import java.util.Map;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -16,6 +25,7 @@ import wbs.console.context.ConsoleContextPrivLookup;
 import wbs.console.lookup.BooleanLookup;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -23,12 +33,14 @@ import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
-import wbs.framework.web.AbstractFile;
-import wbs.framework.web.Action;
-import wbs.framework.web.ActionRequestHandler;
-import wbs.framework.web.ForbiddenException;
-import wbs.framework.web.RequestHandler;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.web.action.Action;
+import wbs.web.action.ActionRequestHandler;
+import wbs.web.exceptions.HttpForbiddenException;
+import wbs.web.file.AbstractFile;
+import wbs.web.handler.RequestHandler;
+import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleFile")
@@ -89,7 +101,7 @@ class ConsoleFile
 
 	public
 	ConsoleFile getResponder (
-			Provider<Responder> responder) {
+			Provider <Responder> responder) {
 
 		return getHandler (
 			responderToRequestHandler (
@@ -111,7 +123,7 @@ class ConsoleFile
 	}
 
 	public
-	Provider<Responder> responder (
+	Provider <Responder> responder (
 			final String responderName) {
 
 		return new Provider<Responder> () {
@@ -145,14 +157,36 @@ class ConsoleFile
 
 	public
 	ConsoleFile getActionName (
-			String name) {
-
-		if (name == null)
-			return this;
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String actionName) {
 
 		return getHandler (
 			actionRequestHandlerProvider.get ()
-				.actionName (name));
+
+			.actionName (
+				parentTaskLogger,
+				actionName));
+
+	}
+
+	public
+	ConsoleFile getActionName (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Optional <String> actionName) {
+
+		if (
+			optionalIsNotPresent (
+				actionName)
+		) {
+			return this;
+		}
+
+		return getHandler (
+			actionRequestHandlerProvider.get ()
+
+			.actionName (
+				parentTaskLogger,
+				actionName.get ()));
 
 	}
 
@@ -178,20 +212,43 @@ class ConsoleFile
 
 	public
 	ConsoleFile postActionName (
-			String actionName) {
-
-		if (actionName == null)
-			return this;
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String actionName) {
 
 		return postHandler (
 			actionRequestHandlerProvider.get ()
-				.actionName (actionName));
+
+			.actionName (
+				parentTaskLogger,
+				actionName));
+
+	}
+
+	public
+	ConsoleFile postActionName (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Optional <String> actionName) {
+
+		if (
+			optionalIsNotPresent (
+				actionName)
+		) {
+			return this;
+		}
+
+		return postHandler (
+			actionRequestHandlerProvider.get ()
+
+			.actionName (
+				parentTaskLogger,
+				optionalGetRequired (
+					actionName)));
 
 	}
 
 	public
 	ConsoleFile privKeys (
-			List<String> privKeys) {
+			List <String> privKeys) {
 
 		return privLookup (
 			contextPrivLookupProvider.get ()
@@ -226,7 +283,8 @@ class ConsoleFile
 
 	@Override
 	public
-	void doGet ()
+	void doGet (
+			@NonNull TaskLogger taskLogger)
 		throws
 			ServletException,
 			IOException {
@@ -240,18 +298,22 @@ class ConsoleFile
 
 		) {
 
-			throw new ForbiddenException (
-				privLookup.describe ());
+			throw new HttpForbiddenException (
+				optionalOf (
+					privLookup.describe ()),
+				emptyList ());
 
 		}
 
-		super.doGet ();
+		super.doGet (
+			taskLogger);
 
 	}
 
 	@Override
 	public
-	void doPost ()
+	void doPost (
+			@NonNull TaskLogger taskLogger)
 		throws
 			ServletException,
 			IOException {
@@ -265,11 +327,14 @@ class ConsoleFile
 
 		) {
 
-			throw new ForbiddenException ();
+			throw new HttpForbiddenException (
+				optionalAbsent (),
+				emptyList ());
 
 		}
 
-		super.doPost ();
+		super.doPost (
+			taskLogger);
 
 	}
 

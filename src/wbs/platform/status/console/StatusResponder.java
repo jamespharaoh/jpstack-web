@@ -1,24 +1,24 @@
 package wbs.platform.status.console;
 
-import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockClose;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockOpen;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleClose;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntryWrite;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockClose;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockOpen;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleClose;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntryWrite;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,14 +28,19 @@ import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
 
+import lombok.NonNull;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("statusResponder")
 public
@@ -43,6 +48,9 @@ class StatusResponder
 	extends HtmlResponder {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -114,26 +122,39 @@ class StatusResponder
 
 	@Override
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.prepare ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
+		super.prepare (
+			taskLogger);
 
 		pageParts.forEach (
-			PagePart::prepare);
+			pagePart ->
+				pagePart.prepare (
+					taskLogger));
 
 	}
 
 	@Override
 	protected
-	void renderHtmlHeadContents () {
+	void renderHtmlHeadContents (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.renderHtmlHeadContents ();
+		super.renderHtmlHeadContents (
+			parentTaskLogger);
 
 		renderStyleBlock ();
 		renderScriptBlock ();
 
 		pageParts.forEach (
-			PagePart::renderHtmlHeadContent);
+			pagePart ->
+				pagePart.renderHtmlHeadContent (
+					parentTaskLogger));
 
 	}
 
@@ -197,14 +218,16 @@ class StatusResponder
 
 	@Override
 	protected
-	void renderHtmlBody () {
+	void renderHtmlBody (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		formatWriter.writeLineFormat (
 			"<body onload=\"statusRequestSchedule ();\">");
 
 		formatWriter.increaseIndent ();
 
-		renderHtmlBodyContents ();
+		renderHtmlBodyContents (
+			parentTaskLogger);
 
 		formatWriter.decreaseIndent ();
 
@@ -215,7 +238,8 @@ class StatusResponder
 
 	@Override
 	protected
-	void renderHtmlBodyContents () {
+	void renderHtmlBodyContents (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// table open
 
@@ -283,7 +307,9 @@ class StatusResponder
 		// parts
 
 		pageParts.forEach (
-			PagePart::renderHtmlBodyContent);
+			pagePart ->
+				pagePart.renderHtmlBodyContent (
+					parentTaskLogger));
 
 		// log out row
 

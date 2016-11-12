@@ -163,10 +163,13 @@ class ChatMainCommand
 
 	@Override
 	public
-	InboxAttemptRec handle () {
+	InboxAttemptRec handle (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		TaskLogger taskLogger =
-			logContext.createTaskLogger ();
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleSimple");
 
 		taskLogger.debugFormat (
 			"message %s: begin processing",
@@ -215,11 +218,13 @@ class ChatMainCommand
 
 		// look for a date of birth
 
-		Optional<InboxAttemptRec> dobInboxAttempt =
-			tryDob ();
+		Optional <InboxAttemptRec> dobInboxAttempt =
+			tryDob (
+				taskLogger);
 
-		if (dobInboxAttempt.isPresent ())
+		if (dobInboxAttempt.isPresent ()) {
 			return dobInboxAttempt.get ();
+		}
 
 		// look for a keyword
 
@@ -323,6 +328,7 @@ class ChatMainCommand
 						rest)
 
 					.handleInbox (
+						taskLogger,
 						command);
 
 			}
@@ -467,9 +473,14 @@ class ChatMainCommand
 	 * appropriate CommandHandler if so, otherwise returns null.
 	 */
 	Optional <InboxAttemptRec> trySchemeKeyword (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String keyword,
 			@NonNull String rest) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"trySchemeKeyword");
 
 		Optional <ChatSchemeKeywordRec> chatSchemeKeywordOptional =
 			chatSchemeKeywordHelper.findByCode (
@@ -551,6 +562,7 @@ class ChatMainCommand
 					rest)
 
 				.handleInbox (
+					taskLogger,
 					command)
 
 			);
@@ -582,6 +594,7 @@ class ChatMainCommand
 
 			return Optional.of (
 				commandManager.handle (
+					taskLogger,
 					inbox,
 					chatSchemeKeyword.getCommand (),
 					optionalAbsent (),
@@ -602,9 +615,14 @@ class ChatMainCommand
 	}
 
 	Optional <InboxAttemptRec> tryChatKeyword (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String keyword,
 			@NonNull String rest) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"tryChatKeyword");
 
 		Optional <ChatKeywordRec> chatKeywordOptional =
 			chatKeywordHelper.findByCode (
@@ -685,6 +703,7 @@ class ChatMainCommand
 					rest)
 
 				.handleInbox (
+					taskLogger,
 					command)
 
 			);
@@ -703,6 +722,7 @@ class ChatMainCommand
 
 			return optionalOf (
 				commandManager.handle (
+					taskLogger,
 					inbox,
 					chatKeyword.getCommand (),
 					optionalAbsent (),
@@ -751,10 +771,12 @@ class ChatMainCommand
 
 	}
 
-	Optional<InboxAttemptRec> tryDob () {
+	Optional <InboxAttemptRec> tryDob (
+			@NonNull TaskLogger taskLogger) {
 
-		if (fromChatUser.getFirstJoin () != null)
-			return Optional.<InboxAttemptRec>absent ();
+		if (fromChatUser.getFirstJoin () != null) {
+			return optionalAbsent ();
+		}
 
 		if (
 
@@ -767,10 +789,10 @@ class ChatMainCommand
 				ChatKeywordJoinType.dateDob)
 
 		) {
-			return Optional.<InboxAttemptRec>absent ();
+			return optionalAbsent ();
 		}
 
-		Optional<LocalDate> dateOfBirth =
+		Optional <LocalDate> dateOfBirth =
 			DateFinder.find (
 				rest,
 				1915);
@@ -779,7 +801,7 @@ class ChatMainCommand
 			optionalIsNotPresent (
 				dateOfBirth)
 		) {
-			return Optional.absent ();
+			return optionalAbsent ();
 		}
 
 		return Optional.of (
@@ -801,6 +823,7 @@ class ChatMainCommand
 				rest)
 
 			.handleInbox (
+				taskLogger,
 				command)
 
 		);

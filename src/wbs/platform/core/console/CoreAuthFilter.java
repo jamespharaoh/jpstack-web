@@ -28,17 +28,20 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.logic.UserLogic;
 import wbs.platform.user.model.UserOnlineObjectHelper;
 import wbs.platform.user.model.UserOnlineRec;
 import wbs.platform.user.model.UserRec;
+import wbs.web.responder.Responder;
 
 @SingletonComponent ("coreAuthFilter")
 public
@@ -52,6 +55,9 @@ class CoreAuthFilter
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -249,6 +255,10 @@ class CoreAuthFilter
 			ServletException,
 			IOException {
 
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"doFilter");
+
 		String path =
 			requestContext.servletPath ();
 
@@ -288,7 +298,8 @@ class CoreAuthFilter
 
 					logonResponder
 						.get ()
-						.execute ();
+						.execute (
+							taskLogger);
 
 				}
 

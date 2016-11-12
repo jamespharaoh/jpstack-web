@@ -2,12 +2,10 @@ package wbs.console.object;
 
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -18,31 +16,39 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @PrototypeComponent ("extendContextBuilder")
 @ConsoleModuleBuilderHandler
 public
 class ExtendContextBuilder <
 	ObjectType extends Record <ObjectType>
-> {
+>
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
+	ConsoleMetaManager consoleMetaManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
-	ConsoleMetaManager consoleMetaManager;
+	ConsoleObjectManager objectManager;
 
 	// builder
 
@@ -66,19 +72,33 @@ class ExtendContextBuilder <
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		setDefaults ();
 
 		buildChildren (
+			taskLogger,
 			builder);
 
 	}
 
 	void buildChildren (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"buildChildren");
 
 		List <ResolvedConsoleContextExtensionPoint> resolvedExtensionPoints =
 			consoleMetaManager.resolveExtensionPoint (
@@ -86,11 +106,10 @@ class ExtendContextBuilder <
 
 		if (resolvedExtensionPoints == null) {
 
-			log.warn (
-				stringFormat (
-					"Extend context %s in %s doesn't resolve",
-					extensionPointName,
-					spec.consoleSpec ().name ()));
+			taskLogger.warningFormat (
+				"Extend context %s in %s doesn't resolve",
+				extensionPointName,
+				spec.consoleSpec ().name ());
 
 			return;
 
@@ -127,6 +146,7 @@ class ExtendContextBuilder <
 				consoleHelper.friendlyName ());
 
 		builder.descend (
+			taskLogger,
 			nextBuilderContainer,
 			spec.children (),
 			consoleModule,

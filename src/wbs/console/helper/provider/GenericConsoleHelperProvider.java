@@ -18,7 +18,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.context.ConsoleContextStuff;
 import wbs.console.context.ConsoleContextStuffSpec;
@@ -31,18 +30,20 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.request.Cryptor;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
 import wbs.utils.etc.PropertyUtils;
 import wbs.utils.string.StringSubstituter;
 
 @Accessors (fluent = true)
-@Log4j
 @PrototypeComponent ("genericConsoleHelperProvider")
 public
 class GenericConsoleHelperProvider <
@@ -60,6 +61,9 @@ class GenericConsoleHelperProvider <
 
 	@WeakSingletonDependency
 	ConsoleObjectManager consoleObjectManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -114,7 +118,13 @@ class GenericConsoleHelperProvider <
 	// init
 
 	public
-	GenericConsoleHelperProvider <RecordType> init () {
+	GenericConsoleHelperProvider <RecordType> init (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"init");
 
 		// check required properties
 
@@ -183,7 +193,7 @@ class GenericConsoleHelperProvider <
 
 			cryptor (
 				componentManager.getComponentRequired (
-					log,
+					taskLogger,
 					consoleHelperProviderSpec.cryptorBeanName (),
 					Cryptor.class));
 
@@ -230,12 +240,17 @@ class GenericConsoleHelperProvider <
 	@Override
 	public
 	void postProcess (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleContextStuff contextStuff) {
 
-		log.debug (
-			stringFormat (
-				"Running post processor for %s",
-				objectName ()));
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"postProcess");
+
+		taskLogger.debugFormat (
+			"Running post processor for %s",
+			objectName ());
 
 		// lookup object
 
@@ -334,6 +349,7 @@ class GenericConsoleHelperProvider <
 		) {
 
 			consoleManager.runPostProcessors (
+				taskLogger,
 				runPostProcessorSpec.name (),
 				contextStuff);
 

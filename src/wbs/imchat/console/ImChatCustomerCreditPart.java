@@ -3,7 +3,7 @@ package wbs.imchat.console;
 import static wbs.utils.etc.Misc.max;
 import static wbs.utils.etc.OptionalUtils.ifNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 
 import java.util.List;
 
@@ -13,14 +13,17 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
-import wbs.console.forms.FormType;
+import lombok.NonNull;
+
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormType;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 import wbs.imchat.model.ImChatCustomerCreditRec;
 import wbs.imchat.model.ImChatCustomerRec;
 
@@ -60,7 +63,8 @@ class ImChatCustomerCreditPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		customerFormFields =
 			imChatCustomerConsoleModule.formFieldSet (
@@ -111,7 +115,8 @@ class ImChatCustomerCreditPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		requestContext.flushNotices ();
 

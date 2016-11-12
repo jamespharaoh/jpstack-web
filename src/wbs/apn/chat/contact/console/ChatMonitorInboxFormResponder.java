@@ -3,31 +3,32 @@ package wbs.apn.chat.contact.console;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlBlockUtils.htmlSpanWrite;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockClose;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockOpen;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlSpanWrite;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockClose;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockOpen;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 
 import java.util.Set;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
@@ -41,8 +42,11 @@ import wbs.console.html.ScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Log4j
 @PrototypeComponent ("chatMonitorInboxFormResponder")
@@ -60,6 +64,9 @@ class ChatMonitorInboxFormResponder
 
 	@SingletonDependency
 	ConsoleManager consoleManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -94,7 +101,8 @@ class ChatMonitorInboxFormResponder
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		Optional <ChatMonitorInboxRec> chatMonitorInboxOptional =
 			chatMonitorInboxHelper.find (
@@ -138,9 +146,16 @@ class ChatMonitorInboxFormResponder
 
 	@Override
 	public
-	void renderHtmlHeadContents () {
+	void renderHtmlHeadContents (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.renderHtmlHeadContents ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlHeadContents");
+
+		super.renderHtmlHeadContents (
+			taskLogger);
 
 		if (chatMonitorInbox == null)
 			return;
@@ -215,7 +230,8 @@ class ChatMonitorInboxFormResponder
 
 	@Override
 	public
-	void renderHtmlBodyContents () {
+	void renderHtmlBodyContents (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		requestContext.flushNotices (
 			formatWriter);

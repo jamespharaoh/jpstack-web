@@ -2,18 +2,17 @@ package wbs.platform.postgresql.console;
 
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowSeparatorWrite;
 
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +20,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.google.common.collect.ImmutableSet;
+
+import lombok.NonNull;
 
 import org.joda.time.Duration;
 
@@ -30,6 +31,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.postgresql.model.PostgresqlMaintenanceFrequency;
 import wbs.platform.postgresql.model.PostgresqlMaintenanceRec;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -82,7 +84,8 @@ class PostgresqlMaintenanceListPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		for (
 			PostgresqlMaintenanceFrequency frequency
@@ -110,7 +113,8 @@ class PostgresqlMaintenanceListPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlTableOpenList ();
 
@@ -174,12 +178,12 @@ class PostgresqlMaintenanceListPart
 						"magic-table-row"),
 					htmlDataAttribute (
 						"target-href",
-						requestContext.resolveContextUrl (
-							stringFormat (
-								"/postgresqlMaintenance",
-								"/%u",
-								postgresqlMaintenance.getId (),
-								"/postgresqlMaintenance.summary"))));
+						requestContext.resolveContextUrlFormat (
+							"/postgresqlMaintenance",
+							"/%u",
+							integerToDecimalString (
+								postgresqlMaintenance.getId ()),
+							"/postgresqlMaintenance.summary")));
 
 				htmlTableCellWrite (
 					integerToDecimalString (

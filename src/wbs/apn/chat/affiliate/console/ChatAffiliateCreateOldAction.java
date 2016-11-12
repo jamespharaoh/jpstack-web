@@ -12,6 +12,24 @@ import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import wbs.console.action.ConsoleAction;
+import wbs.console.context.ConsoleContext;
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.module.ConsoleManager;
+import wbs.console.priv.UserPrivChecker;
+import wbs.console.priv.UserPrivDataLoader;
+import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.sms.keyword.logic.KeywordLogic;
+
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.model.ChatRec;
@@ -24,20 +42,7 @@ import wbs.apn.chat.scheme.model.ChatSchemeKeywordRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
-import wbs.console.action.ConsoleAction;
-import wbs.console.context.ConsoleContext;
-import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.module.ConsoleManager;
-import wbs.console.priv.UserPrivChecker;
-import wbs.console.priv.UserPrivDataLoader;
-import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
-import wbs.sms.keyword.logic.KeywordLogic;
+import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatAffiliateCreateOldAction")
@@ -77,6 +82,9 @@ class ChatAffiliateCreateOldAction
 	@SingletonDependency
 	KeywordLogic keywordLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserPrivChecker privChecker;
 
@@ -99,7 +107,12 @@ class ChatAffiliateCreateOldAction
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		String name =
 			requestContext.parameterRequired (
@@ -335,7 +348,8 @@ class ChatAffiliateCreateOldAction
 
 		requestContext.setEmptyFormData ();
 
-		privChecker.refresh ();
+		privChecker.refresh (
+			taskLogger);
 
 		ConsoleContext targetContext =
 			consoleManager.context (
@@ -343,10 +357,12 @@ class ChatAffiliateCreateOldAction
 				true);
 
 		consoleManager.changeContext (
+			taskLogger,
 			targetContext,
 			"/" + chatAffiliate.getId ());
 
-		return responder ("chatAffiliateSettingsResponder");
+		return responder (
+			"chatAffiliateSettingsResponder");
 
 	}
 

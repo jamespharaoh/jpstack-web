@@ -17,6 +17,7 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -44,7 +45,6 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.http.HttpStatus;
 import org.joda.time.DateTimeZone;
@@ -55,53 +55,50 @@ import org.joda.time.LocalDate;
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.WebApiAction;
 import wbs.api.mvc.WebApiManager;
+import wbs.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
+import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
+import wbs.apn.chat.bill.model.ChatUserCreditObjectHelper;
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.model.ChatMessageMethod;
+import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
+import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.contact.model.ChatMessageSearch;
 import wbs.apn.chat.contact.model.ChatMessageStatus;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.core.model.ChatObjectHelper;
+import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.date.logic.ChatDateLogic;
+import wbs.apn.chat.scheme.model.ChatSchemeObjectHelper;
+import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserDateMode;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserSearch;
 import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
-import wbs.apn.chat.user.image.model.ChatUserImageType;
-import wbs.apn.chat.user.info.logic.ChatInfoLogic;
-import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
-import wbs.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
-import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
-import wbs.apn.chat.bill.model.ChatUserCreditObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageRec;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.scheme.model.ChatSchemeObjectHelper;
-import wbs.apn.chat.scheme.model.ChatSchemeRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageObjectHelper;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.apn.chat.user.image.model.ChatUserImageType;
+import wbs.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.apn.chat.user.info.model.ChatProfileFieldRec;
 import wbs.apn.chat.user.info.model.ChatProfileFieldValueRec;
+import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.apn.chat.user.info.model.ChatUserProfileFieldObjectHelper;
 import wbs.apn.chat.user.info.model.ChatUserProfileFieldRec;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.web.AbstractWebFile;
-import wbs.framework.web.PathHandler;
-import wbs.framework.web.RegexpPathHandler;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.ServletModule;
-import wbs.framework.web.WebFile;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
@@ -134,12 +131,17 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.utils.time.TextualInterval;
+import wbs.web.context.RequestContext;
+import wbs.web.file.AbstractWebFile;
+import wbs.web.file.WebFile;
+import wbs.web.pathhandler.PathHandler;
+import wbs.web.pathhandler.RegexpPathHandler;
+import wbs.web.responder.WebModule;
 
-@Log4j
 @SingletonComponent ("chatApiServletModule")
 public
 class ChatApiServletModule
-	implements ServletModule {
+	implements WebModule {
 
 	// singleton dependencies
 
@@ -194,6 +196,9 @@ class ChatApiServletModule
 	@SingletonDependency
 	LocatorLogic locatorLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MediaObjectHelper mediaHelper;
 
@@ -230,6 +235,26 @@ class ChatApiServletModule
 	@PrototypeDependency
 	Provider <XmlRpcFile> xmlRpcFile;
 
+	// life cycle
+
+	@NormalLifecycleSetup
+	public
+	void setup (
+			@NonNull TaskLogger taskLogger) {
+
+		registerRpcHandlerClasses (
+			taskLogger,
+			MediaRpcHandler.class,
+			MessageSendRpcHandler.class,
+			MessagePollRpcHandler.class,
+			ProfileRpcHandler.class,
+			ProfilesRpcHandler.class,
+			ImageUpdateRpcHandler.class,
+			CreditRpcHandler.class,
+			ProfileDeleteRpcHandler.class);
+
+	}
+
 	// ================================= servlet module
 
 	WebFile mediaFile =
@@ -237,10 +262,16 @@ class ChatApiServletModule
 
 		@Override
 		public
-		void doGet ()
+		void doGet (
+				@NonNull TaskLogger parentTaskLogger)
 			throws
 				ServletException,
 				IOException {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"mediaFile.doGet");
 
 			String format =
 				requestContext.requestStringRequired (
@@ -306,11 +337,10 @@ class ChatApiServletModule
 
 					} else {
 
-						log.warn (
-							stringFormat (
-								"Unable to convert %s to format %s",
-								mimeType,
-								format));
+						taskLogger.warningFormat (
+							"Unable to convert %s to format %s",
+							mimeType,
+							format);
 
 						requestContext.status (
 							HttpStatus.SC_NOT_FOUND);
@@ -321,10 +351,9 @@ class ChatApiServletModule
 
 				} else {
 
-					log.warn (
-						stringFormat (
-							"Unable to convert %s",
-							 mimeType));
+					taskLogger.warningFormat (
+						"Unable to convert %s",
+						 mimeType);
 
 					requestContext.status (
 						HttpStatus.SC_NOT_FOUND);
@@ -473,19 +502,31 @@ class ChatApiServletModule
 	List<Class<? extends RpcHandler>> handlerClasses =
 		new ArrayList<Class<? extends RpcHandler>> ();
 
-	private static
+	private
 	void registerRpcHandlerClasses (
-			Class<?>... handlerClasses) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Class <?> ... handlerClasses) {
 
-		for (Class<?> uncastHandlerClass
-				: handlerClasses) {
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"registerRpcHandlerClasses");
 
-			Class<? extends RpcHandler> handlerClass =
-				uncastHandlerClass.asSubclass (RpcHandler.class);
+		for (
+			Class <?> uncastHandlerClass
+				: handlerClasses
+		) {
+
+			Class <? extends RpcHandler> handlerClass =
+				uncastHandlerClass.asSubclass (
+					RpcHandler.class);
 
 			if (handlerClass.getAnnotation (RpcExport.class) == null) {
 
-				log.warn ("Unable to register " + handlerClass);
+				taskLogger.warningFormat (
+					"Unable to register %s",
+					classNameSimple (
+						handlerClass));
 
 				continue;
 
@@ -505,8 +546,10 @@ class ChatApiServletModule
 	private
 	void initActions () {
 
-		for (Class<? extends RpcHandler> handlerClass
-				: handlerClasses) {
+		for (
+			Class<? extends RpcHandler> handlerClass
+				: handlerClasses
+		) {
 
 			String name =
 				handlerClass.getAnnotation (RpcExport.class).value ();
@@ -773,7 +816,8 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
 			@Cleanup
 			Transaction transaction =
@@ -949,15 +993,6 @@ class ChatApiServletModule
 			List <Long> userIds =
 				chatUserHelper.searchIds (
 					search);
-
-			long time =
-				System.currentTimeMillis ();
-
-			long time0;
-
-			long timeA = 0;
-
-			long timeB = 0;
 
 			// build list
 			// MercatorProjection osgb = locatorDao.findMercatorProjectionByCode
@@ -1223,16 +1258,6 @@ class ChatApiServletModule
 
 				}
 
-				time0 =
-					System.currentTimeMillis ();
-
-				timeA +=
-					+ time0
-					- time;
-
-				time =
-					time0;
-
 				if (user.getLocationLongLat () != null) {
 
 					LongLat longLat =
@@ -1280,16 +1305,6 @@ class ChatApiServletModule
 					}
 
 				}
-
-				time0 =
-					System.currentTimeMillis ();
-
-				timeB +=
-					+ time0
-					- time;
-
-				time =
-					time0;
 
 				profiles.add (
 					profile);
@@ -1357,16 +1372,6 @@ class ChatApiServletModule
 
 			}
 
-			time0 =
-				System.currentTimeMillis ();
-
-			timeA +=
-				+ time0
-				- time;
-
-			log.info ("timeA = " + timeA);
-			log.info ("timeB = " + timeB);
-
 			// return
 
 			return Rpc.rpcSuccess (
@@ -1410,7 +1415,8 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
 			@Cleanup
 			Transaction transaction =
@@ -1710,7 +1716,8 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
 			@Cleanup
 			Transaction transaction =
@@ -2372,7 +2379,13 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"profileDeleteRpcHandler.handle");
 
 			@Cleanup
 			Transaction transaction =
@@ -2403,7 +2416,9 @@ class ChatApiServletModule
 
 			// do updates
 
-			doUpdates (transaction);
+			doUpdates (
+				taskLogger,
+				transaction);
 
 			// commit
 
@@ -2442,6 +2457,7 @@ class ChatApiServletModule
 
 		private
 		void doUpdates (
+				@NonNull TaskLogger taskLogger,
 				@NonNull Transaction transaction) {
 
 			ChatRec chat =
@@ -2462,12 +2478,12 @@ class ChatApiServletModule
 
 			chatUser.setNumber (null);
 
-			log.info (
-				stringFormat (
-					"Delete chat user %s, ",
-					chatUser.getId (),
-					"number was %s",
-					number));
+			taskLogger.noticeFormat (
+				"Delete chat user %s, ",
+				integerToDecimalString (
+					chatUser.getId ()),
+				"number was %s",
+				number);
 
 		}
 
@@ -2570,7 +2586,8 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
 			@Cleanup
 			Transaction transaction =
@@ -2853,7 +2870,8 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
 			@Cleanup
 			Transaction transaction =
@@ -3302,7 +3320,8 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
 			@Cleanup
 			Transaction transaction =
@@ -3925,7 +3944,8 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
 			@Cleanup
 			Transaction transaction =
@@ -4047,10 +4067,13 @@ class ChatApiServletModule
 					"send-amount-count-mismatch",
 					stringFormat (
 						"Send count %s and send amount %s mismatch. Route ",
-						sendCount,
-						sendAmount,
+						integerToDecimalString (
+							sendCount),
+						integerToDecimalString (
+							sendAmount),
 						"charge is %s.",
-						routeCharge));
+						integerToDecimalString (
+							routeCharge)));
 
 			}
 
@@ -4114,22 +4137,6 @@ class ChatApiServletModule
 			}
 
 		}
-
-	}
-
-	// ================================= register handlers
-
-	static {
-
-		registerRpcHandlerClasses (
-			MediaRpcHandler.class,
-			MessageSendRpcHandler.class,
-			MessagePollRpcHandler.class,
-			ProfileRpcHandler.class,
-			ProfilesRpcHandler.class,
-			ImageUpdateRpcHandler.class,
-			CreditRpcHandler.class,
-			ProfileDeleteRpcHandler.class);
 
 	}
 

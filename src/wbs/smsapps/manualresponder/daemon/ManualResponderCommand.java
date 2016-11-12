@@ -6,6 +6,7 @@ import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -16,6 +17,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -30,11 +32,14 @@ import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
+
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.core.logic.DateFinder;
@@ -49,6 +54,7 @@ import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.number.list.logic.NumberListLogic;
+
 import wbs.smsapps.manualresponder.logic.ManualResponderLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderAffiliateRec;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberObjectHelper;
@@ -56,6 +62,7 @@ import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
+
 import wbs.utils.email.EmailLogic;
 import wbs.utils.time.TimeFormatter;
 
@@ -159,13 +166,14 @@ class ManualResponderCommand
 
 	@Override
 	public
-	InboxAttemptRec handle () {
+	InboxAttemptRec handle (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		transaction =
 			database.currentTransaction ();
 
-		Record<?> commandParent =
-			objectManager.getParentOrNull (
+		Record <?> commandParent =
+			objectManager.getParentRequired (
 				command);
 
 		if (commandParent instanceof ManualResponderRec) {
@@ -383,7 +391,8 @@ class ManualResponderCommand
 					"\n",
 
 					"Message ID:   %s\n",
-					message.getId (),
+					integerToDecimalString (
+						message.getId ()),
 					"Route:        %s.%s\n",
 					message.getRoute ().getSlice ().getCode (),
 					message.getRoute ().getCode (),

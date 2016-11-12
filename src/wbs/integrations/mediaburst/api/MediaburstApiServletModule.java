@@ -2,6 +2,7 @@ package wbs.integrations.mediaburst.api;
 
 import static wbs.utils.etc.Misc.fromHex;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.lowercase;
@@ -23,20 +24,18 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.AbstractWebFile;
-import wbs.framework.web.PathHandler;
-import wbs.framework.web.RegexpPathHandler;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.ServletModule;
-import wbs.framework.web.WebFile;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
@@ -52,12 +51,18 @@ import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.web.context.RequestContext;
+import wbs.web.file.AbstractWebFile;
+import wbs.web.file.WebFile;
+import wbs.web.pathhandler.PathHandler;
+import wbs.web.pathhandler.RegexpPathHandler;
+import wbs.web.responder.WebModule;
 
 @Log4j
 @SingletonComponent ("meidaburtApiServletModule")
 public
 class MediaburstApiServletModule
-	implements ServletModule {
+	implements WebModule {
 
 	// singleton dependencies
 
@@ -65,10 +70,10 @@ class MediaburstApiServletModule
 	Database database;
 
 	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
-
-	@SingletonDependency
 	SmsInboxMultipartLogic inboxMultipartLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	NetworkObjectHelper networkHelper;
@@ -81,6 +86,9 @@ class MediaburstApiServletModule
 
 	@SingletonDependency
 	RouteObjectHelper routeHelper;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -183,10 +191,16 @@ class MediaburstApiServletModule
 
 		@Override
 		public
-		void doPost ()
+		void doPost (
+				@NonNull TaskLogger parentTaskLogger)
 			throws
 				ServletException,
 				IOException {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"inFile.doPost");
 
 			// logger.info("MB: "+requestContext.getRequest().getQueryString());
 
@@ -199,7 +213,7 @@ class MediaburstApiServletModule
 			// debugging
 
 			requestContext.debugParameters (
-				log);
+				taskLogger);
 
 			// get request stuff
 
@@ -372,7 +386,8 @@ class MediaburstApiServletModule
 
 		@Override
 		public
-		void doGet ()
+		void doGet (
+				@NonNull TaskLogger parentTaskLogger)
 			throws
 				ServletException,
 				IOException {
@@ -443,8 +458,9 @@ class MediaburstApiServletModule
 				log.fatal (
 					stringFormat (
 						"Ignoring report for unknown message %s/%s",
-						requestContext.requestInteger (
-							"routeId"),
+						integerToDecimalString (
+							requestContext.requestIntegerRequired (
+								"routeId")),
 						requestContext.parameterOrNull (
 							"msg_id")));
 
@@ -453,8 +469,9 @@ class MediaburstApiServletModule
 				log.fatal (
 					stringFormat (
 						"Ignoring report for message %s/%s: %s",
-						requestContext.requestInteger (
-							"routeId"),
+						integerToDecimalString (
+							requestContext.requestIntegerRequired (
+								"routeId")),
 						requestContext.parameterOrNull (
 							"msg_id"),
 						exception.getMessage ()));

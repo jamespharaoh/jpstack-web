@@ -20,8 +20,8 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.hibernate.type.Type;
 import org.hibernate.usertype.CompositeUserType;
@@ -38,14 +38,20 @@ import wbs.framework.component.scaffold.PluginEnumTypeSpec;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.hibernate.EnumUserType;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
-@Log4j
 @SingletonComponent ("schemaTypesHelper")
 public
 class SchemaTypesHelperImplementation
 	implements SchemaTypesHelper {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			SchemaTypesHelperImplementation.class);
 
 	// singleton dependencies
 
@@ -70,17 +76,21 @@ class SchemaTypesHelperImplementation
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void init (
+			@NonNull TaskLogger taskLogger) {
 
-		initTypeNames ();
+		initTypeNames (
+			taskLogger);
 
 	}
 
-	void initTypeNames () {
+	void initTypeNames (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		TaskLogger taskLog =
-			new TaskLogger (
-				log);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initTypeNames");
 
 		ImmutableMap.Builder <Class <?>, List <String>> fieldTypeNamesBuilder =
 			ImmutableMap.builder ();
@@ -114,7 +124,7 @@ class SchemaTypesHelperImplementation
 			) {
 
 				initEnumType (
-					taskLog,
+					taskLogger,
 					fieldTypeNamesBuilder,
 					enumTypesBuilder,
 					enumType);
@@ -127,7 +137,7 @@ class SchemaTypesHelperImplementation
 			) {
 
 				initCustomType (
-					taskLog,
+					taskLogger,
 					fieldTypeNamesBuilder,
 					enumTypesBuilder,
 					customType);
@@ -136,14 +146,7 @@ class SchemaTypesHelperImplementation
 
 		}
 
-		if (taskLog.errors ()) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Aborting due to %s errors",
-					taskLog.errorCount ()));
-
-		}
+		taskLogger.makeException ();
 
 		fieldTypeNames =
 			fieldTypeNamesBuilder.build ();

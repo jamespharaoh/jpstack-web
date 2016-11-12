@@ -10,12 +10,16 @@ import lombok.experimental.Accessors;
 
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.ProxiedRequestComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @ProxiedRequestComponent (
@@ -29,6 +33,9 @@ class UserPrivCheckerImplementation
 
 	@SingletonDependency
 	ConsoleUserHelper consoleUserHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	UserPrivDataLoader privDataLoader;
@@ -49,7 +56,13 @@ class UserPrivCheckerImplementation
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void init (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"init");
 
 		if (! consoleUserHelper.loggedIn ()) {
 
@@ -63,7 +76,8 @@ class UserPrivCheckerImplementation
 				.userId (
 					consoleUserHelper.loggedInUserIdRequired ())
 
-				.build ();
+				.build (
+					taskLogger);
 
 		}
 
@@ -165,11 +179,14 @@ class UserPrivCheckerImplementation
 
 	@Override
 	public
-	void refresh () {
+	void refresh (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		privDataLoader.refresh ();
+		privDataLoader.refresh (
+			parentTaskLogger);
 
-		init ();
+		init (
+			parentTaskLogger);
 
 	}
 

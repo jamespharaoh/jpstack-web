@@ -17,6 +17,7 @@ import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
@@ -30,6 +31,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorPageBuilder")
@@ -84,7 +86,7 @@ class SupervisorPageBuilder <
 	String responderName;
 	String title;
 
-	Provider <PagePart> pagePartFactory;
+	PagePartFactory pagePartFactory;
 
 	// build
 
@@ -142,11 +144,12 @@ class SupervisorPageBuilder <
 	void buildPagePartFactory () {
 
 		pagePartFactory =
-			new Provider<PagePart> () {
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return supervisorPart.get ()
 
@@ -167,9 +170,17 @@ class SupervisorPageBuilder <
 		consoleModule.addResponder (
 			responderName,
 			tabContextResponder.get ()
-				.tab (tabName)
-				.title (title)
-				.pagePartFactory (pagePartFactory));
+
+			.tab (
+				tabName)
+
+			.title (
+				title)
+
+			.pagePartFactory (
+				pagePartFactory)
+
+		);
 
 	}
 

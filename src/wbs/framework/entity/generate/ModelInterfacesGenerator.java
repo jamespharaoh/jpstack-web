@@ -5,27 +5,44 @@ import static wbs.utils.io.FileUtils.fileExistsFormat;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import javax.inject.Provider;
+
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.codegen.JavaClassUnitWriter;
 import wbs.framework.codegen.JavaInterfaceWriter;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.scaffold.PluginModelSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.string.AtomicFileWriter;
 
-@Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("modelInterfacesGenerator")
 public
 class ModelInterfacesGenerator {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <JavaClassUnitWriter> javaClassUnitWriterProvider;
+
+	@PrototypeDependency
+	Provider <JavaInterfaceWriter> javaInterfaceWriterProvider;
 
 	// properties
 
@@ -132,13 +149,12 @@ class ModelInterfacesGenerator {
 
 	private
 	void generateObjectHelperInterface (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		taskLogger =
-			taskLogger.nest (
-				this,
-				"generateObjectHelperInterface",
-				log);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"generateObjectHelperInterface");
 
 		// create directory
 
@@ -167,7 +183,7 @@ class ModelInterfacesGenerator {
 		) {
 
 			JavaClassUnitWriter classUnitWriter =
-				new JavaClassUnitWriter ()
+				javaClassUnitWriterProvider.get ()
 
 				.formatWriter (
 					formatWriter)
@@ -177,7 +193,7 @@ class ModelInterfacesGenerator {
 					plugin.packageName ());
 
 			JavaInterfaceWriter objectHelperWriter =
-				new JavaInterfaceWriter ()
+				javaInterfaceWriterProvider.get ()
 
 				.interfaceName (
 					objectHelperName)
@@ -277,7 +293,7 @@ class ModelInterfacesGenerator {
 		) {
 
 			JavaClassUnitWriter classUnitWriter =
-				new JavaClassUnitWriter ()
+				javaClassUnitWriterProvider.get ()
 
 				.formatWriter (
 					formatWriter)
@@ -287,7 +303,7 @@ class ModelInterfacesGenerator {
 					plugin.packageName ());
 
 			JavaInterfaceWriter daoWriter =
-				new JavaInterfaceWriter ()
+				javaInterfaceWriterProvider.get ()
 
 				.interfaceName (
 					daoName)
@@ -328,13 +344,12 @@ class ModelInterfacesGenerator {
 
 	private
 	void generateConsoleHelperInterface (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		taskLogger =
-			taskLogger.nest (
-				this,
-				"generateConsoleHelperInterface",
-				log);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"generateConsoleHelperInterface");
 
 		// create directory
 
@@ -362,7 +377,7 @@ class ModelInterfacesGenerator {
 				filename);
 
 		JavaClassUnitWriter classUnitWriter =
-			new JavaClassUnitWriter ()
+			javaClassUnitWriterProvider.get ()
 
 			.formatWriter (
 				formatWriter)
@@ -372,7 +387,7 @@ class ModelInterfacesGenerator {
 				plugin.packageName ());
 
 		JavaInterfaceWriter consoleHelperWriter =
-			new JavaInterfaceWriter ()
+			javaInterfaceWriterProvider.get ()
 
 			.interfaceName (
 				consoleHelperName)

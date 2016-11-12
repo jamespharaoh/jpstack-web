@@ -3,21 +3,23 @@ package wbs.apn.chat.user.admin.console;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingThreeWrite;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingThreeWrite;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+
+import lombok.NonNull;
 
 import wbs.apn.chat.core.console.ChatConsoleLogic;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -30,6 +32,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("chatUserAdminInfoPart")
@@ -87,7 +90,8 @@ class ChatUserAdminInfoPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUser =
 			chatUserHelper.findRequired (
@@ -96,10 +100,10 @@ class ChatUserAdminInfoPart
 
 	}
 
-	@SuppressWarnings ("deprecation")
 	@Override
 	public
-	void renderHtmlBodyContent() {
+	void renderHtmlBodyContent(
+			@NonNull TaskLogger parentTaskLogger) {
 
 		if (
 			requestContext.canContext (

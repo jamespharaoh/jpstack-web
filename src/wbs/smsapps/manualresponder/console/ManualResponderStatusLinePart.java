@@ -1,19 +1,22 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockClose;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockOpen;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleClose;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntryWrite;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockClose;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockOpen;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleClose;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntryWrite;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
+
+import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("manualResponderStatusLinePart")
 public
@@ -22,7 +25,8 @@ class ManualResponderStatusLinePart
 
 	@Override
 	public
-	void renderHtmlHeadContent () {
+	void renderHtmlHeadContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		renderStyleBlock ();
 		renderScriptBlock ();
@@ -85,7 +89,8 @@ class ManualResponderStatusLinePart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlTableRowOpen (
 			htmlIdAttribute (

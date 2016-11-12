@@ -20,6 +20,10 @@
 			package="wbs.framework.builder"/>
 
 		<plugin
+			name="codegen"
+			package="wbs.framework.codegen"/>
+
+		<plugin
 			name="database"
 			package="wbs.framework.database"/>
 
@@ -50,10 +54,6 @@
 		<plugin
 			name="sql"
 			package="wbs.framework.sql"/>
-
-		<plugin
-			name="web"
-			package="wbs.framework.web"/>
 
 		<plugin
 			name="component-config"
@@ -653,6 +653,12 @@
 		<plugin
 			name="test-common"
 			package="wbs.test.common"/>
+
+		<!-- web -->
+
+		<plugin
+			name="web"
+			package="wbs.web"/>
 
 	</plugins>
 

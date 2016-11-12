@@ -8,7 +8,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import javax.inject.Provider;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -17,27 +16,32 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
-import wbs.framework.web.Action;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.action.Action;
+import wbs.web.responder.Responder;
 
-@Log4j
 @PrototypeComponent ("contextTabFormActionPageBuilder")
 @ConsoleModuleBuilderHandler
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 public
-class ContextTabFormActionPageBuilder {
+class ContextTabFormActionPageBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -46,6 +50,9 @@ class ContextTabFormActionPageBuilder {
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -88,26 +95,37 @@ class ContextTabFormActionPageBuilder {
 	String pagePartName;
 
 	FormFieldSet formFields;
-	Provider<ConsoleFormActionHelper> formActionHelperProvider;
+	Provider <ConsoleFormActionHelper> formActionHelperProvider;
 
-	Provider<PagePart> pagePartFactory;
+	PagePartFactory pagePartFactory;
 	Action action;
 
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		setDefaults ();
 
 		initFormFields ();
-		initFormActionHelper ();
+
+		initFormActionHelper (
+			taskLogger);
 
 		buildPagePartFactory ();
 		buildAction ();
-		buildResponder ();
+
+		buildResponder (
+			taskLogger);
 
 		for (
 			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
@@ -133,11 +151,12 @@ class ContextTabFormActionPageBuilder {
 
 	}
 
-	void initFormActionHelper () {
+	void initFormActionHelper (
+			@NonNull TaskLogger taskLogger) {
 
 		formActionHelperProvider =
 			componentManager.getComponentProviderRequired (
-				log,
+				taskLogger,
 				helperBeanName,
 				ConsoleFormActionHelper.class);
 
@@ -160,11 +179,12 @@ class ContextTabFormActionPageBuilder {
 	void buildPagePartFactory () {
 
 		pagePartFactory =
-			new Provider<PagePart> () {
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return contextFormActionPartProvider.get ()
 
@@ -196,7 +216,8 @@ class ContextTabFormActionPageBuilder {
 
 			@Override
 			public
-			Responder handle () {
+			Responder handle (
+					@NonNull TaskLogger taskLogger) {
 
 				Action action =
 					contextFormActionActionProvider.get ()
@@ -210,7 +231,8 @@ class ContextTabFormActionPageBuilder {
 					.responderName (
 						responderName);
 
-				return action.handle ();
+				return action.handle (
+					taskLogger);
 
 			}
 
@@ -235,7 +257,8 @@ class ContextTabFormActionPageBuilder {
 
 	}
 
-	void buildResponder () {
+	void buildResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		consoleModule.addResponder (
 			responderName,

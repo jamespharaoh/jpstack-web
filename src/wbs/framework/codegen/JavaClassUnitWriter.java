@@ -26,13 +26,23 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.NullFormatWriter;
 
 @Accessors (fluent = true)
+@PrototypeComponent ("javaClassUnitWriter")
 public
 class JavaClassUnitWriter {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -81,7 +91,12 @@ class JavaClassUnitWriter {
 
 	public
 	void write (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"write");
 
 		formatWriter.writeLineFormat (
 			"package %s;",
@@ -92,6 +107,7 @@ class JavaClassUnitWriter {
 		blocks.forEach (
 			block ->
 				block.writeBlock (
+					taskLogger,
 					new ImportCollector (),
 					new NullFormatWriter ()));
 
@@ -111,6 +127,7 @@ class JavaClassUnitWriter {
 		blocks.forEach (
 			block ->
 				block.writeBlock (
+					taskLogger,
 					new ImportResolver (),
 					formatWriter));
 

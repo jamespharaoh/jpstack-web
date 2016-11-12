@@ -1,14 +1,16 @@
 package wbs.smsapps.subscription.console;
 
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import javax.inject.Named;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+
+import lombok.NonNull;
 
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
@@ -17,6 +19,7 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("subscriptionNumberAddRemovePart")
 public
@@ -42,7 +45,8 @@ class SubscriptionNumberAddRemovePart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		addRemoveFormFieldSet =
 			subscriptionNumberConsoleModule.formFieldSet (
@@ -63,7 +67,8 @@ class SubscriptionNumberAddRemovePart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (

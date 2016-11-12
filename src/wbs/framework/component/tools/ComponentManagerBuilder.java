@@ -28,7 +28,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import wbs.api.module.ApiModule;
 import wbs.api.module.ApiModuleFactory;
@@ -68,13 +67,19 @@ import wbs.framework.component.scaffold.PluginModelsSpec;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHooks;
 
 @Accessors (fluent = true)
-@Log4j
 public
 class ComponentManagerBuilder {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			ComponentManagerBuilder.class);
 
 	// properties
 
@@ -229,28 +234,28 @@ class ComponentManagerBuilder {
 	private
 	void registerComponents () {
 
-		TaskLogger taskLog =
-			new TaskLogger (
-				log);
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"registerComponents");
 
 		createComponentRegistry ();
 
 		registerLayerComponents (
-			taskLog);
+			taskLogger);
 
 		registerConfigComponents (
-			taskLog);
+			taskLogger);
 
 		registerSingletonComponents (
-			taskLog);
+			taskLogger);
 
-		if (taskLog.errors ()) {
+		if (taskLogger.errors ()) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Aborting due to %s errors",
 					integerToDecimalString (
-						taskLog.errorCount ())));
+						taskLogger.errorCount ())));
 
 		}
 
@@ -268,17 +273,21 @@ class ComponentManagerBuilder {
 
 	private
 	void registerLayerComponents (
-			@NonNull TaskLogger taskLog) {
+			@NonNull TaskLogger taskLogger) {
+
+		taskLogger =
+			logContext.nestTaskLogger (
+				taskLogger,
+				"registerLayerComponents");
 
 		for (
 			String layerName
 				: layerNames
 		) {
 
-			log.info (
-				stringFormat (
-					"Loading components for layer %s",
-					layerName));
+			taskLogger.noticeFormat (
+				"Loading components for layer %s",
+				layerName);
 
 			for (
 				PluginSpec plugin
@@ -292,7 +301,7 @@ class ComponentManagerBuilder {
 				if (layer != null) {
 
 					registerLayerComponents (
-						taskLog,
+						taskLogger,
 						plugin,
 						layer);
 
@@ -306,7 +315,7 @@ class ComponentManagerBuilder {
 			) {
 
 				registerLayerAutomaticComponents (
-					taskLog,
+					taskLogger,
 					plugin,
 					layerName);
 
@@ -583,7 +592,7 @@ class ComponentManagerBuilder {
 	}
 
 	void registerFixtureLayerComponents (
-			@NonNull TaskLogger taskLog,
+			@NonNull TaskLogger taskLogger,
 			@NonNull PluginSpec plugin) {
 
 		for (
@@ -613,7 +622,7 @@ class ComponentManagerBuilder {
 
 			} catch (ClassNotFoundException exception) {
 
-				taskLog.errorFormat (
+				taskLogger.errorFormat (
 					"Can't find fixture provider of type %s ",
 					fixtureProviderClassName,
 					"for fixture %s ",
@@ -709,14 +718,13 @@ class ComponentManagerBuilder {
 	}
 
 	void registerLayerComponent (
-			@NonNull TaskLogger taskLog,
+			@NonNull TaskLogger taskLogger,
 			@NonNull PluginComponentSpec componentSpec) {
 
-		log.debug (
-			stringFormat (
-				"Loading %s from %s",
-				componentSpec.className (),
-				componentSpec.plugin ().name ()));
+		taskLogger.debugFormat (
+			"Loading %s from %s",
+			componentSpec.className (),
+			componentSpec.plugin ().name ());
 
 		String componentClassName =
 			stringFormat (
@@ -734,7 +742,7 @@ class ComponentManagerBuilder {
 
 		} catch (ClassNotFoundException exception) {
 
-			taskLog.errorFormat (
+			taskLogger.errorFormat (
 				"No such class %s in %s.%s.%s",
 				componentClassName,
 				componentSpec.plugin ().name (),
@@ -860,7 +868,7 @@ class ComponentManagerBuilder {
 
 		if (componentName == null) {
 
-			taskLog.errorFormat (
+			taskLogger.errorFormat (
 				"Could not find component annotation on %s",
 				componentClass.getName ());
 
@@ -892,12 +900,11 @@ class ComponentManagerBuilder {
 						singletonComponentAnnotation.value ())
 				) {
 
-					log.warn (
-						stringFormat (
-							"Factory method name '%s' ",
-							method.getName (),
-							"does not match component name '%s' ",
-							singletonComponentAnnotation.value ()));
+					taskLogger.warningFormat (
+						"Factory method name '%s' ",
+						method.getName (),
+						"does not match component name '%s'",
+						singletonComponentAnnotation.value ());
 
 				}
 
@@ -948,12 +955,11 @@ class ComponentManagerBuilder {
 						prototypeComponentAnnotation.value ())
 				) {
 
-					log.warn (
-						stringFormat (
-							"Factory method name '%s' ",
-							method.getName (),
-							"does not match component name '%s' ",
-							prototypeComponentAnnotation.value ()));
+					taskLogger.warningFormat (
+						"Factory method name '%s' ",
+						method.getName (),
+						"does not match component name '%s' ",
+						prototypeComponentAnnotation.value ());
 
 				}
 
@@ -1454,17 +1460,16 @@ class ComponentManagerBuilder {
 	}
 
 	void registerConfigComponents (
-			@NonNull TaskLogger taskLog) {
+			@NonNull TaskLogger taskLogger) {
 
 		for (
 			String configName
 				: configNames
 		) {
 
-			log.info (
-				stringFormat (
-					"Loading configuration %s",
-					configName));
+			taskLogger.noticeFormat (
+				"Loading configuration %s",
+				configName);
 
 			String configPath =
 				stringFormat (
@@ -1479,7 +1484,7 @@ class ComponentManagerBuilder {
 	}
 
 	void registerSingletonComponents (
-			@NonNull TaskLogger taskLog) {
+			@NonNull TaskLogger taskLogger) {
 
 		for (
 			Map.Entry <String,Object> entry

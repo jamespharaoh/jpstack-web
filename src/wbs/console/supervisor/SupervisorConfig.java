@@ -1,14 +1,11 @@
 package wbs.console.supervisor;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Provider;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 
 @Accessors (fluent = true)
 @Data
@@ -20,7 +17,6 @@ class SupervisorConfig {
 
 	SupervisorConfigSpec spec;
 
-	List<Provider<PagePart>> pagePartFactories =
-		new ArrayList<Provider<PagePart>> ();
+	List <PagePartFactory> pagePartFactories;
 
 }

@@ -22,8 +22,8 @@ import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.Log4jLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Action;
-import wbs.framework.web.Responder;
+import wbs.web.action.Action;
+import wbs.web.responder.Responder;
 
 public abstract
 class ConsoleAction
@@ -79,10 +79,13 @@ class ConsoleAction
 
 	@Override
 	public final
-	Responder handle () {
+	Responder handle (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		TaskLogger taskLogger =
-			logContext.createTaskLogger ();
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		try {
 

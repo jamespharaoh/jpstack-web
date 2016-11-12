@@ -3,8 +3,8 @@ package wbs.apn.chat.user.core.console;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.objectToStringNullSafe;
-import static wbs.utils.web.HtmlInputUtils.htmlSelect;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.web.utils.HtmlInputUtils.htmlSelect;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,10 +13,15 @@ import javax.inject.Named;
 
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
+
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Deprecated
 @PrototypeComponent ("chatUserSearchOldPart")
@@ -38,6 +43,9 @@ class ChatUserSearchOldPart
 	@Named ("chatUserSearchItemsPerSubPage")
 	Integer itemsPerSubPage;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	@Named ("chatUserSearchSubPagesPerPage")
 	Integer subPagesPerPage;
@@ -46,7 +54,16 @@ class ChatUserSearchOldPart
 
 	@Override
 	public
-	void renderHtmlHeadContent () {
+	void renderHtmlHeadContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlHeadContent");
+
+		super.renderHtmlHeadContent (
+			taskLogger);
 
 		formatWriter.writeFormat (
 			"<script type=\"text/javascript\">\n",
@@ -76,7 +93,8 @@ class ChatUserSearchOldPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		@SuppressWarnings ("unchecked")
 		Map <String, String> params =

@@ -1,6 +1,9 @@
 package wbs.integrations.oxygen8.api;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.string.StringUtils.stringIsEmpty;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.util.ArrayList;
@@ -13,21 +16,22 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import org.apache.commons.fileupload.FileItem;
 
 import org.joda.time.Instant;
 
 import wbs.api.mvc.ApiAction;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInRec;
@@ -43,8 +47,9 @@ import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.Responder;
 
-@Log4j
 @PrototypeComponent ("oxygen8InboundMmsAction")
 public
 class Oxygen8InboundMmsAction
@@ -55,8 +60,8 @@ class Oxygen8InboundMmsAction
 	@SingletonDependency
 	Database database;
 
-	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaLogic mediaLogic;
@@ -78,6 +83,9 @@ class Oxygen8InboundMmsAction
 
 	@SingletonDependency
 	RouteObjectHelper routeHelper;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -109,7 +117,13 @@ class Oxygen8InboundMmsAction
 
 	@Override
 	protected
-	Responder goApi () {
+	Responder goApi (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goApi");
 
 		@Cleanup
 		Transaction transaction =
@@ -117,8 +131,11 @@ class Oxygen8InboundMmsAction
 				"Oxygen8InboundMmsAction.goApi ()",
 				this);
 
-		processRequestHeaders ();
-		processRequestBody ();
+		processRequestHeaders (
+			taskLogger);
+
+		processRequestBody (
+			taskLogger);
 
 		updateDatabase ();
 
@@ -128,10 +145,13 @@ class Oxygen8InboundMmsAction
 
 	}
 
-	void processRequestHeaders () {
+	void processRequestHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		List <String> errors =
-			new ArrayList<> ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"processRequestHeaders");
 
 		// route id
 
@@ -147,16 +167,16 @@ class Oxygen8InboundMmsAction
 
 		if (mmsMessageId == null) {
 
-			errors.add (
+			taskLogger.errorFormat (
 				"Required header missing: X-Mms-Message-Id");
 
 		} else if (mmsMessageId.length () != 32) {
 
-			errors.add (
-				stringFormat (
-					"Header expected to be 32 characters but was %s: ",
-					mmsMessageId.length (),
-					"X-Mms-Message-Id"));
+			taskLogger.errorFormat (
+				"Header expected to be 32 characters but was %s: ",
+				integerToDecimalString (
+					mmsMessageId.length ()),
+				"X-Mms-Message-Id");
 
 		}
 
@@ -166,9 +186,12 @@ class Oxygen8InboundMmsAction
 			requestContext.header (
 				"X-Mms-Message-Type");
 
-		if (mmsMessageType == null) {
+		if (
+			isNull (
+				mmsMessageType)
+		) {
 
-			errors.add (
+			taskLogger.errorFormat (
 				"Required header missing: X-Mms-Message-Type");
 
 		} else if (
@@ -177,27 +200,33 @@ class Oxygen8InboundMmsAction
 				"MO_MMS")
 		) {
 
-			errors.add (
-				stringFormat (
-					"Header expected to equal 'MO_MMS' but was '%s': ",
-					mmsMessageType,
-					"X-Mms-Message-Type"));
+			taskLogger.errorFormat (
+				"Header expected to equal 'MO_MMS' but was '%s': ",
+				mmsMessageType,
+				"X-Mms-Message-Type");
 
 		}
 
 		// sender address
 
 		mmsSenderAddress =
-			requestContext.header ("X-Mms-Sender-Address");
+			requestContext.header (
+				"X-Mms-Sender-Address");
 
-		if (mmsSenderAddress == null) {
+		if (
+			isNull (
+				mmsSenderAddress)
+		) {
 
-			errors.add (
+			taskLogger.errorFormat (
 				"Required header missing: X-Mms-Sender-Address");
 
-		} else if (mmsSenderAddress.isEmpty ()) {
+		} else if (
+			stringIsEmpty (
+				mmsSenderAddress)
+		) {
 
-			errors.add (
+			taskLogger.errorFormat (
 				"Required header empty: X-Mms-Sender-Address");
 
 		}
@@ -205,16 +234,23 @@ class Oxygen8InboundMmsAction
 		// recipient address
 
 		mmsRecipientAddress =
-			requestContext.header ("X-Mms-Recipient-Address");
+			requestContext.header (
+				"X-Mms-Recipient-Address");
 
-		if (mmsRecipientAddress == null) {
+		if (
+			isNull (
+				mmsRecipientAddress)
+		) {
 
-			errors.add (
+			taskLogger.errorFormat (
 				"Required header missing: X-Mms-Recipient-Address");
 
-		} else if (mmsRecipientAddress.isEmpty ()) {
+		} else if (
+			stringIsEmpty (
+				mmsRecipientAddress)
+		) {
 
-			errors.add (
+			taskLogger.errorFormat (
 				"Required header empty: X-Mms-Recipient-Address");
 
 		}
@@ -222,17 +258,22 @@ class Oxygen8InboundMmsAction
 		// subject
 
 		mmsSubject =
-			Optional.fromNullable (
-				requestContext.header ("X-Mms-Subject"));
+			optionalFromNullable (
+				requestContext.header (
+					"X-Mms-Subject"));
 
 		// date
 
 		String mmsDateParam =
-			requestContext.header ("X-Mms-Date");
+			requestContext.header (
+				"X-Mms-Date");
 
-		if (mmsDateParam == null) {
+		if (
+			isNull (
+				mmsDateParam)
+		) {
 
-			errors.add (
+			taskLogger.errorFormat (
 				"Required header missing: X-Mms-Date");
 
 		} else {
@@ -240,11 +281,12 @@ class Oxygen8InboundMmsAction
 			try {
 
 				mmsDate =
-					Instant.parse (mmsDateParam);
+					Instant.parse (
+						mmsDateParam);
 
 			} catch (Exception exception) {
 
-				errors.add (
+				taskLogger.errorFormat (
 					"Error parsing header: X-Mms-Date");
 
 			}
@@ -254,35 +296,33 @@ class Oxygen8InboundMmsAction
 		// network
 
 		mmsNetwork =
-			requestContext.header ("X-Mms-Network");
+			requestContext.header (
+				"X-Mms-Network");
 
-		if (mmsNetwork == null) {
+		if (
+			isNull (
+				mmsNetwork)
+		) {
 
-			errors.add (
+			taskLogger.errorFormat (
 				"Required header missing: X-Mms-Network");
 
 		}
 
 		// errors
 
-		if (! errors.isEmpty ()) {
-
-			for (String error : errors) {
-				log.error (error);
-			}
-
-			throw new RuntimeException (
-				stringFormat (
-					"Aborting due to %s errors logged parsing request headers",
-					errors.size ()));
-
-		}
+		taskLogger.makeException (
+			);
 
 	}
 
-	void processRequestBody () {
+	void processRequestBody (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		int errorCount = 0;
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"processRequestBody");
 
 		for (
 			FileItem fileItem
@@ -295,12 +335,9 @@ class Oxygen8InboundMmsAction
 
 			if (! matcher.matches ()) {
 
-				log.error (
-					stringFormat (
-						"Invalid content type: %s",
-						fileItem.getContentType ()));
-
-				errorCount ++;
+				taskLogger.errorFormat (
+					"Invalid content type: %s",
+					fileItem.getContentType ());
 
 				continue;
 
@@ -340,17 +377,11 @@ class Oxygen8InboundMmsAction
 
 		}
 
-		if (messageString == null)
+		if (messageString == null) {
 			messageString = "";
-
-		if (errorCount > 0) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Aborting due to %s errors",
-					errorCount));
-
 		}
+
+		taskLogger.makeException ();
 
 	}
 

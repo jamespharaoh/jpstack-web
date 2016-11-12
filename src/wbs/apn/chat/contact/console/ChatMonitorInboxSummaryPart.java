@@ -18,27 +18,27 @@ import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localDateNotEqual;
-import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
-import static wbs.utils.web.HtmlInputUtils.htmlSelectYesNo;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockClose;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockOpen;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleClose;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntryWrite;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWriteFormat;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWriteHtml;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.web.utils.HtmlInputUtils.htmlSelectYesNo;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockClose;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockOpen;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleClose;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntryWrite;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWriteFormat;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowSeparatorWrite;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -89,6 +89,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.sms.gazetteer.logic.GazetteerLogic;
 import wbs.utils.time.TimeFormatter;
@@ -197,7 +198,8 @@ class ChatMonitorInboxSummaryPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -338,7 +340,8 @@ class ChatMonitorInboxSummaryPart
 
 	@Override
 	public
-	void renderHtmlHeadContent () {
+	void renderHtmlHeadContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlStyleBlockOpen ();
 
@@ -357,7 +360,8 @@ class ChatMonitorInboxSummaryPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlTableOpenDetails ();
 

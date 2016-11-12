@@ -2,16 +2,17 @@ package wbs.apn.chat.report.console;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenGetAction;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenGetAction;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +30,35 @@ import lombok.NonNull;
 
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
+
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormType;
+import wbs.console.module.ConsoleManager;
+import wbs.console.module.ConsoleModule;
+import wbs.console.part.AbstractPagePart;
+import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.hibernate.HibernateDatabase;
+import wbs.framework.logging.TaskLogger;
+import wbs.framework.object.ObjectManager;
+
+import wbs.platform.affiliate.console.AffiliateConsoleHelper;
+import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.scaffold.model.RootRec;
+import wbs.platform.service.model.ServiceRec;
+import wbs.platform.user.console.UserConsoleLogic;
+
+import wbs.sms.message.stats.console.MessageStatsConsoleHelper;
+import wbs.sms.message.stats.model.MessageStatsData;
+import wbs.sms.message.stats.model.MessageStatsRec;
+import wbs.sms.message.stats.model.MessageStatsSearch;
+import wbs.sms.network.model.NetworkRec;
+import wbs.sms.route.core.model.RouteRec;
+
+import wbs.utils.time.TextualInterval;
 
 import wbs.apn.chat.affiliate.console.ChatAffiliateConsoleHelper;
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
@@ -49,29 +79,6 @@ import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserSearch;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.forms.FormType;
-import wbs.console.module.ConsoleManager;
-import wbs.console.module.ConsoleModule;
-import wbs.console.part.AbstractPagePart;
-import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.hibernate.HibernateDatabase;
-import wbs.framework.object.ObjectManager;
-import wbs.platform.affiliate.console.AffiliateConsoleHelper;
-import wbs.platform.affiliate.model.AffiliateRec;
-import wbs.platform.scaffold.model.RootRec;
-import wbs.platform.service.model.ServiceRec;
-import wbs.platform.user.console.UserConsoleLogic;
-import wbs.sms.message.stats.console.MessageStatsConsoleHelper;
-import wbs.sms.message.stats.model.MessageStatsData;
-import wbs.sms.message.stats.model.MessageStatsRec;
-import wbs.sms.message.stats.model.MessageStatsSearch;
-import wbs.sms.network.model.NetworkRec;
-import wbs.sms.route.core.model.RouteRec;
-import wbs.utils.time.TextualInterval;
 
 @PrototypeComponent ("chatReportRevSharePart")
 public
@@ -153,7 +160,8 @@ class ChatReportRevSharePart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		searchFields =
 			chatReportConsoleModule.formFieldSet (
@@ -556,8 +564,9 @@ class ChatReportRevSharePart
 			return existingReport;
 
 		Object affiliateParent =
-			objectManager.getParentOrNull (
-				affiliate);
+			genericCastUnchecked (
+				objectManager.getParentRequired (
+					affiliate));
 
 		ChatReportRevShareItem newReport;
 
@@ -701,7 +710,8 @@ class ChatReportRevSharePart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		goSearchForm ();
 		goReport ();

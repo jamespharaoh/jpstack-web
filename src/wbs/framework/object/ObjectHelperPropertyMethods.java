@@ -176,6 +176,18 @@ interface ObjectHelperPropertyMethods <
 	}
 
 	default
+	Optional <Record <?>> getParentGeneric (
+			@NonNull Record <?> object) {
+
+		return successOrThrowRuntimeException (
+			getParentOrError (
+				dynamicCast (
+					objectHelper ().objectClass (),
+					object)));
+
+	}
+
+	default
 	Record <?> getParentRequired (
 			RecordType object) {
 
@@ -183,6 +195,19 @@ interface ObjectHelperPropertyMethods <
 			successOrThrowRuntimeException (
 				getParentOrError (
 					object)));
+
+	}
+
+	default
+	Record <?> getParentRequiredGeneric (
+			Record <?> object) {
+
+		return optionalGetRequired (
+			successOrThrowRuntimeException (
+				getParentOrError (
+					dynamicCast (
+						objectHelper ().objectClass (),
+						object))));
 
 	}
 

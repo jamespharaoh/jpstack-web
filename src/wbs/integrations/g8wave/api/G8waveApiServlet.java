@@ -5,10 +5,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.NonNull;
+
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.WbsServlet;
-import wbs.framework.web.WebFile;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.context.RequestContext;
+import wbs.web.file.WebFile;
+import wbs.web.servlet.WbsServlet;
 
 public
 class G8waveApiServlet
@@ -46,7 +49,8 @@ class G8waveApiServlet
 
 	@Override
 	protected
-	WebFile processPath () {
+	WebFile processPath (
+			@NonNull TaskLogger taskLogger) {
 
 		String path =
 			requestContext.pathInfo ();

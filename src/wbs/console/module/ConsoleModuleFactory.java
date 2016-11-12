@@ -12,9 +12,11 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.tools.ComponentFactory;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -27,6 +29,9 @@ class ConsoleModuleFactory
 	@SingletonDependency
 	@Named
 	Builder consoleModuleBuilder;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -43,7 +48,12 @@ class ConsoleModuleFactory
 	@Override
 	public
 	Object makeComponent (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"makeComponent");
 
 		ConsoleModuleImplementation consoleModule =
 			consoleModuleProvider.get ()
@@ -66,6 +76,7 @@ class ConsoleModuleFactory
 					consoleSpec.name ()));
 
 		consoleModuleBuilder.descend (
+			taskLogger,
 			container,
 			consoleSpec.builders (),
 			consoleModule,

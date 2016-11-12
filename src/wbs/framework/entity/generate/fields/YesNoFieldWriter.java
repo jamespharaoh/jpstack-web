@@ -3,19 +3,29 @@ package wbs.framework.entity.generate.fields;
 import lombok.NonNull;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.generate.ModelWriter;
 import wbs.framework.entity.meta.fields.YesNoFieldSpec;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("yesNoFieldWriter")
 @ModelWriter
 public
-class YesNoFieldWriter {
+class YesNoFieldWriter
+	implements BuilderComponent {
+
+	// singleton dependency
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// builder
 
@@ -31,9 +41,16 @@ class YesNoFieldWriter {
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		// write field
 
@@ -63,6 +80,7 @@ class YesNoFieldWriter {
 		}
 
 		propertyWriter.writeBlock (
+			taskLogger,
 			target.imports (),
 			target.formatWriter ());
 

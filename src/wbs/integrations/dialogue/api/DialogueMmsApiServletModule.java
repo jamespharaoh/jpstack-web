@@ -1,6 +1,7 @@
 package wbs.integrations.dialogue.api;
 
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -24,22 +25,19 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import org.apache.commons.fileupload.FileItem;
 
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.AbstractWebFile;
-import wbs.framework.web.PathHandler;
-import wbs.framework.web.RegexpPathHandler;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.ServletModule;
-import wbs.framework.web.WebFile;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
@@ -51,12 +49,17 @@ import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.web.context.RequestContext;
+import wbs.web.file.AbstractWebFile;
+import wbs.web.file.WebFile;
+import wbs.web.pathhandler.PathHandler;
+import wbs.web.pathhandler.RegexpPathHandler;
+import wbs.web.responder.WebModule;
 
-@Log4j
 @SingletonComponent ("dialogueMmsApiServletModule")
 public
 class DialogueMmsApiServletModule
-	implements ServletModule {
+	implements WebModule {
 
 	// TODO this is rather a big mess
 
@@ -65,8 +68,8 @@ class DialogueMmsApiServletModule
 	@SingletonDependency
 	Database database;
 
-	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaLogic mediaLogic;
@@ -82,6 +85,9 @@ class DialogueMmsApiServletModule
 
 	@SingletonDependency
 	RouteObjectHelper routeHelper;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -123,10 +129,16 @@ class DialogueMmsApiServletModule
 
 		@Override
 		public
-		void doPost ()
+		void doPost (
+				@NonNull TaskLogger parentTaskLogger)
 			throws
 				ServletException,
 				IOException {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"inFile.doPost");
 
 			@Cleanup
 			Transaction transaction =
@@ -134,7 +146,8 @@ class DialogueMmsApiServletModule
 					"DialogueMmsApiServletModule.inFile.doPost ()",
 					this);
 
-			requestContext.debugDump (log);
+			requestContext.debugDump (
+				taskLogger);
 
 			// process attachments
 
@@ -270,9 +283,16 @@ class DialogueMmsApiServletModule
 
 		@Override
 		public
-		void doPost ()
-			throws ServletException,
+		void doPost (
+				@NonNull TaskLogger parentTaskLogger)
+			throws
+				ServletException,
 				IOException {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"reportFile.doPost");
 
 			@Cleanup
 			Transaction transaction =
@@ -286,16 +306,27 @@ class DialogueMmsApiServletModule
 
 			// temporary, output all parameters
 
-			log.debug (
-				stringFormat (
-					"Parameter count %s",
+			taskLogger.debugFormat (
+				"Parameter count %s",
+				integerToDecimalString (
 					requestContext.parameterMap ().size ()));
 
-			for (Map.Entry<String,List<String>> entry
-					: requestContext.parameterMap ().entrySet ()) {
+			for (
+				Map.Entry <String, List <String>> entry
+					: requestContext.parameterMap ().entrySet ()
+			) {
 
-				for (String value : entry.getValue ())
-					log.debug (entry.getKey () + " = " + value);
+				for (
+					String value
+						: entry.getValue ()
+				) {
+
+					taskLogger.debugFormat (
+						"%s = %s",
+						entry.getKey (),
+						value);
+
+				}
 
 			}
 

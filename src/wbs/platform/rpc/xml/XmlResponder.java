@@ -6,22 +6,23 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.rpc.core.RpcElem;
 import wbs.platform.rpc.core.RpcList;
 import wbs.platform.rpc.core.RpcPrimitive;
 import wbs.platform.rpc.core.RpcStructure;
 import wbs.platform.rpc.core.RpcType;
+import wbs.web.context.RequestContext;
+import wbs.web.misc.HttpStatus;
+import wbs.web.responder.Responder;
 
 import nu.xom.Document;
 import nu.xom.Element;
@@ -41,12 +42,13 @@ class XmlResponder
 	RpcElem data;
 
 	@Getter @Setter
-	int status =
-		HttpServletResponse.SC_OK;
+	long status =
+		HttpStatus.httpOk;
 
 	@Override
 	public
-	void execute ()
+	void execute (
+			@NonNull TaskLogger parentTaskLogger)
 		throws IOException {
 
 		requestContext.status (

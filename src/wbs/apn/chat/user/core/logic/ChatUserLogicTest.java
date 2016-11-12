@@ -1,5 +1,6 @@
 package wbs.apn.chat.user.core.logic;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -7,13 +8,13 @@ import java.util.List;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.component.annotations.SingletonDependency;
 
 import junit.framework.TestCase;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
 
 public
 class ChatUserLogicTest
@@ -87,8 +88,10 @@ class ChatUserLogicTest
 
 					stringFormat (
 						"users %s and %s",
-						indexLeft,
-						indexRight),
+						integerToDecimalString (
+							indexLeft),
+						integerToDecimalString (
+							indexRight)),
 
 					(boolean)
 					compatibleResults
@@ -168,8 +171,10 @@ class ChatUserLogicTest
 				assertEquals (
 					stringFormat (
 						"users %s and %s",
-						index1,
-						index2),
+						integerToDecimalString (
+							index1),
+						integerToDecimalString (
+							index2)),
 					expectedResult,
 					actualResult);
 

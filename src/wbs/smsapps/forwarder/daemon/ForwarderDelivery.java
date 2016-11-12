@@ -11,6 +11,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
@@ -57,6 +58,7 @@ class ForwarderDelivery
 	@Override
 	public
 	void handle (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long deliveryId,
 			@NonNull Long ref) {
 

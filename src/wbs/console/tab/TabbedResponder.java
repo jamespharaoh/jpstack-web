@@ -3,24 +3,24 @@ package wbs.console.tab;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlDivWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingOneWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteHtml;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
+import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlStyleAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlDivWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingOneWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteHtml;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,10 +32,9 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import org.apache.log4j.Logger;
 
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
@@ -44,12 +43,15 @@ import wbs.console.part.PagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("tabbedResponder")
@@ -60,7 +62,7 @@ class TabbedResponder
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
+	ConsoleUserHelper consoleUserHelper;
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
@@ -68,11 +70,14 @@ class TabbedResponder
 	@SingletonDependency
 	ExceptionUtils exceptionLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	@SingletonDependency
-	ConsoleUserHelper consoleUserHelper;
+	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -146,9 +151,16 @@ class TabbedResponder
 
 	@Override
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.prepare ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
+		super.prepare (
+			taskLogger);
 
 		TabContext tabContext =
 			requestContext.tabContextRequired ();
@@ -187,7 +199,8 @@ class TabbedResponder
 
 			try {
 
-				pagePart.prepare ();
+				pagePart.prepare (
+					taskLogger);
 
 			} catch (RuntimeException exception) {
 
@@ -200,15 +213,10 @@ class TabbedResponder
 
 				// log the exception
 
-				Logger logger =
-					Logger.getLogger (
-						getClass ());
-
-				logger.warn (
-					stringFormat (
-						"Exception while reponding to: %s",
-						path),
-					exception);
+				taskLogger.warningFormatException (
+					exception,
+					"Exception while reponding to: %s",
+					path);
 
 				// record the exception
 
@@ -235,11 +243,19 @@ class TabbedResponder
 
 	@Override
 	protected
-	void renderHtmlHeadContents () {
+	void renderHtmlHeadContents (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.renderHtmlHeadContents ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlHeadContents");
 
-		pagePart.renderHtmlHeadContent ();
+		super.renderHtmlHeadContents (
+			taskLogger);
+
+		pagePart.renderHtmlHeadContent (
+			taskLogger);
 
 		htmlScriptBlockOpen ();
 
@@ -283,7 +299,13 @@ class TabbedResponder
 
 	@Override
 	protected
-	void renderHtmlBodyContents () {
+	void renderHtmlBodyContents (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContents");
 
 		htmlHeadingOneWrite (
 			title);
@@ -399,7 +421,8 @@ class TabbedResponder
 				pagePart)
 		) {
 
-			pagePart.renderHtmlBodyContent ();
+			pagePart.renderHtmlBodyContent (
+				taskLogger);
 
 		}
 

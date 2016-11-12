@@ -10,43 +10,43 @@ import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlDivClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlDivOpen;
-import static wbs.utils.web.HtmlBlockUtils.htmlDivWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlSpanClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlSpanOpen;
-import static wbs.utils.web.HtmlBlockUtils.htmlSpanWrite;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockWrite;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockClose;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleBlockOpen;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleClose;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntryWrite;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWriteHtml;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlEncodeNonBreakingWhitespace;
-import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
-import static wbs.utils.web.HtmlUtils.htmlLinkWriteInline;
+import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlStyleAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlDivClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlDivOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlDivWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlSpanClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlSpanOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlSpanWrite;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockWrite;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockClose;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockOpen;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleClose;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntryWrite;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlUtils.htmlEncodeNonBreakingWhitespace;
+import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
+import static wbs.web.utils.HtmlUtils.htmlLinkWriteInline;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +58,8 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
+import lombok.NonNull;
+
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
@@ -65,11 +67,16 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
 import wbs.platform.queue.logic.DummyQueueCache;
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
@@ -91,11 +98,14 @@ class QueueHomeResponder
 	@SingletonDependency
 	DummyQueueCache dummyQueueCache;
 
-	@SingletonDependency
-	UserPrivChecker privChecker;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
+
+	@SingletonDependency
+	UserPrivChecker privChecker;
 
 	@SingletonDependency
 	QueueItemClaimObjectHelper queueItemClaimHelper;
@@ -179,7 +189,13 @@ class QueueHomeResponder
 
 	@Override
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		myClaimedItems =
 			queueItemClaimHelper.findClaimed (
@@ -199,7 +215,8 @@ class QueueHomeResponder
 			.effectiveUser (
 				userConsoleLogic.userRequired ())
 
-			.sort ()
+			.sort (
+				taskLogger)
 
 			.availableQueues ();
 
@@ -261,9 +278,16 @@ class QueueHomeResponder
 
 	@Override
 	protected
-	void renderHtmlHeadContents () {
+	void renderHtmlHeadContents (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.renderHtmlHeadContents ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlHeadContents");
+
+		super.renderHtmlHeadContents (
+			taskLogger);
 
 		htmlScriptBlockWrite (
 			"top.show_inbox (true)");
@@ -306,7 +330,8 @@ class QueueHomeResponder
 			htmlStyleRuleOpen (
 				stringFormat (
 					"table.list tr.queue-%h td",
-					queue.getId ()));
+					integerToDecimalString (
+						queue.getId ())));
 
 			if (
 				isNotNull (
@@ -492,7 +517,7 @@ class QueueHomeResponder
 				queueInfo.queue ();
 
 			Record <?> parent =
-				objectManager.getParentOrNull (
+				objectManager.getParentRequired (
 					queue);
 
 			Optional <SliceRec> slice =
@@ -517,7 +542,8 @@ class QueueHomeResponder
 						"queueItemRow",
 						stringFormat (
 							"queue-%h",
-							queue.getId ()))),
+							integerToDecimalString (
+								queue.getId ())))),
 
 				htmlStyleAttribute (
 					presentInstances (
@@ -764,7 +790,8 @@ class QueueHomeResponder
 
 	@Override
 	protected
-	void renderHtmlBodyContents () {
+	void renderHtmlBodyContents (
+			@NonNull TaskLogger parentTaskLoggers) {
 
 		renderLinks ();
 

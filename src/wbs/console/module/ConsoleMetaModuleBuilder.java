@@ -5,12 +5,15 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleMetaModuleBuilderHandler;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("consoleMetaModuleBuilder")
 public
@@ -60,12 +63,14 @@ class ConsoleMetaModuleBuilder
 	@Override
 	public
 	void descend (
-			Object parentObject,
-			List<?> childObjects,
-			Object targetObject,
-			MissingBuilderBehaviour missingBuilderBehaviour) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Object parentObject,
+			@NonNull List <?> childObjects,
+			@NonNull Object targetObject,
+			@NonNull MissingBuilderBehaviour missingBuilderBehaviour) {
 
 		builder.descend (
+			parentTaskLogger,
 			parentObject,
 			childObjects,
 			targetObject,

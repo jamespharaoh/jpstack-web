@@ -10,17 +10,19 @@ import javax.servlet.ServletException;
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.AbstractWebFile;
-import wbs.framework.web.RequestContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.web.context.RequestContext;
+import wbs.web.file.AbstractWebFile;
 
 // TODO this doesn't look right...
 
@@ -47,7 +49,8 @@ class BroadcastSystemsReportFile
 
 	@Override
 	public
-	void doGet ()
+	void doGet (
+			@NonNull TaskLogger taskLogger)
 		throws
 			ServletException,
 			IOException {
@@ -56,16 +59,19 @@ class BroadcastSystemsReportFile
 			new Data ();
 
 		processRequest (
+			taskLogger,
 			data);
 
 		updateDatabase (
+			taskLogger,
 			data);
 
 	}
 
 	public
 	void processRequest (
-			Data data) {
+			@NonNull TaskLogger taskLogger,
+			@NonNull Data data) {
 
 		data.routeId =
 			requestContext.requestIntegerRequired (
@@ -107,7 +113,8 @@ class BroadcastSystemsReportFile
 	}
 
 	void updateDatabase (
-			Data data) {
+			@NonNull TaskLogger taskLogger,
+			@NonNull Data data) {
 
 		@Cleanup
 		Transaction transaction =

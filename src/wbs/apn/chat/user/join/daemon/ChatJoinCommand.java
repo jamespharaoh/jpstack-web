@@ -1,5 +1,7 @@
 package wbs.apn.chat.user.join.daemon;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+
 import java.util.Map;
 
 import javax.inject.Provider;
@@ -8,26 +10,32 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
-import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
-import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
+
+import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
+import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatJoinCommand")
@@ -43,11 +51,14 @@ class ChatJoinCommand
 	@SingletonDependency
 	Database database;
 
-	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
 
 	// prototype dependencies
 
@@ -116,10 +127,18 @@ class ChatJoinCommand
 
 	@Override
 	public
-	InboxAttemptRec handle () {
+	InboxAttemptRec handle (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		Object parent =
-			objectManager.getParentOrNull (command);
+			genericCastUnchecked (
+				objectManager.getParentRequired (
+					command));
 
 		if (parent instanceof ChatRec) {
 
@@ -162,6 +181,7 @@ class ChatJoinCommand
 					rest)
 
 				.handleInbox (
+					taskLogger,
 					command);
 
 		}
@@ -198,6 +218,7 @@ class ChatJoinCommand
 					rest)
 
 				.handleInbox (
+					taskLogger,
 					command);
 
 		}
@@ -240,6 +261,7 @@ class ChatJoinCommand
 					rest)
 
 				.handleInbox (
+					taskLogger,
 					command);
 
 		}

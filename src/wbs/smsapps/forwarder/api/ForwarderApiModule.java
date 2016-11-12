@@ -16,7 +16,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,19 +28,21 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
 
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.WebApiAction;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.PathHandler;
-import wbs.framework.web.ServletModule;
-import wbs.framework.web.WebFile;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.rpc.core.Rpc;
@@ -69,12 +70,15 @@ import wbs.smsapps.forwarder.model.ForwarderMessageOutObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutRec;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutReportRec;
 import wbs.smsapps.forwarder.model.ForwarderRec;
+import wbs.web.file.WebFile;
+import wbs.web.pathhandler.PathHandler;
+import wbs.web.responder.WebModule;
 
-@Log4j
+@Accessors (fluent = true)
 @SingletonComponent ("forwarderApiModule")
 public
 class ForwarderApiModule
-	implements ServletModule {
+	implements WebModule {
 
 	// singleton dependencies
 
@@ -95,6 +99,9 @@ class ForwarderApiModule
 
 	@SingletonDependency
 	ForwarderQueryExMessageChecker forwarderQueryExMessageChecker;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaLogic mediaLogic;
@@ -118,39 +125,80 @@ class ForwarderApiModule
 	@PrototypeDependency
 	Provider <XmlRpcAction> xmlRpcAction;
 
-	// ========================================================= servlet module
+	// properties
 
-	@Override
+	@Getter
+	Map <String, PathHandler> paths =
+		ImmutableMap.of ();
+
+	@Getter
+	Map <String, WebFile> files;
+
+	// life cycle
+
+	@NormalLifecycleSetup
 	public
-	Map<String,PathHandler> paths () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return new HashMap<String,PathHandler> ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
+
+		initFiles (
+			taskLogger);
+
+		initRpcHandlers ();
+		initActions ();
 
 	}
 
-	@Override
-	public
-	Map<String,WebFile> files () {
+	private
+	void initFiles (
+			@NonNull TaskLogger taskLogger) {
 
-		return ImmutableMap.<String,WebFile>builder ()
+		files =
+			ImmutableMap.<String, WebFile> builder ()
 
 			.put (
 				"/forwarder/control",
 				apiFile.get ()
-					.getActionName ("forwarderInAction")
-					.postActionName ("forwarderInAction"))
+
+				.getActionName (
+					taskLogger,
+					"forwarderInAction")
+
+				.postActionName (
+					"forwarderInAction")
+
+			)
 
 			.put (
 				"/forwarder/in",
 				apiFile.get ()
-					.getActionName ("forwarderInAction")
-					.postActionName ("forwarderInAction"))
+
+				.getActionName (
+					taskLogger,
+					"forwarderInAction")
+
+				.postActionName (
+					"forwarderInAction")
+
+			)
 
 			.put (
 				"/forwarder/out",
 				apiFile.get ()
-					.getActionName ("forwarderOutAction")
-					.postActionName ("forwarderOutAction"))
+
+				.getActionName (
+					taskLogger,
+					"forwarderOutAction")
+
+				.postActionName (
+					"forwarderOutAction")
+
+			)
 
 			// ---------- php
 
@@ -208,15 +256,6 @@ class ForwarderApiModule
 
 			.build ();
 
-	}
-
-	// life cycle
-
-	@NormalLifecycleSetup
-	public
-	void afterPropertiesSet () {
-		initRpcHandlers ();
-		initActions ();
 	}
 
 	// =========================================================== rpc handlers
@@ -398,7 +437,8 @@ class ForwarderApiModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
 			@Cleanup
 			Transaction transaction =
@@ -773,7 +813,8 @@ class ForwarderApiModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
 			@Cleanup
 			Transaction transaction =
@@ -848,7 +889,8 @@ class ForwarderApiModule
 					String filename =
 						stringFormat (
 							"%s.jpeg",
-							url.hashCode ());
+							integerToDecimalString (
+								url.hashCode ()));
 
 					medias.add (
 						mediaLogic.createMediaFromImageRequired (
@@ -875,7 +917,8 @@ class ForwarderApiModule
 						String txtFilename =
 							stringFormat (
 								"%s.txt",
-								message.hashCode ());
+								integerToDecimalString (
+									message.hashCode ()));
 
 						medias.add (
 							mediaLogic.createTextMedia (
@@ -1670,7 +1713,8 @@ class ForwarderApiModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
 			@Cleanup
 			Transaction transaction =
@@ -2026,7 +2070,13 @@ class ForwarderApiModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"peekExRpcHandler.handle");
 
 			@Cleanup
 			Transaction transaction =
@@ -2055,7 +2105,8 @@ class ForwarderApiModule
 			// find stuff
 
 			RpcResult result =
-				makeSuccess ();
+				makeSuccess (
+					taskLogger);
 
 			// commit
 
@@ -2097,7 +2148,8 @@ class ForwarderApiModule
 		}
 
 		private
-		RpcResult makeSuccess () {
+		RpcResult makeSuccess (
+				@NonNull TaskLogger taskLogger) {
 
 			RpcList messagesPart =
 				Rpc.rpcList (
@@ -2195,7 +2247,10 @@ class ForwarderApiModule
 						: pendingReportList
 				) {
 
-					log.debug ("fmo.id=" + forwarderMessageOut.getId ());
+					taskLogger.debugFormat (
+						"fmo.id = %s",
+						integerToDecimalString (
+							forwarderMessageOut.getId ()));
 
 					ForwarderMessageOutReportRec forwarderMessageOutReport =
 						forwarderMessageOut.getReports ().get (

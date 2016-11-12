@@ -12,8 +12,8 @@ import wbs.apn.chat.infosite.model.ChatInfoSiteRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.PrintResponder;
-import wbs.framework.web.RequestContext;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.PrintResponder;
 
 @PrototypeComponent ("chatInfoSiteViewResponder")
 public

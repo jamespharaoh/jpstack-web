@@ -3,6 +3,7 @@ package wbs.smsapps.forwarder.api;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.isInt;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -14,16 +15,17 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import wbs.api.mvc.ApiAction;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.text.web.TextResponder;
 import wbs.smsapps.forwarder.logic.ForwarderLogic;
 import wbs.smsapps.forwarder.logic.ForwarderNotFoundException;
@@ -34,8 +36,9 @@ import wbs.smsapps.forwarder.model.ForwarderMessageInObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutRec;
 import wbs.smsapps.forwarder.model.ForwarderRec;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.Responder;
 
-@Log4j
 @PrototypeComponent ("forwarderOutAction")
 public
 class ForwarderOutAction
@@ -55,6 +58,9 @@ class ForwarderOutAction
 	@SingletonDependency
 	ForwarderMessageInObjectHelper forwarderMessageInHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RequestContext requestContext;
 
@@ -67,7 +73,13 @@ class ForwarderOutAction
 
 	@Override
 	public
-	Responder goApi () {
+	Responder goApi (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goApi");
 
 		@Cleanup
 		Transaction transaction =
@@ -85,7 +97,7 @@ class ForwarderOutAction
 			Long pri = null;
 
 			for (
-				Map.Entry<String,List<String>> parameterEntry
+				Map.Entry <String, List <String>> parameterEntry
 					: requestContext.parameterMap ().entrySet ()
 			) {
 
@@ -249,7 +261,7 @@ class ForwarderOutAction
 				throw new ReportableException (
 					"Parameter numto must be supplied");
 
-			Optional<ForwarderMessageInRec> forwarderMessageInOptional;
+			Optional <ForwarderMessageInRec> forwarderMessageInOptional;
 
 			if (
 				isNotNull (
@@ -330,28 +342,42 @@ class ForwarderOutAction
 			}
 
 			return textResponderProvider.get ()
+
 				.text (
 					stringFormat (
 						"OK\n",
 						"out_id=%s\n",
-						forwarderMessageOut.getId ()));
+						integerToDecimalString (
+							forwarderMessageOut.getId ())));
 
 		} catch (ReportableException exception) {
 
-			log.error (
-				"Error doing 'out': " + exception.getMessage ());
+			taskLogger.errorFormatException (
+				exception,
+				"Error doing 'out'");
 
-			for (Map.Entry<String,List<String>> entry
-					: requestContext.parameterMap ().entrySet ()) {
+			for (
+				Map.Entry<String,List<String>> entry
+					: requestContext.parameterMap ().entrySet ()
+			) {
 
 				String name =
 					entry.getKey ();
 
-				List<String> values =
+				List <String> values =
 					entry.getValue ();
 
-				for (String value : values)
-					log.error ("Param " + name + ": " + value);
+				for (
+					String value
+						: values
+				) {
+
+					taskLogger.debugFormat (
+						"Param %s: %s",
+						name,
+						value);
+
+				}
 
 			}
 

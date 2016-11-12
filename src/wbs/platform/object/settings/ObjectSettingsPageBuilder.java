@@ -14,7 +14,6 @@ import java.util.List;
 import javax.inject.Provider;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -32,6 +31,7 @@ import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
@@ -40,16 +40,18 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
-import wbs.framework.web.Action;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.action.Action;
+import wbs.web.responder.Responder;
 
-@Log4j
 @PrototypeComponent ("objectSettingsPageBuilder")
 @ConsoleModuleBuilderHandler
 public
@@ -71,6 +73,9 @@ class ObjectSettingsPageBuilder <
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@WeakSingletonDependency
 	ConsoleObjectManager objectManager;
@@ -132,9 +137,16 @@ class ObjectSettingsPageBuilder <
 	@BuildMethod
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		setDefaults ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
+
+		setDefaults (
+			taskLogger);
 
 		buildAction ();
 		buildResponder ();
@@ -187,7 +199,8 @@ class ObjectSettingsPageBuilder <
 
 			@Override
 			public
-			Responder handle () {
+			Responder handle (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				Action settingsAction;
 
@@ -261,7 +274,8 @@ class ObjectSettingsPageBuilder <
 
 				}
 
-				return settingsAction.handle ();
+				return settingsAction.handle (
+					parentTaskLogger);
 
 			}
 
@@ -296,7 +310,8 @@ class ObjectSettingsPageBuilder <
 
 				@Override
 				public
-				Responder handle () {
+				Responder handle (
+						@NonNull TaskLogger parentTaskLogger) {
 
 					Action removeAction;
 
@@ -326,7 +341,8 @@ class ObjectSettingsPageBuilder <
 						.editPrivKey (
 							privKey);
 
-					return removeAction.handle ();
+					return removeAction.handle (
+						parentTaskLogger);
 
 				}
 
@@ -354,12 +370,13 @@ class ObjectSettingsPageBuilder <
 
 	void buildResponder () {
 
-		Provider<PagePart> partFactory =
-			new Provider<PagePart> () {
+		PagePartFactory partFactory =
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return objectSettingsPartProvider.get ()
 
@@ -410,7 +427,13 @@ class ObjectSettingsPageBuilder <
 
 	}
 
-	void setDefaults () {
+	void setDefaults (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setDefaults");
 
 		consoleHelper =
 			ifNotNullThenElse (
@@ -486,7 +509,8 @@ class ObjectSettingsPageBuilder <
 				() -> consoleModule.formFieldSet (
 					spec.fieldsName (),
 					consoleHelper.objectClass ()),
-				() -> defaultFields ());
+				() -> defaultFields (
+					taskLogger));
 
 		// if a provider name is provided
 
@@ -495,7 +519,7 @@ class ObjectSettingsPageBuilder <
 			fieldsProvider =
 				genericCastUnchecked (
 					componentManager.getComponentRequired (
-						log,
+						parentTaskLogger,
 						spec.fieldsProviderName (),
 						FieldsProvider.class));
 
@@ -510,7 +534,13 @@ class ObjectSettingsPageBuilder <
 
 	}
 
-	FormFieldSet <ObjectType> defaultFields () {
+	FormFieldSet <ObjectType> defaultFields (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"defaultFields");
 
 		List <Object> formFieldSpecs =
 			new ArrayList<> ();
@@ -548,6 +578,7 @@ class ObjectSettingsPageBuilder <
 				consoleHelper.objectName ());
 
 		return consoleModuleBuilder.buildFormFieldSet (
+			taskLogger,
 			consoleHelper,
 			fieldSetName,
 			formFieldSpecs);

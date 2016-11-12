@@ -3,17 +3,21 @@ package wbs.integrations.oxygen8.console;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+
+import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.TaskLogger;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
@@ -44,7 +48,8 @@ class Oxygen8RouteSummaryAdditionalPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		route =
 			routeHelper.findRequired (
@@ -59,7 +64,8 @@ class Oxygen8RouteSummaryAdditionalPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlHeadingTwoWrite (
 			"Oxygen8 route information");
@@ -109,7 +115,8 @@ class Oxygen8RouteSummaryAdditionalPart
 					"/oxygen8",
 					"/route",
 					"/%u",
-					route.getId (),
+					integerToDecimalString (
+						route.getId ()),
 					"/in"));
 
 		}
@@ -128,7 +135,8 @@ class Oxygen8RouteSummaryAdditionalPart
 					"/oxygen8",
 					"/route",
 					"/%u",
-					route.getId (),
+					integerToDecimalString (
+						route.getId ()),
 					"/report"));
 
 		}

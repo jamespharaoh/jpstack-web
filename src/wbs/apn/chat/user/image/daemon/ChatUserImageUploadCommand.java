@@ -1,32 +1,32 @@
 package wbs.apn.chat.user.image.daemon;
 
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import org.joda.time.Duration;
 
-import wbs.apn.chat.contact.logic.ChatSendLogic;
-import wbs.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
+
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
@@ -35,7 +35,16 @@ import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
+
 import wbs.utils.random.RandomLogic;
+
+import wbs.apn.chat.contact.logic.ChatSendLogic;
+import wbs.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatUserImageUploadCommand")
@@ -63,8 +72,8 @@ class ChatUserImageUploadCommand
 	@SingletonDependency
 	Database database;
 
-	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MessageObjectHelper messageHelper;
@@ -77,6 +86,9 @@ class ChatUserImageUploadCommand
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
 
 	// properties
 
@@ -108,7 +120,8 @@ class ChatUserImageUploadCommand
 
 	@Override
 	public
-	InboxAttemptRec handle () {
+	InboxAttemptRec handle (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -117,9 +130,9 @@ class ChatUserImageUploadCommand
 			inbox.getMessage ();
 
 		ChatRec chat =
-			(ChatRec)
-			objectManager.getParentOrNull (
-				command);
+			genericCastUnchecked (
+				objectManager.getParentRequired (
+					command));
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (

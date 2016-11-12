@@ -1,8 +1,8 @@
 package wbs.console.reporting;
 
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.List;
 import java.util.Map;
