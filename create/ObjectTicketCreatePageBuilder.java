@@ -11,7 +11,6 @@ import java.util.List;
 import javax.inject.Provider;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -23,32 +22,36 @@ import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Action;
-import wbs.framework.web.Responder;
 import wbs.platform.object.criteria.WhereDeletedCriteriaSpec;
 import wbs.platform.object.criteria.WhereICanManageCriteriaSpec;
 import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
 import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketRec;
+import wbs.web.action.Action;
+import wbs.web.responder.Responder;
 
-@Log4j
 @PrototypeComponent ("objectTicketCreatePageBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ObjectTicketCreatePageBuilder {
+class ObjectTicketCreatePageBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -60,6 +63,9 @@ class ObjectTicketCreatePageBuilder {
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -129,11 +135,19 @@ class ObjectTicketCreatePageBuilder {
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		setDefaults ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
+
+		setDefaults (
+			taskLogger);
 
 		for (
 			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
@@ -179,7 +193,8 @@ class ObjectTicketCreatePageBuilder {
 
 			@Override
 			public
-			Responder handle () {
+			Responder handle (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return objectTicketCreateActionProvider.get ()
 
@@ -222,7 +237,8 @@ class ObjectTicketCreatePageBuilder {
 					.createUserFieldName (
 						createUserFieldName)
 
-					.handle ();
+					.handle (
+						parentTaskLogger);
 
 				}
 
@@ -249,12 +265,13 @@ class ObjectTicketCreatePageBuilder {
 
 	void buildResponder () {
 
-		Provider<PagePart> partFactory =
-			new Provider<PagePart> () {
+		PagePartFactory partFactory =
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return objectTicketCreatePartProvider.get ()
 
@@ -297,7 +314,8 @@ class ObjectTicketCreatePageBuilder {
 
 	// defaults
 
-	void setDefaults () {
+	void setDefaults (
+			@NonNull TaskLogger taskLogger) {
 
 		name =
 			spec.name ();
@@ -371,7 +389,7 @@ class ObjectTicketCreatePageBuilder {
 			fieldsProvider =
 				genericCastUnchecked (
 					componentManager.getComponentRequired (
-						log,
+						taskLogger,
 						spec.fieldsProviderName (),
 						FieldsProvider.class));
 

@@ -19,10 +19,15 @@ import wbs.console.forms.ObjectFormFieldSpec;
 import wbs.console.forms.TextFormFieldSpec;
 import wbs.console.forms.YesNoFormFieldSpec;
 import wbs.console.module.ConsoleModuleBuilder;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketManagerRec;
@@ -37,6 +42,9 @@ class TicketFieldsProvider
 
 	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	TicketFieldTypeObjectHelper ticketFieldTypeHelper;
@@ -58,9 +66,11 @@ class TicketFieldsProvider
 	@Override
 	public
 	FormFieldSet <TicketRec> getFieldsForObject (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull TicketRec ticket) {
 
 		return getFieldsForParent (
+			parentTaskLogger,
 			ticket.getTicketManager ());
 
 	}
@@ -68,7 +78,13 @@ class TicketFieldsProvider
 	@Override
 	public
 	FormFieldSet <TicketRec> getFieldsForParent (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull TicketManagerRec ticketManager) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getFieldsForParent");
 
 		// retrieve existing ticket field types
 
@@ -195,6 +211,7 @@ class TicketFieldsProvider
 				mode);
 
 		return consoleModuleBuilder.buildFormFieldSet (
+			taskLogger,
 			ticketConsoleHelper,
 			fieldSetName,
 			formFieldSpecs);
