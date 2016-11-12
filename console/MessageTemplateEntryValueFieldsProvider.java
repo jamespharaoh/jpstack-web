@@ -15,10 +15,13 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.ScriptRefFormFieldSpec;
 import wbs.console.forms.TextAreaFormFieldSpec;
 import wbs.console.module.ConsoleModuleBuilder;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryValueRec;
 import wbs.services.messagetemplate.model.MessageTemplateFieldTypeRec;
@@ -37,6 +40,9 @@ class MessageTemplateEntryValueFieldsProvider
 	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MessageTemplateSetConsoleHelper messageTemplateSetConsoleHelper;
 
@@ -51,10 +57,16 @@ class MessageTemplateEntryValueFieldsProvider
 	@Override
 	public
 	FormFieldSet <MessageTemplateEntryValueRec> getFieldsForObject (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull MessageTemplateEntryValueRec entryValue) {
 
-		List<Object> formFieldSpecs =
-			new ArrayList<Object> ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getFieldsForObject");
+
+		List <Object> formFieldSpecs =
+			new ArrayList<> ();
 
 		// retrieve existing message template types
 
@@ -127,6 +139,7 @@ class MessageTemplateEntryValueFieldsProvider
 				mode);
 
 		return consoleModuleBuilder.buildFormFieldSet (
+			taskLogger,
 			messageTemplateSetConsoleHelper,
 			fieldSetName,
 			formFieldSpecs);
@@ -136,6 +149,7 @@ class MessageTemplateEntryValueFieldsProvider
 	@Override
 	public
 	FormFieldSet <MessageTemplateEntryValueRec> getFieldsForParent (
+			@NonNull TaskLogger taskLogger,
 			@NonNull MessageTemplateSetRec parent) {
 
 		throw new UnsupportedOperationException ();
