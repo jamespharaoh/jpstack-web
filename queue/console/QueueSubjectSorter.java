@@ -2,6 +2,7 @@ package wbs.platform.queue.console;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
@@ -9,6 +10,7 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalEqualAndPresentWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalNotEqualAndPresentWithClass;
@@ -42,15 +44,20 @@ import org.joda.time.Instant;
 
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.priv.UserPrivCheckerBuilder;
+
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.queue.logic.QueueCache;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -73,6 +80,9 @@ class QueueSubjectSorter {
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -124,7 +134,13 @@ class QueueSubjectSorter {
 	// implementation
 
 	public
-	SortedQueueSubjects sort () {
+	SortedQueueSubjects sort (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sort");
 
 		@Cleanup
 		ActiveTask activeTask =
@@ -153,7 +169,8 @@ class QueueSubjectSorter {
 			.userId (
 				loggedInUser.getId ())
 
-			.build ();
+			.build (
+				taskLogger);
 
 		if (
 			isNotNull (
@@ -166,7 +183,8 @@ class QueueSubjectSorter {
 				.userId (
 					effectiveUser.getId ())
 
-				.build ();
+				.build (
+					taskLogger);
 
 		}
 
@@ -190,7 +208,10 @@ class QueueSubjectSorter {
 		);
 
 		queueSubjects.forEach (
-			this::processSubject);
+			queueSubject ->
+				processSubject (
+					taskLogger,
+					queueSubject));
 
 		// convert subjects to list, filter and sort
 
@@ -258,6 +279,7 @@ class QueueSubjectSorter {
 
 	public
 	void processSubject (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueSubjectRec subject) {
 
 		// get queue info
@@ -280,6 +302,7 @@ class QueueSubjectSorter {
 
 		SubjectInfo subjectInfo =
 			createSubjectInfo (
+				parentTaskLogger,
 				queueInfo,
 				subject);
 
@@ -341,8 +364,14 @@ class QueueSubjectSorter {
 
 	private
 	SubjectInfo createSubjectInfo (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueInfo queueInfo,
 			@NonNull QueueSubjectRec subject) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createSubjectInfo");
 
 		// find next item
 
@@ -397,7 +426,8 @@ class QueueSubjectSorter {
 				.userId (
 					subjectInfo.preferredUser.getId ())
 
-				.build ();
+				.build (
+					taskLogger);
 
 			subjectInfo.preferredByOverflowOperator = (
 
@@ -678,9 +708,11 @@ class QueueSubjectSorter {
 
 			throw new RuntimeException (
 				stringFormat (
-					"Queue item %s in invalid state %s",
-					item.getId (),
-					item.getState ()));
+					"Queue item %s in invalid state \"%s\"",
+					integerToDecimalString (
+						item.getId ()),
+					enumNameSpaces (
+						item.getState ())));
 
 		}
 

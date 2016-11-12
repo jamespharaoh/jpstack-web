@@ -1,5 +1,6 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.thread.ConcurrentUtils.futureValue;
 import static wbs.utils.time.TimeUtils.laterThan;
@@ -19,6 +20,8 @@ import org.joda.time.Instant;
 
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -27,6 +30,9 @@ import wbs.framework.component.tools.EasyReadWriteLock;
 import wbs.framework.component.tools.EasyReadWriteLock.HeldLock;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.queue.logic.DummyQueueCache;
 import wbs.platform.queue.logic.MasterQueueCache;
 import wbs.platform.queue.logic.QueueCache;
@@ -34,6 +40,7 @@ import wbs.platform.status.console.StatusLine;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
+
 import wbs.utils.thread.ThreadManager;
 
 @SingletonComponent ("queueItemStatusLine")
@@ -65,6 +72,9 @@ class QueueItemStatusLine
 
 	@SingletonDependency
 	DummyQueueCache dummyQueueCache;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -176,8 +186,10 @@ class QueueItemStatusLine
 			return futureValue (
 				stringFormat (
 					"updateQueueItems (%s, %s);\n",
-					userData.totalAvailableItems (),
-					userData.userClaimedItems ()));
+					integerToDecimalString (
+						userData.totalAvailableItems ()),
+					integerToDecimalString (
+						userData.userClaimedItems ())));
 
 		}
 
@@ -229,6 +241,10 @@ class QueueItemStatusLine
 
 	private
 	void updateAllUsers () {
+
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"updateAllUsers");
 
 		Instant startTime =
 			Instant.now ();
@@ -288,7 +304,8 @@ class QueueItemStatusLine
 				.effectiveUser (
 					user)
 
-				.sort ();
+				.sort (
+					taskLogger);
 
 			synchronized (userData) {
 

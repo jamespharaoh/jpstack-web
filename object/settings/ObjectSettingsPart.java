@@ -2,14 +2,14 @@ package wbs.platform.object.settings;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostActionEncoding;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostActionEncoding;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -18,6 +18,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -31,9 +32,14 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.scaffold.model.RootObjectHelper;
 
 @Accessors (fluent = true)
@@ -48,10 +54,13 @@ class ObjectSettingsPart <
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
+	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
-	FormFieldLogic formFieldLogic;
+	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
 	RootObjectHelper rootHelper;
@@ -104,7 +113,13 @@ class ObjectSettingsPart <
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		updateResultSet =
 			optionalCast (
@@ -128,7 +143,9 @@ class ObjectSettingsPart <
 		if (formFieldsProvider != null) {
 
 			prepareParent ();
-			prepareFieldSet ();
+
+			prepareFieldSet (
+				taskLogger);
 
 		}
 
@@ -171,23 +188,27 @@ class ObjectSettingsPart <
 
 	}
 
-	void prepareFieldSet () {
+	void prepareFieldSet (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		formFieldSet =
 			formFieldsProvider.getFieldsForObject (
+				parentTaskLogger,
 				object);
 
 	}
 
 	@Override
 	public
-	void renderHtmlHeadContent () {
+	void renderHtmlHeadContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 	}
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		if (canEdit) {
 

@@ -1,7 +1,10 @@
 package wbs.platform.queue.console;
 
+import lombok.NonNull;
+
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("queueSubjectActionsPart")
 public
@@ -45,7 +48,8 @@ class QueueSubjectActionsPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		/*
 		myUser =
@@ -80,7 +84,8 @@ class QueueSubjectActionsPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		/*
 		if (! canSupervise) {

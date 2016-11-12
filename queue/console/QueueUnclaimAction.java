@@ -12,10 +12,10 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("queueUnclaimAction")
 public

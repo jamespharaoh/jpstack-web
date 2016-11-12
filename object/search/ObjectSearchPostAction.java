@@ -1,17 +1,12 @@
 package wbs.platform.object.search;
 
-import static wbs.utils.collection.IterableUtils.iterableMap;
-import static wbs.utils.etc.DebugUtils.debugFormat;
-import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.Misc.getMethodRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -47,8 +42,8 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
 import wbs.utils.etc.PropertyUtils;
+import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchAction")
@@ -332,6 +327,7 @@ class ObjectSearchPostAction <
 
 			Optional <ConsoleContext> targetContext =
 				consoleManager.relatedContext (
+					taskLogger,
 					requestContext.consoleContext (),
 					targetContextType);
 

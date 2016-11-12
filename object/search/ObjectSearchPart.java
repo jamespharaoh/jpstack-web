@@ -4,14 +4,14 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -37,6 +38,7 @@ import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchPart")
@@ -100,7 +102,8 @@ class ObjectSearchPart <
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		search =
 			genericCastUnsafe (
@@ -174,7 +177,8 @@ class ObjectSearchPart <
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// form open
 

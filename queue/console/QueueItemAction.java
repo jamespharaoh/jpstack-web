@@ -5,13 +5,15 @@ import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
 import wbs.platform.queue.model.QueueItemRec;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("queueItemAction")
 public
@@ -21,16 +23,19 @@ class QueueItemAction
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	QueueItemConsoleHelper queueItemHelper;
 
 	@SingletonDependency
 	QueueManager queuePageFactoryManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// details
 
@@ -43,7 +48,12 @@ class QueueItemAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		Long queueItemId =
 			Long.parseLong (
@@ -61,6 +71,7 @@ class QueueItemAction
 				queueItemId);
 
 		return queuePageFactoryManager.getItemResponder (
+			taskLogger,
 			requestContext,
 			queueItem);
 

@@ -1,20 +1,20 @@
 package wbs.platform.priv.console;
 
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
-import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlInputUtils.htmlOptionWrite;
-import static wbs.utils.web.HtmlInputUtils.htmlSelectClose;
-import static wbs.utils.web.HtmlInputUtils.htmlSelectOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlInputUtils.htmlOptionWrite;
+import static wbs.web.utils.HtmlInputUtils.htmlSelectClose;
+import static wbs.web.utils.HtmlInputUtils.htmlSelectOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +23,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import lombok.Data;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
@@ -32,6 +33,7 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.group.console.GroupConsoleHelper;
 import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.model.PrivRec;
@@ -76,7 +78,8 @@ class ObjectSummaryPrivPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		@SuppressWarnings ("unchecked")
 		ObjectLookup<? extends Record<?>> objectLookup =
@@ -201,7 +204,8 @@ class ObjectSummaryPrivPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		renderUsers ();
 		renderGroups ();

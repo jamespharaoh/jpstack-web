@@ -5,15 +5,19 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.api.mvc.WebApiAction;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
-import wbs.framework.web.WebFile;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.context.RequestContext;
+import wbs.web.file.WebFile;
+import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("xmlRpcFile")
@@ -21,11 +25,20 @@ public
 class XmlRpcFile
 	implements WebFile {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RequestContext requestContext;
 
+	// properties
+
 	@Getter @Setter
 	WebApiAction action;
+
+	// public implementation
 
 	public
 	void doHeaders () {
@@ -54,7 +67,8 @@ class XmlRpcFile
 
 	@Override
 	public
-	void doGet ()
+	void doGet (
+			@NonNull TaskLogger taskLogger)
 		throws
 			ServletException,
 			IOException {
@@ -65,7 +79,8 @@ class XmlRpcFile
 
 	@Override
 	public
-	void doOptions ()
+	void doOptions (
+			@NonNull TaskLogger taskLogger)
 		throws
 			ServletException,
 			IOException {
@@ -76,17 +91,25 @@ class XmlRpcFile
 
 	@Override
 	public
-	void doPost ()
+	void doPost (
+			@NonNull TaskLogger parentTaskLogger)
 		throws
 			ServletException,
 			IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doPost");
 
 		doHeaders ();
 
 		Responder responder =
-			action.go ();
+			action.go (
+				taskLogger);
 
-		responder.execute ();
+		responder.execute (
+			taskLogger);
 
 	}
 

@@ -5,13 +5,16 @@ import static wbs.utils.etc.Misc.runFilter;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.media.model.MediaRec;
+import wbs.utils.io.RuntimeIoException;
 
 @Log4j
 @PrototypeComponent ("mediaVideoResponder")
@@ -44,7 +47,8 @@ class MediaVideoResponder
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		MediaRec media =
 			mediaHelper.findRequired (
@@ -92,11 +96,20 @@ class MediaVideoResponder
 
 	@Override
 	public
-	void render ()
-		throws IOException {
+	void render (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		out.write (
-			data);
+		try {
+
+			out.write (
+				data);
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
 
 	}
 

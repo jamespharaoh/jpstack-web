@@ -5,12 +5,12 @@ import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.List;
 import java.util.Set;
@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -35,10 +36,13 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectBrowsePart")
@@ -52,10 +56,13 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 	ConsoleManager consoleManager;
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
+	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
-	FormFieldLogic formFieldLogic;
+	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
@@ -109,11 +116,20 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		prepareCurrentObject ();
+
 		prepareAllObjects ();
-		prepareTargetContext ();
+
+		prepareTargetContext (
+			taskLogger);
 
 	}
 
@@ -242,7 +258,8 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 	}
 
-	void prepareTargetContext () {
+	void prepareTargetContext (
+			@NonNull TaskLogger taskLogger) {
 
 		ConsoleContextType targetContextType =
 			consoleManager.contextType (
@@ -251,6 +268,7 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 		targetContext =
 			consoleManager.relatedContextRequired (
+				taskLogger,
 				requestContext.consoleContext (),
 				targetContextType);
 
@@ -258,7 +276,8 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// table open
 

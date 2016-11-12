@@ -20,24 +20,24 @@ import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localDateNotEqual;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttributeFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPost;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
-import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlDataAttributeFormat;
+import static wbs.web.utils.HtmlAttributeUtils.htmlStyleAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPost;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowSeparatorWrite;
+import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -68,10 +68,13 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.utils.etc.PropertyUtils;
 
@@ -91,6 +94,9 @@ class ObjectSearchResultsPart <
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -161,7 +167,13 @@ class ObjectSearchResultsPart <
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		// current object
 
@@ -276,11 +288,13 @@ class ObjectSearchResultsPart <
 
 		// other stuff
 
-		prepareTargetContext ();
+		prepareTargetContext (
+			taskLogger);
 
 	}
 
-	void prepareTargetContext () {
+	void prepareTargetContext (
+			@NonNull TaskLogger taskLogger) {
 
 		ConsoleContextType targetContextType =
 			consoleManager.contextType (
@@ -289,6 +303,7 @@ class ObjectSearchResultsPart <
 
 		targetContext =
 			consoleManager.relatedContext (
+				taskLogger,
 				requestContext.consoleContext (),
 				targetContextType);
 
@@ -296,7 +311,8 @@ class ObjectSearchResultsPart <
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		goNewSearch ();
 		goTotalObjects ();

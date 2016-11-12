@@ -3,15 +3,14 @@ package wbs.platform.queue.console;
 import static wbs.utils.etc.LogicUtils.ifThenElseEmDash;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
-import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlDataAttribute;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlDataAttribute;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +20,8 @@ import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableSet;
 
+import lombok.NonNull;
+
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.helper.manager.ConsoleObjectManager;
@@ -29,13 +30,19 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
 import wbs.platform.queue.logic.DummyQueueCache;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("queueListActivePart")
@@ -50,6 +57,9 @@ class QueueListActivePart
 
 	@SingletonDependency
 	DummyQueueCache dummyQueueCache;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -94,7 +104,13 @@ class QueueListActivePart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		List <QueueInfo> queueInfosTemp =
 			queueSubjectSorterProvider.get ()
@@ -105,7 +121,8 @@ class QueueListActivePart
 			.loggedInUser (
 				userConsoleLogic.userRequired ())
 
-			.sort ()
+			.sort (
+				taskLogger)
 
 			.availableQueues ();
 
@@ -133,7 +150,8 @@ class QueueListActivePart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger taskLogger) {
 
 		htmlTableOpenList ();
 
@@ -144,6 +162,7 @@ class QueueListActivePart
 
 		ConsoleContext queueContext =
 			consoleManager.relatedContextRequired (
+				taskLogger,
 				requestContext.consoleContext (),
 				queueContextType);
 
@@ -176,18 +195,18 @@ class QueueListActivePart
 					"magic-table-row"),
 				htmlDataAttribute (
 					"target-href",
-					requestContext.resolveContextUrl (
-						stringFormat (
-							"%s",
-							queueContext.pathPrefix (),
-							"/%u",
+					requestContext.resolveContextUrlFormat (
+						"%s",
+						queueContext.pathPrefix (),
+						"/%u",
+						integerToDecimalString (
 							queue.getId ()))));
 
 			// details
 
 			htmlTableCellWrite (
 				objectManager.objectPath (
-					objectManager.getParentOrNull (
+					objectManager.getParentRequired (
 						queue)));
 
 			htmlTableCellWrite (

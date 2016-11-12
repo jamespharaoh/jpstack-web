@@ -1,6 +1,13 @@
 package wbs.platform.priv.console;
 
+import static wbs.utils.etc.Misc.getError;
+import static wbs.utils.etc.Misc.getValue;
+import static wbs.utils.etc.Misc.isError;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -12,15 +19,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.inject.Provider;
 import javax.sql.DataSource;
 
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Instant;
 
@@ -30,14 +36,20 @@ import wbs.console.priv.UserPrivData.PrivPair;
 import wbs.console.priv.UserPrivData.SharedData;
 import wbs.console.priv.UserPrivData.UserData;
 import wbs.console.priv.UserPrivDataLoader;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.group.model.GroupRec;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
@@ -49,7 +61,8 @@ import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserPrivRec;
 import wbs.platform.user.model.UserRec;
 
-@Log4j
+import fj.data.Either;
+
 @SingletonComponent ("privDataLoader")
 public
 class PrivDataLoaderImplementation
@@ -58,19 +71,22 @@ class PrivDataLoaderImplementation
 	// singleton dependencies
 
 	@SingletonDependency
-	ObjectTypeObjectHelper objectTypeHelper;
+	DataSource dataSource;
+
+	@SingletonDependency
+	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
 
 	@SingletonDependency
+	ObjectTypeObjectHelper objectTypeHelper;
+
+	@SingletonDependency
 	PrivObjectHelper privHelper;
-
-	@SingletonDependency
-	Database database;
-
-	@SingletonDependency
-	DataSource dataSource;
 
 	@SingletonDependency
 	UpdateManager updateManager;
@@ -107,38 +123,49 @@ class PrivDataLoaderImplementation
 
 	// implementation
 
-	SharedData getPrivData () {
+	SharedData getPrivData (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return privDataCache
-			.get ();
+		return privDataCache.provide (
+			parentTaskLogger);
 
 	}
 
 	private
 	UserData getUserData (
-			Long userId) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long userId) {
 
-		Provider<UserData> userDataCache =
+		ComponentProvider <UserData> userDataCache =
 			getUserDataCache (
 				userId);
 
-		return userDataCache.get ();
+		return userDataCache.provide (
+			parentTaskLogger);
 
 	}
 
 	@Override
 	public
 	UserPrivData getUserPrivData (
-			Long userId) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long userId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getUserPrivData");
 
 		UserPrivData ret =
 			new UserPrivData ();
 
 		ret.sharedData =
-			getPrivData ();
+			getPrivData (
+				taskLogger);
 
 		ret.userData =
 			getUserData (
+				taskLogger,
 				userId);
 
 		return ret;
@@ -147,9 +174,16 @@ class PrivDataLoaderImplementation
 
 	@Override
 	public synchronized
-	void refresh () {
+	void refresh (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		log.info ("Refreshing");
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"refresh");
+
+		taskLogger.noticeFormat (
+			"Refreshing");
 
 		privDataCache.forceUpdate ();
 		userDataCachesByUserId.clear ();
@@ -157,7 +191,7 @@ class PrivDataLoaderImplementation
 	}
 
 	private synchronized
-	UpdateGetter<UserData> getUserDataCache (
+	UpdateGetter <UserData> getUserDataCache (
 			Long userId) {
 
 		UpdateGetter<UserData> ret =
@@ -188,11 +222,17 @@ class PrivDataLoaderImplementation
 
 	private
 	class PrivDataReloader
-		implements Provider<SharedData> {
+		implements ComponentProvider <SharedData> {
 
 		@Override
 		public
-		SharedData get () {
+		SharedData provide (
+				@NonNull TaskLogger parentTaskLogger) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"privDataReloader.get");
 
 			// create the data
 
@@ -207,7 +247,7 @@ class PrivDataLoaderImplementation
 
 			// start timer
 
-			log.debug (
+			taskLogger.debugFormat (
 				"Priv reload started");
 
 			Instant startTime =
@@ -226,7 +266,7 @@ class PrivDataLoaderImplementation
 
 				try {
 
-					objectManager.getParentOrNull (
+					objectManager.getParentRequired (
 						priv);
 
 					privs.add (
@@ -234,15 +274,16 @@ class PrivDataLoaderImplementation
 
 				} catch (Exception exception) {
 
-					log.warn (
-						stringFormat (
-							"Error getting parent for priv %s: ",
-							priv.getId (),
-							"type %s, ",
-							priv.getParentType ().getCode (),
-							"id %s",
-							priv.getParentId ()),
-						exception);
+					taskLogger.warningFormatException (
+						exception,
+						"Error getting parent for priv %s: ",
+						integerToDecimalString (
+							priv.getId ()),
+						"type %s, ",
+						priv.getParentType ().getCode (),
+						"id %s",
+						integerToDecimalString (
+							priv.getParentId ()));
 
 				}
 
@@ -302,10 +343,9 @@ class PrivDataLoaderImplementation
 
 				} else {
 
-					log.warn (
-						stringFormat (
-							"Ignoring unknown object type %s",
-							objectType.getCode ()));
+					taskLogger.warningFormat (
+						"Ignoring unknown object type %s",
+						objectType.getCode ());
 
 				}
 
@@ -318,30 +358,87 @@ class PrivDataLoaderImplementation
 					: privs
 			) {
 
-				Record<?> parent =
-					objectManager.getParentOrNull (
+				Either <Optional <Record <?>>, String> parentOrError =
+					objectManager.getParentOrError (
 						priv);
+
+				if (
+					isError (
+						parentOrError)
+				) {
+
+					taskLogger.warningFormat (
+						"Error getting parent for priv %s: %s",
+						integerToDecimalString (
+							priv.getId ()),
+						getError (
+							parentOrError));
+
+					continue;
+
+				}
+
+				Record <?> parent =
+					optionalGetRequired (
+						getValue (
+							parentOrError));
 
 				try {
 
 					// do chainedPrivIds
 
-					Record<?> grandParent =
-						objectManager.getParentOrNull (
+					Either <Optional <Record <?>>, String> grandParentOrError =
+						objectManager.getParentOrError (
 							parent);
 
-					if (grandParent != null) {
+					if (
+						isError (
+							parentOrError)
+					) {
 
-						Long chainedPrivId =
+						taskLogger.warningFormat (
+							"Error getting grandparent for priv %s: %s",
+							integerToDecimalString (
+								priv.getId ()),
+							getError (
+								parentOrError));
+
+						continue;
+
+					}
+
+					if (
+						optionalIsPresent (
+							getValue (
+								grandParentOrError))
+					) {
+
+						Record <?> grandParent =
+							optionalGetRequired (
+								getValue (
+									grandParentOrError));
+
+						Optional <Long> chainedPrivIdOptional =
 							getChainedPrivId (
+								taskLogger,
 								newData,
 								grandParent,
 								priv.getCode ());
 
-						if (chainedPrivId != null)
+						if (
+							optionalIsPresent (
+								chainedPrivIdOptional)
+						) {
+
+							Long chainedPrivId =
+								optionalGetRequired (
+									chainedPrivIdOptional);
+
 							newData.chainedPrivIds.put (
 								priv.getId (),
 								chainedPrivId);
+
+						}
 
 					}
 
@@ -352,7 +449,8 @@ class PrivDataLoaderImplementation
 							parent);
 
 					ObjectData objectData =
-						newData.objectDatasByObjectId.get (objectId);
+						newData.objectDatasByObjectId.get (
+							objectId);
 
 					if (
 						stringEqualSafe (
@@ -369,13 +467,21 @@ class PrivDataLoaderImplementation
 
 					} else {
 
-						Long managePrivId =
+						Optional <Long> managePrivIdOptional =
 							getChainedPrivId (
+								taskLogger,
 								newData,
 								parent,
 								"manage");
 
-						if (managePrivId != null) {
+						if (
+							optionalIsPresent (
+								managePrivIdOptional)
+						) {
+
+							Long managePrivId =
+								optionalGetRequired (
+									managePrivIdOptional);
 
 							newData.managePrivIds.put (
 								priv.getId (),
@@ -393,7 +499,8 @@ class PrivDataLoaderImplementation
 					throw new RuntimeException (
 						stringFormat (
 							"Error loading priv %s",
-							priv.getId ()),
+							integerToDecimalString (
+								priv.getId ())),
 						exception);
 
 				}
@@ -416,9 +523,9 @@ class PrivDataLoaderImplementation
 			Instant endTime =
 				Instant.now ();
 
-			log.debug (
-				stringFormat (
-					"Reload complete (%sms)",
+			taskLogger.debugFormat (
+				"Reload complete (%sms)",
+				integerToDecimalString (
 					endTime.getMillis () - startTime.getMillis ()));
 
 			return newData;
@@ -431,37 +538,82 @@ class PrivDataLoaderImplementation
 		 * included there. That is sufficient for our purposes here.
 		 */
 		private
-		Long getChainedPrivId (
-				SharedData newData,
-				Record<?> object,
-				String code) {
+		Optional <Long> getChainedPrivId (
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull SharedData newData,
+				@NonNull Record <?> object,
+				@NonNull String code) {
 
-			while (object != null) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getChainedPrivId");
 
-				GlobalId objectId =
-					objectManager.getGlobalId (object);
+			Optional <Record <?>> currentObjectOptional =
+				optionalOf (
+					object);
 
-				ObjectData objectData =
-					newData.objectDatasByObjectId.get (objectId);
+			while (
+				optionalIsPresent (
+					currentObjectOptional)
+			) {
 
-				if (objectData != null) {
+				Record <?> currentObject =
+					optionalGetRequired (
+						currentObjectOptional);
+
+				GlobalId currentObjectId =
+					objectManager.getGlobalId (
+						currentObject);
+
+				ObjectData currentObjectData =
+					newData.objectDatasByObjectId.get (
+						currentObjectId);
+
+				if (currentObjectData != null) {
 
 					Long chainedPrivId =
-						objectData.privIdsByCode.get (
+						currentObjectData.privIdsByCode.get (
 							code);
 
-					if (chainedPrivId != null)
-						return chainedPrivId;
+					if (chainedPrivId != null) {
+
+						return optionalOf (
+							chainedPrivId);
+
+					}
 
 				}
 
-				object =
-					objectManager.getParentOrNull (
-						object);
+				Either <Optional <Record <?>>, String> nextObjectOrError =
+					objectManager.getParentOrError (
+						currentObject);
+
+				if (
+					isError (
+						nextObjectOrError)
+				) {
+
+					taskLogger.warningFormat (
+						"Error getting parent for object %s of type %s: %s",
+						integerToDecimalString (
+							currentObjectId.typeId ()),
+						integerToDecimalString (
+							currentObjectId.objectId ()),
+						getError (
+							nextObjectOrError));
+
+					continue;
+
+				}
+
+				currentObjectOptional =
+					getValue (
+						nextObjectOrError);
 
 			}
 
-			return null;
+			return optionalAbsent ();
 
 		}
 
@@ -471,7 +623,7 @@ class PrivDataLoaderImplementation
 
 	private
 	class UserDataReloader
-		implements Provider<UserData> {
+		implements ComponentProvider <UserData> {
 
 		private final
 		Long userId;
@@ -487,7 +639,13 @@ class PrivDataLoaderImplementation
 
 		@Override
 		public
-		UserData get () {
+		UserData provide (
+				@NonNull TaskLogger parentTaskLogger) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"userDataReloader.get");
 
 			// create the data
 
@@ -502,9 +660,9 @@ class PrivDataLoaderImplementation
 
 			// start timer
 
-			log.debug (
-				stringFormat (
-					"User %s priv reload started",
+			taskLogger.debugFormat (
+				"User %s priv reload started",
+				integerToDecimalString (
 					userId));
 
 			Instant startTime =
@@ -572,10 +730,11 @@ class PrivDataLoaderImplementation
 			Instant endTime =
 				Instant.now ();
 
-			log.debug (
-				stringFormat (
-					"User %s priv reload complere (%sms)",
-					userId,
+			taskLogger.debugFormat (
+				"User %s priv reload complere (%sms)",
+				integerToDecimalString (
+					userId),
+				integerToDecimalString (
 					endTime.getMillis () - startTime.getMillis ()));
 
 			return newData;

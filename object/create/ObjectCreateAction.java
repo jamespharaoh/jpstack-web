@@ -33,20 +33,26 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.utils.etc.PropertyUtils;
+
+import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectCreateAction")
@@ -70,6 +76,9 @@ class ObjectCreateAction <
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -148,7 +157,12 @@ class ObjectCreateAction <
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		parentHelper =
 			genericCastUnchecked (
@@ -239,7 +253,10 @@ class ObjectCreateAction <
 		// perform updates
 
 		if (formFieldsProvider != null) {
-			prepareFieldSet();
+
+			prepareFieldSet (
+				taskLogger);
+
 		}
 
 		UpdateResultSet updateResultSet =
@@ -391,7 +408,8 @@ class ObjectCreateAction <
 
 		requestContext.setEmptyFormData ();
 
-		privChecker.refresh ();
+		privChecker.refresh (
+			taskLogger);
 
 		ConsoleContextType targetContextType =
 			consoleManager.contextType (
@@ -400,10 +418,12 @@ class ObjectCreateAction <
 
 		ConsoleContext targetContext =
 			consoleManager.relatedContextRequired (
+				taskLogger,
 				requestContext.consoleContext (),
 				targetContextType);
 
 		consoleManager.changeContext (
+			taskLogger,
 			targetContext,
 			"/" + object.getId ());
 
@@ -484,11 +504,13 @@ class ObjectCreateAction <
 
 	}
 
-	void prepareFieldSet () {
+	void prepareFieldSet (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		formFieldSet =
 			parent != null
 				? formFieldsProvider.getFieldsForParent (
+					parentTaskLogger,
 					parent)
 				: formFieldsProvider.getStaticFields ();
 

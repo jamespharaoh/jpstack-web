@@ -6,16 +6,19 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSummaryPart")
@@ -23,36 +26,49 @@ public
 class ObjectSummaryPart
 	extends AbstractPagePart {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// properties
 
 	@Getter @Setter
-	List<Provider<PagePart>> partFactories;
+	List <PagePartFactory> partFactories;
 
 	// state
 
-	List<PagePart> parts;
+	List <PagePart> parts;
 
 	// implementation
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		parts =
-			new ArrayList<PagePart> ();
+			new ArrayList<> ();
 
 		for (
-			Provider<PagePart> partFactory
+			PagePartFactory partFactory
 				: partFactories
 		) {
 
 			PagePart pagePart =
-				partFactory.get ();
+				partFactory.buildPagePart (
+					taskLogger);
 
 			pagePart.setup (
-				Collections.<String,Object>emptyMap ());
+				Collections.emptyMap ());
 
-			pagePart.prepare ();
+			pagePart.prepare (
+				taskLogger);
 
 			parts.add (
 				pagePart);
@@ -84,14 +100,21 @@ class ObjectSummaryPart
 
 	@Override
 	public
-	void renderHtmlHeadContent () {
+	void renderHtmlHeadContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlHeadContent");
 
 		for (
 			PagePart part
 				: parts
 		) {
 
-			part.renderHtmlHeadContent ();
+			part.renderHtmlHeadContent (
+				taskLogger);
 
 		}
 
@@ -99,14 +122,21 @@ class ObjectSummaryPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
 		for (
 			PagePart part
 				: parts
 		) {
 
-			part.renderHtmlBodyContent ();
+			part.renderHtmlBodyContent (
+				taskLogger);
 
 		}
 

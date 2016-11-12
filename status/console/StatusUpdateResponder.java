@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import lombok.NonNull;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
@@ -22,12 +24,14 @@ import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.model.RootRec;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+import wbs.utils.io.RuntimeIoException;
 
 @PrototypeComponent ("statusUpdateResponder")
 public
@@ -66,7 +70,8 @@ class StatusUpdateResponder
 
 	@Override
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// redirect to login page if not logged in
 
@@ -175,8 +180,8 @@ class StatusUpdateResponder
 
 	@Override
 	protected
-	void render ()
-		throws IOException {
+	void render (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		Element statusUpdateElem =
 			new Element ("status-update");
@@ -197,9 +202,18 @@ class StatusUpdateResponder
 			new XMLOutputter (
 				Format.getPrettyFormat ());
 
-		xmlOutputter.output (
-			document,
-			requestContext.writer ());
+		try {
+
+			xmlOutputter.output (
+				document,
+				requestContext.writer ());
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
 
 	}
 

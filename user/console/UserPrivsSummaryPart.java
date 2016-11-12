@@ -2,12 +2,12 @@ package wbs.platform.user.console;
 
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import lombok.NonNull;
+
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.console.part.AbstractPagePart;
@@ -23,6 +25,7 @@ import wbs.console.priv.UserPrivChecker;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.model.PrivRec;
@@ -57,7 +60,8 @@ class UserPrivsSummaryPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		Map<Long,PrivStuff> privStuffsByPrivId =
 			new HashMap<> ();
@@ -91,8 +95,8 @@ class UserPrivsSummaryPart
 			PrivStuff privStuff =
 				new PrivStuff ();
 
-			Record<?> parent =
-				objectManager.getParentOrNull (
+			Record <?> parent =
+				objectManager.getParentRequired (
 					priv);
 
 			privStuff.path =
@@ -135,8 +139,8 @@ class UserPrivsSummaryPart
 					privStuff =
 						new PrivStuff ();
 
-					Record<?> parent =
-						objectManager.getParentOrNull (
+					Record <?> parent =
+						objectManager.getParentRequired (
 							priv);
 
 					privStuff.path =
@@ -170,7 +174,8 @@ class UserPrivsSummaryPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlTableOpenList ();
 

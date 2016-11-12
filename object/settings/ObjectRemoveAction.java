@@ -24,9 +24,9 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleLogic;
+import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectRemoveAction")
@@ -103,7 +103,7 @@ class ObjectRemoveAction
 			ephemeralObject);
 
 		Record <?> parentObject =
-			objectHelper.getParentOrNullGeneric (
+			objectHelper.getParentRequiredGeneric (
 				ephemeralObject);
 
 		eventLogic.createEvent (
@@ -129,10 +129,12 @@ class ObjectRemoveAction
 
 		ConsoleContext targetContext =
 			consoleManager.relatedContextRequired (
+				taskLogger,
 				requestContext.consoleContext (),
 				targetContextType);
 
 		consoleManager.changeContext (
+			taskLogger,
 			targetContext,
 			"/" + parentObject.getId ());
 

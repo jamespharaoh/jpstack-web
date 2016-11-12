@@ -14,7 +14,6 @@ import javax.inject.Provider;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
@@ -32,23 +31,27 @@ import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.console.module.ConsoleModuleBuilder;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.part.TextPart;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSummaryPageBuilder")
 @ConsoleModuleBuilderHandler
@@ -56,7 +59,8 @@ public
 class ObjectSummaryPageBuilder <
 	ObjectType extends Record <ObjectType>,
 	ParentType extends Record <ParentType>
-> {
+>
+	implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -68,6 +72,9 @@ class ObjectSummaryPageBuilder <
 
 	@SingletonDependency
 	ConsoleModuleBuilder consoleModuleBuilder;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -115,7 +122,7 @@ class ObjectSummaryPageBuilder <
 
 	String privKey;
 
-	List <Provider <PagePart>> pagePartFactories =
+	List <PagePartFactory> pagePartFactories =
 		new ArrayList<> ();
 
 	// build meta
@@ -129,11 +136,19 @@ class ObjectSummaryPageBuilder <
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		setDefaults ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
+
+		setDefaults (
+			taskLogger);
 
 		buildResponder ();
 
@@ -152,6 +167,7 @@ class ObjectSummaryPageBuilder <
 		}
 
 		builder.descend (
+			taskLogger,
 			spec,
 			spec.builders (),
 			this,
@@ -215,15 +231,16 @@ class ObjectSummaryPageBuilder <
 
 	void buildResponder () {
 
-		Provider<PagePart> partFactory =
-			new Provider<PagePart> () {
+		PagePartFactory partFactory =
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
 
-				return objectSummaryPartProvider.get ()
-					.partFactories (pagePartFactories);
+				return objectSummaryPartProvider.get ().partFactories (
+					pagePartFactories);
 
 			}
 
@@ -257,12 +274,13 @@ class ObjectSummaryPageBuilder <
 	ObjectSummaryPageBuilder <ObjectType, ParentType> addFieldsPart (
 			@NonNull FormFieldSet <ObjectType> formFieldSet) {
 
-		Provider <PagePart> partFactory =
-			new Provider <PagePart> () {
+		PagePartFactory partFactory =
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return summaryFieldsPartProvider.get ()
 
@@ -296,12 +314,13 @@ class ObjectSummaryPageBuilder <
 				"<h2>%h</h2>\n",
 				heading);
 
-		Provider<PagePart> pagePartFactory =
-			new Provider<PagePart> () {
+		PagePartFactory pagePartFactory =
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return textPart.get ()
 
@@ -315,7 +334,6 @@ class ObjectSummaryPageBuilder <
 		pagePartFactories.add (
 			pagePartFactory);
 
-
 		return this;
 
 	}
@@ -324,16 +342,17 @@ class ObjectSummaryPageBuilder <
 	ObjectSummaryPageBuilder<ObjectType,ParentType> addPart (
 			@NonNull String beanName) {
 
-		Provider <PagePart> partFactory =
-			new Provider <PagePart> () {
+		PagePartFactory partFactory =
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				Object object =
 					componentManager.getComponentRequired (
-						log,
+						parentTaskLogger,
 						beanName,
 						Object.class);
 
@@ -364,7 +383,13 @@ class ObjectSummaryPageBuilder <
 
 	}
 
-	void setDefaults () {
+	void setDefaults (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setDefaults");
 
 		consoleHelper =
 			container.consoleHelper ();
@@ -375,7 +400,8 @@ class ObjectSummaryPageBuilder <
 				() -> consoleModule.formFieldSet (
 					spec.fieldsName (),
 					consoleHelper.objectClass ()),
-				() -> defaultFields ());
+				() -> defaultFields (
+					taskLogger));
 
 		privKey =
 			spec.privKey ();
@@ -394,7 +420,7 @@ class ObjectSummaryPageBuilder <
 			fieldsProvider =
 				genericCastUnchecked (
 					componentManager.getComponentRequired (
-						log,
+						taskLogger,
 						spec.fieldsProviderName (),
 						FieldsProvider.class));
 
@@ -409,7 +435,13 @@ class ObjectSummaryPageBuilder <
 
 	}
 
-	FormFieldSet <ObjectType> defaultFields () {
+	FormFieldSet <ObjectType> defaultFields (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"defaultFields");
 
 		List <Object> formFieldSpecs =
 			new ArrayList<> ();
@@ -444,8 +476,10 @@ class ObjectSummaryPageBuilder <
 
 		}
 
-		if (consoleHelper.nameExists ()
-				&& ! consoleHelper.nameIsCode ()) {
+		if (
+			consoleHelper.nameExists ()
+			&& ! consoleHelper.nameIsCode ()
+		) {
 
 			formFieldSpecs.add (
 				new NameFormFieldSpec ());
@@ -465,6 +499,7 @@ class ObjectSummaryPageBuilder <
 				consoleHelper.objectName ());
 
 		return consoleModuleBuilder.buildFormFieldSet (
+			taskLogger,
 			consoleHelper,
 			fieldSetName,
 			formFieldSpecs);

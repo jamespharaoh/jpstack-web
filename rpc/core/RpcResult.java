@@ -99,7 +99,7 @@ class RpcResult {
 	}
 
 	public
-	int getHttpStatus () {
+	long getHttpStatus () {
 
 		return Rpc.statusToHttpStatus (
 			status);

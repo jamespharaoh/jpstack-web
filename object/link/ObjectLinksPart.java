@@ -2,15 +2,15 @@ package wbs.platform.object.link;
 
 import static wbs.utils.etc.LogicUtils.booleanToTrueFalse;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -36,9 +37,10 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.utils.etc.PropertyUtils;
-import wbs.utils.web.HtmlTableCheckWriter;
+import wbs.web.utils.HtmlTableCheckWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectLinksPart")
@@ -97,7 +99,8 @@ class ObjectLinksPart <
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		contextObject =
 			consoleHelper.lookupObject (
@@ -119,7 +122,8 @@ class ObjectLinksPart <
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// form open
 

@@ -8,18 +8,18 @@ import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlRowSpanAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlStyleAttribute;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlRowSpanAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlStyleAttribute;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +31,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
+
 import org.joda.time.Duration;
 
 import wbs.console.forms.FormFieldLogic;
@@ -40,10 +42,15 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.queue.console.QueueSubjectSorter.QueueInfo;
@@ -61,6 +68,9 @@ class QueueDebugPart
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -101,7 +111,13 @@ class QueueDebugPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		formFields =
 			queueConsoleModule.formFieldSet (
@@ -135,7 +151,8 @@ class QueueDebugPart
 					userHelper.find (
 						form.userId ())))
 
-			.sort ();
+			.sort (
+				taskLogger);
 
 		queueInfos =
 			sortedQueueSubjects.allQueues ().stream ()
@@ -152,7 +169,8 @@ class QueueDebugPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		formFieldLogic.outputFormTable (
 			requestContext,

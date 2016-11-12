@@ -3,6 +3,7 @@ package wbs.platform.currency.console;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -38,6 +39,7 @@ import wbs.console.forms.TextFormFieldRenderer;
 import wbs.console.forms.TextualRangeFormFieldInterfaceMapping;
 import wbs.console.forms.UpdatableFormField;
 import wbs.console.helper.manager.ConsoleObjectManager;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -215,8 +217,10 @@ class CurrencyFormFieldBuilder {
 			throw new RuntimeException (
 				stringFormat (
 					"Don't know how to map %s as integer for %s.%s",
-					propertyClass,
-					context.containerClass (),
+					classNameSimple (
+						propertyClass),
+					classNameSimple (
+						context.containerClass ()),
 					name));
 
 		}
