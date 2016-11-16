@@ -12,7 +12,7 @@ $(function () {
 				"Current version, this is the version you should normally ",
 				"use, unless you are told otherwise or having problems caused ",
 				"by new changes.",
-			],
+			].join (""),
 		},
 		{
 			name: "previous",
