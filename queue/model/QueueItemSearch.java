@@ -16,7 +16,9 @@ class QueueItemSearch
 
 	Long sliceId;
 
-	Long parentTypeId;
+	Long queueParentTypeId;
+	Long queueTypeId;
+	Long queueId;
 
 	TextualInterval createdTime;
 

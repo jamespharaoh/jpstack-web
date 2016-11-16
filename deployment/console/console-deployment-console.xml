@@ -1,0 +1,87 @@
+<console-module
+	name="console-deployment">
+
+	<console-helper-provider
+		object-name="consoleDeployment">
+
+		<priv-key
+			name="consoleDeployment.manage"
+			priv="manage"/>
+
+		<context-stuff
+			name="consoleDeploymentName"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="consoleDeployment"
+		object-name="consoleDeployment">
+
+		<list>
+
+			<object-list-page
+				fields="list"/>
+
+			<object-create-page
+				fields="create"/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page
+				fields="summary"/>
+
+			<object-settings-page
+				fields="settings"/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+	<field-set
+		name="list"
+		object-name="consoleDeployment">
+
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="create"
+		object-name="consoleDeployment">
+
+		<name-field/>
+		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="summary"
+		object-name="consoleDeployment">
+
+		<id-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+	</field-set>
+
+	<field-set
+		name="settings"
+		object-name="consoleDeployment">
+
+		<id-field/>
+		<code-field/>
+		<name-field/>
+		<description-field/>
+		<deleted-field/>
+
+	</field-set>
+
+</console-module>

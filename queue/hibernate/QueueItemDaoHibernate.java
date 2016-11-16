@@ -78,13 +78,37 @@ class QueueItemDaoHibernate
 
 		if (
 			isNotNull (
-				search.parentTypeId ())
+				search.queueParentTypeId ())
 		) {
 
 			criteria.add (
 				Restrictions.eq (
 					"_queue.parentType.id",
-					search.parentTypeId ()));
+					search.queueParentTypeId ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.queueTypeId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_queue.queueType.id",
+					search.queueTypeId ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.queueId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_queue.id",
+					search.queueId ()));
 
 		}
 

@@ -149,8 +149,18 @@
 			nullable="yes"/>
 
 		<object-field
-			name="parentTypeId"
+			name="queueParentTypeId"
 			object-type="objectType"
+			nullable="yes"/>
+
+		<object-field
+			name="queueTypeId"
+			object-type="queueType"
+			nullable="yes"/>
+
+		<object-field
+			name="queueId"
+			object-type="queue"
 			nullable="yes"/>
 
 		<interval-field

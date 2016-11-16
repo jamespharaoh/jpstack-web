@@ -1,5 +1,6 @@
 package wbs.platform.rpc.core;
 
+import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -109,7 +110,8 @@ class RpcList
 			throw new RuntimeException (
 				stringFormat (
 					"Member type should be: %s",
-					memberType));
+					enumName (
+						memberType)));
 
 		}
 
