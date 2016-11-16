@@ -158,6 +158,10 @@
 			package="wbs.platform.daemon"/>
 
 		<plugin
+			name="deployment"
+			package="wbs.platform.deployment"/>
+
+		<plugin
 			name="event"
 			package="wbs.platform.event"/>
 

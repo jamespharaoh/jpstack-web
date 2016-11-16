@@ -1,0 +1,21 @@
+<plugin
+	name="deployment"
+	package="wbs.platform.deployment">
+
+	<plugin-dependencies>
+		<plugin-dependency name="platform-common"/>
+	</plugin-dependencies>
+
+	<models>
+		<model name="consoleDeployment"/>
+	</models>
+
+	<fixtures>
+		<fixture name="deployment"/>
+	</fixtures>
+
+	<console-modules>
+		<console-module name="console-deployment"/>
+	</console-modules>
+
+</plugin>

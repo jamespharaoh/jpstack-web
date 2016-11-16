@@ -33,6 +33,7 @@ import wbs.api.module.ApiModule;
 import wbs.api.module.ApiModuleFactory;
 import wbs.api.module.ApiModuleSpec;
 import wbs.api.module.ApiModuleSpecFactory;
+
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.helper.enums.EnumConsoleHelperFactory;
 import wbs.console.module.ConsoleMetaModule;
@@ -41,6 +42,8 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.module.ConsoleModuleFactory;
 import wbs.console.module.ConsoleModuleSpec;
 import wbs.console.module.ConsoleModuleSpecFactory;
+
+import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.activitymanager.ActivityManagerImplementation;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -136,13 +139,25 @@ class ComponentManagerBuilder {
 		activityManager =
 			new ActivityManagerImplementation ();
 
-		loadPlugins ();
+		try (
 
-		createPluginManager ();
+			ActiveTask activeTask =
+				activityManager.start (
+					"setup",
+					"componentManagerBuilder.build ()",
+					this);
 
-		registerComponents ();
+		) {
 
-		return componentRegistry.build ();
+			loadPlugins ();
+
+			createPluginManager ();
+
+			registerComponents ();
+
+			return componentRegistry.build ();
+
+		}
 
 	}
 

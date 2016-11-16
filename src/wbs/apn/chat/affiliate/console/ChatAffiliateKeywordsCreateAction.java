@@ -5,8 +5,19 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
+
+import wbs.console.action.ConsoleAction;
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.sms.keyword.logic.KeywordLogic;
 
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.keyword.console.ChatKeywordConsoleHelper;
@@ -17,15 +28,6 @@ import wbs.apn.chat.scheme.model.ChatSchemeKeywordRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
-import wbs.console.action.ConsoleAction;
-import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.logging.TaskLogger;
-import wbs.sms.keyword.logic.KeywordLogic;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatAffiliateKeywordsCreateAction")
@@ -115,78 +117,83 @@ class ChatAffiliateKeywordsCreateAction
 				requestContext.parameterRequired (
 					"orient"));
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatAffiliateKeywordCreateAction.goReal ()",
-				this);
+		try (
 
-		ChatAffiliateRec chatAffiliate =
-			chatAffiliateHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatAffiliateId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatAffiliateKeywordCreateAction.goReal ()",
+					this);
 
-		ChatSchemeRec chatScheme =
-			chatAffiliate.getChatScheme ();
-
-		Optional<ChatKeywordRec> chatKeywordOptional =
-			chatKeywordHelper.findByCode (
-				chatScheme.getChat (),
-				keyword);
-
-		if (
-			optionalIsPresent (
-				chatKeywordOptional)
 		) {
 
-			requestContext.addError (
-				"Global keyword already exists: " + keyword);
+			ChatAffiliateRec chatAffiliate =
+				chatAffiliateHelper.findRequired (
+					requestContext.stuffInteger (
+						"chatAffiliateId"));
 
-			return null;
+			ChatSchemeRec chatScheme =
+				chatAffiliate.getChatScheme ();
+
+			Optional <ChatKeywordRec> chatKeywordOptional =
+				chatKeywordHelper.findByCode (
+					chatScheme.getChat (),
+					keyword);
+
+			if (
+				optionalIsPresent (
+					chatKeywordOptional)
+			) {
+
+				requestContext.addError (
+					"Global keyword already exists: " + keyword);
+
+				return null;
+
+			}
+
+			Optional <ChatSchemeKeywordRec> chatSchemeKeywordOptional =
+				chatSchemeKeywordHelper.findByCode (
+					chatScheme,
+					keyword);
+
+			if (
+				optionalIsPresent (
+					chatSchemeKeywordOptional)
+			) {
+
+				requestContext.addError (
+					"Keyword already exists: " + keyword);
+
+				return null;
+
+			}
+
+			chatSchemeKeywordHelper.insert (
+				chatSchemeKeywordHelper.createInstance ()
+
+				.setChatScheme (
+					chatScheme)
+
+				.setKeyword (
+					keyword)
+
+				.setJoinType (
+					joinType)
+
+				.setJoinGender (
+					gender)
+
+				.setJoinOrient (
+					orient)
+
+				.setJoinChatAffiliate (
+					chatAffiliate)
+
+			);
+
+			transaction.commit ();
 
 		}
-
-		Optional<ChatSchemeKeywordRec> chatSchemeKeywordOptional =
-			chatSchemeKeywordHelper.findByCode (
-				chatScheme,
-				keyword);
-
-		if (
-			optionalIsPresent (
-				chatSchemeKeywordOptional)
-		) {
-
-			requestContext.addError (
-				"Keyword already exists: " + keyword);
-
-			return null;
-
-		}
-
-		chatSchemeKeywordHelper.insert (
-			chatSchemeKeywordHelper.createInstance ()
-
-			.setChatScheme (
-				chatScheme)
-
-			.setKeyword (
-				keyword)
-
-			.setJoinType (
-				joinType)
-
-			.setJoinGender (
-				gender)
-
-			.setJoinOrient (
-				orient)
-
-			.setJoinChatAffiliate (
-				chatAffiliate)
-
-		);
-
-		transaction.commit ();
 
 		requestContext.addNotice (
 			"Chat scheme keyword created");

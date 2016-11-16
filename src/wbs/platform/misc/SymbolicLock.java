@@ -58,9 +58,10 @@ class SymbolicLock<T> {
 	}
 
 	public static
-	interface HeldLock {
+	interface HeldLock
+		extends AutoCloseable {
 
-		public
+		@Override
 		void close ();
 
 	}

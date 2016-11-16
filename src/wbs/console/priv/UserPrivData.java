@@ -3,6 +3,8 @@ package wbs.console.priv;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -12,6 +14,7 @@ import java.util.Map;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
+
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 
@@ -102,12 +105,15 @@ class UserPrivData {
 
 	public
 	Long coreGetObjectTypeId (
-			@NonNull Class<?> objectClassParam) {
+			@NonNull Class <?> objectClassParam) {
 
-		Class<?> objectClass =
+		Class <?> objectClass =
 			objectClassParam;
 
-		while (Record.class.isAssignableFrom (objectClass)) {
+		while (
+			Record.class.isAssignableFrom (
+				objectClass)
+		) {
 
 			Long id =
 				sharedData.objectTypeIdsByClassName.get (
@@ -124,7 +130,8 @@ class UserPrivData {
 		throw new IllegalArgumentException (
 			stringFormat (
 				"Unknown data object class %s",
-				objectClassParam));
+				classNameSimple (
+					objectClassParam)));
 
 	}
 
@@ -206,7 +213,8 @@ class UserPrivData {
 						throw new IllegalArgumentException (
 							stringFormat (
 								"Unknown object type %s",
-								parentObjectId.typeId ()));
+								integerToDecimalString (
+									parentObjectId.typeId ())));
 
 					}
 
@@ -215,7 +223,8 @@ class UserPrivData {
 							"Unknown priv %s on object type %s (%s)",
 							privCode,
 							objectTypeCode,
-							parentObjectId.objectId ()));
+							integerToDecimalString (
+								parentObjectId.objectId ())));
 
 					return false;
 

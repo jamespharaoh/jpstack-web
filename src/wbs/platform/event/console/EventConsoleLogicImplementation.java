@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
@@ -32,6 +31,7 @@ import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.PagePart;
 import wbs.console.part.PagePartFactory;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -43,6 +43,7 @@ import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.event.model.EventLinkRec;
 import wbs.platform.event.model.EventRec;
@@ -51,8 +52,10 @@ import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.StringFormatWriter;
+
 import wbs.web.utils.HtmlUtils;
 
 @SingletonComponent ("eventConsoleLogic")
@@ -128,19 +131,24 @@ class EventConsoleLogicImplementation
 
 		return taskLogger -> {
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadOnly (
-					"ObjectEventsPartFactory.get ()",
-					this);
+			try (
 
-			PermanentRecord <?> object =
-				genericCastUnchecked (
-					objectLookup.lookupObject (
-						requestContext.contextStuff ()));
+				Transaction transaction =
+					database.beginReadOnly (
+						"EventConsoleLogic.makeEventsPartFactory.buildPagePart ()",
+						this);
 
-			return makeEventsPart (
-				object);
+			) {
+
+				PermanentRecord <?> object =
+					genericCastUnchecked (
+						objectLookup.lookupObject (
+							requestContext.contextStuff ()));
+
+				return makeEventsPart (
+					object);
+
+			}
 
 		};
 

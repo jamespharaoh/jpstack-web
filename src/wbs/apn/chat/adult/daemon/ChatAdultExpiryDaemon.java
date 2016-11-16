@@ -8,23 +8,24 @@ import java.util.List;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
+
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.object.ObjectManager;
+
+import wbs.platform.daemon.SleepingDaemonService;
 
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.object.ObjectManager;
-import wbs.platform.daemon.SleepingDaemonService;
 
 @Log4j
 @SingletonComponent ("chatAdultExpiryDaemon")
@@ -90,26 +91,31 @@ class ChatAdultExpiryDaemon
 		log.debug (
 			"Checking for all users whose adult verification has expired");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ChatAdultExpiryDaemon.runOnce ()",
-				this);
+		try (
 
-		List<ChatUserRec> chatUsers =
-			chatUserHelper.findAdultExpiryLimit (
-				transaction.now (),
-				1000);
+			Transaction transaction =
+				database.beginReadOnly (
+					"ChatAdultExpiryDaemon.runOnce ()",
+					this);
 
-		transaction.close ();
-
-		for (
-			ChatUserRec chatUser
-				: chatUsers
 		) {
 
-			doUserAdultExpiry (
-				chatUser.getId ());
+			List <ChatUserRec> chatUsers =
+				chatUserHelper.findAdultExpiryLimit (
+					transaction.now (),
+					1000);
+
+			transaction.close ();
+
+			for (
+				ChatUserRec chatUser
+					: chatUsers
+			) {
+
+				doUserAdultExpiry (
+					chatUser.getId ());
+
+			}
 
 		}
 
@@ -118,114 +124,119 @@ class ChatAdultExpiryDaemon
 	void doUserAdultExpiry (
 			@NonNull Long chatUserId) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatAdultExpiryDaemon.runOnce ()",
-				this);
+		try (
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				chatUserId);
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatAdultExpiryDaemon.runOnce ()",
+					this);
 
-		ChatSchemeRec chatScheme =
-			chatUser.getChatScheme ();
-
-		String chatUserPath =
-			objectManager.objectPath (
-				chatUser);
-
-		// make sure adult expiry is set
-
-		if (chatUser.getAdultExpiry () == null) {
-
-			log.warn (
-				stringFormat (
-					"Skipped adult expiry for %s ",
-					chatUserPath,
-					"(field is null)"));
-
-			return;
-
-		}
-
-		// make sure adult expiry time is in past
-
-		if (
-			earlierThan (
-				transaction.now (),
-				chatUser.getAdultExpiry ())
 		) {
 
-			log.warn (
-				stringFormat (
-					"Skipped adult expiry for %s ",
-					chatUserPath,
-					"(time is in future)"));
+			ChatUserRec chatUser =
+				chatUserHelper.findRequired (
+					chatUserId);
 
-			return;
+			ChatSchemeRec chatScheme =
+				chatUser.getChatScheme ();
 
-		}
+			String chatUserPath =
+				objectManager.objectPath (
+					chatUser);
 
-		log.info (
-			stringFormat (
-				"Performing adult expiry for %s (time is %s)",
-				chatUserPath,
-				chatUser.getAdultExpiry ()));
+			// make sure adult expiry is set
 
-		// update the user
-
-		chatUser.setAdultVerified (false);
-		chatUser.setAdultExpiry (null);
-
-		if (chatUser.getBlockAll ()) {
-
-			log.info (
-				stringFormat (
-					"Not sending adult expiry message to %s due to block all",
-					chatUserPath));
-
-		} else if (chatUser.getNumber () == null) {
-
-			log.info (
-				stringFormat (
-					"Not sending adult expiry message to %s due to deletion",
-					chatUserPath));
-
-		} else if (chatUser.getChatScheme () == null) {
-
-			log.info (
-				stringFormat (
-					"Not sending adult expiry message to %s ",
-					chatUserPath,
-					"due to lack of scheme"));
-
-		} else {
-
-			// send them a message
-
-			if (chatScheme.getRbFreeRouter () != null) {
-
-				chatSendLogic.sendSystemRbFree (
-					chatUser,
-					Optional.<Long>absent (),
-					"adult_expiry",
-					TemplateMissing.error,
-					Collections.<String,String>emptyMap ());
-
-			} else {
+			if (chatUser.getAdultExpiry () == null) {
 
 				log.warn (
 					stringFormat (
-						"Not sending adult expiry to %s as no route is ",
+						"Skipped adult expiry for %s ",
 						chatUserPath,
-						"configured"));
+						"(field is null)"));
+
+				return;
 
 			}
 
-		}
+			// make sure adult expiry time is in past
 
-		transaction.commit ();
+			if (
+				earlierThan (
+					transaction.now (),
+					chatUser.getAdultExpiry ())
+			) {
+
+				log.warn (
+					stringFormat (
+						"Skipped adult expiry for %s ",
+						chatUserPath,
+						"(time is in future)"));
+
+				return;
+
+			}
+
+			log.info (
+				stringFormat (
+					"Performing adult expiry for %s (time is %s)",
+					chatUserPath,
+					chatUser.getAdultExpiry ().toString ()));
+
+			// update the user
+
+			chatUser.setAdultVerified (false);
+			chatUser.setAdultExpiry (null);
+
+			if (chatUser.getBlockAll ()) {
+
+				log.info (
+					stringFormat (
+						"Not sending adult expiry message to %s due to block all",
+						chatUserPath));
+
+			} else if (chatUser.getNumber () == null) {
+
+				log.info (
+					stringFormat (
+						"Not sending adult expiry message to %s due to deletion",
+						chatUserPath));
+
+			} else if (chatUser.getChatScheme () == null) {
+
+				log.info (
+					stringFormat (
+						"Not sending adult expiry message to %s ",
+						chatUserPath,
+						"due to lack of scheme"));
+
+			} else {
+
+				// send them a message
+
+				if (chatScheme.getRbFreeRouter () != null) {
+
+					chatSendLogic.sendSystemRbFree (
+						chatUser,
+						Optional.<Long>absent (),
+						"adult_expiry",
+						TemplateMissing.error,
+						Collections.<String,String>emptyMap ());
+
+				} else {
+
+					log.warn (
+						stringFormat (
+							"Not sending adult expiry to %s as no route is ",
+							chatUserPath,
+							"configured"));
+
+				}
+
+			}
+
+			transaction.commit ();
+
+		}
 
 	}
 

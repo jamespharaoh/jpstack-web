@@ -164,6 +164,7 @@
       <fileset dir="src/wbs/platform/core/api/files"/>
       <fileset dir="src/wbs/platform/currency/api/files"/>
       <fileset dir="src/wbs/platform/daemon/api/files"/>
+      <fileset dir="src/wbs/platform/deployment/api/files"/>
       <fileset dir="src/wbs/platform/event/api/files"/>
       <fileset dir="src/wbs/platform/exception/api/files"/>
       <fileset dir="src/wbs/platform/group/api/files"/>
@@ -338,6 +339,7 @@
       <fileset dir="src/wbs/platform/core/console/files"/>
       <fileset dir="src/wbs/platform/currency/console/files"/>
       <fileset dir="src/wbs/platform/daemon/console/files"/>
+      <fileset dir="src/wbs/platform/deployment/console/files"/>
       <fileset dir="src/wbs/platform/event/console/files"/>
       <fileset dir="src/wbs/platform/exception/console/files"/>
       <fileset dir="src/wbs/platform/group/console/files"/>
