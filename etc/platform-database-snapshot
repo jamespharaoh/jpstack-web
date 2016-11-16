@@ -6,23 +6,35 @@ today="$(date +'%Y-%m-%d' --date='-0 days')"
 yesterday="$(date +'%Y-%m-%d' --date='-1 days')"
 
 lock="/backup/lock"
-basebackup="/backup/backups/platform-database-basebackup"
-dump="/backup/backups/platform-database-dump"
+
+basebackup_enabled="yes"
+basebackup_path="/backup/backups/platform-database-basebackup"
+basebackup_name="platform-database-basebackup"
+basebackup_today="$basebackup_path/$basebackup_name-$today.tar"
+basebackup_yesterday="$basebackup_path/$basebackup_name-$yesterday.tar"
+
+dump_path="/backup/backups/platform-database-dump"
+dump_name="platform-database-basebackup"
+dump_enabled="no"
+dump_today="$dump_path/$dump_name-$today.sql"
+dump_yesterday="$dump_path/$dump_name-$yesterday.sql"
 
 exec 200>"$lock"
 flock --exclusive 200
 
-if test -e $basebackup-$today; then
+if test -e $basebackup_today; then
 
 	echo "Already done a basebackup today"
 
-elif test -e $dump-$today; then
+elif test -e $dump_today; then
 
 	echo "Already done a dump today"
 
-elif ! test -e "$basebackup-$yesterday"; then
+elif test "$basebackup_enabled" = "yes" -a \! -e "$basebackup_yesterday"; then
 
 	echo "Performing base backup"
+
+	mkdir -p "$basebackup_path"
 
 	time {
 
@@ -52,7 +64,7 @@ elif ! test -e "$basebackup-$yesterday"; then
 				--password-file "/backup/password" \
 				--silent \
 				backup \
-				"$basebackup-$today"
+				"$basebackup_today"
 
 		}
 
@@ -66,9 +78,11 @@ elif ! test -e "$basebackup-$yesterday"; then
 
 	}
 
-elif ! test -e "$dump-$yesterday"; then
+elif test "$dump_enabled" = "yes" -a \! -e "$dump_yesterday"; then
 
 	echo "Performing SQL dump"
+
+	mkdir -p "$dump_path"
 
 	time {
 
@@ -85,11 +99,15 @@ elif ! test -e "$dump-$yesterday"; then
 				--password-file "/backup/password" \
 				--silent \
 				backup \
-				"$dump-$today"
+				"$dump_today"
 
 		}
 
 	}
+
+else
+
+	echo "Nothing to do"
 
 fi
 

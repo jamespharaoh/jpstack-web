@@ -1,6 +1,6 @@
 <?php
 
-define ("HOME", "/home/ubuntu/wbs-hades");
+define ("HOME", "/home/ubuntu/wbs-hades-next");
 
 function find_services () {
 
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 	global $messages;
 
-	if ($_POST["special"] == "killall") {
+	if ($_POST ["special"] == "killall") {
 
 		exec (
 			"sudo kill -kill $(pidof java)",
@@ -92,6 +92,11 @@ function do_button ($service, $command, $enabled) { ?>
 
 		<input
 			type="hidden"
+			name="special"
+			value=""/>
+
+		<input
+			type="hidden"
 			name="service"
 			value="<?php print htmlentities ($service) ?>"/>
 
@@ -110,15 +115,19 @@ function do_button ($service, $command, $enabled) { ?>
 <?php }
 
 // make sure we reload
+
 header ("Expires: 0");
 header ("Cache-Control: no-store, no-cache, must-revalidate");
 header ("Pragma: no-cache");
 header ("Refresh: 10");
 
-?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+?>
+<!DOCTYPE html>
 <html>
 <head>
+
 	<title>Hades Control Panel</title>
+
 	<style type="text/css">
 		form { margin: 0; padding: 0; }
 		tr.running td.yes { background-color: #a0ffa0; }
@@ -128,8 +137,10 @@ header ("Refresh: 10");
 		p.output { color: darkgreen; }
 		p.notice { color: darkblue; }
 	</style>
+
 </head>
 <body>
+
 	<h1>Hades Control Panel</h1>
 
 	<?php foreach ($messages as $message) {
@@ -144,12 +155,15 @@ header ("Refresh: 10");
 			<th>Stop</th>
 			<th>Restart</th>
 		</tr>
+
 		<?php $statuses = array (
 			array ("running", "yes", "yes", false, true, true),
 			array ("not-running", "no", "no", true, false, false),
 			array ("part-running", "part", "partially", false, true, true));
+
 		foreach ($services as $service) {
 			$status = $statuses [get_status ($service)]; ?>
+
 			<tr class="<?php print $status [0] ?>">
 				<td><?php print htmlentities ($service) ?></td>
 				<td class="<?= $status [1] ?>"><?= $status [2] ?></td>
@@ -157,7 +171,9 @@ header ("Refresh: 10");
 				<td><?php do_button ($service, "stop", $status [4]); ?></td>
 				<td><?php do_button ($service, "restart", $status [5]); ?></td>
 			</tr>
+
 		<?php } ?>
+
 	</table>
 
 	<p><a href="?">Reload page &gt;&gt;</a></p>
