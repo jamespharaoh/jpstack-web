@@ -3,6 +3,7 @@ package wbs.framework.object;
 import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.lessThan;
@@ -27,6 +28,8 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.Record;
+
+import wbs.utils.etc.OptionalUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperIdImplementation")
@@ -129,6 +132,18 @@ class ObjectHelperIdImplementation <
 				orThrow.get ();
 
 		}
+
+	}
+
+	@Override
+	public
+	List <Optional <RecordType>> findMany (
+			@NonNull List <Long> ids) {
+
+		return iterableMapToList (
+			OptionalUtils::optionalFromNullable,
+			objectDatabaseHelper.findMany (
+				ids));
 
 	}
 

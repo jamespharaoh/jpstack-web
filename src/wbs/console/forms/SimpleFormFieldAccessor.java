@@ -10,8 +10,10 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
@@ -37,8 +39,8 @@ class SimpleFormFieldAccessor <Container, Native>
 
 	@Override
 	public
-	Optional<Native> read (
-			Container container) {
+	Optional <Native> read (
+			@NonNull Container container) {
 
 		// get native object
 
@@ -83,7 +85,7 @@ class SimpleFormFieldAccessor <Container, Native>
 	public
 	void write (
 			@NonNull Container container,
-			@NonNull Optional<Native> nativeValue) {
+			@NonNull Optional <Native> nativeValue) {
 
 		// sanity check native type
 

@@ -3,15 +3,16 @@ package wbs.platform.object.search;
 import static wbs.utils.etc.Misc.getMethodRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -25,10 +26,12 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.WriterFormatWriter;
 
@@ -151,7 +154,7 @@ class ObjectSearchCsvResponder <RecordType>
 					64)
 		) {
 
-			List <RecordType> objects;
+			List <Optional <RecordType>> objects;
 
 			if (
 				isNotNull (
@@ -177,29 +180,16 @@ class ObjectSearchCsvResponder <RecordType>
 			} else {
 
 				objects =
-					new ArrayList<> ();
-
-				for (
-					Long objectId
-						: batch
-				) {
-
-					@SuppressWarnings ("unchecked")
-					RecordType objectTemp =
-						(RecordType)
-						consoleHelper.findRequired (
-							objectId);
-
-					objects.add (
-						objectTemp);
-
-				}
+					genericCastUnchecked (
+						consoleHelper.findMany (
+							batch));
 
 			}
 
 			for (
 				RecordType object
-					: objects
+					: presentInstances (
+						objects)
 			) {
 
 				// write object
