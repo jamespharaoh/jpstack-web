@@ -20,6 +20,7 @@ import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.logging.Log4jLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.context.RequestContext;
 import wbs.web.exceptions.ExternalRedirectException;
 import wbs.web.exceptions.HttpForbiddenException;
@@ -160,38 +161,43 @@ class WbsServlet
 			ServletException,
 			IOException {
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"doOptions");
-
 		TaskLogger taskLogger =
 			logContext.createTaskLogger (
 				"doOptions");
 
-		try {
+		try (
 
-			WebFile file =
-				processPath (
-					taskLogger);
+			ActiveTask activeTask =
+				startTask (
+					"doOptions");
 
-			if (file != null) {
+		) {
 
-				file.doOptions (
-					taskLogger);
+			try {
 
-			} else {
+				WebFile file =
+					processPath (
+						taskLogger);
 
-				handleNotFound (
-					taskLogger);
+				if (file != null) {
+
+					file.doOptions (
+						taskLogger);
+
+				} else {
+
+					handleNotFound (
+						taskLogger);
+
+				}
+
+			} catch (Throwable exception) {
+
+				handleException (
+					taskLogger,
+					exception);
 
 			}
-
-		} catch (Throwable exception) {
-
-			handleException (
-				taskLogger,
-				exception);
 
 		}
 
