@@ -29,6 +29,9 @@ interface ObjectHelperIdMethods <
 			Long id,
 			Supplier <? extends RuntimeException> orThrow);
 
+	List <Optional <RecordType>> findMany (
+			List <Long> ids);
+
 	List <RecordType> findManyRequired (
 			List <Long> ids);
 
