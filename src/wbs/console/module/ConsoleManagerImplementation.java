@@ -2,6 +2,7 @@ package wbs.console.module;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -46,6 +47,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.supervisor.SupervisorConfig;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.ContextTabPlacement;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -56,6 +58,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.exceptions.ExternalRedirectException;
 import wbs.web.exceptions.HttpNotFoundException;
 import wbs.web.file.WebFile;
@@ -1850,21 +1853,11 @@ class ConsoleManagerImplementation
 		ConsoleContext currentContext =
 			sourceContext;
 
-		while (
-			isNotNull (
-				currentContext.parentContextName ())
-		) {
-
-			// get parent of current context
-
-			currentContext =
-				context (
-					currentContext.parentContextName (),
-					true);
+		for (;;) {
 
 			// lookup target context based on parent and type
 
-			Optional<ConsoleContext> targetOptional =
+			Optional <ConsoleContext> targetOptional =
 				contextWithParentOfType (
 					currentContext,
 					targetContextType,
@@ -1876,6 +1869,20 @@ class ConsoleManagerImplementation
 			) {
 				return targetOptional;
 			}
+
+			// get parent of current context
+
+			if (
+				isNull (
+					currentContext.parentContextName ())
+			) {
+				break;
+			}
+
+			currentContext =
+				context (
+					currentContext.parentContextName (),
+					true);
 
 		}
 
