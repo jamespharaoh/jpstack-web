@@ -5,7 +5,9 @@ import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalNotEqualOrNotPresentWithClass;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
@@ -27,10 +29,12 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
+
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
+
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.delivery.model.DeliveryTypeObjectHelper;
 import wbs.sms.message.outbox.logic.SmsMessageSender;
@@ -44,6 +48,7 @@ import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
 import wbs.sms.tracker.logic.SmsTrackerManager;
+
 import wbs.smsapps.forwarder.model.ForwarderMessageInObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutObjectHelper;
@@ -882,10 +887,12 @@ class ForwarderLogicImplementation
 
 		if (
 
-			referenceNotEqualWithClass (
+			optionalNotEqualOrNotPresentWithClass (
 				ForwarderMessageInRec.class,
-				forwarderMessaeOut.getForwarderMessageIn (),
-				forwarderMessageIn)
+				optionalFromNullable (
+					forwarderMessaeOut.getForwarderMessageIn ()),
+				optionalFromNullable (
+					forwarderMessageIn))
 
 			|| stringNotEqualSafe (
 				message.getNumFrom (),
@@ -1044,7 +1051,8 @@ class ForwarderLogicImplementation
 					forwarderMessageOut.getId ())
 
 				.subjectString (
-					subject)
+					optionalFromNullable (
+						subject))
 
 				.medias (
 					medias)
