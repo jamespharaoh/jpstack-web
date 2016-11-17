@@ -16,11 +16,11 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
 import wbs.imchat.logic.ImChatLogic;
 import wbs.imchat.model.ImChatCustomerRec;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("imChatCustomerSettingsPasswordAction")
 public

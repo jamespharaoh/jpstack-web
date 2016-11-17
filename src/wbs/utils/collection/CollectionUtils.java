@@ -405,4 +405,11 @@ class CollectionUtils {
 
 	}
 
+	public static <Type>
+	List <Type> emptyList () {
+
+		return ImmutableList.of ();
+
+	}
+
 }

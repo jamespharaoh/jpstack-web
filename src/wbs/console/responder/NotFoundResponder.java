@@ -1,14 +1,17 @@
 package wbs.console.responder;
 
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingOneWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormatError;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteHtml;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingOneWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormatError;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteHtml;
+
+import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("notFoundResponder")
 public
@@ -24,7 +27,8 @@ class NotFoundResponder
 
 	@Override
 	public
-	void renderHtmlBodyContents () {
+	void renderHtmlBodyContents (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlHeadingOneWrite (
 			"Page not found");

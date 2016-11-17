@@ -17,7 +17,7 @@ import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleMetaModuleImplementation;
 import wbs.console.module.ConsoleModuleImplementation;
-import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
@@ -141,7 +141,7 @@ class ObjectEventsPageBuilder <
 
 	void buildResponder () {
 
-		Provider<PagePart> eventsPartFactory =
+		PagePartFactory eventsPartFactory =
 			eventConsoleModule.makeEventsPartFactory (
 				consoleHelper);
 

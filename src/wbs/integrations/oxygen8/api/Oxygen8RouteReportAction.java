@@ -15,8 +15,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.TaskLogger;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogType;
 import wbs.integrations.oxygen8.model.Oxygen8ReportCodeObjectHelper;
@@ -28,6 +27,8 @@ import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.utils.string.FormatWriter;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.Responder;
 
 @SingletonComponent ("oxygen8RouteReportAction")
 public
@@ -76,6 +77,7 @@ class Oxygen8RouteReportAction
 	@Override
 	protected
 	void processRequest (
+			@NonNull TaskLogger taskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		routeId =
@@ -94,7 +96,8 @@ class Oxygen8RouteReportAction
 
 	@Override
 	protected
-	void updateDatabase () {
+	void updateDatabase (
+			@NonNull TaskLogger taskLogger) {
 
 		@Cleanup
 		Transaction transaction =
@@ -148,6 +151,7 @@ class Oxygen8RouteReportAction
 	@Override
 	protected
 	Responder createResponse (
+			@NonNull TaskLogger taskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		// encode response
@@ -180,6 +184,7 @@ class Oxygen8RouteReportAction
 	@Override
 	protected
 	void storeLog (
+			@NonNull TaskLogger taskLogger,
 			@NonNull String debugLog) {
 
 		@Cleanup

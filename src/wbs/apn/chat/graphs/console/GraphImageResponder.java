@@ -13,10 +13,14 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import lombok.NonNull;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.graph.console.GraphScale;
+import wbs.utils.io.RuntimeIoException;
 
 public abstract
 class GraphImageResponder
@@ -280,7 +284,8 @@ class GraphImageResponder
 
 	@Override
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		prepareData ();
 		prepareVerticalScale ();
@@ -300,13 +305,22 @@ class GraphImageResponder
 
 	@Override
 	protected
-	void render ()
-		throws IOException {
+	void render (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		ImageIO.write (
-			image,
-			"PNG",
-			requestContext.outputStream ());
+		try {
+
+			ImageIO.write (
+				image,
+				"PNG",
+				requestContext.outputStream ());
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
 
 	}
 

@@ -1,17 +1,18 @@
 package wbs.apn.chat.user.image.api;
 
+import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveOneElement;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.FileOutputStream;
 import java.util.List;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
@@ -21,18 +22,20 @@ import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
 import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.utils.random.RandomLogic;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.Responder;
 
-@Log4j
 @PrototypeComponent ("chatUserImageUploadPostAction")
 public
 class ChatUserImageUploadPostAction
@@ -52,6 +55,9 @@ class ChatUserImageUploadPostAction
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RandomLogic randomLogic;
 
@@ -62,7 +68,13 @@ class ChatUserImageUploadPostAction
 
 	@Override
 	protected
-	Responder goApi () {
+	Responder goApi (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goApi");
 
 		@Cleanup
 		Transaction transaction =
@@ -102,11 +114,9 @@ class ChatUserImageUploadPostAction
 
 			transaction.commit ();
 
-			Provider<Responder> responderProvider =
-				responder (
-					"chatUserImageUploadExpiredPage");
-
-			return responderProvider.get ();
+			return responder (
+				taskLogger,
+				"chatUserImageUploadExpiredPage");
 
 		}
 
@@ -114,20 +124,25 @@ class ChatUserImageUploadPostAction
 
 			// update the image
 
-			List<FileItem> fileItems =
+			List <FileItem> fileItems =
 				requestContext.fileItems ();
 
-			if (fileItems.size () != 1) {
+			if (
+				collectionDoesNotHaveOneElement (
+					fileItems)
+			) {
 
 				throw new RuntimeException (
 					stringFormat (
 						"Wrong number of file items: %s",
-						fileItems.size ()));
+						integerToDecimalString (
+							fileItems.size ())));
 
 			}
 
 			FileItem fileItem =
-				fileItems.get (0);
+				listFirstElementRequired (
+					fileItems);
 
 			if (
 				stringNotEqualSafe (
@@ -142,7 +157,7 @@ class ChatUserImageUploadPostAction
 
 			}
 
-			if (log.isDebugEnabled ()) {
+			if (taskLogger.debugEnabled ()) {
 
 				try {
 
@@ -156,17 +171,17 @@ class ChatUserImageUploadPostAction
 						new FileOutputStream (
 							filename));
 
-					log.debug (
-						stringFormat (
-							"Written %s bytes to temporary file %s",
-							fileItem.get ().length,
-							filename));
+					taskLogger.debugFormat (
+						"Written %s bytes to temporary file %s",
+						integerToDecimalString (
+							fileItem.get ().length),
+						filename);
 
 				} catch (Exception exception) {
 
-					log.debug (
-						"Error writing image data to debug file",
-						exception);
+					taskLogger.debugFormatException (
+						exception,
+						"Error writing image data to debug file");
 
 				}
 
@@ -201,11 +216,9 @@ class ChatUserImageUploadPostAction
 
 			transaction.commit ();
 
-			Provider<Responder> responderProvider =
-				responder (
-					"chatUserImageUploadSuccessPage");
-
-			return responderProvider.get ();
+			return responder (
+				taskLogger,
+				"chatUserImageUploadSuccessPage");
 
 		} catch (Exception exception) {
 
@@ -245,11 +258,9 @@ class ChatUserImageUploadPostAction
 
 			errorTransaction.commit ();
 
-			Provider<Responder> responderProvider =
-				responder (
-					"chatUserImageUploadErrorPage");
-
-			return responderProvider.get ();
+			return responder (
+				taskLogger,
+				"chatUserImageUploadErrorPage");
 
 		}
 

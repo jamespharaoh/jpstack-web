@@ -19,27 +19,31 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("enumFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class EnumFormFieldBuilder {
+class EnumFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -48,6 +52,9 @@ class EnumFormFieldBuilder {
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -108,9 +115,16 @@ class EnumFormFieldBuilder {
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		String name =
 			spec.name ();
@@ -176,7 +190,7 @@ class EnumFormFieldBuilder {
 
 		EnumConsoleHelper enumConsoleHelper =
 			componentManager.getComponentOrElse (
-				log,
+				taskLogger,
 				enumConsoleHelperName,
 				EnumConsoleHelper.class,
 				() -> new EnumConsoleHelper ()

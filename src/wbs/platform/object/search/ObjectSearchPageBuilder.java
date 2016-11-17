@@ -31,6 +31,7 @@ import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
@@ -44,8 +45,9 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.entity.record.Record;
-import wbs.framework.web.Action;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.action.Action;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("objectSearchPageBuilder")
 @ConsoleModuleBuilderHandler
@@ -199,7 +201,8 @@ class ObjectSearchPageBuilder <
 
 			@Override
 			public
-			Responder handle () {
+			Responder handle (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return objectSearchGetAction.get ()
 
@@ -212,7 +215,8 @@ class ObjectSearchPageBuilder <
 					.sessionKey (
 						sessionKey)
 
-					.handle ();
+					.handle (
+						parentTaskLogger);
 
 			}
 
@@ -227,7 +231,8 @@ class ObjectSearchPageBuilder <
 
 			@Override
 			public
-			Responder handle () {
+			Responder handle (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return objectSearchPostAction.get ()
 
@@ -269,7 +274,8 @@ class ObjectSearchPageBuilder <
 					.fileName (
 						fileName)
 
-					.handle ();
+					.handle (
+						parentTaskLogger);
 
 			}
 
@@ -303,12 +309,13 @@ class ObjectSearchPageBuilder <
 
 	void buildSearchResponder () {
 
-		Provider <PagePart> searchPartFactory =
-			new Provider <PagePart> () {
+		PagePartFactory searchPartFactory =
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return objectSearchPart.get ()
 
@@ -357,12 +364,13 @@ class ObjectSearchPageBuilder <
 
 		// search results responder
 
-		Provider <PagePart> searchResultsPartFactory =
-			new Provider <PagePart> () {
+		PagePartFactory searchResultsPartFactory =
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return objectSearchResultsPartProvider.get ()
 

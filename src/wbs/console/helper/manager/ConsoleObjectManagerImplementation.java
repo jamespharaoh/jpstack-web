@@ -33,7 +33,7 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
 import wbs.utils.string.FormatWriter;
-import wbs.utils.web.HtmlTableCellWriter;
+import wbs.web.utils.HtmlTableCellWriter;
 
 import fj.data.Either;
 

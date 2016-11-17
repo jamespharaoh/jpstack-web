@@ -5,15 +5,20 @@ import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
+
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.user.console.UserConsoleLogic;
+
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("queueClaimAction")
 public
@@ -23,19 +28,22 @@ class QueueClaimAction
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
+	Database database;
 
-	@SingletonDependency
-	QueueConsoleHelper queueHelper;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	QueueConsoleLogic queueConsoleLogic;
 
 	@SingletonDependency
-	Database database;
+	QueueConsoleHelper queueHelper;
 
 	@SingletonDependency
 	QueueManager queuePageFactoryManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -53,7 +61,12 @@ class QueueClaimAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		Long queueId =
 			Long.parseLong (
@@ -72,6 +85,7 @@ class QueueClaimAction
 
 		QueueItemRec queueItem =
 			queueConsoleLogic.claimQueueItem (
+				taskLogger,
 				queue,
 				userConsoleLogic.userRequired ());
 
@@ -86,6 +100,7 @@ class QueueClaimAction
 
 		Responder responder =
 			queuePageFactoryManager.getItemResponder (
+				taskLogger,
 				requestContext,
 				queueItem);
 

@@ -2,20 +2,25 @@ package wbs.imchat.console;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.string.StringUtils.stringInSafe;
-import static wbs.utils.web.HtmlBlockUtils.htmlHeadingTwoWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWriteFormat;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.NonNull;
+
 import wbs.console.part.AbstractPagePart;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.imchat.model.ImChatCustomerRec;
 import wbs.platform.event.console.EventConsoleLogic;
 import wbs.platform.event.console.EventLinkConsoleHelper;
@@ -38,16 +43,20 @@ class ImChatCustomerSettingsPasswordPart
 	@SingletonDependency
 	ImChatCustomerConsoleHelper imChatCustomerHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// state
 
 	ImChatCustomerRec customer;
-	List<EventRec> events;
+	List <EventRec> events;
 
 	// implementation
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// get customer
 
@@ -90,13 +99,20 @@ class ImChatCustomerSettingsPasswordPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
 		requestContext.flushNotices ();
 
 		renderRequestNewPasswordForm ();
 
-		renderRecentPasswordEvents ();
+		renderRecentPasswordEvents (
+			taskLogger);
 
 	}
 
@@ -140,7 +156,13 @@ class ImChatCustomerSettingsPasswordPart
 	}
 
 	private
-	void renderRecentPasswordEvents () {
+	void renderRecentPasswordEvents (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderRecentPasswordEvents");
 
 		htmlHeadingTwoWrite (
 			"Recent forgotten password events");
@@ -157,6 +179,7 @@ class ImChatCustomerSettingsPasswordPart
 		} else {
 
 			eventConsoleLogic.writeEventsTable (
+				taskLogger,
 				formatWriter,
 				events);
 

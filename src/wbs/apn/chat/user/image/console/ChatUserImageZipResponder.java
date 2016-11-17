@@ -1,10 +1,14 @@
 package wbs.apn.chat.user.image.console;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import lombok.NonNull;
 
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
@@ -12,6 +16,8 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+import wbs.utils.io.RuntimeIoException;
 
 @PrototypeComponent ("chatUserImageZipResponder")
 public
@@ -30,13 +36,14 @@ class ChatUserImageZipResponder
 	// implementation
 
 	@Override
-	@SuppressWarnings ("unchecked")
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUsers =
-			(List<ChatUserRec>)
-			requestContext.request ("chatUsers");
+			genericCastUnchecked (
+				requestContext.request (
+					"chatUsers"));
 
 	}
 
@@ -56,52 +63,61 @@ class ChatUserImageZipResponder
 
 	@Override
 	public
-	void render ()
-		throws IOException {
+	void render (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		ZipOutputStream zipOutputStream =
-			new ZipOutputStream (
-				requestContext.outputStream ());
+		try {
 
-		zipOutputStream.setMethod (
-			ZipOutputStream.STORED);
+			ZipOutputStream zipOutputStream =
+				new ZipOutputStream (
+					requestContext.outputStream ());
 
-		for (
-			ChatUserRec chatUser
-				: chatUsers
-		) {
+			zipOutputStream.setMethod (
+				ZipOutputStream.STORED);
 
-			ZipEntry zipEntry =
-				new ZipEntry (
-					chatUser.getCode () + ".jpg");
+			for (
+				ChatUserRec chatUser
+					: chatUsers
+			) {
 
-			ChatUserImageRec chatUserImage =
-				chatUser.getChatUserImageList ().get (0);
+				ZipEntry zipEntry =
+					new ZipEntry (
+						chatUser.getCode () + ".jpg");
 
-			byte[] data =
-				chatUserImage.getMedia ().getContent ().getData ();
+				ChatUserImageRec chatUserImage =
+					chatUser.getChatUserImageList ().get (0);
 
-			zipEntry.setSize (
-				data.length);
+				byte[] data =
+					chatUserImage.getMedia ().getContent ().getData ();
 
-			zipEntry.setCrc (
-				getCrc32 (data));
+				zipEntry.setSize (
+					data.length);
 
-			zipEntry.setTime (
-				chatUserImage.getTimestamp ().getMillis ());
+				zipEntry.setCrc (
+					getCrc32 (data));
 
-			zipOutputStream.putNextEntry (
-				zipEntry);
+				zipEntry.setTime (
+					chatUserImage.getTimestamp ().getMillis ());
 
-			zipOutputStream.write (
-				data);
+				zipOutputStream.putNextEntry (
+					zipEntry);
 
-			zipOutputStream.closeEntry ();
+				zipOutputStream.write (
+					data);
+
+				zipOutputStream.closeEntry ();
+
+			}
+
+			zipOutputStream.finish ();
+			zipOutputStream.close ();
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
 
 		}
-
-		zipOutputStream.finish ();
-		zipOutputStream.close ();
 
 	}
 

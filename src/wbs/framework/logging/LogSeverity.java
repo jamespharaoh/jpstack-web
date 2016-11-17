@@ -5,5 +5,6 @@ enum LogSeverity {
 	debug,
 	notice,
 	warning,
-	error;
+	error,
+	fatal;
 }

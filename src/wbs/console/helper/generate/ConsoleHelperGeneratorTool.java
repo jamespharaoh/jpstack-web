@@ -3,21 +3,22 @@ package wbs.console.helper.generate;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
 import javax.inject.Provider;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-@Log4j
 public
 class ConsoleHelperGeneratorTool {
 
@@ -25,6 +26,9 @@ class ConsoleHelperGeneratorTool {
 
 	@SingletonDependency
 	EntityHelper entityHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -35,14 +39,13 @@ class ConsoleHelperGeneratorTool {
 
 	public
 	void generateConsoleHelpers (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <String> params) {
 
-		taskLogger =
-			taskLogger.nest (
-				this,
-				"generateObjectHelpers",
-				log);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"generateConsoleHelpers");
 
 		List <Model <?>> models =
 			entityHelper.models ();
@@ -62,10 +65,11 @@ class ConsoleHelperGeneratorTool {
 		) {
 
 			TaskLogger nestedTaskLogger =
-				taskLogger.nest (
-					this,
-					"generateConsoleHelpers.forEachModel",
-					log);
+				logContext.nestTaskLogger (
+					taskLogger,
+					stringFormat (
+						"generateConsoleHelpers.forEachModel (%s)",
+						model.objectName ()));
 
 			consoleHelperGeneratorProvider.get ()
 

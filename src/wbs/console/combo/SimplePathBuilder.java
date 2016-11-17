@@ -1,30 +1,37 @@
 package wbs.console.combo;
 
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
-import wbs.framework.web.PathHandler;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.pathhandler.PathHandler;
 
-@Log4j
 @PrototypeComponent ("simplePathBuilder")
 @ConsoleModuleBuilderHandler
 public
-class SimplePathBuilder {
+class SimplePathBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	ComponentManager componentManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// builder
 
@@ -45,21 +52,30 @@ class SimplePathBuilder {
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		setDefaults ();
 
-		buildPath ();
+		buildPath (
+			taskLogger);
 
 	}
 
-	void buildPath () {
+	void buildPath (
+			@NonNull TaskLogger taskLogger) {
 
 		PathHandler pathHandler =
 			componentManager.getComponentRequired (
-				log,
+				taskLogger,
 				pathHandlerName,
 				PathHandler.class);
 

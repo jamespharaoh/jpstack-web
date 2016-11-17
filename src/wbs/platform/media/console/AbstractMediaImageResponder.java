@@ -4,12 +4,16 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.io.IOException;
 
+import lombok.NonNull;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
+import wbs.utils.io.RuntimeIoException;
 
 public abstract
 class AbstractMediaImageResponder
@@ -46,7 +50,8 @@ class AbstractMediaImageResponder
 
 	@Override
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		media =
 			mediaHelper.findRequired (
@@ -131,11 +136,21 @@ class AbstractMediaImageResponder
 	}
 
 	@Override
-	protected void render ()
-		throws IOException {
+	protected
+	void render (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		requestContext.outputStream ().write (
-			data);
+		try {
+
+			requestContext.outputStream ().write (
+				data);
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
 
 	}
 

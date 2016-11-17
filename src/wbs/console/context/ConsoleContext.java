@@ -15,8 +15,8 @@ import wbs.console.tab.Tab;
 import wbs.console.tab.TabList;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
-import wbs.framework.web.PageNotFoundException;
-import wbs.framework.web.WebFile;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.file.WebFile;
 
 @Accessors (fluent = true)
 public abstract
@@ -74,30 +74,12 @@ class ConsoleContext
 	abstract String titleForStuff (
 			ConsoleContextStuff stuff);
 
-	/**
-	 * Sets up any request data for this context.
-	 *
-	 * @param requestContext
-	 *            the console request context
-	 * @param pathParts
-	 *            an iterator to retrieve any path parts (usually integer ids)
-	 *            from if this is a dynamic context
-	 * @param parentContextTab
-	 *            if not null indicates we are embedded and to use this context
-	 *            tab to link into the above context
-	 * @throws PageNotFoundException
-	 *             if the path is invalid
-	 */
 	public abstract
 	void initContext (
+			TaskLogger taskLogger,
 			PathSupply pathParts,
 			ConsoleContextStuff contextStuff);
 
-	/**
-	 * Returns the current local path, eg the id of the object currently being
-	 * examined. Includes prefix "/" but not trailing. If there is no local path
-	 * just return "".
-	 */
 	public
 	String localPathForStuff (
 			ConsoleContextStuff contextStuff) {

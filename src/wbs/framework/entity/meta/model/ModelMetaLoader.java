@@ -1,6 +1,7 @@
 package wbs.framework.entity.meta.model;
 
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -16,7 +17,6 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -26,13 +26,19 @@ import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
-@Log4j
 @SingletonComponent ("modelMetaLoader")
 public
 class ModelMetaLoader {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			ModelMetaLoader.class);
 
 	// singleton dependencies
 
@@ -61,17 +67,27 @@ class ModelMetaLoader {
 
 	@NormalLifecycleSetup
 	public
-	void setup () {
+	void setup (
+			@NonNull TaskLogger taskLogger) {
 
-		createDataFromXml ();
-		loadSpecs ();
+		createDataFromXml (
+			taskLogger);
+
+		loadSpecs (
+			taskLogger);
 
 	}
 
 	// implementation
 
 	private
-	void createDataFromXml () {
+	void createDataFromXml (
+			@NonNull TaskLogger taskLogger) {
+
+		taskLogger =
+			logContext.nestTaskLogger (
+				taskLogger,
+				"createDataFromXml");
 
 		DataFromXmlBuilder dataFromXmlBuilder =
 			new DataFromXmlBuilder ();
@@ -99,17 +115,19 @@ class ModelMetaLoader {
 	}
 
 	private
-	void loadSpecs () {
+	void loadSpecs (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"loadSpecs");
 
 		ImmutableMap.Builder <String, ModelMetaSpec> modelBuilder =
 			ImmutableMap.builder ();
 
 		ImmutableMap.Builder <String, ModelMetaSpec> componentBuilder =
 			ImmutableMap.builder ();
-
-		TaskLogger taskLog =
-			new TaskLogger (
-				log);
 
 		pluginManager.plugins ().forEach (
 			pluginSpec -> {
@@ -124,7 +142,7 @@ class ModelMetaLoader {
 			pluginSpec.models ().models ().forEach (
 				pluginModelSpec ->
 					loadModelMeta (
-						taskLog,
+						taskLogger,
 						modelBuilder,
 						pluginSpec,
 						pluginModelSpec.name ()));
@@ -132,19 +150,20 @@ class ModelMetaLoader {
 			pluginSpec.models ().componentTypes ().forEach (
 				pluginComponentTypeSpec ->
 					loadModelMeta (
-						taskLog,
+						taskLogger,
 						componentBuilder,
 						pluginSpec,
 						pluginComponentTypeSpec.name ()));
 
 		});
 
-		if (taskLog.errors ()) {
+		if (taskLogger.errors ()) {
 
 			throw new RuntimeException (
 				stringFormat (
 					"Aborting due to %s errors",
-					taskLog.errorCount ()));
+					integerToDecimalString (
+						taskLogger.errorCount ())));
 
 		}
 
@@ -158,7 +177,7 @@ class ModelMetaLoader {
 
 	private
 	void loadModelMeta (
-			@NonNull TaskLogger taskLog,
+			@NonNull TaskLogger taskLogger,
 			@NonNull ImmutableMap.Builder <String, ModelMetaSpec> builder,
 			@NonNull PluginSpec plugin,
 			@NonNull String modelName) {
@@ -176,7 +195,7 @@ class ModelMetaLoader {
 
 		if (inputStream == null) {
 
-			taskLog.errorFormat (
+			taskLogger.errorFormat (
 				"Model meta not found for %s.%s: %s",
 				plugin.name (),
 				modelName,
@@ -200,7 +219,7 @@ class ModelMetaLoader {
 
 		} catch (Exception exception) {
 
-			taskLog.errorFormatException (
+			taskLogger.errorFormatException (
 				exception,
 				"Error reading model meta for %s.%s: %s",
 				plugin.name (),
@@ -217,7 +236,7 @@ class ModelMetaLoader {
 				modelName)
 		) {
 
-			taskLog.errorFormat (
+			taskLogger.errorFormat (
 				"Model meta name %s should be %s in %s",
 				spec.name (),
 				modelName,

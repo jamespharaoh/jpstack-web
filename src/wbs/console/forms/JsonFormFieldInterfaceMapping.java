@@ -16,7 +16,7 @@ import fj.data.Either;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.WriterFormatWriter;
-import wbs.utils.web.JsonToHtml;
+import wbs.web.utils.JsonToHtml;
 
 @PrototypeComponent ("jsonFormFieldInterfaceMapping")
 public

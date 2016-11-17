@@ -7,8 +7,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
@@ -17,8 +15,11 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.updatelog.model.UpdateLogObjectHelper;
 import wbs.platform.updatelog.model.UpdateLogRec;
 
@@ -476,14 +477,14 @@ class UpdateManager {
 
 	}
 
-	public <T>
-	UpdateGetter<T> makeUpdateGetterAdaptor (
-			Provider<? extends T> getter,
+	public <Type>
+	UpdateGetter <Type> makeUpdateGetterAdaptor (
+			ComponentProvider <? extends Type> getter,
 			long reloadTimeMs,
 			String table,
 			long ref) {
 
-		return new UpdateGetterAdaptor<T> (
+		return new UpdateGetterAdaptor <Type> (
 			getter,
 			reloadTimeMs,
 			table,
@@ -492,18 +493,18 @@ class UpdateManager {
 	}
 
 	public static
-	interface UpdateGetter<T>
-		extends Provider<T> {
+	interface UpdateGetter <T>
+		extends ComponentProvider <T> {
 
 		void forceUpdate ();
 
 	}
 
 	private
-	class UpdateGetterAdaptor<T>
-		implements UpdateGetter<T> {
+	class UpdateGetterAdaptor <T>
+		implements UpdateGetter <T> {
 
-		Provider<? extends T> getter;
+		ComponentProvider <? extends T> getter;
 		long reloadTimeMs;
 		String table;
 		long ref;
@@ -518,7 +519,7 @@ class UpdateManager {
 
 		public
 		UpdateGetterAdaptor (
-				Provider<? extends T> newGetter,
+				ComponentProvider <? extends T> newGetter,
 				long newReloadTimeMs,
 				String newTable,
 				long newRef) {
@@ -536,7 +537,8 @@ class UpdateManager {
 
 		@Override
 		public synchronized
-		T get () {
+		T provide (
+				@NonNull TaskLogger parentTaskLogger) {
 
 			long now =
 				System.currentTimeMillis ();
@@ -546,7 +548,8 @@ class UpdateManager {
 			if (forceUpdate) {
 
 				value =
-					getter.get ();
+					getter.provide (
+						parentTaskLogger);
 
 				lastReload = now;
 				forceUpdate = false;
@@ -565,7 +568,8 @@ class UpdateManager {
 			if (oldVersion != newVersion) {
 
 				value =
-					getter.get ();
+					getter.provide (
+						parentTaskLogger);
 
 				lastReload = now;
 				oldVersion = newVersion;
@@ -579,7 +583,8 @@ class UpdateManager {
 			if (lastReload + reloadTimeMs < now) {
 
 				value =
-					getter.get ();
+					getter.provide (
+						parentTaskLogger);
 
 				lastReload = now;
 				oldVersion = newVersion;

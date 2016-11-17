@@ -61,4 +61,42 @@ class FileUtils {
 
 	}
 
+	public static
+	void deleteDirectory (
+			@NonNull String path) {
+
+		try {
+
+			org.apache.commons.io.FileUtils.deleteDirectory (
+				new File (
+					path));
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
+
+	}
+
+	public static
+	void forceMkdir (
+			@NonNull String path) {
+
+		try {
+
+			org.apache.commons.io.FileUtils.forceMkdir (
+				new File (
+					path));
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
+
+	}
+
 }

@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.utils.string.FormatWriter;
-import wbs.utils.web.HtmlUtils;
+import wbs.web.utils.HtmlUtils;
 
 import fj.data.Either;
 

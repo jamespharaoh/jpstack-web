@@ -12,11 +12,13 @@ import java.util.List;
 import lombok.NonNull;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.codegen.JavaPropertyWriter;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginManager;
@@ -27,19 +29,25 @@ import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
 import wbs.framework.entity.generate.fields.ModelFieldWriterTarget;
 import wbs.framework.entity.meta.collections.ChildrenListSpec;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("childrenListWriter")
 @ModelWriter
 public
-class ChildrenListWriter {
+class ChildrenListWriter
+	implements BuilderComponent {
 
 	// singleton dependencies
 
-	@SingletonDependency
-	PluginManager pluginManager;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ModelMetaLoader modelMetaLoader;
+
+	@SingletonDependency
+	PluginManager pluginManager;
 
 	// builder
 
@@ -55,9 +63,16 @@ class ChildrenListWriter {
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		String fieldName =
 			ifNull (
@@ -124,6 +139,7 @@ class ChildrenListWriter {
 							fullFieldTypeName)))
 
 			.writeBlock (
+				taskLogger,
 				target.imports (),
 				target.formatWriter ());
 

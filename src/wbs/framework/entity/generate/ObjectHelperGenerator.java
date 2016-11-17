@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.inject.Provider;
+
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -34,13 +36,14 @@ import wbs.framework.codegen.JavaClassWriter;
 import wbs.framework.codegen.JavaImportRegistry;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
-import wbs.framework.entity.model.ModelMethods;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectDatabaseHelper;
 import wbs.framework.object.ObjectHelperImplementation;
@@ -51,6 +54,7 @@ import wbs.framework.object.ObjectModelImplementation;
 import wbs.framework.object.ObjectModelMethods;
 import wbs.framework.object.ObjectTypeEntry;
 import wbs.framework.object.ObjectTypeRegistry;
+
 import wbs.utils.etc.OptionalUtils;
 import wbs.utils.string.AtomicFileWriter;
 import wbs.utils.string.FormatWriter;
@@ -60,10 +64,21 @@ import wbs.utils.string.FormatWriter;
 public
 class ObjectHelperGenerator {
 
-	// dependencies
+	// singleton dependencies
 
 	@SingletonDependency
 	EntityHelper entityHelper;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <JavaAnnotationWriter> javaAnnotationWriterProvider;
+
+	@PrototypeDependency
+	Provider <JavaClassWriter> javaClassWriterProvider;
+
+	@PrototypeDependency
+	Provider <JavaClassUnitWriter> javaClassUnitWriterProvider;
 
 	// properties
 
@@ -293,7 +308,7 @@ class ObjectHelperGenerator {
 				filename);
 
 		JavaClassUnitWriter classUnitWriter =
-			new JavaClassUnitWriter ()
+			javaClassUnitWriterProvider.get ()
 
 			.formatWriter (
 				formatWriter)
@@ -303,13 +318,13 @@ class ObjectHelperGenerator {
 				packageName);
 
 		JavaClassWriter classWriter =
-			new JavaClassWriter ()
+			javaClassWriterProvider.get ()
 
 			.className (
 				objectHelperImplementationName)
 
 			.addClassAnnotation (
-				new JavaAnnotationWriter ()
+				javaAnnotationWriterProvider.get ()
 
 				.name (
 					"java.lang.SuppressWarnings")
@@ -379,6 +394,9 @@ class ObjectHelperGenerator {
 
 		classWriter.addSingletonDependency (
 			EntityHelper.class);
+
+		classWriter.addClassSingletonDependency (
+			LogContext.class);
 
 		classWriter.addSingletonDependency (
 			ObjectTypeRegistry.class);
@@ -470,6 +488,7 @@ class ObjectHelperGenerator {
 	}
 
 	void writeLifecycle (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
 
@@ -492,7 +511,7 @@ class ObjectHelperGenerator {
 			"void setup (");
 
 		formatWriter.writeLineFormat (
-			"\t\t%s taskLogger) {",
+			"\t\t%s parentTaskLogger) {",
 			imports.register (
 				TaskLogger.class));
 
@@ -503,19 +522,16 @@ class ObjectHelperGenerator {
 		// nest task logger
 
 		formatWriter.writeLineFormat (
-			"taskLogger =");
+			"TaskLogger taskLogger =");
 
 		formatWriter.writeLineFormat (
-			"\ttaskLogger.nest (");
+			"\tlogContext.nestTaskLogger (");
 
 		formatWriter.writeLineFormat (
-			"\t\tthis,");
+			"\t\tparentTaskLogger,");
 
 		formatWriter.writeLineFormat (
-			"\t\t\"setup\",");
-
-		formatWriter.writeLineFormat (
-			"\t\tlogger);");
+			"\t\t\"setup\");");
 
 		formatWriter.writeNewline ();
 
@@ -625,7 +641,7 @@ class ObjectHelperGenerator {
 			"\t\tcomponentManager.getComponent (");
 
 		formatWriter.writeLineFormat (
-			"\t\t\tlogger,");
+			"\t\t\ttaskLogger,");
 
 		formatWriter.writeLineFormat (
 			"\t\t\t\"%s\",",
@@ -818,6 +834,7 @@ class ObjectHelperGenerator {
 	}
 
 	void writeImplementation (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
 

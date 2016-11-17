@@ -1,5 +1,6 @@
 package wbs.integrations.fonix.api;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.LogicUtils.booleanEqual;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -24,9 +25,7 @@ import wbs.framework.data.tools.DataFromGeneric;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.web.PageNotFoundException;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.TaskLogger;
 import wbs.integrations.fonix.logic.FonixLogic;
 import wbs.integrations.fonix.model.FonixDeliveryStatusObjectHelper;
 import wbs.integrations.fonix.model.FonixDeliveryStatusRec;
@@ -42,6 +41,9 @@ import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.utils.string.FormatWriter;
+import wbs.web.context.RequestContext;
+import wbs.web.exceptions.HttpNotFoundException;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("fonixRouteReportAction")
 public
@@ -98,6 +100,7 @@ class FonixRouteReportAction
 	@Override
 	protected
 	void processRequest (
+			@NonNull TaskLogger taskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		// read and log request
@@ -128,7 +131,8 @@ class FonixRouteReportAction
 
 	@Override
 	protected
-	void updateDatabase () {
+	void updateDatabase (
+			@NonNull TaskLogger taskLogger) {
 
 		// begin transaction
 
@@ -167,7 +171,11 @@ class FonixRouteReportAction
 				false)
 
 		) {
-			throw new PageNotFoundException ();
+
+			throw new HttpNotFoundException (
+				optionalAbsent (),
+				emptyList ());
+
 		}
 
 		RouteRec smsRoute =
@@ -190,7 +198,11 @@ class FonixRouteReportAction
 				true)
 
 		) {
-			throw new PageNotFoundException ();
+
+			throw new HttpNotFoundException (
+				optionalAbsent (),
+				emptyList ());
+
 		}
 
 		FonixRouteOutRec fonixRouteOut =
@@ -279,6 +291,7 @@ class FonixRouteReportAction
 	@Override
 	protected
 	Responder createResponse (
+			@NonNull TaskLogger taskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		// encode response
@@ -311,6 +324,7 @@ class FonixRouteReportAction
 	@Override
 	protected
 	void storeLog (
+			@NonNull TaskLogger taskLogger,
 			@NonNull String debugLog) {
 
 		@Cleanup

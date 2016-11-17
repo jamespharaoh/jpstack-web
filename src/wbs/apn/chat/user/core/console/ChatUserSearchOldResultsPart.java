@@ -7,17 +7,17 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlAttributeUtils.htmlAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlAttributeUtils.htmlIdAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlDivWrite;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
-import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
+import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlDivWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,6 +27,8 @@ import java.util.Set;
 import javax.inject.Named;
 
 import com.google.common.collect.ImmutableSet;
+
+import lombok.NonNull;
 
 import wbs.apn.chat.core.console.ChatConsoleLogic;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
@@ -43,8 +45,11 @@ import wbs.console.misc.PageBuilder;
 import wbs.console.misc.Percentager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.utils.time.TimeFormatter;
@@ -74,6 +79,9 @@ class ChatUserSearchOldResultsPart
 
 	@SingletonDependency
 	CurrencyLogic currencyLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
@@ -145,7 +153,13 @@ class ChatUserSearchOldResultsPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		ConsoleContextType targetContextType =
 			consoleManager.contextType (
@@ -154,6 +168,7 @@ class ChatUserSearchOldResultsPart
 
 		targetContext =
 			consoleManager.relatedContextRequired (
+				taskLogger,
 				requestContext.consoleContext (),
 				targetContextType);
 
@@ -214,11 +229,11 @@ class ChatUserSearchOldResultsPart
 				"<tr",
 				" class=\"magic-table-row\"",
 				" data-target-href=\"%h\"",
-				requestContext.resolveContextUrl (
-					stringFormat (
-						"%s",
-						targetContext.pathPrefix (),
-						"/%u",
+				requestContext.resolveContextUrlFormat (
+					"%s",
+					targetContext.pathPrefix (),
+					"/%u",
+					integerToDecimalString (
 						chatUser.getId ())),
 				">\n");
 
@@ -482,13 +497,14 @@ class ChatUserSearchOldResultsPart
 				htmlClassAttribute (
 					stringFormat (
 						"little-page-link-%s",
-						page)),
+						integerToDecimalString (page))),
 				htmlAttribute (
 					"onclick",
 					joinWithSpace (
 						stringFormat (
 							"pageBuilder.showLittlePage (%s);",
-							page),
+							integerToDecimalString (
+								page)),
 						"magicTable.setupMagicHandlers ($('#pageHolder'));")));
 
 		}
@@ -499,7 +515,8 @@ class ChatUserSearchOldResultsPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlParagraphOpen (
 			htmlClassAttribute (

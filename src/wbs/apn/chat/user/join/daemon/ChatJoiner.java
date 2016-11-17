@@ -221,10 +221,13 @@ class ChatJoiner {
 	// public implementation
 
 	public
-	void handleSimple () {
+	void handleSimple (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		TaskLogger taskLogger =
-			logContext.createTaskLogger ();
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleSimple");
 
 		handleWithState (
 			taskLogger);
@@ -233,10 +236,13 @@ class ChatJoiner {
 
 	public
 	InboxAttemptRec handleInbox (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull CommandRec command) {
 
 		TaskLogger taskLogger =
-			logContext.createTaskLogger ();
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleSimple");
 
 		handleWithState (
 			taskLogger);

@@ -2,12 +2,14 @@ package wbs.apn.chat.core.daemon;
 
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.util.Collections;
 
 import com.google.common.base.Optional;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -15,16 +17,17 @@ import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
+import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.logic.ChatHelpLogLogic;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.info.logic.ChatInfoLogic;
-import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.info.logic.ChatInfoLogic;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.IdObject;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -112,12 +115,13 @@ class ChatPhotoCommand
 
 	@Override
 	public
-	InboxAttemptRec handle () {
+	InboxAttemptRec handle (
+			@NonNull TaskLogger taskLogger) {
 
 		ChatRec chat =
-			(ChatRec) (Object)
-			objectManager.getParentOrNull (
-				command);
+			genericCastUnchecked (
+				objectManager.getParentRequired (
+					command));
 
 		ServiceRec defaultService =
 			serviceHelper.findByCodeRequired (

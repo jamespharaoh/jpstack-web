@@ -1,8 +1,11 @@
 package wbs.console.supervisor;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+
 import java.util.Map;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -15,6 +18,7 @@ import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsResolver;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTableStatsGroupPart")
@@ -47,23 +51,26 @@ class SupervisorTableStatsGroupPart
 	// implementation
 
 	@Override
-	@SuppressWarnings ("unchecked")
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		statsPeriod =
-			(StatsPeriod)
-			parameters.get ("statsPeriod");
+			genericCastUnchecked (
+				parameters.get (
+					"statsPeriod"));
 
 		statsDataSetsByName =
-			(Map<String,StatsDataSet>)
-			parameters.get ("statsDataSetsByName");
+			genericCastUnchecked (
+				parameters.get (
+					"statsDataSetsByName"));
 
 	}
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try {
 

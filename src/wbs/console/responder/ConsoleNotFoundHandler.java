@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.console.misc.ConsoleUserHelper;
@@ -18,12 +19,15 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;
 import wbs.console.tab.TabbedResponder;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
-import wbs.framework.web.WebNotFoundHandler;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.handler.WebNotFoundHandler;
 
 @Log4j
 @SingletonComponent ("notFoundHandler")
@@ -38,6 +42,9 @@ class ConsoleNotFoundHandler
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -71,15 +78,22 @@ class ConsoleNotFoundHandler
 
 	@Override
 	public
-	void handleNotFound ()
+	void handleNotFound (
+			@NonNull TaskLogger parentTaskLogger)
 		throws
 			ServletException,
 			IOException {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleNotFound");
+
 		// log it the old fashioned way
 
-		log.error (
-			"Path not found: " + requestContext.requestUri ());
+		taskLogger.errorFormat (
+			"Path not found: %s",
+			requestContext.requestUri ());
 
 		// make an exception log of this calamity
 
@@ -119,15 +133,25 @@ class ConsoleNotFoundHandler
 		) {
 
 			tabbedPageProvider.get ()
-				.tab (notFoundTab)
-				.title ("Page not found")
-				.pagePart (notFoundPartProvider.get ())
-				.execute ();
+
+				.tab (
+					notFoundTab)
+
+				.title (
+					"Page not found")
+
+				.pagePart (
+					notFoundPartProvider.get ())
+
+				.execute (
+					taskLogger);
 
 		} else {
 
 			notFoundPageProvider.get ()
-				.execute ();
+
+				.execute (
+					taskLogger);
 
 		}
 

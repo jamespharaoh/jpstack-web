@@ -1,9 +1,11 @@
 package wbs.platform.core.console;
 
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockClose;
-import static wbs.utils.web.HtmlScriptUtils.htmlScriptBlockOpen;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
+import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
 
 import java.io.IOException;
+
+import lombok.NonNull;
 
 import org.joda.time.Instant;
 
@@ -12,6 +14,7 @@ import wbs.console.responder.ConsolePrintResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.TaskLogger;
 import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("coreFrameSetResponder")
@@ -34,7 +37,8 @@ class CoreFrameSetResponder
 
 	@Override
 	public
-	void render () {
+	void render (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		goDocType ();
 

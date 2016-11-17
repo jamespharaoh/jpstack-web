@@ -1,0 +1,23 @@
+<plugin
+	name="web"
+	package="wbs.web">
+
+i	<layer name="web">
+
+		<component class="action.ActionRequestHandler"/>
+
+		<component class="context.RequestContextImplementation"/>
+
+		<component class="pathhandler.DelegatingPathHandler"/>
+
+		<component class="responder.JsonResponder"/>
+
+		<component class="servlet.PathHandlerServlet"/>
+i		<component class="servlet.ResponseFilter"/>
+
+		<component class="utils.HtmlTableCellWriter"/>
+		<component class="utils.HtmlTableCheckWriter"/>
+
+	</layer>
+
+</plugin>

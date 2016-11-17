@@ -17,6 +17,8 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -42,9 +44,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.http.HttpStatus;
 import org.joda.time.DateTimeZone;
@@ -55,53 +55,18 @@ import org.joda.time.LocalDate;
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.WebApiAction;
 import wbs.api.mvc.WebApiManager;
-import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
-import wbs.apn.chat.bill.logic.ChatCreditLogic;
-import wbs.apn.chat.contact.logic.ChatMessageLogic;
-import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.contact.model.ChatMessageSearch;
-import wbs.apn.chat.contact.model.ChatMessageStatus;
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.date.logic.ChatDateLogic;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserDateMode;
-import wbs.apn.chat.user.core.model.ChatUserSearch;
-import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
-import wbs.apn.chat.user.image.model.ChatUserImageType;
-import wbs.apn.chat.user.info.logic.ChatInfoLogic;
-import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
-import wbs.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
-import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
-import wbs.apn.chat.bill.model.ChatUserCreditObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageRec;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.scheme.model.ChatSchemeObjectHelper;
-import wbs.apn.chat.scheme.model.ChatSchemeRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.apn.chat.user.image.model.ChatUserImageObjectHelper;
-import wbs.apn.chat.user.image.model.ChatUserImageRec;
-import wbs.apn.chat.user.info.model.ChatProfileFieldRec;
-import wbs.apn.chat.user.info.model.ChatProfileFieldValueRec;
-import wbs.apn.chat.user.info.model.ChatUserProfileFieldObjectHelper;
-import wbs.apn.chat.user.info.model.ChatUserProfileFieldRec;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.web.AbstractWebFile;
-import wbs.framework.web.PathHandler;
-import wbs.framework.web.RegexpPathHandler;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.ServletModule;
-import wbs.framework.web.WebFile;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
@@ -126,6 +91,7 @@ import wbs.platform.rpc.web.ReusableRpcHandler;
 import wbs.platform.rpc.xml.XmlRpcAction;
 import wbs.platform.rpc.xml.XmlRpcFile;
 import wbs.platform.user.model.UserRec;
+
 import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.locator.model.EastNorth;
 import wbs.sms.locator.model.LongLat;
@@ -133,13 +99,54 @@ import wbs.sms.locator.model.MercatorProjection;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
+
 import wbs.utils.time.TextualInterval;
 
-@Log4j
+import wbs.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
+import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
+import wbs.apn.chat.bill.logic.ChatCreditLogic;
+import wbs.apn.chat.bill.model.ChatUserCreditObjectHelper;
+import wbs.apn.chat.contact.logic.ChatMessageLogic;
+import wbs.apn.chat.contact.model.ChatMessageMethod;
+import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
+import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.contact.model.ChatMessageSearch;
+import wbs.apn.chat.contact.model.ChatMessageStatus;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.core.model.ChatObjectHelper;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.date.logic.ChatDateLogic;
+import wbs.apn.chat.scheme.model.ChatSchemeObjectHelper;
+import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.apn.chat.user.core.model.ChatUserDateMode;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserSearch;
+import wbs.apn.chat.user.core.model.ChatUserType;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
+import wbs.apn.chat.user.image.model.ChatUserImageObjectHelper;
+import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.apn.chat.user.image.model.ChatUserImageType;
+import wbs.apn.chat.user.info.logic.ChatInfoLogic;
+import wbs.apn.chat.user.info.model.ChatProfileFieldRec;
+import wbs.apn.chat.user.info.model.ChatProfileFieldValueRec;
+import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
+import wbs.apn.chat.user.info.model.ChatUserProfileFieldObjectHelper;
+import wbs.apn.chat.user.info.model.ChatUserProfileFieldRec;
+import wbs.web.context.RequestContext;
+import wbs.web.file.AbstractWebFile;
+import wbs.web.file.WebFile;
+import wbs.web.pathhandler.PathHandler;
+import wbs.web.pathhandler.RegexpPathHandler;
+import wbs.web.responder.WebModule;
+
 @SingletonComponent ("chatApiServletModule")
 public
 class ChatApiServletModule
-	implements ServletModule {
+	implements WebModule {
 
 	// singleton dependencies
 
@@ -194,6 +201,9 @@ class ChatApiServletModule
 	@SingletonDependency
 	LocatorLogic locatorLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MediaObjectHelper mediaHelper;
 
@@ -230,6 +240,26 @@ class ChatApiServletModule
 	@PrototypeDependency
 	Provider <XmlRpcFile> xmlRpcFile;
 
+	// life cycle
+
+	@NormalLifecycleSetup
+	public
+	void setup (
+			@NonNull TaskLogger taskLogger) {
+
+		registerRpcHandlerClasses (
+			taskLogger,
+			MediaRpcHandler.class,
+			MessageSendRpcHandler.class,
+			MessagePollRpcHandler.class,
+			ProfileRpcHandler.class,
+			ProfilesRpcHandler.class,
+			ImageUpdateRpcHandler.class,
+			CreditRpcHandler.class,
+			ProfileDeleteRpcHandler.class);
+
+	}
+
 	// ================================= servlet module
 
 	WebFile mediaFile =
@@ -237,10 +267,16 @@ class ChatApiServletModule
 
 		@Override
 		public
-		void doGet ()
+		void doGet (
+				@NonNull TaskLogger parentTaskLogger)
 			throws
 				ServletException,
 				IOException {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"mediaFile.doGet");
 
 			String format =
 				requestContext.requestStringRequired (
@@ -250,81 +286,23 @@ class ChatApiServletModule
 				requestContext.requestIntegerRequired (
 					"mediaId");
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadOnly (
-					"ChatApiServletModule.MediaFile.doGet ()",
-					this);
+			try (
 
-			Optional<MediaRec> mediaOptional =
-				mediaHelper.find (
-					mediaId);
+				Transaction transaction =
+					database.beginReadOnly (
+						"ChatApiServletModule.MediaFile.doGet ()",
+						this);
 
-			if (
-				optionalIsNotPresent (
-					mediaOptional)
 			) {
 
-				requestContext.status (
-					HttpStatus.SC_NOT_FOUND);
+				Optional <MediaRec> mediaOptional =
+					mediaHelper.find (
+						mediaId);
 
-				return;
-
-			}
-
-			MediaRec media =
-				mediaOptional.get ();
-
-			byte[] data =
-				media.getContent ().getData ();
-
-			String mimeType =
-				media.getMediaType ().getMimeType ();
-
-			if (allOf (
-
-				() ->isNotNull (
-					format),
-
-				() -> stringNotEqualSafe (
-					format,
-					"orig")
-
-			)) {
-
-				if (mediaLogic.isVideo (mimeType)) {
-
-					if (
-						mediaLogic.videoProfileNames ().contains (
-							format)
-					) {
-
-						data =
-							mediaLogic.videoConvertRequired (
-								format,
-								data);
-
-					} else {
-
-						log.warn (
-							stringFormat (
-								"Unable to convert %s to format %s",
-								mimeType,
-								format));
-
-						requestContext.status (
-							HttpStatus.SC_NOT_FOUND);
-
-						return;
-
-					}
-
-				} else {
-
-					log.warn (
-						stringFormat (
-							"Unable to convert %s",
-							 mimeType));
+				if (
+					optionalIsNotPresent (
+						mediaOptional)
+				) {
 
 					requestContext.status (
 						HttpStatus.SC_NOT_FOUND);
@@ -333,22 +311,84 @@ class ChatApiServletModule
 
 				}
 
+				MediaRec media =
+					mediaOptional.get ();
+
+				byte[] data =
+					media.getContent ().getData ();
+
+				String mimeType =
+					media.getMediaType ().getMimeType ();
+
+				if (allOf (
+
+					() ->isNotNull (
+						format),
+
+					() -> stringNotEqualSafe (
+						format,
+						"orig")
+
+				)) {
+
+					if (mediaLogic.isVideo (mimeType)) {
+
+						if (
+							mediaLogic.videoProfileNames ().contains (
+								format)
+						) {
+
+							data =
+								mediaLogic.videoConvertRequired (
+									format,
+									data);
+
+						} else {
+
+							taskLogger.warningFormat (
+								"Unable to convert %s to format %s",
+								mimeType,
+								format);
+
+							requestContext.status (
+								HttpStatus.SC_NOT_FOUND);
+
+							return;
+
+						}
+
+					} else {
+
+						taskLogger.warningFormat (
+							"Unable to convert %s",
+							 mimeType);
+
+						requestContext.status (
+							HttpStatus.SC_NOT_FOUND);
+
+						return;
+
+					}
+
+				}
+
+				requestContext.setHeader (
+					"Content-Type",
+					media.getMediaType ().getMimeType ());
+
+				requestContext.setHeader (
+					"Content-Length",
+					integerToDecimalString (
+						arrayLength (
+							data)));
+
+				OutputStream out =
+					requestContext.outputStream ();
+
+				out.write (
+					data);
+
 			}
-
-			requestContext.setHeader (
-				"Content-Type",
-				media.getMediaType ().getMimeType ());
-
-			requestContext.setHeader (
-				"Content-Length",
-				integerToDecimalString (
-					arrayLength (
-						data)));
-
-			OutputStream out =
-				requestContext.outputStream ();
-
-			out.write (data);
 
 		}
 
@@ -473,19 +513,31 @@ class ChatApiServletModule
 	List<Class<? extends RpcHandler>> handlerClasses =
 		new ArrayList<Class<? extends RpcHandler>> ();
 
-	private static
+	private
 	void registerRpcHandlerClasses (
-			Class<?>... handlerClasses) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Class <?> ... handlerClasses) {
 
-		for (Class<?> uncastHandlerClass
-				: handlerClasses) {
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"registerRpcHandlerClasses");
 
-			Class<? extends RpcHandler> handlerClass =
-				uncastHandlerClass.asSubclass (RpcHandler.class);
+		for (
+			Class <?> uncastHandlerClass
+				: handlerClasses
+		) {
+
+			Class <? extends RpcHandler> handlerClass =
+				uncastHandlerClass.asSubclass (
+					RpcHandler.class);
 
 			if (handlerClass.getAnnotation (RpcExport.class) == null) {
 
-				log.warn ("Unable to register " + handlerClass);
+				taskLogger.warningFormat (
+					"Unable to register %s",
+					classNameSimple (
+						handlerClass));
 
 				continue;
 
@@ -505,8 +557,10 @@ class ChatApiServletModule
 	private
 	void initActions () {
 
-		for (Class<? extends RpcHandler> handlerClass
-				: handlerClasses) {
+		for (
+			Class<? extends RpcHandler> handlerClass
+				: handlerClasses
+		) {
 
 			String name =
 				handlerClass.getAnnotation (RpcExport.class).value ();
@@ -773,30 +827,36 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadOnly (
-					"ChatApiServletModule.ProfilesRpcHandler.handle (source)",
-					this);
+			try (
 
-			// get params
+				Transaction transaction =
+					database.beginReadOnly (
+						"ChatApiServletModule.ProfilesRpcHandler.handle (source)",
+						this);
 
-			getParams (source);
+			) {
 
-			// bail on any request-invalid classErrors
+				// get params
 
-			if (errors.iterator ().hasNext ())
-				return Rpc.rpcError (
-					"chat-profiles-response",
-					Rpc.stRequestInvalid,
-					"request-invalid",
-					errors);
+				getParams (source);
 
-			// return
+				// bail on any request-invalid classErrors
 
-			return makeResponse ();
+				if (errors.iterator ().hasNext ())
+					return Rpc.rpcError (
+						"chat-profiles-response",
+						Rpc.stRequestInvalid,
+						"request-invalid",
+						errors);
+
+				// return
+
+				return makeResponse ();
+
+			}
 
 		}
 
@@ -835,544 +895,510 @@ class ChatApiServletModule
 		private
 		RpcResult makeResponse () {
 
-			@Cleanup
-			Transaction transaction =
-				database.currentTransaction ();
+			try (
 
-			if (number != null) {
+				Transaction transaction =
+					database.currentTransaction ();
 
-				ChatRec chat =
-					chatHelper.findRequired (
-						chatId);
-
-				NumberRec numberRec =
-					numberHelper.findOrCreate (
-						number);
-
-				myUser =
-					chatUserHelper.find (
-						chat,
-						numberRec);
-
-				if (anyOf (
-
-					() -> isNull (
-						myUser),
-
-					() -> integerNotEqualSafe (
-						myUser.getChat ().getId (),
-						chatId)
-
-				)) {
-
-					return Rpc.rpcError (
-						"chat-profiles-response",
-						Rpc.stRequestInvalid,
-						"request-invalid",
-						"Number not recognised");
-
-				}
-
-			}
-
-			LongLat myLongLat =
-				myUser != null
-					? myUser.getLocationLongLat ()
-					: null;
-
-			// find users
-
-			ChatUserSearch search =
-				new ChatUserSearch ()
-
-				.chatId (
-					chatId)
-
-				.hasGender (
-					true)
-
-				.hasOrient (
-					true)
-
-				.blockAll (
-					false)
-
-				.barred (
-					false)
-
-				.deleted (
-					false)
-
-				.codeIn (
-					codes)
-
-				.lastAction (
-					ifThenElse (
-						isNotNull (
-							lastAction),
-
-					() ->
-						TextualInterval.after (
-							DateTimeZone.UTC,
-							transaction.now ().minus (
-								Duration.standardSeconds (
-									lastAction))),
-
-					() -> null)
-
-				)
-
-				.typeIn (
-					types)
-
-				.hasPicture (
-					hasImage)
-
-				.hasVideo (
-					hasVideo)
-
-				.hasAudio (
-					hasAudio)
-
-				.hasDatingMode (
-					isDating)
-
-				.online (
-					isOnline)
-
-				.genderIn (
-					genders)
-
-				.orientIn (
-					orients);
-
-			List <Long> userIds =
-				chatUserHelper.searchIds (
-					search);
-
-			long time =
-				System.currentTimeMillis ();
-
-			long time0;
-
-			long timeA = 0;
-
-			long timeB = 0;
-
-			// build list
-			// MercatorProjection osgb = locatorDao.findMercatorProjectionByCode
-			// ("uk_national_grid");
-
-			MercatorProjection osgb =
-				ukNationalGrid;
-
-			RpcList profiles =
-				Rpc.rpcList (
-					"profiles",
-					"profile",
-					RpcType.rStructure);
-
-			for (
-				Long userId
-					: userIds
 			) {
 
-				ChatUserRec user =
-					chatUserHelper.findRequired (
-						userId);
+				if (number != null) {
 
-				// ignore system chat user, unless they are asked for
-				// specifically
+					ChatRec chat =
+						chatHelper.findRequired (
+							chatId);
 
-				if (
+					NumberRec numberRec =
+						numberHelper.findOrCreate (
+							number);
 
-					isNotNull (
-						myUser)
+					myUser =
+						chatUserHelper.find (
+							chat,
+							numberRec);
 
-					&& referenceEqualWithClass (
-						UserRec.class,
-						user,
-						myUser.getChat ().getSystemChatUser ())
+					if (anyOf (
 
-					&& isNotNull (
+						() -> isNull (
+							myUser),
+
+						() -> integerNotEqualSafe (
+							myUser.getChat ().getId (),
+							chatId)
+
+					)) {
+
+						return Rpc.rpcError (
+							"chat-profiles-response",
+							Rpc.stRequestInvalid,
+							"request-invalid",
+							"Number not recognised");
+
+					}
+
+				}
+
+				LongLat myLongLat =
+					myUser != null
+						? myUser.getLocationLongLat ()
+						: null;
+
+				// find users
+
+				ChatUserSearch search =
+					new ChatUserSearch ()
+
+					.chatId (
+						chatId)
+
+					.hasGender (
+						true)
+
+					.hasOrient (
+						true)
+
+					.blockAll (
+						false)
+
+					.barred (
+						false)
+
+					.deleted (
+						false)
+
+					.codeIn (
 						codes)
 
+					.lastAction (
+						ifThenElse (
+							isNotNull (
+								lastAction),
+
+						() ->
+							TextualInterval.after (
+								DateTimeZone.UTC,
+								transaction.now ().minus (
+									Duration.standardSeconds (
+										lastAction))),
+
+						() -> null)
+
+					)
+
+					.typeIn (
+						types)
+
+					.hasPicture (
+						hasImage)
+
+					.hasVideo (
+						hasVideo)
+
+					.hasAudio (
+						hasAudio)
+
+					.hasDatingMode (
+						isDating)
+
+					.online (
+						isOnline)
+
+					.genderIn (
+						genders)
+
+					.orientIn (
+						orients);
+
+				List <Long> userIds =
+					chatUserHelper.searchIds (
+						search);
+
+				// build list
+				// MercatorProjection osgb = locatorDao.findMercatorProjectionByCode
+				// ("uk_national_grid");
+
+				MercatorProjection osgb =
+					ukNationalGrid;
+
+				RpcList profiles =
+					Rpc.rpcList (
+						"profiles",
+						"profile",
+						RpcType.rStructure);
+
+				for (
+					Long userId
+						: userIds
 				) {
-					continue;
-				}
 
-				// ignore specifically excluded users, unless specifically
-				// requested
+					ChatUserRec user =
+						chatUserHelper.findRequired (
+							userId);
 
-				if (user.getHiddenFromChatTube ()
-						&& codes != null)
-					continue;
+					// ignore system chat user, unless they are asked for
+					// specifically
 
-				RpcStructure profile =
-					Rpc.rpcStruct ("profile",
-						Rpc.rpcElem ("code", user.getCode ()),
-						Rpc.rpcElem ("online", user.getOnline ()),
-						Rpc.rpcElem ("gender", user.getGender ().toString ()),
-						Rpc.rpcElem ("orient", user.getOrient ().toString ()));
+					if (
 
-				/*if (user.getNumber () != null)
-					profile.add (
-						rpcElem ("number", user.getNumber ().getNumber ()));*/
+						isNotNull (
+							myUser)
 
-				if (user.getName() != null)
-					profile.add (
-						Rpc.rpcElem ("name", user.getName ()));
+						&& referenceEqualWithClass (
+							UserRec.class,
+							user,
+							myUser.getChat ().getSystemChatUser ())
 
-				if (user.getInfoText () != null)
-					profile.add (
-						Rpc.rpcElem ("info", user.getInfoText ().getText ()));
+						&& isNotNull (
+							codes)
 
-				if (user.getMainChatUserImage () != null) {
-
-					profile.add (
-						Rpc.rpcElem (
-							"media-id",
-							user.getMainChatUserImage ().getMedia ().getId ()));
-
-				}
-
-				if (user.getChatUserImageList ().size () > 0) {
-
-					RpcList images =
-						new RpcList (
-							"images",
-							"image",
-							RpcType.rStructure);
-
-					for (
-						ChatUserImageRec chatUserImage
-							: user.getChatUserImageList ()
 					) {
+						continue;
+					}
 
-						RpcStructure image =
-							Rpc.rpcStruct (
+					// ignore specifically excluded users, unless specifically
+					// requested
+
+					if (user.getHiddenFromChatTube ()
+							&& codes != null)
+						continue;
+
+					RpcStructure profile =
+						Rpc.rpcStruct ("profile",
+							Rpc.rpcElem ("code", user.getCode ()),
+							Rpc.rpcElem ("online", user.getOnline ()),
+							Rpc.rpcElem ("gender", user.getGender ().toString ()),
+							Rpc.rpcElem ("orient", user.getOrient ().toString ()));
+
+					/*if (user.getNumber () != null)
+						profile.add (
+							rpcElem ("number", user.getNumber ().getNumber ()));*/
+
+					if (user.getName() != null)
+						profile.add (
+							Rpc.rpcElem ("name", user.getName ()));
+
+					if (user.getInfoText () != null)
+						profile.add (
+							Rpc.rpcElem ("info", user.getInfoText ().getText ()));
+
+					if (user.getMainChatUserImage () != null) {
+
+						profile.add (
+							Rpc.rpcElem (
+								"media-id",
+								user.getMainChatUserImage ().getMedia ().getId ()));
+
+					}
+
+					if (user.getChatUserImageList ().size () > 0) {
+
+						RpcList images =
+							new RpcList (
+								"images",
 								"image",
+								RpcType.rStructure);
 
-								Rpc.rpcElem (
-									"media-id",
-									chatUserImage.getMedia ().getId ()),
+						for (
+							ChatUserImageRec chatUserImage
+								: user.getChatUserImageList ()
+						) {
 
-								Rpc.rpcElem (
-									"classification",
-									"unknown"),
+							RpcStructure image =
+								Rpc.rpcStruct (
+									"image",
 
-								Rpc.rpcElem (
-									"selected",
-									chatUserImage
-										== user.getMainChatUserImage ()));
+									Rpc.rpcElem (
+										"media-id",
+										chatUserImage.getMedia ().getId ()),
 
-						if (chatUserImage.getFullMedia () != null) {
+									Rpc.rpcElem (
+										"classification",
+										"unknown"),
 
-							image.add (
-								Rpc.rpcElem (
-								"full-media-id",
-								chatUserImage.getFullMedia ().getId ()));
+									Rpc.rpcElem (
+										"selected",
+										chatUserImage
+											== user.getMainChatUserImage ()));
 
-						}
+							if (chatUserImage.getFullMedia () != null) {
 
-						images.add (image);
-
-					}
-
-					profile.add (images);
-
-				}
-
-				if (user.getChatUserVideoList ().size () > 0) {
-
-					RpcList videos =
-						new RpcList (
-							"videos",
-							"video",
-							RpcType.rStructure);
-
-					for (
-						ChatUserImageRec chatUserImage
-							: user.getChatUserVideoList ()
-					) {
-
-						RpcStructure video =
-							Rpc.rpcStruct (
-								"video",
-
-								Rpc.rpcElem (
-									"media-id",
-									chatUserImage.getMedia ().getId ()),
-
-								Rpc.rpcElem (
-									"classification",
-									"unknown"),
-
-								Rpc.rpcElem (
-									"selected",
-									chatUserImage
-										== user.getMainChatUserVideo ()));
-
-						if (chatUserImage.getFullMedia () != null) {
-
-							video.add (
-
-								Rpc.rpcElem (
+								image.add (
+									Rpc.rpcElem (
 									"full-media-id",
-									chatUserImage.getFullMedia ().getId ()),
+									chatUserImage.getFullMedia ().getId ()));
 
-								Rpc.rpcElem (
-									"full-media-filename",
-									chatUserImage.getFullMedia ()
-										.getFilename ()),
+							}
 
-								Rpc.rpcElem (
-									"full-media-mime-type",
-									chatUserImage.getFullMedia ()
-										.getMediaType ().getMimeType ()));
+							images.add (image);
 
 						}
 
-						videos.add (video);
+						profile.add (images);
 
 					}
 
-					profile.add (videos);
+					if (user.getChatUserVideoList ().size () > 0) {
 
-				}
+						RpcList videos =
+							new RpcList (
+								"videos",
+								"video",
+								RpcType.rStructure);
 
-				if (user.getChatUserAudioList ().size () > 0) {
+						for (
+							ChatUserImageRec chatUserImage
+								: user.getChatUserVideoList ()
+						) {
 
-					RpcList videos =
-						new RpcList (
-							"audios",
-							"audio",
-							RpcType.rStructure);
+							RpcStructure video =
+								Rpc.rpcStruct (
+									"video",
 
-					for (
-						ChatUserImageRec chatUserImage
-							: user.getChatUserAudioList ()
-					) {
+									Rpc.rpcElem (
+										"media-id",
+										chatUserImage.getMedia ().getId ()),
 
-						videos.add (
-							Rpc.rpcStruct (
+									Rpc.rpcElem (
+										"classification",
+										"unknown"),
+
+									Rpc.rpcElem (
+										"selected",
+										chatUserImage
+											== user.getMainChatUserVideo ()));
+
+							if (chatUserImage.getFullMedia () != null) {
+
+								video.add (
+
+									Rpc.rpcElem (
+										"full-media-id",
+										chatUserImage.getFullMedia ().getId ()),
+
+									Rpc.rpcElem (
+										"full-media-filename",
+										chatUserImage.getFullMedia ()
+											.getFilename ()),
+
+									Rpc.rpcElem (
+										"full-media-mime-type",
+										chatUserImage.getFullMedia ()
+											.getMediaType ().getMimeType ()));
+
+							}
+
+							videos.add (video);
+
+						}
+
+						profile.add (videos);
+
+					}
+
+					if (user.getChatUserAudioList ().size () > 0) {
+
+						RpcList videos =
+							new RpcList (
+								"audios",
 								"audio",
+								RpcType.rStructure);
 
-								Rpc.rpcElem (
-									"media-id",
-									chatUserImage.getMedia ().getId ()),
+						for (
+							ChatUserImageRec chatUserImage
+								: user.getChatUserAudioList ()
+						) {
 
-								Rpc.rpcElem (
-									"classification",
-									"unknown"),
+							videos.add (
+								Rpc.rpcStruct (
+									"audio",
 
-								Rpc.rpcElem (
-									"selected",
-									chatUserImage
-										== user.getMainChatUserAudio ())));
+									Rpc.rpcElem (
+										"media-id",
+										chatUserImage.getMedia ().getId ()),
+
+									Rpc.rpcElem (
+										"classification",
+										"unknown"),
+
+									Rpc.rpcElem (
+										"selected",
+										chatUserImage
+											== user.getMainChatUserAudio ())));
+
+						}
+
+						profile.add (
+							videos);
 
 					}
 
-					profile.add (
-						videos);
+					if (! user.getProfileFields ().isEmpty ()) {
 
-				}
-
-				if (! user.getProfileFields ().isEmpty ()) {
-
-					RpcList profileFields =
-						Rpc.rpcList (
-							"profile-fields",
-							"profile-field",
-							RpcType.rStructure);
-
-					for (
-						ChatUserProfileFieldRec userField
-							: user.getProfileFields ().values ()
-					) {
-
-						profileFields.add (
-
-							Rpc.rpcStruct (
+						RpcList profileFields =
+							Rpc.rpcList (
+								"profile-fields",
 								"profile-field",
+								RpcType.rStructure);
 
-								Rpc.rpcElem (
-									"name",
-									userField.getChatProfileField ()
-										.getCode ()),
+						for (
+							ChatUserProfileFieldRec userField
+								: user.getProfileFields ().values ()
+						) {
 
-								Rpc.rpcElem (
-									"value",
-									userField.getChatProfileFieldValue ()
-										.getCode ())));
+							profileFields.add (
+
+								Rpc.rpcStruct (
+									"profile-field",
+
+									Rpc.rpcElem (
+										"name",
+										userField.getChatProfileField ()
+											.getCode ()),
+
+									Rpc.rpcElem (
+										"value",
+										userField.getChatProfileFieldValue ()
+											.getCode ())));
+
+						}
+
+						profile.add (profileFields);
 
 					}
 
-					profile.add (profileFields);
+					if (user.getDob () != null) {
 
-				}
+						profile.add (
+							Rpc.rpcElem (
+								"age",
+								chatUserLogic.getAgeInYears (
+									user,
+									transaction.now ())));
 
-				if (user.getDob () != null) {
+					}
 
-					profile.add (
-						Rpc.rpcElem (
-							"age",
-							chatUserLogic.getAgeInYears (
-								user,
-								transaction.now ())));
+					if (user.getLocationLongLat () != null) {
 
-				}
+						LongLat longLat =
+							user.getLocationLongLat ();
 
-				time0 =
-					System.currentTimeMillis ();
-
-				timeA +=
-					+ time0
-					- time;
-
-				time =
-					time0;
-
-				if (user.getLocationLongLat () != null) {
-
-					LongLat longLat =
-						user.getLocationLongLat ();
-
-					EastNorth eastNorth =
-						locatorLogic.longLatToEastNorth (
-							osgb,
-							user.getLocationLongLat ());
-
-					profile.add (
-
-						Rpc.rpcElem (
-							"longitude",
-							longLat.longitude ()),
-
-						Rpc.rpcElem (
-							"latitude",
-							longLat.latitude ()),
-
-						Rpc.rpcElem (
-							"easting",
-							eastNorth.getEasting ()),
-
-						Rpc.rpcElem (
-							"northing",
-							eastNorth.getNorthing ()));
-
-					if (myLongLat != null) {
+						EastNorth eastNorth =
+							locatorLogic.longLatToEastNorth (
+								osgb,
+								user.getLocationLongLat ());
 
 						profile.add (
 
 							Rpc.rpcElem (
-								"distance-in-metres",
-								locatorLogic.distanceMetres (
-									myLongLat,
-									longLat)),
+								"longitude",
+								longLat.longitude ()),
 
 							Rpc.rpcElem (
-								"distance-in-miles",
-								locatorLogic.distanceMiles (
-									myLongLat,
-									longLat)));
+								"latitude",
+								longLat.latitude ()),
 
-					}
+							Rpc.rpcElem (
+								"easting",
+								eastNorth.getEasting ()),
 
-				}
+							Rpc.rpcElem (
+								"northing",
+								eastNorth.getNorthing ()));
 
-				time0 =
-					System.currentTimeMillis ();
+						if (myLongLat != null) {
 
-				timeB +=
-					+ time0
-					- time;
+							profile.add (
 
-				time =
-					time0;
+								Rpc.rpcElem (
+									"distance-in-metres",
+									locatorLogic.distanceMetres (
+										myLongLat,
+										longLat)),
 
-				profiles.add (
-					profile);
-
-			}
-
-			if (myLongLat != null) {
-
-				Collections.sort (
-					profiles.getValue (),
-					new Comparator<Object> () {
-
-						@Override
-						public
-						int compare (
-								Object o1,
-								Object o2) {
-
-							RpcStructure s1 =
-								(RpcStructure) o1;
-
-							RpcStructure s2 =
-								(RpcStructure) o2;
-
-							RpcElem e1 =
-								s1.getValue ().get ("distance-in-metres");
-
-							RpcElem e2 =
-								s2.getValue ().get ("distance-in-metres");
-
-							double d1 =
-								e1 != null
-									? (Double) e1.getValue ()
-									: Double.MAX_VALUE;
-
-							double d2 =
-								e2 != null
-									? (Double) e2.getValue ()
-									: Double.MAX_VALUE;
-
-							if (d1 < d2)
-								return -1;
-
-							if (d2 < d1)
-								return 1;
-
-							return 0;
+								Rpc.rpcElem (
+									"distance-in-miles",
+									locatorLogic.distanceMiles (
+										myLongLat,
+										longLat)));
 
 						}
 
 					}
 
-				);
-
-			}
-
-			if (limit != null) {
-
-				while (profiles.getValue ().size () > limit) {
-
-					profiles.getValue ().remove (
-						profiles.getValue ().size () - 1);
+					profiles.add (
+						profile);
 
 				}
 
+				if (myLongLat != null) {
+
+					Collections.sort (
+						profiles.getValue (),
+						new Comparator<Object> () {
+
+							@Override
+							public
+							int compare (
+									Object o1,
+									Object o2) {
+
+								RpcStructure s1 =
+									(RpcStructure) o1;
+
+								RpcStructure s2 =
+									(RpcStructure) o2;
+
+								RpcElem e1 =
+									s1.getValue ().get ("distance-in-metres");
+
+								RpcElem e2 =
+									s2.getValue ().get ("distance-in-metres");
+
+								double d1 =
+									e1 != null
+										? (Double) e1.getValue ()
+										: Double.MAX_VALUE;
+
+								double d2 =
+									e2 != null
+										? (Double) e2.getValue ()
+										: Double.MAX_VALUE;
+
+								if (d1 < d2)
+									return -1;
+
+								if (d2 < d1)
+									return 1;
+
+								return 0;
+
+							}
+
+						}
+
+					);
+
+				}
+
+				if (limit != null) {
+
+					while (profiles.getValue ().size () > limit) {
+
+						profiles.getValue ().remove (
+							profiles.getValue ().size () - 1);
+
+					}
+
+				}
+
+				// return
+
+				return Rpc.rpcSuccess (
+					"chat-profiles-response",
+					"Listing chat user profiles",
+					profiles);
+
 			}
-
-			time0 =
-				System.currentTimeMillis ();
-
-			timeA +=
-				+ time0
-				- time;
-
-			log.info ("timeA = " + timeA);
-			log.info ("timeB = " + timeB);
-
-			// return
-
-			return Rpc.rpcSuccess (
-				"chat-profiles-response",
-				"Listing chat user profiles",
-				profiles);
 
 		}
 
@@ -1410,33 +1436,40 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadOnly (
-					"ChatApiServletModule.MediaRpcHandler.handle (source)",
-					this);
+			try (
 
-			// get params
+				Transaction transaction =
+					database.beginReadOnly (
+						"ChatApiServletModule.MediaRpcHandler.handle (source)",
+						this);
 
-			getParams (source);
+			) {
 
-			// bail on any request-invalid errors
+				// get params
 
-			if (errors.iterator ().hasNext ()) {
+				getParams (
+					source);
 
-				return Rpc.rpcError (
-					"chat-media-response",
-					Rpc.stRequestInvalid,
-					"request-invalid",
-					errors);
+				// bail on any request-invalid errors
+
+				if (errors.iterator ().hasNext ()) {
+
+					return Rpc.rpcError (
+						"chat-media-response",
+						Rpc.stRequestInvalid,
+						"request-invalid",
+						errors);
+
+				}
+
+				// return
+
+				return makeResponse ();
 
 			}
-
-			// return
-
-			return makeResponse ();
 
 		}
 
@@ -1710,37 +1743,45 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"ChatApiServletModule.ProfileRpcHandler.handle (source)",
-					this);
+			try (
 
-			// get params
+				Transaction transaction =
+					database.beginReadWrite (
+						"ChatApiServletModule.ProfileRpcHandler.handle (source)",
+						this);
 
-			getParams (source);
+			) {
 
-			// bail on any request-invalid classErrors
+				// get params
 
-			if (errors.iterator ().hasNext ()) {
+				getParams (
+					source);
 
-				return Rpc.rpcError (
-					"chat-profile-response",
-					Rpc.stRequestInvalid,
-					"request-invalid",
-					errors);
+				// bail on any request-invalid classErrors
+
+				if (errors.iterator ().hasNext ()) {
+
+					return Rpc.rpcError (
+						"chat-profile-response",
+						Rpc.stRequestInvalid,
+						"request-invalid",
+						errors);
+
+				}
+
+				// do updates
+
+				doUpdates (
+					transaction);
+
+				// commit
+
+				transaction.commit ();
 
 			}
-
-			// do updates
-
-			doUpdates (transaction);
-
-			// commit
-
-			transaction.commit ();
 
 			// return
 
@@ -2372,46 +2413,60 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					stringFormat (
-						"%s.%s.%s (%s)",
-						"ChatApiServletModule",
-						"ProfileDeleteRpcHandler",
-						"handle",
-						"source"),
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"profileDeleteRpcHandler.handle");
 
-			// get params
+			try (
 
-			getParams (source);
+				Transaction transaction =
+					database.beginReadWrite (
+						stringFormat (
+							"%s.%s.%s (%s)",
+							"ChatApiServletModule",
+							"ProfileDeleteRpcHandler",
+							"handle",
+							"source"),
+						this);
 
-			// bail on any request-invalid classErrors
+			) {
 
-			if (errors.iterator ().hasNext ()) {
+				// get params
 
-				return Rpc.rpcError (
-					"chat-delete-response",
-					Rpc.stRequestInvalid,
-					"request-invalid",
-					errors);
+				getParams (
+					source);
+
+				// bail on any request-invalid classErrors
+
+				if (errors.iterator ().hasNext ()) {
+
+					return Rpc.rpcError (
+						"chat-delete-response",
+						Rpc.stRequestInvalid,
+						"request-invalid",
+						errors);
+
+				}
+
+				// do updates
+
+				doUpdates (
+					taskLogger,
+					transaction);
+
+				// commit
+
+				transaction.commit ();
+
+				// return
+
+				return makeResponse ();
 
 			}
-
-			// do updates
-
-			doUpdates (transaction);
-
-			// commit
-
-			transaction.commit ();
-
-			// return
-
-			return makeResponse ();
 
 		}
 
@@ -2442,6 +2497,7 @@ class ChatApiServletModule
 
 		private
 		void doUpdates (
+				@NonNull TaskLogger taskLogger,
 				@NonNull Transaction transaction) {
 
 			ChatRec chat =
@@ -2462,12 +2518,12 @@ class ChatApiServletModule
 
 			chatUser.setNumber (null);
 
-			log.info (
-				stringFormat (
-					"Delete chat user %s, ",
-					chatUser.getId (),
-					"number was %s",
-					number));
+			taskLogger.noticeFormat (
+				"Delete chat user %s, ",
+				integerToDecimalString (
+					chatUser.getId ()),
+				"number was %s",
+				number);
 
 		}
 
@@ -2570,42 +2626,49 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					stringFormat (
-						"%s.%s.%s (%s)",
-						"ChatApiServletModule",
-						"MessageSendRpcHandler",
-						"handle",
-						"source"),
-					this);
+			try (
 
-			// get params
+				Transaction transaction =
+					database.beginReadWrite (
+						stringFormat (
+							"%s.%s.%s (%s)",
+							"ChatApiServletModule",
+							"MessageSendRpcHandler",
+							"handle",
+							"source"),
+						this);
 
-			getParams (source);
+			) {
 
-			// bail on any request-invalid classErrors
+				// get params
 
-			if (errors.iterator ().hasNext ()) {
+				getParams (
+					source);
 
-				return Rpc.rpcError (
-					"chat-message-send-response",
-					Rpc.stRequestInvalid,
-					"request-invalid",
-					errors);
+				// bail on any request-invalid classErrors
+
+				if (errors.iterator ().hasNext ()) {
+
+					return Rpc.rpcError (
+						"chat-message-send-response",
+						Rpc.stRequestInvalid,
+						"request-invalid",
+						errors);
+
+				}
+
+				// do it
+
+				doIt ();
+
+				// commit
+
+				transaction.commit ();
 
 			}
-
-			// do it
-
-			doIt ();
-
-			// commit
-
-			transaction.commit ();
 
 			// return
 
@@ -2853,50 +2916,57 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					stringFormat (
-						"%s.%s.%s (%s)",
-						"ChatApiServletModule",
-						"MessagePollRpcHandler",
-						"handle",
-						"source"),
-					this);
+			try (
 
-			// get params
+				Transaction transaction =
+					database.beginReadWrite (
+						stringFormat (
+							"%s.%s.%s (%s)",
+							"ChatApiServletModule",
+							"MessagePollRpcHandler",
+							"handle",
+							"source"),
+						this);
 
-			getParams (source);
+			) {
 
-			// bail on any request-invalid classErrors
+				// get params
 
-			if (errors.iterator ().hasNext ()) {
+				getParams (
+					source);
 
-				return Rpc.rpcError (
+				// bail on any request-invalid classErrors
+
+				if (errors.iterator ().hasNext ()) {
+
+					return Rpc.rpcError (
+						"chat-message-poll-response",
+						Rpc.stRequestInvalid,
+						"request-invalid",
+						errors);
+
+				}
+
+				// do it
+
+				doIt (
+					transaction.now ());
+
+				// commit
+
+				transaction.commit ();
+
+				// return
+
+				return Rpc.rpcSuccess (
 					"chat-message-poll-response",
-					Rpc.stRequestInvalid,
-					"request-invalid",
-					errors);
+					"Message poll successful",
+					respMessages);
 
 			}
-
-			// do it
-
-			doIt (
-				transaction.now ());
-
-			// commit
-
-			transaction.commit ();
-
-			// return
-
-			return Rpc.rpcSuccess (
-				"chat-message-poll-response",
-				"Message poll successful",
-				respMessages);
 
 		}
 
@@ -3302,58 +3372,69 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					stringFormat (
-						"%s.%s.%s (%s)",
-						"ChatApiServletModule",
-						"ImageUpdateRpcHandler",
-						"handle",
-						"source"),
-					this);
+			try (
 
-			// get params
+				Transaction transaction =
+					database.beginReadWrite (
+						stringFormat (
+							"%s.%s.%s (%s)",
+							"ChatApiServletModule",
+							"ImageUpdateRpcHandler",
+							"handle",
+							"source"),
+						this);
 
-			getParams (source);
+			) {
 
-			// bail on any request-invalid classErrors
+				// get params
 
-			if (errors.iterator ().hasNext ()) {
+				getParams (source);
 
-				return Rpc.rpcError (
+				// bail on any request-invalid classErrors
+
+				if (errors.iterator ().hasNext ()) {
+
+					return Rpc.rpcError (
+						"chat-image-update-response",
+						Rpc.stRequestInvalid,
+						"request-invalid",
+						errors);
+
+				}
+
+				// do it
+
+				doIt (transaction);
+
+				// commit
+
+				transaction.commit ();
+
+				// return
+
+				return Rpc.rpcSuccess (
 					"chat-image-update-response",
-					Rpc.stRequestInvalid,
-					"request-invalid",
-					errors);
+					"Image update successful",
+					respImages,
+					respOtherImages);
 
 			}
 
-			// do it
-
-			doIt (transaction);
-
-			// commit
-
-			transaction.commit ();
-
-			// return
-
-			return Rpc.rpcSuccess (
-				"chat-image-update-response",
-				"Image update successful",
-				respImages,
-				respOtherImages);
-
 		}
 
-		@SuppressWarnings ("unchecked")
-		private void getParams (RpcSource source) {
+		private
+		void getParams (
+				@NonNull RpcSource source) {
 
-			Map<String,Object> params = (Map<String,Object>)
-				source.obtain (imageUpdateRequestDef, errors, true);
+			Map <String, Object> params =
+				genericCastUnchecked (
+					source.obtain (
+						imageUpdateRequestDef,
+						errors,
+						true));
 
 			if (params == null)
 				return;
@@ -3379,29 +3460,45 @@ class ChatApiServletModule
 			if (params.get ("add-files") != null) {
 
 				add.addAll (
-					(List <ImageUpdateAdd>)
-					params.get (
-						"add-files"));
+					genericCastUnchecked (
+						params.get (
+							"add-files")));
 
 			}
 
 			if (params.get ("add") != null) {
-				for (byte[] data : (List<byte[]>) params.get ("add")) {
-					ImageUpdateAdd imageUpdateAdd = new ImageUpdateAdd ();
-					imageUpdateAdd.imageData = data;
-					add.add (imageUpdateAdd);
+
+				List <byte[]> addParams =
+					genericCastUnchecked (
+						params.get ("add"));
+
+				for (
+					byte[] data
+						: addParams
+				) {
+
+					ImageUpdateAdd imageUpdateAdd =
+						new ImageUpdateAdd ();
+
+					imageUpdateAdd.imageData =
+						data;
+
+					add.add (
+						imageUpdateAdd);
+
 				}
+
 			}
 
 			reorder =
-				(List <Long>)
-				params.get (
-					"reorder");
+				genericCastUnchecked (
+					params.get (
+						"reorder"));
 
 			delete =
-				(List <Long>)
-				params.get (
-					"delete");
+				genericCastUnchecked (
+					params.get (
+						"delete"));
 
 			selectedImageId =
 				(Long)
@@ -3925,47 +4022,54 @@ class ChatApiServletModule
 		@Override
 		public
 		RpcResult handle (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"ChatApiServletModule.CreditRpcHandler.handle (source)",
-					this);
+			try (
 
-			// get params
+				Transaction transaction =
+					database.beginReadWrite (
+						"ChatApiServletModule.CreditRpcHandler.handle (source)",
+						this);
 
-			getParams (source);
+			) {
 
-			// bail on any request-invalid classErrors
+				// get params
 
-			if (errors.iterator ().hasNext ()) {
+				getParams (
+					source);
 
-				return Rpc.rpcError (
+				// bail on any request-invalid classErrors
+
+				if (errors.iterator ().hasNext ()) {
+
+					return Rpc.rpcError (
+						"chat-credit-response",
+						Rpc.stRequestInvalid,
+						"request-invalid",
+						errors);
+
+				}
+
+				// do it
+
+				doIt (transaction);
+
+				// commit
+
+				transaction.commit ();
+
+				// return
+
+				return Rpc.rpcSuccess (
 					"chat-credit-response",
-					Rpc.stRequestInvalid,
-					"request-invalid",
-					errors);
+					"Credit successful",
+
+					Rpc.rpcElem (
+						"route-charge",
+						routeCharge));
 
 			}
-
-			// do it
-
-			doIt (transaction);
-
-			// commit
-
-			transaction.commit ();
-
-			// return
-
-			return Rpc.rpcSuccess (
-				"chat-credit-response",
-				"Credit successful",
-
-				Rpc.rpcElem (
-					"route-charge",
-					routeCharge));
 
 		}
 
@@ -4047,10 +4151,13 @@ class ChatApiServletModule
 					"send-amount-count-mismatch",
 					stringFormat (
 						"Send count %s and send amount %s mismatch. Route ",
-						sendCount,
-						sendAmount,
+						integerToDecimalString (
+							sendCount),
+						integerToDecimalString (
+							sendAmount),
 						"charge is %s.",
-						routeCharge));
+						integerToDecimalString (
+							routeCharge)));
 
 			}
 
@@ -4114,22 +4221,6 @@ class ChatApiServletModule
 			}
 
 		}
-
-	}
-
-	// ================================= register handlers
-
-	static {
-
-		registerRpcHandlerClasses (
-			MediaRpcHandler.class,
-			MessageSendRpcHandler.class,
-			MessagePollRpcHandler.class,
-			ProfileRpcHandler.class,
-			ProfilesRpcHandler.class,
-			ImageUpdateRpcHandler.class,
-			CreditRpcHandler.class,
-			ProfileDeleteRpcHandler.class);
 
 	}
 

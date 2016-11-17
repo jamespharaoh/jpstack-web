@@ -12,8 +12,6 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import org.apache.log4j.Logger;
-
 import wbs.framework.exception.ExceptionUtilsImplementation;
 import wbs.utils.string.FormatWriter;
 
@@ -79,11 +77,8 @@ class FormatWriterLogTarget
 
 	@Override
 	public
-	LogTarget nest (
-			@NonNull Logger logger) {
-
-		return this;
-
+	boolean debugEnabled () {
+		return true;
 	}
 
 }

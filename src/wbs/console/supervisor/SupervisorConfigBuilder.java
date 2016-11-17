@@ -5,34 +5,44 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
-import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.reporting.StatsAggregator;
 import wbs.console.reporting.StatsFormatter;
 import wbs.console.reporting.StatsGrouper;
 import wbs.console.reporting.StatsProvider;
 import wbs.console.reporting.StatsResolver;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorConfigBuilder")
 @ConsoleModuleBuilderHandler
 public
-class SupervisorConfigBuilder {
+class SupervisorConfigBuilder
+	implements BuilderComponent {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// builder
 
@@ -68,17 +78,25 @@ class SupervisorConfigBuilder {
 		new LinkedHashMap<String,StatsResolver> ();
 
 	@Getter @Setter
-	List<Provider<PagePart>> pagePartFactories =
-		new ArrayList<Provider<PagePart>> ();
+	List <PagePartFactory> pagePartFactories =
+		new ArrayList<> ();
 
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		builder.descend (
+			taskLogger,
 			spec,
 			spec.builders (),
 			this,

@@ -1,6 +1,6 @@
 package wbs.utils.string;
 
-import static wbs.utils.web.HtmlUtils.htmlEncode;
+import static wbs.web.utils.HtmlUtils.htmlEncode;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
-import wbs.utils.web.HtmlUtils;
+import wbs.web.utils.HtmlUtils;
 
 public
 class StringFormatter {

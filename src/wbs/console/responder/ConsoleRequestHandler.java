@@ -4,8 +4,8 @@ import javax.inject.Provider;
 
 import wbs.console.module.ConsoleManager;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.RequestHandler;
-import wbs.framework.web.Responder;
+import wbs.web.handler.RequestHandler;
+import wbs.web.responder.Responder;
 
 public abstract
 class ConsoleRequestHandler

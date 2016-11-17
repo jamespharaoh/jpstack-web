@@ -12,13 +12,12 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-
-import org.apache.log4j.Logger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -28,12 +27,19 @@ class TaskLogger {
 
 	// state
 
-	private
+	private final
 	Optional <TaskLogger> parent;
 
-	private
+	private final
 	LogTarget logTarget;
 
+	private final
+	String staticContext;
+
+	private final
+	String dynamicContext;
+
+	long fatalCount;
 	long errorCount;
 	long warningCount;
 	long noticeCount;
@@ -47,7 +53,9 @@ class TaskLogger {
 	public
 	TaskLogger (
 			@NonNull Optional <TaskLogger> parent,
-			@NonNull LogTarget logTarget) {
+			@NonNull LogTarget logTarget,
+			@NonNull String staticContext,
+			@NonNull String dynamicContext) {
 
 		this.parent =
 			parent;
@@ -55,36 +63,56 @@ class TaskLogger {
 		this.logTarget =
 			logTarget;
 
+		this.staticContext =
+			staticContext;
+
+		this.dynamicContext =
+			dynamicContext;
+
 	}
 
 	public
 	TaskLogger (
-			@NonNull LogTarget logTarget) {
+			@NonNull TaskLogger parent,
+			@NonNull LogTarget logTarget,
+			@NonNull String staticContext,
+			@NonNull String dynamicContext) {
+
+		this (
+			optionalOf (
+				parent),
+			logTarget,
+			staticContext,
+			dynamicContext);
+
+	}
+
+	public
+	TaskLogger (
+			@NonNull LogTarget logTarget,
+			@NonNull String staticContext,
+			@NonNull String dynamicContext) {
 
 		this (
 			optionalAbsent (),
-			logTarget);
+			logTarget,
+			staticContext,
+			dynamicContext);
 
 	}
 
 	public
 	TaskLogger (
-			@NonNull Logger logger) {
+			@NonNull FormatWriter formatWriter,
+			@NonNull String staticContext,
+			@NonNull String dynamicContext) {
 
 		this (
 			optionalAbsent (),
-			new Log4jLogTarget (
-				logger));
-
-	}
-
-	public
-	TaskLogger (
-			@NonNull FormatWriter formatWriter) {
-
-		this (
 			new FormatWriterLogTarget (
-				formatWriter));
+				formatWriter),
+			staticContext,
+			dynamicContext);
 
 	}
 
@@ -93,7 +121,7 @@ class TaskLogger {
 	public
 	long errorCount () {
 
-		return errorCount;
+		return errorCount + fatalCount;
 
 	}
 
@@ -101,7 +129,7 @@ class TaskLogger {
 	boolean errors () {
 
 		return moreThanZero (
-			errorCount);
+			errorCount + fatalCount);
 
 	}
 
@@ -134,6 +162,13 @@ class TaskLogger {
 
 		switch (severity) {
 
+		case fatal:
+
+			fatalFormat (
+				arguments);
+
+			break;
+
 		case error:
 
 			errorFormat (
@@ -163,6 +198,42 @@ class TaskLogger {
 			break;
 
 		}
+
+	}
+
+	public
+	void fatalFormat (
+			@NonNull String ... arguments) {
+
+		writeFirstError (
+			LogSeverity.error);
+
+		logTarget.writeToLog (
+			LogSeverity.fatal,
+			stringFormatArray (
+				arguments),
+			optionalAbsent ());
+
+		increaseFatalCount ();
+
+	}
+
+	public
+	void fatalFormatException (
+			@NonNull Throwable throwable,
+			@NonNull String ... arguments) {
+
+		writeFirstError (
+			LogSeverity.fatal);
+
+		logTarget.writeToLog (
+			LogSeverity.fatal,
+			stringFormatArray (
+				arguments),
+			optionalOf (
+				throwable));
+
+		increaseFatalCount ();
 
 	}
 
@@ -311,6 +382,35 @@ class TaskLogger {
 	}
 
 	public
+	RuntimeException makeException (
+			@NonNull Supplier <RuntimeException> exceptionSupplier) {
+
+		if (errors ()) {
+
+			String message =
+				stringFormat (
+					"%s due to %s errors",
+					lastError,
+					integerToDecimalString (
+						errorCount + fatalCount));
+
+			logTarget.writeToLog (
+				LogSeverity.error,
+				message,
+				optionalAbsent ());
+
+			throw exceptionSupplier.get ();
+
+		} else {
+
+			return new RuntimeException (
+				"No errors");
+
+		}
+
+	}
+
+	public
 	RuntimeException makeException () {
 
 		if (errors ()) {
@@ -320,7 +420,7 @@ class TaskLogger {
 					"%s due to %s errors",
 					lastError,
 					integerToDecimalString (
-						errorCount));
+						errorCount + fatalCount));
 
 			logTarget.writeToLog (
 				LogSeverity.error,
@@ -355,15 +455,8 @@ class TaskLogger {
 	}
 
 	public
-	TaskLogger nest (
-			@NonNull Object owner,
-			@NonNull String methodName,
-			@NonNull Logger logger) {
-
-		return new TaskLogger (
-			logTarget.nest (
-				logger));
-
+	boolean debugEnabled () {
+		return logTarget.debugEnabled ();
 	}
 
 	// private implementation
@@ -386,12 +479,33 @@ class TaskLogger {
 
 		switch (severity) {
 
+		case fatal:
+
+			if (
+
+				equalToZero (
+					fatalCount + errorCount)
+
+				&& isNotNull (
+					firstError)
+
+			) {
+
+				logTarget.writeToLog (
+					LogSeverity.fatal,
+					firstError,
+					optionalAbsent ());
+
+			}
+
+			break;
+
 		case error:
 
 			if (
 
 				equalToZero (
-					errorCount)
+					errorCount + fatalCount)
 
 				&& isNotNull (
 					firstError)
@@ -412,6 +526,7 @@ class TaskLogger {
 			if (
 
 				equalToZero (
+					+ fatalCount
 					+ errorCount
 					+ warningCount)
 
@@ -434,6 +549,7 @@ class TaskLogger {
 			if (
 
 				equalToZero (
+					+ fatalCount
 					+ errorCount
 					+ warningCount
 					+ noticeCount)
@@ -457,6 +573,7 @@ class TaskLogger {
 			if (
 
 				equalToZero (
+					+ fatalCount
 					+ errorCount
 					+ warningCount
 					+ noticeCount
@@ -477,6 +594,17 @@ class TaskLogger {
 			break;
 
 		}
+
+	}
+
+	private
+	void increaseFatalCount () {
+
+		fatalCount ++;
+
+		optionalDo (
+			parent,
+			TaskLogger::increaseFatalCount);
 
 	}
 

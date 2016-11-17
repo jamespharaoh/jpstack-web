@@ -11,8 +11,8 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.AbstractResponder;
-import wbs.framework.web.RequestContext;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.AbstractResponder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("imChatMediaResponder")

@@ -10,8 +10,12 @@ import java.util.function.Function;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.string.FormatWriter;
 
+@PrototypeComponent ("javaPropertyWriter")
 public
 class JavaPropertyWriter
 	implements JavaBlockWriter {
@@ -279,6 +283,7 @@ class JavaPropertyWriter
 	@Override
 	public
 	void writeBlock (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
 

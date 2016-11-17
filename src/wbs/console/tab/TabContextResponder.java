@@ -7,21 +7,24 @@ import java.io.IOException;
 import javax.inject.Provider;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.request.ConsoleRequestContext;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.responder.Responder;
 
-@Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("tabContextResponder")
 @DataClass ("tab-context-responder")
@@ -35,6 +38,9 @@ class TabContextResponder
 
 	@SingletonDependency
 	ComponentManager componentManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -56,24 +62,25 @@ class TabContextResponder
 
 	@DataAttribute
 	@Getter @Setter
-	Provider<PagePart> pagePartFactory;
+	PagePartFactory pagePartFactory;
 
 	// utility methods
 
 	public
 	TabContextResponder pagePartName (
-			final String pagePartName) {
+			String pagePartName) {
 
-		Provider<PagePart> factory =
-			new Provider<PagePart> () {
+		PagePartFactory factory =
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger taskLogger) {
 
 				Object bean =
 					componentManager.getComponentRequired (
-						log,
+						taskLogger,
 						pagePartName,
 						Object.class);
 
@@ -100,21 +107,25 @@ class TabContextResponder
 
 		};
 
-		return pagePartFactory (factory);
+		return pagePartFactory (
+			factory);
 
 	}
 
 	public
 	void setPagePart (
-			final PagePart pagePart) {
+			PagePart pagePart) {
 
 		pagePartFactory =
-			new Provider<PagePart> () {
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
+
 				return pagePart;
+
 			}
 
 		};
@@ -123,8 +134,14 @@ class TabContextResponder
 
 	@Override
 	public
-	void execute ()
+	void execute (
+			@NonNull TaskLogger parentTaskLogger)
 		throws IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"execute");
 
 		if (pagePartFactory == null) {
 
@@ -144,9 +161,11 @@ class TabContextResponder
 				title)
 
 			.pagePart (
-				pagePartFactory.get ())
+				pagePartFactory.buildPagePart (
+					taskLogger))
 
-			.execute ();
+			.execute (
+				taskLogger);
 
 	}
 

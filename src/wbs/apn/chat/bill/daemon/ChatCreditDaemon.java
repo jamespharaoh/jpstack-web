@@ -13,18 +13,21 @@ import lombok.extern.log4j.Log4j;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+
+import wbs.platform.daemon.SleepingDaemonService;
+
+import wbs.utils.time.TimeFormatter;
+
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.bill.logic.ChatCreditLogic.BillCheckOptions;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.platform.daemon.SleepingDaemonService;
-import wbs.utils.time.TimeFormatter;
 
 @Log4j
 @SingletonComponent ("chatCreditDaemon")
@@ -93,18 +96,25 @@ class ChatCreditDaemon
 		log.debug (
 			"Checking for all users with negative credit");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ChatCreditDaemon.runOnce ()",
-				this);
+		List <Long> chatIds;
 
-		List <Long> chatIds =
-			iterableMapToList (
-				ChatRec::getId,
-				chatHelper.findAll ());
+		try (
 
-		transaction.close ();
+			Transaction transaction =
+				database.beginReadOnly (
+					"ChatCreditDaemon.runOnce ()",
+					this);
+
+		) {
+
+			chatIds =
+				iterableMapToList (
+					ChatRec::getId,
+					chatHelper.findAll ());
+
+			transaction.close ();
+
+		}
 
 		chatIds.forEach (
 			this::doChat);

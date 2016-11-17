@@ -18,6 +18,7 @@ import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
@@ -31,8 +32,9 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.Record;
-import wbs.framework.web.Action;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.action.Action;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("objectLinksPageBuilder")
 @ConsoleModuleBuilderHandler
@@ -154,7 +156,8 @@ class ObjectLinksPageBuilder <
 
 			@Override
 			public
-			Responder handle () {
+			Responder handle (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return objectLinksAction.get ()
 
@@ -191,7 +194,8 @@ class ObjectLinksPageBuilder <
 					.successNotice (
 						successNotice)
 
-					.handle ();
+					.handle (
+						parentTaskLogger);
 
 			}
 
@@ -209,12 +213,13 @@ class ObjectLinksPageBuilder <
 
 	void buildResponder () {
 
-		Provider<PagePart> partFactory =
-			new Provider<PagePart> () {
+		PagePartFactory partFactory =
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return objectLinksPart.get ()
 					.consoleHelper (container.consoleHelper ())
@@ -230,9 +235,17 @@ class ObjectLinksPageBuilder <
 		consoleModule.addResponder (
 			responderName,
 			tabContextResponder.get ()
-				.tab (tabName)
-				.title (pageTitle)
-				.pagePartFactory (partFactory));
+
+			.tab (
+				tabName)
+
+			.title (
+				pageTitle)
+
+			.pagePartFactory (
+				partFactory)
+
+		);
 
 	}
 

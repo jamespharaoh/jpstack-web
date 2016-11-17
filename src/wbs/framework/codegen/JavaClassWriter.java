@@ -12,8 +12,11 @@ import static wbs.utils.collection.CollectionUtils.listSliceAllButLastItemRequir
 import static wbs.utils.collection.IterableUtils.iterableMap;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.Misc.fullClassName;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.TypeUtils.classNameFull;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.parameterSourceTypeName;
 import static wbs.utils.etc.TypeUtils.typeSourceName;
 import static wbs.utils.etc.TypeUtils.typeVariableSourceDeclaration;
@@ -51,16 +54,26 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import org.apache.log4j.Logger;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
+@PrototypeComponent ("javaClassWriter")
 public
 class JavaClassWriter
 	implements JavaBlockWriter {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -193,50 +206,20 @@ class JavaClassWriter
 
 	}
 
-	public
-	JavaClassWriter addSingletonDependency (
-			@NonNull String typeName,
-			@NonNull String variableName) {
-
-		return addSingletonDependency (
-			typeName,
-			variableName,
-			false);
-
-	}
-
-	public
-	JavaClassWriter addNamedSingletonDependency (
-			@NonNull Class <?> typeClass,
-			@NonNull String variableName) {
-
-		return addSingletonDependency (
-			typeClass.getName (),
-			variableName,
-			true);
-
-	}
-
-	public
-	JavaClassWriter addNamedSingletonDependency (
-			@NonNull String typeName,
-			@NonNull String variableName) {
-
-		return addSingletonDependency (
-			typeName,
-			variableName,
-			true);
-
-	}
+	// singleton dependencies
 
 	public
 	JavaClassWriter addSingletonDependency (
 			@NonNull String typeName,
 			@NonNull String variableName,
+			@NonNull Class <?> annotationClass,
 			@NonNull Boolean named) {
 
 		singletonDependencies.add (
 			new Dependency ()
+
+			.annotationClass (
+				annotationClass)
 
 			.classNameSupplier (
 				imports -> typeName)
@@ -255,7 +238,9 @@ class JavaClassWriter
 
 	public
 	JavaClassWriter addSingletonDependency (
-			@NonNull Class <?> dependencyClass) {
+			@NonNull Class <?> dependencyClass,
+			@NonNull Class <?> annotationClass,
+			@NonNull Boolean named) {
 
 		SingletonComponent singletonComponentAnnotation =
 			(SingletonComponent)
@@ -281,10 +266,82 @@ class JavaClassWriter
 		}
 
 		return addSingletonDependency (
-			dependencyClass.getName (),
-			variableName);
+			classNameFull (
+				dependencyClass),
+			variableName,
+			annotationClass,
+			named);
 
 	}
+
+	public
+	JavaClassWriter addSingletonDependency (
+			@NonNull String typeName,
+			@NonNull String variableName,
+			@NonNull Class <?> annotationClass) {
+
+		return addSingletonDependency (
+			typeName,
+			variableName,
+			annotationClass,
+			false);
+
+	}
+
+	public
+	JavaClassWriter addNamedSingletonDependency (
+			@NonNull Class <?> typeClass,
+			@NonNull String variableName) {
+
+		return addSingletonDependency (
+			classNameFull (
+				typeClass),
+			variableName,
+			SingletonDependency.class,
+			true);
+
+	}
+
+	public
+	JavaClassWriter addNamedSingletonDependency (
+			@NonNull String typeName,
+			@NonNull String variableName) {
+
+		return addSingletonDependency (
+			typeName,
+			variableName,
+			SingletonDependency.class,
+			true);
+
+	}
+
+	public
+	JavaClassWriter addSingletonDependency (
+			@NonNull Class <?> dependencyClass) {
+
+		return addSingletonDependency (
+			dependencyClass,
+			SingletonDependency.class,
+			false);
+
+	}
+
+	public
+	JavaClassWriter addClassSingletonDependency (
+			@NonNull Class <?> dependencyClass) {
+
+		return addSingletonDependency (
+			fullClassName (
+				dependencyClass),
+			uncapitalise (
+				classNameSimple (
+					dependencyClass)),
+			ClassSingletonDependency.class,
+			false);
+
+	}
+
+	// prototype dependencies
 
 	public
 	JavaClassWriter addPrototypeDependency (
@@ -306,6 +363,9 @@ class JavaClassWriter
 
 		prototypeDependencies.add (
 			new Dependency ()
+
+			.annotationClass (
+				PrototypeDependency.class)
 
 			.classNameSupplier (
 				imports -> typeName)
@@ -355,6 +415,9 @@ class JavaClassWriter
 
 		prototypeDependencies.add (
 			new Dependency ()
+
+			.annotationClass (
+				PrototypeDependency.class)
 
 			.classNameSupplier (
 				classNameSupplier)
@@ -522,8 +585,14 @@ class JavaClassWriter
 	@Override
 	public
 	void writeBlock (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeBlock");
 
 		// class annotations
 
@@ -681,6 +750,7 @@ class JavaClassWriter
 		blocks.forEach (
 			block ->
 				block.writeBlock (
+					taskLogger,
 					imports,
 					formatWriter));
 
@@ -752,7 +822,7 @@ class JavaClassWriter
 			formatWriter.writeLineFormat (
 				"@%s",
 				imports.register (
-					SingletonDependency.class));
+					dependency.annotationClass ()));
 
 			formatWriter.writeLineFormat (
 				"%s %s;",
@@ -1223,6 +1293,7 @@ class JavaClassWriter
 
 		Function <JavaImportRegistry, String> classNameSupplier;
 		String memberName;
+		Class <?> annotationClass;
 		Boolean named = false;
 
 	}

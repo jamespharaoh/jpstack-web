@@ -12,11 +12,11 @@ import javax.inject.Provider;
 import javax.servlet.ServletException;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ErrorResponder;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -25,10 +25,11 @@ import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
-import wbs.framework.web.WebExceptionHandler;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.utils.string.StringFormatter;
+import wbs.web.handler.WebExceptionHandler;
 
-@Log4j
 @SingletonComponent ("exceptionHandler")
 public
 class ConsoleExceptionHandler
@@ -44,6 +45,9 @@ class ConsoleExceptionHandler
 
 	@SingletonDependency
 	ExceptionUtils exceptionLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
@@ -67,11 +71,11 @@ class ConsoleExceptionHandler
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void init (
+			@NonNull TaskLogger taskLogger) {
 
-		log.info (
-			stringFormat (
-				"Initialised console exception handler"));
+		taskLogger.noticeFormat (
+			"Initialised console exception handler");
 
 	}
 
@@ -79,18 +83,23 @@ class ConsoleExceptionHandler
 	@Override
 	public
 	void handleException (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Throwable throwable)
 		throws
 			ServletException,
 			IOException {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleException");
+
 		// log it the old fashioned way
 
-		log.error (
-			stringFormat (
-				"Request generated exception: %s",
-				requestContext.requestUri ()),
-			throwable);
+		taskLogger.errorFormatException (
+			throwable,
+			"Request generated exception: %s",
+			requestContext.requestUri ());
 
 		// make an exception log of this calamity
 
@@ -108,9 +117,9 @@ class ConsoleExceptionHandler
 
 		} catch (RuntimeException localException) {
 
-			log.fatal (
-				"Error creating exception log",
-				localException);
+			taskLogger.fatalFormatException (
+				localException,
+				"Error creating exception log");
 
 		}
 
@@ -123,8 +132,12 @@ class ConsoleExceptionHandler
 				requestContext.reset ();
 
 				errorPageProvider.get ()
-					.exception (throwable)
-					.execute ();
+
+					.exception (
+						throwable)
+
+					.execute (
+						taskLogger);
 
 			} else {
 

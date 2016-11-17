@@ -7,13 +7,15 @@ import java.io.PrintWriter;
 import javax.inject.Provider;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.Responder;
 
 // TODO this belongs elsewhere
 
@@ -37,7 +39,8 @@ class TextResponder
 
 	@Override
 	public
-	void execute () {
+	void execute (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		requestContext.setHeader (
 			"Content-Type",

@@ -6,7 +6,7 @@ import com.google.common.base.Optional;
 
 import wbs.console.helper.core.ConsoleHooks;
 import wbs.platform.text.model.TextRec;
-import wbs.utils.web.HtmlUtils;
+import wbs.web.utils.HtmlUtils;
 
 public
 class TextConsoleHooks

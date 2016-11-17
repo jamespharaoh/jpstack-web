@@ -18,12 +18,23 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
+@PrototypeComponent ("javaInterfaceWriter")
 public
 class JavaInterfaceWriter
 	implements JavaBlockWriter {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -110,8 +121,16 @@ class JavaInterfaceWriter
 	@Override
 	public
 	void writeBlock (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull JavaImportRegistry imports,
 			@NonNull FormatWriter formatWriter) {
+
+		// singleton dependencies
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeBlock");
 
 		// interface annotations
 
@@ -220,6 +239,7 @@ class JavaInterfaceWriter
 		blocks.forEach (
 			block ->
 				block.writeBlock (
+					taskLogger,
 					imports,
 					formatWriter));
 

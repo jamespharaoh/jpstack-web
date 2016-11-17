@@ -1,7 +1,6 @@
 package wbs.console.module;
 
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
-import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -18,13 +17,13 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.supervisor.SupervisorConfig;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.ContextTabPlacement;
-import wbs.framework.web.Responder;
-import wbs.framework.web.ServletModule;
-import wbs.framework.web.WebFile;
+import wbs.web.file.WebFile;
+import wbs.web.responder.Responder;
+import wbs.web.responder.WebModule;
 
 public
 interface ConsoleModule
-	extends ServletModule {
+	extends WebModule {
 
 	String name ();
 

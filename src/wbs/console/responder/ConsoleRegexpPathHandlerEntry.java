@@ -6,9 +6,9 @@ import javax.servlet.ServletException;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.RegexpPathHandler;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.WebFile;
+import wbs.web.context.RequestContext;
+import wbs.web.file.WebFile;
+import wbs.web.pathhandler.RegexpPathHandler;
 
 public abstract
 class ConsoleRegexpPathHandlerEntry

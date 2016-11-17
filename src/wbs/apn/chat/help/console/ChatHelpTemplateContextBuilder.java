@@ -15,7 +15,6 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ConsoleContextBuilderContainerImplementation;
@@ -25,28 +24,40 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.object.ObjectContext;
 import wbs.console.tab.ConsoleContextTab;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.object.create.ObjectCreatePageSpec;
 import wbs.platform.object.list.ObjectListPageSpec;
 import wbs.platform.object.settings.ObjectSettingsPageSpec;
 
+import wbs.apn.chat.help.model.ChatHelpTemplateRec;
+
 @PrototypeComponent ("chatHelpTemplateContextBuilder")
 @ConsoleModuleBuilderHandler
 public
-class ChatHelpTemplateContextBuilder {
+class ChatHelpTemplateContextBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	ChatHelpTemplateConsoleHelper chatHelpTemplateHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -121,9 +132,16 @@ class ChatHelpTemplateContextBuilder {
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		setDefaults ();
 
@@ -167,6 +185,7 @@ class ChatHelpTemplateContextBuilder {
 					beanName));
 
 		builder.descend (
+			taskLogger,
 			listContainer,
 			listChildren,
 			consoleModule,
@@ -204,6 +223,7 @@ class ChatHelpTemplateContextBuilder {
 				beanName);
 
 		builder.descend (
+			taskLogger,
 			objectContainer,
 			objectBuilders,
 			consoleModule,

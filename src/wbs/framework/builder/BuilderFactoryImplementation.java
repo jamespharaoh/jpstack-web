@@ -1,5 +1,7 @@
 package wbs.framework.builder;
 
+import static wbs.utils.etc.NumberUtils.equalToTwo;
+import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
@@ -17,6 +19,7 @@ import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("builderFactory")
 public
@@ -90,8 +93,10 @@ class BuilderFactoryImplementation
 
 		}
 
-		for (Method method
-				: builderClass.getDeclaredMethods ()) {
+		for (
+			Method method
+				: builderClass.getDeclaredMethods ()
+		) {
 
 			BuildMethod buildMethodAnnotation =
 				method.getAnnotation (
@@ -113,7 +118,8 @@ class BuilderFactoryImplementation
 			throw new RuntimeException (
 				stringFormat (
 					"No @BuilderParent field for %s",
-					builderClass));
+					classNameFull (
+						builderClass)));
 
 		}
 
@@ -126,11 +132,14 @@ class BuilderFactoryImplementation
 		if (builderInfo.buildMethod == null)
 			throw new RuntimeException ();
 
-		if (builderInfo.buildMethod.getParameterTypes ().length != 1) {
+		if (
+			builderInfo.buildMethod.getParameterTypes ().length < 1
+			|| builderInfo.buildMethod.getParameterTypes ().length > 2
+		) {
 
 			throw new RuntimeException (
 				stringFormat (
-					"Build method %s.%s should have a single argument",
+					"Build method %s.%s should have one or two arguments",
 					builderClass.getSimpleName (),
 					builderInfo.buildMethod.getName ()));
 
@@ -150,10 +159,10 @@ class BuilderFactoryImplementation
 	@Override
 	public
 	BuilderFactory addBuilders (
-			Map<Class<?>,Provider<Object>> buildersMap) {
+			Map <Class <?>, Provider <Object>> buildersMap) {
 
 		for (
-			Map.Entry<Class<?>,Provider<Object>> builderEntry
+			Map.Entry <Class <?>, Provider <Object>> builderEntry
 				: buildersMap.entrySet ()
 		) {
 
@@ -182,8 +191,10 @@ class BuilderFactoryImplementation
 		List<BuilderInfo> candidateBuilderInfos =
 			new ArrayList<BuilderInfo> ();
 
-		for (BuilderInfo builderInfo
-				: builderInfos) {
+		for (
+			BuilderInfo builderInfo
+				: builderInfos
+		) {
 
 			if (! builderInfo.parentField.getType ().isAssignableFrom (
 					parentClass))
@@ -245,6 +256,7 @@ class BuilderFactoryImplementation
 		@Override
 		public
 		void descend (
+				@NonNull TaskLogger parentTaskLogger,
 				Object parentObject,
 				List<?> sourceObjects,
 				Object targetObject,
@@ -256,6 +268,7 @@ class BuilderFactoryImplementation
 			) {
 
 				build (
+					parentTaskLogger,
 					parentObject,
 					sourceObject,
 					targetObject,
@@ -266,6 +279,7 @@ class BuilderFactoryImplementation
 		}
 
 		void build (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Object parentObject,
 				@NonNull Object sourceObject,
 				@NonNull Object targetObject,
@@ -328,9 +342,23 @@ class BuilderFactoryImplementation
 
 				// call builder
 
-				builderInfo.buildMethod.invoke (
-					builderObject,
-					this);
+				if (
+					equalToTwo (
+						builderInfo.buildMethod.getParameterCount ())
+				) {
+
+					builderInfo.buildMethod.invoke (
+						builderObject,
+						parentTaskLogger,
+						this);
+
+				} else {
+
+					builderInfo.buildMethod.invoke (
+						builderObject,
+						this);
+
+				}
 
 			} catch (Exception exception) {
 

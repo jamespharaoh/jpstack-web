@@ -6,6 +6,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.api.mvc.ApiAction;
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
@@ -14,12 +15,15 @@ import wbs.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
 import wbs.apn.chat.infosite.model.ChatInfoSiteRec;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatInfoSiteRespondAction")
 public
@@ -40,6 +44,9 @@ class ChatInfoSiteRespondAction
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RequestContext requestContext;
 
@@ -47,7 +54,13 @@ class ChatInfoSiteRespondAction
 
 	@Override
 	protected
-	Responder goApi () {
+	Responder goApi (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goApi");
 
 		@Cleanup
 		Transaction transaction =
@@ -88,8 +101,9 @@ class ChatInfoSiteRespondAction
 
 		transaction.commit ();
 
-		return responder ("chatInfoSiteMessageSentResponder")
-			.get ();
+		return responder (
+			taskLogger,
+			"chatInfoSiteMessageSentResponder");
 
 	}
 

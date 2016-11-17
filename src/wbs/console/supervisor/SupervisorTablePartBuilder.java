@@ -6,25 +6,38 @@ import java.util.List;
 import javax.inject.Provider;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTablePartBuilder")
 @ConsoleModuleBuilderHandler
 public
-class SupervisorTablePartBuilder {
+class SupervisorTablePartBuilder
+	implements BuilderComponent {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -45,36 +58,35 @@ class SupervisorTablePartBuilder {
 	// state
 
 	@Getter @Setter
-	List<Provider<PagePart>> pagePartFactories =
-		new ArrayList<Provider<PagePart>> ();
+	List <Provider <PagePart>> pagePartFactories =
+		new ArrayList<> ();
 
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
-		Provider<PagePart> pagePartFactory =
-			new Provider<PagePart> () {
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
-			@Override
-			public
-			PagePart get () {
+		PagePartFactory pagePartFactory =
+			nextTaskLogger ->
+				supervisorTablePartProvider.get ()
 
-				return supervisorTablePartProvider.get ()
-
-					.supervisorTablePartBuilder (
-						SupervisorTablePartBuilder.this);
-
-			}
-
-		};
+			.supervisorTablePartBuilder (
+				SupervisorTablePartBuilder.this);
 
 		supervisorConfigBuilder.pagePartFactories ().add (
 			pagePartFactory);
 
 		builder.descend (
+			taskLogger,
 			spec,
 			spec.builders (),
 			this,

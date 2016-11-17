@@ -9,18 +9,20 @@ import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
-import static wbs.utils.web.HtmlTableUtils.htmlTableDetailsRowWriteRaw;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteRaw;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowSeparatorWrite;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import lombok.NonNull;
 
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
@@ -35,6 +37,7 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.sms.gazetteer.logic.GazetteerLogic;
@@ -90,7 +93,8 @@ class ChatUserSummaryPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUser =
 			chatUserHelper.findRequired (
@@ -139,7 +143,8 @@ class ChatUserSummaryPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		boolean isUser =
 			chatUser.getType () == ChatUserType.user;
@@ -291,7 +296,8 @@ class ChatUserSummaryPart
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						chatUser.getUserMessageCharge ()),
-					chatUser.getUserMessageCount ()));
+					integerToDecimalString (
+						chatUser.getUserMessageCount ())));
 
 			htmlTableDetailsRowWriteHtml (
 				"Monitor messages",
@@ -300,7 +306,8 @@ class ChatUserSummaryPart
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						chatUser.getMonitorMessageCharge ()),
-					chatUser.getMonitorMessageCount ()));
+					integerToDecimalString (
+						chatUser.getMonitorMessageCount ())));
 
 			htmlTableDetailsRowWriteHtml (
 				"Text profile",
@@ -309,7 +316,8 @@ class ChatUserSummaryPart
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						chatUser.getTextProfileCharge ()),
-					chatUser.getTextProfileCount ()));
+					integerToDecimalString (
+						chatUser.getTextProfileCount ())));
 
 			htmlTableDetailsRowWriteHtml (
 				"Image profile",
@@ -318,7 +326,8 @@ class ChatUserSummaryPart
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						chatUser.getImageProfileCharge ()),
-					chatUser.getImageProfileCount ()));
+					integerToDecimalString (
+						chatUser.getImageProfileCount ())));
 
 			htmlTableDetailsRowWriteHtml (
 				"Video profile",
@@ -327,7 +336,8 @@ class ChatUserSummaryPart
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						chatUser.getVideoProfileCharge ()),
-					chatUser.getVideoProfileCount ()));
+					integerToDecimalString (
+						chatUser.getVideoProfileCount ())));
 
 			htmlTableDetailsRowWriteHtml (
 				"Received message",
@@ -336,7 +346,8 @@ class ChatUserSummaryPart
 					currencyLogic.formatHtml (
 						chatUser.getChat ().getCurrency (),
 						chatUser.getReceivedMessageCharge ()),
-					chatUser.getReceivedMessageCount ()));
+					integerToDecimalString (
+						chatUser.getReceivedMessageCount ())));
 
 			for (
 				ChatLogicHooks.ChatUserCharge chatUserCharge
@@ -351,7 +362,8 @@ class ChatUserSummaryPart
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
 							chatUserCharge.charge),
-						chatUserCharge.count));
+						integerToDecimalString (
+							chatUserCharge.count)));
 
 			}
 

@@ -1,23 +1,23 @@
 package wbs.apn.chat.settings.console;
 
+import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import java.util.List;
 
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
@@ -27,10 +27,12 @@ import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserSearch;
 import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.part.AbstractPagePart;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @PrototypeComponent ("chatSettingsMonitorsPart")
 public
 class ChatSettingsMonitorsPart
@@ -46,6 +48,9 @@ class ChatSettingsMonitorsPart
 
 	@SingletonDependency
 	ChatUserDao chatUserDao;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// state
 
@@ -71,14 +76,20 @@ class ChatSettingsMonitorsPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		ChatRec chat =
 			chatHelper.findRequired (
 				requestContext.stuffInteger (
 					"chatId"));
 
-		List<Long> onlineMonitorIds =
+		List <Long> onlineMonitorIds =
 			chatUserHelper.searchIds (
 				new ChatUserSearch ()
 
@@ -93,7 +104,10 @@ class ChatSettingsMonitorsPart
 
 		);
 
-		log.debug ("Got " + onlineMonitorIds.size ());
+		taskLogger.debugFormat (
+			"Got %s",
+			integerToDecimalString (
+				onlineMonitorIds.size ()));
 
 		for (
 			Long monitorId
@@ -104,10 +118,11 @@ class ChatSettingsMonitorsPart
 				chatUserHelper.findRequired (
 					monitorId);
 
-			log.debug (
-				stringFormat (
-					"Orient %s, gender %s",
-					monitor.getOrient (),
+			taskLogger.debugFormat (
+				"Orient %s, gender %s",
+				enumName (
+					monitor.getOrient ()),
+				enumName (
 					monitor.getGender ()));
 
 			switch (monitor.getOrient ()) {
@@ -170,7 +185,8 @@ class ChatSettingsMonitorsPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// form open
 

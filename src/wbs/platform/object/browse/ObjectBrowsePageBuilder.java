@@ -24,18 +24,23 @@ import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleBuilder;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.scaffold.model.SliceRec;
 
 @PrototypeComponent ("objectBrowsePageBuilder")
@@ -43,7 +48,8 @@ import wbs.platform.scaffold.model.SliceRec;
 public
 class ObjectBrowsePageBuilder <
 	ObjectType extends Record <ObjectType>
-> {
+>
+	implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -52,6 +58,9 @@ class ObjectBrowsePageBuilder <
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -89,11 +98,19 @@ class ObjectBrowsePageBuilder <
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
 
-		setDefaults ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
+
+		setDefaults (
+			taskLogger);
 
 		for (
 			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint
@@ -155,12 +172,13 @@ class ObjectBrowsePageBuilder <
 
 	void buildResponder () {
 
-		Provider<PagePart> partFactory =
-			new Provider<PagePart> () {
+		PagePartFactory partFactory =
+			new PagePartFactory () {
 
 			@Override
 			public
-			PagePart get () {
+			PagePart buildPagePart (
+					@NonNull TaskLogger parentTaskLogger) {
 
 				return objectBrowsePart.get ()
 
@@ -203,7 +221,13 @@ class ObjectBrowsePageBuilder <
 
 	// defaults
 
-	void setDefaults () {
+	void setDefaults (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setDefaults");
 
 		consoleHelper =
 			container.consoleHelper ();
@@ -217,11 +241,18 @@ class ObjectBrowsePageBuilder <
 				() -> consoleModule.formFieldSet (
 					spec.fieldsName (),
 					consoleHelper.objectClass ()),
-				() -> defaultFields ());
+				() -> defaultFields (
+					taskLogger));
 
 	}
 
-	FormFieldSet <ObjectType> defaultFields () {
+	FormFieldSet <ObjectType> defaultFields (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"defaultFields");
 
 		// create spec
 
@@ -273,6 +304,7 @@ class ObjectBrowsePageBuilder <
 				consoleHelper.objectName ());
 
 		return consoleModuleBuilder.buildFormFieldSet (
+			taskLogger,
 			consoleHelper,
 			fieldSetName,
 			formFieldSpecs);

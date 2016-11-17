@@ -1,12 +1,13 @@
 package wbs.platform.object.summary;
 
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -16,9 +17,14 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.scaffold.model.RootObjectHelper;
 
 @Accessors (fluent = true)
@@ -33,10 +39,13 @@ class ObjectSummaryFieldsPart <
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
+	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
-	FormFieldLogic formFieldLogic;
+	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
 	RootObjectHelper rootHelper;
@@ -61,15 +70,25 @@ class ObjectSummaryFieldsPart <
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		object =
 			consoleHelper.lookupObject (
 				requestContext.contextStuff ());
 
 		if (formFieldsProvider != null) {
-			prepareParent();
-			prepareFieldSet();
+
+			prepareParent ();
+
+			prepareFieldSet (
+				taskLogger);
+
 		}
 
 	}
@@ -111,17 +130,20 @@ class ObjectSummaryFieldsPart <
 
 	}
 
-	void prepareFieldSet () {
+	void prepareFieldSet (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		formFieldSet =
 			formFieldsProvider.getFieldsForObject (
+				parentTaskLogger,
 				object);
 
 	}
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlTableOpenDetails ();
 

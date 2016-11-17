@@ -33,6 +33,7 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.NormalLifecycleSetup;
+
 import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.StringFormatWriter;
@@ -210,7 +211,10 @@ class ActivityManagerImplementation
 				Thread.currentThread ().getName ())
 
 			.startTime (
-				Instant.now ());
+				Instant.now ())
+
+			.state (
+				Task.State.active);
 
 		task.parameters ().putAll (
 			parameters);
@@ -517,14 +521,14 @@ class ActivityManagerImplementation
 				if (closed)
 					throw new IllegalStateException ();
 
-				concluded =
-					true;
+				postProcessTask (
+					task);
 
 				task.state (
 					Task.State.success);
 
-				postProcessTask (
-					task);
+				concluded =
+					true;
 
 			}
 
@@ -533,15 +537,23 @@ class ActivityManagerImplementation
 		@Override
 		public <ExceptionType extends Throwable>
 		ExceptionType fail (
-				ExceptionType exception) {
+				@NonNull ExceptionType exception) {
 
 			synchronized (ActivityManagerImplementation.this) {
 
-				if (concluded)
-					throw new IllegalStateException ();
+				if (concluded) {
 
-				if (closed)
-					throw new IllegalStateException ();
+					throw new IllegalStateException (
+						"Tried to fail task in concluded state");
+
+				}
+
+				if (closed) {
+
+					throw new IllegalStateException (
+						"Tried to fail task in closed state");
+
+				}
 
 				concluded =
 					true;

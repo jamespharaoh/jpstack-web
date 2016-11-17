@@ -1,32 +1,31 @@
 package wbs.apn.chat.bill.daemon;
 
+import static wbs.utils.etc.EnumUtils.enumNameSpaces;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import javax.inject.Named;
 
-import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
-import wbs.apn.chat.bill.logic.ChatCreditLogic;
-import wbs.apn.chat.bill.logic.ChatCreditLogic.BillCheckOptions;
-import wbs.apn.chat.bill.model.ChatUserCreditMode;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.misc.SymbolicLock;
 import wbs.platform.misc.SymbolicLock.HeldLock;
+
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
@@ -34,8 +33,13 @@ import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
 import wbs.sms.message.delivery.model.DeliveryTypeRec;
 
+import wbs.apn.chat.bill.logic.ChatCreditLogic;
+import wbs.apn.chat.bill.logic.ChatCreditLogic.BillCheckOptions;
+import wbs.apn.chat.bill.model.ChatUserCreditMode;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+
 @PrototypeComponent ("chatBillDeliveryHandler")
-@Log4j
 public
 class ChatBillDeliveryHandler
 	implements DeliveryHandler {
@@ -46,6 +50,10 @@ class ChatBillDeliveryHandler
 	ChatCreditLogic chatCreditLogic;
 
 	@SingletonDependency
+	@Named
+	SymbolicLock <Long> chatUserDeliveryLocks;
+
+	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
 
 	@SingletonDependency
@@ -54,9 +62,8 @@ class ChatBillDeliveryHandler
 	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
-	@SingletonDependency
-	@Named
-	SymbolicLock <Long> chatUserDeliveryLocks;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// details
 
@@ -154,143 +161,157 @@ class ChatBillDeliveryHandler
 	@Override
 	public
 	void handle (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long deliveryId,
 			@NonNull Long ref) {
 
-		@Cleanup
-		HeldLock lock =
-			chatUserDeliveryLocks.easy (
-				ref);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatBillDeliveryHandler.handle (deliveryId, ref)",
-				this);
+		try (
 
-		DeliveryRec delivery =
-			deliveryHelper.findRequired (
-				deliveryId);
+			HeldLock lock =
+				chatUserDeliveryLocks.easy (
+					ref);
 
-		MessageRec message =
-			delivery.getMessage ();
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatBillDeliveryHandler.handle (deliveryId, ref)",
+					this);
 
-		DeliveryTypeRec deliveryType =
-			message.getDeliveryType ();
-
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				message.getRef ());
-
-		// work out strict mode
-
-		boolean strict;
-
-		if (
-			stringEqualSafe (
-				deliveryType.getCode (),
-				"chat_bill")
 		) {
 
-			strict = false;
+			DeliveryRec delivery =
+				deliveryHelper.findRequired (
+					deliveryId);
 
-		} else if (
-			stringEqualSafe (
-				deliveryType.getCode (),
-				"chat_bill_strict")
-		) {
+			MessageRec message =
+				delivery.getMessage ();
 
-			strict = true;
+			DeliveryTypeRec deliveryType =
+				message.getDeliveryType ();
 
-		} else {
+			ChatUserRec chatUser =
+				chatUserHelper.findRequired (
+					message.getRef ());
 
-			throw new RuntimeException (
-				deliveryType.getCode ());
+			// work out strict mode
 
-		}
+			boolean strict;
 
-		// work out if sent today
+			if (
+				stringEqualSafe (
+					deliveryType.getCode (),
+					"chat_bill")
+			) {
 
-		DateTimeZone timeZone =
-			DateTimeZone.forID (
-				chatUser.getChatScheme ().getTimezone ());
+				strict = false;
 
-		Instant startOfDayTime =
-			DateTime
-				.now (timeZone)
-				.withTimeAtStartOfDay ()
-				.toInstant ();
+			} else if (
+				stringEqualSafe (
+					deliveryType.getCode (),
+					"chat_bill_strict")
+			) {
 
-		Instant messageSentTime =
-			message.getCreatedTime ();
+				strict = true;
 
-		boolean sentToday =
-			messageSentTime.isAfter (
-				startOfDayTime);
+			} else {
 
-		// update last bill sent
+				throw new RuntimeException (
+					deliveryType.getCode ());
 
-		if (
-			sentToday
-			&& delivery.getNewMessageStatus ().isGoodType ()
-		) {
+			}
 
-			chatUser
+			// work out if sent today
 
-				.setLastBillSent (
-				null);
+			DateTimeZone timeZone =
+				DateTimeZone.forID (
+					chatUser.getChatScheme ().getTimezone ());
 
-		}
+			Instant startOfDayTime =
+				DateTime
+					.now (timeZone)
+					.withTimeAtStartOfDay ()
+					.toInstant ();
 
-		addCredit (
-			chatUser,
-			delivery.getOldMessageStatus (),
-			- message.getCharge (),
-			sentToday,
-			strict);
+			Instant messageSentTime =
+				message.getCreatedTime ();
 
-		addCredit (
-			chatUser,
-			delivery.getNewMessageStatus (),
-			message.getCharge (),
-			sentToday,
-			strict);
+			boolean sentToday =
+				messageSentTime.isAfter (
+					startOfDayTime);
 
-		// and remove the delivery
+			// update last bill sent
 
-		deliveryHelper.remove (
-			delivery);
+			if (
+				sentToday
+				&& delivery.getNewMessageStatus ().isGoodType ()
+			) {
 
-		// and rebill if appropriate
+				chatUser
 
-		if (delivery.getNewMessageStatus ().isGoodType ()) {
+					.setLastBillSent (
+					null);
 
-			chatCreditLogic.userBill (
+			}
+
+			addCredit (
 				chatUser,
-				new BillCheckOptions ()
-					.retry (true));
+				delivery.getOldMessageStatus (),
+				- message.getCharge (),
+				sentToday,
+				strict);
 
-		}
-
-		// update credit limit where appropriate
-
-		if (delivery.getNewMessageStatus ().isGoodType ()) {
-
-			chatCreditLogic.creditLimitUpdate (
-				chatUser);
-
-		}
-
-		log.info (
-			stringFormat (
-				"Delivery report processed for message %s %s ",
-				message.getId (),
+			addCredit (
+				chatUser,
 				delivery.getNewMessageStatus (),
-				"for chat user %s %s",
-				chatUser.getId (),
-				chatCreditLogic.userCreditDebug (chatUser)));
+				message.getCharge (),
+				sentToday,
+				strict);
 
-		transaction.commit ();
+			// and remove the delivery
+
+			deliveryHelper.remove (
+				delivery);
+
+			// and rebill if appropriate
+
+			if (delivery.getNewMessageStatus ().isGoodType ()) {
+
+				chatCreditLogic.userBill (
+					chatUser,
+					new BillCheckOptions ()
+						.retry (true));
+
+			}
+
+			// update credit limit where appropriate
+
+			if (delivery.getNewMessageStatus ().isGoodType ()) {
+
+				chatCreditLogic.creditLimitUpdate (
+					chatUser);
+
+			}
+
+			taskLogger.noticeFormat (
+				"Delivery report processed for message %s ",
+				integerToDecimalString (
+					message.getId ()),
+				"in state \"%s\" ",
+				enumNameSpaces (
+					delivery.getNewMessageStatus ()),
+				"for chat user %s %s",
+				integerToDecimalString (
+					chatUser.getId ()),
+				chatCreditLogic.userCreditDebug (
+					chatUser));
+
+			transaction.commit ();
+
+		}
 
 	}
 

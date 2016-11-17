@@ -1,6 +1,6 @@
 package wbs.integrations.dialogue.api;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -18,7 +18,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
@@ -26,21 +26,15 @@ import org.apache.commons.codec.binary.Hex;
 import org.joda.time.Instant;
 
 import wbs.api.mvc.ApiFile;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.AbstractWebFile;
-import wbs.framework.web.Action;
-import wbs.framework.web.PathHandler;
-import wbs.framework.web.RegexpPathHandler;
-import wbs.framework.web.RegexpPathHandler.Entry;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
-import wbs.framework.web.ServletModule;
-import wbs.framework.web.WebFile;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.sms.gsm.ConcatenatedInformationElement;
@@ -53,12 +47,20 @@ import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.web.action.Action;
+import wbs.web.context.RequestContext;
+import wbs.web.file.AbstractWebFile;
+import wbs.web.file.WebFile;
+import wbs.web.pathhandler.PathHandler;
+import wbs.web.pathhandler.RegexpPathHandler;
+import wbs.web.pathhandler.RegexpPathHandler.Entry;
+import wbs.web.responder.Responder;
+import wbs.web.responder.WebModule;
 
-@Log4j
 @SingletonComponent ("dialogueApiServletModule")
 public
 class DialogueApiServletModule
-	implements ServletModule {
+	implements WebModule {
 
 	// singleton dependencies
 
@@ -70,6 +72,9 @@ class DialogueApiServletModule
 
 	@SingletonDependency
 	SmsInboxMultipartLogic inboxMultipartLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	NetworkObjectHelper networkHelper;
@@ -125,10 +130,16 @@ class DialogueApiServletModule
 
 		@Override
 		public
-		void doPost ()
+		void doPost (
+				@NonNull TaskLogger parentTaskLogger)
 			throws
 				ServletException,
 				IOException {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"inFile.doPost");
 
 			// get request stuff
 
@@ -217,12 +228,19 @@ class DialogueApiServletModule
 						0,
 						headerBytes.length);
 
-					log.debug ("udh.length = " + headerBytes.length);
+					taskLogger.debugFormat (
+						"udh.length = %s",
+						integerToDecimalString (
+							headerBytes.length));
 
 					for (int i = 0; i < headerBytes.length; i++) {
 
-						log.debug (
-							"udh[" + i + "] = "	+ (headerBytes[i] & 0xff));
+						taskLogger.debugFormat (
+							"udh [%s] = %s",
+							integerToDecimalString (
+								i),
+							integerToDecimalString (
+								headerBytes [i] & 0xff));
 
 					}
 
@@ -243,21 +261,17 @@ class DialogueApiServletModule
 						0,
 						messageBytes.length);
 
-				} catch (Exception e) {
+				} catch (Exception exception) {
 
-					log.debug (
-						"Error decoding user data header " + e.getMessage ());
+					taskLogger.debugFormat (
+						"Error decoding user data header: %s",
+						exception.getMessage ());
 
-					requestContext.debugParameters (log);
+					requestContext.debugParameters (
+						taskLogger);
 
-					throw new ServletException (e);
-
-					/*
-					messageBytes = new String (
-							"Unrecognised message content").getBytes();
-
-					udh = null;
-					*/
+					throw new ServletException (
+						exception);
 
 				}
 
@@ -274,7 +288,9 @@ class DialogueApiServletModule
 			try {
 
 				message =
-					new String (messageBytes, charset);
+					new String (
+						messageBytes,
+						charset);
 
 			} catch (UnsupportedEncodingException exception) {
 
@@ -362,7 +378,13 @@ class DialogueApiServletModule
 
 		@Override
 		public
-		Responder handle () {
+		Responder handle (
+				@NonNull TaskLogger parentTaskLogger) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"reportAction.handle");
 
 			String idParam =
 				requestContext.parameterOrNull ("X-E3-ID");
@@ -387,8 +409,17 @@ class DialogueApiServletModule
 				List<String> values =
 					entry.getValue ();
 
-				for (String value : values)
-					log.debug ("Param " + name + " = " + value);
+				for (
+					String value
+						: values
+				) {
+
+					taskLogger.debugFormat (
+						"Param %s = %s",
+						name,
+						value);
+
+				}
 
 			}
 
@@ -396,10 +427,9 @@ class DialogueApiServletModule
 
 			if (userKeyParam == null) {
 
-				log.warn (
-					stringFormat (
-						"Ignoring dialogue report with no user key, X-E3-ID=%s",
-						idParam));
+				taskLogger.warningFormat (
+					"Ignoring dialogue report with no user key, X-E3-ID=%s",
+					idParam);
 
 				return dialogueResponderProvider
 					.get ();
@@ -455,8 +485,10 @@ class DialogueApiServletModule
 
 			} else {
 
-				log.error (
-					"Unrecognised report for " + messageId);
+				taskLogger.errorFormat (
+					"Unrecognised report for %s",
+					integerToDecimalString (
+						messageId));
 
 				return dialogueResponderProvider
 					.get ();

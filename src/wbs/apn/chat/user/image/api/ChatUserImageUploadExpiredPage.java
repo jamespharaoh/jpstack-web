@@ -11,8 +11,8 @@ import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
 import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.PrintResponder;
-import wbs.framework.web.RequestContext;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.PrintResponder;
 
 @PrototypeComponent ("chatUserImageUploadExpiredPage")
 public

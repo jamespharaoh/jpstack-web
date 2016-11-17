@@ -16,7 +16,6 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -24,6 +23,7 @@ import wbs.smsapps.subscription.logic.SubscriptionLogic;
 import wbs.smsapps.subscription.model.SubscriptionNumberObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionSendRec;
 import wbs.smsapps.subscription.model.SubscriptionSendState;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("subscriptionSendControlAction")
 public

@@ -1,21 +1,22 @@
 package wbs.platform.event.console;
 
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.time.TimeUtils.instantToDateNullSafe;
 import static wbs.utils.time.TimeUtils.millisToInstant;
-import static wbs.utils.web.HtmlAttributeUtils.htmlColumnSpanAttribute;
-import static wbs.utils.web.HtmlStyleUtils.htmlStyleRuleEntry;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWriteHtml;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowSeparatorWrite;
-import static wbs.utils.web.HtmlUtils.htmlLinkWriteHtml;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowSeparatorWrite;
+import static wbs.web.utils.HtmlUtils.htmlLinkWriteHtml;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,14 +24,15 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -39,6 +41,9 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.event.model.EventLinkRec;
 import wbs.platform.event.model.EventRec;
@@ -47,11 +52,12 @@ import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.StringFormatWriter;
-import wbs.utils.web.HtmlUtils;
 
-@Log4j
+import wbs.web.utils.HtmlUtils;
+
 @SingletonComponent ("eventConsoleLogic")
 public
 class EventConsoleLogicImplementation
@@ -61,6 +67,9 @@ class EventConsoleLogicImplementation
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
@@ -117,25 +126,24 @@ class EventConsoleLogicImplementation
 
 	@Override
 	public
-	Provider<PagePart> makeEventsPartFactory (
-			final ObjectLookup<?> objectLookup) {
+	PagePartFactory makeEventsPartFactory (
+			ObjectLookup <?> objectLookup) {
 
-		return new Provider<PagePart> () {
+		return taskLogger -> {
 
-			@Override
-			public
-			PagePart get () {
+			try (
 
-				@Cleanup
 				Transaction transaction =
 					database.beginReadOnly (
-						"ObjectEventsPartFactory.get ()",
+						"EventConsoleLogic.makeEventsPartFactory.buildPagePart ()",
 						this);
 
-				PermanentRecord<?> object =
-					(PermanentRecord<?>)
-					objectLookup.lookupObject (
-						requestContext.contextStuff ());
+			) {
+
+				PermanentRecord <?> object =
+					genericCastUnchecked (
+						objectLookup.lookupObject (
+							requestContext.contextStuff ()));
 
 				return makeEventsPart (
 					object);
@@ -312,8 +320,14 @@ class EventConsoleLogicImplementation
 	@Override
 	public
 	void writeEventsTable (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Iterable <EventRec> events) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeEventsTable");
 
 		htmlTableOpenList ();
 
@@ -361,6 +375,7 @@ class EventConsoleLogicImplementation
 			}
 
 			writeEventRow (
+				taskLogger,
 				htmlWriter,
 				event);
 
@@ -373,8 +388,14 @@ class EventConsoleLogicImplementation
 	@Override
 	public
 	void writeEventRow (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull EventRec event) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeEventRow");
 
 		htmlTableRowOpen ();
 
@@ -396,11 +417,11 @@ class EventConsoleLogicImplementation
 
 		} catch (RuntimeException exception) {
 
-			log.error (
-				stringFormat (
-					"Error displaying event %s",
-					event.getId ()),
-				exception);
+			taskLogger.errorFormatException (
+				exception,
+				"Error displaying event %s",
+				integerToDecimalString (
+					event.getId ()));
 
 			htmlTableCellWrite (
 				"(error displaying this event)");

@@ -5,16 +5,26 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("modelBuilderManager")
 public
 class ModelBuilderManager {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -33,7 +43,8 @@ class ModelBuilderManager {
 
 	@NormalLifecycleSetup
 	public
-	void setup () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		modelBuilder =
 			builderFactoryProvider.get ()
@@ -49,11 +60,13 @@ class ModelBuilderManager {
 
 	public
 	void build (
-			ModelFieldBuilderContext context,
-			List <?> sourceItems,
-			ModelFieldBuilderTarget target) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ModelFieldBuilderContext context,
+			@NonNull List <?> sourceItems,
+			@NonNull ModelFieldBuilderTarget target) {
 
 		modelBuilder.descend (
+			parentTaskLogger,
 			context,
 			sourceItems,
 			target,

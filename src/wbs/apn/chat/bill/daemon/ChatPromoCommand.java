@@ -4,6 +4,7 @@ import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.LogicUtils.allOf;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.utils.time.TimeUtils.laterThan;
 
@@ -12,39 +13,26 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
-import wbs.apn.chat.bill.logic.ChatCreditLogic;
-import wbs.apn.chat.contact.logic.ChatSendLogic;
-import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.date.logic.ChatDateLogic;
-import wbs.apn.chat.help.logic.ChatHelpLogLogic;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserDateMode;
-import wbs.apn.chat.user.join.daemon.ChatJoiner;
-import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
-import wbs.apn.chat.bill.model.ChatPromoRec;
-import wbs.apn.chat.bill.model.ChatPromoUserObjectHelper;
-import wbs.apn.chat.bill.model.ChatPromoUserRec;
-import wbs.apn.chat.contact.model.ChatMessageRec;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.help.model.ChatHelpLogRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.model.UserRec;
+
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageRec;
@@ -52,6 +40,26 @@ import wbs.sms.message.inbox.daemon.CommandHandler;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
+
+import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
+import wbs.apn.chat.bill.logic.ChatCreditLogic;
+import wbs.apn.chat.bill.model.ChatPromoRec;
+import wbs.apn.chat.bill.model.ChatPromoUserObjectHelper;
+import wbs.apn.chat.bill.model.ChatPromoUserRec;
+import wbs.apn.chat.contact.logic.ChatSendLogic;
+import wbs.apn.chat.contact.model.ChatMessageMethod;
+import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.date.logic.ChatDateLogic;
+import wbs.apn.chat.help.logic.ChatHelpLogLogic;
+import wbs.apn.chat.help.model.ChatHelpLogRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.apn.chat.user.core.model.ChatUserDateMode;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.join.daemon.ChatJoiner;
+import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatPromoCommand")
@@ -90,6 +98,9 @@ class ChatPromoCommand
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
@@ -138,15 +149,21 @@ class ChatPromoCommand
 
 	@Override
 	public
-	InboxAttemptRec handle () {
+	InboxAttemptRec handle (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		Transaction transaction =
 			database.currentTransaction ();
 
 		ChatPromoRec chatPromo =
-			(ChatPromoRec) (Object)
-			objectManager.getParentOrNull (
-				command);
+			genericCastUnchecked (
+				objectManager.getParentRequired (
+					command));
 
 		ChatRec chat =
 			chatPromo.getChat ();
@@ -419,6 +436,7 @@ class ChatPromoCommand
 					"")
 
 				.handleInbox (
+					taskLogger,
 					command);
 
 		}

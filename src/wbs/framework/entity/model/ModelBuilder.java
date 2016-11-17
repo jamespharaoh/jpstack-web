@@ -11,9 +11,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.scaffold.PluginModelSpec;
@@ -23,6 +25,8 @@ import wbs.framework.entity.build.ModelFieldBuilderContext;
 import wbs.framework.entity.build.ModelFieldBuilderTarget;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.schema.helper.SchemaNamesHelper;
 import wbs.framework.schema.helper.SchemaTypesHelper;
@@ -33,6 +37,9 @@ public
 class ModelBuilder <RecordType extends Record <RecordType>> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ModelBuilderManager modelBuilderManager;
@@ -66,11 +73,18 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 	// implementation
 
 	public
-	Model <?> build () {
+	Model <?> build (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		try {
 
-			return buildReal ();
+			return buildReal (
+				taskLogger);
 
 		} catch (Exception exception) {
 
@@ -85,7 +99,13 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 	}
 
 	private
-	Model <?> buildReal () {
+	Model <?> buildReal (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"buildReal");
 
 		plugin =
 			modelMeta.plugin ();
@@ -195,11 +215,13 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 				model.fieldsByName ());
 
 		modelBuilderManager.build (
+			taskLogger,
 			context,
 			modelMeta.fields (),
 			target);
 
 		modelBuilderManager.build (
+			taskLogger,
 			context,
 			modelMeta.collections (),
 			target);

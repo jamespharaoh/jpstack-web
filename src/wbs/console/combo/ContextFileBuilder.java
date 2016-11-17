@@ -1,6 +1,7 @@
 package wbs.console.combo;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
@@ -13,27 +14,36 @@ import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.responder.ConsoleFile;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("contextFileBuilder")
 @ConsoleModuleBuilderHandler
 public
 class ContextFileBuilder <
 	ObjectType extends Record <ObjectType>
-> {
+>
+	implements BuilderComponent {
 
 	// singleton dependencies
 
 	@SingletonDependency
 	ConsoleMetaManager consoleMetaManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -62,9 +72,16 @@ class ContextFileBuilder <
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		setDefaults ();
 
@@ -75,6 +92,7 @@ class ContextFileBuilder <
 		) {
 
 			buildContextFile (
+				taskLogger,
 				resolvedExtensionPoint);
 
 		}
@@ -82,14 +100,26 @@ class ContextFileBuilder <
 	}
 
 	void buildContextFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
 		consoleModule.addContextFile (
 			fileName,
 			consoleFileProvider.get ()
-				.getResponderName (getResponderName)
-				.getActionName (getActionName)
-				.postActionName (postActionName),
+
+				.getResponderName (
+					getResponderName)
+
+				.getActionName (
+					parentTaskLogger,
+					optionalFromNullable (
+						getActionName))
+
+				.postActionName (
+					parentTaskLogger,
+					optionalFromNullable (
+						postActionName)),
+
 			resolvedExtensionPoint.contextTypeNames ());
 
 	}

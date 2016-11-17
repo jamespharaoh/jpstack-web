@@ -7,15 +7,15 @@ import com.google.common.collect.ImmutableMap;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.PathHandler;
-import wbs.framework.web.RegexpPathHandler;
-import wbs.framework.web.ServletModule;
-import wbs.framework.web.WebFile;
+import wbs.web.file.WebFile;
+import wbs.web.pathhandler.PathHandler;
+import wbs.web.pathhandler.RegexpPathHandler;
+import wbs.web.responder.WebModule;
 
 @SingletonComponent ("txtNationApiServletModule")
 public
 class TxtNationApiServletModule
-	implements ServletModule {
+	implements WebModule {
 
 	// singleton dependencies
 

@@ -55,10 +55,10 @@ import wbs.console.tab.TabList;
 import wbs.framework.component.annotations.ProxiedRequestComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
-import wbs.framework.web.RequestContext;
 import wbs.utils.etc.OptionalUtils;
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.WriterFormatWriter;
+import wbs.web.context.RequestContext;
 
 /**
  * Extends RequestContext to provide loads of extra functionality useful in all

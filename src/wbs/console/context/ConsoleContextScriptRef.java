@@ -1,5 +1,6 @@
 package wbs.console.context;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Random;
@@ -60,7 +61,8 @@ class ConsoleContextScriptRef
 				"%s",
 				contextSource,
 				"?v=%u",
-				reloadHack));
+				integerToDecimalString (
+					reloadHack)));
 
 	}
 

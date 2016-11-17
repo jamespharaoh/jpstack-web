@@ -9,7 +9,7 @@ import lombok.NonNull;
 
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.WriterFormatWriter;
-import wbs.utils.web.HtmlUtils;
+import wbs.web.utils.HtmlUtils;
 
 public
 class PageBuilder {

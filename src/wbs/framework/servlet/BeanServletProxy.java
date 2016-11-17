@@ -9,15 +9,19 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import lombok.extern.log4j.Log4j;
-
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-@Log4j
 public
 class BeanServletProxy
 	implements Servlet {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			BeanServletProxy.class);
 
 	// state
 
@@ -47,6 +51,10 @@ class BeanServletProxy
 			ServletConfig servletConfig)
 		throws ServletException {
 
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"init");
+
 		ServletContext servletContext =
 			servletConfig.getServletContext ();
 
@@ -54,10 +62,6 @@ class BeanServletProxy
 			(ComponentManager)
 			servletContext.getAttribute (
 				"wbs-application-context");
-
-		TaskLogger taskLogger =
-			new TaskLogger (
-				log);
 
 		target =
 			componentManager.getComponentRequired (

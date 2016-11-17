@@ -1,5 +1,6 @@
 package wbs.platform.servlet;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitComma;
 
@@ -15,19 +16,25 @@ import javax.servlet.ServletRequestListener;
 import javax.servlet.http.HttpServletRequest;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.component.tools.ComponentManagerBuilder;
 import wbs.framework.component.tools.ThreadLocalProxyComponentFactory;
-import wbs.framework.web.RequestContextImplementation;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.context.RequestContextImplementation;
 
-@Log4j
 public
 class WbsServletListener
 	implements
 		ServletContextListener,
 		ServletRequestListener {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			WbsServletListener.class);
 
 	ServletContext servletContext;
 
@@ -38,12 +45,15 @@ class WbsServletListener
 	void contextDestroyed (
 			@NonNull ServletContextEvent event) {
 
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"contextDestroyed");
+
 		if (componentManager == null)
 			return;
 
-		log.info (
-			stringFormat (
-				"Destroying application context"));
+		taskLogger.noticeFormat (
+			"Destroying application context");
 
 		componentManager.close ();
 
@@ -54,9 +64,12 @@ class WbsServletListener
 	void contextInitialized (
 			@NonNull ServletContextEvent event) {
 
-		log.info (
-			stringFormat (
-				"Initialising application context"));
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"contextInitialized");
+
+		taskLogger.noticeFormat (
+			"Initialising application context");
 
 		servletContext =
 			event.getServletContext ();
@@ -113,17 +126,21 @@ class WbsServletListener
 	void requestDestroyed (
 			@NonNull ServletRequestEvent event) {
 
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"requestDestroyed");
+
 		for (
 			String requestBeanName
 				: componentManager.requestComponentNames ()
 		) {
 
 			ThreadLocalProxyComponentFactory.Control control =
-				(ThreadLocalProxyComponentFactory.Control)
-				componentManager.getComponentRequired (
-					log,
-					requestBeanName,
-					Object.class);
+				genericCastUnchecked (
+					componentManager.getComponentRequired (
+						taskLogger,
+						requestBeanName,
+						Object.class));
 
 			control.threadLocalProxyReset ();
 
@@ -139,6 +156,10 @@ class WbsServletListener
 	public
 	void requestInitialized (
 			@NonNull ServletRequestEvent event) {
+
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"requestInitialized");
 
 		boolean setServletContext = false;
 		boolean setServletRequest = false;
@@ -167,11 +188,11 @@ class WbsServletListener
 			) {
 
 				ThreadLocalProxyComponentFactory.Control control =
-					(ThreadLocalProxyComponentFactory.Control)
-					componentManager.getComponentRequired (
-						log,
-						requestBeanName,
-						Object.class);
+					genericCastUnchecked (
+						componentManager.getComponentRequired (
+							taskLogger,
+							requestBeanName,
+							Object.class));
 
 				String targetBeanName =
 					stringFormat (
@@ -180,7 +201,7 @@ class WbsServletListener
 
 				Object targetBean =
 					componentManager.getComponentRequired (
-						log,
+						taskLogger,
 						targetBeanName,
 						Object.class);
 
@@ -204,11 +225,11 @@ class WbsServletListener
 				) {
 
 					ThreadLocalProxyComponentFactory.Control control =
-						(ThreadLocalProxyComponentFactory.Control)
-						componentManager.getComponentRequired (
-							log,
-							requestBeanName,
-							Object.class);
+						genericCastUnchecked (
+							componentManager.getComponentRequired (
+								taskLogger,
+								requestBeanName,
+								Object.class));
 
 					control.threadLocalProxyReset ();
 

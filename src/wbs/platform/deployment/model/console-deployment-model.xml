@@ -1,0 +1,34 @@
+<model-meta
+	name="consoleDeployment"
+	type="major">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<code-field/>
+
+		<!-- details -->
+
+		<name-field/>
+
+		<description-field/>
+
+		<deleted-field/>
+
+	</fields>
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a console deployment"
+			template="yes"/>
+
+	</priv-types>
+
+</model-meta>

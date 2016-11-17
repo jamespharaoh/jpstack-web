@@ -21,7 +21,6 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -36,6 +35,7 @@ import wbs.smsapps.broadcast.model.BroadcastNumberRec;
 import wbs.smsapps.broadcast.model.BroadcastNumberState;
 import wbs.smsapps.broadcast.model.BroadcastRec;
 import wbs.smsapps.broadcast.model.BroadcastState;
+import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("broadcastNumbersAction")

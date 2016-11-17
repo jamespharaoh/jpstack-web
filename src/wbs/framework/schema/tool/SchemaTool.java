@@ -17,19 +17,19 @@ import javax.sql.DataSource;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.schema.builder.SchemaFromModel;
 import wbs.framework.schema.helper.SchemaTypesHelper;
 import wbs.framework.schema.model.Schema;
 import wbs.utils.string.AtomicFileWriter;
 
-@Log4j
 public
 class SchemaTool {
 
@@ -40,6 +40,9 @@ class SchemaTool {
 
 	@SingletonDependency
 	EntityHelper entityHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SchemaToSql schemaToSql;
@@ -61,21 +64,24 @@ class SchemaTool {
 
 	public
 	void schemaCreate (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <String> arguments) {
 
-		taskLogger =
-			taskLogger.nest (
-				this,
-				"schemaCreate",
-				log);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"schemaCreate");
 
 		defineTables (
 			taskLogger);
 
 		createSchemaSqlScript ();
-		executeSchemaSqlScript ();
-		createObjectTypes ();
+
+		executeSchemaSqlScript (
+			taskLogger);
+
+		createObjectTypes (
+			taskLogger);
 
 	}
 
@@ -141,7 +147,13 @@ class SchemaTool {
 
 	}
 
-	void executeSchemaSqlScript () {
+	void executeSchemaSqlScript (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"executeSchemaSqlScript");
 
 		try {
 
@@ -158,9 +170,8 @@ class SchemaTool {
 			Statement statement =
 				connection.createStatement ();
 
-			log.info (
-				stringFormat (
-					"Running schema create script"));
+			taskLogger.noticeFormat (
+				"Running schema create script");
 
 			int errors = 0;
 
@@ -178,18 +189,16 @@ class SchemaTool {
 
 					if (errors == 0) {
 
-						log.error (
-							stringFormat (
-								"Error: %s",
-								sqlStatement),
-							exception);
+						taskLogger.errorFormatException (
+							exception,
+							"Error: %s",
+							sqlStatement);
 
 					} else if (errors < 100) {
 
-						log.error (
-							stringFormat (
-								"Error: %s",
-								sqlStatement));
+						taskLogger.errorFormat (
+							"Error: %s",
+							sqlStatement);
 
 					}
 
@@ -203,11 +212,10 @@ class SchemaTool {
 
 			if (errors > 100) {
 
-				log.error (
-					stringFormat (
-						"Additional %s errors not shown",
-						integerToDecimalString (
-							errors - 100)));
+				taskLogger.errorFormat (
+					"Additional %s errors not shown",
+					integerToDecimalString (
+						errors - 100));
 
 			}
 
@@ -223,9 +231,8 @@ class SchemaTool {
 
 			connection.commit ();
 
-			log.info (
-				stringFormat (
-					"Schema created successfully"));
+			taskLogger.noticeFormat (
+				"Schema created successfully");
 
 			connection.close ();
 
@@ -238,7 +245,13 @@ class SchemaTool {
 
 	}
 
-	void createObjectTypes () {
+	void createObjectTypes (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createObjectTypes");
 
 		try {
 
@@ -267,7 +280,7 @@ class SchemaTool {
 							"?, ",
 							"?)"));
 
-			log.info (
+			taskLogger.noticeFormat (
 				"Creating object types");
 
 			for (
@@ -312,7 +325,7 @@ class SchemaTool {
 
 			connection.commit ();
 
-			log.info (
+			taskLogger.noticeFormat (
 				"Object types created successfully");
 
 			connection.close ();

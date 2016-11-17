@@ -12,11 +12,13 @@ import java.util.Map;
 import javax.inject.Named;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.rpc.core.Rpc;
 import wbs.platform.rpc.core.RpcDefinition;
 import wbs.platform.rpc.core.RpcHandler;
@@ -74,7 +76,8 @@ class ForwarderUnqueueExRpcHandler
 	@Override
 	public
 	RpcResult handle (
-			RpcSource source) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull RpcSource source) {
 
 		@Cleanup
 		Transaction transaction =

@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.Builder.MissingBuilderBehaviour;
 import wbs.framework.builder.BuilderFactory;
@@ -13,6 +15,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.entity.generate.fields.ModelFieldWriterContext;
 import wbs.framework.entity.generate.fields.ModelFieldWriterTarget;
+import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("modelWriterManager")
 public
@@ -60,11 +63,13 @@ class ModelWriterManager {
 
 	public
 	void write (
-			ModelFieldWriterContext context,
-			List<?> sourceItems,
-			ModelFieldWriterTarget target) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ModelFieldWriterContext context,
+			@NonNull List <?> sourceItems,
+			@NonNull ModelFieldWriterTarget target) {
 
 		modelWriter.descend (
+			parentTaskLogger,
 			context,
 			sourceItems,
 			target,

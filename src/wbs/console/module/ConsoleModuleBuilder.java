@@ -18,14 +18,22 @@ import wbs.console.forms.FormItem;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderFactory;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("consoleModuleBuilder")
 public
 class ConsoleModuleBuilder
 	implements Builder {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -69,9 +77,15 @@ class ConsoleModuleBuilder
 
 	public <Container>
 	FormFieldSet <Container> buildFormFieldSet (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleHelper <?> consoleHelper,
 			@NonNull String fieldSetName,
 			@NonNull List <Object> formFieldSpecs) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"buildFormFieldSet");
 
 		FormFieldBuilderContext formFieldBuilderContext =
 			new FormFieldBuilderContextImplementation ()
@@ -86,6 +100,7 @@ class ConsoleModuleBuilder
 			new FormFieldSet <Container> ();
 
 		builder.descend (
+			taskLogger,
 			formFieldBuilderContext,
 			formFieldSpecs,
 			formFieldSet,
@@ -127,6 +142,7 @@ class ConsoleModuleBuilder
 	@Override
 	public
 	void descend (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object parentObject,
 			@NonNull List <?> childObjects,
 			@NonNull Object targetObject,
@@ -158,12 +174,14 @@ class ConsoleModuleBuilder
 		}
 
 		builder.descend (
+			parentTaskLogger,
 			parentObject,
 			firstPass,
 			targetObject,
 			missingBuilderBehaviour);
 
 		builder.descend (
+			parentTaskLogger,
 			parentObject,
 			secondPass,
 			targetObject,

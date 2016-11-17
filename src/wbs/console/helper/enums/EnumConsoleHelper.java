@@ -2,7 +2,7 @@ package wbs.console.helper.enums;
 
 import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.camelToSpaces;
-import static wbs.utils.web.HtmlInputUtils.htmlSelect;
+import static wbs.web.utils.HtmlInputUtils.htmlSelect;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

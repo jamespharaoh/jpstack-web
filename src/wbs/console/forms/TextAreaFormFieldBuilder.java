@@ -10,27 +10,31 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.utils.etc.PropertyUtils;
 
-@Log4j
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("textAreaFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class TextAreaFormFieldBuilder {
+class TextAreaFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -39,6 +43,9 @@ class TextAreaFormFieldBuilder {
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -96,9 +103,16 @@ class TextAreaFormFieldBuilder {
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		String name =
 			spec.name ();
@@ -153,7 +167,7 @@ class TextAreaFormFieldBuilder {
 
 			dataProvider =
 				componentManager.getComponentRequired (
-					log,
+					taskLogger,
 					spec.dataProvider (),
 					FormFieldDataProvider.class);
 
@@ -290,7 +304,7 @@ class TextAreaFormFieldBuilder {
 			updateHookBeanName != null
 
 			? componentManager.getComponentRequired (
-				log,
+				taskLogger,
 				updateHookBeanName,
 				FormFieldUpdateHook.class)
 

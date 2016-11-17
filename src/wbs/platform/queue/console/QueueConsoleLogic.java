@@ -1,5 +1,6 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
 import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
@@ -19,6 +20,8 @@ import lombok.NonNull;
 import org.joda.time.Instant;
 
 import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -28,7 +31,10 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.meta.model.ModelMetaLoader;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.queue.logic.DummyQueueCache;
 import wbs.platform.queue.metamodel.QueueTypeSpec;
 import wbs.platform.queue.metamodel.QueueTypesSpec;
@@ -57,11 +63,14 @@ class QueueConsoleLogic {
 	@SingletonDependency
 	DummyQueueCache dummyQueueCache;
 
-	@SingletonDependency
-	ObjectManager objectManager;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ModelMetaLoader modelMetaLoader;
+
+	@SingletonDependency
+	ObjectManager objectManager;
 
 	@SingletonDependency
 	QueueItemClaimObjectHelper queueItemClaimHelper;
@@ -180,8 +189,14 @@ class QueueConsoleLogic {
 
 	public
 	QueueItemRec claimQueueItem (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueRec queue,
 			@NonNull UserRec user) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"claimQueueItem");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -203,7 +218,8 @@ class QueueConsoleLogic {
 			.effectiveUser (
 				user)
 
-			.sort ();
+			.sort (
+				taskLogger);
 
 		if (subjects.availableSubjects ().isEmpty ())
 			return null;
@@ -295,7 +311,8 @@ class QueueConsoleLogic {
 			throw new RuntimeException (
 				stringFormat (
 					"Cannot unclaim queue item in %s state",
-					queueItem.getState ()));
+					enumName (
+						queueItem.getState ())));
 
 		}
 
@@ -360,7 +377,8 @@ class QueueConsoleLogic {
 			throw new IllegalStateException (
 				stringFormat (
 					"Cannot reclaim queue item in %s state",
-					queueItem.getState ()));
+					enumName (
+						queueItem.getState ())));
 
 		}
 

@@ -1,5 +1,8 @@
 package wbs.framework.codegen;
 
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.listLastItemRequired;
+import static wbs.utils.collection.CollectionUtils.listSliceAllButLastItemRequired;
 import static wbs.utils.collection.MapUtils.mapIsEmpty;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
@@ -15,9 +18,12 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.PrototypeComponent;
+
 import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
+@PrototypeComponent ("javaAssignmentWriter")
 public
 class JavaAssignmentWriter {
 
@@ -154,9 +160,45 @@ class JavaAssignmentWriter {
 					: calls.entrySet ()
 			) {
 
-				formatWriter.writeLineFormat (
-					"\t.%s ()",
-					callEntry.getKey ());
+				String functionName =
+					callEntry.getKey ();
+
+				List <String> arguments =
+					callEntry.getValue ();
+
+				if (
+					collectionIsEmpty (
+						arguments)
+				) {
+
+					formatWriter.writeLineFormat (
+						"\t.%s ()",
+						functionName);
+
+				} else {
+
+					formatWriter.writeLineFormat (
+						"\t.%s (",
+						functionName);
+
+					for (
+						String argument
+							: listSliceAllButLastItemRequired (
+								arguments)
+					) {
+
+						formatWriter.writeLineFormat (
+							"\t\t%s,",
+							argument);
+
+					}
+
+					formatWriter.writeLineFormat (
+						"\t\t%s);",
+						listLastItemRequired (
+							arguments));
+
+				}
 
 				// TODO arguments!
 

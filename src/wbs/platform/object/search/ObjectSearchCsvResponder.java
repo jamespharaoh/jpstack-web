@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -31,6 +32,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.WriterFormatWriter;
@@ -89,7 +91,8 @@ class ObjectSearchCsvResponder <RecordType>
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// set search object
 
@@ -132,7 +135,8 @@ class ObjectSearchCsvResponder <RecordType>
 
 	@Override
 	protected
-	void render () {
+	void render (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		Transaction transaction =
 			database.currentTransaction ();

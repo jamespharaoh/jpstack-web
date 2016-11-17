@@ -3,10 +3,10 @@ package wbs.apn.chat.user.core.daemon;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.earlierThan;
 
 import java.util.List;
@@ -15,27 +15,30 @@ import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.apn.chat.user.info.logic.ChatInfoLogic;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.daemon.SleepingDaemonService;
 
-@Log4j
+import wbs.apn.chat.contact.model.ChatMessageMethod;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
+import wbs.apn.chat.user.info.logic.ChatInfoLogic;
+
 @SingletonComponent ("chatUserOnlineDaemon")
 public
 class ChatUserOnlineDaemon
@@ -57,6 +60,9 @@ class ChatUserOnlineDaemon
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -102,7 +108,12 @@ class ChatUserOnlineDaemon
 	protected
 	void runOnce () {
 
-		log.debug ("Checking online users for action needed");
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"runOnce");
+
+		taskLogger.debugFormat (
+			"Checking online users for action needed");
 
 		@Cleanup
 		Transaction transaction =
@@ -122,6 +133,7 @@ class ChatUserOnlineDaemon
 		) {
 
 			doUser (
+				taskLogger,
 				chatUser.getId ());
 
 		}
@@ -129,7 +141,13 @@ class ChatUserOnlineDaemon
 	}
 
 	void doUser (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doUser");
 
 		@Cleanup
 		Transaction transaction =
@@ -171,10 +189,9 @@ class ChatUserOnlineDaemon
 
 		) {
 
-			log.info (
-				stringFormat (
-					"Automatically logging off user %s",
-					chatUser.getCode ()));
+			taskLogger.noticeFormat (
+				"Automatically logging off user %s",
+				chatUser.getCode ());
 
 			chatMiscLogic.userLogoffWithMessage (
 				chatUser,
@@ -205,11 +222,11 @@ class ChatUserOnlineDaemon
 
 		) {
 
-			log.info (
-				stringFormat (
-					"Automatically logging off %s user %s",
-					chatUser.getDeliveryMethod (),
-					chatUser.getCode ()));
+			taskLogger.noticeFormat (
+				"Automatically logging off %s user %s",
+				enumName (
+					chatUser.getDeliveryMethod ()),
+				chatUser.getCode ());
 
 			chatUserLogic.logoff (
 				chatUser,
@@ -228,11 +245,11 @@ class ChatUserOnlineDaemon
 			&& chatUser.getSessionInfoRemain () <= 0
 		) {
 
-			log.info (
-				stringFormat (
-					"Logging off %s user %s due to session info limit",
-					chatUser.getDeliveryMethod (),
-					chatUser.getCode ()));
+			taskLogger.noticeFormat (
+				"Logging off %s user %s due to session info limit",
+				enumName (
+					chatUser.getDeliveryMethod ()),
+				chatUser.getCode ());
 
 			chatUserLogic.logoff (
 				chatUser,
@@ -253,11 +270,10 @@ class ChatUserOnlineDaemon
 
 		if (chatUser.getNumber () == null) {
 
-			log.warn (
-				stringFormat (
-					"Logging off %s: no number",
-					objectManager.objectPath (
-						chatUser)));
+			taskLogger.warningFormat (
+				"Logging off %s: no number",
+				objectManager.objectPath (
+					chatUser));
 
 			chatUser
 
@@ -327,11 +343,10 @@ class ChatUserOnlineDaemon
 
 		) {
 
-			log.info (
-				stringFormat (
-					"Sending info to user %s",
-					objectManager.objectPathMini (
-						chatUser)));
+			taskLogger.noticeFormat (
+				"Sending info to user %s",
+				objectManager.objectPathMini (
+					chatUser));
 
 			long numSent =
 				chatInfoLogic.sendUserInfos (
@@ -377,10 +392,9 @@ class ChatUserOnlineDaemon
 
 		) {
 
-			log.info (
-				stringFormat (
-					"Sending name hint to user %s",
-					chatUser.getCode ()));
+			taskLogger.noticeFormat (
+				"Sending name hint to user %s",
+				chatUser.getCode ());
 
 			chatInfoLogic.sendNameHint (
 				chatUser);
@@ -452,10 +466,9 @@ class ChatUserOnlineDaemon
 
 		) {
 
-			log.info (
-				stringFormat (
-					"Sending pic hint to user %s",
-					chatUser.getCode ()));
+			taskLogger.noticeFormat (
+				"Sending pic hint to user %s",
+				chatUser.getCode ());
 
 			chatInfoLogic.sendPicHint (
 				chatUser);
@@ -499,10 +512,9 @@ class ChatUserOnlineDaemon
 
 		) {
 
-			log.info (
-				stringFormat (
-					"Sending pic hint 2 to user %s",
-					chatUser.getCode ()));
+			taskLogger.noticeFormat (
+				"Sending pic hint 2 to user %s",
+				chatUser.getCode ());
 
 			chatInfoLogic.sendPicHint2 (
 				chatUser);

@@ -8,27 +8,25 @@ import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.localTime;
-import static wbs.utils.web.HtmlAttributeUtils.htmlClassAttribute;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenGetAction;
-import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenGetAction;
+import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
-import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -39,17 +37,21 @@ import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.console.reporting.StatsConsoleLogic;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorPart")
 public
@@ -63,6 +65,9 @@ class SupervisorPart
 
 	@SingletonDependency
 	ConsoleManager consoleManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -109,7 +114,13 @@ class SupervisorPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		prepareSupervisorConfig ();
 		prepareDate ();
@@ -118,9 +129,12 @@ class SupervisorPart
 
 			createStatsPeriod ();
 			createStatsConditions ();
-			createStatsDataSets ();
 
-			createPageParts ();
+			createStatsDataSets (
+				taskLogger);
+
+			createPageParts (
+				taskLogger);
 
 		}
 
@@ -316,7 +330,13 @@ class SupervisorPart
 
 	}
 
-	void createStatsDataSets () {
+	void createStatsDataSets (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createStatsDataSets");
 
 		ImmutableMap.Builder <String, StatsDataSet> dataSetsBuilder =
 			ImmutableMap.builder ();
@@ -335,7 +355,7 @@ class SupervisorPart
 
 			StatsProvider statsProvider =
 				componentManager.getComponentRequired (
-					log,
+					taskLogger,
 					supervisorDataSetSpec.providerBeanName (),
 					StatsProvider.class);
 
@@ -355,7 +375,13 @@ class SupervisorPart
 
 	}
 
-	void createPageParts () {
+	void createPageParts (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createPageParts");
 
 		Map <String, Object> partParameters =
 			ImmutableMap.<String, Object> builder ()
@@ -374,17 +400,19 @@ class SupervisorPart
 			ImmutableList.builder ();
 
 		for (
-			Provider<PagePart> pagePartFactory
+			PagePartFactory pagePartFactory
 				: supervisorConfig.pagePartFactories ()
 		) {
 
 			PagePart pagePart =
-				pagePartFactory.get ();
+				pagePartFactory.buildPagePart (
+					taskLogger);
 
 			pagePart.setup (
 				partParameters);
 
-			pagePart.prepare ();
+			pagePart.prepare (
+				taskLogger);
 
 			pagePartsBuilder.add (
 				pagePart);
@@ -398,14 +426,21 @@ class SupervisorPart
 
 	@Override
 	public
-	void renderHtmlHeadContent () {
+	void renderHtmlHeadContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlHeadContent");
 
 		for (
 			PagePart pagePart
 				: pageParts
 		) {
 
-			pagePart.renderHtmlHeadContent ();
+			pagePart.renderHtmlHeadContent (
+				taskLogger);
 
 		}
 
@@ -413,7 +448,13 @@ class SupervisorPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
 		String localUrl =
 			requestContext.resolveLocalUrl (
@@ -527,7 +568,8 @@ class SupervisorPart
 				: pageParts
 		) {
 
-			pagePart.renderHtmlBodyContent ();
+			pagePart.renderHtmlBodyContent (
+				taskLogger);
 
 		}
 

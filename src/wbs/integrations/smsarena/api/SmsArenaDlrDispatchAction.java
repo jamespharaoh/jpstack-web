@@ -10,6 +10,7 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -17,9 +18,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionUtils;
-import wbs.framework.web.Action;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.TaskLogger;
 import wbs.integrations.smsarena.model.SmsArenaDlrReportLogObjectHelper;
 import wbs.integrations.smsarena.model.SmsArenaDlrReportLogType;
 import wbs.integrations.smsarena.model.SmsArenaReportCodeObjectHelper;
@@ -31,6 +30,9 @@ import wbs.platform.text.web.TextResponder;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.web.action.Action;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("smsArenaDlrDispatchAction")
 public
@@ -86,7 +88,8 @@ class SmsArenaDlrDispatchAction
 
 	@Override
 	public
-	Responder handle () {
+	Responder handle (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try {
 

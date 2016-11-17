@@ -1,22 +1,26 @@
 package wbs.smsapps.alerts.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.utils.web.HtmlFormUtils.htmlFormClose;
-import static wbs.utils.web.HtmlFormUtils.htmlFormOpenPost;
-import static wbs.utils.web.HtmlInputUtils.htmlSelectYesNo;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellOpen;
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableHeaderRowWrite;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPost;
+import static wbs.web.utils.HtmlInputUtils.htmlSelectYesNo;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
+
+import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 import wbs.smsapps.alerts.model.AlertsNumberRec;
 import wbs.smsapps.alerts.model.AlertsSettingsObjectHelper;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
@@ -39,7 +43,8 @@ class AlertsSettingsNumbersPart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		alertsSettings =
 			alertsSettingsHelper.findRequired (
@@ -50,7 +55,8 @@ class AlertsSettingsNumbersPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// top
 
@@ -102,12 +108,14 @@ class AlertsSettingsNumbersPart
 				" name=\"%h\"",
 				stringFormat (
 					"name_%s",
-					alertsNumber.getId ()),
+					integerToDecimalString (
+						alertsNumber.getId ())),
 				" value=\"%h\"",
 				requestContext.formOrDefault (
 					stringFormat (
 						"name_%s",
-						alertsNumber.getId ()),
+						integerToDecimalString (
+							alertsNumber.getId ())),
 					alertsNumber.getName ()),
 				">");
 
@@ -123,12 +131,14 @@ class AlertsSettingsNumbersPart
 				" name=\"%h\"",
 				stringFormat (
 					"number_%s",
-					alertsNumber.getId ()),
+					integerToDecimalString (
+						alertsNumber.getId ())),
 				" value=\"%h\"",
 				requestContext.formOrDefault (
 					stringFormat (
 						"number_%s",
-						alertsNumber.getId ()),
+						integerToDecimalString (
+							alertsNumber.getId ())),
 					alertsNumber.getNumber ().getNumber ()),
 				">");
 
@@ -141,11 +151,13 @@ class AlertsSettingsNumbersPart
 			htmlSelectYesNo (
 				stringFormat (
 					"enabled_%s",
-					alertsNumber.getId ()),
+					integerToDecimalString (
+						alertsNumber.getId ())),
 				requestContext.formOrEmptyString (
 					stringFormat (
 						"enabled_%s",
-						alertsNumber.getId ())),
+						integerToDecimalString (
+							alertsNumber.getId ()))),
 				alertsNumber.getEnabled ());
 
 			htmlTableCellClose ();
@@ -160,7 +172,8 @@ class AlertsSettingsNumbersPart
 				" name=\"%h\"",
 				stringFormat (
 					"delete_%s",
-					alertsNumber.getId ()),
+					integerToDecimalString (
+						alertsNumber.getId ())),
 				" value=\"delete\"",
 				">");
 

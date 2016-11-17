@@ -9,7 +9,7 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
-import wbs.framework.web.HttpStatus;
+import wbs.web.misc.HttpStatus;
 
 public
 class Rpc {
@@ -46,7 +46,7 @@ class Rpc {
 		stCancelled = 0x5001;
 
 	public static
-	int statusToHttpStatus (
+	long statusToHttpStatus (
 			long status) {
 
 		switch (

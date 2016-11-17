@@ -8,6 +8,7 @@ import static wbs.utils.etc.Misc.toEnumGeneric;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.hyphenToCamel;
@@ -47,7 +48,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -66,6 +66,8 @@ import wbs.framework.data.annotations.DataContent;
 import wbs.framework.data.annotations.DataIgnore;
 import wbs.framework.data.annotations.DataInitMethod;
 import wbs.framework.data.annotations.DataParent;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.utils.etc.PropertyUtils;
 
@@ -76,10 +78,14 @@ import wbs.utils.etc.PropertyUtils;
  * TODO read annotations first for efficiency
  */
 @Accessors (fluent = true)
-@Log4j
 public
 class DataFromXmlImplementation
 	implements DataFromXml {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			DataFromXmlImplementation.class);
 
 	// properties
 
@@ -101,16 +107,11 @@ class DataFromXmlImplementation
 			@NonNull String filename,
 			@NonNull List <Object> parents) {
 
-		if (
-			isNull (
-				taskLogger)
-		) {
-
-			taskLogger =
-				new TaskLogger (
-					log);
-
-		}
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				optionalFromNullable (
+					this.taskLogger),
+				"readInputStream");
 
 		taskLogger.firstErrorFormat (
 			"Error reading %s from filesystem",

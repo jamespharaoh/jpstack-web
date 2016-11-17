@@ -1,23 +1,37 @@
 package wbs.console.combo;
 
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+
 import javax.inject.Provider;
+
+import lombok.NonNull;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
 import wbs.console.responder.ConsoleFile;
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("simpleFileBuilder")
 @ConsoleModuleBuilderHandler
 public
-class SimpleFileBuilder {
+class SimpleFileBuilder
+	implements BuilderComponent {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -46,24 +60,43 @@ class SimpleFileBuilder {
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		setDefaults ();
 
-		buildFile ();
+		buildFile (
+			taskLogger);
 
 	}
 
-	void buildFile () {
+	void buildFile (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		consoleModule.addFile (
 			path,
 			consoleFileProvider.get ()
-				.getResponderName (getResponderName)
-				.getActionName (getActionName)
-				.postActionName (postActionName));
+
+				.getResponderName (
+					getResponderName)
+
+				.getActionName (
+					parentTaskLogger,
+					optionalFromNullable (
+						getActionName))
+
+				.postActionName (
+					parentTaskLogger,
+					optionalFromNullable (
+						postActionName)));
 
 	}
 

@@ -1,9 +1,12 @@
 package wbs.apn.chat.user.image.console;
 
-import static wbs.utils.web.HtmlBlockUtils.htmlParagraphWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
+
+import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("chatUserImageRevertPart")
 public
@@ -12,7 +15,8 @@ class ChatUserImageRevertPart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlParagraphWrite (
 			"Not implemented...");

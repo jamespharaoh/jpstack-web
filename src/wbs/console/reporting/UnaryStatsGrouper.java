@@ -1,6 +1,6 @@
 package wbs.console.reporting;
 
-import static wbs.utils.web.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 
 import java.util.Collections;
 import java.util.List;

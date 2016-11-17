@@ -1,13 +1,18 @@
 package wbs.apn.chat.help.console;
 
+import lombok.NonNull;
+
 import wbs.console.context.ConsoleContext;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.queue.console.AbstractQueueConsolePlugin;
 import wbs.platform.queue.model.QueueItemRec;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatHelpQueueConsolePlugin")
 public
@@ -22,6 +27,9 @@ class ChatHelpQueueConsolePlugin
 	@SingletonDependency
 	ConsoleManager consoleManager;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// details
 
 	{
@@ -31,7 +39,13 @@ class ChatHelpQueueConsolePlugin
 	@Override
 	public
 	Responder makeResponder (
-			QueueItemRec queueItem) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull QueueItemRec queueItem) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"makeResponder");
 
 		ConsoleContext targetContext =
 			consoleManager.context (
@@ -39,6 +53,7 @@ class ChatHelpQueueConsolePlugin
 				true);
 
 		consoleManager.changeContext (
+			taskLogger,
 			targetContext,
 			"/" + queueItem.getRefObjectId ());
 

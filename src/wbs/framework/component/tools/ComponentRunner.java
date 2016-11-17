@@ -2,7 +2,6 @@ package wbs.framework.component.tools;
 
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitComma;
 import static wbs.utils.string.StringUtils.uncapitalise;
 
@@ -14,17 +13,22 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.component.registry.ComponentDefinition;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.LoggedErrorsException;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
-@Log4j
 public
 class ComponentRunner {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			ComponentRunner.class);
 
 	@Getter @Setter
 	String primaryProjectName;
@@ -148,23 +152,26 @@ class ComponentRunner {
 	void main (
 			@NonNull String[] argumentsArray) {
 
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"main");
+
 		List <String> arguments =
 			Arrays.asList (
 				argumentsArray);
 
 		if (arguments.size () < 5) {
 
-			log.error (
-				stringFormat (
-					"Expects five or more parameters: %s",
-					joinWithCommaAndSpace (
-						"primary project name",
-						"primary project package name",
-						"layer names (comma separated)",
-						"config names (comma separated)",
-						"runner class name",
-						"runner method name",
-						"runner arguments...")));
+			taskLogger.errorFormat (
+				"Expects five or more parameters: %s",
+				joinWithCommaAndSpace (
+					"primary project name",
+					"primary project package name",
+					"layer names (comma separated)",
+					"config names (comma separated)",
+					"runner class name",
+					"runner method name",
+					"runner arguments..."));
 
 			System.exit (1);
 
@@ -198,7 +205,7 @@ class ComponentRunner {
 					arguments.subList (6, arguments.size ()))
 
 				.run (
-					new TaskLogger (log));
+					taskLogger);
 
 		} catch (LoggedErrorsException loggedErrorsException) {
 
@@ -208,9 +215,9 @@ class ComponentRunner {
 
 		} catch (Exception exception) {
 
-			log.error (
-				"Failed to run component",
-				exception);
+			taskLogger.errorFormatException (
+				exception,
+				"Failed to run component");
 
 			System.exit (1);
 

@@ -9,14 +9,16 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.framework.web.AbstractWebFile;
-import wbs.framework.web.RequestContext;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.integrations.digitalselect.model.DigitalSelectRouteOutObjectHelper;
 import wbs.integrations.digitalselect.model.DigitalSelectRouteOutRec;
 import wbs.platform.text.model.TextObjectHelper;
@@ -24,6 +26,8 @@ import wbs.sms.core.logic.NoSuchMessageException;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
+import wbs.web.context.RequestContext;
+import wbs.web.file.AbstractWebFile;
 
 @Log4j
 @SingletonComponent ("digitalSelectRouteReportFile")
@@ -38,6 +42,9 @@ class DigitalSelectRouteReportFile
 
 	@SingletonDependency
 	DigitalSelectRouteOutObjectHelper digitalSelectRouteOutHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
@@ -55,8 +62,14 @@ class DigitalSelectRouteReportFile
 
 	@Override
 	public
-	void doPost ()
+	void doPost (
+			@NonNull TaskLogger parentTaskLogger)
 		throws IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doPost");
 
 		Long routeId =
 			requestContext.requestIntegerRequired (
@@ -73,7 +86,7 @@ class DigitalSelectRouteReportFile
 		// debugging
 
 		requestContext.debugDump (
-			log);
+			taskLogger);
 
 		// sanity checks
 

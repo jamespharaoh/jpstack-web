@@ -1,5 +1,6 @@
 package wbs.console.context;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -17,10 +18,12 @@ import lombok.extern.log4j.Log4j;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.ContextTabPlacement;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
-import wbs.framework.web.WebFile;
+
+import wbs.web.file.WebFile;
 
 @Accessors (fluent = true)
 @Log4j
@@ -179,17 +182,20 @@ class ConsoleContextType {
 				throw new RuntimeException (
 					stringFormat (
 						"Unable to resolve %s tab locations",
-						unresolvedPlacements.size ()));
+						integerToDecimalString (
+							unresolvedPlacements.size ())));
 
 			}
 
 		}
 
-		Map<String,ConsoleContextTab> myNewContextTabs =
-			new LinkedHashMap<String,ConsoleContextTab> ();
+		Map <String, ConsoleContextTab> myNewContextTabs =
+			new LinkedHashMap<> ();
 
-		for (String tabSpec
-				: resolvedNames) {
+		for (
+			String tabSpec
+				: resolvedNames
+		) {
 
 			if (tabSpec.charAt (0) == '+')
 				continue;

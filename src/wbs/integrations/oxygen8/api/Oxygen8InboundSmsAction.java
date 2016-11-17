@@ -14,6 +14,7 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 
 import lombok.Cleanup;
+import lombok.NonNull;
 
 import wbs.api.mvc.ApiAction;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -22,9 +23,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionUtils;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
 import wbs.integrations.oxygen8.model.Oxygen8ConfigRec;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogType;
@@ -38,6 +38,8 @@ import wbs.platform.text.web.TextResponder;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+import wbs.web.context.RequestContext;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("oxygen8InboundSmsAction")
 public
@@ -105,7 +107,8 @@ class Oxygen8InboundSmsAction
 
 	@Override
 	protected
-	Responder goApi () {
+	Responder goApi (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		try {
 

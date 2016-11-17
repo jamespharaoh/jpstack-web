@@ -57,6 +57,8 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 import wbs.platform.daemon.AbstractDaemonService;
@@ -69,6 +71,11 @@ import wbs.utils.time.TimeFormatter;
 public
 class ChatDateDaemon
 	extends AbstractDaemonService {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			ChatDateDaemon.class);
 
 	// singleton dependencies
 
@@ -145,9 +152,14 @@ class ChatDateDaemon
 
 			// then do the run
 
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"runService");
+
 			try {
 
-				doRun ();
+				doRun (
+					taskLogger);
 
 			} catch (RuntimeException exception) {
 
@@ -164,11 +176,8 @@ class ChatDateDaemon
 
 	}
 
-	void doRun () {
-
-		TaskLogger taskLogger =
-			new TaskLogger (
-				log);
+	void doRun (
+			@NonNull TaskLogger taskLogger) {
 
 		taskLogger.noticeFormat (
 			"Dating batch started");

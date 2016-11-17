@@ -1,10 +1,10 @@
 package wbs.platform.event.console;
 
-import javax.inject.Provider;
-
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.PagePart;
+import wbs.console.part.PagePartFactory;
 import wbs.framework.entity.record.PermanentRecord;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.event.model.EventRec;
 import wbs.utils.string.FormatWriter;
 
@@ -14,7 +14,7 @@ interface EventConsoleLogic {
 	PagePart makeEventsPart (
 			PermanentRecord <?> object);
 
-	Provider <PagePart> makeEventsPartFactory (
+	PagePartFactory makeEventsPartFactory (
 			ObjectLookup <?> objectLookup);
 
 	void writeEventHtml (
@@ -26,10 +26,12 @@ interface EventConsoleLogic {
 			Object object);
 
 	void writeEventsTable (
+			TaskLogger taskLogger,
 			FormatWriter htmlWriter,
 			Iterable <EventRec> events);
 
 	void writeEventRow (
+			TaskLogger taskLogger,
 			FormatWriter htmlWriter,
 			EventRec event);
 

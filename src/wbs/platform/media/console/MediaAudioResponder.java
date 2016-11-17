@@ -3,12 +3,16 @@ package wbs.platform.media.console;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import lombok.NonNull;
+
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
+import wbs.utils.io.RuntimeIoException;
 
 @PrototypeComponent ("mediaAudioResponder")
 public
@@ -38,7 +42,8 @@ class MediaAudioResponder
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		MediaRec media =
 			mediaHelper.findRequired (
@@ -66,10 +71,20 @@ class MediaAudioResponder
 
 	@Override
 	public
-	void render ()
-		throws IOException {
+	void render (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		out.write (data);
+		try {
+
+			out.write (
+				data);
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
 
 	}
 

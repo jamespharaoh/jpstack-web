@@ -8,13 +8,18 @@ import java.io.IOException;
 import javax.inject.Provider;
 import javax.servlet.ServletException;
 
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.web.AbstractWebFile;
-import wbs.framework.web.Action;
-import wbs.framework.web.RequestContext;
-import wbs.framework.web.Responder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.web.action.Action;
+import wbs.web.context.RequestContext;
+import wbs.web.file.AbstractWebFile;
+import wbs.web.responder.Responder;
 
 @SingletonComponent ("oxygen8InboundFile")
 public
@@ -22,6 +27,9 @@ class Oxygen8InboundFile
 	extends AbstractWebFile {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RequestContext requestContext;
@@ -38,10 +46,16 @@ class Oxygen8InboundFile
 
 	@Override
 	public
-	void doPost ()
+	void doPost (
+			@NonNull TaskLogger parentTaskLogger)
 		throws
 			IOException,
 			ServletException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doPost");
 
 		// detect request type
 
@@ -66,9 +80,11 @@ class Oxygen8InboundFile
 		}
 
 		Responder responder =
-			action.handle ();
+			action.handle (
+				taskLogger);
 
-		responder.execute ();
+		responder.execute (
+			taskLogger);
 
 	}
 

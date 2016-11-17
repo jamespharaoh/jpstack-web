@@ -2,6 +2,7 @@ package wbs.integrations.smsarena.daemon;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.stringToUrl;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -28,15 +29,19 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
+
 import wbs.integrations.smsarena.model.SmsArenaRouteOutObjectHelper;
 import wbs.integrations.smsarena.model.SmsArenaRouteOutRec;
+
 import wbs.platform.exception.logic.ExceptionLogLogic;
+
 import wbs.sms.gsm.GsmUtils;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender2;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
-import wbs.utils.web.HtmlUtils;
+
+import wbs.web.utils.HtmlUtils;
 
 @Log4j
 @SingletonComponent ("smsArenaSender")
@@ -137,7 +142,8 @@ class SmsArenaSender
 		log.info (
 			stringFormat (
 				"Sending message %s",
-				message.getId ()));
+				integerToDecimalString (
+					message.getId ())));
 
 		// create params map for the request query string
 
@@ -469,7 +475,8 @@ class SmsArenaSender
 					.message (
 						stringFormat (
 							"HTTP error %s from remote system: %s",
-							httpUrlConnection.getResponseCode (),
+							integerToDecimalString (
+								httpUrlConnection.getResponseCode ()),
 							responseString))
 
 					.responseTrace (

@@ -1,7 +1,7 @@
 package wbs.console.supervisor;
 
-import static wbs.utils.web.HtmlTableUtils.htmlTableClose;
-import static wbs.utils.web.HtmlTableUtils.htmlTableOpenList;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
 
 import java.util.Collections;
 import java.util.List;
@@ -11,18 +11,29 @@ import javax.inject.Provider;
 import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.console.part.PagePart;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("supervisorTablePart")
 public
 class SupervisorTablePart
 	extends AbstractPagePart {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// properties
 
 	@Getter @Setter
 	SupervisorTablePartBuilder supervisorTablePartBuilder;
@@ -32,7 +43,13 @@ class SupervisorTablePart
 
 	@Override
 	public
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		// prepare page parts
 
@@ -50,7 +67,8 @@ class SupervisorTablePart
 			pagePart.setup (
 				parameters);
 
-			pagePart.prepare ();
+			pagePart.prepare (
+				taskLogger);
 
 			pagePartsBuilder.add (
 				pagePart);
@@ -64,14 +82,21 @@ class SupervisorTablePart
 
 	@Override
 	public
-	void renderHtmlHeadContent () {
+	void renderHtmlHeadContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlHeadContent");
 
 		for (
 			PagePart pagePart
 				: pageParts
 		) {
 
-			pagePart.renderHtmlHeadContent ();
+			pagePart.renderHtmlHeadContent (
+				taskLogger);
 
 		}
 
@@ -79,7 +104,13 @@ class SupervisorTablePart
 
 	@Override
 	public
-	void renderHtmlBodyContent () {
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
 		htmlTableOpenList ();
 
@@ -88,7 +119,8 @@ class SupervisorTablePart
 				: pageParts
 		) {
 
-			pagePart.renderHtmlBodyContent ();
+			pagePart.renderHtmlBodyContent (
+				taskLogger);
 
 		}
 

@@ -49,8 +49,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.web.Responder;
 import wbs.utils.etc.NumberUtils;
+import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatUserSearchOldAction")
 public
@@ -535,10 +535,12 @@ class ChatUserSearchOldAction
 
 				ConsoleContext targetContext =
 					consoleManager.relatedContextRequired (
+						taskLogger,
 						requestContext.consoleContext (),
 						targetContextType);
 
 				consoleManager.changeContext (
+					taskLogger,
 					targetContext,
 					"/" + chatUserId);
 

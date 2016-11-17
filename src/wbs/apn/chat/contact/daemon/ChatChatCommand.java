@@ -17,7 +17,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
@@ -36,12 +35,15 @@ import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
@@ -60,7 +62,6 @@ import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.message.outbox.model.FailedMessageObjectHelper;
 
 @Accessors (fluent = true)
-@Log4j
 @PrototypeComponent ("chatChatCommand")
 public
 class ChatChatCommand
@@ -97,6 +98,9 @@ class ChatChatCommand
 
 	@SingletonDependency
 	CommandObjectHelper commandHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
@@ -163,7 +167,75 @@ class ChatChatCommand
 
 	}
 
-	// implementation
+	// public implementation
+
+	@Override
+	public
+	InboxAttemptRec handle (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
+
+		chat =
+			chatHelper.findRequired (
+				command.getParentId ());
+
+		message =
+			inbox.getMessage ();
+
+		fromChatUser =
+			chatUserHelper.findOrCreate (
+				chat,
+				message);
+
+		affiliate =
+			chatUserLogic.getAffiliate (
+				fromChatUser);
+
+		toChatUser =
+			chatUserHelper.findRequired (
+				commandRef.get ());
+
+		// treat as join if the user has no affiliate
+
+		Optional <InboxAttemptRec> joinInboxAttempt =
+			tryJoin (
+				taskLogger);
+
+		if (joinInboxAttempt.isPresent ())
+			return joinInboxAttempt.get ();
+
+		// look for keywords to interpret
+
+		for (
+			KeywordFinder.Match match
+				: keywordFinder.find (
+					rest)
+		) {
+
+			if (! match.rest ().isEmpty ())
+				continue;
+
+			Optional <InboxAttemptRec> keywordInboxAttempt =
+				checkKeyword (
+					taskLogger,
+					match.simpleKeyword (),
+					"");
+
+			if (keywordInboxAttempt.isPresent ())
+				return keywordInboxAttempt.get ();
+
+		}
+
+		// send the message to the other user
+
+		return doChat (
+			taskLogger);
+
+	}
 
 	InboxAttemptRec doBlock () {
 
@@ -252,7 +324,13 @@ class ChatChatCommand
 
 	}
 
-	InboxAttemptRec doChat () {
+	InboxAttemptRec doChat (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doChat");
 
 		ServiceRec defaultService =
 			serviceHelper.findByCodeRequired (
@@ -261,15 +339,14 @@ class ChatChatCommand
 
 		if (toChatUser == null) {
 
-			log.warn (
-				stringFormat (
-					"Message %s ",
-					integerToDecimalString (
-						inbox.getId ()),
-					"ignored as recipient user id %s ",
-					integerToDecimalString (
-						commandRef.get ()),
-					"does not exist"));
+			taskLogger.warningFormat (
+				"Message %d ",
+				integerToDecimalString (
+					inbox.getId ()),
+				"ignored as recipient user id %d ",
+				integerToDecimalString (
+					commandRef.get ()),
+				"does not exist");
 
 			return smsInboxLogic.inboxProcessed (
 				inbox,
@@ -330,8 +407,14 @@ class ChatChatCommand
 	}
 
 	Optional <InboxAttemptRec> checkKeyword (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String keyword,
 			@NonNull String rest) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"checkKeyword");
 
 		Optional <ChatKeywordRec> chatKeywordOptional =
 			chatKeywordHelper.findByCode (
@@ -370,6 +453,7 @@ class ChatChatCommand
 
 			return optionalOf (
 				commandManager.handle (
+					taskLogger,
 					inbox,
 					chatKeyword.getCommand (),
 					optionalAbsent (),
@@ -381,7 +465,13 @@ class ChatChatCommand
 
 	}
 
-	Optional <InboxAttemptRec> tryJoin () {
+	Optional <InboxAttemptRec> tryJoin (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"tryJoin");
 
 		if (
 			isNotNull (
@@ -397,11 +487,10 @@ class ChatChatCommand
 		// joined then how can they be replying to a magic number from a
 		// user. maybe from a broadcast, but that is all a bit fucked up.
 
-		log.warn (
-			stringFormat (
-				"Chat request from unjoined user %s",
-				integerToDecimalString (
-					fromChatUser.getId ())));
+		taskLogger.warningFormat (
+			"Chat request from unjoined user %s",
+			integerToDecimalString (
+				fromChatUser.getId ()));
 
 		ChatSchemeRec chatScheme =
 			chat.getChatSchemes ().iterator ().next ();
@@ -425,68 +514,10 @@ class ChatChatCommand
 				rest)
 
 			.handleInbox (
+				taskLogger,
 				command)
 
 		);
-
-	}
-
-	@Override
-	public
-	InboxAttemptRec handle () {
-
-		chat =
-			chatHelper.findRequired (
-				command.getParentId ());
-
-		message =
-			inbox.getMessage ();
-
-		fromChatUser =
-			chatUserHelper.findOrCreate (
-				chat,
-				message);
-
-		affiliate =
-			chatUserLogic.getAffiliate (
-				fromChatUser);
-
-		toChatUser =
-			chatUserHelper.findRequired (
-				commandRef.get ());
-
-		// treat as join if the user has no affiliate
-
-		Optional<InboxAttemptRec> joinInboxAttempt =
-			tryJoin ();
-
-		if (joinInboxAttempt.isPresent ())
-			return joinInboxAttempt.get ();
-
-		// look for keywords to interpret
-
-		for (
-			KeywordFinder.Match match
-				: keywordFinder.find (
-					rest)
-		) {
-
-			if (! match.rest ().isEmpty ())
-				continue;
-
-			Optional<InboxAttemptRec> keywordInboxAttempt =
-				checkKeyword (
-					match.simpleKeyword (),
-					"");
-
-			if (keywordInboxAttempt.isPresent ())
-				return keywordInboxAttempt.get ();
-
-		}
-
-		// send the message to the other user
-
-		return doChat ();
 
 	}
 

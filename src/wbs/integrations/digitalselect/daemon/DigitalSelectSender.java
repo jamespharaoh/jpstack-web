@@ -1,5 +1,6 @@
 package wbs.integrations.digitalselect.daemon;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -13,7 +14,6 @@ import com.google.common.collect.ImmutableList;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.IOUtils;
 
@@ -26,23 +26,27 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.integrations.digitalselect.daemon.DigitalSelectSender.State;
 import wbs.integrations.digitalselect.model.DigitalSelectRouteOutObjectHelper;
 import wbs.integrations.digitalselect.model.DigitalSelectRouteOutRec;
+
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
 
-@Log4j
 @SingletonComponent ("digitalSelectSender")
 public
 class DigitalSelectSender
-	extends AbstractSmsSender1<State> {
+	extends AbstractSmsSender1 <State> {
 
 	// singleton dependencies
 
@@ -51,6 +55,9 @@ class DigitalSelectSender
 
 	@SingletonDependency
 	DigitalSelectRouteOutObjectHelper digitalSelectRouteOutHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// details
 
@@ -75,6 +82,10 @@ class DigitalSelectSender
 			OutboxRec outbox)
 		throws SendFailureException {
 
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"getMessage");
+
 		Transaction transaction =
 			database.currentTransaction ();
 
@@ -84,7 +95,8 @@ class DigitalSelectSender
 				() -> new RuntimeException (
 					stringFormat (
 						"No digital select route out %s",
-						outbox.getRoute ().getId ())));
+						integerToDecimalString (
+							outbox.getRoute ().getId ()))));
 
 		State state =
 			new State ()
@@ -114,21 +126,27 @@ class DigitalSelectSender
 
 	@Override
 	protected
-	Optional<List<String>> sendMessage (
+	Optional <List <String>> sendMessage (
 			@NonNull State state)
 		throws SendFailureException {
 
-		log.info (
-			stringFormat (
-				"Sending message %s",
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"sendMessage");
+
+		taskLogger.noticeFormat (
+			"Sending message %s",
+			integerToDecimalString (
 				state.message ().getId ()));
 
 		try {
 
 			openConnection (
+				taskLogger,
 				state);
 
 			return readResponse (
+				taskLogger,
 				state);
 
 		} catch (IOException exception) {
@@ -145,9 +163,9 @@ class DigitalSelectSender
 
 			} catch (IOException exception) {
 
-				log.warn (
-					"Got IO exception closing http client",
-					exception);
+				taskLogger.warningFormatException (
+					exception,
+					"Got IO exception closing http client");
 
 			}
 
@@ -157,7 +175,8 @@ class DigitalSelectSender
 
 	private static
 	void openConnection (
-			State state)
+			@NonNull TaskLogger taskLogger,
+			@NonNull State state)
 		throws IOException {
 
 		state.httpClient (
@@ -206,12 +225,11 @@ class DigitalSelectSender
 		post.setEntity (
 			formEntity);
 
-		log.debug (
-			stringFormat (
-				"Making request to %s with %s",
-				state.digitalSelectRouteOut ().getUrl (),
-				IOUtils.toString (
-					formEntity.getContent ())));
+		taskLogger.debugFormat (
+			"Making request to %s with %s",
+			state.digitalSelectRouteOut ().getUrl (),
+			IOUtils.toString (
+				formEntity.getContent ()));
 
 		state.httpResponse (
 			state
@@ -227,20 +245,26 @@ class DigitalSelectSender
 
 	public
 	Optional<List<String>> readResponse (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull State state)
 		throws
 			IOException,
 			SendFailureException {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"readResponse");
+
 		String responseString =
 			IOUtils.toString (
 				state.httpResponse ().getEntity ().getContent ());
 
-		log.debug (
-			stringFormat (
-				"Message %s response: %s",
-				state.message ().getId (),
-				responseString));
+		taskLogger.debugFormat (
+			"Message %s response: %s",
+			integerToDecimalString (
+				state.message ().getId ()),
+			responseString);
 
 		StatusLine statusLine =
 			state.httpResponse ().getStatusLine ();
@@ -250,10 +274,12 @@ class DigitalSelectSender
 			String errorMessage =
 				stringFormat (
 					"Got error %s from remote system: %s",
-					statusLine.getStatusCode (),
+					integerToDecimalString (
+						statusLine.getStatusCode ()),
 					responseString);
 
-			log.error (
+			taskLogger.errorFormat (
+				"%s",
 				errorMessage);
 
 			throw tempFailure (
@@ -272,7 +298,8 @@ class DigitalSelectSender
 					"Got invalid response from remote system: %s",
 					responseString);
 
-			log.error (
+			taskLogger.errorFormat (
+				"%s",
 				errorMessage);
 
 			throw tempFailure (

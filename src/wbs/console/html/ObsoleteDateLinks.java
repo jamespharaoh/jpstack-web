@@ -2,7 +2,7 @@ package wbs.console.html;
 
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.web.HtmlUtils.htmlLinkWrite;
+import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 
 import java.util.Map;
 
