@@ -1,14 +1,20 @@
 package wbs.platform.object.create;
 
+import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringSplitSlash;
 import static wbs.utils.time.TimeUtils.instantToDateNullSafe;
 
 import java.util.Date;
+import java.util.List;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -411,21 +417,66 @@ class ObjectCreateAction <
 		privChecker.refresh (
 			taskLogger);
 
-		ConsoleContextType targetContextType =
-			consoleManager.contextType (
-				targetContextTypeName,
-				true);
+		List <String> targetContextTypeNameParts =
+			stringSplitSlash (
+				targetContextTypeName);
 
-		ConsoleContext targetContext =
-			consoleManager.relatedContextRequired (
+		if (
+			collectionHasOneElement (
+				targetContextTypeNameParts)
+		) {
+
+			ConsoleContextType targetContextType =
+				consoleManager.contextType (
+					targetContextTypeName,
+					true);
+
+			ConsoleContext targetContext =
+				consoleManager.relatedContextRequired (
+					taskLogger,
+					requestContext.consoleContext (),
+					targetContextType);
+
+			consoleManager.changeContext (
 				taskLogger,
-				requestContext.consoleContext (),
-				targetContextType);
+				targetContext,
+				"/" + object.getId ());
 
-		consoleManager.changeContext (
-			taskLogger,
-			targetContext,
-			"/" + object.getId ());
+		} else if (
+			collectionHasTwoElements (
+				targetContextTypeNameParts)
+		) {
+
+			ConsoleContextType targetParentContextType =
+				consoleManager.contextType (
+					listFirstElementRequired (
+						targetContextTypeNameParts),
+					true);
+
+			ConsoleContext targetParentContext =
+				consoleManager.relatedContextRequired (
+					taskLogger,
+					requestContext.consoleContext (),
+					targetParentContextType);
+
+			ConsoleContextType targetContextType =
+				consoleManager.contextType (
+					listSecondElementRequired (
+						targetContextTypeNameParts),
+					true);
+
+			ConsoleContext targetContext =
+				consoleManager.relatedContextRequired (
+					taskLogger,
+					targetParentContext,
+					targetContextType);
+
+			consoleManager.changeContext (
+				taskLogger,
+				targetContext,
+				"/" + object.getId ());
+
+		}
 
 		return responder (
 			targetResponderName);
