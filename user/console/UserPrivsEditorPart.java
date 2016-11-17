@@ -26,12 +26,14 @@ import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.console.PrivConsoleHelper;
 import wbs.platform.priv.model.PrivRec;
@@ -92,10 +94,20 @@ class UserPrivsEditorPart
 	}
 
 	@Override
-	public Set <HtmlLink> links () {
+	public
+	Set <HtmlLink> links () {
 
-		// TODO Auto-generated method stub
-		return super.links ();
+		return ImmutableSet.<HtmlLink> builder ()
+
+			.addAll (
+				super.links ())
+
+			.add (
+				HtmlLink.applicationCssStyle (
+					"/style/user-privs-editor.css"))
+
+			.build ();
+
 	}
 
 	@Override
