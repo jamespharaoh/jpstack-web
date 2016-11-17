@@ -30,7 +30,9 @@
 			<object-list-page
 				fields="list"/>
 
-			<object-create-page/>
+			<object-create-page
+				target-context-type="autoResponder:combo/autoResponder.settings"
+				target-responder="autoResponderSettingsGeneralResponder"/>
 
 		</list>
 
@@ -39,12 +41,22 @@
 			<object-summary-page
 				fields="summary"/>
 
-			<object-settings-page
-				fields="settings"/>
+			<section
+				name="settings"
+				label="Settings">
 
-			<object-sms-message-set-page
-				name="responses"
-				message-set="default"/>
+				<object-settings-page
+					short-name="General"
+					fields="settings"/>
+
+				<object-sms-message-set-page
+					name="responses"
+					message-set="default"/>
+
+				<context-tab-action-page
+					name="templates"/>
+
+			</section>
 
 			<object-sms-messages-page/>
 

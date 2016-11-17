@@ -38,6 +38,12 @@
 			name="sequenceResponses"
 			default="no"/>
 
+		<!-- statistics -->
+
+		<integer-field
+			name="numTemplates"
+			default="0"/>
+
 	</fields>
 
 	<priv-types>

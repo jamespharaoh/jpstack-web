@@ -3,7 +3,6 @@ package wbs.smsapps.autoresponder.console;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.simplify;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
@@ -19,28 +18,33 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.sms.message.core.model.MessageDirection;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageSearch;
+
 import wbs.smsapps.autoresponder.model.AutoResponderObjectHelper;
 import wbs.smsapps.autoresponder.model.AutoResponderRec;
+
 import wbs.utils.time.IntervalFormatter;
 import wbs.utils.time.TextualInterval;
 
-@Log4j
 @PrototypeComponent ("autoResponderVotesPart")
 public
 class AutoResponderVotesPart
@@ -53,6 +57,9 @@ class AutoResponderVotesPart
 
 	@SingletonDependency
 	IntervalFormatter intervalFormatter;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MessageObjectHelper messageHelper;
@@ -74,6 +81,11 @@ class AutoResponderVotesPart
 	public
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		// check units
 
@@ -114,9 +126,9 @@ class AutoResponderVotesPart
 				Duration.standardSeconds (
 					timePeriodSeconds));
 
-		log.info (
-			stringFormat (
-				"Searching from %s",
+		taskLogger.debugFormat (
+			"Searching from %s",
+			userConsoleLogic.timestampWithoutTimezoneString (
 				startTime));
 
 		// retrieve messages

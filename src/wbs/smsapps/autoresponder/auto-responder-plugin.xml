@@ -13,10 +13,13 @@
 	<models>
 		<model name="autoResponder"/>
 		<model name="autoResponderRequest"/>
+		<model name="autoResponderTemplate"/>
 	</models>
 
 	<layer name="console">
 		<component class="console.AutoResponderVotesPart"/>
+		<component class="console.AutoResponderSettingsTemplatesAction"/>
+		<component class="console.AutoResponderSettingsTemplatesPart"/>
 	</layer>
 
 	<layer name="daemon">
