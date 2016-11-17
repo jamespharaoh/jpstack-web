@@ -1,11 +1,15 @@
 package wbs.console.context;
 
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -15,8 +19,10 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabList;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.utils.string.AbstractStringSubstituter;
 
 /**
@@ -56,6 +62,24 @@ class ConsoleContextStuff {
 
 	Set <String> privs =
 		new HashSet<> ();
+
+	// property accessors
+
+	public
+	Map <String, Object> attributes () {
+
+		return ImmutableMap.copyOf (
+			attributes);
+
+	}
+
+	public
+	Set <String> privs () {
+
+		return ImmutableSet.copyOf (
+			privs);
+
+	}
 
 	// implementation
 
@@ -165,14 +189,17 @@ class ConsoleContextStuff {
 		throw new RuntimeException (
 			stringFormat (
 				"Not a tab: %s",
-				object.getClass ()));
+				classNameSimple (
+					object.getClass ())));
 
 	}
 
 	public
 	void reset () {
+
 		tabsByNameByContext =
-			new HashMap<ConsoleContext,Map<String,Tab>> ();
+			new HashMap <> ();
+
 	}
 
 	public
