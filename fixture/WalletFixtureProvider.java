@@ -1,16 +1,22 @@
 package wbs.services.wallet.fixture;
 
+import lombok.NonNull;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+
+import wbs.utils.random.RandomLogic;
+
 import wbs.services.wallet.model.WalletObjectHelper;
 import wbs.services.wallet.model.WalletServiceObjectHelper;
 import wbs.services.wallet.model.WalletServiceRec;
-import wbs.utils.random.RandomLogic;
 
 @PrototypeComponent ("walletFixtureProvider")
 public
@@ -41,7 +47,8 @@ class WalletFixtureProvider
 
 	@Override
 	public
-	void createFixtures () {
+	void createFixtures (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		menuItemHelper.insert (
 			menuItemHelper.createInstance ()
