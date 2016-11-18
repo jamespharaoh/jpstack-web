@@ -100,10 +100,6 @@
 			package="wbs.console.helper"/>
 
 		<plugin
-			name="console-html"
-			package="wbs.console.html"/>
-
-		<plugin
 			name="console-misc"
 			package="wbs.console.misc"/>
 
