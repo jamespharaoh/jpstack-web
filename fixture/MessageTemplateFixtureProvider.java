@@ -1,13 +1,20 @@
 package wbs.services.messagetemplate.fixture;
 
+import lombok.NonNull;
+
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+
+import wbs.utils.random.RandomLogic;
+
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeObjectHelper;
@@ -21,7 +28,6 @@ import wbs.services.messagetemplate.model.MessageTemplateParameterObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateSetObjectHelper;
 import wbs.services.messagetemplate.model.MessageTemplateSetRec;
 import wbs.services.messagetemplate.model.MessageTemplateTypeCharset;
-import wbs.utils.random.RandomLogic;
 
 public
 class MessageTemplateFixtureProvider
@@ -72,7 +78,8 @@ class MessageTemplateFixtureProvider
 
 	@Override
 	public
-	void createFixtures () {
+	void createFixtures (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		menuItemHelper.insert (
 			menuItemHelper.createInstance ()

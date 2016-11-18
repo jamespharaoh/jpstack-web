@@ -5,12 +5,17 @@ import static wbs.utils.string.StringUtils.emptyStringIfNull;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
+
 import wbs.services.messagetemplate.fixture.MessageTemplateDatabaseSpec;
 import wbs.services.messagetemplate.fixture.MessageTemplateEntryTypeSpec;
 import wbs.services.messagetemplate.fixture.MessageTemplateFieldTypeSpec;
@@ -28,7 +33,10 @@ public
 class MessageTemplateLogicImplementation
 	implements MessageTemplateLogic {
 
-	// dependencies
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MessageTemplateDatabaseObjectHelper messageTemplateDatabaseHelper;
@@ -50,25 +58,21 @@ class MessageTemplateLogicImplementation
 	@Override
 	public
 	MessageTemplateDatabaseRec readMessageTemplateDatabaseFromClasspath (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull SliceRec slice,
 			@NonNull String resourceName) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"readMessageTemplateDatabaseFromClasspath");
+
 		// load data
-
-		DataFromXml dataFromXml =
-			new DataFromXmlBuilder ()
-
-			.registerBuilderClasses (
-				MessageTemplateDatabaseSpec.class,
-				MessageTemplateEntryTypeSpec.class,
-				MessageTemplateFieldTypeSpec.class,
-				MessageTemplateParameterSpec.class)
-
-			.build ();
 
 		MessageTemplateDatabaseSpec databaseSpec =
 			(MessageTemplateDatabaseSpec)
 			dataFromXml.readClasspath (
+				taskLogger,
 				resourceName);
 
 		// create database
@@ -193,5 +197,17 @@ class MessageTemplateLogicImplementation
 		return mtDatabase;
 
 	}
+
+	private final static
+	DataFromXml dataFromXml =
+		new DataFromXmlBuilder ()
+
+		.registerBuilderClasses (
+			MessageTemplateDatabaseSpec.class,
+			MessageTemplateEntryTypeSpec.class,
+			MessageTemplateFieldTypeSpec.class,
+			MessageTemplateParameterSpec.class)
+
+		.build ();
 
 }
