@@ -155,14 +155,12 @@ class TextFormFieldRenderer <Container>
 
 			out.writeNewline ();
 
-			out.writeIndent ();
-
 			for (
 				Map.Entry<String,String> presetEntry
 					: presets ().entrySet ()
 			) {
 
-				out.writeFormat (
+				out.writeLineFormat (
 					"<input",
 					" type=\"button\"",
 					" name=\"%h\"",
@@ -173,9 +171,11 @@ class TextFormFieldRenderer <Container>
 						presetEntry.getValue ()),
 					" onclick=\"%h\"",
 					stringFormat (
-						"$('#%j.%j').val ('%j'); return false",
-						formName,
-						name (),
+						"$('%j').val ('%j'); return false",
+						stringFormat (
+							"#%s\\.%s",
+							formName,
+							name ()),
 						presetEntry.getValue ()),
 					" value=\"%h\"",
 					presetEntry.getKey (),
@@ -183,9 +183,11 @@ class TextFormFieldRenderer <Container>
 
 			}
 
-		}
+		} else {
 
-		out.writeNewline ();
+			out.writeNewline ();
+
+		}
 
 	}
 
@@ -207,9 +209,11 @@ class TextFormFieldRenderer <Container>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j.%j\").val (\"\");",
-				formName,
-				name);
+				"$(\"%j\").val (\"\");",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name));
 
 		} else if (
 			enumInSafe (
@@ -218,9 +222,11 @@ class TextFormFieldRenderer <Container>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j.%j\").val (\"%j\");",
-				formName,
-				name,
+				"$(\"%j\").val (\"%j\");",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name),
 				interfaceValue.or (""));
 
 		} else {

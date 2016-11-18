@@ -109,10 +109,10 @@ class ConsoleFormActionsPart
 	}
 
 	@Override
-	public 
+	public
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
-	
+
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
@@ -123,18 +123,18 @@ class ConsoleFormActionsPart
 				pagePart.prepare (
 					taskLogger));
 
-	}	
+	}
 
 	@Override
 	public
 	void renderHtmlHeadContent (
 			@NonNull TaskLogger parentTaskLogger) {
-	
+
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
 				"renderHtmlHeadContent");
-	
+
 		pageParts.forEach (
 			pagePart ->
 				pagePart.renderHtmlHeadContent (
@@ -146,7 +146,7 @@ class ConsoleFormActionsPart
 	public
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
-	
+
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,

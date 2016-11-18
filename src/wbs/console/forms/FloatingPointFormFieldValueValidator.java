@@ -49,7 +49,7 @@ class FloatingPointFormFieldValueValidator
 			|| genericValue.get () > maximum
 		) {
 
-			return optionalOf (			
+			return optionalOf (
 				stringFormat (
 					"Value for \"%s\" must be between %s and %s",
 					label (),

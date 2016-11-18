@@ -341,9 +341,11 @@ class TextAreaFormFieldRenderer <Container, Parent>
 		) {
 
 			javascriptWriter.writeFormat (
-				"$(\"#%j.%j\").val (\"\");",
-				formName,
-				name);
+				"$(\"%j\").val (\"\");",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name));
 
 		} else if (
 			enumInSafe (
@@ -352,9 +354,11 @@ class TextAreaFormFieldRenderer <Container, Parent>
 		) {
 
 			javascriptWriter.writeFormat (
-				"$(\"#%j.%j\").val (\"%j\");",
-				formName,
-				name,
+				"$(\"%j\").val (\"%j\");",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name),
 				interfaceValue.or (""));
 
 		} else {

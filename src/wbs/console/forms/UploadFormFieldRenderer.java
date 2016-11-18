@@ -92,14 +92,18 @@ class UploadFormFieldRenderer <Container>
 			@NonNull String formName) {
 
 		javascriptWriter.writeLineFormat (
-			"$(\"#%j.%j\").replaceWith (",
-			formName,
-			name);
+			"$(\"%j\").replaceWith (",
+			stringFormat (
+				"#%s\\.%s",
+				formName,
+				name));
 
 		javascriptWriter.writeLineFormat (
-			"\t$(\"#%j.%j\").clone (true));",
-			formName,
-			name);
+			"\t$(\"%j\").clone (true));",
+			stringFormat (
+				"#%s\\.%s",
+				formName,
+				name));
 
 	}
 

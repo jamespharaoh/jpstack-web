@@ -2,9 +2,10 @@ package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +16,7 @@ import javax.inject.Provider;
 import org.joda.time.Instant;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -23,6 +25,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.utils.etc.PropertyUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -176,17 +179,19 @@ class TimestampFormFieldBuilder {
 		} else {
 
 			throw new RuntimeException (
-				stringFormatObsolete (
+				stringFormat (
 					"Don't know how to map %s as timestamp for %s.%s",
-					propertyClass,
-					context.containerClass (),
+					classNameSimple (
+						propertyClass),
+					classNameSimple (
+						context.containerClass ()),
 					name));
 
 		}
 
 		// value validator
 
-		List<FormFieldValueValidator> valueValidators =
+		List <FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
 
 		if (! nullable) {

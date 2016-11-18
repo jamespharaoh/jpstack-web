@@ -97,11 +97,18 @@ class YesNoFormFieldRenderer <Container>
 						formName))
 				: interfaceValue;
 
-		htmlWriter.writeLineFormat (
+		htmlWriter.writeLineFormatIncreaseIndent (
 			"<select",
-			" name=\"%h.%h\"",
-			formName,
-			name (),
+			" id=\"%h\"",
+			stringFormat (
+				"%s.%s",
+				formName,
+				name ()),
+			" name=\"%h\"",
+			stringFormat (
+				"%s.%s",
+				formName,
+				name ()),
 			">");
 
 		if (
@@ -147,7 +154,7 @@ class YesNoFormFieldRenderer <Container>
 			">%h</option>",
 			noLabel ());
 
-		htmlWriter.writeLineFormat (
+		htmlWriter.writeLineFormatDecreaseIndent (
 			"</select>");
 
 	}
@@ -170,9 +177,11 @@ class YesNoFormFieldRenderer <Container>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j.%j\").val (\"none\");",
-				formName,
-				name);
+				"$(\"%j\").val (\"none\");",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name));
 
 		} else if (
 			enumInSafe (
@@ -181,9 +190,11 @@ class YesNoFormFieldRenderer <Container>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j.%j\").val (%s);",
-				formName,
-				name,
+				"$(\"%j\").val (%s);",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name),
 				booleanToTrueFalseNone (
 					interfaceValue));
 

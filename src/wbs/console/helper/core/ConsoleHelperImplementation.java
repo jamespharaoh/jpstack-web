@@ -125,7 +125,7 @@ class ConsoleHelperImplementation <
 		return objectHelper.findRequired (
 			requestContext.stuffInteger (
 				idKey ()));
-	
+
 	}
 
 	@Override

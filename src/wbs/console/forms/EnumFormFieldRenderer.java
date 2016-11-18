@@ -179,9 +179,11 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j.%j\").val (\"none\");",
-				formName,
-				name);
+				"$(\"%j\").val (\"none\");",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name));
 
 		} else if (
 			enumInSafe (
@@ -190,9 +192,11 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j.%j\").val (\"%h\");",
-				formName,
-				name,
+				"$(\"%j\").val (\"%h\");",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name),
 				interfaceValue.isPresent ()
 					? camelToHyphen (
 						interfaceValue.get ().name ())

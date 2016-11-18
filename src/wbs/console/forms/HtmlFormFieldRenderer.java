@@ -12,13 +12,14 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+
 import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("htmlFormFieldRenderer")
 @Accessors (fluent = true)
 public
-class HtmlFormFieldRenderer<Container>
-	implements FormFieldRenderer<Container,String> {
+class HtmlFormFieldRenderer <Container>
+	implements FormFieldRenderer <Container, String> {
 
 	// properties
 
@@ -36,8 +37,8 @@ class HtmlFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -51,8 +52,8 @@ class HtmlFormFieldRenderer<Container>
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -67,7 +68,7 @@ class HtmlFormFieldRenderer<Container>
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
-			@NonNull Optional<String> interfaceValue,
+			@NonNull Optional <String> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
@@ -90,8 +91,8 @@ class HtmlFormFieldRenderer<Container>
 	void renderHtmlSimple (
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue,
 			boolean link) {
 
 		htmlWriter.writeFormat (

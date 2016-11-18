@@ -95,7 +95,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 				? integerToDecimalString (
 					interfaceValue.get ().getId ())
 				: "none",
-			">\n");
+			">");
 
 	}
 
@@ -216,7 +216,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			" name=\"%h.%h\"",
 			formName,
 			name,
-			">\n");
+			">");
 
 		// none option
 
@@ -241,7 +241,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 				currentValue.isPresent ()
 					? ""
 					: " selected",
-				">&mdash;</option>\n");
+				">&mdash;</option>");
 
 		}
 
@@ -285,7 +285,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 				selected
 					? " selected"
 					: "",
-				">%h</option>\n",
+				">%h</option>",
 				optionLabel);
 
 		}
@@ -313,9 +313,11 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j.%j\").val (\"none\");",
-				formName,
-				name);
+				"$(\"%j\").val (\"none\");",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name));
 
 		} else if (
 			enumInSafe (
@@ -324,9 +326,11 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j.%j\").val (\"%h\");",
-				formName,
-				name,
+				"$(\"%j\").val (\"%h\");",
+				stringFormat (
+					"#%s\\.%s",
+					formName,
+					name),
 				interfaceValue.isPresent ()
 					? integerToDecimalString (
 						interfaceValue.get ().getId ())
