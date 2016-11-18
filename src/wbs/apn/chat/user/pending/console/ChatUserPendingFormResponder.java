@@ -40,6 +40,22 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
+import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.ScriptRef;
+import wbs.console.misc.JqueryScriptRef;
+import wbs.console.priv.UserPrivChecker;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.HtmlResponder;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.media.console.MediaConsoleLogic;
+
 import wbs.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -48,19 +64,6 @@ import wbs.apn.chat.user.core.logic.ChatUserLogic.PendingMode;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.apn.chat.user.image.model.ChatUserImageType;
-import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.html.ScriptRef;
-import wbs.console.misc.JqueryScriptRef;
-import wbs.console.priv.UserPrivChecker;
-import wbs.console.request.ConsoleRequestContext;
-import wbs.console.responder.HtmlResponder;
-import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.entity.record.GlobalId;
-import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.media.console.MediaConsoleLogic;
 
 @PrototypeComponent ("chatUserPendingFormResponder")
 public

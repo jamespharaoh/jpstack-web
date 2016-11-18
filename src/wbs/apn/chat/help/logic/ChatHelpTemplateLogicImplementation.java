@@ -6,15 +6,18 @@ import java.util.Map;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+
+import wbs.platform.misc.MapStringSubstituter;
+
+import wbs.sms.gsm.MessageSplitter;
+
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.platform.misc.MapStringSubstituter;
-import wbs.sms.gsm.MessageSplitter;
 
 @SingletonComponent ("chatTemplateLogic")
 public

@@ -14,14 +14,6 @@ import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 
-import wbs.apn.chat.bill.model.ChatUserCreditMode;
-import wbs.apn.chat.contact.logic.ChatMessageLogic;
-import wbs.apn.chat.contact.model.ChatUserInitiationReason;
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
-import wbs.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -29,7 +21,17 @@ import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.daemon.SleepingDaemonService;
+
+import wbs.apn.chat.bill.model.ChatUserCreditMode;
+import wbs.apn.chat.contact.logic.ChatMessageLogic;
+import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
+import wbs.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
+import wbs.apn.chat.contact.model.ChatUserInitiationReason;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 
 @Log4j
 @SingletonComponent ("chatUserQuietDaemon")

@@ -16,18 +16,22 @@ import java.util.List;
 
 import lombok.NonNull;
 
+import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+import wbs.framework.object.ObjectManager;
+
+import wbs.platform.currency.logic.CurrencyLogic;
+
+import wbs.utils.time.TimeFormatter;
+
 import wbs.apn.chat.broadcast.model.ChatBroadcastObjectHelper;
 import wbs.apn.chat.broadcast.model.ChatBroadcastRec;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
-import wbs.console.part.AbstractPagePart;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
-import wbs.framework.object.ObjectManager;
-import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("chatBroadcastListPart")
 public

@@ -11,15 +11,15 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Set;
 
-import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.usertype.UserType;
-
-import wbs.utils.collection.ReversableMap;
-
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.usertype.UserType;
+
+import wbs.utils.collection.ReversableMap;
 
 @Accessors (fluent = true)
 public

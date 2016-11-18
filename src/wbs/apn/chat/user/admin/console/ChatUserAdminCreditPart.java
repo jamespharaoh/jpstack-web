@@ -21,17 +21,20 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import lombok.NonNull;
 
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.currency.logic.CurrencyLogic;
+import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.part.AbstractPagePart;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.platform.user.console.UserConsoleLogic;
 
 @PrototypeComponent ("chatUserAdminCreditPart")
 public

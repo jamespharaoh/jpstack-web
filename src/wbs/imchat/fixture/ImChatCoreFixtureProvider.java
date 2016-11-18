@@ -1,22 +1,37 @@
 package wbs.imchat.fixture;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.io.FileUtils.fileReadBytes;
 import static wbs.utils.string.StringUtils.joinWithSlash;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.SneakyThrows;
+import lombok.NonNull;
 
-import org.apache.commons.io.IOUtils;
-
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
+
+import wbs.platform.currency.model.CurrencyObjectHelper;
+import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.model.MediaRec;
+import wbs.platform.menu.model.MenuGroupObjectHelper;
+import wbs.platform.menu.model.MenuItemObjectHelper;
+import wbs.platform.scaffold.model.SliceObjectHelper;
+import wbs.platform.text.model.TextObjectHelper;
+
+import wbs.utils.random.RandomLogic;
+
 import wbs.imchat.model.ImChatConversationObjectHelper;
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerDetailDataType;
@@ -36,18 +51,9 @@ import wbs.imchat.model.ImChatRec;
 import wbs.imchat.model.ImChatSessionObjectHelper;
 import wbs.imchat.model.ImChatSessionRec;
 import wbs.imchat.model.ImChatTemplateObjectHelper;
-import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
-import wbs.platform.currency.model.CurrencyObjectHelper;
-import wbs.platform.media.logic.MediaLogic;
-import wbs.platform.media.model.MediaRec;
-import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuItemObjectHelper;
-import wbs.platform.scaffold.model.SliceObjectHelper;
-import wbs.platform.text.model.TextObjectHelper;
 import wbs.services.messagetemplate.logic.MessageTemplateLogic;
 import wbs.services.messagetemplate.model.MessageTemplateDatabaseRec;
 import wbs.services.messagetemplate.model.MessageTemplateSetObjectHelper;
-import wbs.utils.random.RandomLogic;
 
 @PrototypeComponent ("imChatCoreFixtureProvider")
 public
@@ -92,6 +98,9 @@ class ImChatCoreFixtureProvider
 	@SingletonDependency
 	ImChatTemplateObjectHelper imChatTemplateHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MediaLogic mediaLogic;
 
@@ -122,9 +131,14 @@ class ImChatCoreFixtureProvider
 	// implementation
 
 	@Override
-	@SneakyThrows (Exception.class)
 	public
-	void createFixtures () {
+	void createFixtures (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFixtures");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -164,6 +178,7 @@ class ImChatCoreFixtureProvider
 
 		MessageTemplateDatabaseRec primaryMessageTemplateDatabase =
 			messageTemplateLogic.readMessageTemplateDatabaseFromClasspath (
+				taskLogger,
 				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"),
@@ -190,6 +205,7 @@ class ImChatCoreFixtureProvider
 
 		MessageTemplateDatabaseRec embeddedMessageTemplateDatabase =
 			messageTemplateLogic.readMessageTemplateDatabaseFromClasspath (
+				taskLogger,
 				sliceHelper.findByCodeRequired (
 					GlobalId.root,
 					"test"),
@@ -421,22 +437,26 @@ class ImChatCoreFixtureProvider
 				.setCode (
 					stringFormat (
 						"template_%s",
-						index))
+						integerToDecimalString (
+							index)))
 
 				.setName (
 					stringFormat (
 						"Template %s",
-						index))
+						integerToDecimalString (
+							index)))
 
 				.setDescription (
 					stringFormat (
 						"Test template %s",
-						index))
+						integerToDecimalString (
+							index)))
 
 				.setText (
 					stringFormat (
 						"Test IM chat template %s",
-						index))
+						integerToDecimalString (
+							index)))
 
 			);
 
@@ -615,17 +635,15 @@ class ImChatCoreFixtureProvider
 
 		MediaRec dougalMedia =
 			mediaLogic.createMediaFromImageRequired (
-				IOUtils.toByteArray (
-					new FileInputStream (
-						"binaries/test/dougal.jpg")),
+				fileReadBytes (
+					"binaries/test/dougal.jpg"),
 				"image/jpeg",
 				"dougal.jpg");
 
 		MediaRec ermintrudeMedia =
 			mediaLogic.createMediaFromImageRequired (
-				IOUtils.toByteArray (
-					new FileInputStream (
-						"binaries/test/ermintrude.jpg")),
+				fileReadBytes (
+					"binaries/test/dougal.jpg"),
 				"image/jpeg",
 				"ermintrude.jpg");
 
@@ -648,17 +666,20 @@ class ImChatCoreFixtureProvider
 				.setCode (
 					stringFormat (
 						"profile_%s",
-						index))
+						integerToDecimalString (
+							index)))
 
 				.setName (
 					stringFormat (
 						"Profile %s",
-						index))
+						integerToDecimalString (
+							index)))
 
 				.setDescription (
 					stringFormat (
 						"Test IM chat profile %s",
-						index))
+						integerToDecimalString (
+							index)))
 
 				.setState (
 					ImChatProfileState.ready)
@@ -666,22 +687,26 @@ class ImChatCoreFixtureProvider
 				.setPublicName (
 					stringFormat (
 						"Profile %s",
-						index))
+						integerToDecimalString (
+							index)))
 
 				.setPublicDescription (
 					stringFormat (
 						"Test IM chat profile %s",
-						index))
+						integerToDecimalString (
+							index)))
 
 				.setPublicDescriptionShort (
 					stringFormat (
 						"Test IM chat profile %s",
-						index))
+						integerToDecimalString (
+							index)))
 
 				.setProfileImage (
 					index % 2 == 0
 						? dougalMedia
 						: ermintrudeMedia)
+
 			));
 
 		}

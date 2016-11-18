@@ -7,6 +7,7 @@ import static wbs.web.utils.HtmlBlockUtils.htmlDivClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlDivOpen;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlInputUtils.htmlSelect;
 import static wbs.web.utils.HtmlTableUtils.htmlTableBodyClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableBodyOpen;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
@@ -21,8 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Provider;
-
 import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
@@ -30,13 +29,13 @@ import lombok.NonNull;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
-import wbs.console.html.SelectBuilder;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.sms.network.console.NetworkConsoleHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
@@ -55,11 +54,6 @@ class SimulatorSessionConsolePart
 	@SingletonDependency
 	RouteConsoleHelper routeHelper;
 
-	// prototype dependencies
-
-	@PrototypeDependency
-	Provider <SelectBuilder> selectBuilderProvider;
-
 	// state
 
 	Map <String, String> routeOptions =
@@ -72,7 +66,7 @@ class SimulatorSessionConsolePart
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
 		return ImmutableSet.<ScriptRef>builder ()
 
@@ -184,12 +178,15 @@ class SimulatorSessionConsolePart
 
 		htmlTableDetailsRowWriteHtml (
 			"Network",
-			() -> selectBuilderProvider.get ()
-				.htmlClass ("networkSelect")
-				.options (networkOptions)
-				.selectedValue ((String)
-					requestContext.session ("simulatorNetworkId"))
-				.build ());
+			() -> htmlSelect (
+				"network",
+				networkOptions,
+				emptyStringIfNull (
+					(String)
+					requestContext.session (
+						"simulatorNetworkId")),
+				htmlClassAttribute (
+					"networkSelect")));
 
 		htmlTableDetailsRowWriteHtml (
 			"Num from",

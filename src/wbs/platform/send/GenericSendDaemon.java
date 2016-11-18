@@ -1,5 +1,6 @@
 package wbs.platform.send;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -17,6 +18,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+
 import wbs.platform.daemon.SleepingDaemonService;
 
 @Accessors (fluent = true)
@@ -124,7 +126,8 @@ class GenericSendDaemon <
 		log ().debug (
 			stringFormat (
 				"Performing send for %s",
-				jobId));
+				integerToDecimalString (
+					jobId)));
 
 		@Cleanup
 		Transaction transaction =
@@ -149,7 +152,8 @@ class GenericSendDaemon <
 			log ().debug (
 				stringFormat (
 					"Not sending job %s",
-					jobId));
+					integerToDecimalString (
+						jobId)));
 
 			return;
 
@@ -164,7 +168,8 @@ class GenericSendDaemon <
 			log ().warn (
 				stringFormat (
 					"Not configured job %s",
-					jobId));
+					integerToDecimalString (
+						jobId)));
 
 			return;
 
@@ -185,7 +190,8 @@ class GenericSendDaemon <
 			log ().debug (
 				stringFormat (
 					"Triggering completion for job %s",
-					jobId));
+					integerToDecimalString (
+						jobId)));
 
 			helper ().sendComplete (
 				service,
@@ -213,7 +219,8 @@ class GenericSendDaemon <
 					log ().debug (
 						stringFormat (
 							"Sending item %s",
-							item.getId ()));
+							integerToDecimalString (
+								item.getId ())));
 
 					// send item
 
@@ -227,7 +234,8 @@ class GenericSendDaemon <
 					log ().debug (
 						stringFormat (
 							"Rejecting item %s",
-							item.getId ()));
+							integerToDecimalString (
+								item.getId ())));
 
 					// reject it
 
@@ -249,7 +257,8 @@ class GenericSendDaemon <
 		log ().debug (
 			stringFormat (
 				"Finished send for job %s",
-				jobId));
+				integerToDecimalString (
+					jobId)));
 
 	}
 

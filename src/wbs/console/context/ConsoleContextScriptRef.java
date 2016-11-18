@@ -54,7 +54,7 @@ class ConsoleContextScriptRef
 	@Override
 	public
 	String getUrl (
-			ConsoleRequestContext requestContext) {
+			@NonNull ConsoleRequestContext requestContext) {
 
 		return requestContext.resolveContextUrl (
 			stringFormat (

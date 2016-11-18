@@ -1,9 +1,9 @@
 package wbs.platform.object.search;
 
-import static wbs.utils.etc.Misc.getMethodRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToHyphen;
@@ -166,7 +166,7 @@ class ObjectSearchCsvResponder <RecordType>
 			) {
 
 				Method method =
-					getMethodRequired (
+					methodGetRequired (
 						consoleHelper.getClass (),
 						resultsDaoMethodName,
 						ImmutableList.<Class<?>> of (

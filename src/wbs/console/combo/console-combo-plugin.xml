@@ -9,8 +9,6 @@
 		<component class="ContextActionSpec"/>
 		<component class="ContextFileBuilder"/>
 		<component class="ContextFileSpec"/>
-		<component class="ContextFormActionAction"/>
-		<component class="ContextFormActionPart"/>
 		<component class="ContextGetActionBuilder"/>
 		<component class="ContextGetActionSpec"/>
 		<component class="ContextRequestHandlerBuilder"/>
@@ -23,8 +21,6 @@
 		<component class="ContextTabResponderSpec"/>
 		<component class="ContextTabActionPageBuilder"/>
 		<component class="ContextTabActionPageSpec"/>
-		<component class="ContextTabFormActionPageBuilder"/>
-		<component class="ContextTabFormActionPageSpec"/>
 		<component class="ContextTabPageBuilder"/>
 		<component class="ContextTabPageSpec"/>
 		<component class="SimpleActionPageBuilder"/>

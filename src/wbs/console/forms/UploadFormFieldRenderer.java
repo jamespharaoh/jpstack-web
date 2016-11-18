@@ -19,6 +19,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+
 import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
 
@@ -74,7 +75,7 @@ class UploadFormFieldRenderer <Container>
 		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"file\"",
-			" name=\"%h-%h\"",
+			" name=\"%h.%h\"",
 			formName,
 			name (),
 			">");
@@ -91,12 +92,12 @@ class UploadFormFieldRenderer <Container>
 			@NonNull String formName) {
 
 		javascriptWriter.writeLineFormat (
-			"$(\"#%j-%j\").replaceWith (",
+			"$(\"#%j.%j\").replaceWith (",
 			formName,
 			name);
 
 		javascriptWriter.writeLineFormat (
-			"\t$(\"#%j-%j\").clone (true));",
+			"\t$(\"#%j.%j\").clone (true));",
 			formName,
 			name);
 
@@ -114,7 +115,7 @@ class UploadFormFieldRenderer <Container>
 
 			&& submission.hasFileItem (
 				stringFormat (
-					"%s-%s",
+					"%s.%s",
 					formName,
 					name ()))
 
@@ -129,7 +130,7 @@ class UploadFormFieldRenderer <Container>
 		FileItem fileItem =
 			submission.fileItem (
 				stringFormat (
-					"%s-%s",
+					"%s.%s",
 					formName,
 					name ()));
 

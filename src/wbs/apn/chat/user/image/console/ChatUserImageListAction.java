@@ -22,19 +22,22 @@ import com.google.common.base.Optional;
 import lombok.Cleanup;
 import lombok.NonNull;
 
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.apn.chat.user.image.model.ChatUserImageRec;
-import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.media.logic.MediaLogic;
+
+import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatUserImageListAction")

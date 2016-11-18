@@ -17,11 +17,13 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.helper.provider.ConsoleHelperProvider;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
+
 import wbs.utils.string.FormatWriter;
 
 import fj.data.Either;
@@ -114,6 +116,16 @@ class ConsoleHelperImplementation <
 		return consoleHelperProvider.canView (
 			object);
 
+	}
+
+	@Override
+	public
+	RecordType findFromContextRequired () {
+
+		return objectHelper.findRequired (
+			requestContext.stuffInteger (
+				idKey ()));
+	
 	}
 
 	@Override

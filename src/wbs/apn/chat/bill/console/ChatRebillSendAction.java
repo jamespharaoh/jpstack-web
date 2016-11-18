@@ -22,23 +22,26 @@ import lombok.NonNull;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import wbs.console.action.ConsoleAction;
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.module.ConsoleModule;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.bill.logic.ChatCreditLogic.BillCheckOptions;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.console.action.ConsoleAction;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.module.ConsoleModule;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.user.console.UserConsoleLogic;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatRebillSendAction")

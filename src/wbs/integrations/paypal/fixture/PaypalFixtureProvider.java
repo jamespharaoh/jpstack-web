@@ -12,7 +12,10 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
+
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
@@ -43,7 +46,8 @@ class PaypalFixtureProvider
 
 	@Override
 	public
-	void createFixtures () {
+	void createFixtures (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		menuItemHelper.insert (
 			menuItemHelper.createInstance ()

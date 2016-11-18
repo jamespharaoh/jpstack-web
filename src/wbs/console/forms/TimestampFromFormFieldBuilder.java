@@ -3,6 +3,7 @@ package wbs.console.forms;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -17,6 +18,7 @@ import org.joda.time.Instant;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.manager.ConsoleObjectManager;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -167,15 +169,17 @@ class TimestampFromFormFieldBuilder {
 			throw new RuntimeException (
 				stringFormat (
 					"Don't know how to map %s as timestamp for %s.%s",
-					propertyClass,
-					context.containerClass (),
+					classNameSimple (
+						propertyClass),
+					classNameSimple (
+						context.containerClass ()),
 					name));
 
 		}
 
 		// value validator
 
-		List<FormFieldValueValidator> valueValidators =
+		List <FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
 
 		if (! nullable) {

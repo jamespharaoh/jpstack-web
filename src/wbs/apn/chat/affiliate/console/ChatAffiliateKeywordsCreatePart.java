@@ -13,12 +13,14 @@ import javax.inject.Named;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.core.console.ChatKeywordJoinTypeConsoleHelper;
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.core.console.ChatKeywordJoinTypeConsoleHelper;
 
 @PrototypeComponent ("chatAffiliateKeywordsCreatePart")
 public

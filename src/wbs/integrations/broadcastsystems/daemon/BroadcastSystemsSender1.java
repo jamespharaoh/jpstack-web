@@ -1,6 +1,7 @@
 package wbs.integrations.broadcastsystems.daemon;
 
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
@@ -24,12 +25,15 @@ import wbs.framework.component.config.WbsConfig;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
+
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutRec;
+
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
+
 import wbs.web.utils.HtmlUtils;
 
 @Log4j
@@ -130,7 +134,7 @@ class BroadcastSystemsSender1
 			State state) {
 
 		log.info (
-			stringFormat (
+			stringFormatObsolete (
 				"Sending message %s",
 				state.messageId));
 
@@ -221,7 +225,7 @@ class BroadcastSystemsSender1
 				state.urlConn.getInputStream ());
 
 		log.debug (
-			stringFormat (
+			stringFormatObsolete (
 				"Message %s response: %s",
 				state.messageId,
 				responseString));
@@ -241,7 +245,7 @@ class BroadcastSystemsSender1
 
 				exceptionLogger.logSimple (
 					"unknown",
-					stringFormat (
+					stringFormatObsolete (
 						"message %s",
 						state.messageId),
 					"Success response did not match",
@@ -272,7 +276,7 @@ class BroadcastSystemsSender1
 
 				exceptionLogger.logSimple (
 					"unknown",
-					stringFormat (
+					stringFormatObsolete (
 						"message %s",
 						state.messageId),
 					"Failure response did not match",

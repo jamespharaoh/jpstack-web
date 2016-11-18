@@ -32,12 +32,14 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
+
 import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)

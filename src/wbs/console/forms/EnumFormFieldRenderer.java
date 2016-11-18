@@ -20,9 +20,10 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import wbs.console.forms.FormType;
 import wbs.console.helper.enums.EnumConsoleHelper;
+
 import wbs.framework.component.annotations.PrototypeComponent;
+
 import wbs.utils.string.FormatWriter;
 
 import fj.data.Either;
@@ -63,7 +64,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 		htmlWriter.writeLineFormat (
 			"<input",
 			" type=\"hidden\"",
-			" name=\"%h-%h\"",
+			" name=\"%h.%h\"",
 			formName,
 			name (),
 			" value=\"%h\"",
@@ -98,10 +99,10 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 
 		htmlWriter.writeLineFormatIncreaseIndent (
 			"<select",
-			" id=\"%h-%h\"",
+			" id=\"%h.%h\"",
 			formName,
 			name,
-			" name=\"%h-%h\"",
+			" name=\"%h.%h\"",
 			formName,
 			name,
 			">");
@@ -178,7 +179,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j-%j\").val (\"none\");",
+				"$(\"#%j.%j\").val (\"none\");",
 				formName,
 				name);
 
@@ -189,7 +190,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j-%j\").val (\"%h\");",
+				"$(\"#%j.%j\").val (\"%h\");",
 				formName,
 				name,
 				interfaceValue.isPresent ()
@@ -213,7 +214,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 
 		return submission.hasParameter (
 			stringFormat (
-				"%s-%s",
+				"%s.%s",
 				formName,
 				name ()));
 
@@ -228,7 +229,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 		String parameterValue =
 			submission.parameter (
 				stringFormat (
-					"%s-%s",
+					"%s.%s",
 					formName,
 					name ()));
 
@@ -250,7 +251,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 						hyphenToCamel (
 							submission.parameter (
 								stringFormat (
-									"%s-%s",
+									"%s.%s",
 									formName,
 									name ()))))));
 

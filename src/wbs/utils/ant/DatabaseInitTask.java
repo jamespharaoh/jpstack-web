@@ -1,5 +1,6 @@
 package wbs.utils.ant;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.BufferedReader;
@@ -10,18 +11,26 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Task;
-
-import wbs.framework.component.config.WbsConfig;
-
 import com.google.common.base.Joiner;
 
 import lombok.Data;
 
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Task;
+
+import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 public
 class DatabaseInitTask
 	extends Task {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			DatabaseInitTask.class);
 
 	WbsConfig wbsConfig;
 
@@ -41,6 +50,10 @@ class DatabaseInitTask
 	public
 	void init () {
 
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"init");
+
 		String configFilename =
 			System.getenv (
 				"WBS_CONFIG_XML");
@@ -55,6 +68,7 @@ class DatabaseInitTask
 
 		wbsConfig =
 			WbsConfig.readFilename (
+				taskLogger,
 				configFilename);
 
 	}
@@ -114,7 +128,8 @@ class DatabaseInitTask
 					stringFormat (
 						"Command \"%s\" returned %s",
 						command,
-						result));
+						integerToDecimalString (
+							result)));
 
 			}
 
@@ -134,14 +149,16 @@ class DatabaseInitTask
 		List<String> parts =
 			new ArrayList<String> ();
 
-		for (ScriptElement scriptElement
-				: scriptElements) {
+		for (
+			ScriptElement scriptElement
+				: scriptElements
+		) {
 
 			File scriptFile =
 				new File (
 					stringFormat (
 						"%s/%s",
-						getProject ().getBaseDir (),
+						getProject ().getBaseDir ().getPath (),
 						scriptElement.getName ()));
 
 			if (! scriptFile.exists ()) {

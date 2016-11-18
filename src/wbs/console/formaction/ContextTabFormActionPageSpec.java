@@ -1,26 +1,22 @@
-package wbs.console.combo;
-
-import java.util.List;
+package wbs.console.formaction;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleModuleData;
 import wbs.console.module.ConsoleModuleSpec;
-
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
-import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
 @Data
-@DataClass ("context-tab-form-actions-page")
-@PrototypeComponent ("contextTabFormActionsPageSpec")
+@DataClass ("context-tab-form-action-page")
+@PrototypeComponent ("contextTabFormActionPageSpec")
 @ConsoleModuleData
 public
-class ContextTabFormActionsPageSpec {
+class ContextTabFormActionPageSpec {
 
 	// tree attributes
 
@@ -32,8 +28,18 @@ class ContextTabFormActionsPageSpec {
 	@DataAttribute
 	String name;
 
-	@DataChildren (
-		direct = true)
-	List <ConsoleFormActionSpec> actions;
+	@DataAttribute (
+		name = "fields")
+	String fieldsName;
+
+	@DataAttribute
+	String helpText;
+
+	@DataAttribute
+	String submitLabel;
+
+	@DataAttribute (
+		name = "helper")
+	String helperName;
 
 }

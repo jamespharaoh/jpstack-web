@@ -15,4 +15,13 @@ class RuntimeReflectiveOperationException
 
 	}
 
+	public
+	RuntimeReflectiveOperationException (
+			@NonNull String message) {
+
+		super (
+			message);
+
+	}
+
 }

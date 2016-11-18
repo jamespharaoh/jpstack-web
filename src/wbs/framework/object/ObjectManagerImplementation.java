@@ -6,12 +6,15 @@ import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isSubclassOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -43,6 +46,7 @@ import wbs.framework.database.Database;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+
 import wbs.utils.etc.PropertyUtils;
 
 import fj.data.Either;
@@ -304,7 +308,7 @@ class ObjectManagerImplementation
 			// get some stuff
 
 			Record <?> parent =
-				objectHelper.getParentOrNullGeneric (
+				objectHelper.getParentRequiredGeneric (
 					object);
 
 			ObjectHelper <?> parentHelper =
@@ -681,9 +685,9 @@ class ObjectManagerImplementation
 
 			if (parents.contains (current)) {
 
-				@SuppressWarnings ("unchecked")
 				ParentType temp =
-					(ParentType) current;
+					genericCastUnchecked (
+						current);
 
 				return temp;
 
@@ -693,7 +697,7 @@ class ObjectManagerImplementation
 				return null;
 
 			current =
-				currentHelper.getParentOrNullGeneric (
+				currentHelper.getParentRequiredGeneric (
 					current);
 
 			currentHelper =
@@ -788,7 +792,7 @@ class ObjectManagerImplementation
 			) {
 
 				object =
-					getParentOrNull (
+					getParentRequired (
 						(Record <?>) object);
 
 			} else if (
@@ -798,8 +802,8 @@ class ObjectManagerImplementation
 			) {
 
 				object =
-					getParentOrNull (
-					getParentOrNull (
+					getParentRequired (
+					getParentRequired (
 						(Record <?>)
 						object));
 
@@ -810,9 +814,9 @@ class ObjectManagerImplementation
 			) {
 
 				object =
-					getParentOrNull (
-					getParentOrNull (
-					getParentOrNull (
+					getParentRequired (
+					getParentRequired (
+					getParentRequired (
 						(Record <?>)
 						object)));
 
@@ -953,7 +957,7 @@ class ObjectManagerImplementation
 					object)
 			) {
 
-				return Optional.<ObjectType>of (
+				return optionalOf (
 					ancestorClass.cast (
 						object));
 
@@ -966,14 +970,14 @@ class ObjectManagerImplementation
 					object)
 			) {
 
-				return Optional.absent ();
+				return optionalAbsent ();
 
 			}
 
 			// iterate via parent
 
 			object =
-				getParentOrNull (
+				getParentRequired (
 					object);
 
 		}

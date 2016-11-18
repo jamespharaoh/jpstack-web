@@ -30,17 +30,19 @@ import javax.inject.Named;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.core.console.ChatKeywordJoinTypeConsoleHelper;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.core.console.ChatKeywordJoinTypeConsoleHelper;
+import wbs.apn.chat.core.model.ChatObjectHelper;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.scheme.model.ChatSchemeRec;
 
 @PrototypeComponent ("chatAffiliateCreateOldPart")
 public

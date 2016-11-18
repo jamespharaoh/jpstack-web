@@ -1,6 +1,6 @@
 package wbs.framework.entity.generate.fields;
 
-import static wbs.utils.etc.Misc.getStaticMethodRequired;
+import static wbs.utils.etc.ReflectionUtils.methodGetStaticRequired;
 
 import com.google.common.collect.ImmutableList;
 
@@ -81,7 +81,7 @@ class TimestampFieldWriter
 				ReadableInstant.class)
 
 			.setterConversion (
-				getStaticMethodRequired (
+				methodGetStaticRequired (
 					TimeUtils.class,
 					"toInstantNullSafe",
 					ImmutableList.of (

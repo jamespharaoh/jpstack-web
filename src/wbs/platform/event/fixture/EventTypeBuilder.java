@@ -22,6 +22,7 @@ import wbs.framework.entity.fixtures.ModelMetaBuilderHandler;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
+
 import wbs.platform.event.metamodel.EventTypeSpec;
 import wbs.platform.event.model.EventTypeObjectHelper;
 

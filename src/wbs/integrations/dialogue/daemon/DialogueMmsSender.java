@@ -4,6 +4,7 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 
 import java.io.BufferedReader;
@@ -93,7 +94,7 @@ class DialogueMmsSender
 			dialogueMmsRouteHelper.findOrThrow (
 				outbox.getRoute ().getId (),
 				() -> tempFailure (
-					stringFormat (
+					stringFormatObsolete (
 						"No Dialogue MMS route for message %s",
 						outbox.getMessage ().getId ())));
 
@@ -127,7 +128,7 @@ class DialogueMmsSender
 		try {
 
 			log.debug (
-				stringFormat (
+				stringFormatObsolete (
 					"Sending %s",
 					dialogueMmsOutbox.outbox.getMessage ().getId ()));
 

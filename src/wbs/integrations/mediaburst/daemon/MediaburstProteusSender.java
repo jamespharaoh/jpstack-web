@@ -3,6 +3,7 @@ package wbs.integrations.mediaburst.daemon;
 import static wbs.utils.etc.NumberUtils.integerInSafe;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,10 +22,12 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
+
 import wbs.integrations.mediaburst.model.MediaburstNetworkObjectHelper;
 import wbs.integrations.mediaburst.model.MediaburstNetworkRec;
 import wbs.integrations.mediaburst.model.MediaburstProteusRouteOutObjectHelper;
 import wbs.integrations.mediaburst.model.MediaburstProteusRouteOutRec;
+
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
 import wbs.sms.message.outbox.model.OutboxRec;
@@ -33,6 +36,7 @@ import wbs.sms.message.wap.model.WapPushMessageRec;
 import wbs.sms.network.logic.NetworkPrefixCache;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteRec;
+
 import wbs.utils.etc.Xom;
 
 import nu.xom.Builder;
@@ -137,7 +141,7 @@ class MediaburstProteusSender
 				mediaburstNetworkHelper.findOrThrow (
 					network.getId (),
 					() -> permFailure (
-						stringFormat (
+						stringFormatObsolete (
 							"Cannot find Mediaburst network information for message %s",
 							proteusOutbox.messageId)));
 
@@ -173,7 +177,7 @@ class MediaburstProteusSender
 				wapPushMessageHelper.findOrThrow (
 					outbox.getId (),
 					() -> tempFailure (
-						stringFormat (
+						stringFormatObsolete (
 							"Wap push message not found for message %s",
 							outbox.getId ())));
 
@@ -359,7 +363,7 @@ class MediaburstProteusSender
 
 						Xom.xomElem (
 							"DlrUrl",
-							stringFormat (
+							stringFormatObsolete (
 								"%s",
 								wbsConfig.apiUrl (),
 								"/mediaburst",

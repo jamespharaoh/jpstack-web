@@ -18,6 +18,23 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.console.action.ConsoleAction;
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.module.ConsoleModule;
+import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.model.MediaRec;
+import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.model.UserObjectHelper;
+
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -25,20 +42,6 @@ import wbs.apn.chat.user.image.model.ChatUserImageObjectHelper;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
-import wbs.console.action.ConsoleAction;
-import wbs.console.forms.FormFieldLogic;
-import wbs.console.forms.FormFieldSet;
-import wbs.console.module.ConsoleModule;
-import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.media.logic.MediaLogic;
-import wbs.platform.media.model.MediaRec;
-import wbs.platform.user.console.UserConsoleLogic;
-import wbs.platform.user.model.UserObjectHelper;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatUserImageUploadAction")

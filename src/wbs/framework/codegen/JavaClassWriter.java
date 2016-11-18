@@ -222,7 +222,9 @@ class JavaClassWriter
 				annotationClass)
 
 			.classNameSupplier (
-				imports -> typeName)
+				imports ->
+					imports.register (
+						typeName))
 
 			.memberName (
 				variableName)
@@ -368,7 +370,9 @@ class JavaClassWriter
 				PrototypeDependency.class)
 
 			.classNameSupplier (
-				imports -> typeName)
+				imports ->
+					imports.register (
+						typeName))
 
 			.memberName (
 				variableName)

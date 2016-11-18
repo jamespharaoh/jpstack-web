@@ -23,6 +23,7 @@ import wbs.framework.component.tools.ThreadLocalProxyComponentFactory;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.context.RequestContextImplementation;
 
 public
@@ -113,7 +114,8 @@ class WbsServletListener
 				"servletContext",
 				event.getServletContext ())
 
-			.build ();
+			.build (
+				taskLogger);
 
 		servletContext.setAttribute (
 			"wbs-application-context",

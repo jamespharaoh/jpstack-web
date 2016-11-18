@@ -8,6 +8,7 @@ import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ReflectionUtils.fieldSet;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -203,10 +204,12 @@ class DataFromGeneric {
 			throw new RuntimeException (
 				stringFormat (
 					"Unable to map map attribute %s.%s ",
-					field.getDeclaringClass ().getSimpleName (),
+					classNameSimple (
+						field.getDeclaringClass ()),
 					field.getName (),
 					"of type %s",
-					field.getType ()));
+					classNameSimple (
+						field.getType ())));
 
 		}
 

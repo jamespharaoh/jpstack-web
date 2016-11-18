@@ -4,18 +4,24 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
+import lombok.NonNull;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.integrations.smsarena.model.SmsArenaConfigObjectHelper;
 import wbs.integrations.smsarena.model.SmsArenaConfigRec;
 import wbs.integrations.smsarena.model.SmsArenaReportCodeObjectHelper;
 import wbs.integrations.smsarena.model.SmsArenaRouteInObjectHelper;
 import wbs.integrations.smsarena.model.SmsArenaRouteOutObjectHelper;
+
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
@@ -59,7 +65,8 @@ class SmsArenaFixtureProvider
 
 	@Override
 	public
-	void createFixtures () {
+	void createFixtures (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		menuItemHelper.insert (
 			menuItemHelper.createInstance ()

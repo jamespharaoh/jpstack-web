@@ -7,8 +7,10 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.tools.ComponentFactory;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -16,10 +18,13 @@ public
 class ConsoleModuleSpecFactory
 	implements ComponentFactory {
 
-	// dependencies
+	// singleton dependencies
 
 	@SingletonDependency
 	ConsoleModuleSpecReader consoleSpecReader;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -31,11 +36,17 @@ class ConsoleModuleSpecFactory
 	@Override
 	public
 	Object makeComponent (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"makeComponent");
 
 		try {
 
 			return consoleSpecReader.readClasspath (
+				taskLogger,
 				xmlResourceName);
 
 		} catch (Exception exception) {

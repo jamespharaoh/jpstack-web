@@ -21,6 +21,29 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.LocalDate;
 
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.entity.record.IdObject;
+import wbs.framework.logging.Log4jLogContext;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.media.model.MediaRec;
+import wbs.platform.service.model.ServiceObjectHelper;
+
+import wbs.sms.command.model.CommandObjectHelper;
+import wbs.sms.command.model.CommandRec;
+import wbs.sms.core.logic.DateFinder;
+import wbs.sms.core.logic.KeywordFinder;
+import wbs.sms.message.core.model.MessageRec;
+import wbs.sms.message.inbox.daemon.CommandHandler;
+import wbs.sms.message.inbox.daemon.CommandManager;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
+
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
@@ -41,26 +64,6 @@ import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.PrototypeDependency;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.annotations.WeakSingletonDependency;
-import wbs.framework.entity.record.IdObject;
-import wbs.framework.logging.Log4jLogContext;
-import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.media.model.MediaRec;
-import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.sms.command.model.CommandObjectHelper;
-import wbs.sms.command.model.CommandRec;
-import wbs.sms.core.logic.DateFinder;
-import wbs.sms.core.logic.KeywordFinder;
-import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.CommandManager;
-import wbs.sms.message.inbox.logic.SmsInboxLogic;
-import wbs.sms.message.inbox.model.InboxAttemptRec;
-import wbs.sms.message.inbox.model.InboxRec;
 
 /**
  * MainCommandHandler takes input from the main chat interface, looking for

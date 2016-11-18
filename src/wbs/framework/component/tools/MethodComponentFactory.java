@@ -1,6 +1,11 @@
 package wbs.framework.component.tools;
 
-import static wbs.utils.etc.ReflectionUtils.methodInvokeByName;
+import static wbs.utils.etc.NumberUtils.equalToOne;
+import static wbs.utils.etc.NumberUtils.equalToZero;
+import static wbs.utils.etc.ReflectionUtils.methodGetByNameRequired;
+import static wbs.utils.etc.ReflectionUtils.methodInvoke;
+
+import java.lang.reflect.Method;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -26,11 +31,37 @@ class MethodComponentFactory
 	@Override
 	public
 	Object makeComponent (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		return methodInvokeByName (
-			factoryComponent,
-			factoryMethodName);
+		Method method =
+			methodGetByNameRequired (
+				factoryComponent.getClass (),
+				factoryMethodName);
+
+		if (
+			equalToZero (
+				method.getParameterCount ())
+		) {
+
+			return methodInvoke (
+				method,
+				factoryComponent);
+
+		} else if (
+			equalToOne (
+				method.getParameterCount ())
+		) {
+
+			return methodInvoke (
+				method,
+				factoryComponent,
+				parentTaskLogger);
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 	}
 

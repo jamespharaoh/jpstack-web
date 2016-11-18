@@ -2,6 +2,7 @@ package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -18,6 +19,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.html.ScriptRef;
+
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataChildrenIndex;
@@ -168,12 +170,8 @@ class FormFieldSet <Container> {
 				this.containerClass)
 		) {
 
-			@SuppressWarnings ("unchecked")
-			FormFieldSet <ContainerAgain> returnTemp =
-				(FormFieldSet <ContainerAgain>)
-				this;
-
-			return returnTemp;
+			return genericCastUnchecked (
+				this);
 
 		} else {
 

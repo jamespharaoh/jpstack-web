@@ -24,6 +24,7 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -32,10 +33,11 @@ import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
+
 import wbs.utils.string.FormatWriter;
-import wbs.web.utils.HtmlTableCellWriter;
 
 import fj.data.Either;
+import wbs.web.utils.HtmlTableCellWriter;
 
 /**
  * Performs console-relevant operations on DataObjects such as resolving names

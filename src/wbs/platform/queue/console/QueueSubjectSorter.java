@@ -16,6 +16,7 @@ import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalNotEqualAndPresentWithClass;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.utils.time.TimeUtils.laterThan;
 
@@ -151,12 +152,12 @@ class QueueSubjectSorter {
 					getClass ().getSimpleName (),
 					"sort",
 					joinWithCommaAndSpace (
-						stringFormat (
+						stringFormatObsolete (
 							"queue=%s",
 							ifNull (
 								queue,
 								"null")),
-						stringFormat (
+						stringFormatObsolete (
 							"effectiveUser=%s",
 							ifNull (
 								effectiveUser,

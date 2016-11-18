@@ -1,5 +1,13 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.NumberUtils.floatToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.string.StringUtils.stringFormat;
+
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -7,15 +15,11 @@ import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 
-import static wbs.utils.string.StringUtils.stringFormat;
-
-import com.google.common.base.Optional;
-
 @Accessors (fluent = true)
 @PrototypeComponent ("doubleFormFieldValueValidator")
 public
 class FloatingPointFormFieldValueValidator
-	implements FormFieldValueValidator<Double> {
+	implements FormFieldValueValidator <Double> {
 
 	@Getter @Setter
 	String label;
@@ -28,12 +32,15 @@ class FloatingPointFormFieldValueValidator
 
 	@Override
 	public
-	Optional<String> validate (
-			@NonNull Optional<Double> genericValue) {
+	Optional <String> validate (
+			@NonNull Optional <Double> genericValue) {
 
-		if (! genericValue.isPresent ()) {
+		if (
+			optionalIsNotPresent (
+				genericValue)
+		) {
 
-			return Optional.<String>absent ();
+			return optionalAbsent ();
 
 		}
 
@@ -42,16 +49,18 @@ class FloatingPointFormFieldValueValidator
 			|| genericValue.get () > maximum
 		) {
 
-			return Optional.of (
+			return optionalOf (			
 				stringFormat (
 					"Value for \"%s\" must be between %s and %s",
 					label (),
-					minimum,
-					maximum));
+					floatToDecimalString (
+						minimum),
+					floatToDecimalString (
+						maximum)));
 
 		}
 
-		return Optional.<String>absent ();
+		return optionalAbsent ();
 
 	}
 

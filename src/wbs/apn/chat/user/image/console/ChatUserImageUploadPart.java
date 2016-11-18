@@ -17,15 +17,17 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormType;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.user.image.model.ChatUserImageType;
 
 @PrototypeComponent ("chatUserImageUploadPart")
 public

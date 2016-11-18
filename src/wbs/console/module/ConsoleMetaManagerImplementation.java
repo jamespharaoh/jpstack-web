@@ -29,6 +29,7 @@ import wbs.console.context.ConsoleContextExtensionPoint;
 import wbs.console.context.ConsoleContextHint;
 import wbs.console.context.ConsoleContextLink;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
+
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;

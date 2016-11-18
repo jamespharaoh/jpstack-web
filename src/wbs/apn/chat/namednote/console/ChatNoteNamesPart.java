@@ -18,14 +18,16 @@ import java.util.List;
 
 import lombok.NonNull;
 
+import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.namednote.model.ChatNoteNameObjectHelper;
 import wbs.apn.chat.namednote.model.ChatNoteNameRec;
-import wbs.console.part.AbstractPagePart;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("chatNoteNamesPart")
 public

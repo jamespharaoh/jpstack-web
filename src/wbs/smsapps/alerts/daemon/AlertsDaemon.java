@@ -34,6 +34,7 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.daemon.SleepingDaemonService;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
@@ -44,15 +45,18 @@ import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
+
 import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
+
 import wbs.smsapps.alerts.model.AlertsAlertObjectHelper;
 import wbs.smsapps.alerts.model.AlertsNumberRec;
 import wbs.smsapps.alerts.model.AlertsSettingsObjectHelper;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
 import wbs.smsapps.alerts.model.AlertsStatusCheckObjectHelper;
 import wbs.smsapps.alerts.model.AlertsSubjectRec;
+
 import wbs.utils.string.StringSubstituter;
 
 @Log4j
@@ -350,22 +354,23 @@ class AlertsDaemon
 		log.debug (
 			stringFormat (
 				"now is %s",
-				now));
+				now.toString ()));
 
 		log.debug (
 			stringFormat (
 				"oldest is %s",
-				oldest));
+				oldest.toString ()));
 
 		log.debug (
 			stringFormat (
 				"oldest duration is %s",
-				maxDurationFoundInQueue));
+				maxDurationFoundInQueue.toString ()));
 
 		log.debug (
 			stringFormat (
 				"unclaimed count is %s",
-				numUnclaimed));
+				integerToDecimalString (
+					numUnclaimed)));
 
 		// check if alert is due
 
@@ -392,7 +397,7 @@ class AlertsDaemon
 			log.debug (
 				stringFormat (
 					"maximum duration of %s exceeded",
-					maxDurationAllowedInQueue));
+					maxDurationAllowedInQueue.toString ()));
 
 			alertDue = true;
 
@@ -401,7 +406,8 @@ class AlertsDaemon
 			log.debug (
 				stringFormat (
 					"maximum unclaimed count of %s exceeded",
-					alertsSettings.getMaxItemsInQueue ()));
+					integerToDecimalString (
+						alertsSettings.getMaxItemsInQueue ())));
 
 			alertDue = true;
 
@@ -578,7 +584,7 @@ class AlertsDaemon
 		log.debug (
 			stringFormat (
 				"last alert was at %s",
-				alertsSettings.getLastAlert ()));
+				alertsSettings.getLastAlert ().toString ()));
 
 		Duration durationSinceLastSend =
 			new Duration (
@@ -588,14 +594,14 @@ class AlertsDaemon
 		log.debug (
 			stringFormat (
 				"duration since last alert is %s",
-				durationSinceLastSend));
+				durationSinceLastSend.toString ()));
 
 		if (durationSinceLastSend.isShorterThan (minAlertFrequency)) {
 
 			log.debug (
 				stringFormat (
 					"mininum alert frequency of %s not exceeded",
-					minAlertFrequency));
+					minAlertFrequency.toString ()));
 
 			return true;
 
@@ -604,7 +610,7 @@ class AlertsDaemon
 			log.debug (
 				stringFormat (
 					"minimum alert frequency of %s exceeded",
-					minAlertFrequency));
+					minAlertFrequency.toString ()));
 
 			return false;
 

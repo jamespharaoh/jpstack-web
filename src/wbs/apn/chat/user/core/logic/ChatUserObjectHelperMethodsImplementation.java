@@ -5,22 +5,25 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
-import wbs.apn.chat.bill.model.ChatUserCreditMode;
-import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.core.logic.ChatNumberReportLogic;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelperMethods;
-import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.logic.NumberLogic;
 import wbs.sms.number.core.model.NumberRec;
+
 import wbs.utils.random.RandomLogic;
+
+import wbs.apn.chat.bill.model.ChatUserCreditMode;
+import wbs.apn.chat.contact.model.ChatMessageMethod;
+import wbs.apn.chat.core.logic.ChatNumberReportLogic;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelperMethods;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
 
 @Log4j
 public

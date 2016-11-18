@@ -57,7 +57,7 @@ class ObjectSummaryFieldsBuilder <
 
 		objectSummaryPageBuilder.addFieldsPart (
 			genericCastUnchecked (
-				objectSummaryPageBuilder.consoleModule.formFieldSet (
+				objectSummaryPageBuilder.consoleModule.formFieldSetRequired (
 					objectSummaryFieldsSpec.fieldsName ())));
 
 	}

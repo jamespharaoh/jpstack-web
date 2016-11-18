@@ -1,9 +1,9 @@
 package wbs.platform.object.search;
 
-import static wbs.utils.etc.Misc.getMethodRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -35,6 +35,7 @@ import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.RedirectResponder;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -42,7 +43,9 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.etc.PropertyUtils;
+
 import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
@@ -278,7 +281,7 @@ class ObjectSearchPostAction <
 		) {
 
 			Method method =
-				getMethodRequired (
+				methodGetRequired (
 					consoleHelper.getClass (),
 					searchDaoMethodName,
 					ImmutableList.<Class <?>> of (

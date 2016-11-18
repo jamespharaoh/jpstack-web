@@ -14,6 +14,7 @@ import lombok.experimental.Accessors;
 import wbs.console.part.PagePart;
 import wbs.console.part.PagePartFactory;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -23,6 +24,7 @@ import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)

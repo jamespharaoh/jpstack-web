@@ -1,7 +1,7 @@
 package wbs.platform.queue.console;
 
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.util.List;
 
@@ -146,14 +146,14 @@ class QueueUsersAction
 		if (reclaim) {
 
 			requestContext.addNotice (
-				stringFormat (
+				stringFormatObsolete (
 					"Reclaimed %s queue items",
 					numQueueItems));
 
 		} else {
 
 			requestContext.addNotice (
-				stringFormat (
+				stringFormatObsolete (
 					"Unclaimed %s queue items",
 					numQueueItems));
 

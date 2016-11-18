@@ -6,7 +6,6 @@ import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.classForName;
-import static wbs.utils.etc.TypeUtils.classNameFull;
 import static wbs.utils.etc.TypeUtils.classPackageName;
 import static wbs.utils.io.FileUtils.directoryCreateWithParents;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -534,12 +533,13 @@ class ConsoleHelperGenerator {
 			imports ->
 				stringFormat (
 					"%s <%s>",
-					classNameFull (
+					imports.register (
 						ConsoleHelperImplementation.class),
-					stringFormat (
-						"%s.model.%s",
-						packageName,
-						recordClassName)),
+					imports.register (
+						stringFormat (
+							"%s.model.%s",
+							packageName,
+							recordClassName))),
 			"consoleHelperImplementation");
 
 	}

@@ -88,6 +88,10 @@
 			package="wbs.console.context"/>
 
 		<plugin
+			name="console-form-action"
+			package="wbs.console.formaction"/>
+
+		<plugin
 			name="console-forms"
 			package="wbs.console.forms"/>
 

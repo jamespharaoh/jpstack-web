@@ -1,8 +1,10 @@
 package wbs.integrations.broadcastsystems.daemon;
 
 import static wbs.utils.etc.Misc.stringToUrl;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 
@@ -30,13 +32,17 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
+
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutRec;
+
 import wbs.platform.exception.logic.ExceptionLogLogic;
+
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender2;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
+
 import wbs.web.utils.HtmlUtils;
 
 @SingletonComponent ("broadcastSystemsSender2")
@@ -138,7 +144,8 @@ class BroadcastSystemsSender2
 		log.info (
 			stringFormat (
 				"Sending message %s",
-				message.getId ()));
+				integerToDecimalString (
+					message.getId ())));
 
 		// create connection
 
@@ -258,7 +265,7 @@ class BroadcastSystemsSender2
 					.build ();
 
 			log.debug (
-				stringFormat (
+				stringFormatObsolete (
 					"Message %s response: %s",
 					messageId,
 					responseString));
@@ -317,7 +324,7 @@ class BroadcastSystemsSender2
 							PerformSendStatus.remoteError)
 
 						.message (
-							stringFormat (
+							stringFormatObsolete (
 								"Error from remote system: %s",
 								httpUrlConnection.getResponseCode (),
 								response.get ("error")))
@@ -350,7 +357,7 @@ class BroadcastSystemsSender2
 						PerformSendStatus.unknownError)
 
 					.message (
-						stringFormat (
+						stringFormatObsolete (
 							"HTTP error %s from remote system: %s",
 							httpUrlConnection.getResponseCode (),
 							responseString))

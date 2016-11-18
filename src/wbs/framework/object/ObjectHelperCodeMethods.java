@@ -25,7 +25,7 @@ interface ObjectHelperCodeMethods <
 			Record <?> parent,
 			String ... code);
 
-	Optional<RecordType> findByCode (
+	Optional <RecordType> findByCode (
 			GlobalId parentGlobalId,
 			String ... code);
 

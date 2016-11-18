@@ -16,10 +16,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+
 import wbs.utils.string.FormatWriter;
-import wbs.web.utils.HtmlUtils;
 
 import fj.data.Either;
+import wbs.web.utils.HtmlUtils;
 
 @PrototypeComponent ("textAreaFormFieldRenderer")
 @Accessors (fluent = true)
@@ -84,7 +85,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 		htmlWriter.writeFormat (
 			"<input",
 			" type=\"hidden\"",
-			" name=\"%h-%h\"",
+			" name=\"%h.%h\"",
 			formName,
 			name (),
 			" value=\"%h\"",
@@ -106,7 +107,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 
 		out.writeFormat (
 			"<textarea",
-			" id=\"%h-%h\"",
+			" id=\"%h.%h\"",
 			formName,
 			name (),
 			" rows=\"%h\"",
@@ -115,7 +116,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 			" cols=\"%h\"",
 			integerToDecimalString (
 				cols ()),
-			" name=\"%h-%h\"",
+			" name=\"%h.%h\"",
 			formName,
 			name ());
 
@@ -126,7 +127,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 					"%s (this, document.getElementById ('%j'), %s);",
 					charCountFunction,
 					stringFormat (
-						"%s-%s-chars",
+						"%s.%s:chars",
 						formName,
 						name ()),
 					ifNull (
@@ -161,7 +162,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 				"<span",
 				" id=\"%h\"",
 				stringFormat (
-					"%s-%s-chars",
+					"%s.%s:chars",
 					formName,
 					name ()),
 				">&nbsp;</span>");
@@ -340,7 +341,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 		) {
 
 			javascriptWriter.writeFormat (
-				"$(\"#%j-%j\").val (\"\");",
+				"$(\"#%j.%j\").val (\"\");",
 				formName,
 				name);
 
@@ -351,7 +352,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 		) {
 
 			javascriptWriter.writeFormat (
-				"$(\"#%j-%j\").val (\"%j\");",
+				"$(\"#%j.%j\").val (\"%j\");",
 				formName,
 				name,
 				interfaceValue.or (""));
@@ -372,7 +373,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 
 		return submission.hasParameter (
 			stringFormat (
-				"%s-%s",
+				"%s.%s",
 				formName,
 				name ()));
 
@@ -384,7 +385,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 
 		return submission.parameter (
 			stringFormat (
-				"%s-%s",
+				"%s.%s",
 				formName,
 				name ()));
 
@@ -400,7 +401,7 @@ class TextAreaFormFieldRenderer <Container, Parent>
 			Optional.fromNullable (
 				submission.parameter (
 					stringFormat (
-						"%s-%s",
+						"%s.%s",
 						formName,
 						name ()))));
 

@@ -1,6 +1,6 @@
 package wbs.console.context;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.util.Random;
 
@@ -56,7 +56,7 @@ class ConsoleApplicationScriptRef
 			ConsoleRequestContext requestContext) {
 
 		return requestContext.resolveApplicationUrl (
-			stringFormat (
+			stringFormatObsolete (
 				"%s",
 				applicationSource,
 				"?v=%u",

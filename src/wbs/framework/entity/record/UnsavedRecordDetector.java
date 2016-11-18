@@ -5,7 +5,7 @@ import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.Misc.isNull;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.util.Set;
 
@@ -73,14 +73,14 @@ class UnsavedRecordDetector {
 			) {
 
 				log.error (
-					stringFormat (
+					stringFormatObsolete (
 						"Unsaved record %s",
 						unsavedRecord));
 
 			}
 
 			throw new IllegalStateException (
-				stringFormat (
+				stringFormatObsolete (
 					"%s unsaved records",
 					currentFrame.unsavedRecords.size ()));
 
@@ -176,7 +176,7 @@ class UnsavedRecordDetector {
 		) {
 
 			throw new IllegalStateException (
-				stringFormat (
+				stringFormatObsolete (
 					"Record to remove is not in list: %s",
 					record));
 

@@ -1,6 +1,6 @@
 package wbs.console.reporting;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ class StatsPeriod {
 		if (timestamp.isBefore (startTime)) {
 
 			throw new IllegalArgumentException (
-				stringFormat (
+				stringFormatObsolete (
 					"Timestamp %s is before start of period %s",
 					timestamp,
 					startTime));
@@ -74,7 +74,7 @@ class StatsPeriod {
 		if (timestamp.isEqual (endTime)) {
 
 			throw new IllegalArgumentException (
-				stringFormat (
+				stringFormatObsolete (
 					"Timestamp %s is equal to end of period",
 					timestamp));
 
@@ -83,7 +83,7 @@ class StatsPeriod {
 		if (timestamp.isAfter (endTime)) {
 
 			throw new IllegalArgumentException (
-				stringFormat (
+				stringFormatObsolete (
 					"Timestamp %s is after end of period %s",
 					timestamp,
 					endTime));
@@ -102,7 +102,7 @@ class StatsPeriod {
 		}
 
 		throw new RuntimeException (
-			stringFormat (
+			stringFormatObsolete (
 				"Logic error %s %s %s",
 				timestamp,
 				startTime,

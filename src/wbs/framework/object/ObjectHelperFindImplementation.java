@@ -1,7 +1,7 @@
 package wbs.framework.object;
 
-import static wbs.utils.etc.Misc.getMethodRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.lang.reflect.InvocationTargetException;
@@ -134,7 +134,7 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 		}
 
 		Method searchIdsMethod =
-			getMethodRequired (
+			methodGetRequired (
 				objectModel.daoImplementation ().getClass (),
 				"searchIds",
 				ImmutableList.of (

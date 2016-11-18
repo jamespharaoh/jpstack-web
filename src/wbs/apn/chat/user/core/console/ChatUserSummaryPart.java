@@ -9,6 +9,7 @@ import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWrite;
@@ -386,7 +387,7 @@ class ChatUserSummaryPart
 
 				htmlTableDetailsRowWriteHtml (
 					chatUserCharge.name,
-					stringFormat (
+					stringFormatObsolete (
 						"%s (%h)",
 						chatUserCharge.name,
 						currencyLogic.formatHtml (

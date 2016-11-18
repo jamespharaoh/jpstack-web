@@ -1,10 +1,14 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.CodeUtils.simplifyToCode;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.regex.Pattern;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -12,8 +16,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-
-import com.google.common.base.Optional;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("nameFormFieldValueValidator")
@@ -30,10 +32,10 @@ class NameFormFieldValueValidator
 
 	@Override
 	public
-	Optional<String> validate (
-			@NonNull Optional<String> genericValue) {
+	Optional <String> validate (
+			@NonNull Optional <String> genericValue) {
 
-		Optional<String> code =
+		Optional <String> code =
 			simplifyToCode (
 				genericValue.get ());
 
@@ -42,15 +44,14 @@ class NameFormFieldValueValidator
 				code)
 		) {
 
-			return Optional.of (
+			return optionalOf (
 				stringFormat (
 					"Names must contain at least one letter, and cannot have ",
 					"a digit before the first letter"));
 
-
 		}
 
-		return Optional.<String>absent ();
+		return optionalAbsent ();
 
 	}
 

@@ -1,6 +1,6 @@
 package wbs.apn.chat.infosite.api;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
@@ -140,13 +140,13 @@ class ChatInfoSiteViewResponder
 				"<p>",
 
 				"<a href=\"%h\">",
-				stringFormat (
+				stringFormatObsolete (
 					"%u/%u/full",
 					infoSite.getToken (),
 					index),
 
 				"<img src=\"%h\">",
-				stringFormat (
+				stringFormatObsolete (
 					"%u/%u/normal",
 					infoSite.getToken (),
 					index),

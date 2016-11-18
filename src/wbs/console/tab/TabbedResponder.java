@@ -258,8 +258,20 @@ class TabbedResponder
 		super.renderHtmlHeadContents (
 			taskLogger);
 
-		pagePart.renderHtmlHeadContent (
-			taskLogger);
+		if (
+
+			isNotNull (
+				pagePartThrew)
+
+			&& isNotNull (
+				pagePart)
+
+		) {
+
+			pagePart.renderHtmlHeadContent (
+				taskLogger);
+
+		}
 
 		htmlScriptBlockOpen ();
 

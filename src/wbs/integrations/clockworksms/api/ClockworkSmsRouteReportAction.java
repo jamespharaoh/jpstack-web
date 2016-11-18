@@ -22,6 +22,8 @@ import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiLoggingAction;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -32,7 +34,9 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.integrations.clockworksms.model.ClockworkSmsDeliveryStatusDetailCodeObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsDeliveryStatusDetailCodeRec;
 import wbs.integrations.clockworksms.model.ClockworkSmsDeliveryStatusObjectHelper;
@@ -41,14 +45,18 @@ import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogType;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutRec;
+
 import wbs.platform.text.web.TextResponder;
+
 import wbs.sms.message.core.logic.SmsMessageLogic;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+
 import wbs.utils.string.FormatWriter;
+
 import wbs.web.context.RequestContext;
 import wbs.web.exceptions.HttpNotFoundException;
 import wbs.web.responder.Responder;
@@ -78,6 +86,9 @@ class ClockworkSmsRouteReportAction
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RequestContext requestContext;
@@ -110,8 +121,13 @@ class ClockworkSmsRouteReportAction
 	@Override
 	protected
 	void processRequest (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"processRequest");
 
 		// read and log request
 
@@ -142,6 +158,7 @@ class ClockworkSmsRouteReportAction
 		request =
 			(ClockworkSmsRouteReportRequest)
 			dataFromXml.readInputStream (
+				taskLogger,
 				new ByteArrayInputStream (
 					requestBytes),
 				"clockwork-sms-route-report.xml");
@@ -151,7 +168,13 @@ class ClockworkSmsRouteReportAction
 	@Override
 	protected
 	void updateDatabase (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		@SuppressWarnings ("unused")
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"updateDatabase");
 
 		// begin transaction
 
@@ -432,7 +455,7 @@ class ClockworkSmsRouteReportAction
 	@Override
 	protected
 	void storeLog (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String debugLog) {
 
 		@Cleanup

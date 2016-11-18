@@ -7,7 +7,7 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 import static wbs.utils.string.StringUtils.utf8ToString;
 
@@ -383,7 +383,7 @@ class GenericHttpSender <
 
 			errorMessage =
 				optionalOf (
-					stringFormat (
+					stringFormatObsolete (
 						"Server returned %s: %s",
 						httpResponse.getStatusLine ().getStatusCode (),
 						httpResponse.getStatusLine ().getReasonPhrase ()));

@@ -1,12 +1,11 @@
 package wbs.apn.chat.graphs.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
 import static wbs.web.utils.HtmlFormUtils.htmlFormOpenGetAction;
-
-import java.util.Collections;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -17,6 +16,7 @@ import org.joda.time.YearMonth;
 
 import wbs.console.html.ObsoleteDateLinks;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -88,7 +88,7 @@ class AbstractMonthlyGraphPart
 				formatWriter,
 				requestContext.resolveLocalUrl (
 					myLocalPart),
-				Collections.<String,String>emptyMap (),
+				emptyMap (),
 				yearMonth.toLocalDate (1));
 
 			htmlParagraphOpen ();

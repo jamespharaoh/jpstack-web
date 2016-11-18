@@ -1,5 +1,6 @@
 package wbs.smsapps.forwarder.daemon;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 import static wbs.utils.time.TimeUtils.earlierThan;
@@ -30,8 +31,10 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+
 import wbs.platform.daemon.AbstractDaemonService;
 import wbs.platform.daemon.QueueBuffer;
+
 import wbs.smsapps.forwarder.model.ForwarderMessageInObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
 
@@ -422,7 +425,8 @@ class ForwarderDaemon
 						"doMessage",
 						stringFormat (
 							"forwarderMessageInId = %s",
-							forwarderMessageInId)),
+							integerToDecimalString (
+								forwarderMessageInId))),
 					this);
 
 			ForwarderMessageInRec forwarderMessageIn =

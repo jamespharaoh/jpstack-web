@@ -120,20 +120,21 @@ class SimpleStatsResolver
 				throw new RuntimeException (
 					stringFormat (
 						"Unexpected data for %s/%s",
-						indexValue,
-						datum.startTime ()));
+						indexValue.toString (),
+						datum.startTime ().toString ()));
 
 			}
 
-			List<Object> totalValues =
-				unaggregatedTotals.get (indexValue);
+			List <Object> totalValues =
+				unaggregatedTotals.get (
+					indexValue);
 
 			if (totalValues == null) {
 
 				throw new RuntimeException (
 					stringFormat (
 						"Unexpected data for %s",
-						indexValue));
+						indexValue.toString ()));
 
 			}
 

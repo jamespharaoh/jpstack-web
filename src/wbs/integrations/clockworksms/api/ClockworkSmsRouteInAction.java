@@ -22,6 +22,7 @@ import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiLoggingAction;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -33,16 +34,21 @@ import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogType;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteInObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteInRec;
+
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
+
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+
 import wbs.utils.string.FormatWriter;
+
 import wbs.web.context.RequestContext;
 import wbs.web.exceptions.HttpNotFoundException;
 import wbs.web.responder.Responder;
@@ -197,10 +203,11 @@ class ClockworkSmsRouteInAction
 		request =
 			(ClockworkSmsRouteInRequest)
 			dataFromXml.readInputStream (
+				taskLogger,
 				new ByteArrayInputStream (
 					requestBytes),
 				"clockwork-sms-route-in.xml",
-				ImmutableList.of ());
+				emptyList ());
 
 	}
 

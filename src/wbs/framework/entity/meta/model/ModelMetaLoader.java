@@ -68,7 +68,12 @@ class ModelMetaLoader {
 	@NormalLifecycleSetup
 	public
 	void setup (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
 
 		createDataFromXml (
 			taskLogger);
@@ -82,11 +87,12 @@ class ModelMetaLoader {
 
 	private
 	void createDataFromXml (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		taskLogger =
+		@SuppressWarnings ("unused")
+		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
-				taskLogger,
+				parentTaskLogger,
 				"createDataFromXml");
 
 		DataFromXmlBuilder dataFromXmlBuilder =
@@ -177,10 +183,15 @@ class ModelMetaLoader {
 
 	private
 	void loadModelMeta (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ImmutableMap.Builder <String, ModelMetaSpec> builder,
 			@NonNull PluginSpec plugin,
 			@NonNull String modelName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"loadModelMeta");
 
 		String resourceName =
 			stringFormat (
@@ -212,6 +223,7 @@ class ModelMetaLoader {
 			spec =
 				(ModelMetaSpec)
 				dataFromXml.readInputStream (
+					taskLogger,
 					inputStream,
 					resourceName,
 					ImmutableList.<Object> of (

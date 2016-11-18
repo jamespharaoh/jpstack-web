@@ -17,17 +17,23 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.integrations.clockworksms.foreignapi.ClockworkSmsMessageRequest;
 import wbs.integrations.clockworksms.foreignapi.ClockworkSmsMessageResponse;
 import wbs.integrations.clockworksms.foreignapi.ClockworkSmsMessageSender;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutRec;
+
 import wbs.platform.scaffold.model.RootObjectHelper;
+
 import wbs.sms.gsm.GsmUtils;
 import wbs.sms.message.core.logic.SmsMessageLogic;
 import wbs.sms.message.core.model.MessageRec;
@@ -45,6 +51,9 @@ class ClockworkSmsSenderHelper
 
 	@SingletonDependency
 	ClockworkSmsRouteOutObjectHelper clockworkSmsRouteOutHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -76,6 +85,7 @@ class ClockworkSmsSenderHelper
 	@Override
 	public
 	SetupRequestResult <ClockworkSmsMessageSender> setupRequest (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull OutboxRec smsOutbox) {
 
 		// get stuff
@@ -274,7 +284,13 @@ class ClockworkSmsSenderHelper
 	@Override
 	public
 	PerformSendResult performSend (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ClockworkSmsMessageSender clockworkSender) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"performSend");
 
 		PerformSendResult result =
 			new PerformSendResult ();
@@ -290,7 +306,8 @@ class ClockworkSmsSenderHelper
 			result.responseTrace (
 				clockworkSender.responseTrace ());
 
-			clockworkSender.decode ();
+			clockworkSender.decode (
+				taskLogger);
 
 			return result
 
@@ -314,6 +331,7 @@ class ClockworkSmsSenderHelper
 	@Override
 	public
 	ProcessResponseResult processSend (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ClockworkSmsMessageSender clockworkSender) {
 
 		ClockworkSmsMessageResponse clockworkResponse =

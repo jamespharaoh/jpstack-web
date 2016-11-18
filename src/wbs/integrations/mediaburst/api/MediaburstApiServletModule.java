@@ -4,6 +4,8 @@ import static wbs.utils.etc.Misc.fromHex;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.lowercase;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -36,9 +38,11 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
+
 import wbs.sms.core.logic.NoSuchMessageException;
 import wbs.sms.gsm.ConcatenatedInformationElement;
 import wbs.sms.gsm.UserDataHeader;
@@ -51,6 +55,7 @@ import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+
 import wbs.web.context.RequestContext;
 import wbs.web.file.AbstractWebFile;
 import wbs.web.file.WebFile;
@@ -436,10 +441,10 @@ class MediaburstApiServletModule
 						requestContext.parameterRequired (
 							"msg_id"),
 						newMessageStatus,
-						Optional.of (
+						optionalOf (
 							statusParam),
-						Optional.absent (),
-						Optional.of (
+						optionalAbsent (),
+						optionalOf (
 							joinWithSpace (
 								stringFormat (
 									"status=%s",
@@ -447,7 +452,7 @@ class MediaburstApiServletModule
 								stringFormat (
 									"deliver_code=%s",
 									deliverCodeParam))),
-						Optional.absent ());
+						optionalAbsent ());
 
 				}
 

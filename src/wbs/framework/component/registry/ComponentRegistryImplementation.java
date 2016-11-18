@@ -54,7 +54,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ClassUtils;
@@ -88,7 +87,6 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.LogContextComponentFactory;
 import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @Accessors (fluent = true)
 public
 class ComponentRegistryImplementation
@@ -350,6 +348,7 @@ class ComponentRegistryImplementation
 			if (outputPath != null) {
 
 				outputComponentDefinitions (
+					taskLogger,
 					outputPath);
 
 			}
@@ -688,28 +687,22 @@ class ComponentRegistryImplementation
 
 	public
 	ComponentRegistryImplementation registerXmlClasspath (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String classpath) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"registerXmlClasspath");
 
 		@Cleanup
 		HeldLock heldlock =
 			lock.write ();
 
-		DataFromXml dataFromXml =
-			new DataFromXmlBuilder ()
-
-			.registerBuilderClasses (
-				ComponentsSpec.class,
-				ComponentsComponentSpec.class,
-				ComponentsValuePropertySpec.class,
-				ComponentsReferencePropertySpec.class,
-				ComponentsPropertiesPropertySpec.class,
-				ComponentPropertyValueSpec.class)
-
-			.build ();
-
 		ComponentsSpec components =
 			(ComponentsSpec)
 			dataFromXml.readClasspath (
+				taskLogger,
 				classpath);
 
 		components.register (
@@ -722,28 +715,21 @@ class ComponentRegistryImplementation
 	@Override
 	public
 	ComponentRegistryImplementation registerXmlFilename (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String filename) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"registerXmlClasspath");
 		@Cleanup
 		HeldLock heldlock =
 			lock.write ();
 
-		DataFromXml dataFromXml =
-			new DataFromXmlBuilder ()
-
-			.registerBuilderClasses (
-				ComponentsSpec.class,
-				ComponentsComponentSpec.class,
-				ComponentsValuePropertySpec.class,
-				ComponentsReferencePropertySpec.class,
-				ComponentsPropertiesPropertySpec.class,
-				ComponentPropertyValueSpec.class)
-
-			.build ();
-
 		ComponentsSpec componentsSpec =
 			(ComponentsSpec)
 			dataFromXml.readFilename (
+				taskLogger,
 				filename);
 
 		componentsSpec.register (
@@ -775,16 +761,21 @@ class ComponentRegistryImplementation
 
 	public
 	void outputComponentDefinitions (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String outputPath) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"outputComponentDefinitions");
 
 		@Cleanup
 		HeldLock heldlock =
 			lock.read ();
 
-		log.info (
-			stringFormat (
-				"Writing component definitions to %s",
-				outputPath));
+		taskLogger.noticeFormat (
+			"Writing component definitions to %s",
+			outputPath);
 
 		try {
 
@@ -796,11 +787,10 @@ class ComponentRegistryImplementation
 
 		} catch (IOException exception) {
 
-			log.warn (
-				stringFormat (
-					"Error deleting contents of %s",
-					outputPath),
-				exception);
+			taskLogger.warningFormatException (
+				exception,
+				"Error deleting contents of %s",
+				outputPath);
 
 		}
 
@@ -823,11 +813,10 @@ class ComponentRegistryImplementation
 
 			} catch (Exception exception) {
 
-				log.warn (
-					stringFormat (
-						"Error writing %s",
-						outputFile),
-					exception);
+				taskLogger.warningFormatException (
+					exception,
+					"Error writing %s",
+					outputFile);
 
 			}
 
@@ -846,11 +835,10 @@ class ComponentRegistryImplementation
 
 		} catch (Exception exception) {
 
-			log.warn (
-				stringFormat (
-					"Error writing %s",
-					orderedSingletonsFile),
-				exception);
+			taskLogger.warningFormatException (
+				exception,
+				"Error writing %s",
+				orderedSingletonsFile);
 
 		}
 
@@ -1796,5 +1784,21 @@ class ComponentRegistryImplementation
 		return orderedDefinitions;
 
 	}
+
+	// data
+
+	private static final
+	DataFromXml dataFromXml =
+		new DataFromXmlBuilder ()
+
+		.registerBuilderClasses (
+			ComponentsSpec.class,
+			ComponentsComponentSpec.class,
+			ComponentsValuePropertySpec.class,
+			ComponentsReferencePropertySpec.class,
+			ComponentsPropertiesPropertySpec.class,
+			ComponentPropertyValueSpec.class)
+
+		.build ();
 
 }

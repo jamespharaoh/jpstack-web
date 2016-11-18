@@ -1,9 +1,10 @@
-package wbs.console.combo;
+package wbs.console.formaction;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -14,17 +15,23 @@ import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormType;
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
-@PrototypeComponent ("contextFormActionPart")
+@PrototypeComponent ("consoleFormActionPart")
 public
-class ContextFormActionPart <FormState>
+class ConsoleFormActionPart <FormState>
 	extends AbstractPagePart {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
@@ -36,6 +43,12 @@ class ContextFormActionPart <FormState>
 
 	@Getter @Setter
 	ConsoleFormActionHelper <FormState> formActionHelper;
+
+	@Getter @Setter
+	String name;
+
+	@Getter @Setter
+	String heading;
 
 	@Getter @Setter
 	String helpText;
@@ -70,26 +83,56 @@ class ContextFormActionPart <FormState>
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		if (helpText != null) {
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
+		// write heading
+
+		if (
+			isNotNull (
+				heading)
+		) {
+
+			htmlHeadingTwoWrite (
+				heading);
+
+		}
+
+		// write help
+
+		if (
+			isNotNull (
+				helpText)
+		) {
 
 			htmlParagraphWrite (
 				helpText);
 
 		}
 
+		// write preamble
+
+		formActionHelper.writePreamble (
+			taskLogger,
+			formatWriter);
+
+		// write form
+
 		formFieldLogic.outputFormTable (
 			requestContext,
 			formatWriter,
 			formFields,
-			Optional.absent (),
+			optionalAbsent (),
 			formState,
-			ImmutableMap.of (),
+			emptyMap (),
 			"post",
 			requestContext.resolveLocalUrl (
 				localFile),
 			submitLabel,
 			FormType.perform,
-			"action");
+			name);
 
 	}
 

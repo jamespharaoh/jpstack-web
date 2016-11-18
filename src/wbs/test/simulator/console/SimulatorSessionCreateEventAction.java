@@ -1,13 +1,14 @@
 package wbs.test.simulator.console;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.LogicUtils.parseBooleanTrueFalseRequired;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.doesNotStartWithSimple;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
-
-import java.util.Collections;
 
 import javax.inject.Provider;
 
@@ -17,11 +18,11 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Cleanup;
 import lombok.NonNull;
 
-import org.joda.time.Instant;
 import org.json.simple.JSONValue;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -31,11 +32,12 @@ import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
-import wbs.platform.media.model.MediaRec;
+
 import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.console.SliceConsoleHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
@@ -46,6 +48,7 @@ import wbs.sms.number.core.console.NumberConsoleHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
 import wbs.sms.route.core.model.RouteRec;
+
 import wbs.test.simulator.model.SimulatorEventObjectHelper;
 import wbs.test.simulator.model.SimulatorRec;
 import wbs.test.simulator.model.SimulatorRouteRec;
@@ -260,7 +263,7 @@ class SimulatorSessionCreateEventAction
 
 		// work out route
 
-		Optional<RouteRec> routeOption =
+		Optional <RouteRec> routeOption =
 			resolveRoute (
 				simulator,
 				numTo);
@@ -279,16 +282,18 @@ class SimulatorSessionCreateEventAction
 
 		MessageRec message =
 			smsInboxLogic.inboxInsert (
-				Optional.<String>absent (),
-				textHelper.findOrCreate (messageText),
+				optionalAbsent (),
+				textHelper.findOrCreate (
+					messageText),
 				numFrom,
 				numTo,
 				route,
-				Optional.of (network),
-				Optional.<Instant>absent (),
-				Collections.<MediaRec>emptyList (),
-				Optional.<String>absent (),
-				Optional.<String>absent ());
+				optionalOf (
+					network),
+				optionalAbsent (),
+				emptyList (),
+				optionalAbsent (),
+				optionalAbsent ());
 
 		// create event data
 
@@ -330,6 +335,8 @@ class SimulatorSessionCreateEventAction
 		);
 
 		// associate number with session
+
+		transaction.flush ();
 
 		NumberRec number =
 			numberHelper.findOrCreate (

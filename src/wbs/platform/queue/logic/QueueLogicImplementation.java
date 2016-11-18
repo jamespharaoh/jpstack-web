@@ -1,9 +1,11 @@
 package wbs.platform.queue.logic;
 
+import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -25,6 +27,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimStatus;
 import wbs.platform.queue.model.QueueItemObjectHelper;
@@ -188,7 +191,8 @@ class QueueLogicImplementation
 			log.warn (
 				stringFormat (
 					"Unable to determine slice for queue %s",
-					queue.getId ()));
+					integerToDecimalString (
+						queue.getId ())));
 
 		}
 
@@ -315,8 +319,9 @@ class QueueLogicImplementation
 
 			throw new RuntimeException (
 				stringFormat (
-					"Cannot cancel queue item in %s state",
-					queueItem.getState ()));
+					"Cannot cancel queue item in state: %s",
+					enumNameSpaces (
+						queueItem.getState ())));
 
 		}
 
@@ -401,17 +406,23 @@ class QueueLogicImplementation
 			throw new IllegalStateException (
 				stringFormat (
 					"Cannot process queue item %s ",
-					queueItem.getId (),
+					integerToDecimalString (
+						queueItem.getId ()),
 					"with index %s ",
-					queueItem.getIndex (),
+					integerToDecimalString (
+						queueItem.getIndex ()),
 					"for queue subject %s ",
-					queueSubject.getId (),
+					integerToDecimalString (
+						queueSubject.getId ()),
 					"whose total is %s ",
-					queueSubject.getTotalItems (),
+					integerToDecimalString (
+						queueSubject.getTotalItems ()),
 					"and active is %s, ",
-					queueSubject.getActiveItems (),
+					integerToDecimalString (
+						queueSubject.getActiveItems ()),
 					"implying a current item index of %s",
-					currentItemIndex));
+					integerToDecimalString (
+						currentItemIndex)));
 
 		}
 
@@ -419,9 +430,11 @@ class QueueLogicImplementation
 
 			throw new RuntimeException (
 				stringFormat (
-					"Cannot process queue item %s in state %s",
-					queueItem.getId (),
-					queueItem.getState ()));
+					"Cannot process queue item %s in state: %s",
+					integerToDecimalString (
+						queueItem.getId ()),
+					enumNameSpaces (
+						queueItem.getState ())));
 
 		}
 

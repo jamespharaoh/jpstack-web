@@ -1,6 +1,7 @@
 package wbs.console.part;
 
 import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -14,10 +15,12 @@ import lombok.NonNull;
 import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.string.FormatWriter;
 
 public
@@ -96,7 +99,8 @@ class AbstractPagePart
 			throw new IllegalStateException (
 				stringFormat (
 					"%s not autowired correctl",
-					getClass ().getName ().toString ()));
+					classNameSimple (
+						getClass ())));
 
 		}
 

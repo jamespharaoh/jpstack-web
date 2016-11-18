@@ -1,6 +1,6 @@
 package wbs.utils.collection;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -159,7 +159,7 @@ class ReversableMap<KeyType,ValueType>
 		if (map.containsKey (value)) {
 
 			throw new IllegalArgumentException (
-				stringFormat (
+				stringFormatObsolete (
 					"Attempt to insert duplicate key: %s",
 					key));
 
@@ -168,7 +168,7 @@ class ReversableMap<KeyType,ValueType>
 		if (reverseMap.map.containsKey (value)) {
 
 			throw new IllegalArgumentException (
-				stringFormat (
+				stringFormatObsolete (
 					"Attempt to insert duplicate value: %s",
 					value));
 
@@ -200,7 +200,7 @@ class ReversableMap<KeyType,ValueType>
 					entry.getKey ())) {
 
 				throw new IllegalArgumentException (
-					stringFormat (
+					stringFormatObsolete (
 						"Attempt to insert duplicate key: %s",
 						entry.getKey ()));
 
@@ -210,7 +210,7 @@ class ReversableMap<KeyType,ValueType>
 					entry.getValue ())) {
 
 				throw new IllegalArgumentException (
-					stringFormat (
+					stringFormatObsolete (
 						"Attempt to insert duplicate value: %s",
 						entry.getValue ()));
 

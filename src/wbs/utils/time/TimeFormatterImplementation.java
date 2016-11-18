@@ -1,11 +1,16 @@
 package wbs.utils.time;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.lessThanZero;
 import static wbs.utils.string.StringUtils.pluralise;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.millisecondsToDuration;
 
 import java.util.Locale;
+
+import com.google.common.base.Optional;
+
+import lombok.NonNull;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -19,10 +24,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import wbs.framework.component.annotations.SingletonComponent;
-
-import com.google.common.base.Optional;
-
-import lombok.NonNull;
 
 @SingletonComponent ("timeFormatter")
 public
@@ -173,7 +174,8 @@ class TimeFormatterImplementation
 				stringFormat (
 					"Don't understand how to parse '%s' (length is %s)",
 					isoString,
-					isoString.length ()));
+					integerToDecimalString (
+						isoString.length ())));
 
 		}
 

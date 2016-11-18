@@ -18,6 +18,7 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 
 import wbs.framework.hibernate.HibernateDao;
+
 import wbs.imchat.model.ImChatMessageDao;
 import wbs.imchat.model.ImChatMessageRec;
 import wbs.imchat.model.ImChatMessageSearch;

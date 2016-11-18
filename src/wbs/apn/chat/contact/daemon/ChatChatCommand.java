@@ -18,6 +18,34 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
+import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.text.model.TextRec;
+
+import wbs.sms.command.model.CommandObjectHelper;
+import wbs.sms.command.model.CommandRec;
+import wbs.sms.core.logic.KeywordFinder;
+import wbs.sms.message.core.model.MessageObjectHelper;
+import wbs.sms.message.core.model.MessageRec;
+import wbs.sms.message.inbox.daemon.CommandHandler;
+import wbs.sms.message.inbox.daemon.CommandManager;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
+import wbs.sms.message.outbox.model.FailedMessageObjectHelper;
+
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.contact.model.ChatBlockObjectHelper;
@@ -35,31 +63,6 @@ import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.join.daemon.ChatJoiner;
 import wbs.apn.chat.user.join.daemon.ChatJoiner.JoinType;
-import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.PrototypeDependency;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.annotations.WeakSingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.affiliate.model.AffiliateRec;
-import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.platform.service.model.ServiceRec;
-import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.text.model.TextRec;
-import wbs.sms.command.model.CommandObjectHelper;
-import wbs.sms.command.model.CommandRec;
-import wbs.sms.core.logic.KeywordFinder;
-import wbs.sms.message.core.model.MessageObjectHelper;
-import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.daemon.CommandManager;
-import wbs.sms.message.inbox.logic.SmsInboxLogic;
-import wbs.sms.message.inbox.model.InboxAttemptRec;
-import wbs.sms.message.inbox.model.InboxRec;
-import wbs.sms.message.outbox.model.FailedMessageObjectHelper;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatChatCommand")

@@ -1,6 +1,7 @@
 package wbs.integrations.oxygen8.api;
 
 import static wbs.utils.etc.Misc.fromHex;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.bytesToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.secondsToInstant;
@@ -17,6 +18,7 @@ import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiAction;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -25,6 +27,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.integrations.oxygen8.model.Oxygen8ConfigRec;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogType;
@@ -32,12 +35,15 @@ import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInRec;
+
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
+
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+
 import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
 
@@ -307,7 +313,8 @@ class Oxygen8InboundSmsAction
 			throw new RuntimeException (
 				stringFormat (
 					"Don't know how to handle data type %s",
-					dataType));
+					integerToDecimalString (
+						dataType)));
 
 		}
 

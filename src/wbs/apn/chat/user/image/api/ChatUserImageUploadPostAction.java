@@ -3,6 +3,7 @@ package wbs.apn.chat.user.image.api;
 import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveOneElement;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
@@ -18,10 +19,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 
 import wbs.api.mvc.ApiAction;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.image.model.ChatUserImageType;
-import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
-import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -31,8 +29,13 @@ import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-import wbs.sms.message.core.model.MessageRec;
+
 import wbs.utils.random.RandomLogic;
+
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.apn.chat.user.image.model.ChatUserImageType;
+import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
+import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
 
@@ -194,7 +197,7 @@ class ChatUserImageUploadPostAction
 				fileItem.getName (),
 				/*fileItem.getContentType (),*/
 				"image/jpeg",
-				Optional.<MessageRec>absent (),
+				optionalAbsent (),
 				false);
 
 			// update token

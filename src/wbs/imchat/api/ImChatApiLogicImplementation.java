@@ -7,7 +7,7 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.camelToHyphen;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 import static wbs.utils.string.StringUtils.underscoreToHyphen;
 import static wbs.utils.time.TimeUtils.calculateAgeInYears;
@@ -145,7 +145,7 @@ class ImChatApiLogicImplementation
 				profile.getPublicDescriptionShort ())
 
 			.thumbnailImageLink (
-				stringFormat (
+				stringFormatObsolete (
 					"%s",
 					wbsConfig.apiUrl (),
 					"/im-chat-media/%u",
@@ -161,7 +161,7 @@ class ImChatApiLogicImplementation
 				resizedHeight)
 
 			.miniatureImageLink (
-				stringFormat (
+				stringFormatObsolete (
 					"%s",
 					wbsConfig.apiUrl (),
 					"/im-chat-media/%u",

@@ -1,7 +1,7 @@
 package wbs.apn.chat.core.logic;
 
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.time.TimeUtils.laterThan;
 
 import com.google.common.base.Optional;
@@ -73,7 +73,7 @@ class ChatNumberReportLogicImplementation
 		if (numberReport.getLastSuccess () != null) {
 
 			log.debug (
-				stringFormat (
+				stringFormatObsolete (
 					"REPORT LAST SUCCESS %s %s",
 					numberReport.getLastSuccess (),
 					number.getNumber ()));
@@ -87,7 +87,7 @@ class ChatNumberReportLogicImplementation
 		if (numberReport.getFirstFailure () != null) {
 
 			log.debug (
-				stringFormat (
+				stringFormatObsolete (
 					"REPORT FIRST FAILURE %s %s",
 					numberReport.getFirstFailure (),
 					number.getNumber ()));

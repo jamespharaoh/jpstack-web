@@ -1267,7 +1267,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 			}
 
-			List<?> objectsUncast =
+			List <?> objectsUncast =
 				session.createQuery (
 
 				stringFormat (

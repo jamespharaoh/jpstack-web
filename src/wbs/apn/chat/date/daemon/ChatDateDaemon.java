@@ -34,6 +34,26 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import wbs.framework.activitymanager.ActiveTask;
+import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.framework.object.ObjectManager;
+
+import wbs.platform.daemon.AbstractDaemonService;
+
+import wbs.sms.locator.logic.LocatorLogic;
+import wbs.sms.locator.model.LongLat;
+
+import wbs.utils.time.TimeFormatter;
+
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.model.ChatContactRec;
@@ -49,22 +69,6 @@ import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
 import wbs.apn.chat.user.info.logic.ChatInfoLogic;
-import wbs.framework.activitymanager.ActiveTask;
-import wbs.framework.activitymanager.ActivityManager;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.GenericExceptionResolution;
-import wbs.framework.logging.DefaultLogContext;
-import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
-import wbs.framework.object.ObjectManager;
-import wbs.platform.daemon.AbstractDaemonService;
-import wbs.sms.locator.logic.LocatorLogic;
-import wbs.sms.locator.model.LongLat;
-import wbs.utils.time.TimeFormatter;
 
 @Log4j
 @SingletonComponent ("chatDateDaemon")

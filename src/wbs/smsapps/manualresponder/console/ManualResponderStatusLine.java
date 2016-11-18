@@ -1,7 +1,7 @@
 package wbs.smsapps.manualresponder.console;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.thread.ConcurrentUtils.futureValue;
 
 import java.util.HashMap;
@@ -112,7 +112,7 @@ class ManualResponderStatusLine
 		// return update script
 
 		return futureValue (
-			stringFormat (
+			stringFormatObsolete (
 				"updateManualResponder (%s, %s);\n",
 				caches.numTodayCache.get (),
 				caches.numThisHourCache.get ()));

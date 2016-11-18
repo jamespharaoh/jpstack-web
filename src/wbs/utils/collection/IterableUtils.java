@@ -1,5 +1,11 @@
 package wbs.utils.collection;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -8,6 +14,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
@@ -101,6 +108,53 @@ class IterableUtils {
 		return StreamSupport.stream (
 			iterable.spliterator (),
 			false);
+
+	}
+
+	public static <ItemType>
+	ItemType iterableFindExactlyOneRequired (
+			@NonNull Predicate <ItemType> predicate,
+			@NonNull Iterable <ItemType> iterable) {
+
+		Optional <ItemType> value =
+			optionalAbsent ();
+
+		for (
+			ItemType item
+				: iterable
+		) {
+
+			if (
+				! predicate.test (
+					item)
+			) {
+				continue;
+			}
+
+			if (
+				optionalIsPresent (
+					value)
+			) {
+				throw new IllegalArgumentException (
+					"Multiple matching elements");
+			}
+
+			value =
+				optionalOf (
+					item);
+
+		}
+
+		if (
+			optionalIsNotPresent (
+				value)
+		) {
+			throw new IllegalArgumentException (
+				"No matching element found");
+		}
+
+		return optionalGetRequired (
+			value);
 
 	}
 

@@ -37,7 +37,9 @@ import wbs.console.notice.ConsoleNotices;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;
 import wbs.console.tab.TabList;
+
 import wbs.framework.entity.record.Record;
+
 import wbs.utils.string.FormatWriter;
 
 public

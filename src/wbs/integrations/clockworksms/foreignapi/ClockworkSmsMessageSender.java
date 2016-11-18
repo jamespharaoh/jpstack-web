@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -32,11 +33,15 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONObject;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataToXml;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.io.RuntimeIoException;
 
 @Accessors (fluent = true)
@@ -49,6 +54,9 @@ class ClockworkSmsMessageSender {
 	@SingletonDependency
 	@Named
 	DataFromXml clockworkSmsForeignApiDataFromXml;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	WbsConfig wbsConfig;
@@ -319,7 +327,13 @@ class ClockworkSmsMessageSender {
 	}
 
 	public
-	ClockworkSmsMessageSender decode () {
+	ClockworkSmsMessageSender decode (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"decode");
 
 		// check state
 
@@ -338,6 +352,7 @@ class ClockworkSmsMessageSender {
 			clockworkResponse =
 				(ClockworkSmsMessageResponse)
 				clockworkSmsForeignApiDataFromXml.readInputStream (
+					taskLogger,
 					new ByteArrayInputStream (
 						stringToUtf8 (
 							xmlResponse)),

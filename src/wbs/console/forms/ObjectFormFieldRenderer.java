@@ -29,10 +29,12 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
+
 import wbs.utils.etc.OptionalUtils;
 import wbs.utils.string.FormatWriter;
 
@@ -85,7 +87,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		htmlWriter.writeLineFormat (
 			"<input",
 			" type=\"hidden\"",
-			" name=\"%h-%h\"",
+			" name=\"%h.%h\"",
 			formName,
 			name (),
 			" value=\"%h\"",
@@ -208,10 +210,10 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		formatWriter.writeLineFormat (
 			"<select",
-			" id=\"%h-%h\"",
+			" id=\"%h.%h\"",
 			formName,
 			name,
-			" name=\"%h-%h\"",
+			" name=\"%h.%h\"",
 			formName,
 			name,
 			">\n");
@@ -311,7 +313,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j-%j\").val (\"none\");",
+				"$(\"#%j.%j\").val (\"none\");",
 				formName,
 				name);
 
@@ -322,7 +324,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j-%j\").val (\"%h\");",
+				"$(\"#%j.%j\").val (\"%h\");",
 				formName,
 				name,
 				interfaceValue.isPresent ()
@@ -348,7 +350,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 			submission.hasParameter (
 				stringFormat (
-					"%s-%s",
+					"%s.%s",
 					formName,
 					name ()))
 
@@ -365,7 +367,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		String param =
 			submission.parameter (
 				stringFormat (
-					"%s-%s",
+					"%s.%s",
 					formName,
 					name ()));
 

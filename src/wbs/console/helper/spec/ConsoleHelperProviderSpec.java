@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 
 import wbs.console.context.ConsoleContextStuffSpec;
 import wbs.console.module.ConsoleModuleData;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;

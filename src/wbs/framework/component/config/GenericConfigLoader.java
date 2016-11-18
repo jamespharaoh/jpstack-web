@@ -2,14 +2,22 @@ package wbs.framework.component.config;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("genericConfigLoader")
 public
 class GenericConfigLoader {
+
+	// singleotn components
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// state
 
@@ -34,24 +42,33 @@ class GenericConfigLoader {
 
 	// public implementation
 
-	public
-	AbstractGenericConfig load (
+	public <Config extends AbstractGenericConfig <Config>>
+	AbstractGenericConfig <?> load (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String configFilePath) {
 
-		return new AbstractGenericConfig ()
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"load");
+
+		return new AbstractGenericConfig <Config> ()
 
 			.genericConfigSpec (
 				loadSpec (
+					taskLogger,
 					configFilePath));
 
 	}
 
 	public
 	GenericConfigSpec loadSpec (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String configFilePath) {
 
 		return (GenericConfigSpec)
 			dataFromXml.readFilename (
+				parentTaskLogger,
 				configFilePath);
 
 	}

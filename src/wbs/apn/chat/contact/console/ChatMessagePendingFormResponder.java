@@ -27,17 +27,19 @@ import java.util.List;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageRec;
-import wbs.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
-import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
+import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
+import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 
 @PrototypeComponent ("chatMessagePendingFormResponder")
 public

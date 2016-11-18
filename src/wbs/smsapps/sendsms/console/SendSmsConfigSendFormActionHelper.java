@@ -8,23 +8,28 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import wbs.console.combo.AbstractConsoleFormActionHelper;
+import wbs.console.formaction.AbstractConsoleFormActionHelper;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.component.annotations.PrototypeComponent;
+
 import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Transaction;
+
 import wbs.platform.text.console.TextConsoleHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.number.core.console.NumberConsoleHelper;
 import wbs.sms.number.core.model.NumberRec;
+
 import wbs.smsapps.sendsms.model.SendSmsConfigRec;
+
 import wbs.web.responder.Responder;
 
-@PrototypeComponent ("sendSmsConfigSendFormActionHelper")
+@SingletonComponent ("sendSmsConfigSendFormActionHelper")
 public
 class SendSmsConfigSendFormActionHelper
 	extends AbstractConsoleFormActionHelper <SendSmsConfigSendForm> {

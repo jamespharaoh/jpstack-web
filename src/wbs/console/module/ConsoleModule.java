@@ -17,6 +17,7 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.supervisor.SupervisorConfig;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.ContextTabPlacement;
+
 import wbs.web.file.WebFile;
 import wbs.web.responder.Responder;
 import wbs.web.responder.WebModule;
@@ -48,7 +49,7 @@ interface ConsoleModule
 	// implementation
 
 	default
-	FormFieldSet <?> formFieldSet (
+	FormFieldSet <?> formFieldSetRequired (
 			@NonNull String name) {
 
 		return mapItemForKeyOrThrow (
@@ -69,7 +70,7 @@ interface ConsoleModule
 			@NonNull Class <?> containerClass) {
 
 		FormFieldSet <?> fieldsUncast =
-			formFieldSet (
+			formFieldSetRequired (
 				name);
 
 		return fieldsUncast.cast (

@@ -18,14 +18,18 @@ import wbs.framework.database.Database;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.integrations.fonix.model.FonixConfigObjectHelper;
 import wbs.integrations.fonix.model.FonixDeliveryStatusObjectHelper;
 import wbs.integrations.fonix.model.FonixNetworkObjectHelper;
 import wbs.integrations.fonix.model.FonixRouteInObjectHelper;
 import wbs.integrations.fonix.model.FonixRouteOutObjectHelper;
+
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
@@ -82,7 +86,8 @@ class FonixFixtureProvider
 
 	@Override
 	public
-	void createFixtures () {
+	void createFixtures (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		createMenus ();
 

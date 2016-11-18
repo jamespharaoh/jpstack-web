@@ -23,14 +23,17 @@ import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.daemon.SleepingDaemonService;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
+
+import wbs.utils.random.RandomLogic;
+
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
-import wbs.utils.random.RandomLogic;
 
 @Log4j
 @SingletonComponent ("ticketStateTimeDaemon")

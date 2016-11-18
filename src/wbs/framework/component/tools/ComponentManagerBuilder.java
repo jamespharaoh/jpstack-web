@@ -134,7 +134,13 @@ class ComponentManagerBuilder {
 	}
 
 	public
-	ComponentManager build () {
+	ComponentManager build (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		activityManager =
 			new ActivityManagerImplementation ();
@@ -149,7 +155,8 @@ class ComponentManagerBuilder {
 
 		) {
 
-			loadPlugins ();
+			loadPlugins (
+				taskLogger);
 
 			createPluginManager ();
 
@@ -162,7 +169,13 @@ class ComponentManagerBuilder {
 	}
 
 	private
-	void loadPlugins () {
+	void loadPlugins (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"loadPlugins");
 
 		String buildPath =
 			"/wbs-build.xml";
@@ -179,6 +192,7 @@ class ComponentManagerBuilder {
 		BuildSpec build =
 			(BuildSpec)
 			buildDataFromXml.readClasspath (
+				taskLogger,
 				buildPath);
 
 		ImmutableList.Builder <PluginSpec> pluginsBuilder =
@@ -218,6 +232,7 @@ class ComponentManagerBuilder {
 			PluginSpec plugin =
 				(PluginSpec)
 				pluginDataFromXml.readClasspath (
+					taskLogger,
 					pluginPath,
 					ImmutableList.of (
 						build));
@@ -1475,7 +1490,12 @@ class ComponentManagerBuilder {
 	}
 
 	void registerConfigComponents (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"registerConfigComponents");
 
 		for (
 			String configName
@@ -1492,6 +1512,7 @@ class ComponentManagerBuilder {
 					configName);
 
 			componentRegistry.registerXmlFilename (
+				taskLogger,
 				configPath);
 
 		}
@@ -1499,7 +1520,7 @@ class ComponentManagerBuilder {
 	}
 
 	void registerSingletonComponents (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		for (
 			Map.Entry <String,Object> entry

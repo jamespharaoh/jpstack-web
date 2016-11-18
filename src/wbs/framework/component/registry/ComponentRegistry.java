@@ -8,6 +8,7 @@ import java.util.Map;
 import com.google.common.base.Optional;
 
 import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.logging.TaskLogger;
 
 public
 interface ComponentRegistry {
@@ -44,6 +45,7 @@ interface ComponentRegistry {
 			Object value);
 
 	ComponentRegistry registerXmlFilename (
+			TaskLogger parentTaskLogger,
 			String filename);
 
 	// request components (messy)

@@ -13,7 +13,9 @@ import java.util.Map;
 import lombok.NonNull;
 
 import wbs.utils.string.FormatWriter;
+
 import wbs.web.utils.HtmlAttributeUtils.HtmlAttribute;
+import wbs.web.utils.HtmlAttributeUtils.ToHtmlAttribute;
 
 public
 class HtmlInputUtils {
@@ -560,15 +562,25 @@ class HtmlInputUtils {
 			@NonNull FormatWriter formatWriter,
 			@NonNull String name,
 			@NonNull Map <? extends Key, String> options,
-			@NonNull Key selectedValue) {
+			@NonNull Key selectedValue,
+			@NonNull ToHtmlAttribute ... attributes) {
 
-		formatWriter.writeLineFormat (
+		formatWriter.writeIndent ();
+
+		formatWriter.writeFormat (
 			"<select",
 			" id=\"%h\"",
 			name,
 			" name=\"%h\"",
-			name,
+			name);
+
+		htmlAttributesWrite (
+			attributes);
+
+		formatWriter.writeFormat (
 			">");
+
+		formatWriter.writeNewline ();
 
 		formatWriter.increaseIndent ();
 
@@ -596,13 +608,15 @@ class HtmlInputUtils {
 	void htmlSelect (
 			@NonNull String name,
 			@NonNull Map <? extends Key, String> options,
-			@NonNull Key selectedValue) {
+			@NonNull Key selectedValue,
+			@NonNull ToHtmlAttribute ... attributes) {
 
 		htmlSelect (
 			currentFormatWriter (),
 			name,
 			options,
-			selectedValue);
+			selectedValue,
+			attributes);
 
 	}
 

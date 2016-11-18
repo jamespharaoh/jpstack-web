@@ -35,6 +35,13 @@ class MapUtils {
 
 	}
 
+	public static <KeyType, ValueType>
+	Map <KeyType, ValueType> emptyMap () {
+
+		return ImmutableMap.of ();
+
+	}
+
 	// key lookup
 
 	public static <KeyType>

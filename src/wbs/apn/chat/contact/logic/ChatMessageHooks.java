@@ -7,15 +7,16 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.object.ObjectHooks;
+
 import wbs.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.apn.chat.contact.model.ChatContactRec;
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.annotations.WeakSingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.object.ObjectHooks;
 
 public
 class ChatMessageHooks

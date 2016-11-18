@@ -62,11 +62,13 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
 import wbs.platform.media.logic.MediaLogic;
@@ -74,6 +76,7 @@ import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.sms.customer.model.SmsCustomerRec;
 import wbs.sms.customer.model.SmsCustomerSessionObjectHelper;
 import wbs.sms.customer.model.SmsCustomerSessionRec;
@@ -86,6 +89,7 @@ import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
+
 import wbs.smsapps.manualresponder.model.ManualResponderNumberObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
@@ -93,7 +97,9 @@ import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
+
 import wbs.utils.time.TextualInterval;
+
 import wbs.web.utils.HtmlUtils;
 
 @PrototypeComponent ("manualResponderRequestPendingSummaryPart")

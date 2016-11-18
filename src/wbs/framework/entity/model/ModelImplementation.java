@@ -20,6 +20,7 @@ import wbs.framework.data.annotations.DataReference;
 import wbs.framework.entity.record.Record;
 import wbs.framework.entity.record.RootRecord;
 import wbs.framework.object.ObjectHelper;
+
 import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)

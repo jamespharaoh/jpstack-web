@@ -23,15 +23,19 @@ import wbs.framework.database.Database;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.integrations.clockworksms.model.ClockworkSmsConfigObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsConfigRec;
 import wbs.integrations.clockworksms.model.ClockworkSmsDeliveryStatusDetailCodeObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsDeliveryStatusObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteInObjectHelper;
 import wbs.integrations.clockworksms.model.ClockworkSmsRouteOutObjectHelper;
+
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
@@ -85,7 +89,8 @@ class ClockworkSmsFixtureProvider
 
 	@Override
 	public
-	void createFixtures () {
+	void createFixtures (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		createMenus ();
 

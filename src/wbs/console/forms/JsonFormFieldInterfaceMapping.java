@@ -7,28 +7,29 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.io.StringWriter;
 import java.util.Map;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 
-import fj.data.Either;
+import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.WriterFormatWriter;
+
+import fj.data.Either;
 import wbs.web.utils.JsonToHtml;
 
 @PrototypeComponent ("jsonFormFieldInterfaceMapping")
 public
-class JsonFormFieldInterfaceMapping<Container>
-	implements FormFieldInterfaceMapping<Container,String,String> {
+class JsonFormFieldInterfaceMapping <Container>
+	implements FormFieldInterfaceMapping <Container, String, String> {
 
 	@Override
 	public
-	Either<Optional<String>,String> interfaceToGeneric (
+	Either<Optional <String>, String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue) {
 
 		throw new UnsupportedOperationException (
 			stringFormat (

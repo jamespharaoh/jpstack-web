@@ -8,7 +8,6 @@ import static wbs.utils.etc.Misc.toEnumGeneric;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.hyphenToCamel;
@@ -69,6 +68,7 @@ import wbs.framework.data.annotations.DataParent;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.etc.PropertyUtils;
 
 /**
@@ -90,9 +90,6 @@ class DataFromXmlImplementation
 	// properties
 
 	@Getter @Setter
-	TaskLogger taskLogger;
-
-	@Getter @Setter
 	Map <String, List <DataClassInfo>> dataClassesMap;
 
 	@Getter @Setter
@@ -103,14 +100,14 @@ class DataFromXmlImplementation
 	@Override
 	public
 	Object readInputStream (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull InputStream inputStream,
 			@NonNull String filename,
 			@NonNull List <Object> parents) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
-				optionalFromNullable (
-					this.taskLogger),
+				parentTaskLogger,
 				"readInputStream");
 
 		taskLogger.firstErrorFormat (
@@ -156,7 +153,8 @@ class DataFromXmlImplementation
 					ImmutableList.of (
 						document.getRootElement ().getName ()))
 
-				.build ();
+				.build (
+					taskLogger);
 
 		} catch (Exception exception) {
 
@@ -177,8 +175,14 @@ class DataFromXmlImplementation
 	@Override
 	public
 	Object readClasspath (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String filename,
 			@NonNull List <Object> parents) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"readClasspath");
 
 		InputStream inputStream =
 			getClass ().getResourceAsStream (
@@ -194,6 +198,7 @@ class DataFromXmlImplementation
 		}
 
 		return readInputStream (
+			taskLogger,
 			inputStream,
 			filename,
 			parents);
@@ -203,8 +208,14 @@ class DataFromXmlImplementation
 	@Override
 	public
 	Object readFilename (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String filename,
 			@NonNull List <Object> parents) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"readClasspath");
 
 		InputStream inputStream;
 
@@ -224,6 +235,7 @@ class DataFromXmlImplementation
 		}
 
 		return readInputStream (
+			taskLogger,
 			inputStream,
 			filename,
 			parents);
@@ -250,7 +262,13 @@ class DataFromXmlImplementation
 		Set <String> matchedElementNames =
 			new HashSet<> ();
 
-		Object build () {
+		Object build (
+				@NonNull TaskLogger parentTaskLogger) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"ElementBuilder.build");
 
 			Iterator <Object> parentsIterator =
 				parents.iterator ();
@@ -350,6 +368,7 @@ class DataFromXmlImplementation
 			) {
 
 				buildField (
+					parentTaskLogger,
 					field);
 
 			}
@@ -463,7 +482,8 @@ class DataFromXmlImplementation
 		}
 
 		void buildField (
-				Field field) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Field field) {
 
 			for (
 				Annotation annotation
@@ -473,6 +493,7 @@ class DataFromXmlImplementation
 				if (annotation instanceof DataAttribute) {
 
 					buildAttributeField (
+						parentTaskLogger,
 						field,
 						(DataAttribute) annotation);
 
@@ -481,6 +502,7 @@ class DataFromXmlImplementation
 				if (annotation instanceof DataContent) {
 
 					buildContentField (
+						parentTaskLogger,
 						field,
 						(DataContent) annotation);
 
@@ -489,6 +511,7 @@ class DataFromXmlImplementation
 				if (annotation instanceof DataChild) {
 
 					buildChildField (
+						parentTaskLogger,
 						field,
 						(DataChild) annotation);
 
@@ -497,6 +520,7 @@ class DataFromXmlImplementation
 				if (annotation instanceof DataChildren) {
 
 					buildChildrenField (
+						parentTaskLogger,
 						field,
 						(DataChildren) annotation);
 
@@ -524,7 +548,10 @@ class DataFromXmlImplementation
 
 				if (annotation instanceof DataAncestor) {
 
-					for (Object ancestor : parents) {
+					for (
+						Object ancestor
+							: parents
+					) {
 
 						if (! field.getType ().isInstance (ancestor))
 							continue;
@@ -553,6 +580,7 @@ class DataFromXmlImplementation
 		}
 
 		void buildAttributeField (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Field field,
 				@NonNull DataAttribute dataAttributeAnnotation) {
 
@@ -571,7 +599,7 @@ class DataFromXmlImplementation
 
 				if (dataAttributeAnnotation.required ()) {
 
-					taskLogger.errorFormat (
+					parentTaskLogger.errorFormat (
 						"%s: ",
 						joinWithFullStop (
 							context),
@@ -596,7 +624,7 @@ class DataFromXmlImplementation
 
 				if (collection == null) {
 
-					taskLogger.errorFormat (
+					parentTaskLogger.errorFormat (
 						"%s: ",
 						joinWithFullStop (
 							context),
@@ -612,7 +640,7 @@ class DataFromXmlImplementation
 
 				if (namedObject == null) {
 
-					taskLogger.errorFormat (
+					parentTaskLogger.errorFormat (
 						"%s: ",
 						joinWithFullStop (
 							context),
@@ -632,6 +660,7 @@ class DataFromXmlImplementation
 			} else {
 
 				setScalarFieldRequired (
+					parentTaskLogger,
 					object,
 					field,
 					attributeValue);
@@ -709,6 +738,7 @@ class DataFromXmlImplementation
 		}
 
 		void setScalarFieldRequired (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Object object,
 				@NonNull Field field,
 				@NonNull String stringValue) {
@@ -720,7 +750,7 @@ class DataFromXmlImplementation
 					stringValue)
 			) {
 
-				taskLogger.errorFormat (
+				parentTaskLogger.errorFormat (
 					"%s: ",
 					joinWithFullStop (
 						context),
@@ -735,6 +765,7 @@ class DataFromXmlImplementation
 		}
 
 		void buildContentField (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Field field,
 				@NonNull DataContent dataContentAnnotation) {
 
@@ -750,7 +781,7 @@ class DataFromXmlImplementation
 
 			} else {
 
-				taskLogger.errorFormat (
+				parentTaskLogger.errorFormat (
 					"%s: ",
 					joinWithFullStop (
 						context),
@@ -765,6 +796,7 @@ class DataFromXmlImplementation
 		}
 
 		void buildChildField (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Field field,
 				@NonNull DataChild dataChildAnnotation) {
 
@@ -825,7 +857,8 @@ class DataFromXmlImplementation
 							Collections.singletonList (
 								childElement.getName ())))
 
-					.build ();
+					.build (
+						parentTaskLogger);
 
 				if (child != null) {
 
@@ -841,8 +874,9 @@ class DataFromXmlImplementation
 		}
 
 		void buildChildrenField (
-				Field field,
-				DataChildren dataChildrenAnnotation) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Field field,
+				@NonNull DataChildren dataChildrenAnnotation) {
 
 			if (
 
@@ -860,7 +894,7 @@ class DataFromXmlImplementation
 
 			) {
 
-				taskLogger.errorFormat (
+				parentTaskLogger.errorFormat (
 					"%s: ",
 					joinWithFullStop (
 						context),
@@ -987,7 +1021,7 @@ class DataFromXmlImplementation
 
 					if (entryKey == null) {
 
-						taskLogger.errorFormat (
+						parentTaskLogger.errorFormat (
 							"%s: ",
 							joinWithFullStop (
 								context),
@@ -1000,12 +1034,12 @@ class DataFromXmlImplementation
 
 					if (entryValue == null) {
 
-						taskLogger.errorFormat (
+						parentTaskLogger.errorFormat (
 							"%s: ",
 							joinWithFullStop (
 								context),
 							"Must specify 'entryValue' on @DataChildren ",
-							"when field type is Map, at %s.%s",
+							"when f	ield type is Map, at %s.%s",
 							object.getClass ().getSimpleName (),
 							field.getName ());
 
@@ -1061,7 +1095,7 @@ class DataFromXmlImplementation
 
 					if (stringValue == null) {
 
-						taskLogger.errorFormat (
+						parentTaskLogger.errorFormat (
 							"%s: ",
 							joinWithFullStop (
 								context),
@@ -1097,7 +1131,7 @@ class DataFromXmlImplementation
 
 					} else {
 
-						taskLogger.errorFormat (
+						parentTaskLogger.errorFormat (
 							"%s: ",
 							joinWithFullStop (
 								context),
@@ -1131,7 +1165,8 @@ class DataFromXmlImplementation
 								Collections.singletonList (
 									childElement.getName ())))
 
-						.build ());
+						.build (
+							parentTaskLogger));
 
 				}
 

@@ -5,6 +5,7 @@ import static wbs.utils.etc.Misc.stringToUrl;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.net.HttpURLConnection;
@@ -285,7 +286,7 @@ class SmsArenaSender
 		// create connection with the url and the query string
 
 		String urlString =
-			stringFormat (
+			stringFormatObsolete (
 				"%s?%s",
 				smsArenaRouteOut.getRelayUrl (),
 				paramsString);
@@ -393,7 +394,7 @@ class SmsArenaSender
 					.build ();
 
 			log.debug (
-				stringFormat (
+				stringFormatObsolete (
 					"Message %s response: %s",
 					messageId,
 					responseString));
@@ -440,7 +441,7 @@ class SmsArenaSender
 							PerformSendStatus.remoteError)
 
 						.message (
-							stringFormat (
+							stringFormatObsolete (
 								"Error from remote system: %s",
 								httpUrlConnection.getResponseCode (),
 								ack))

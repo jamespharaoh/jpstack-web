@@ -30,9 +30,6 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.core.console.ChatConsoleLogic;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
@@ -45,14 +42,21 @@ import wbs.console.misc.PageBuilder;
 import wbs.console.misc.Percentager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.media.console.MediaConsoleLogic;
+
 import wbs.utils.time.TimeFormatter;
+
+import wbs.apn.chat.core.console.ChatConsoleLogic;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 
 @PrototypeComponent ("chatUserSearchOldResultsPart")
 public

@@ -3,6 +3,7 @@ package wbs.platform.queue.logic;
 import java.util.List;
 
 import wbs.framework.entity.record.Record;
+
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
@@ -14,14 +15,14 @@ interface QueueLogic {
 
 	QueueItemRec createQueueItem (
 			QueueSubjectRec queueSubject,
-			Record<?> refObject,
+			Record <?> refObject,
 			String source,
 			String details);
 
 	QueueItemRec createQueueItem (
 			QueueRec queue,
-			Record<?> subjectObject,
-			Record<?> refObject,
+			Record <?> subjectObject,
+			Record <?> refObject,
 			String source,
 			String details);
 

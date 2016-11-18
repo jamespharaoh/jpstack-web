@@ -9,7 +9,7 @@ import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.io.File;
 import java.io.IOException;
@@ -529,7 +529,7 @@ class DataToXml {
 		} else {
 
 			throw new RuntimeException (
-				stringFormat (
+				stringFormatObsolete (
 					"Don't know how to handle collection of type %s",
 					children.getClass ()));
 

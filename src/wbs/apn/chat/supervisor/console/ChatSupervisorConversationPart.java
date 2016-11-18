@@ -32,6 +32,17 @@ import lombok.NonNull;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.media.console.MediaConsoleLogic;
+
+import wbs.utils.time.TimeFormatter;
+
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
@@ -40,13 +51,6 @@ import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.part.AbstractPagePart;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.media.console.MediaConsoleLogic;
-import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("chatSupervisorConversationPart")
 public

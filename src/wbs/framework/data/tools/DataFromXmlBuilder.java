@@ -228,9 +228,6 @@ class DataFromXmlBuilder {
 
 		return new DataFromXmlImplementation ()
 
-			.taskLogger (
-				taskLogger)
-
 			.dataClassesMap (
 				ImmutableMap.copyOf (
 					dataClassesMap))

@@ -9,6 +9,7 @@ import javax.inject.Provider;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.reporting.MultiplicationStatsResolver;
 import wbs.console.reporting.StatsResolver;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;

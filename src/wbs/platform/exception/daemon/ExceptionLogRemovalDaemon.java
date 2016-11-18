@@ -1,7 +1,7 @@
 package wbs.platform.exception.daemon;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.util.List;
 
@@ -115,7 +115,7 @@ class ExceptionLogRemovalDaemon
 			transaction.commit ();
 
 			log.info (
-				stringFormat (
+				stringFormatObsolete (
 					"Removed %s old exception logs",
 					oldExceptionLogs.size ()));
 

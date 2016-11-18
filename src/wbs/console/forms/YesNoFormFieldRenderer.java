@@ -64,7 +64,7 @@ class YesNoFormFieldRenderer <Container>
 		htmlWriter.writeLineFormat (
 			"<input",
 			" type=\"hidden\"",
-			" name=\"%h-%h\"",
+			" name=\"%h.%h\"",
 			formName,
 			name (),
 			" value=\"%h\"",
@@ -99,7 +99,7 @@ class YesNoFormFieldRenderer <Container>
 
 		htmlWriter.writeLineFormat (
 			"<select",
-			" name=\"%h-%h\"",
+			" name=\"%h.%h\"",
 			formName,
 			name (),
 			">");
@@ -170,7 +170,7 @@ class YesNoFormFieldRenderer <Container>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j-%j\").val (\"none\");",
+				"$(\"#%j.%j\").val (\"none\");",
 				formName,
 				name);
 
@@ -181,7 +181,7 @@ class YesNoFormFieldRenderer <Container>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j-%j\").val (%s);",
+				"$(\"#%j.%j\").val (%s);",
 				formName,
 				name,
 				booleanToTrueFalseNone (
@@ -203,7 +203,7 @@ class YesNoFormFieldRenderer <Container>
 
 		return submission.hasParameter (
 			stringFormat (
-				"%s-%s",
+				"%s.%s",
 				formName,
 				name ()));
 
@@ -215,7 +215,7 @@ class YesNoFormFieldRenderer <Container>
 
 		return submission.parameter (
 			stringFormat (
-				"%s-%s",
+				"%s.%s",
 				formName,
 				name ()));
 

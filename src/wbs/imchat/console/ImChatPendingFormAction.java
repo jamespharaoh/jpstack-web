@@ -1,6 +1,7 @@
 package wbs.imchat.console;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.maximumJavaInteger;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -10,19 +11,22 @@ import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.currency.logic.CurrencyLogic;
+import wbs.platform.queue.logic.QueueLogic;
+import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerRec;
 import wbs.imchat.model.ImChatMessageRec;
 import wbs.imchat.model.ImChatRec;
 import wbs.imchat.model.ImChatTemplateRec;
-import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.platform.queue.logic.QueueLogic;
-import wbs.platform.user.console.UserConsoleLogic;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("imChatPendingFormAction")
@@ -221,13 +225,15 @@ class ImChatPendingFormAction
 
 			if (messageLength < minLength) {
 
-				requestContext.addError (
-					stringFormat (
-						"Message has %s ",
-						messageLength,
-						"characters, but the minimum is %s, ",
-						minLength,
-						"please add %s more",
+				requestContext.addErrorFormat (
+					"Message has %s ",
+					integerToDecimalString (
+						messageLength),
+					"characters, but the minimum is %s, ",
+					integerToDecimalString (
+						minLength),
+					"please add %s more",
+					integerToDecimalString (
 						minLength - messageLength));
 
 				return null;
@@ -236,13 +242,15 @@ class ImChatPendingFormAction
 
 			if (messageLength > maxLength) {
 
-				requestContext.addError (
-					stringFormat (
-						"Message has %s ",
-						messageLength,
-						"characters, but the maximum is %s, ",
-						maxLength,
-						"please remove %s",
+				requestContext.addErrorFormat (
+					"Message has %s ",
+					integerToDecimalString (
+						messageLength),
+					"characters, but the maximum is %s, ",
+					integerToDecimalString (
+						maxLength),
+					"please remove %s",
+					integerToDecimalString (
 						messageLength - maxLength));
 
 				return null;

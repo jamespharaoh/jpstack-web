@@ -17,6 +17,7 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+
 import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("htmlTableCellWriter")

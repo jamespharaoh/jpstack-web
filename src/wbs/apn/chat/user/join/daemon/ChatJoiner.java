@@ -25,6 +25,38 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.Log4jLogContext;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.framework.object.ObjectManager;
+
+import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.event.logic.EventLogic;
+import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
+import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.user.model.UserRec;
+
+import wbs.sms.command.model.CommandObjectHelper;
+import wbs.sms.command.model.CommandRec;
+import wbs.sms.core.logic.DateFinder;
+import wbs.sms.message.core.model.MessageObjectHelper;
+import wbs.sms.message.core.model.MessageRec;
+import wbs.sms.message.delivery.model.DeliveryObjectHelper;
+import wbs.sms.message.delivery.model.DeliveryRec;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
+
+import wbs.utils.email.EmailLogic;
+import wbs.utils.random.RandomLogic;
+import wbs.utils.time.TimeFormatter;
+
 import wbs.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
@@ -52,34 +84,6 @@ import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.apn.chat.user.info.logic.ChatInfoLogic;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.config.WbsConfig;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.logging.Log4jLogContext;
-import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
-import wbs.framework.object.ObjectManager;
-import wbs.platform.affiliate.model.AffiliateRec;
-import wbs.platform.event.logic.EventLogic;
-import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.platform.service.model.ServiceRec;
-import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.user.model.UserRec;
-import wbs.sms.command.model.CommandObjectHelper;
-import wbs.sms.command.model.CommandRec;
-import wbs.sms.core.logic.DateFinder;
-import wbs.sms.message.core.model.MessageObjectHelper;
-import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.delivery.model.DeliveryObjectHelper;
-import wbs.sms.message.delivery.model.DeliveryRec;
-import wbs.sms.message.inbox.logic.SmsInboxLogic;
-import wbs.sms.message.inbox.model.InboxAttemptRec;
-import wbs.sms.message.inbox.model.InboxRec;
-import wbs.utils.email.EmailLogic;
-import wbs.utils.random.RandomLogic;
-import wbs.utils.time.TimeFormatter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatJoiner")

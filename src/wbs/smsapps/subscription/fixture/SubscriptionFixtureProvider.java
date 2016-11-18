@@ -6,21 +6,27 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
+
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.keyword.model.KeywordObjectHelper;
 import wbs.sms.keyword.model.KeywordSetObjectHelper;
 import wbs.sms.keyword.model.KeywordSetRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.router.model.RouterObjectHelper;
+
 import wbs.smsapps.subscription.model.SubscriptionAffiliateObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionAffiliateRec;
 import wbs.smsapps.subscription.model.SubscriptionKeywordObjectHelper;
@@ -82,7 +88,8 @@ class SubscriptionFixtureProvider
 
 	@Override
 	public
-	void createFixtures () {
+	void createFixtures (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		menuItemHelper.insert (
 			menuItemHelper.createInstance ()

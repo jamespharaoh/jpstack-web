@@ -1,0 +1,17 @@
+<plugin
+	name="console-form-action"
+	package="wbs.console.formaction">
+
+	<layer name="console">
+		<component class="ConsoleFormActionAction"/>
+		<component class="ConsoleFormActionPart"/>
+		<component class="ConsoleFormActionSpec"/>
+		<component class="ConsoleFormActionsAction"/>
+		<component class="ConsoleFormActionsPart"/>
+		<component class="ContextTabFormActionPageBuilder"/>
+		<component class="ContextTabFormActionPageSpec"/>
+		<component class="ContextTabFormActionsPageBuilder"/>
+		<component class="ContextTabFormActionsPageSpec"/>
+	</layer>
+
+</plugin>

@@ -6,6 +6,7 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,15 +33,18 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.object.ObjectManager;
+
 import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteOutRec;
+
 import wbs.sms.gsm.GsmUtils;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender2;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.route.core.model.RouteRec;
+
 import wbs.web.utils.HtmlUtils;
 
 @Log4j
@@ -133,7 +137,7 @@ class Oxygen8Sender
 					SetupSendStatus.configError)
 
 				.message (
-					stringFormat (
+					stringFormatObsolete (
 						"Oxygen8 network not found for %s",
 						message.getNumber ().getNetwork ().getId ()));
 
@@ -177,7 +181,7 @@ class Oxygen8Sender
 					SetupSendStatus.validationError)
 
 				.message (
-					stringFormat (
+					stringFormatObsolete (
 						"Length is %s but multipart not enabled",
 						gsmLength));
 
@@ -293,7 +297,7 @@ class Oxygen8Sender
 			throws IOException {
 
 			log.info (
-				stringFormat (
+				stringFormatObsolete (
 					"Sending message %s",
 					message.getId ()));
 
@@ -471,7 +475,7 @@ class Oxygen8Sender
 					urlConnection.getInputStream ());
 
 			log.debug (
-				stringFormat (
+				stringFormatObsolete (
 					"Message %s code %s response: [%s]",
 					message.getId (),
 					urlConnection.getResponseCode (),
@@ -564,7 +568,7 @@ class Oxygen8Sender
 					PerformSendStatus.unknownError)
 
 				.message (
-					stringFormat (
+					stringFormatObsolete (
 						"Server returned %s",
 						urlConnection.getResponseCode ()))
 

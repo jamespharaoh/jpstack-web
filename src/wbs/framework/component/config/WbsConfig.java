@@ -16,6 +16,9 @@ import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @Data
@@ -23,6 +26,11 @@ import wbs.framework.data.tools.DataFromXmlBuilder;
 @PrototypeComponent ("wbsConfig")
 public
 class WbsConfig {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			WbsConfig.class);
 
 	// general information
 
@@ -82,7 +90,13 @@ class WbsConfig {
 
 	public static
 	WbsConfig readFilename (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String filename) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"readFilename");
 
 		DataFromXml dataFromXml =
 			new DataFromXmlBuilder ()
@@ -98,6 +112,7 @@ class WbsConfig {
 		WbsConfig wbsConfig =
 			(WbsConfig)
 			dataFromXml.readFilename (
+				taskLogger,
 				filename);
 
 		return wbsConfig;

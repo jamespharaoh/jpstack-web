@@ -1,20 +1,26 @@
 package wbs.smsapps.manualresponder.fixture;
 
+import lombok.NonNull;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
+
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.customer.model.SmsCustomerManagerObjectHelper;
 import wbs.sms.keyword.model.KeywordObjectHelper;
 import wbs.sms.keyword.model.KeywordSetObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.router.model.RouterObjectHelper;
+
 import wbs.smsapps.manualresponder.model.ManualResponderObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateObjectHelper;
@@ -69,7 +75,8 @@ class ManualResponderFixtureProvider
 
 	@Override
 	public
-	void createFixtures () {
+	void createFixtures (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		createMenuItem ();
 

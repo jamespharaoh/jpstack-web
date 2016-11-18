@@ -116,7 +116,8 @@ class ComponentRunner {
 			.outputPath (
 				"work/runner/components")
 
-			.build ();
+			.build (
+				taskLogger);
 
 	}
 

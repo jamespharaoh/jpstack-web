@@ -4,7 +4,7 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -176,7 +176,7 @@ class TimestampFormFieldBuilder {
 		} else {
 
 			throw new RuntimeException (
-				stringFormat (
+				stringFormatObsolete (
 					"Don't know how to map %s as timestamp for %s.%s",
 					propertyClass,
 					context.containerClass (),

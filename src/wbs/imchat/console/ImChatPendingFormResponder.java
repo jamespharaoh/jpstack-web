@@ -41,18 +41,21 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.responder.HtmlResponder;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.currency.logic.CurrencyLogic;
+
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerRec;
 import wbs.imchat.model.ImChatMessageObjectHelper;
 import wbs.imchat.model.ImChatMessageRec;
 import wbs.imchat.model.ImChatRec;
 import wbs.imchat.model.ImChatTemplateRec;
-import wbs.platform.currency.logic.CurrencyLogic;
 
 @PrototypeComponent ("imChatPendingFormResponder")
 public

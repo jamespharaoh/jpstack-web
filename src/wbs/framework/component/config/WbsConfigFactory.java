@@ -2,15 +2,33 @@ package wbs.framework.component.config;
 
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("wbsConfigLoader")
 public
 class WbsConfigFactory {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// components
+
 	@SingletonComponent ("wbsConfig")
 	public
-	WbsConfig wbsConfig () {
+	WbsConfig wbsConfig (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"wbsConfig");
 
 		String configFilename =
 			System.getenv (
@@ -26,6 +44,7 @@ class WbsConfigFactory {
 
 		WbsConfig wbsConfig =
 			WbsConfig.readFilename (
+				taskLogger,
 				configFilename);
 
 		return wbsConfig;

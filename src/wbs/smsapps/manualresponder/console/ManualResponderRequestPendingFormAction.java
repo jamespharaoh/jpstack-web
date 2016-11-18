@@ -21,17 +21,20 @@ import org.apache.commons.lang3.tuple.Pair;
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.gsm.GsmUtils;
@@ -39,6 +42,7 @@ import wbs.sms.keyword.logic.KeywordLogic;
 import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
+
 import wbs.smsapps.manualresponder.logic.ManualResponderLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
@@ -48,6 +52,7 @@ import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
+
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("manualResponderRequestPendingFormAction")

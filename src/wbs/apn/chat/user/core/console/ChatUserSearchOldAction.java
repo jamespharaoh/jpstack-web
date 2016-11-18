@@ -26,12 +26,6 @@ import lombok.NonNull;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import wbs.apn.chat.bill.model.ChatUserCreditMode;
-import wbs.apn.chat.user.core.model.ChatUserDateMode;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
 import wbs.console.action.ConsoleAction;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
@@ -44,12 +38,21 @@ import wbs.console.param.ParamCheckerSet;
 import wbs.console.param.TimestampFromParamChecker;
 import wbs.console.param.TimestampToParamChecker;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.etc.NumberUtils;
+
+import wbs.apn.chat.bill.model.ChatUserCreditMode;
+import wbs.apn.chat.user.core.model.ChatUserDateMode;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserType;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatUserSearchOldAction")

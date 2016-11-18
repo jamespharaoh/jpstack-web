@@ -1,4 +1,4 @@
-package wbs.console.combo;
+package wbs.console.formaction;
 
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.camelToSpaces;
@@ -20,6 +20,7 @@ import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.TabContextResponder;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -33,6 +34,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.action.Action;
 import wbs.web.responder.Responder;
 
@@ -60,13 +62,13 @@ class ContextTabFormActionPageBuilder
 	Provider <ConsoleFile> consoleFileProvider;
 
 	@PrototypeDependency
-	Provider <ContextFormActionAction> contextFormActionActionProvider;
+	Provider <ConsoleFormActionAction> consoleFormActionActionProvider;
 
 	@PrototypeDependency
-	Provider <ContextFormActionPart> contextFormActionPartProvider;
+	Provider <ConsoleFormActionPart> consoleFormActionPartProvider;
 
 	@PrototypeDependency
-	Provider <ConsoleContextTab> contextTabProvider;
+	Provider <ConsoleContextTab> consoleContextTabProvider;
 
 	@PrototypeDependency
 	Provider <TabContextResponder> tabContextResponderProvider;
@@ -168,7 +170,7 @@ class ContextTabFormActionPageBuilder
 		consoleModule.addContextTab (
 			container.taskLogger (),
 			container.tabLocation (),
-			contextTabProvider.get ()
+			consoleContextTabProvider.get ()
 				.name (tabName)
 				.defaultLabel (tabLabel)
 				.localFile (localFile),
@@ -186,13 +188,16 @@ class ContextTabFormActionPageBuilder
 			PagePart buildPagePart (
 					@NonNull TaskLogger parentTaskLogger) {
 
-				return contextFormActionPartProvider.get ()
+				return consoleFormActionPartProvider.get ()
 
-					.formFields (
-						formFields)
+					.name (
+						"action")
 
 					.formActionHelper (
 						formActionHelperProvider.get ())
+
+					.formFields (
+						formFields)
 
 					.helpText (
 						spec.helpText ())
@@ -220,7 +225,7 @@ class ContextTabFormActionPageBuilder
 					@NonNull TaskLogger taskLogger) {
 
 				Action action =
-					contextFormActionActionProvider.get ()
+					consoleFormActionActionProvider.get ()
 
 					.fields (
 						formFields)

@@ -6,27 +6,19 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.joda.time.Instant;
 
-import wbs.apn.chat.bill.model.ChatUserCreditMode;
-import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.contact.model.ChatMessageStatus;
-import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.help.model.ChatHelpTemplateObjectHelper;
-import wbs.apn.chat.scheme.model.ChatSchemeObjectHelper;
-import wbs.apn.chat.scheme.model.ChatSchemeRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
@@ -36,6 +28,7 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.gazetteer.model.GazetteerObjectHelper;
@@ -46,7 +39,21 @@ import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.router.model.RouterObjectHelper;
 import wbs.sms.route.sender.model.SenderObjectHelper;
+
 import wbs.utils.random.RandomLogic;
+
+import wbs.apn.chat.bill.model.ChatUserCreditMode;
+import wbs.apn.chat.contact.model.ChatMessageMethod;
+import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
+import wbs.apn.chat.contact.model.ChatMessageStatus;
+import wbs.apn.chat.core.model.ChatObjectHelper;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.help.model.ChatHelpTemplateObjectHelper;
+import wbs.apn.chat.scheme.model.ChatSchemeObjectHelper;
+import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
 
 @PrototypeComponent ("chatCoreFixtureProvider")
 public
@@ -122,7 +129,8 @@ class ChatCoreFixtureProvider
 
 	@Override
 	public
-	void createFixtures () {
+	void createFixtures (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		createMenuItems ();
 

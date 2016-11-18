@@ -1,4 +1,4 @@
-package wbs.console.combo;
+package wbs.console.formaction;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -16,6 +16,10 @@ import wbs.framework.data.annotations.DataClass;
 @ConsoleModuleData
 public
 class ConsoleFormActionSpec {
+
+	@DataAttribute (
+		required = true)
+	String name;
 
 	@DataAttribute (
 		name = "fields")

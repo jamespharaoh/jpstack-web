@@ -1,5 +1,6 @@
 package wbs.framework.component.scaffold;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collections;
@@ -172,7 +173,8 @@ class PluginManager {
 				throw new RuntimeException (
 					stringFormat (
 						"Aborting due to %s errors",
-						remainingPlugins.size ()));
+						integerToDecimalString (
+							remainingPlugins.size ())));
 
 			}
 

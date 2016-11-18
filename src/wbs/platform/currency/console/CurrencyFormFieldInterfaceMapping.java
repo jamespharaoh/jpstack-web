@@ -17,9 +17,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.forms.FormFieldInterfaceMapping;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.currency.model.CurrencyRec;
 

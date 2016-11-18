@@ -5,9 +5,11 @@ import static wbs.utils.etc.TypeUtils.dynamicCast;
 import com.google.common.base.Optional;
 
 import wbs.console.helper.provider.ConsoleHelperProvider;
+
 import wbs.framework.codegen.DoNotDelegate;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectHelper;
+
 import wbs.utils.string.FormatWriter;
 
 public
@@ -78,6 +80,8 @@ interface ConsoleHelperMethods <
 				object));
 
 	}
+
+	RecordType findFromContextRequired ();
 
 	void writeHtml (
 			FormatWriter formatWriter,

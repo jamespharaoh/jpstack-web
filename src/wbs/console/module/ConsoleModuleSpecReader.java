@@ -7,16 +7,24 @@ import javax.inject.Provider;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.data.tools.DataFromXml;
 import wbs.framework.data.tools.DataFromXmlBuilder;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @SingletonComponent ("consoleModuleSpecReader")
 public
 class ConsoleModuleSpecReader {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -55,11 +63,18 @@ class ConsoleModuleSpecReader {
 
 	public
 	ConsoleModuleSpec readClasspath (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String xmlResourceName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"readClasspath");
 
 		ConsoleModuleSpec consoleSpec =
 			(ConsoleModuleSpec)
 			dataFromXml.readClasspath (
+				taskLogger,
 				xmlResourceName);
 
 		return consoleSpec;

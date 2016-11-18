@@ -31,22 +31,24 @@ import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.ScriptRef;
+import wbs.console.module.ConsoleManager;
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.responder.HtmlResponder;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.apn.chat.user.core.model.ChatUserOperatorLabel;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.html.ScriptRef;
-import wbs.console.module.ConsoleManager;
-import wbs.console.request.ConsoleRequestContext;
-import wbs.console.responder.HtmlResponder;
-import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
 
 @Log4j
 @PrototypeComponent ("chatMonitorInboxFormResponder")

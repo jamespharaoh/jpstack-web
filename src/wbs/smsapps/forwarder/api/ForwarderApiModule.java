@@ -34,6 +34,7 @@ import lombok.experimental.Accessors;
 
 import wbs.api.mvc.ApiFile;
 import wbs.api.mvc.WebApiAction;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -43,6 +44,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.rpc.core.Rpc;
@@ -60,7 +62,9 @@ import wbs.platform.rpc.core.RpcType;
 import wbs.platform.rpc.php.PhpRpcAction;
 import wbs.platform.rpc.web.ReusableRpcHandler;
 import wbs.platform.rpc.xml.XmlRpcAction;
+
 import wbs.sms.message.core.model.MessageStatus;
+
 import wbs.smsapps.forwarder.logic.ForwarderLogic;
 import wbs.smsapps.forwarder.logic.ForwarderLogicImplementation;
 import wbs.smsapps.forwarder.logic.ReportableException;
@@ -70,6 +74,7 @@ import wbs.smsapps.forwarder.model.ForwarderMessageOutObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutRec;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutReportRec;
 import wbs.smsapps.forwarder.model.ForwarderRec;
+
 import wbs.web.file.WebFile;
 import wbs.web.pathhandler.PathHandler;
 import wbs.web.responder.WebModule;
@@ -1306,7 +1311,8 @@ class ForwarderApiModule
 						: sendExMessageChain.sendTemplate.errors
 				) {
 
-					sendExMessageChain.errors.add (error);
+					sendExMessageChain.errors.add (
+						error);
 
 					errors.add (
 						stringFormat (

@@ -86,6 +86,22 @@ class NumberUtils {
 
 	}
 
+	public static
+	String floatToDecimalString (
+			@NonNull Float floatValue) {
+
+		return floatValue.toString ();
+
+	}
+
+	public static
+	String floatToDecimalString (
+			@NonNull Double floatValue) {
+
+		return floatValue.toString ();
+
+	}
+
 	// ---------- java integer (32 bit)
 
 	public static

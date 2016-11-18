@@ -1,11 +1,13 @@
 package wbs.apn.chat.user.core.logic;
 
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.notLessThan;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalFromJava;
@@ -38,24 +40,6 @@ import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
-import wbs.apn.chat.bill.model.ChatUserCreditMode;
-import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.core.logic.ChatNumberReportLogic;
-import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
-import wbs.apn.chat.user.image.model.ChatUserImageType;
-import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
-import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
-import wbs.apn.chat.category.model.ChatCategoryRec;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.scheme.model.ChatSchemeMapRec;
-import wbs.apn.chat.scheme.model.ChatSchemeRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.apn.chat.user.core.model.ChatUserSessionRec;
-import wbs.apn.chat.user.image.model.ChatUserImageObjectHelper;
-import wbs.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
@@ -65,6 +49,7 @@ import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.event.logic.EventLogic;
@@ -78,15 +63,36 @@ import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.user.model.UserRec;
+
 import wbs.sms.core.logic.KeywordFinder;
 import wbs.sms.gazetteer.model.GazetteerEntryObjectHelper;
 import wbs.sms.gazetteer.model.GazetteerEntryRec;
 import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.logic.NumberLogic;
+
 import wbs.utils.email.EmailLogic;
 import wbs.utils.random.RandomLogic;
 import wbs.utils.time.TimeFormatter;
+
+import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
+import wbs.apn.chat.bill.model.ChatUserCreditMode;
+import wbs.apn.chat.category.model.ChatCategoryRec;
+import wbs.apn.chat.contact.model.ChatMessageMethod;
+import wbs.apn.chat.core.logic.ChatNumberReportLogic;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.scheme.model.ChatSchemeMapRec;
+import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserSessionRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
+import wbs.apn.chat.user.image.model.ChatUserImageObjectHelper;
+import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.apn.chat.user.image.model.ChatUserImageType;
+import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 
 @SingletonComponent ("chatUserLogic")
 public
@@ -1068,7 +1074,8 @@ class ChatUserLogicImplementation
 			throw new RuntimeException (
 				stringFormat (
 					"Unknown chat user image type: %s (in ",
-					type,
+					enumNameSpaces (
+						type),
 					"ChatLogicImpl.userSetImage)"));
 
 		}
@@ -1194,7 +1201,8 @@ class ChatUserLogicImplementation
 
 							"Message: %s\n",
 							message.isPresent ()
-								? message.get ().getId ()
+								? integerToDecimalString (
+									message.get ().getId ())
 								: "(via api)",
 
 							"Location: %s\n",
@@ -1202,7 +1210,7 @@ class ChatUserLogicImplementation
 
 							"Timestamp: %s\n",
 							message.isPresent ()
-								? message.get ().getCreatedTime ()
+								? message.get ().getCreatedTime ().toString ()
 								: "(via api)"));
 
 				} catch (Exception exception) {
@@ -1241,7 +1249,8 @@ class ChatUserLogicImplementation
 				throw new IllegalStateException (
 					stringFormat (
 						"Chat user %s not in transaction",
-						chatUser.getId ()));
+						integerToDecimalString (
+							chatUser.getId ())));
 
 			}
 
@@ -1412,7 +1421,9 @@ class ChatUserLogicImplementation
 				if (
 					stringNotEqualSafe (
 						prefix,
-						number.subSequence (0, prefix.length ()))
+						number.subSequence (
+							0,
+							prefix.length ()))
 				) {
 					continue;
 				}
@@ -1641,7 +1652,8 @@ class ChatUserLogicImplementation
 			throw new RuntimeException (
 				stringFormat (
 					"Not an image mode: %s",
-					mode));
+					enumNameSpaces (
+						mode)));
 
 		}
 

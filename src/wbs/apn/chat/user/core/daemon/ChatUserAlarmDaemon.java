@@ -1,6 +1,6 @@
 package wbs.apn.chat.user.core.daemon;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.util.List;
 
@@ -118,7 +118,7 @@ class ChatUserAlarmDaemon
 
 				exceptionLogger.logThrowable (
 					"daemon",
-					stringFormat (
+					stringFormatObsolete (
 						"chatUserAlarm %s",
 						alarm.getId ()),
 					exception,

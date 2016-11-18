@@ -19,12 +19,15 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.SmsSenderHelper;
 import wbs.sms.message.outbox.model.OutboxRec;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteRec;
+
 import wbs.test.simulator.daemon.SimulatorSenderHelper.State;
 import wbs.test.simulator.model.SimulatorEventObjectHelper;
 import wbs.test.simulator.model.SimulatorEventRec;
@@ -66,10 +69,11 @@ class SimulatorSenderHelper
 
 	@Override
 	public
-	SetupRequestResult<State> setupRequest (
+	SetupRequestResult <State> setupRequest (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull OutboxRec outbox) {
 
-		return new SetupRequestResult<State> ()
+		return new SetupRequestResult <State> ()
 
 			.status (
 				SetupRequestStatus.success)
@@ -87,6 +91,7 @@ class SimulatorSenderHelper
 	@Override
 	public
 	PerformSendResult performSend (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull State state) {
 
 		@Cleanup
@@ -200,6 +205,7 @@ class SimulatorSenderHelper
 	@Override
 	public
 	ProcessResponseResult processSend (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull State state) {
 
 		return new ProcessResponseResult ()

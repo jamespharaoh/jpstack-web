@@ -1,4 +1,4 @@
-package wbs.console.combo;
+package wbs.console.formaction;
 
 import javax.inject.Provider;
 

@@ -22,6 +22,33 @@ import lombok.extern.log4j.Log4j;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.entity.record.IdObject;
+import wbs.framework.object.ObjectManager;
+
+import wbs.platform.event.logic.EventLogic;
+import wbs.platform.exception.logic.ExceptionLogLogic;
+import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.queue.logic.QueueLogic;
+import wbs.platform.queue.model.QueueItemRec;
+import wbs.platform.service.model.ServiceObjectHelper;
+
+import wbs.sms.command.model.CommandObjectHelper;
+import wbs.sms.locator.logic.LocatorManager;
+import wbs.sms.locator.model.LocatorObjectHelper;
+import wbs.sms.locator.model.LocatorRec;
+import wbs.sms.locator.model.LongLat;
+import wbs.sms.magicnumber.logic.MagicNumberLogic;
+import wbs.sms.message.core.model.MessageRec;
+import wbs.sms.message.outbox.logic.SmsMessageSender;
+
+import wbs.utils.random.RandomLogic;
+import wbs.utils.time.TimeFormatter;
+
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
@@ -43,29 +70,6 @@ import wbs.apn.chat.user.core.model.Orient;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.apn.chat.user.info.model.ChatUserNameObjectHelper;
 import wbs.apn.chat.user.info.model.ChatUserNameRec;
-import wbs.framework.component.annotations.PrototypeDependency;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.entity.record.IdObject;
-import wbs.framework.object.ObjectManager;
-import wbs.platform.event.logic.EventLogic;
-import wbs.platform.exception.logic.ExceptionLogLogic;
-import wbs.platform.media.logic.MediaLogic;
-import wbs.platform.queue.logic.QueueLogic;
-import wbs.platform.queue.model.QueueItemRec;
-import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.sms.command.model.CommandObjectHelper;
-import wbs.sms.locator.logic.LocatorManager;
-import wbs.sms.locator.model.LocatorObjectHelper;
-import wbs.sms.locator.model.LocatorRec;
-import wbs.sms.locator.model.LongLat;
-import wbs.sms.magicnumber.logic.MagicNumberLogic;
-import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.outbox.logic.SmsMessageSender;
-import wbs.utils.random.RandomLogic;
-import wbs.utils.time.TimeFormatter;
 
 @Log4j
 @SingletonComponent ("chatMiscLogic")

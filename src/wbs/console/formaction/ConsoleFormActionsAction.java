@@ -1,4 +1,10 @@
-package wbs.console.combo;
+package wbs.console.formaction;
+
+import static wbs.utils.collection.IterableUtils.iterableFindExactlyOneRequired;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.string.StringUtils.stringEqualSafe;
+
+import java.util.List;
 
 import javax.servlet.ServletException;
 
@@ -14,19 +20,20 @@ import lombok.experimental.Accessors;
 import wbs.console.action.ConsoleAction;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
-import wbs.console.forms.FormFieldSet;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.responder.Responder;
 
-@PrototypeComponent ("contextFormActionAction")
+@PrototypeComponent ("contextFormActionsAction")
 @Accessors (fluent = true)
 public
-class ContextFormActionAction <FormState>
+class ConsoleFormActionsAction
 	extends ConsoleAction {
 
 	// singleton dependencies
@@ -43,10 +50,7 @@ class ContextFormActionAction <FormState>
 	// properties
 
 	@Getter @Setter
-	FormFieldSet <FormState> fields;
-
-	@Getter @Setter
-	ConsoleFormActionHelper <FormState> formActionHelper;
+	List <ConsoleFormAction <?>> formActions;
 
 	@Getter @Setter
 	String responderName;
@@ -68,8 +72,20 @@ class ContextFormActionAction <FormState>
 			@NonNull TaskLogger taskLogger)
 		throws ServletException {
 
-		FormState formState =
-			formActionHelper.constructFormState ();
+		String formName =
+			requestContext.formRequired (
+				"form.name");
+
+		ConsoleFormAction <?> formAction =
+			iterableFindExactlyOneRequired (
+				candidateFormAction ->
+					stringEqualSafe (
+						candidateFormAction.name (),
+						formName),
+				formActions);
+
+		Object formState =
+			formAction.helper ().constructFormState ();
 
 		@Cleanup
 		Transaction transaction =
@@ -77,25 +93,27 @@ class ContextFormActionAction <FormState>
 				"ContextFormActionAction.goReal ()",
 				this);
 
-		formActionHelper.updatePassiveFormState (
-			formState);
+		formAction.helper ().updatePassiveFormState (
+			genericCastUnchecked (
+				formState));
 
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
 				requestContext,
-				fields,
+				formAction.formFields (),
 				formState,
 				ImmutableMap.of (),
-				"action");
+				formName);
 
 		if (updateResultSet.errorCount () > 0) {
 			return null;
 		}
 
-		Optional<Responder> responder =
-			formActionHelper.processFormSubmission (
+		Optional <Responder> responder =
+			formAction.helper ().processFormSubmission (
 				transaction,
-				formState);
+				genericCastUnchecked (
+					formState));
 
 		return responder.orNull ();
 

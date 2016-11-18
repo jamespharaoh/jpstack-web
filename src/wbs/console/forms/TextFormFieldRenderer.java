@@ -20,6 +20,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+
 import wbs.utils.string.FormatWriter;
 
 import fj.data.Either;
@@ -99,7 +100,7 @@ class TextFormFieldRenderer <Container>
 		htmlWriter.writeLineFormat (
 			"<input",
 			" type=\"hidden\"",
-			" name=\"%h-%h\"",
+			" name=\"%h.%h\"",
 			formName,
 			name (),
 			" value=\"%h\"",
@@ -124,10 +125,10 @@ class TextFormFieldRenderer <Container>
 		out.writeFormat (
 			"<input",
 			" type=\"text\"",
-			" id=\"%h-%h\"",
+			" id=\"%h.%h\"",
 			formName,
 			name (),
-			" name=\"%h-%h\"",
+			" name=\"%h.%h\"",
 			formName,
 			name (),
 			" value=\"%h\"",
@@ -166,13 +167,13 @@ class TextFormFieldRenderer <Container>
 					" type=\"button\"",
 					" name=\"%h\"",
 					stringFormat (
-						"%s-%s-%s",
+						"%s.%s.%s",
 						formName,
 						name (),
 						presetEntry.getValue ()),
 					" onclick=\"%h\"",
 					stringFormat (
-						"$('#%j-%j').val ('%j'); return false",
+						"$('#%j.%j').val ('%j'); return false",
 						formName,
 						name (),
 						presetEntry.getValue ()),
@@ -206,7 +207,7 @@ class TextFormFieldRenderer <Container>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j-%j\").val (\"\");",
+				"$(\"#%j.%j\").val (\"\");",
 				formName,
 				name);
 
@@ -217,7 +218,7 @@ class TextFormFieldRenderer <Container>
 		) {
 
 			javascriptWriter.writeLineFormat (
-				"$(\"#%j-%j\").val (\"%j\");",
+				"$(\"#%j.%j\").val (\"%j\");",
 				formName,
 				name,
 				interfaceValue.or (""));
@@ -238,7 +239,7 @@ class TextFormFieldRenderer <Container>
 
 		return submission.hasParameter (
 			stringFormat (
-				"%s-%s",
+				"%s.%s",
 				formName,
 				name ()));
 
@@ -250,7 +251,7 @@ class TextFormFieldRenderer <Container>
 
 		return submission.parameter (
 			stringFormat (
-				"%s-%s",
+				"%s.%s",
 				formName,
 				name ()));
 

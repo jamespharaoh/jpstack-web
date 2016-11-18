@@ -252,18 +252,20 @@ class SchemaToSqlImplementation
 			@NonNull SchemaTable schemaTable,
 			@NonNull SchemaColumn schemaColumn) {
 
-		List<String> parts =
-			new ArrayList<String> ();
+		List <String> parts =
+			new ArrayList<> ();
 
 		parts.add (
 			stringFormat (
 				"ALTER TABLE %s",
-				sqlLogic.quoteIdentifier (schemaTable.name ())));
+				sqlLogic.quoteIdentifier (
+					schemaTable.name ())));
 
 		parts.add (
 			stringFormat (
 				"ADD COLUMN %s %s",
-				sqlLogic.quoteIdentifier (schemaColumn.name ()),
+				sqlLogic.quoteIdentifier (
+					schemaColumn.name ()),
 				schemaColumn.type ()));
 
 		if (! schemaColumn.nullable ()) {

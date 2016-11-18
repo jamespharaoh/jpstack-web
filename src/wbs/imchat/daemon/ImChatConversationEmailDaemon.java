@@ -1,6 +1,7 @@
 package wbs.imchat.daemon;
 
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -11,14 +12,16 @@ import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 
-import wbs.imchat.model.ImChatConversationObjectHelper;
-import wbs.imchat.model.ImChatConversationRec;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
-import wbs.imchat.logic.ImChatLogic;
+
 import wbs.platform.daemon.SleepingDaemonService;
+
+import wbs.imchat.logic.ImChatLogic;
+import wbs.imchat.model.ImChatConversationObjectHelper;
+import wbs.imchat.model.ImChatConversationRec;
 
 @Log4j
 @SingletonComponent ("imChatConversationEmailDaemon")
@@ -117,7 +120,8 @@ class ImChatConversationEmailDaemon
 					"doConversation",
 					stringFormat (
 						"conversationId = %s",
-						conversationId)),
+						integerToDecimalString (
+							conversationId))),
 				this);
 
 		ImChatConversationRec conversation =
@@ -147,7 +151,8 @@ class ImChatConversationEmailDaemon
 					"doConversation",
 					stringFormat (
 						"conversationId = %s",
-						conversationId)),
+						integerToDecimalString (
+							conversationId))),
 				this);
 
 		conversation =

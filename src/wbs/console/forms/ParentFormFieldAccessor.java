@@ -1,5 +1,7 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -26,15 +28,13 @@ class ParentFormFieldAccessor <
 
 	// implementation
 
-	@SuppressWarnings ("unchecked")
 	@Override
 	public
 	Optional <Parent> read (
-			Container container) {
+			@NonNull Container container) {
 
-		return Optional.of (
-			(Parent)
-			objectManager.getParentOrNull (
+		return genericCastUnchecked (
+			objectManager.getParentRequired (
 				container));
 
 	}

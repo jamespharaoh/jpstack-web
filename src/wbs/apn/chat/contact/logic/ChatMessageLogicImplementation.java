@@ -31,6 +31,30 @@ import lombok.extern.log4j.Log4j;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.entity.record.IdObject;
+import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.exception.ExceptionUtils;
+import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.object.ObjectManager;
+
+import wbs.integrations.jigsaw.api.JigsawApi;
+import wbs.integrations.urbanairship.logic.UrbanAirshipApi;
+
+import wbs.platform.media.model.MediaRec;
+import wbs.platform.queue.logic.QueueLogic;
+import wbs.platform.queue.model.QueueItemRec;
+import wbs.platform.queue.model.QueueRec;
+import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.text.model.TextRec;
+
+import wbs.sms.command.model.CommandObjectHelper;
+import wbs.sms.gsm.MessageSplitter;
+
 import wbs.apn.chat.approval.model.ChatApprovalRegexpObjectHelper;
 import wbs.apn.chat.approval.model.ChatApprovalRegexpRec;
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
@@ -61,26 +85,6 @@ import wbs.apn.chat.user.core.model.ChatUserOperatorLabel;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.user.core.model.Gender;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.entity.record.IdObject;
-import wbs.framework.exception.ExceptionLogger;
-import wbs.framework.exception.ExceptionUtils;
-import wbs.framework.exception.GenericExceptionResolution;
-import wbs.framework.object.ObjectManager;
-import wbs.integrations.jigsaw.api.JigsawApi;
-import wbs.integrations.urbanairship.logic.UrbanAirshipApi;
-import wbs.platform.media.model.MediaRec;
-import wbs.platform.queue.logic.QueueLogic;
-import wbs.platform.queue.model.QueueItemRec;
-import wbs.platform.queue.model.QueueRec;
-import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.text.model.TextRec;
-import wbs.sms.command.model.CommandObjectHelper;
-import wbs.sms.gsm.MessageSplitter;
 
 @Log4j
 @SingletonComponent ("chatMessageLogic")

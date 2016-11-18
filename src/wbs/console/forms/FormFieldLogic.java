@@ -6,6 +6,7 @@ import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NumberUtils.equalToOne;
 import static wbs.utils.etc.NumberUtils.equalToThree;
 import static wbs.utils.etc.NumberUtils.equalToTwo;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -46,8 +47,10 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.entity.record.PermanentRecord;
+
 import wbs.utils.string.FormatWriter;
 
 @Log4j
@@ -250,7 +253,8 @@ class FormFieldLogic {
 			requestContext.addError (
 				stringFormat (
 					"There are %s invalid fields",
-					errorFieldNames.size ()));
+					integerToDecimalString (
+						errorFieldNames.size ())));
 
 		}
 
@@ -704,6 +708,14 @@ class FormFieldLogic {
 			method,
 			actionUrl,
 			enctype);
+
+		htmlWriter.writeLineFormat (
+			"<input",
+			" type=\"hidden\"",
+			" name=\"form.name\"",
+			" value=\"%h\"",
+			formName,
+			">");
 
 		htmlTableOpenDetails (
 			htmlWriter);

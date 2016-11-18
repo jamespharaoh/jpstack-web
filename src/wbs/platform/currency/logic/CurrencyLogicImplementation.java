@@ -20,6 +20,7 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonComponent;
+
 import wbs.platform.currency.model.CurrencyRec;
 
 @SingletonComponent ("currencyLogic")

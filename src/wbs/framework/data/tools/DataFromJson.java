@@ -6,7 +6,7 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ReflectionUtils.fieldSet;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -182,7 +182,7 @@ class DataFromJson {
 		} else {
 
 			throw new RuntimeException (
-				stringFormat (
+				stringFormatObsolete (
 					"Unable to map json attribute %s.%s ",
 					field.getDeclaringClass ().getSimpleName (),
 					field.getName (),

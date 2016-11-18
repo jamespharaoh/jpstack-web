@@ -24,6 +24,10 @@ import org.hibernate.criterion.Subqueries;
 import org.hibernate.sql.JoinType;
 import org.joda.time.Instant;
 
+import wbs.framework.hibernate.HibernateDao;
+
+import wbs.sms.number.core.model.NumberRec;
+
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.apn.chat.category.model.ChatCategoryRec;
@@ -38,8 +42,6 @@ import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.apn.chat.user.image.model.ChatUserImageType;
-import wbs.framework.hibernate.HibernateDao;
-import wbs.sms.number.core.model.NumberRec;
 
 public
 class ChatUserDaoHibernate
@@ -980,7 +982,7 @@ class ChatUserDaoHibernate
 					throw new IllegalArgumentException (
 						stringFormat (
 							"Unknown order by: %s",
-							 value));
+							 (String) value));
 
 				}
 

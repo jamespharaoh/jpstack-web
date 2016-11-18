@@ -13,6 +13,22 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.Seconds;
 
+import wbs.console.action.ConsoleAction;
+import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.model.UserObjectHelper;
+
+import wbs.utils.time.TextualInterval;
+import wbs.utils.time.TimeFormatException;
+import wbs.utils.time.TimeFormatter;
+
 import wbs.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
@@ -22,18 +38,6 @@ import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.console.action.ConsoleAction;
-import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.user.console.UserConsoleLogic;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.utils.time.TextualInterval;
-import wbs.utils.time.TimeFormatException;
-import wbs.utils.time.TimeFormatter;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatMonitorInboxAlarmAction")

@@ -15,18 +15,21 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+
+import wbs.platform.currency.logic.CurrencyLogic;
+import wbs.platform.event.logic.EventLogic;
+import wbs.platform.user.model.UserRec;
+
+import wbs.utils.email.EmailLogic;
+import wbs.utils.random.RandomLogic;
+import wbs.utils.string.StringFormatWriter;
+import wbs.utils.time.TimeFormatter;
+
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerRec;
 import wbs.imchat.model.ImChatMessageRec;
 import wbs.imchat.model.ImChatProfileRec;
 import wbs.imchat.model.ImChatRec;
-import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.platform.event.logic.EventLogic;
-import wbs.platform.user.model.UserRec;
-import wbs.utils.email.EmailLogic;
-import wbs.utils.random.RandomLogic;
-import wbs.utils.string.StringFormatWriter;
-import wbs.utils.time.TimeFormatter;
 
 @SingletonComponent ("imChatLogic")
 public

@@ -2,7 +2,9 @@ package wbs.apn.chat.contact.logic;
 
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrDefault;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -17,19 +19,11 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.contact.model.ChatMessageRec;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.help.logic.ChatHelpLogLogic;
-import wbs.apn.chat.help.logic.ChatHelpTemplateLogic;
-import wbs.apn.chat.help.model.ChatHelpLogRec;
-import wbs.apn.chat.help.model.ChatHelpTemplateRec;
-import wbs.apn.chat.scheme.model.ChatSchemeRec;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.misc.MapStringSubstituter;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -37,6 +31,7 @@ import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.user.model.UserRec;
+
 import wbs.sms.command.logic.CommandLogic;
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
@@ -46,6 +41,18 @@ import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.route.router.model.RouterRec;
+
+import wbs.utils.etc.NumberUtils;
+
+import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.help.logic.ChatHelpLogLogic;
+import wbs.apn.chat.help.logic.ChatHelpTemplateLogic;
+import wbs.apn.chat.help.model.ChatHelpLogRec;
+import wbs.apn.chat.help.model.ChatHelpTemplateRec;
+import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 
 @SingletonComponent ("chatSendLogic")
 public
@@ -601,11 +608,16 @@ class ChatSendLogicImplementation
 						"System template not found: %s ",
 						templateCode,
 						"for chat %s, ",
-						chatUser.getChat ().getId (),
+						integerToDecimalString (
+							chatUser.getChat ().getId ()),
 						"user %s ",
-						chatUser.getId (),
+						integerToDecimalString (
+							chatUser.getId ()),
 						"and thread %s ",
-						threadId,
+						optionalMapRequiredOrDefault (
+							NumberUtils::integerToDecimalString,
+							threadId,
+							"(none)"),
 						"and template code %s",
 						templateCode));
 

@@ -15,6 +15,7 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.ScriptRefFormFieldSpec;
 import wbs.console.forms.TextAreaFormFieldSpec;
 import wbs.console.module.ConsoleModuleBuilder;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -22,6 +23,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryValueRec;
 import wbs.services.messagetemplate.model.MessageTemplateFieldTypeRec;

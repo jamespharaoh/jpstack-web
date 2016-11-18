@@ -18,17 +18,19 @@ import javax.servlet.ServletException;
 import lombok.Cleanup;
 import lombok.NonNull;
 
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.namednote.model.ChatNoteNameObjectHelper;
-import wbs.apn.chat.namednote.model.ChatNoteNameRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.core.model.ChatObjectHelper;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.namednote.model.ChatNoteNameObjectHelper;
+import wbs.apn.chat.namednote.model.ChatNoteNameRec;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatNoteNamesAction")

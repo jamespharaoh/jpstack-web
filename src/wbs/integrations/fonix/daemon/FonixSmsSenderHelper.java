@@ -2,6 +2,7 @@ package wbs.integrations.fonix.daemon;
 
 import static wbs.sms.gsm.GsmUtils.gsmStringIsNotValid;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanOne;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -19,13 +20,17 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.integrations.fonix.foreignapi.FonixMessageSendRequest;
 import wbs.integrations.fonix.foreignapi.FonixMessageSendResponse;
 import wbs.integrations.fonix.foreignapi.FonixMessageSender;
 import wbs.integrations.fonix.model.FonixRouteOutObjectHelper;
 import wbs.integrations.fonix.model.FonixRouteOutRec;
+
 import wbs.platform.scaffold.model.RootObjectHelper;
+
 import wbs.sms.gsm.GsmUtils;
 import wbs.sms.message.core.logic.SmsMessageLogic;
 import wbs.sms.message.core.model.MessageRec;
@@ -73,6 +78,7 @@ public class FonixSmsSenderHelper
 	@Override
 	public
 	SetupRequestResult <FonixMessageSender> setupRequest (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull OutboxRec smsOutbox) {
 
 		// get stuff
@@ -147,9 +153,11 @@ public class FonixSmsSenderHelper
 				.statusMessage (
 					stringFormat (
 						"Message has length %s ",
-						gsmLength,
+						integerToDecimalString (
+							gsmLength),
 						"and so would be split into %s parts ",
-						gsmParts,
+						integerToDecimalString (
+							gsmParts),
 						"but the maximum is one"));
 
 		}
@@ -235,6 +243,7 @@ public class FonixSmsSenderHelper
 	@Override
 	public
 	PerformSendResult performSend (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FonixMessageSender fonixSender) {
 
 		PerformSendResult result =
@@ -275,6 +284,7 @@ public class FonixSmsSenderHelper
 	@Override
 	public
 	ProcessResponseResult processSend (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FonixMessageSender fonixSender) {
 
 		// check for generic error

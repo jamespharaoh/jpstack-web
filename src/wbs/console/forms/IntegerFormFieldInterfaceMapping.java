@@ -12,13 +12,14 @@ import java.util.Map;
 
 import com.google.common.base.Optional;
 
-import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+
+import fj.data.Either;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("integerFormFieldInterfaceMapping")

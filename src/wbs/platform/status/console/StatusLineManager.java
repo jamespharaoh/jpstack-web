@@ -1,5 +1,6 @@
 package wbs.platform.status.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collection;
@@ -102,7 +103,8 @@ class StatusLineManager {
 		log.info (
 			stringFormat (
 				"Initialised %s status lines",
-				statusLines.size ()));
+				integerToDecimalString (
+					statusLines.size ())));
 
 	}
 
