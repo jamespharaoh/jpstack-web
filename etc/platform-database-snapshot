@@ -55,7 +55,8 @@ elif test "$basebackup_enabled" = "yes" -a \! -e "$basebackup_yesterday"; then
 				--warning=no-file-ignored \
 				--warning=file-changed \
 				--directory "/mnt/zuri-platform-database-data/8.3/main" \
-				"."
+				"." \
+			|| test "$?" -eq "1"
 
 		} | {
 
