@@ -107,7 +107,7 @@ class FileUtils {
 			@NonNull String path) {
 
 		try {
-			
+
 			return IOUtils.toByteArray (
 				new FileInputStream (
 					path));

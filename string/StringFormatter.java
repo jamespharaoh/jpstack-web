@@ -19,11 +19,11 @@ public
 class StringFormatter {
 
 	private final
-	Map<Character,Conversion> conversions;
+	Map <Character, Conversion> conversions;
 
 	public
 	StringFormatter (
-			@NonNull Map<Character,Conversion> newConversions) {
+			@NonNull Map <Character, Conversion> newConversions) {
 
 		conversions =
 			newConversions;
