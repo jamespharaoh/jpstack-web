@@ -5,7 +5,9 @@ import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalNotEqualOrNotPresentWithClass;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
@@ -885,10 +887,12 @@ class ForwarderLogicImplementation
 
 		if (
 
-			referenceNotEqualWithClass (
+			optionalNotEqualOrNotPresentWithClass (
 				ForwarderMessageInRec.class,
-				forwarderMessaeOut.getForwarderMessageIn (),
-				forwarderMessageIn)
+				optionalFromNullable (
+					forwarderMessaeOut.getForwarderMessageIn ()),
+				optionalFromNullable (
+					forwarderMessageIn))
 
 			|| stringNotEqualSafe (
 				message.getNumFrom (),
@@ -1047,7 +1051,8 @@ class ForwarderLogicImplementation
 					forwarderMessageOut.getId ())
 
 				.subjectString (
-					subject)
+					optionalFromNullable (
+						subject))
 
 				.medias (
 					medias)
