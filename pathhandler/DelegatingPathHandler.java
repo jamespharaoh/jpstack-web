@@ -17,6 +17,7 @@ import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.file.WebFile;
 import wbs.web.responder.WebModule;
 
@@ -140,11 +141,11 @@ class DelegatingPathHandler
 
 						throw new RuntimeException (
 							stringFormat (
-							"Duplicated file '%s' (in %s and %s)",
-							moduleFileName,
-							fileDeclaredByModule.get (
-								moduleFileName),
-							servletModuleName));
+								"Duplicated file '%s' (in %s and %s)",
+								moduleFileName,
+								fileDeclaredByModule.get (
+									moduleFileName),
+								servletModuleName));
 
 					}
 

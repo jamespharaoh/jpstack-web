@@ -16,8 +16,10 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.utils.string.FormatWriter;
 
 @PrototypeComponent ("htmlTableLinkCellWriter")
