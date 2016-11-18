@@ -12,6 +12,7 @@ import java.util.Map;
 import lombok.NonNull;
 
 import wbs.utils.string.FormatWriter;
+
 import wbs.web.utils.HtmlAttributeUtils.HtmlAttribute;
 import wbs.web.utils.HtmlAttributeUtils.ToHtmlAttribute;
 
@@ -134,6 +135,10 @@ class HtmlUtils {
 
 			case '/':
 				dest.append ("\\/");
+				break;
+
+			case '\\':
+				dest.append ("\\\\");
 				break;
 
 			default:
