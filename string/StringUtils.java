@@ -404,6 +404,17 @@ class StringUtils {
 	}
 
 	public static
+	String hyphenToSpaces (
+			@NonNull String string) {
+
+		return stringReplaceAllSimple (
+			"-",
+			" ",
+			string);
+
+	}
+
+	public static
 	String underscoreToCamel (
 			@NonNull String string) {
 
@@ -1041,13 +1052,13 @@ class StringUtils {
 
 		return stringFormat (
 			arguments.toArray (
-				new Object [] {}));
+				new String [] {}));
 
 	}
 
 	@Deprecated
 	public static
-	String stringFormat (
+	String stringFormatObsolete (
 			Object ... arguments) {
 
 		return StringFormatter.standardArray (
@@ -1057,10 +1068,10 @@ class StringUtils {
 
 	@Deprecated
 	public static
-	String stringFormatListGeneric (
+	String stringFormatListObsolete (
 			List <?> arguments) {
 
-		return stringFormat (
+		return stringFormatObsolete (
 			arguments.toArray (
 				new Object [] {}));
 

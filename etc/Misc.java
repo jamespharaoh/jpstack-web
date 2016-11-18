@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -873,50 +871,6 @@ class Misc {
 
 	}
 
-	public static
-	Method getMethodRequired (
-			@NonNull Class<?> objectClass,
-			@NonNull String name,
-			@NonNull List<Class<?>> parameterTypes) {
-
-		try {
-
-			return objectClass.getMethod (
-				name,
-				parameterTypes.toArray (
-					new Class<?> [0]));
-
-		} catch (NoSuchMethodException exception) {
-
-			throw new RuntimeException (
-				exception);
-
-		}
-
-	}
-
-	public static
-	Method getDeclaredMethodRequired (
-			@NonNull Class<?> objectClass,
-			@NonNull String name,
-			@NonNull List<Class<?>> parameterTypes) {
-
-		try {
-
-			return objectClass.getDeclaredMethod (
-				name,
-				parameterTypes.toArray (
-					new Class<?> [0]));
-
-		} catch (NoSuchMethodException exception) {
-
-			throw new RuntimeException (
-				exception);
-
-		}
-
-	}
-
 	public static <Type>
 	Type eitherGetLeft (
 			@NonNull Either<Type,?> either) {
@@ -1095,38 +1049,6 @@ class Misc {
 				result.right ().value ());
 
 		}
-
-	}
-
-	public static
-	boolean isNotStatic (
-			@NonNull Method method) {
-
-		return ! Modifier.isStatic (
-			method.getModifiers ());
-
-	}
-
-	public static
-	Method getStaticMethodRequired (
-			@NonNull Class<?> containingClass,
-			@NonNull String methodName,
-			@NonNull List<Class<?>> parameterTypes) {
-
-		Method method =
-			getDeclaredMethodRequired (
-				containingClass,
-				methodName,
-				parameterTypes);
-
-		if (
-			isNotStatic (
-				method)
-		) {
-			throw new RuntimeException ();
-		}
-
-		return method;
 
 	}
 

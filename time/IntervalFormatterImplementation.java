@@ -2,7 +2,7 @@ package wbs.utils.time;
 
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -198,7 +198,7 @@ class IntervalFormatterImplementation
 			if (input / scale == 1)
 				return "1 " + singularLabel;
 
-			return stringFormat (
+			return stringFormatObsolete (
 				"%s %s",
 				input / scale,
 				pluralLabel);

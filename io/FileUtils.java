@@ -3,9 +3,12 @@ package wbs.utils.io;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import lombok.NonNull;
+
+import org.apache.commons.io.IOUtils;
 
 public
 class FileUtils {
@@ -88,6 +91,25 @@ class FileUtils {
 
 			org.apache.commons.io.FileUtils.forceMkdir (
 				new File (
+					path));
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeIoException (
+				ioException);
+
+		}
+
+	}
+
+	public static
+	byte[] fileReadBytes (
+			@NonNull String path) {
+
+		try {
+			
+			return IOUtils.toByteArray (
+				new FileInputStream (
 					path));
 
 		} catch (IOException ioException) {

@@ -15,4 +15,13 @@ class RuntimeNoSuchMethodException
 
 	}
 
+	public
+	RuntimeNoSuchMethodException (
+			@NonNull String message) {
+
+		super (
+			message);
+
+	}
+
 }

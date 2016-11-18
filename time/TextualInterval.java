@@ -6,6 +6,7 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.lowercase;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.string.StringUtils.stringInSafe;
 import static wbs.utils.string.StringUtils.stringSplitSimple;
 import static wbs.utils.time.TimeUtils.millisToInstant;
