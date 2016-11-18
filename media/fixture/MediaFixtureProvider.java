@@ -5,6 +5,8 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.media.model.MediaTypeObjectHelper;
 
 @PrototypeComponent ("mediaFixtureProvider")
@@ -21,7 +23,8 @@ class MediaFixtureProvider
 
 	@Override
 	public
-	void createFixtures () {
+	void createFixtures (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		createTextMediaTypes ();
 		createImageMediaTypes ();

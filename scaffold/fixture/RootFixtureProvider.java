@@ -1,9 +1,14 @@
 package wbs.platform.scaffold.fixture;
 
+import lombok.NonNull;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.scaffold.model.RootObjectHelper;
+
 import wbs.utils.random.RandomLogic;
 
 @PrototypeComponent ("rootFixtureProvider")
@@ -23,7 +28,8 @@ class RootFixtureProvider
 
 	@Override
 	public
-	void createFixtures () {
+	void createFixtures (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		rootHelper.insert (
 			rootHelper.createInstance ()

@@ -1,5 +1,6 @@
 package wbs.platform.daemon;
 
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.utils.thread.ThreadManager;
 
 /**
@@ -124,7 +126,8 @@ class AbstractDaemonService {
 		log.info (
 			stringFormat (
 				"Starting %s",
-				getClass ().getSimpleName ()));
+				classNameSimple (
+					getClass ())));
 
 		// call init
 

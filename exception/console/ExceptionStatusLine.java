@@ -1,6 +1,6 @@
 package wbs.platform.exception.console;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.thread.ConcurrentUtils.futureValue;
 
 import java.util.concurrent.Future;
@@ -89,7 +89,7 @@ class ExceptionStatusLine
 		// return
 
 		return futureValue (
-			stringFormat (
+			stringFormatObsolete (
 				"updateExceptions (%s, %s);\n",
 				numExceptions,
 				numExceptionsFatal));

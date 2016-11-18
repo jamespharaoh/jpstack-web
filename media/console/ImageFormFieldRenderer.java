@@ -22,10 +22,13 @@ import org.apache.commons.io.IOUtils;
 import wbs.console.forms.FormFieldRenderer;
 import wbs.console.forms.FormFieldSubmission;
 import wbs.console.forms.FormType;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
+
 import wbs.utils.io.RuntimeIoException;
 import wbs.utils.string.FormatWriter;
 
@@ -108,7 +111,7 @@ class ImageFormFieldRenderer <Container>
 		htmlWriter.writeFormat (
 			"<input",
 			" type=\"file\"",
-			" name=\"%h-%h\"",
+			" name=\"%h.%h\"",
 			formName,
 			name (),
 			"><br>\n");
@@ -121,7 +124,7 @@ class ImageFormFieldRenderer <Container>
 			htmlWriter.writeFormat (
 				"<input",
 				" type=\"submit\"",
-				" name=\"%h-%h-remove\"",
+				" name=\"%h.%h:remove\"",
 				formName,
 				name (),
 				" value=\"remove image\"",
@@ -141,12 +144,12 @@ class ImageFormFieldRenderer <Container>
 			@NonNull String formName) {
 
 		javascriptWriter.writeLineFormat (
-			"$(\"#%j-%j\").replaceWith (",
+			"$(\"#%j.%j\").replaceWith (",
 			formName,
 			name);
 
 		javascriptWriter.writeLineFormat (
-			"\t$(\"#%j-%j\").clone (true));",
+			"\t$(\"#%j.%j\").clone (true));",
 			formName,
 			name);
 
@@ -162,7 +165,7 @@ class ImageFormFieldRenderer <Container>
 
 			submission.hasParameter (
 				stringFormat (
-					"%s-%s-remove",
+					"%s.%s:remove",
 					formName,
 					name ()))
 
@@ -172,14 +175,14 @@ class ImageFormFieldRenderer <Container>
 
 			&& submission.hasFileItem (
 				stringFormat (
-					"%s-%s",
+					"%s.%s",
 					formName,
 					name ()))
 
 			&& moreThanZero (
 				submission.fileItem (
 					stringFormat (
-						"%s-%s",
+						"%s.%s",
 						formName,
 						name ())
 				).getSize ())
@@ -195,7 +198,7 @@ class ImageFormFieldRenderer <Container>
 		if (
 			submission.hasParameter (
 				stringFormat (
-					"%s-%s-remove",
+					"%s.%s:remove",
 					formName,
 					name ()))
 		) {
@@ -205,7 +208,7 @@ class ImageFormFieldRenderer <Container>
 		FileItem fileItem =
 			submission.fileItem (
 				stringFormat (
-					"%s-%s",
+					"%s.%s",
 					formName,
 					name ()));
 

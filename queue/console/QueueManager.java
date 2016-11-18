@@ -16,6 +16,7 @@ import org.joda.time.Duration;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -24,11 +25,13 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.queue.metamodel.QueueTypeSpec;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.queue.model.QueueSubjectRec;
 import wbs.platform.queue.model.QueueTypeRec;
+
 import wbs.web.responder.Responder;
 
 @SingletonComponent ("queueManager")

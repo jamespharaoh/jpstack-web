@@ -1,5 +1,6 @@
 package wbs.platform.send;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -18,6 +19,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+
 import wbs.platform.daemon.SleepingDaemonService;
 
 @Accessors (fluent = true)
@@ -150,7 +152,8 @@ class GenericScheduleDaemon <
 			log ().debug (
 				stringFormat (
 					"Not sending %s because it is not scheduled",
-					job));
+					integerToDecimalString (
+						jobId)));
 
 			return;
 
@@ -171,7 +174,8 @@ class GenericScheduleDaemon <
 			log ().warn (
 				stringFormat (
 					"Not sending %s because it is scheduled in the future",
-					job));
+					integerToDecimalString (
+						jobId)));
 
 			return;
 
@@ -182,7 +186,8 @@ class GenericScheduleDaemon <
 		log ().info (
 			stringFormat (
 				"Sending %s",
-				job));
+				integerToDecimalString (
+					jobId)));
 
 		helper ().sendStart (
 			service,

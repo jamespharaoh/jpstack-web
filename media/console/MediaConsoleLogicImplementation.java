@@ -16,11 +16,14 @@ import com.google.common.collect.ImmutableMap;
 import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeRec;
+
 import wbs.utils.string.FormatWriter;
 
 @SingletonComponent ("mediaConsoleLogic")

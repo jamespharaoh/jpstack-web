@@ -8,8 +8,10 @@ import static wbs.utils.etc.Misc.runFilter;
 import static wbs.utils.etc.Misc.runFilterAdvanced;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThan;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -45,6 +47,7 @@ import lombok.extern.log4j.Log4j;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
+
 import wbs.platform.media.model.ContentObjectHelper;
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaObjectHelper;
@@ -902,7 +905,8 @@ class MediaLogicImplementation
 				stringFormat (
 					"Attempt to read image of type %s with %s bytes with %s",
 					mimeType,
-					data.length,
+					integerToDecimalString (
+						data.length),
 					imageReader.toString ()));
 
 			imageReader.setInput (
@@ -919,7 +923,8 @@ class MediaLogicImplementation
 					stringFormat (
 						"Failed to read image of type %s with %s bytes",
 						mimeType,
-						data.length),
+						integerToDecimalString (
+							data.length)),
 					exception);
 
 			}
@@ -930,9 +935,10 @@ class MediaLogicImplementation
 			stringFormat (
 				"Exhausted options to read image of type %s with %s bytes",
 				mimeType,
-				data.length));
+				integerToDecimalString (
+					data.length)));
 
-		return Optional.<BufferedImage>absent ();
+		return optionalAbsent ();
 
 	}
 

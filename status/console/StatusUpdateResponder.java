@@ -21,16 +21,19 @@ import org.joda.time.Instant;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.model.RootRec;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+
 import wbs.utils.io.RuntimeIoException;
 
 @PrototypeComponent ("statusUpdateResponder")

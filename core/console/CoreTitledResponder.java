@@ -1,6 +1,7 @@
 package wbs.platform.core.console;
 
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingOneWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteHtml;

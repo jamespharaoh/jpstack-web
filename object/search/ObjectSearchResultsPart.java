@@ -3,7 +3,6 @@ package wbs.platform.object.search;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.CollectionUtils.listSlice;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
-import static wbs.utils.etc.Misc.getMethodRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -13,6 +12,7 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -68,6 +68,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -75,7 +76,9 @@ import wbs.framework.entity.record.IdObject;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
@@ -261,7 +264,7 @@ class ObjectSearchResultsPart <
 		) {
 
 			Method method =
-				getMethodRequired (
+				methodGetRequired (
 					consoleHelper.getClass (),
 					resultsDaoMethodName,
 					ImmutableList.<Class <?>> of (

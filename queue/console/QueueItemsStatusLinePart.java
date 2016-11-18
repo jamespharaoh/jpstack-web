@@ -21,6 +21,7 @@ import lombok.NonNull;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.logging.TaskLogger;
 

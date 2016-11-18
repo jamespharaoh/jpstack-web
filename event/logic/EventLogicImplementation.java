@@ -1,7 +1,7 @@
 package wbs.platform.event.logic;
 
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import lombok.NonNull;
 
@@ -235,7 +235,7 @@ class EventLogicImplementation
 		// error otherwise
 
 		throw new RuntimeException (
-			stringFormat (
+			stringFormatObsolete (
 				"Unlinkable type %s passed as link parameter %s",
 				linkObject.getClass (),
 				index));
@@ -251,7 +251,7 @@ class EventLogicImplementation
 		if (linkObject == null) {
 
 			throw new RuntimeException (
-				stringFormat (
+				stringFormatObsolete (
 					"Null passed as link parameter %s",
 					index));
 

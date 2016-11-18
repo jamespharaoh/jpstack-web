@@ -1,6 +1,6 @@
 package wbs.platform.rpc.core;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import org.joda.time.LocalDate;
 
@@ -49,7 +49,7 @@ class RpcPrimitive
 			return RpcType.rDate;
 
 		throw new RuntimeException (
-			stringFormat (
+			stringFormatObsolete (
 				"Don't know what to do with %s",
 				primitive.getClass ()));
 

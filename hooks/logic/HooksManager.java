@@ -1,5 +1,6 @@
 package wbs.platform.hooks.logic;
 
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Constructor;
@@ -65,7 +66,8 @@ class HooksManager {
 		log.debug (
 			stringFormat (
 				"Initialising proxy type %s",
-				proxy.getClass ().getName ()));
+				classNameSimple (
+					proxy.getClass ())));
 
 		Object delegate =
 			createDelegate (

@@ -13,7 +13,9 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleManager;
+
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
