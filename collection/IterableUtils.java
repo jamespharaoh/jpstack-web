@@ -112,6 +112,32 @@ class IterableUtils {
 	}
 
 	public static <ItemType>
+	Optional <ItemType> iterableFindFirst (
+			@NonNull Predicate <ItemType> predicate,
+			@NonNull Iterable <ItemType> iterable) {
+
+		for (
+			ItemType item
+				: iterable
+		) {
+
+			if (
+				predicate.test (
+					item)
+			) {
+
+				return optionalOf (
+					item);
+
+			}
+
+		}
+
+		return optionalAbsent ();
+
+	}
+
+	public static <ItemType>
 	ItemType iterableFindExactlyOneRequired (
 			@NonNull Predicate <ItemType> predicate,
 			@NonNull Iterable <ItemType> iterable) {

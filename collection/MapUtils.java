@@ -189,6 +189,38 @@ class MapUtils {
 
 	}
 
+	public static <KeyType, InValueType, OutValueType>
+	Map <KeyType, OutValueType> mapWithDerivedKeyAndValue (
+			@NonNull Iterable <? extends InValueType> values,
+			@NonNull Function <
+				? super InValueType,
+				? extends KeyType
+			> keyFunction,
+			@NonNull Function <
+				? super InValueType,
+				? extends OutValueType
+			> valueFunction) {
+
+		ImmutableMap.Builder <KeyType, OutValueType> builder =
+			ImmutableMap.builder ();
+
+		for (
+			InValueType value
+				: values
+		) {
+
+			builder.put (
+				keyFunction.apply (
+					value),
+				valueFunction.apply (
+					value));
+
+		}
+
+		return builder.build ();
+
+	}
+
 	public static <KeyType, ValueType>
 	void mapPutOrThrowIllegalStateException (
 			@NonNull Map <KeyType, ValueType> map,

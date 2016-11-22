@@ -1,7 +1,6 @@
 package wbs.utils.etc;
 
 import static wbs.utils.etc.LogicUtils.ifThenElse;
-import static wbs.utils.string.StringUtils.bytesToString;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -491,69 +490,6 @@ class Misc {
 
 	}
 
-	public static
-	byte[] fromHex (
-			@NonNull String hex) {
-
-		byte[] bytes =
-			new byte [
-				hex.length () / 2];
-
-		for (
-			int index = 0;
-			index < bytes.length;
-			index ++
-		) {
-
-			bytes [index] = (byte)
-				Integer.parseInt (
-					hex.substring (
-						2 * index,
-						2 * index + 2),
-					16);
-
-		}
-
-		return bytes;
-
-	}
-
-	static final
-	byte[] HEX_CHAR_TABLE = {
-		(byte) '0', (byte) '1', (byte) '2', (byte) '3',
-		(byte) '4', (byte) '5', (byte) '6', (byte) '7',
-		(byte) '8', (byte) '9', (byte) 'a', (byte) 'b',
-		(byte) 'c', (byte) 'd', (byte) 'e', (byte) 'f'
-	};
-
-	public static
-	String toHex (
-			@NonNull byte[] byteValues) {
-
-		byte[] hex =
-			new byte [2 * byteValues.length];
-
-		int index = 0;
-
-		for (byte byteValue : byteValues) {
-
-			int intValue =
-				byteValue & 0xFF;
-
-			hex [index ++] =
-				HEX_CHAR_TABLE [intValue >>> 4];
-
-			hex [index ++] =
-				HEX_CHAR_TABLE [intValue & 0xf];
-
-		}
-
-		return bytesToString (
-			hex,
-			"ASCII");
-
-	}
-
 	private static final
 	char[] lowercaseLetters =
 		new char [26];
@@ -614,7 +550,7 @@ class Misc {
 
 	@SneakyThrows (NoSuchAlgorithmException.class)
 	public static
-	String hashSha1 (
+	String hashSha1Base64 (
 			String string) {
 
 		MessageDigest messageDigest =
