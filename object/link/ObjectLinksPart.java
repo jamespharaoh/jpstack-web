@@ -30,6 +30,7 @@ import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.helper.core.ConsoleHelper;
+import wbs.console.html.HtmlTableCheckWriter;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
@@ -40,7 +41,6 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.utils.etc.PropertyUtils;
-import wbs.web.utils.HtmlTableCheckWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectLinksPart")
