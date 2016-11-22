@@ -11,8 +11,8 @@ import lombok.NonNull;
 
 import wbs.api.mvc.ApiLoggingAction;
 
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
-import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
@@ -36,7 +36,7 @@ import wbs.utils.string.FormatWriter;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
 
-@SingletonComponent ("oxygen8RouteReportAction")
+@PrototypeComponent ("oxygen8RouteReportAction")
 public
 class Oxygen8RouteReportAction
 	extends ApiLoggingAction {
