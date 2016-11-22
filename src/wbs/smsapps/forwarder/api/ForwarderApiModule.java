@@ -161,7 +161,12 @@ class ForwarderApiModule
 
 	private
 	void initFiles (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initFiles");
 
 		files =
 			ImmutableMap.<String, WebFile> builder ()
@@ -175,6 +180,7 @@ class ForwarderApiModule
 					"forwarderInAction")
 
 				.postActionName (
+					taskLogger,
 					"forwarderInAction")
 
 			)
@@ -188,6 +194,7 @@ class ForwarderApiModule
 					"forwarderInAction")
 
 				.postActionName (
+					taskLogger,
 					"forwarderInAction")
 
 			)
@@ -201,6 +208,7 @@ class ForwarderApiModule
 					"forwarderOutAction")
 
 				.postActionName (
+					taskLogger,
 					"forwarderOutAction")
 
 			)

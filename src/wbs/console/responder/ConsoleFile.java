@@ -81,7 +81,7 @@ class ConsoleFile
 
 	@DataChildren
 	@Getter @Setter
-	Map<String,Object> requestParams =
+	Map <String, Object> requestParams =
 		new LinkedHashMap<String,Object> ();
 
 	// utility methods
@@ -146,12 +146,16 @@ class ConsoleFile
 	}
 
 	public
-	ConsoleFile getAction (
-			Action action) {
+	ConsoleFile getActionProvider (
+			Provider <Action> actionProvider) {
 
 		return getHandler (
+
 			actionRequestHandlerProvider.get ()
-				.action (action));
+				.actionProvider (
+					actionProvider)
+
+		);
 
 	}
 
@@ -201,12 +205,16 @@ class ConsoleFile
 	}
 
 	public
-	ConsoleFile postAction (
-			Action action) {
+	ConsoleFile postActionProvider (
+			@NonNull Provider <Action> actionProvider) {
 
 		return postHandler (
 			actionRequestHandlerProvider.get ()
-				.action (action));
+
+			.actionProvider (
+				actionProvider)
+
+		);
 
 	}
 

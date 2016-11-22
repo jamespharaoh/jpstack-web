@@ -52,7 +52,6 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.action.Action;
-import wbs.web.responder.Responder;
 
 @PrototypeComponent ("objectSettingsPageBuilder")
 @ConsoleModuleBuilderHandler
@@ -132,7 +131,7 @@ class ObjectSettingsPageBuilder <
 	String tabName;
 	String tabLocation;
 
-	Action settingsAction;
+	Provider <Action> settingsActionProvider;
 
 	// build
 
@@ -196,92 +195,75 @@ class ObjectSettingsPageBuilder <
 
 	void buildAction () {
 
-		settingsAction =
-			new Action () {
+		if (consoleHelper.ephemeral ()) {
 
-			@Override
-			public
-			Responder handle (
-					@NonNull TaskLogger parentTaskLogger) {
+			settingsActionProvider =
+				() -> objectSettingsActionProvider.get ()
 
-				Action settingsAction;
+				.detailsResponder (
+					consoleManager.responder (
+						responderName,
+						true))
 
-				if (consoleHelper.ephemeral ()) {
+				.accessDeniedResponder (
+					consoleManager.responder (
+						responderName,
+						true))
 
-					settingsAction =
-						objectSettingsActionProvider.get ()
+				.editPrivKey (
+					privKey)
 
-						.detailsResponder (
-							consoleManager.responder (
-								responderName,
-								true))
+				.objectLookup (
+					consoleHelper)
 
-						.accessDeniedResponder (
-							consoleManager.responder (
-								responderName,
-								true))
+				.consoleHelper (
+					consoleHelper)
 
-						.editPrivKey (
-							privKey)
+				.formFieldSet (
+					formFieldSet)
 
-						.objectLookup (
-							consoleHelper)
+				.formFieldsProvider (
+					fieldsProvider)
 
-						.consoleHelper (
-							consoleHelper)
+				.objectRefName (
+					consoleHelper.codeExists ()
+						? consoleHelper.codeFieldName ()
+						: "id")
 
-						.formFieldSet (
-							formFieldSet)
+				.objectType (
+					consoleHelper.objectTypeCode ());
 
-						.formFieldsProvider (
-							fieldsProvider)
+		} else {
 
-						.objectRefName (
-							consoleHelper.codeExists ()
-								? consoleHelper.codeFieldName ()
-								: "id")
+			settingsActionProvider =
+				() -> objectSettingsActionProvider.get ()
 
-						.objectType (
-							consoleHelper.objectTypeCode ());
+				.detailsResponder (
+					consoleManager.responder (
+						responderName,
+						true))
 
-				} else {
+				.accessDeniedResponder (
+					consoleManager.responder (
+						responderName,
+						true))
 
-					settingsAction =
-						objectSettingsActionProvider.get ()
+				.editPrivKey (
+					privKey)
 
-						.detailsResponder (
-							consoleManager.responder (
-								responderName,
-								true))
+				.objectLookup (
+					consoleHelper)
 
-						.accessDeniedResponder (
-							consoleManager.responder (
-								responderName,
-								true))
+				.consoleHelper (
+						consoleHelper)
 
-						.editPrivKey (
-							privKey)
+				.formFieldSet (
+					formFieldSet)
 
-						.objectLookup (
-							consoleHelper)
+				.formFieldsProvider (
+						fieldsProvider);
 
-						.consoleHelper (
-								consoleHelper)
-
-						.formFieldSet (
-							formFieldSet)
-
-						.formFieldsProvider (
-								fieldsProvider);
-
-				}
-
-				return settingsAction.handle (
-					parentTaskLogger);
-
-			}
-
-		};
+		}
 
 	}
 
@@ -297,8 +279,8 @@ class ObjectSettingsPageBuilder <
 				.getResponderName (
 					responderName)
 
-				.postAction (
-					settingsAction)
+				.postActionProvider (
+					settingsActionProvider)
 
 				.privName (
 					privKey),
@@ -307,48 +289,31 @@ class ObjectSettingsPageBuilder <
 
 		if (consoleHelper.ephemeral ()) {
 
-			Action removeAction =
-				new Action () {
+			Provider <Action> removeActionProvider =
+				() -> objectRemoveAction.get ()
 
-				@Override
-				public
-				Responder handle (
-						@NonNull TaskLogger parentTaskLogger) {
+				.objectHelper (
+					consoleHelper)
 
-					Action removeAction;
+				.settingsResponder (
+					consoleManager.responder (
+						responderName,
+						true))
 
-					removeAction =
-						objectRemoveAction.get ()
+				.listResponder (
+					consoleManager.responder (
+						stringFormat (
+							"%sListResponder",
+							container.newBeanNamePrefix ()),
+						true))
 
-						.objectHelper (
-							consoleHelper)
+				.nextContextTypeName (
+					ifNull (
+						spec.listContextTypeName (),
+					consoleHelper.objectName () + ":list"))
 
-						.settingsResponder (
-							consoleManager.responder (
-								responderName,
-								true))
-
-						.listResponder (
-							consoleManager.responder (
-								stringFormat (
-									"%sListResponder",
-									container.newBeanNamePrefix ()),
-								true))
-
-						.nextContextTypeName (
-							ifNull (
-								spec.listContextTypeName (),
-								consoleHelper.objectName () + ":list"))
-
-						.editPrivKey (
-							privKey);
-
-					return removeAction.handle (
-						parentTaskLogger);
-
-				}
-
-			};
+				.editPrivKey (
+					privKey);
 
 			consoleModule.addContextFile (
 
@@ -358,8 +323,8 @@ class ObjectSettingsPageBuilder <
 
 				consoleFile.get ()
 
-					.postAction (
-						removeAction)
+					.postActionProvider (
+						removeActionProvider)
 
 					.privName (
 						privKey),

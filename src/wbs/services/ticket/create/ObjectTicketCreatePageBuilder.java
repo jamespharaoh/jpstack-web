@@ -48,7 +48,6 @@ import wbs.platform.object.criteria.WhereNotDeletedCriteriaSpec;
 import wbs.services.ticket.core.model.TicketManagerRec;
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.web.action.Action;
-import wbs.web.responder.Responder;
 
 @PrototypeComponent ("objectTicketCreatePageBuilder")
 @ConsoleModuleBuilderHandler
@@ -191,61 +190,47 @@ class ObjectTicketCreatePageBuilder
 	void buildFile (
 			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
-		Action createAction =
-			new Action () {
+		Provider <Action> createActionProvider =
+			() -> objectTicketCreateActionProvider.get ()
 
-			@Override
-			public
-			Responder handle (
-					@NonNull TaskLogger parentTaskLogger) {
+			.consoleHelper (
+				consoleHelper)
 
-				return objectTicketCreateActionProvider.get ()
+			.typeCode (
+				typeCode)
 
-					.consoleHelper (
-						consoleHelper)
+			.responderName (
+				responderName)
 
-					.typeCode (
-						typeCode)
+			.targetContextTypeName (
+				targetContextTypeName)
 
-					.responderName (
-						responderName)
+			.targetResponderName (
+				targetResponderName)
 
-					.targetContextTypeName (
-						targetContextTypeName)
+			.createPrivDelegate (
+				createPrivDelegate)
 
-					.targetResponderName (
-						targetResponderName)
+			.createPrivCode (
+				createPrivCode)
 
-					.createPrivDelegate (
-						createPrivDelegate)
+			.fields (
+				fields)
 
-					.createPrivCode (
-						createPrivCode)
+			.formFieldsProvider (
+				fieldsProvider)
 
-					.fields (
-						fields)
+			.ticketFieldSpecs(
+					ticketFields)
 
-					.formFieldsProvider (
-						fieldsProvider)
+			.ticketManagerPath(
+				ticketManagerPath)
 
-					.ticketFieldSpecs(
-							ticketFields)
+			.createTimeFieldName (
+				createTimeFieldName)
 
-					.ticketManagerPath(
-						ticketManagerPath)
-
-					.createTimeFieldName (
-						createTimeFieldName)
-
-					.createUserFieldName (
-						createUserFieldName)
-
-					.handle (
-						parentTaskLogger);
-
-				}
-
-			};
+			.createUserFieldName (
+				createUserFieldName);
 
 			consoleModule.addContextFile (
 
@@ -256,8 +241,8 @@ class ObjectTicketCreatePageBuilder
 					.getResponderName (
 						responderName)
 
-					.postAction (
-						createAction)
+					.postActionProvider (
+						createActionProvider)
 
 					/*.privKeys (
 						Collections.singletonList (privKey)*/,

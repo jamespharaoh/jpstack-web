@@ -11,6 +11,7 @@ import javax.inject.Provider;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiFile;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -18,6 +19,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.context.RequestContext;
 import wbs.web.file.WebFile;
 import wbs.web.pathhandler.PathHandler;
@@ -69,6 +71,7 @@ class ChatInfoSiteApiModule
 				"chatInfoSiteViewAction")
 
 			.postActionName (
+				taskLogger,
 				"chatInfoSiteRespondAction");
 
 		infoSiteImageFile =

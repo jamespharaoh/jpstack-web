@@ -36,7 +36,6 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.action.Action;
-import wbs.web.responder.Responder;
 
 @PrototypeComponent ("objectLinksPageBuilder")
 @ConsoleModuleBuilderHandler
@@ -153,62 +152,55 @@ class ObjectLinksPageBuilder <
 	void buildFile (
 			@NonNull ResolvedConsoleContextExtensionPoint extensionPoint) {
 
-		Action action =
-			new Action () {
+		Provider <Action> actionProvider =
+			() -> objectLinksAction.get ()
 
-			@Override
-			public
-			Responder handle (
-					@NonNull TaskLogger parentTaskLogger) {
+			.responderName (
+				responderName)
 
-				return objectLinksAction.get ()
+			.contextHelper (
+				consoleHelper)
 
-					.responderName (
-						responderName)
+			.contextLinkField (
+				linksField.name ())
 
-					.contextHelper (
-						consoleHelper)
+			.targetHelper (
+				targetConsoleHelper)
 
-					.contextLinkField (
-						linksField.name ())
+			.targetLinkField (
+				targetLinksField.name ())
 
-					.targetHelper (
-						targetConsoleHelper)
+			.addEventName (
+				addEventName)
 
-					.targetLinkField (
-						targetLinksField.name ())
+			.removeEventName (
+				removeEventName)
 
-					.addEventName (
-						addEventName)
+			.eventOrder (
+				eventOrder)
 
-					.removeEventName (
-						removeEventName)
+			.contextUpdateSignalName (
+				updateSignalName)
 
-					.eventOrder (
-						eventOrder)
+			.targetUpdateSignalName (
+				targetUpdateSignalName)
 
-					.contextUpdateSignalName (
-						updateSignalName)
-
-					.targetUpdateSignalName (
-						targetUpdateSignalName)
-
-					.successNotice (
-						successNotice)
-
-					.handle (
-						parentTaskLogger);
-
-			}
-
-		};
+			.successNotice (
+				successNotice);
 
 		consoleModule.addContextFile (
 			localFile,
 			consoleFile.get ()
-				.getResponderName (responderName)
-				.postAction (action)
-				.privName (privKey),
+
+				.getResponderName (
+					responderName)
+
+				.postActionProvider (
+					actionProvider)
+
+				.privName (
+					privKey),
+
 			extensionPoint.contextTypeNames ());
 
 	}

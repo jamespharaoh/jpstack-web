@@ -16,6 +16,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.handler.RequestHandler;
 import wbs.web.responder.Responder;
 
@@ -36,25 +37,6 @@ class ActionRequestHandler
 	Provider <Action> actionProvider;
 
 	// utils
-
-	public
-	ActionRequestHandler action (
-			final Action action) {
-
-		actionProvider =
-			new Provider <Action> () {
-
-			@Override
-			public
-			Action get () {
-				return action;
-			}
-
-		};
-
-		return this;
-
-	}
 
 	public
 	ActionRequestHandler actionName (

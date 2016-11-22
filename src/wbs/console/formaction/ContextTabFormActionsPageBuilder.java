@@ -100,7 +100,7 @@ class ContextTabFormActionsPageBuilder
 	List <ConsoleFormAction> formActions;
 
 	PagePartFactory pagePartFactory;
-	Action action;
+	Provider <Action> actionProvider;
 
 	// build
 
@@ -124,8 +124,7 @@ class ContextTabFormActionsPageBuilder
 		buildPagePartFactory (
 			taskLogger);
 
-		buildAction (
-			taskLogger);
+		buildAction ();
 
 		buildResponder (
 			taskLogger);
@@ -247,22 +246,17 @@ class ContextTabFormActionsPageBuilder
 
 	}
 
-	void buildAction (
-			@NonNull TaskLogger parentTaskLogger) {
+	void buildAction () {
 
-		action =
-			nextTaskLogger ->
-				consoleFormActionsActionProvider.get ()
+		actionProvider =
+			() -> consoleFormActionsActionProvider.get ()
 
 			.formActions (
 				genericCastUnchecked (
 					formActions))
 
 			.responderName (
-				responderName)
-
-			.handle (
-				nextTaskLogger);
+				responderName);
 
 	}
 
@@ -277,8 +271,8 @@ class ContextTabFormActionsPageBuilder
 				.getResponderName (
 					responderName)
 
-				.postAction (
-					action),
+				.postActionProvider (
+					actionProvider),
 
 			resolvedExtensionPoint.contextTypeNames ());
 

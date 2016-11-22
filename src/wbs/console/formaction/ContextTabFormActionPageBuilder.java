@@ -36,7 +36,6 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.action.Action;
-import wbs.web.responder.Responder;
 
 @PrototypeComponent ("contextTabFormActionPageBuilder")
 @ConsoleModuleBuilderHandler
@@ -100,7 +99,7 @@ class ContextTabFormActionPageBuilder
 	Provider <ConsoleFormActionHelper> formActionHelperProvider;
 
 	PagePartFactory pagePartFactory;
-	Action action;
+	Provider <Action> actionProvider;
 
 	// build
 
@@ -216,37 +215,23 @@ class ContextTabFormActionPageBuilder
 
 	void buildAction () {
 
-		action =
-			new Action () {
+		actionProvider =
+			() -> consoleFormActionActionProvider.get ()
 
-			@Override
-			public
-			Responder handle (
-					@NonNull TaskLogger taskLogger) {
+			.fields (
+				formFields)
 
-				Action action =
-					consoleFormActionActionProvider.get ()
+			.formActionHelper (
+				formActionHelperProvider.get ())
 
-					.fields (
-						formFields)
-
-					.formActionHelper (
-						formActionHelperProvider.get ())
-
-					.responderName (
-						responderName);
-
-				return action.handle (
-					taskLogger);
-
-			}
-
-		};
+			.responderName (
+				responderName);
 
 	}
 
 	void buildFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint
+				resolvedExtensionPoint) {
 
 		consoleModule.addContextFile (
 			localFile,
@@ -255,8 +240,8 @@ class ContextTabFormActionPageBuilder
 				.getResponderName (
 					responderName)
 
-				.postAction (
-					action),
+				.postActionProvider (
+					actionProvider),
 
 			resolvedExtensionPoint.contextTypeNames ());
 

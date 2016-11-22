@@ -48,7 +48,6 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.action.Action;
-import wbs.web.responder.Responder;
 
 @PrototypeComponent ("objectCreatePageBuilder")
 @ConsoleModuleBuilderHandler
@@ -186,55 +185,41 @@ class ObjectCreatePageBuilder <
 	void buildFile (
 			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
 
-		Action createAction =
-			new Action () {
+		Provider <Action> createActionProvider =
+			() -> objectCreateActionProvider.get ()
 
-			@Override
-			public
-			Responder handle (
-					@NonNull TaskLogger taskLogger) {
+			.consoleHelper (
+				consoleHelper)
 
-				return objectCreateActionProvider.get ()
+			.typeCode (
+				typeCode)
 
-					.consoleHelper (
-						consoleHelper)
+			.responderName (
+				responderName)
 
-					.typeCode (
-						typeCode)
+			.targetContextTypeName (
+				targetContextTypeName)
 
-					.responderName (
-						responderName)
+			.targetResponderName (
+				targetResponderName)
 
-					.targetContextTypeName (
-						targetContextTypeName)
+			.createPrivDelegate (
+				createPrivDelegate)
 
-					.targetResponderName (
-						targetResponderName)
+			.createPrivCode (
+				createPrivCode)
 
-					.createPrivDelegate (
-						createPrivDelegate)
+			.formFieldSet (
+				formFieldSet)
 
-					.createPrivCode (
-						createPrivCode)
+			.formFieldsProvider (
+				fieldsProvider)
 
-					.formFieldSet (
-						formFieldSet)
+			.createTimeFieldName (
+				createTimeFieldName)
 
-					.formFieldsProvider (
-						fieldsProvider)
-
-					.createTimeFieldName (
-						createTimeFieldName)
-
-					.createUserFieldName (
-						createUserFieldName)
-
-					.handle (
-						taskLogger);
-
-			}
-
-		};
+			.createUserFieldName (
+				createUserFieldName);
 
 		consoleModule.addContextFile (
 
@@ -245,8 +230,8 @@ class ObjectCreatePageBuilder <
 				.getResponderName (
 					responderName)
 
-				.postAction (
-					createAction)
+				.postActionProvider (
+					createActionProvider)
 
 				/*.privKeys (
 					Collections.singletonList (privKey)*/,

@@ -26,6 +26,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.joda.time.Instant;
 
 import wbs.api.mvc.ApiFile;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -35,8 +36,10 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
+
 import wbs.sms.gsm.ConcatenatedInformationElement;
 import wbs.sms.gsm.UserDataHeader;
 import wbs.sms.message.core.model.MessageStatus;
@@ -47,6 +50,7 @@ import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+
 import wbs.web.action.Action;
 import wbs.web.context.RequestContext;
 import wbs.web.file.AbstractWebFile;
@@ -373,8 +377,8 @@ class DialogueApiServletModule
 	};
 
 	private final
-	Action reportAction =
-		new Action () {
+	Provider <Action> reportActionProvider =
+		() -> new Action () {
 
 		@Override
 		public
@@ -529,7 +533,9 @@ class DialogueApiServletModule
 
 		reportFile =
 			apiFileProvider.get ()
-				.postAction (reportAction);
+
+			.postActionProvider (
+				reportActionProvider);
 
 		routeFiles =
 			ImmutableMap.<String,WebFile>builder ()
