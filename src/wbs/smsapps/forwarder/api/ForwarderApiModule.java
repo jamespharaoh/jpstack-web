@@ -151,11 +151,12 @@ class ForwarderApiModule
 				parentTaskLogger,
 				"setup");
 
+		initRpcHandlers ();
+
+		initActions ();
+
 		initFiles (
 			taskLogger);
-
-		initRpcHandlers ();
-		initActions ();
 
 	}
 
