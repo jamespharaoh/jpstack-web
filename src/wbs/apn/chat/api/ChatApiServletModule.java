@@ -258,6 +258,9 @@ class ChatApiServletModule
 			CreditRpcHandler.class,
 			ProfileDeleteRpcHandler.class);
 
+		initRpcHandlers ();
+		initActions ();
+
 	}
 
 	// ================================= servlet module
@@ -467,17 +470,6 @@ class ChatApiServletModule
 		}
 
 		return ret;
-
-	}
-
-	// ================================= init stuff
-
-	@NormalLifecycleSetup
-	public
-	void initStuff () {
-
-		initRpcHandlers ();
-		initActions ();
 
 	}
 
