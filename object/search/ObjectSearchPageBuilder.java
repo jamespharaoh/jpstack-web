@@ -49,7 +49,6 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.action.Action;
-import wbs.web.responder.Responder;
 
 @PrototypeComponent ("objectSearchPageBuilder")
 @ConsoleModuleBuilderHandler
@@ -135,8 +134,8 @@ class ObjectSearchPageBuilder <
 	String searchResultsResponderName;
 	Long itemsPerPage;
 
-	Action searchGetAction;
-	Action searchPostAction;
+	Provider <Action> searchGetActionProvider;
+	Provider <Action> searchPostActionProvider;
 
 	// build
 
@@ -198,95 +197,68 @@ class ObjectSearchPageBuilder <
 
 	void buildGetAction () {
 
-		searchGetAction =
-			new Action () {
+		searchGetActionProvider =
+			() -> objectSearchGetAction.get ()
 
-			@Override
-			public
-			Responder handle (
-					@NonNull TaskLogger parentTaskLogger) {
+			.searchResponderName (
+				searchResponderName)
 
-				return objectSearchGetAction.get ()
+			.searchResultsResponderName (
+				searchResultsResponderName)
 
-					.searchResponderName (
-						searchResponderName)
-
-					.searchResultsResponderName (
-						searchResultsResponderName)
-
-					.sessionKey (
-						sessionKey)
-
-					.handle (
-						parentTaskLogger);
-
-			}
-
-		};
+			.sessionKey (
+				sessionKey);
 
 	}
 
 	void buildPostAction () {
 
-		searchPostAction =
-			new Action () {
+		searchPostActionProvider =
+			() ->  objectSearchPostAction.get ()
 
-			@Override
-			public
-			Responder handle (
-					@NonNull TaskLogger parentTaskLogger) {
+			.consoleHelper (
+				consoleHelper)
 
-				return objectSearchPostAction.get ()
+			.searchClass (
+				searchClass)
 
-					.consoleHelper (
-						consoleHelper)
+			.searchDaoMethodName (
+				spec.searchDaoMethodName ())
 
-					.searchClass (
-						searchClass)
+			.resultsDaoMethodName (
+				spec.resultsDaoMethodName ())
 
-					.searchDaoMethodName (
-						spec.searchDaoMethodName ())
+			.sessionKey (
+				sessionKey)
 
-					.resultsDaoMethodName (
-						spec.resultsDaoMethodName ())
+			.parentIdKey (
+				parentIdKey)
 
-					.sessionKey (
-						sessionKey)
+			.parentIdName (
+				parentIdName)
 
-					.parentIdKey (
-						parentIdKey)
+			.searchFormFieldSet (
+				searchFormFieldSet)
 
-					.parentIdName (
-						parentIdName)
+			.resultsFormFieldSets (
+				ImmutableList.copyOf (
+					presentInstances (
+						Optional.of (
+							resultsFormFieldSet),
+						Optional.fromNullable (
+							resultsRowsFormFieldSet))))
 
-					.searchFormFieldSet (
-						searchFormFieldSet)
+			.searchResponderName (
+				searchResponderName)
 
-					.resultsFormFieldSets (
-						ImmutableList.copyOf (
-							presentInstances (
-								Optional.of (
-									resultsFormFieldSet),
-								Optional.fromNullable (
-									resultsRowsFormFieldSet))))
-
-					.searchResponderName (
-						searchResponderName)
-
-					.fileName (
-						fileName)
-
-					.handle (
-						parentTaskLogger);
-
-			}
-
-		};
+			.fileName (
+				fileName);
 
 	}
 
 	void buildContextFile (
-			ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+			@NonNull ResolvedConsoleContextExtensionPoint
+				resolvedExtensionPoint) {
 
 		consoleModule.addContextFile (
 
@@ -294,11 +266,11 @@ class ObjectSearchPageBuilder <
 
 			consoleFile.get ()
 
-				.getAction (
-					searchGetAction)
+				.getActionProvider (
+					searchGetActionProvider)
 
-				.postAction (
-					searchPostAction)
+				.postActionProvider (
+					searchPostActionProvider)
 
 				.privKeys (
 					privKey != null
