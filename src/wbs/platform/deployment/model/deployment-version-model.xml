@@ -1,5 +1,5 @@
 <model-meta
-	name="consoleDeployment"
+	name="deploymentVersion"
 	type="major">
 
 	<fields>
@@ -15,10 +15,14 @@
 		<!-- details -->
 
 		<name-field/>
-
 		<description-field/>
-
 		<deleted-field/>
+
+		<!-- data -->
+
+		<reference-field
+			name="releaseNotes"
+			type="text"/>
 
 	</fields>
 

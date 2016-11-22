@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import wbs.integrations.fonix.model.FonixInboundLogType;
 import wbs.utils.time.TextualInterval;
 
 @Accessors (fluent = true)
@@ -24,7 +23,7 @@ class Oxygen8InboundLogSearch
 
 	String details;
 
-	FonixInboundLogType type;
+	Oxygen8InboundLogType type;
 
 	Boolean success;
 

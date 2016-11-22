@@ -1494,4 +1494,30 @@ class StringUtils {
 
 	}
 
+	public static
+	boolean stringMatches (
+			@NonNull Pattern pattern,
+			@NonNull String string) {
+
+		Matcher matcher =
+			pattern.matcher (
+				string);
+
+		return matcher.matches ();
+
+	}
+
+	public static
+	boolean stringDoesNotMatch (
+			@NonNull Pattern pattern,
+			@NonNull String string) {
+
+		Matcher matcher =
+			pattern.matcher (
+				string);
+
+		return ! matcher.matches ();
+
+	}
+
 }

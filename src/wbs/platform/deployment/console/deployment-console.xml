@@ -1,0 +1,26 @@
+<console-module
+	name="deployment">
+
+	<simple-context
+		name="deployment">
+
+		<priv-key
+			name="deployment.manage"
+			delegate="root"
+			priv="manage"/>
+
+		<context-link
+			name="version"
+			link="deploymentVersion"
+			label="Versions"
+			priv-key="deployment.manage"/>
+
+		<context-link
+			name="console"
+			link="consoleDeployment"
+			label="Console"
+			priv-key="deployment.manage"/>
+
+	</simple-context>
+
+</console-module>

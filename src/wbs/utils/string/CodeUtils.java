@@ -5,17 +5,29 @@ import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 
 import wbs.utils.etc.OptionalUtils;
-
-import com.google.common.base.Optional;
 
 public
 class CodeUtils {
 
 	public static
-	Optional<String> simplifyToCode (
+	String simplifyToCodeRelaxed (
+			@NonNull String string) {
+
+		return string
+			.toLowerCase ()
+			.replaceAll ("[^a-z0-9]+", " ")
+			.trim ()
+			.replaceAll (" ", "_");
+
+	}
+
+	public static
+	Optional <String> simplifyToCode (
 			@NonNull String string) {
 
 		String code =

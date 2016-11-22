@@ -1,34 +1,36 @@
 package wbs.console.forms;
 
+import static wbs.utils.string.CodeUtils.simplifyToCodeRelaxed;
+
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
-
-import com.google.common.base.Optional;
-
 import wbs.console.helper.core.ConsoleHelper;
+
 import wbs.framework.component.annotations.PrototypeComponent;
+
 import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("nameFormFieldAccessor")
 public
-class NameFormFieldAccessor<Container>
-	implements FormFieldAccessor<Container,String> {
+class NameFormFieldAccessor <Container>
+	implements FormFieldAccessor <Container, String> {
 
 	// properties
 
 	@Getter @Setter
-	ConsoleHelper<?> consoleHelper;
+	ConsoleHelper <?> consoleHelper;
 
 	// implementation
 
 	@Override
 	public
-	Optional<String> read (
+	Optional <String> read (
 			@NonNull Container container) {
 
 		return Optional.fromNullable (
@@ -43,7 +45,7 @@ class NameFormFieldAccessor<Container>
 	public
 	void write (
 			@NonNull Container container,
-			@NonNull Optional<String> nativeValue) {
+			@NonNull Optional <String> nativeValue) {
 
 		PropertyUtils.setProperty (
 			container,
@@ -53,7 +55,7 @@ class NameFormFieldAccessor<Container>
 		if (consoleHelper.codeExists ()) {
 
 			String codeValue =
-				simplifyToCodeRequired (
+				simplifyToCodeRelaxed (
 					nativeValue.get ());
 
 			PropertyUtils.setProperty (

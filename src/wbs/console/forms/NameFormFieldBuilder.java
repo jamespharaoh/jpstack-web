@@ -1,14 +1,15 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.inject.Provider;
 
@@ -17,6 +18,7 @@ import com.google.common.base.Optional;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -198,14 +200,33 @@ class NameFormFieldBuilder {
 
 		// value validator
 
-		List<FormFieldValueValidator> valueValidators =
+		List <FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
 
 		valueValidators.add (
 			requiredFormFieldValueValidatorProvider.get ());
 
 		valueValidators.add (
-			nameFormFieldValueValidatorProvider.get ());
+			nameFormFieldValueValidatorProvider.get ()
+
+			.namePattern (
+				ifNotNullThenElse (
+					spec.pattern (),
+					() -> Pattern.compile (
+						spec.pattern ()),
+					() -> null))
+
+			.nameError (
+				spec.patternError ())
+
+			.codePattern (
+				ifNotNullThenElse (
+					spec.codePattern (),
+					() -> Pattern.compile (
+						spec.codePattern ()),
+					() -> null))
+
+		);
 
 		// constraint validator
 

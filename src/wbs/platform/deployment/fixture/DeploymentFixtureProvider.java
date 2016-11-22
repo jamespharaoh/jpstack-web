@@ -41,19 +41,19 @@ class DeploymentFixtureProvider
 					"internal"))
 
 			.setCode (
-				"console_deployment")
+				"deployment")
 
 			.setName (
-				"Console deployment")
+				"Deployment")
 
 			.setDescription (
 				"")
 
 			.setLabel (
-				"Console deployments")
+				"Deployments")
 
 			.setTargetPath (
-				"/consoleDeployments")
+				"/deployment")
 
 			.setTargetFrame (
 				"main")

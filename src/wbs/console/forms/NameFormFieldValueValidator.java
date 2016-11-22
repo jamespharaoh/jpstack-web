@@ -1,9 +1,12 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.string.CodeUtils.simplifyToCode;
+import static wbs.utils.string.CodeUtils.isNotValidCode;
+import static wbs.utils.string.CodeUtils.simplifyToCodeRelaxed;
+import static wbs.utils.string.StringUtils.stringDoesNotMatch;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.regex.Pattern;
@@ -28,6 +31,12 @@ class NameFormFieldValueValidator
 	@Getter @Setter
 	Pattern codePattern;
 
+	@Getter @Setter
+	Pattern namePattern;
+
+	@Getter @Setter
+	String nameError;
+
 	// implementation
 
 	@Override
@@ -35,19 +44,61 @@ class NameFormFieldValueValidator
 	Optional <String> validate (
 			@NonNull Optional <String> genericValue) {
 
-		Optional <String> code =
-			simplifyToCode (
-				genericValue.get ());
+		// validate name
 
 		if (
-			optionalIsNotPresent (
-				code)
+
+			isNotNull (
+				namePattern)
+
+			&& stringDoesNotMatch (
+				namePattern,
+				genericValue.get ())
+
 		) {
 
 			return optionalOf (
-				stringFormat (
-					"Names must contain at least one letter, and cannot have ",
-					"a digit before the first letter"));
+				nameError);
+
+		}
+
+		// validate code
+
+		String code =
+			simplifyToCodeRelaxed (
+				genericValue.get ());
+
+		if (
+			isNotNull (
+				codePattern)
+		) {
+
+			if (
+				stringDoesNotMatch (
+					codePattern,
+					code)
+			) {
+
+				return optionalOf (
+					nameError);
+
+			}
+
+		} else {
+
+			if (
+				isNotValidCode (
+					code)
+			) {
+
+				return optionalOf (
+					ifNull (
+						nameError,
+						stringFormat (
+							"Names must contain at least one letter, and ",
+							"cannot have a digit before the first letter")));
+
+			}
 
 		}
 
