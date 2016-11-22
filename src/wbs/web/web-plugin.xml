@@ -15,9 +15,6 @@ i	<layer name="web">
 		<component class="servlet.PathHandlerServlet"/>
 i		<component class="servlet.ResponseFilter"/>
 
-		<component class="utils.HtmlTableCellWriter"/>
-		<component class="utils.HtmlTableCheckWriter"/>
-
 	</layer>
 
 </plugin>

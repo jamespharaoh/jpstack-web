@@ -1,4 +1,4 @@
-package wbs.web.utils;
+package wbs.console.html;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
