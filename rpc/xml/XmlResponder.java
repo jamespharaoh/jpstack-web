@@ -1,6 +1,6 @@
 package wbs.platform.rpc.xml;
 
-import static wbs.utils.etc.Misc.toHex;
+import static wbs.utils.etc.BinaryUtils.bytesToHex;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,18 +15,19 @@ import lombok.extern.log4j.Log4j;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.rpc.core.RpcElem;
 import wbs.platform.rpc.core.RpcList;
 import wbs.platform.rpc.core.RpcPrimitive;
 import wbs.platform.rpc.core.RpcStructure;
 import wbs.platform.rpc.core.RpcType;
-import wbs.web.context.RequestContext;
-import wbs.web.misc.HttpStatus;
-import wbs.web.responder.Responder;
 
 import nu.xom.Document;
 import nu.xom.Element;
 import nu.xom.Serializer;
+import wbs.web.context.RequestContext;
+import wbs.web.misc.HttpStatus;
+import wbs.web.responder.Responder;
 
 @Log4j
 @Accessors (fluent = true)
@@ -136,7 +137,8 @@ class XmlResponder
 				(byte[]) data.getValue ();
 
 			elem.appendChild (
-				toHex (bytes));
+				bytesToHex (
+					bytes));
 
 		} else {
 

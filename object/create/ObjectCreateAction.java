@@ -517,7 +517,7 @@ class ObjectCreateAction <
 				optionalOrNull (
 					requestContext.form (
 						stringFormat (
-							"create-%s",
+							"create.%s",
 							consoleHelper.parentFieldName ())));
 
 			if (

@@ -3,6 +3,7 @@ package wbs.platform.priv.console;
 import static wbs.utils.etc.Misc.getError;
 import static wbs.utils.etc.Misc.getValue;
 import static wbs.utils.etc.Misc.isError;
+import static wbs.utils.etc.Misc.isSuccess;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -253,37 +254,42 @@ class PrivDataLoaderImplementation
 			Instant startTime =
 				Instant.now ();
 
-			// get privs, excluding any whose parent object types are
-			// unknown, this is a hack.
+			// get privs, filter those we can't get parent for
 
-			List<PrivRec> privs =
-				new ArrayList<PrivRec> ();
+			List <PrivRec> privs =
+				new ArrayList<> ();
 
 			for (
 				PrivRec priv
 					: privHelper.findAll ()
 			) {
 
-				try {
-
-					objectManager.getParentRequired (
+				Either <Optional <Record <?>>, String> privParentOrError =
+					objectManager.getParentOrError (
 						priv);
+
+				if (
+					isSuccess (
+						privParentOrError)
+				) {
 
 					privs.add (
 						priv);
 
-				} catch (Exception exception) {
+				} else {
 
-					taskLogger.warningFormatException (
-						exception,
+					taskLogger.warningFormat (
 						"Error getting parent for priv %s: ",
 						integerToDecimalString (
 							priv.getId ()),
-						"type %s, ",
+						"type = %s, ",
 						priv.getParentType ().getCode (),
-						"id %s",
+						"id = %s: ",
 						integerToDecimalString (
-							priv.getParentId ()));
+							priv.getParentId ()),
+						"%s",
+						getError (
+							privParentOrError));
 
 				}
 
@@ -291,7 +297,10 @@ class PrivDataLoaderImplementation
 
 			// build objectDatasByObjectId
 
-			for (PrivRec priv : privs) {
+			for (
+				PrivRec priv
+					: privs
+			) {
 
 				GlobalId objectId =
 					new GlobalId (
@@ -299,7 +308,8 @@ class PrivDataLoaderImplementation
 						priv.getParentId ());
 
 				ObjectData objectData =
-					newData.objectDatasByObjectId.get (objectId);
+					newData.objectDatasByObjectId.get (
+						objectId);
 
 				if (objectData == null) {
 
