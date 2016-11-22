@@ -82,9 +82,6 @@ class SimulatorSessionCreateEventAction
 	NetworkConsoleHelper networkHelper;
 
 	@SingletonDependency
-	NumberConsoleHelper numberHelper;
-
-	@SingletonDependency
 	ObjectManager objectManager;
 
 	@SingletonDependency
@@ -107,6 +104,9 @@ class SimulatorSessionCreateEventAction
 
 	@SingletonDependency
 	SliceConsoleHelper sliceHelper;
+
+	@SingletonDependency
+	NumberConsoleHelper smsNumberHelper;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -285,7 +285,8 @@ class SimulatorSessionCreateEventAction
 				optionalAbsent (),
 				textHelper.findOrCreate (
 					messageText),
-				numFrom,
+				smsNumberHelper.findOrCreate (
+					numFrom),
 				numTo,
 				route,
 				optionalOf (
@@ -339,7 +340,7 @@ class SimulatorSessionCreateEventAction
 		transaction.flush ();
 
 		NumberRec number =
-			numberHelper.findOrCreate (
+			smsNumberHelper.findOrCreate (
 				numFrom);
 
 		SimulatorSessionNumberRec simulatorSessionNumber =

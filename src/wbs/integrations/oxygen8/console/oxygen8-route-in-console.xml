@@ -6,12 +6,12 @@
 		view-priv="root:manage">
 
 		<priv-key
-			name="oxygen8_manage"
+			name="oxygen8.manage"
 			delegate="root"
 			priv="manage"/>
 
 		<priv-key
-			name="oxygen8RouteIn_manage"
+			name="oxygen8RouteIn.manage"
 			delegate="root"
 			priv="manage"/>
 
@@ -61,6 +61,9 @@
 			label="Config"
 			object-type="oxygen8Config"/>
 
+		<enum-field
+			name="type"/>
+
 	</field-set>
 
 	<field-set
@@ -72,6 +75,9 @@
 		<object-field
 			name="oxygen8Config"
 			object-type="oxygen8Config"/>
+
+		<enum-field
+			name="type"/>
 
 	</field-set>
 
@@ -86,6 +92,9 @@
 			name="oxygen8Config"
 			object-type="oxygen8Config"/>
 
+		<enum-field
+			name="type"/>
+
 	</field-set>
 
 	<field-set
@@ -97,6 +106,9 @@
 		<object-field
 			name="oxygen8Config"
 			object-type="oxygen8Config"/>
+
+		<enum-field
+			name="type"/>
 
 	</field-set>
 

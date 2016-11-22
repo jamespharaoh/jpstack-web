@@ -1,6 +1,6 @@
 package wbs.platform.user.logic;
 
-import static wbs.utils.etc.Misc.hashSha1;
+import static wbs.utils.etc.Misc.hashSha1Base64;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -235,7 +235,7 @@ class UserLogicImplementation
 		if (
 			stringNotEqualSafe (
 				user.getPassword (),
-				hashSha1 (
+				hashSha1Base64 (
 					password))
 		) {
 

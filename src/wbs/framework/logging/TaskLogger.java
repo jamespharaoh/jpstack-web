@@ -11,6 +11,8 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -47,6 +49,9 @@ class TaskLogger {
 
 	String firstError;
 	String lastError = "Aborting";
+
+	List <String> errorMessages =
+		new ArrayList<> ();
 
 	// constructors
 

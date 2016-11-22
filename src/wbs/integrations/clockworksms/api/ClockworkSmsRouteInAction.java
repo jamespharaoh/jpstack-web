@@ -1,13 +1,14 @@
 package wbs.integrations.clockworksms.api;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.etc.BinaryUtils.bytesToHex;
 import static wbs.utils.etc.LogicUtils.not;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.min;
-import static wbs.utils.etc.Misc.toHex;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.utf8ToStringSafe;
 
 import java.io.ByteArrayInputStream;
@@ -16,7 +17,6 @@ import java.util.Arrays;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 
 import lombok.Cleanup;
 import lombok.NonNull;
@@ -44,6 +44,7 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
 
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
+import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -82,6 +83,9 @@ class ClockworkSmsRouteInAction
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
+
+	@SingletonDependency
+	NumberObjectHelper smsNumberHelper;
 
 	@SingletonDependency
 	RouteObjectHelper smsRouteHelper;
@@ -162,7 +166,7 @@ class ClockworkSmsRouteInAction
 					String.format (
 						"%06x",
 						position),
-					toHex (
+					bytesToHex (
 						requestBytesChunk));
 
 			}
@@ -294,18 +298,19 @@ class ClockworkSmsRouteInAction
 		// insert message
 
 		smsInboxLogic.inboxInsert (
-			Optional.of (
+			optionalOf (
 				request.id ()),
 			textHelper.findOrCreate (
 				request.content ()),
-			request.from (),
+			smsNumberHelper.findOrCreate (
+				request.from ()),
 			request.to (),
 			smsRoute,
-			Optional.absent (),
-			Optional.absent (),
-			ImmutableList.of (),
-			Optional.absent (),
-			Optional.absent ());
+			optionalAbsent (),
+			optionalAbsent (),
+			emptyList (),
+			optionalAbsent (),
+			optionalAbsent ());
 
 		// commit and return
 

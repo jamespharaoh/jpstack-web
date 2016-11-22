@@ -37,6 +37,7 @@ import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
 
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
+import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -73,6 +74,9 @@ class FonixRouteInAction
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
+
+	@SingletonDependency
+	NumberObjectHelper smsNumberHelper;
 
 	@SingletonDependency
 	RouteObjectHelper smsRouteHelper;
@@ -116,115 +120,121 @@ class FonixRouteInAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				stringFormat (
-					"%s.%s ()",
-					getClass ().getSimpleName (),
-					"updateDatabase"),
-				this);
+		try (
 
-		// lookup route
-
-		Optional <RouteRec> smsRouteOptional =
-			smsRouteHelper.find (
-				parseIntegerRequired (
-					requestContext.requestStringRequired (
-						"smsRouteId")));
-
-		if (
-
-			optionalIsNotPresent (
-				smsRouteOptional)
+			Transaction transaction =
+				database.beginReadWrite (
+					stringFormat (
+						"%s.%s ()",
+						getClass ().getSimpleName (),
+						"updateDatabase"),
+					this);
 
 		) {
 
-			throw new HttpNotFoundException (
-				optionalOf (
-					stringFormat (
-						"Route %s does not exist",
+			// lookup route
+
+			Optional <RouteRec> smsRouteOptional =
+				smsRouteHelper.find (
+					parseIntegerRequired (
 						requestContext.requestStringRequired (
-							"smsRouteId"))),
-				emptyList ());
+							"smsRouteId")));
 
-		}
+			if (
 
-		if (smsRouteOptional.get ().getDeleted ()) {
+				optionalIsNotPresent (
+					smsRouteOptional)
 
-			throw new HttpNotFoundException (
+			) {
+
+				throw new HttpNotFoundException (
+					optionalOf (
+						stringFormat (
+							"Route %s does not exist",
+							requestContext.requestStringRequired (
+								"smsRouteId"))),
+					emptyList ());
+
+			}
+
+			if (smsRouteOptional.get ().getDeleted ()) {
+
+				throw new HttpNotFoundException (
+					optionalOf (
+						stringFormat (
+							"Route %s.%s has been deleted",
+							smsRouteOptional.get ().getSlice ().getCode (),
+							smsRouteOptional.get ().getCode ())),
+					emptyList ());
+
+			}
+
+			if (! smsRouteOptional.get ().getCanReceive ()) {
+
+				throw new HttpNotFoundException (
+					optionalOf (
+						stringFormat (
+							"Route %s.%s is not configured for inbound messages",
+							smsRouteOptional.get ().getSlice ().getCode (),
+							smsRouteOptional.get ().getCode ())),
+					emptyList ());
+
+			}
+
+			RouteRec smsRoute =
+				optionalGetRequired (
+					smsRouteOptional);
+
+			// lookup fonix route in
+
+			Optional <FonixRouteInRec> fonixRouteInOptional =
+				fonixRouteInHelper.find (
+					smsRoute.getId ());
+
+			if (
+
+				optionalIsNotPresent (
+					fonixRouteInOptional)
+
+				|| fonixRouteInOptional.get ().getDeleted ()
+
+			) {
+
+				throw new HttpNotFoundException (
+					optionalAbsent (),
+					emptyList ());
+
+			}
+
+			@SuppressWarnings ("unused")
+			FonixRouteInRec fonixRouteIn =
+				optionalGetRequired (
+					fonixRouteInOptional);
+
+			// insert message
+
+			smsInboxLogic.inboxInsert (
 				optionalOf (
-					stringFormat (
-						"Route %s.%s has been deleted",
-						smsRouteOptional.get ().getSlice ().getCode (),
-						smsRouteOptional.get ().getCode ())),
-				emptyList ());
-
-		}
-
-		if (! smsRouteOptional.get ().getCanReceive ()) {
-
-			throw new HttpNotFoundException (
-				optionalOf (
-					stringFormat (
-						"Route %s.%s is not configured for inbound messages",
-						smsRouteOptional.get ().getSlice ().getCode (),
-						smsRouteOptional.get ().getCode ())),
-				emptyList ());
-
-		}
-
-		RouteRec smsRoute =
-			optionalGetRequired (
-				smsRouteOptional);
-
-		// lookup fonix route in
-
-		Optional <FonixRouteInRec> fonixRouteInOptional =
-			fonixRouteInHelper.find (
-				smsRoute.getId ());
-
-		if (
-
-			optionalIsNotPresent (
-				fonixRouteInOptional)
-
-			|| fonixRouteInOptional.get ().getDeleted ()
-
-		) {
-
-			throw new HttpNotFoundException (
+					request.guid ()),
+				textHelper.findOrCreate (
+					request.body ()),
+				smsNumberHelper.findOrCreate (
+					request.moNumber ()),
+				request.destination (),
+				smsRoute,
 				optionalAbsent (),
-				emptyList ());
+				optionalOf (
+					fonixLogic.stringToInstant (
+						request.receiveTime ())),
+				ImmutableList.of (),
+				optionalAbsent (),
+				optionalAbsent ());
+
+			// commit and return
+
+			transaction.commit ();
 
 		}
-
-		@SuppressWarnings ("unused")
-		FonixRouteInRec fonixRouteIn =
-			optionalGetRequired (
-				fonixRouteInOptional);
-
-		// insert message
-
-		smsInboxLogic.inboxInsert (
-			optionalOf (
-				request.guid ()),
-			textHelper.findOrCreate (
-				request.body ()),
-			request.moNumber (),
-			request.destination (),
-			smsRoute,
-			optionalAbsent (),
-			optionalOf (
-				fonixLogic.stringToInstant (
-					request.receiveTime ())),
-			ImmutableList.of (),
-			optionalAbsent (),
-			optionalAbsent ());
-
-		// commit and return
-
-		transaction.commit ();
 
 		success = true;
 

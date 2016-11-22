@@ -1,6 +1,9 @@
 package wbs.integrations.dialogue.api;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,8 +26,6 @@ import lombok.NonNull;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
-import org.joda.time.Instant;
-
 import wbs.api.mvc.ApiFile;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -37,7 +38,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 
 import wbs.sms.gsm.ConcatenatedInformationElement;
@@ -48,6 +48,7 @@ import wbs.sms.message.inbox.logic.SmsInboxMultipartLogic;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
+import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -91,6 +92,9 @@ class DialogueApiServletModule
 
 	@SingletonDependency
 	RouteObjectHelper routeHelper;
+
+	@SingletonDependency
+	NumberObjectHelper smsNumberHelper;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -350,16 +354,20 @@ class DialogueApiServletModule
 				// insert a message
 
 				smsInboxLogic.inboxInsert (
-					Optional.of (idParam),
-					textHelper.findOrCreate (message),
-					numFromParam,
+					optionalOf (
+						idParam),
+					textHelper.findOrCreate (
+						message),
+					smsNumberHelper.findOrCreate (
+						numFromParam),
 					numToParam,
 					route,
-					Optional.of (network),
-					Optional.<Instant>absent (),
-					Collections.<MediaRec>emptyList (),
-					Optional.<String>absent (),
-					Optional.<String>absent ());
+					optionalOf (
+						network),
+					optionalAbsent (),
+					emptyList (),
+					optionalAbsent (),
+					optionalAbsent ());
 
 			}
 

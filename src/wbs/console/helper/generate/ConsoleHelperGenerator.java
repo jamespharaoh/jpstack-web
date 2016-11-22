@@ -49,7 +49,6 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
-import wbs.framework.database.Database;
 import wbs.framework.entity.generate.ObjectHelperGenerator;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
@@ -430,9 +429,6 @@ class ConsoleHelperGenerator {
 
 		classWriter.addSingletonDependency (
 			ComponentManager.class);
-
-		classWriter.addSingletonDependency (
-			Database.class);
 
 		classWriter.addSingletonDependency (
 			EntityHelper.class);

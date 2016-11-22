@@ -3,18 +3,21 @@ package wbs.framework.data.tools;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.etc.LogicUtils.parseBooleanYesNoEmpty;
 import static wbs.utils.etc.Misc.contains;
+import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.toEnumGeneric;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.hyphenToCamel;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 import static wbs.utils.string.StringUtils.uncapitalise;
 
 import java.io.FileInputStream;
@@ -297,8 +300,8 @@ class DataFromXmlImplementation
 
 			}
 
-			List<DataClassInfo> matchingDataClassInfos =
-				new ArrayList<DataClassInfo> ();
+			List <DataClassInfo> matchingDataClassInfos =
+				new ArrayList<> ();
 
 			for (
 				DataClassInfo dataClassInfo :
@@ -769,8 +772,53 @@ class DataFromXmlImplementation
 				@NonNull Field field,
 				@NonNull DataContent dataContentAnnotation) {
 
-			String stringValue =
-				element.getTextTrim ();
+			String stringValue;
+
+			if (
+				stringIsNotEmpty (
+					dataContentAnnotation.name ())
+			) {
+
+				Element contentElement =
+					element.element (
+						dataContentAnnotation.name ());
+
+				if (
+					isNotNull (
+						contentElement)
+				) {
+
+					stringValue =
+						contentElement.getTextTrim ();
+
+				} else if (
+					dataContentAnnotation.required ()
+				) {
+
+					parentTaskLogger.errorFormat (
+						"%s: ",
+						joinWithFullStop (
+							context),
+						"Missing required content element <%s> ",
+						dataContentAnnotation.name (),
+						"at %s.%s",
+						object.getClass ().getSimpleName (),
+						field.getName ());
+
+					return;
+
+				} else {
+
+					stringValue = null;
+
+				}
+
+			} else {
+
+				stringValue =
+					element.getTextTrim ();
+
+			}
 
 			if (field.getType () == String.class) {
 
@@ -1217,7 +1265,8 @@ class DataFromXmlImplementation
 				DataChildrenIndex dataChildrenIndexAnnotation) {
 
 			Matcher matcher =
-				childrenIndexPattern.matcher (field.getName ());
+				childrenIndexPattern.matcher (
+					field.getName ());
 
 			if (! matcher.matches ())
 				throw new RuntimeException ();
@@ -1229,16 +1278,19 @@ class DataFromXmlImplementation
 				uncapitalise (
 					matcher.group (2));
 
-			Map<Object,Object> childrenIndex =
-				new LinkedHashMap<Object,Object> ();
+			Map <Object, Object> childrenIndex =
+				new LinkedHashMap<> ();
 
-			List<?> children =
-				(List<?>)
-				PropertyUtils.get (
-					object,
-					childrenFieldName);
+			List <?> children =
+				genericCastUnchecked (
+					PropertyUtils.get (
+						object,
+						childrenFieldName));
 
-			for (Object child : children) {
+			for (
+				Object child
+					: children
+			) {
 
 				Object index =
 					PropertyUtils.get (

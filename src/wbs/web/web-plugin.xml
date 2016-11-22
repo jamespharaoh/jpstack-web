@@ -13,7 +13,7 @@ i	<layer name="web">
 		<component class="responder.JsonResponder"/>
 
 		<component class="servlet.PathHandlerServlet"/>
-i		<component class="servlet.ResponseFilter"/>
+		<component class="servlet.ResponseFilter"/>
 
 	</layer>
 

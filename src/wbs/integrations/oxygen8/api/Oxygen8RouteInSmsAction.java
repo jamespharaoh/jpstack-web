@@ -1,18 +1,18 @@
 package wbs.integrations.oxygen8.api;
 
-import static wbs.utils.etc.Misc.fromHex;
+import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.etc.BinaryUtils.bytesFromHex;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.bytesToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.secondsToInstant;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Provider;
-
-import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
@@ -36,20 +36,20 @@ import wbs.integrations.oxygen8.model.Oxygen8NetworkRec;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInRec;
 
-import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.web.TextResponder;
 
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
+import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
 import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
 
-@PrototypeComponent ("oxygen8InboundSmsAction")
+@PrototypeComponent ("oxygen8RouteInSmsAction")
 public
-class Oxygen8InboundSmsAction
+class Oxygen8RouteInSmsAction
 	extends ApiAction {
 
 	// singleton dependencies
@@ -80,6 +80,9 @@ class Oxygen8InboundSmsAction
 
 	@SingletonDependency
 	RouteObjectHelper routeHelper;
+
+	@SingletonDependency
+	NumberObjectHelper smsNumberHelper;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -154,7 +157,7 @@ class Oxygen8InboundSmsAction
 		// output headers
 
 		for (
-			Map.Entry<String,List<String>> headerEntry
+			Map.Entry <String, List <String>> headerEntry
 				: requestContext.headerMap ().entrySet ()
 		) {
 
@@ -180,7 +183,7 @@ class Oxygen8InboundSmsAction
 		// output params
 
 		for (
-			Map.Entry<String,List<String>> parameterEntry
+			Map.Entry <String, List <String>> parameterEntry
 				: requestContext.parameterMap ().entrySet ()
 		) {
 
@@ -289,7 +292,8 @@ class Oxygen8InboundSmsAction
 
 		dataType =
 			Integer.parseInt (
-				requestContext.parameterOrNull ("DataType"));
+				requestContext.parameterOrNull (
+					"DataType"));
 
 		switch (dataType) {
 
@@ -303,7 +307,8 @@ class Oxygen8InboundSmsAction
 
 			textContent =
 				bytesToString (
-					fromHex (rawContent),
+					bytesFromHex (
+						rawContent),
 					"utf-16be");
 
 			break;
@@ -362,21 +367,22 @@ class Oxygen8InboundSmsAction
 		}
 
 		smsInboxLogic.inboxInsert (
-			Optional.of (
+			optionalOf (
 				reference),
 			textHelper.findOrCreate (
 				textContent),
-			msisdn,
+			smsNumberHelper.findOrCreate (
+				msisdn),
 			shortcode,
 			route,
-			Optional.of (
+			optionalOf (
 				oxygen8Network.getNetwork ()),
-			Optional.of (
+			optionalOf (
 				secondsToInstant (
 					dateReceived)),
-			Collections.<MediaRec>emptyList (),
-			Optional.<String>absent (),
-			Optional.<String>absent ());
+			emptyList (),
+			optionalAbsent (),
+			optionalAbsent ());
 
 		transaction.commit ();
 

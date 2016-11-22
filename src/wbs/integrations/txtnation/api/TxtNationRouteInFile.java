@@ -1,18 +1,16 @@
 package wbs.integrations.txtnation.api;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.PrintWriter;
-import java.util.Collections;
-
-import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-
-import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -25,11 +23,10 @@ import wbs.framework.logging.TaskLogger;
 import wbs.integrations.txtnation.model.TxtNationRouteInObjectHelper;
 import wbs.integrations.txtnation.model.TxtNationRouteInRec;
 
-import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
-import wbs.sms.network.model.NetworkRec;
+import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
 
@@ -59,6 +56,9 @@ class TxtNationRouteInFile
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
+
+	@SingletonDependency
+	NumberObjectHelper smsNumberHelper;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -205,16 +205,19 @@ class TxtNationRouteInFile
 		// store message
 
 		smsInboxLogic.inboxInsert (
-			Optional.of (idParam),
-			textHelper.findOrCreate (messageParam),
-			numberFrom,
+			optionalOf (
+				idParam),
+			textHelper.findOrCreate (
+				messageParam),
+			smsNumberHelper.findOrCreate (
+				numberFrom),
 			numberTo,
 			txtNationRouteIn.getRoute (),
-			Optional.<NetworkRec>absent (),
-			Optional.<Instant>absent (),
-			Collections.<MediaRec>emptyList (),
-			Optional.<String>absent (),
-			Optional.<String>absent ());
+			optionalAbsent (),
+			optionalAbsent (),
+			emptyList (),
+			optionalAbsent (),
+			optionalAbsent ());
 
 		// commit
 

@@ -39,8 +39,6 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.logging.LogContext;
@@ -52,7 +50,6 @@ import wbs.framework.object.ObjectManager;
 import wbs.framework.object.ObjectModel;
 import wbs.framework.object.ObjectModelImplementation;
 import wbs.framework.object.ObjectModelMethods;
-import wbs.framework.object.ObjectTypeEntry;
 import wbs.framework.object.ObjectTypeRegistry;
 
 import wbs.utils.etc.OptionalUtils;
@@ -390,9 +387,6 @@ class ObjectHelperGenerator {
 			ComponentManager.class);
 
 		classWriter.addSingletonDependency (
-			Database.class);
-
-		classWriter.addSingletonDependency (
 			EntityHelper.class);
 
 		classWriter.addClassSingletonDependency (
@@ -535,33 +529,6 @@ class ObjectHelperGenerator {
 
 		formatWriter.writeNewline ();
 
-		// open transaction
-
-		formatWriter.writeLineFormat (
-			"try (");
-
-		formatWriter.writeLineFormat (
-			"\t%s transaction =",
-			imports.register (
-				Transaction.class));
-
-		formatWriter.writeLineFormat (
-			"\t\tdatabase.beginReadOnly (");
-
-		formatWriter.writeLineFormat (
-			"\t\t\t\"%sObjectHelper.setup\",",
-			model.objectName ());
-
-		formatWriter.writeLineFormat (
-			"\t\t\tthis);");
-
-		formatWriter.writeLineFormat (
-			") {");
-
-		formatWriter.writeNewline ();
-
-		formatWriter.increaseIndent ();
-
 		// model
 
 		formatWriter.writeLineFormat (
@@ -573,22 +540,6 @@ class ObjectHelperGenerator {
 		formatWriter.writeLineFormat (
 			"\t\t\"%s\");",
 			model.objectName ());
-
-		formatWriter.writeNewline ();
-
-		// object type
-
-		formatWriter.writeLineFormat (
-			"%s objectType =",
-			imports.register (
-				ObjectTypeEntry.class));
-
-		formatWriter.writeLineFormat (
-			"\tobjectTypeRegistry.findByCode (");
-
-		formatWriter.writeLineFormat (
-			"\t\t\"%s\");",
-			model.objectTypeCode ());
 
 		formatWriter.writeNewline ();
 
@@ -608,20 +559,6 @@ class ObjectHelperGenerator {
 			formatWriter.writeLineFormat (
 				"\t\t\"%s\");",
 				parentModel.objectName ());
-
-			formatWriter.writeNewline ();
-
-			// parent type
-
-			formatWriter.writeLineFormat (
-				"ObjectTypeEntry parentType =");
-
-			formatWriter.writeLineFormat (
-				"\tobjectTypeRegistry.findByCode (");
-
-			formatWriter.writeLineFormat (
-				"\t\t\"%s\");",
-				parentModel.objectTypeCode ());
 
 			formatWriter.writeNewline ();
 
@@ -678,7 +615,10 @@ class ObjectHelperGenerator {
 			"\t.objectTypeId (");
 
 		formatWriter.writeLineFormat (
-			"\t\tobjectType.getId ())");
+			"\t\tobjectTypeRegistry.typeIdForCodeRequired (");
+
+		formatWriter.writeLineFormat (
+			"\t\t\tmodel.objectTypeCode ()))");
 
 		formatWriter.writeNewline ();
 
@@ -686,7 +626,7 @@ class ObjectHelperGenerator {
 			"\t.objectTypeCode (");
 
 		formatWriter.writeLineFormat (
-			"\t\tobjectType.getCode ())");
+			"\t\tmodel.objectTypeCode ())");
 
 		formatWriter.writeNewline ();
 
@@ -699,7 +639,10 @@ class ObjectHelperGenerator {
 				"\t.parentTypeId (");
 
 			formatWriter.writeLineFormat (
-				"\t\tparentType.getId ())");
+				"\t\tobjectTypeRegistry.typeIdForCodeRequired (");
+
+			formatWriter.writeLineFormat (
+				"\t\t\tparentModel.objectTypeCode ()))");
 
 			formatWriter.writeNewline ();
 
@@ -812,15 +755,6 @@ class ObjectHelperGenerator {
 			formatWriter.writeNewline ();
 
 		}
-
-		// close transaction
-
-		formatWriter.decreaseIndent ();
-
-		formatWriter.writeLineFormat (
-			"}");
-
-		formatWriter.writeNewline ();
 
 		// close method
 

@@ -2,6 +2,9 @@ package wbs.integrations.dialogue.api;
 
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -48,7 +51,7 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
-import wbs.sms.network.model.NetworkRec;
+import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -91,6 +94,9 @@ class DialogueMmsApiServletModule
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
+
+	@SingletonDependency
+	NumberObjectHelper smsNumberHelper;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -254,19 +260,20 @@ class DialogueMmsApiServletModule
 			// insert into inbox
 
 			smsInboxLogic.inboxInsert (
-				Optional.of (
+				optionalOf (
 					mmsMessageId),
 				textHelper.findOrCreate (
 					text),
-				mmsSenderAddress,
+				smsNumberHelper.findOrCreate (
+					mmsSenderAddress),
 				mmsRecipientAddress,
 				route,
-				Optional.<NetworkRec>absent (),
-				Optional.of (
+				optionalAbsent (),
+				optionalOf (
 					mmsDate),
 				medias,
-				Optional.<String>absent (),
-				Optional.fromNullable (
+				optionalAbsent (),
+				optionalFromNullable (
 					mmsSubject));
 
 			transaction.commit ();

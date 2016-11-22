@@ -1,7 +1,7 @@
 package wbs.platform.rpc.xml;
 
+import static wbs.utils.etc.BinaryUtils.bytesFromHex;
 import static wbs.utils.etc.EnumUtils.enumName;
-import static wbs.utils.etc.Misc.fromHex;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -796,7 +796,7 @@ class XmlRpcAction
 
 		}
 
-		return fromHex (
+		return bytesFromHex (
 			text);
 
 	}

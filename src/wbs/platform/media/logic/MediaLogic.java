@@ -19,7 +19,7 @@ interface MediaLogic {
 			byte[] data,
 			String mimeType,
 			String filename,
-			Optional<String> encoding);
+			Optional <String> encoding);
 
 	MediaRec createMediaRequired (
 			byte[] data,

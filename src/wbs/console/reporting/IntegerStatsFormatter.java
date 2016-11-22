@@ -19,6 +19,7 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
 
+import wbs.console.html.HtmlTableCellWriter;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -26,7 +27,6 @@ import wbs.utils.string.FormatWriter;
 import wbs.utils.string.StringSubstituter;
 import wbs.utils.time.TimeFormatter;
 import wbs.web.misc.UrlParams;
-import wbs.web.utils.HtmlTableCellWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("intStatsFormatter")

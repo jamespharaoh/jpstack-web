@@ -10,4 +10,10 @@ import java.lang.annotation.Target;
 public
 @interface DataContent {
 
+	String name ()
+	default "";
+
+	boolean required ()
+	default false;
+
 }

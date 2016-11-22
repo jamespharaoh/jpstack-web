@@ -56,7 +56,17 @@ class HttpStatus {
 		httpRequestUriTooLong = 414,
 		httpUnsupportedMediaType = 415,
 		httpRequestedRangeNotSatisfiable = 416,
-		httpExpectationFailed = 417;
+		httpExpectationFailed = 417,
+		httpImATeapot = 418,
+		httpMisdirectedRequest = 421,
+		httpUnprocessableEntity = 422,
+		httpLocked = 423,
+		httpFailedDependency = 424,
+		httpUpgradeRequired = 426,
+		httpPreconditionRequired = 428,
+		httpTooManyRequests = 429,
+		httpRequestHeaderFieldsTooLarge = 431,
+		httpUnavailableForLegalReasons = 451;
 
 	public final static
 	long

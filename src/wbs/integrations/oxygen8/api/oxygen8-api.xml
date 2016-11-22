@@ -1,0 +1,21 @@
+<api-module name="oxygen8">
+
+	<resource name="oxygen8">
+
+		<resource name="route">
+		<variable name="smsRouteId">
+
+			<resource name="in">
+				<post-action name="routeIn"/>
+			</resource>
+
+			<resource name="report">
+				<post-action name="routeReport"/>
+			</resource>
+
+		</variable>
+		</resource>
+
+	</resource>
+
+</api-module>

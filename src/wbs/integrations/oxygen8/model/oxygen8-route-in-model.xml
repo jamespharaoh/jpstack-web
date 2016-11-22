@@ -19,6 +19,10 @@
 		<reference-field
 			type="oxygen8Config"/>
 
+		<enum-field
+			name="type"
+			type="oxygen8RouteInType"/>
+
 	</fields>
 
 </model-meta>

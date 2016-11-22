@@ -106,7 +106,12 @@ class DevopsScript
 				[
 					"cd #{@deployment_project_path}",
 					"ant api-deploy",
-					"sudo restart #{@config_services["api"]}",
+					[
+						"if status #{@config_services["api"]} | grep -q stop/",
+						"then sudo start #{@config_services["api"]}",
+						"else sudo restart #{@config_services["api"]}",
+						"fi",
+					].join("; "),
 				].join(" && ")
 
 		when "daemon-auto"
@@ -154,10 +159,13 @@ class DevopsScript
 			;;
 
 		when "top"
+
 			title "#{@config_name} top"
+
 			ssh "-t", "top"
 
 		when "help", nil
+
 			puts ""
 			puts "Syntax:"
 			puts ""

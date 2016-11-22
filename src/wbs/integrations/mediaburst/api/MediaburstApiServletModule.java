@@ -1,10 +1,12 @@
 package wbs.integrations.mediaburst.api;
 
-import static wbs.utils.etc.Misc.fromHex;
+import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.etc.BinaryUtils.bytesFromHex;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.lowercase;
@@ -14,22 +16,18 @@ import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 
 import javax.servlet.ServletException;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
-
-import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -39,7 +37,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 
@@ -53,6 +50,7 @@ import wbs.sms.message.inbox.logic.SmsInboxMultipartLogic;
 import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
+import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
 
@@ -94,6 +92,9 @@ class MediaburstApiServletModule
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
+
+	@SingletonDependency
+	NumberObjectHelper smsNumberHelper;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -293,7 +294,7 @@ class MediaburstApiServletModule
 				userDataHeader =
 					UserDataHeader.decode (
 						ByteBuffer.wrap (
-							fromHex (
+							bytesFromHex (
 								udhParam)));
 
 			} else {
@@ -342,16 +343,19 @@ class MediaburstApiServletModule
 			} else {
 
 				smsInboxLogic.inboxInsert (
-					Optional.of (msgIdParam),
+					optionalOf (
+						msgIdParam),
 					messageText,
-					numFromParam,
+					smsNumberHelper.findOrCreate (
+						numFromParam),
 					numToParam,
 					route,
-					Optional.fromNullable (network),
-					Optional.<Instant>absent (),
-					Collections.<MediaRec>emptyList (),
-					Optional.<String>absent (),
-					Optional.<String>absent ());
+					optionalFromNullable (
+						network),
+					optionalAbsent (),
+					emptyList (),
+					optionalAbsent (),
+					optionalAbsent ());
 
 			}
 

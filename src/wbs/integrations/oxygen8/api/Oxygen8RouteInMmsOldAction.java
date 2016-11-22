@@ -2,7 +2,9 @@ package wbs.integrations.oxygen8.api;
 
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
@@ -23,6 +25,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.joda.time.Instant;
 
 import wbs.api.mvc.ApiAction;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -32,27 +35,32 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.integrations.oxygen8.model.Oxygen8NetworkObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInObjectHelper;
 import wbs.integrations.oxygen8.model.Oxygen8RouteInRec;
+
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.text.web.TextResponder;
+
 import wbs.sms.message.core.model.MessageTypeObjectHelper;
 import wbs.sms.message.core.model.MessageTypeRec;
 import wbs.sms.message.inbox.logic.SmsInboxLogic;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
+import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+
 import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
 
-@PrototypeComponent ("oxygen8InboundMmsAction")
+@PrototypeComponent ("oxygen8RouteInMmsOldAction")
 public
-class Oxygen8InboundMmsAction
+class Oxygen8RouteInMmsOldAction
 	extends ApiAction {
 
 	// singleton dependencies
@@ -86,6 +94,9 @@ class Oxygen8InboundMmsAction
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
+
+	@SingletonDependency
+	NumberObjectHelper smsNumberHelper;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -448,15 +459,19 @@ class Oxygen8InboundMmsAction
 				messageString);
 
 		smsInboxLogic.inboxInsert (
-			Optional.of (mmsMessageId),
+			optionalOf (
+				mmsMessageId),
 			messageText,
-			mmsSenderAddress,
+			smsNumberHelper.findOrCreate (
+				mmsSenderAddress),
 			mmsRecipientAddress,
 			route,
-			Optional.of (network),
-			Optional.of (mmsDate),
+			optionalOf (
+				network),
+			optionalOf (
+				mmsDate),
 			medias,
-			Optional.<String>absent (),
+			optionalAbsent (),
 			mmsSubject);
 
 	}
