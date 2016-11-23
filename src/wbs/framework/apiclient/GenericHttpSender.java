@@ -5,9 +5,10 @@ import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 import static wbs.utils.string.StringUtils.utf8ToString;
 
@@ -37,6 +38,7 @@ import org.json.simple.JSONObject;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+
 import wbs.utils.io.RuntimeIoException;
 
 @Accessors (fluent = true)
@@ -383,9 +385,10 @@ class GenericHttpSender <
 
 			errorMessage =
 				optionalOf (
-					stringFormatObsolete (
+					stringFormat (
 						"Server returned %s: %s",
-						httpResponse.getStatusLine ().getStatusCode (),
+						integerToDecimalString (
+							httpResponse.getStatusLine ().getStatusCode ()),
 						httpResponse.getStatusLine ().getReasonPhrase ()));
 
 		} else {

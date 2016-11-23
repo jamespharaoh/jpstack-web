@@ -1,8 +1,9 @@
 package wbs.utils.time;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -198,9 +199,10 @@ class IntervalFormatterImplementation
 			if (input / scale == 1)
 				return "1 " + singularLabel;
 
-			return stringFormatObsolete (
+			return stringFormat (
 				"%s %s",
-				input / scale,
+				integerToDecimalString (
+					input / scale),
 				pluralLabel);
 
 		}

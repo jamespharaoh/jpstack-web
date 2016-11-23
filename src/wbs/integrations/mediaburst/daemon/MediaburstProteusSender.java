@@ -1,6 +1,7 @@
 package wbs.integrations.mediaburst.daemon;
 
 import static wbs.utils.etc.NumberUtils.integerInSafe;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatObsolete;
@@ -141,9 +142,11 @@ class MediaburstProteusSender
 				mediaburstNetworkHelper.findOrThrow (
 					network.getId (),
 					() -> permFailure (
-						stringFormatObsolete (
-							"Cannot find Mediaburst network information for message %s",
-							proteusOutbox.messageId)));
+						stringFormat (
+							"Cannot find Mediaburst network information for ",
+							"message %s",
+							integerToDecimalString (
+								proteusOutbox.messageId))));
 
 		}
 
@@ -177,9 +180,10 @@ class MediaburstProteusSender
 				wapPushMessageHelper.findOrThrow (
 					outbox.getId (),
 					() -> tempFailure (
-						stringFormatObsolete (
+						stringFormat (
 							"Wap push message not found for message %s",
-							outbox.getId ())));
+							integerToDecimalString (
+								outbox.getId ()))));
 
 			proteusOutbox.wapPushMessage.getUrlText ().getText ();
 

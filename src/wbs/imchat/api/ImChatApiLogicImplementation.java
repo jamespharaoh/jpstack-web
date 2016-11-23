@@ -4,10 +4,11 @@ import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.camelToHyphen;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 import static wbs.utils.string.StringUtils.underscoreToHyphen;
 import static wbs.utils.time.TimeUtils.calculateAgeInYears;
@@ -16,14 +17,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
+
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
+
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+
+import wbs.platform.currency.logic.CurrencyLogic;
+import wbs.platform.event.logic.EventLogic;
+import wbs.platform.media.model.ContentRec;
+import wbs.platform.media.model.MediaRec;
+
+import wbs.sms.core.logic.DateFinder;
+
+import wbs.utils.time.TimeFormatter;
+
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerDetailTypeRec;
 import wbs.imchat.model.ImChatCustomerDetailValueObjectHelper;
@@ -34,17 +51,6 @@ import wbs.imchat.model.ImChatPricePointRec;
 import wbs.imchat.model.ImChatProfileRec;
 import wbs.imchat.model.ImChatPurchaseRec;
 import wbs.imchat.model.ImChatRec;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.component.config.WbsConfig;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.platform.event.logic.EventLogic;
-import wbs.platform.media.model.ContentRec;
-import wbs.platform.media.model.MediaRec;
-import wbs.sms.core.logic.DateFinder;
-import wbs.utils.time.TimeFormatter;
 
 @SingletonComponent ("imChatApiLogic")
 public
@@ -145,13 +151,15 @@ class ImChatApiLogicImplementation
 				profile.getPublicDescriptionShort ())
 
 			.thumbnailImageLink (
-				stringFormatObsolete (
+				stringFormat (
 					"%s",
 					wbsConfig.apiUrl (),
 					"/im-chat-media/%u",
-					image.getId (),
+					integerToDecimalString (
+						image.getId ()),
 					"/%u",
-					hash,
+					integerToDecimalString (
+						hash),
 					"/thumbnail.jpg"))
 
 			.thumbnailImageWidth (
@@ -161,13 +169,15 @@ class ImChatApiLogicImplementation
 				resizedHeight)
 
 			.miniatureImageLink (
-				stringFormatObsolete (
+				stringFormat (
 					"%s",
 					wbsConfig.apiUrl (),
 					"/im-chat-media/%u",
-					image.getId (),
+					integerToDecimalString (
+						image.getId ()),
 					"/%u",
-					hash,
+					integerToDecimalString (
+						hash),
 					"/miniature.jpg"))
 
 			.miniatureImageWidth (

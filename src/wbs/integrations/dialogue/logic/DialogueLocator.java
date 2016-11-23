@@ -1,5 +1,6 @@
 package wbs.integrations.dialogue.logic;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.ByteArrayOutputStream;
@@ -27,7 +28,9 @@ import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.object.ObjectManager;
+
 import wbs.integrations.dialogue.model.DialogueLocatorRec;
+
 import wbs.sms.locator.logic.Locator;
 import wbs.sms.locator.logic.LocatorException;
 import wbs.sms.locator.model.LocatorObjectHelper;
@@ -108,9 +111,9 @@ class DialogueLocator
 				locatorId);
 
 		DialogueLocatorRec dialogueLocator =
-			(DialogueLocatorRec)
-			objectManager.getParentOrNull (
-				locator);
+			genericCastUnchecked (
+				objectManager.getParentRequired (
+					locator));
 
 		locatorInfo.url =
 			dialogueLocator.getUrl ();

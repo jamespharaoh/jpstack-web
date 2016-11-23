@@ -1,7 +1,9 @@
 package wbs.platform.event.logic;
 
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.NonNull;
 
@@ -15,6 +17,7 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.event.model.EventLinkObjectHelper;
 import wbs.platform.event.model.EventLinkRec;
 import wbs.platform.event.model.EventObjectHelper;
@@ -235,10 +238,12 @@ class EventLogicImplementation
 		// error otherwise
 
 		throw new RuntimeException (
-			stringFormatObsolete (
+			stringFormat (
 				"Unlinkable type %s passed as link parameter %s",
-				linkObject.getClass (),
-				index));
+				classNameSimple (
+					linkObject.getClass ()),
+				integerToDecimalString (
+					index)));
 
 	}
 
@@ -251,9 +256,10 @@ class EventLogicImplementation
 		if (linkObject == null) {
 
 			throw new RuntimeException (
-				stringFormatObsolete (
+				stringFormat (
 					"Null passed as link parameter %s",
-					index));
+					integerToDecimalString (
+						index)));
 
 		}
 

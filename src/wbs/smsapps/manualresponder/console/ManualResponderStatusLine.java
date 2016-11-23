@@ -1,7 +1,8 @@
 package wbs.smsapps.manualresponder.console;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.thread.ConcurrentUtils.futureValue;
 
 import java.util.HashMap;
@@ -20,18 +21,22 @@ import org.joda.time.Interval;
 
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+
 import wbs.platform.misc.CachedGetter;
 import wbs.platform.status.console.StatusLine;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
+
 import wbs.smsapps.manualresponder.model.ManualResponderOperatorReport;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestSearch;
+
 import wbs.utils.time.TextualInterval;
 
 @SingletonComponent ("manualResponderStatusLine")
@@ -112,10 +117,12 @@ class ManualResponderStatusLine
 		// return update script
 
 		return futureValue (
-			stringFormatObsolete (
+			stringFormat (
 				"updateManualResponder (%s, %s);\n",
-				caches.numTodayCache.get (),
-				caches.numThisHourCache.get ()));
+				integerToDecimalString (
+					caches.numTodayCache.get ()),
+				integerToDecimalString (
+					caches.numThisHourCache.get ())));
 
 	}
 

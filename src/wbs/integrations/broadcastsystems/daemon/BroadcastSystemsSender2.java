@@ -4,7 +4,6 @@ import static wbs.utils.etc.Misc.stringToUrl;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 
@@ -265,9 +264,10 @@ class BroadcastSystemsSender2
 					.build ();
 
 			log.debug (
-				stringFormatObsolete (
+				stringFormat (
 					"Message %s response: %s",
-					messageId,
+					integerToDecimalString (
+						messageId),
 					responseString));
 
 			if (httpUrlConnection.getResponseCode () == 200) {
@@ -324,10 +324,11 @@ class BroadcastSystemsSender2
 							PerformSendStatus.remoteError)
 
 						.message (
-							stringFormatObsolete (
+							stringFormat (
 								"Error from remote system: %s",
-								httpUrlConnection.getResponseCode (),
-								response.get ("error")))
+								integerToDecimalString (
+									httpUrlConnection.getResponseCode ()),
+								response.get ("error").toString ()))
 
 						.responseTrace (
 							new JSONObject (
@@ -357,9 +358,10 @@ class BroadcastSystemsSender2
 						PerformSendStatus.unknownError)
 
 					.message (
-						stringFormatObsolete (
+						stringFormat (
 							"HTTP error %s from remote system: %s",
-							httpUrlConnection.getResponseCode (),
+							integerToDecimalString (
+								httpUrlConnection.getResponseCode ()),
 							responseString))
 
 					.responseTrace (

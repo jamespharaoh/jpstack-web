@@ -1,7 +1,7 @@
 package wbs.integrations.broadcastsystems.daemon;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
@@ -134,9 +134,10 @@ class BroadcastSystemsSender1
 			State state) {
 
 		log.info (
-			stringFormatObsolete (
+			stringFormat (
 				"Sending message %s",
-				state.messageId));
+				integerToDecimalString (
+					state.messageId)));
 
 		try {
 
@@ -225,9 +226,10 @@ class BroadcastSystemsSender1
 				state.urlConn.getInputStream ());
 
 		log.debug (
-			stringFormatObsolete (
+			stringFormat (
 				"Message %s response: %s",
-				state.messageId,
+				integerToDecimalString (
+					state.messageId),
 				responseString));
 
 		if (state.urlConn.getResponseCode () == 200) {
@@ -245,9 +247,10 @@ class BroadcastSystemsSender1
 
 				exceptionLogger.logSimple (
 					"unknown",
-					stringFormatObsolete (
+					stringFormat (
 						"message %s",
-						state.messageId),
+						integerToDecimalString (
+							state.messageId)),
 					"Success response did not match",
 					responseString,
 					Optional.absent (),
@@ -276,9 +279,10 @@ class BroadcastSystemsSender1
 
 				exceptionLogger.logSimple (
 					"unknown",
-					stringFormatObsolete (
+					stringFormat (
 						"message %s",
-						state.messageId),
+						integerToDecimalString (
+							state.messageId)),
 					"Failure response did not match",
 					responseString,
 					Optional.absent (),

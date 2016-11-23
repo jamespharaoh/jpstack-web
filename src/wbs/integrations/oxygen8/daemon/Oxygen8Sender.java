@@ -1,12 +1,12 @@
 package wbs.integrations.oxygen8.daemon;
 
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -137,9 +137,10 @@ class Oxygen8Sender
 					SetupSendStatus.configError)
 
 				.message (
-					stringFormatObsolete (
+					stringFormat (
 						"Oxygen8 network not found for %s",
-						message.getNumber ().getNetwork ().getId ()));
+						integerToDecimalString (
+							message.getNumber ().getNetwork ().getId ())));
 
 		}
 
@@ -181,9 +182,10 @@ class Oxygen8Sender
 					SetupSendStatus.validationError)
 
 				.message (
-					stringFormatObsolete (
+					stringFormat (
 						"Length is %s but multipart not enabled",
-						gsmLength));
+						integerToDecimalString (
+							gsmLength)));
 
 		}
 
@@ -279,7 +281,7 @@ class Oxygen8Sender
 	@Accessors (fluent = true)
 	@Data
 	class PerformSendCallable
-		implements Callable<PerformSendResult> {
+		implements Callable <PerformSendResult> {
 
 		OutboxRec outbox;
 		MessageRec message;
@@ -297,13 +299,14 @@ class Oxygen8Sender
 			throws IOException {
 
 			log.info (
-				stringFormatObsolete (
+				stringFormat (
 					"Sending message %s",
-					message.getId ()));
+					integerToDecimalString (
+						message.getId ())));
 
 			openConnection ();
 
-			Optional<PerformSendResult> sendRequestResult =
+			Optional <PerformSendResult> sendRequestResult =
 				sendRequest ();
 
 			if (sendRequestResult.isPresent ()) {
@@ -475,10 +478,12 @@ class Oxygen8Sender
 					urlConnection.getInputStream ());
 
 			log.debug (
-				stringFormatObsolete (
+				stringFormat (
 					"Message %s code %s response: [%s]",
-					message.getId (),
-					urlConnection.getResponseCode (),
+					integerToDecimalString (
+						message.getId ()),
+					integerToDecimalString (
+						urlConnection.getResponseCode ()),
 					responseString));
 
 			Map<String,Object> responseTrace =
@@ -568,9 +573,10 @@ class Oxygen8Sender
 					PerformSendStatus.unknownError)
 
 				.message (
-					stringFormatObsolete (
+					stringFormat (
 						"Server returned %s",
-						urlConnection.getResponseCode ()))
+						integerToDecimalString (
+							urlConnection.getResponseCode ())))
 
 				.responseTrace (
 					new JSONObject (

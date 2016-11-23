@@ -1,17 +1,19 @@
 package wbs.apn.chat.infosite.api;
 
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.io.IOException;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
 
 import wbs.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
 import wbs.apn.chat.infosite.model.ChatInfoSiteRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.PrintResponder;
 
@@ -140,16 +142,18 @@ class ChatInfoSiteViewResponder
 				"<p>",
 
 				"<a href=\"%h\">",
-				stringFormatObsolete (
+				stringFormat (
 					"%u/%u/full",
 					infoSite.getToken (),
-					index),
+					integerToDecimalString (
+						index)),
 
 				"<img src=\"%h\">",
-				stringFormatObsolete (
+				stringFormat (
 					"%u/%u/normal",
 					infoSite.getToken (),
-					index),
+					integerToDecimalString (
+						index)),
 
 				"</a>",
 

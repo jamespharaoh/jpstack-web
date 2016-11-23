@@ -10,7 +10,6 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.string.StringUtils.uncapitalise;
 
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ import lombok.NonNull;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;

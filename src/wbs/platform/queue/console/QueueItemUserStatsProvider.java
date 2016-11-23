@@ -19,10 +19,12 @@ import wbs.console.reporting.StatsDatum;
 import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
+
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
@@ -101,8 +103,9 @@ class QueueItemUserStatsProvider
 					? queueSubject.getQueue ()
 					: queueItem.getQueue ();
 
-			Record<?> parent =
-				objectManager.getParentOrNull (queue);
+			Record <?> parent =
+				objectManager.getParentRequired (
+					queue);
 
 			if (
 				! privChecker.canRecursive (
