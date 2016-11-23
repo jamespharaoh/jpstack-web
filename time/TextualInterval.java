@@ -6,7 +6,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.lowercase;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.string.StringUtils.stringInSafe;
 import static wbs.utils.string.StringUtils.stringSplitSimple;
 import static wbs.utils.time.TimeUtils.millisToInstant;
@@ -15,7 +14,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+
+import lombok.NonNull;
+import lombok.Value;
+import lombok.experimental.Accessors;
+
 import org.apache.commons.lang3.tuple.Pair;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
@@ -26,13 +33,6 @@ import org.joda.time.ReadableInstant;
 import org.joda.time.YearMonth;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
-
-import lombok.NonNull;
-import lombok.Value;
-import lombok.experimental.Accessors;
 
 @Accessors (fluent = true)
 @Value
