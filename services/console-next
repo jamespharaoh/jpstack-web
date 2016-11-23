@@ -4,7 +4,7 @@ timeout_start="60"
 timeout_stop="15"
 timeout_kill="5"
 
-tomcat_home="/home/ubuntu/tomcat-console-next"
+tomcat_home="/home/ubuntu/tomcat/platform-console-next"
 tomcat_port="9011"
 
 upstart_service="platform-console-next"

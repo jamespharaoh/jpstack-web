@@ -6,7 +6,7 @@ timeout_start="5"
 timeout_stop="5"
 timeout_kill="5"
 
-upstart_service="platform-daemon"
+upstart_service="platform-daemon-live"
 
 function service_hook_is_running_1 {
 

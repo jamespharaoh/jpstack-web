@@ -4,10 +4,10 @@ timeout_start="60"
 timeout_stop="15"
 timeout_kill="5"
 
-tomcat_home="/home/ubuntu/tomcat-api"
+tomcat_home="/home/ubuntu/tomcat/platform-api-live"
 tomcat_port="9101"
 
-upstart_service="platform-api"
+upstart_service="platform-api-live"
 
 function service_hook_is_running_1 {
 
