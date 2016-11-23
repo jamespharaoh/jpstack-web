@@ -32,6 +32,16 @@ interface ObjectManagerMethods {
 			Record <?> object);
 
 	default
+	Optional <Record <?>> getParent (
+			@NonNull Record <?> object) {
+
+		return successOrThrowRuntimeException (
+			getParentOrError (
+				object));
+
+	}
+
+	default
 	Record <?> getParentRequired (
 			@NonNull Record <?> object) {
 
