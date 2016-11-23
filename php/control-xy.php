@@ -1,6 +1,6 @@
 <?php
 
-define ("HOME", "/home/ubuntu/wbs-hades-next");
+define ("HOME", "/home/ubuntu/wbs-hades/platform-console-dev");
 
 function find_services () {
 
