@@ -1,6 +1,7 @@
 package wbs.platform.php;
 
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.regex.Pattern;
 
@@ -53,9 +54,10 @@ class PhpMisc {
 		}
 
 		throw new RuntimeException (
-			stringFormatObsolete (
+			stringFormat (
 				"Don't know what to do with %s",
-				object.getClass ()));
+				classNameSimple (
+					object.getClass ())));
 
 	}
 

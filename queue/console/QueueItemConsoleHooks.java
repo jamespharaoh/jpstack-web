@@ -6,10 +6,12 @@ import lombok.NonNull;
 
 import wbs.console.helper.core.ConsoleHooks;
 import wbs.console.priv.UserPrivChecker;
+
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemSearch;
 import wbs.platform.queue.model.QueueRec;
@@ -48,7 +50,7 @@ class QueueItemConsoleHooks
 
 		// queues
 
-		ImmutableList.Builder<Long> queuesBuilder =
+		ImmutableList.Builder <Long> queuesBuilder =
 			ImmutableList.builder ();
 
 		for (
@@ -56,8 +58,8 @@ class QueueItemConsoleHooks
 				: queueHelper.findAll ()
 		) {
 
-			Record<?> queueParent =
-				objectManager.getParentOrNull (
+			Record <?> queueParent =
+				objectManager.getParentRequired (
 					queue);
 
 			 if (
