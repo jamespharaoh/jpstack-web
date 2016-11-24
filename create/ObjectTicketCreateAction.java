@@ -188,7 +188,7 @@ class ObjectTicketCreateAction <
 
 		ticketManager =
 			(TicketManagerRec)
-			objectManager.dereference (
+			objectManager.dereferenceObsolete (
 				contextObject,
 				ticketManagerPath);
 
@@ -201,7 +201,7 @@ class ObjectTicketCreateAction <
 
 			Record<?> createDelegate =
 				createPrivDelegate != null
-					? (Record<?>) objectManager.dereference (
+					? (Record<?>) objectManager.dereferenceObsolete (
 							ticketManager,
 						createPrivDelegate)
 					: ticketManager;
@@ -252,7 +252,7 @@ class ObjectTicketCreateAction <
 
 				ticketFieldValue.setStringValue (
 					(String)
-					objectManager.dereference (
+					objectManager.dereferenceObsolete (
 						contextObject,
 						ticketFieldSpec.valuePath ()));
 
@@ -262,7 +262,7 @@ class ObjectTicketCreateAction <
 
 				ticketFieldValue.setIntegerValue (
 					(Long)
-					objectManager.dereference (
+					objectManager.dereferenceObsolete (
 						contextObject,
 						ticketFieldSpec.valuePath ()));
 
@@ -272,7 +272,7 @@ class ObjectTicketCreateAction <
 
 				ticketFieldValue.setBooleanValue (
 					(Boolean)
-					objectManager.dereference (
+					objectManager.dereferenceObsolete (
 						contextObject,
 						ticketFieldSpec.valuePath ()));
 
@@ -282,7 +282,7 @@ class ObjectTicketCreateAction <
 
 				Long objectId = (
 					(Record <?>)
-					objectManager.dereference (
+					objectManager.dereferenceObsolete (
 						contextObject,
 						ticketFieldSpec.valuePath ())
 				).getId ();
@@ -315,7 +315,7 @@ class ObjectTicketCreateAction <
 
 		if (consoleHelper.typeCodeExists ()) {
 
-			PropertyUtils.setProperty (
+			PropertyUtils.propertySetAuto (
 				ticket,
 				consoleHelper.typeCodeFieldName (),
 				typeCode);
@@ -354,7 +354,7 @@ class ObjectTicketCreateAction <
 
 		if (createTimeFieldName != null) {
 
-			PropertyUtils.setProperty (
+			PropertyUtils.propertySetAuto (
 				ticket,
 				createTimeFieldName,
 				transaction.now ());
@@ -365,7 +365,7 @@ class ObjectTicketCreateAction <
 
 		if (createUserFieldName != null) {
 
-			PropertyUtils.setProperty (
+			PropertyUtils.propertySetAuto (
 				ticket,
 				createUserFieldName,
 				userConsoleLogic.userRequired ());
