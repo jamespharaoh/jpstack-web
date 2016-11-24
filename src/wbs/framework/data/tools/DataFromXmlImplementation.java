@@ -788,6 +788,9 @@ class DataFromXmlImplementation
 						contentElement)
 				) {
 
+					matchedElementNames.add (
+						dataContentAnnotation.name ());
+
 					stringValue =
 						contentElement.getTextTrim ();
 

@@ -1,6 +1,7 @@
 package wbs.integrations.oxygen8.api;
 
 import static wbs.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 
 import javax.inject.Provider;
 
@@ -90,8 +91,9 @@ class Oxygen8RouteInAction
 
 			Oxygen8RouteInRec oxygen8RouteIn =
 				oxygen8RouteInHelper.findRequired (
-					requestContext.requestIntegerRequired (
-						"routeId"));
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"smsRouteId")));
 
 			switch (oxygen8RouteIn.getType ()) {
 

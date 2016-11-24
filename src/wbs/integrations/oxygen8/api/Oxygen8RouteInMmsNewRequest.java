@@ -31,6 +31,11 @@ class Oxygen8RouteInMmsNewRequest {
 	String destination;
 
 	@DataContent (
+		name = "O8reference",
+		required = true)
+	String oxygenateReference;
+
+	@DataContent (
 		name = "MessageID",
 		required = true)
 	String messageId;

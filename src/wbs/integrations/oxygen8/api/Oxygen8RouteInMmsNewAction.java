@@ -1,26 +1,30 @@
 package wbs.integrations.oxygen8.api;
 
 import static wbs.utils.collection.CollectionUtils.emptyList;
-import static wbs.utils.collection.IterableUtils.iterableFindFirst;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.IterableUtils.iterableFilter;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.BinaryUtils.bytesFromBase64;
 import static wbs.utils.etc.Misc.shouldNeverHappen;
+import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrDefault;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringIsEmpty;
+import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.utils.string.StringUtils.stringNotInSafe;
+import static wbs.utils.string.StringUtils.stringSplitSlash;
 import static wbs.utils.string.StringUtils.utf8ToString;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 import javax.inject.Provider;
-
-import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
@@ -36,6 +40,7 @@ import wbs.framework.data.tools.DataFromXmlBuilder;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.LoggedErrorsException;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.oxygen8.model.Oxygen8InboundLogObjectHelper;
@@ -76,29 +81,11 @@ class Oxygen8RouteInMmsNewAction
 	@SingletonDependency
 	MediaLogic mediaLogic;
 
-	/*
-	@SingletonDependency
-	MessageTypeObjectHelper messageTypeHelper;
-
-	@SingletonDependency
-	NetworkObjectHelper networkHelper;
-	*/
-
 	@SingletonDependency
 	Oxygen8InboundLogObjectHelper oxygen8InboundLogHelper;
 
-	/*
-	@SingletonDependency
-	Oxygen8NetworkObjectHelper oxygen8NetworkHelper;
-	*/
-
 	@SingletonDependency
 	Oxygen8RouteInObjectHelper oxygen8RouteInHelper;
-
-	/*
-	@SingletonDependency
-	RequestContext requestContext;
-	*/
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
@@ -121,24 +108,6 @@ class Oxygen8RouteInMmsNewAction
 
 	Oxygen8RouteInMmsNewRequest request;
 
-	/*
-	Long routeId;
-
-	String mmsMessageId;
-	String mmsMessageType;
-	String mmsSenderAddress;
-	String mmsRecipientAddress;
-	Optional<String> mmsSubject;
-	Instant mmsDate;
-	String mmsNetwork;
-
-	String messageString;
-	TextRec messageText;
-
-	List <MediaRec> medias =
-		new ArrayList<MediaRec> ();
-	*/
-
 	Boolean success = false;
 
 	// abstract implementation
@@ -154,12 +123,48 @@ class Oxygen8RouteInMmsNewAction
 				parentTaskLogger,
 				"processRequest");
 
-		request =
-			genericCastUnchecked (
-				requestFromXml.readInputStream (
-					taskLogger,
-					requestContext.inputStream (),
-					"oxygen8-route-in-mms-new.xml"));
+		// read request
+
+		byte[] requestBytes =
+			requestContext.requestBodyRaw ();
+
+		String requestString =
+			utf8ToString (
+				requestBytes);
+
+		debugWriter.writeLineFormat (
+			"===== REQUEST BODY =====");
+
+		debugWriter.writeNewline ();
+
+		debugWriter.writeString (
+			stringTrim (
+				requestString));
+
+		debugWriter.writeNewline ();
+		debugWriter.writeNewline ();
+
+		// decode request
+
+		try {
+
+			request =
+				genericCastUnchecked (
+					requestFromXml.readInputStream (
+						taskLogger,
+						new ByteArrayInputStream (
+							requestBytes),
+						"oxygen8-route-in-mms-new.xml"));
+
+		} catch (LoggedErrorsException loggedErrorsException) {
+
+			throw new HttpUnprocessableEntityException (
+				"Unable to interpret MMS request",
+				emptyList ());
+
+		}
+
+		// simple verification
 
 		if (
 			stringNotEqualSafe (
@@ -192,6 +197,8 @@ class Oxygen8RouteInMmsNewAction
 			}
 
 		}
+
+		// check for errors
 
 		taskLogger.makeException (
 			() -> new HttpUnprocessableEntityException (
@@ -229,8 +236,9 @@ class Oxygen8RouteInMmsNewAction
 
 			Oxygen8RouteInRec oxygen8RouteIn =
 				oxygen8RouteInHelper.findRequired (
-					requestContext.requestIntegerRequired (
-						"smsRouteId"));
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"smsRouteId")));
 
 			RouteRec smsRoute =
 				oxygen8RouteIn.getRoute ();
@@ -243,27 +251,69 @@ class Oxygen8RouteInMmsNewAction
 							attachment),
 					request.attachments ());
 
-			Optional <MediaRec> textMediaOptional =
-				iterableFindFirst (
-					mediaLogic::isText,
-					medias);
+			// combine text parts
+
+			StringBuilder stringBuilder =
+				new StringBuilder ();
+
+			if (
+				stringIsNotEmpty (
+					request.subject ())
+			) {
+
+				stringBuilder.append (
+					stringTrim (
+						request.subject ()));
+
+				stringBuilder.append (
+					":\n");
+
+			}
+
+			for (
+				MediaRec textMedia
+					: iterableFilter (
+						mediaLogic::isText,
+						medias)
+			) {
+
+				String mediaString =
+					utf8ToString (
+						textMedia.getContent ().getData ());
+
+				if (
+					stringIsEmpty (
+						mediaString)
+				) {
+					continue;
+				}
+
+				stringBuilder.append (
+					stringTrim (
+						mediaString));
+
+				stringBuilder.append (
+					"\n");
+
+			}
 
 			TextRec messageBodyText =
 				textHelper.findOrCreate (
-					optionalMapRequiredOrDefault (
-						media ->
-							utf8ToString (
-								media.getContent ().getData ()),
-						textMediaOptional,
-						request.subject ()));
+					stringBuilder.toString ());
+
+			// lookup number, discarding extra info
 
 			NumberRec number =
 				smsNumberHelper.findOrCreate (
-					request.source ());
+					listFirstElementRequired (
+						stringSplitSlash (
+							request.source ())));
+
+			// insert message
 
 			smsInboxLogic.inboxInsert (
 				optionalOf (
-					request.messageId ()),
+					request.oxygenateReference ()),
 				messageBodyText,
 				number,
 				request.destination (),
@@ -279,6 +329,8 @@ class Oxygen8RouteInMmsNewAction
 
 		}
 
+		success = true;
+
 	}
 
 	@Override
@@ -287,10 +339,20 @@ class Oxygen8RouteInMmsNewAction
 			@NonNull TaskLogger taskLogger,
 			@NonNull FormatWriter debugWriter) {
 
+		debugWriter.writeLineFormat (
+			"===== RESPONSE =====");
+
+		debugWriter.writeNewline ();
+
+		debugWriter.writeLineFormat (
+			"SUCCESS");
+
+		debugWriter.writeNewline ();
+
 		return textResponderProvider.get ()
 
 			.text (
-				"SUCCESS");
+				"SUCCESS\n");
 
 	}
 
@@ -365,7 +427,8 @@ class Oxygen8RouteInMmsNewAction
 				attachmentContent,
 				attachment.contentType (),
 				attachment.fileName (),
-				optionalAbsent ());
+				optionalOf (
+					"utf8"));
 
 		} else {
 
