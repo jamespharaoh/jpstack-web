@@ -202,6 +202,12 @@ class DevopsScript
 					"git checkout -B wip origin/wip",
 				].join("; ")
 
+			system_nofail \
+				"git branch -D wip"
+
+			system_nofail \
+				"git push origin :wip"
+
 		when "wip"
 
 			system_nofail \
