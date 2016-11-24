@@ -80,7 +80,7 @@ class ObjectCsvFormFieldInterfaceMapping <
 				root =
 					Optional.<Record<?>>of (
 						(Record<?>)
-						objectManager.dereference (
+						objectManager.dereferenceObsolete (
 							container,
 							rootFieldName));
 

@@ -539,7 +539,7 @@ class DataFromXmlImplementation
 					if (! parents.iterator ().hasNext ())
 						throw new RuntimeException ();
 
-					PropertyUtils.set (
+					PropertyUtils.propertySetSimple (
 						object,
 						field.getName (),
 						parents.iterator ().next ());
@@ -556,7 +556,7 @@ class DataFromXmlImplementation
 						if (! field.getType ().isInstance (ancestor))
 							continue;
 
-						PropertyUtils.set (
+						PropertyUtils.propertySetSimple (
 							object,
 							field.getName (),
 							ancestor);
@@ -652,7 +652,7 @@ class DataFromXmlImplementation
 
 				}
 
-				PropertyUtils.set (
+				PropertyUtils.propertySetSimple (
 					object,
 					field.getName (),
 					namedObject);
@@ -676,7 +676,7 @@ class DataFromXmlImplementation
 
 			if (field.getType () == String.class) {
 
-				PropertyUtils.set (
+				PropertyUtils.propertySetSimple (
 					object,
 					field.getName (),
 					stringValue);
@@ -685,7 +685,7 @@ class DataFromXmlImplementation
 
 			} else if (field.getType () == Integer.class) {
 
-				PropertyUtils.set (
+				PropertyUtils.propertySetSimple (
 					object,
 					field.getName (),
 					Integer.parseInt (
@@ -695,7 +695,7 @@ class DataFromXmlImplementation
 
 			} else if (field.getType () == Long.class) {
 
-				PropertyUtils.set (
+				PropertyUtils.propertySetSimple (
 					object,
 					field.getName (),
 					Long.parseLong (
@@ -705,7 +705,7 @@ class DataFromXmlImplementation
 
 			} else if (field.getType () == Boolean.class) {
 
-				PropertyUtils.set (
+				PropertyUtils.propertySetSimple (
 					object,
 					field.getName (),
 					optionalOrNull (
@@ -722,7 +722,7 @@ class DataFromXmlImplementation
 						hyphenToCamel (
 							stringValue));
 
-				PropertyUtils.set (
+				PropertyUtils.propertySetSimple (
 					object,
 					field.getName (),
 					enumValue);
@@ -774,7 +774,7 @@ class DataFromXmlImplementation
 
 			if (field.getType () == String.class) {
 
-				PropertyUtils.set (
+				PropertyUtils.propertySetSimple (
 					object,
 					field.getName (),
 					stringValue);
@@ -862,7 +862,7 @@ class DataFromXmlImplementation
 
 				if (child != null) {
 
-					PropertyUtils.set (
+					PropertyUtils.propertySetSimple (
 						object,
 						field.getName (),
 						child);
@@ -955,7 +955,7 @@ class DataFromXmlImplementation
 				nextParents =
 					Iterables.concat (
 						ImmutableList.<Object> of (
-							PropertyUtils.get (
+							PropertyUtils.propertyGetSimple (
 								object,
 								dataChildrenAnnotation.surrogateParent ()),
 							object),
@@ -1196,14 +1196,14 @@ class DataFromXmlImplementation
 
 				}
 
-				PropertyUtils.set (
+				PropertyUtils.propertySetSimple (
 					object,
 					field.getName (),
 					mapBuilder.build ());
 
 			} else {
 
-				PropertyUtils.set (
+				PropertyUtils.propertySetSimple (
 					object,
 					field.getName (),
 					children);
@@ -1234,14 +1234,14 @@ class DataFromXmlImplementation
 
 			List<?> children =
 				(List<?>)
-				PropertyUtils.get (
+				PropertyUtils.propertyGetSimple (
 					object,
 					childrenFieldName);
 
 			for (Object child : children) {
 
 				Object index =
-					PropertyUtils.get (
+					PropertyUtils.propertyGetSimple (
 						child,
 						indexFieldName);
 
@@ -1254,7 +1254,7 @@ class DataFromXmlImplementation
 
 			}
 
-			PropertyUtils.set (
+			PropertyUtils.propertySetSimple (
 				object,
 				field.getName (),
 				childrenIndex);

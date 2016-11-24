@@ -265,7 +265,7 @@ class DataToXml {
 							field.getName ());
 
 					Object attributeValueObject =
-						PropertyUtils.get (
+						PropertyUtils.propertyGetSimple (
 							object,
 							field.getName ());
 
@@ -285,7 +285,7 @@ class DataToXml {
 							field.getName ());
 
 					Object attributeValueObject =
-						PropertyUtils.get (
+						PropertyUtils.propertyGetSimple (
 							object,
 							field.getName ());
 
@@ -316,7 +316,7 @@ class DataToXml {
 								field.getName ()));
 
 					Object childValueObject =
-						PropertyUtils.get (
+						PropertyUtils.propertyGetSimple (
 							object,
 							field.getName ());
 
@@ -343,7 +343,7 @@ class DataToXml {
 				if (annotation instanceof DataChildren) {
 
 					Object children =
-						PropertyUtils.get (
+						PropertyUtils.propertyGetSimple (
 							object,
 							field.getName ());
 
@@ -382,7 +382,7 @@ class DataToXml {
 							field.getName ());
 
 					Object referencedObject =
-						PropertyUtils.get (
+						PropertyUtils.propertyGetSimple (
 							object,
 							field.getName ());
 
@@ -550,7 +550,7 @@ class DataToXml {
 					continue;
 
 				Object nameValueObject =
-					PropertyUtils.get (
+					PropertyUtils.propertyGetSimple (
 						object,
 						field.getName ());
 

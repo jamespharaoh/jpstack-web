@@ -1,5 +1,8 @@
 package wbs.framework.object;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.Misc.mapSuccess;
+import static wbs.utils.etc.Misc.successOrElse;
 import static wbs.utils.etc.Misc.successOrThrowRuntimeException;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -13,7 +16,6 @@ import java.util.Set;
 import java.util.SortedMap;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
@@ -38,6 +40,19 @@ interface ObjectManagerMethods {
 		return successOrThrowRuntimeException (
 			getParentOrError (
 				object));
+
+	}
+
+	default
+	Either <Record <?>, String> getParentRequiredOrError (
+			@NonNull Record <?> object) {
+
+		return mapSuccess (
+			getParentOrError (
+				object),
+			optional ->
+				optionalGetRequired (
+					optional));
 
 	}
 
@@ -265,20 +280,84 @@ interface ObjectManagerMethods {
 
 	// structured dereferncing
 
-	Object dereference (
+	Either <Optional <Object>, String> dereferenceOrError (
 			Object object,
 			String path,
-			Map<String,Object> hints);
+			Map <String, Object> hints);
 
 	default
-	Object dereference (
-			Object object,
-			String path) {
+	Either <Optional <Object>, String> dereferenceOrError (
+			@NonNull Object object,
+			@NonNull String path) {
 
-		return dereference (
+		return dereferenceOrError (
 			object,
 			path,
-			ImmutableMap.of ());
+			emptyMap ());
+
+	}
+
+	default
+	Object dereferenceRequired (
+			@NonNull Object object,
+			@NonNull String path,
+			@NonNull Map <String, Object> hints) {
+
+		return optionalGetRequired (
+			successOrThrowRuntimeException (
+				dereferenceOrError (
+					object,
+					path,
+					hints)));
+
+	}
+
+	default
+	Object dereferenceRequired (
+			@NonNull Object object,
+			@NonNull String path) {
+
+		return optionalGetRequired (
+			successOrThrowRuntimeException (
+				dereferenceOrError (
+					object,
+					path,
+					emptyMap ())));
+
+	}
+
+	@Deprecated
+	default
+	Object dereferenceObsolete (
+			@NonNull Object object,
+			@NonNull String path,
+			@NonNull Map <String, Object> hints) {
+
+		return optionalOrNull (
+			successOrElse (
+				dereferenceOrError (
+					object,
+					path,
+					hints),
+				error ->
+					optionalAbsent ()));
+
+	}
+
+	@Deprecated
+	default
+	Object dereferenceObsolete (
+			@NonNull Object object,
+			@NonNull String path) {
+
+		return optionalOrNull (
+			successOrElse (
+				dereferenceOrError (
+					object,
+					path,
+					emptyMap ()),
+				error ->
+					optionalAbsent ()));
 
 	}
 

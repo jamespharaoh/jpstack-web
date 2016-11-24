@@ -1,7 +1,6 @@
 package wbs.platform.core.console;
 
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingOneWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteHtml;
@@ -19,6 +18,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.part.PagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.responder.HtmlResponder;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -28,6 +28,7 @@ import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.console.UserConsoleLogic;
 
 @Accessors (fluent = true)

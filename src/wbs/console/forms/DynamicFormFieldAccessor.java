@@ -1,5 +1,6 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.objectClassNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -53,8 +54,9 @@ class DynamicFormFieldAccessor <
 				container);
 
 		Object nativeObject =
-			consoleHelper.getDynamicGeneric (
-				container,
+			consoleHelper.getDynamic (
+				genericCastUnchecked (
+					container),
 				name);
 
 		// special case for null
@@ -120,8 +122,9 @@ class DynamicFormFieldAccessor <
 			consoleObjectManager.findConsoleHelperRequired (
 				container);
 
-		consoleHelper.setDynamicGeneric (
-			container,
+		consoleHelper.setDynamic (
+			genericCastUnchecked (
+				container),
 			name,
 			nativeValueOptional);
 

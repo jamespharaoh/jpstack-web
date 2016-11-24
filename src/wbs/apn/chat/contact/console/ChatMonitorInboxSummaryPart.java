@@ -17,7 +17,6 @@ import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.time.TimeUtils.localDateNotEqual;
 import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
@@ -61,6 +60,25 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.html.ScriptRef;
+import wbs.console.misc.JqueryEditableScriptRef;
+import wbs.console.misc.JqueryScriptRef;
+import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.media.console.MediaConsoleLogic;
+
+import wbs.sms.gazetteer.logic.GazetteerLogic;
+
+import wbs.utils.time.TimeFormatter;
+
 import wbs.apn.chat.contact.model.ChatContactNoteObjectHelper;
 import wbs.apn.chat.contact.model.ChatContactNoteRec;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
@@ -80,20 +98,6 @@ import wbs.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.html.ScriptRef;
-import wbs.console.misc.JqueryEditableScriptRef;
-import wbs.console.misc.JqueryScriptRef;
-import wbs.console.part.AbstractPagePart;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.media.console.MediaConsoleLogic;
-import wbs.sms.gazetteer.logic.GazetteerLogic;
-import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("chatMonitorInboxSummaryPart")
 public

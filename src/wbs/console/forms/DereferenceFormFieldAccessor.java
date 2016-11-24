@@ -47,7 +47,7 @@ class DereferenceFormFieldAccessor <Container, Native>
 		@SuppressWarnings ("unchecked")
 		Native nativeValue =
 			(Native)
-			objectManager.dereference (
+			objectManager.dereferenceObsolete (
 				container,
 				path);
 
@@ -108,7 +108,7 @@ class DereferenceFormFieldAccessor <Container, Native>
 
 		// set property
 
-		PropertyUtils.setProperty (
+		PropertyUtils.propertySetAuto (
 			container,
 			path,
 			nativeValue.orNull ());

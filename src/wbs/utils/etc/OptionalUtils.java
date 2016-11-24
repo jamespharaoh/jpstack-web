@@ -523,6 +523,16 @@ class OptionalUtils {
 	}
 
 	public static <Type>
+	Optional <Type> optionalGetOrAbsent (
+			@NonNull Optional <Optional <Type>> optional) {
+
+		return optional.isPresent ()
+			? optional.get ()
+			: Optional.absent ();
+
+	}
+
+	public static <Type>
 	Type optionalOrNull (
 			@NonNull Optional <Type> optional) {
 

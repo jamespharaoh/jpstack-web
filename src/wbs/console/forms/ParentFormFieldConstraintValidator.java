@@ -54,7 +54,7 @@ class ParentFormFieldConstraintValidator <
 		Record <?> privDelegate =
 			createPrivDelegate != null
 				? (Record <?>)
-					objectManager.dereference (
+					objectManager.dereferenceObsolete (
 						nativeValue.get (),
 						createPrivDelegate)
 				: nativeValue.get ();

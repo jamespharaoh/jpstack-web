@@ -1,5 +1,6 @@
 package wbs.platform.postgresql.daemon;
 
+import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.notLessThan;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -480,23 +481,19 @@ class PostgresqlMaintenanceDaemon
 	}
 
 	void calcDaily (
-			@NonNull DateTime dailyTime) {
+			@NonNull DateTime originalDailyTime) {
 
-		if (
-			notLessThan (
-				dailyTime.getHourOfDay (),
-				dailyHour)
-		) {
-
-			dailyTime =
-				dailyTime.plusDays (
-					1);
-
-		}
+		DateTime actualDailyTime =
+			ifThenElse (
+				notLessThan (
+					originalDailyTime.getHourOfDay (),
+					dailyHour),
+				() -> originalDailyTime.plusDays (1),
+				() -> originalDailyTime);
 
 		nextDaily =
 			toInstant (
-				dailyTime.withTime (
+				actualDailyTime.withTime (
 					localTime (
 						dailyHour,
 						0,
@@ -506,25 +503,21 @@ class PostgresqlMaintenanceDaemon
 	}
 
 	void calcHourly (
-			@NonNull DateTime hourlyTime) {
+			@NonNull DateTime originalHourlyTime) {
 
-		if (
-			notLessThan (
-				hourlyTime.getMinuteOfHour (),
-				hourlyMinute)
-		) {
-
-			hourlyTime =
-				hourlyTime.plusHours (
-					1);
-
-		}
+		DateTime actualHourlyTime =
+			ifThenElse (
+				notLessThan (
+					originalHourlyTime.getMinuteOfHour (),
+					hourlyMinute),
+				() -> originalHourlyTime.plusHours (1),
+				() -> originalHourlyTime);
 
 		nextHourly =
 			toInstant (
-				hourlyTime.withTime (
+				actualHourlyTime.withTime (
 					localTime (
-						hourlyTime.getHourOfDay (),
+						actualHourlyTime.getHourOfDay (),
 						hourlyMinute,
 						0,
 						0)));

@@ -1,7 +1,7 @@
 package wbs.platform.priv.console;
 
 import static wbs.utils.etc.Misc.getError;
-import static wbs.utils.etc.Misc.getValue;
+import static wbs.utils.etc.Misc.resultValueRequired;
 import static wbs.utils.etc.Misc.isError;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -380,7 +380,7 @@ class PrivDataLoaderImplementation
 
 				Record <?> parent =
 					optionalGetRequired (
-						getValue (
+						resultValueRequired (
 							parentOrError));
 
 				try {
@@ -409,13 +409,13 @@ class PrivDataLoaderImplementation
 
 					if (
 						optionalIsPresent (
-							getValue (
+							resultValueRequired (
 								grandParentOrError))
 					) {
 
 						Record <?> grandParent =
 							optionalGetRequired (
-								getValue (
+								resultValueRequired (
 									grandParentOrError));
 
 						Optional <Long> chainedPrivIdOptional =
@@ -608,7 +608,7 @@ class PrivDataLoaderImplementation
 				}
 
 				currentObjectOptional =
-					getValue (
+					resultValueRequired (
 						nextObjectOrError);
 
 			}

@@ -319,8 +319,9 @@ class ConsoleObjectManagerImplementation
 			return stringFormat (
 				"%s_%s",
 				objectHelper.objectName (),
-				objectHelper.getTypeCodeGeneric (
-					object));
+				objectHelper.getTypeCode (
+					genericCastUnchecked (
+						object)));
 
 		} else {
 
@@ -676,12 +677,12 @@ class ConsoleObjectManagerImplementation
 
 	@Override
 	public
-	Object dereference (
-			Object object,
-			String path,
-			Map<String,Object> hints) {
+	Either <Optional <Object>, String> dereferenceOrError (
+			@NonNull Object object,
+			@NonNull String path,
+			@NonNull Map <String, Object> hints) {
 
-		return objectManager.dereference (
+		return objectManager.dereferenceOrError (
 			object,
 			path,
 			hints);

@@ -59,9 +59,9 @@
 
 		<name-field
 			label="Version"
-			pattern="^(\d+)\.(\d+).(\d+)$"
-			pattern-error="Version number must match 'x.y.z'"
-			code-pattern="^(\d+)_(\d+)_(\d+)$"/>
+			pattern="^(\d+)\.(\d+)$"
+			pattern-error="Version number must match 'x.y'"
+			code-pattern="^(\d+)_(\d+)$"/>
 
 		<description-field/>
 

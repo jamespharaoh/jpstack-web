@@ -47,7 +47,7 @@ class SimpleFormFieldAccessor <Container, Native>
 		Object nativeObject;
 
 		nativeObject =
-			PropertyUtils.getProperty (
+			PropertyUtils.propertyGetAuto (
 				container,
 				name);
 
@@ -112,7 +112,7 @@ class SimpleFormFieldAccessor <Container, Native>
 
 		// set property
 
-		PropertyUtils.setProperty (
+		PropertyUtils.propertySetAuto (
 			container,
 			name,
 			nativeValue.orNull ());

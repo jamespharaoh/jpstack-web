@@ -122,7 +122,7 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 			@NonNull RecordType object) {
 
 		return (String)
-			PropertyUtils.getProperty (
+			PropertyUtils.propertyGetAuto (
 				object,
 				typeCodeField.name ());
 
@@ -136,7 +136,7 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 		if (codeField != null) {
 
 			return (String)
-				PropertyUtils.getProperty (
+				PropertyUtils.propertyGetAuto (
 					object,
 					codeField.name ());
 
@@ -154,7 +154,7 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 			@NonNull RecordType object) {
 
 		return (String)
-			PropertyUtils.getProperty (
+			PropertyUtils.propertyGetAuto (
 				object,
 				nameField.name ());
 
@@ -166,7 +166,7 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 			@NonNull RecordType object) {
 
 		return (String)
-			PropertyUtils.getProperty (
+			PropertyUtils.propertyGetAuto (
 				object,
 				descriptionField.name ());
 
@@ -222,7 +222,7 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 		}
 
 		return (Record<?>)
-			PropertyUtils.getProperty (
+			PropertyUtils.propertyGetAuto (
 				object,
 				parentField.name ());
 
@@ -243,7 +243,7 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 		}
 
 		return (Long)
-			PropertyUtils.getProperty (
+			PropertyUtils.propertyGetAuto (
 				object,
 				parentIdField.name ());
 
@@ -264,7 +264,7 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 		}
 
 		return (Record <?>)
-			PropertyUtils.getProperty (
+			PropertyUtils.propertyGetAuto (
 				object,
 				parentTypeField.name ());
 

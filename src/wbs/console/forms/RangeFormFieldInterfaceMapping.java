@@ -2,7 +2,7 @@ package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.errorResult;
 import static wbs.utils.etc.Misc.getError;
-import static wbs.utils.etc.Misc.getValue;
+import static wbs.utils.etc.Misc.resultValueRequired;
 import static wbs.utils.etc.Misc.isError;
 import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -85,7 +85,7 @@ class RangeFormFieldInterfaceMapping <
 
 		if (
 			optionalIsNotPresent (
-				getValue (
+				resultValueRequired (
 					leftResult))
 		) {
 
@@ -116,7 +116,7 @@ class RangeFormFieldInterfaceMapping <
 
 		if (
 			optionalIsNotPresent (
-				getValue (
+				resultValueRequired (
 					rightResult))
 		) {
 
@@ -131,10 +131,10 @@ class RangeFormFieldInterfaceMapping <
 			Optional.of (
 				Range.between (
 					optionalGetRequired (
-						getValue (
+						resultValueRequired (
 							leftResult)),
 					optionalGetRequired (
-						getValue (
+						resultValueRequired (
 							rightResult)))));
 
 	}
@@ -178,7 +178,7 @@ class RangeFormFieldInterfaceMapping <
 
 		if (
 			optionalIsNotPresent (
-				getValue (
+				resultValueRequired (
 					leftResult))
 		) {
 
@@ -209,7 +209,7 @@ class RangeFormFieldInterfaceMapping <
 
 		if (
 			optionalIsNotPresent (
-				getValue (
+				resultValueRequired (
 					rightResult))
 		) {
 
@@ -225,11 +225,11 @@ class RangeFormFieldInterfaceMapping <
 				Range.between (
 
 			optionalGetRequired (
-				getValue (
+				resultValueRequired (
 					leftResult)),
 
 			optionalGetRequired (
-				getValue (
+				resultValueRequired (
 					rightResult))
 
 		)));

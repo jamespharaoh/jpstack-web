@@ -1,9 +1,11 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.EnumUtils.enumInSafe;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
@@ -66,21 +68,20 @@ class TextAreaFormFieldRenderer <Container, Parent>
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue,
+			@NonNull Optional <String> suppliedInterfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		if (
-			formValuePresent (
-				submission,
-				formName)
-		) {
-			interfaceValue =
-				Optional.of (
+		Optional <String> interfaceValue =
+			ifThenElse (
+				formValuePresent (
+					submission,
+					formName),
+				() -> optionalOf (
 					formValue (
 						submission,
-						formName));
-		}
+						formName)),
+				() -> suppliedInterfaceValue);
 
 		htmlWriter.writeFormat (
 			"<input",

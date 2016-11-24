@@ -1,10 +1,19 @@
 package wbs.framework.object;
 
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.CollectionUtils.listSliceAllButFirstItemRequired;
+import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.Misc.errorResultFormat;
+import static wbs.utils.etc.Misc.getError;
+import static wbs.utils.etc.Misc.isError;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.resultValueRequired;
+import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
@@ -14,12 +23,13 @@ import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
+import static wbs.utils.etc.PropertyUtils.propertyGetAuto;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isSubclassOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringInSafe;
 import static wbs.utils.string.StringUtils.stringSplitFullStop;
-import static wbs.utils.string.StringUtils.stringStartsWithSimple;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -196,8 +206,9 @@ class ObjectManagerImplementation
 			objectHelperForClassRequired (
 				object.getClass ());
 
-		return objectHelper.getParentOrErrorGeneric (
-			object);
+		return objectHelper.getParentOrError (
+			genericCastUnchecked (
+				object));
 
 	}
 
@@ -283,17 +294,20 @@ class ObjectManagerImplementation
 	@Override
 	public
 	String objectPath (
-			Record <?> object,
+			Record <?> startingObject,
 			@NonNull Optional <Record <?>> assumedRoot,
-			boolean mini,
+			boolean startingMini,
 			boolean preload) {
 
-		if (object == null)
+		if (startingObject == null)
 			return "-";
+
+		Record <?> currentObject =
+			startingObject;
 
 		ObjectHelper <?> objectHelper =
 			objectHelperForObjectRequired (
-				object);
+				currentObject);
 
 		if (objectHelper.isRoot ())
 			return "root";
@@ -303,13 +317,17 @@ class ObjectManagerImplementation
 
 		ObjectHelper <?> specificObjectHelper = null;
 
+		Boolean currentMini =
+			startingMini;
+
 		do {
 
 			// get some stuff
 
 			Record <?> parent =
-				objectHelper.getParentRequiredGeneric (
-					object);
+				objectHelper.getParentRequired (
+					genericCastUnchecked (
+						currentObject));
 
 			ObjectHelper <?> parentHelper =
 				objectHelperForObjectRequired (
@@ -334,15 +352,16 @@ class ObjectManagerImplementation
 				}
 
 				partsToReturn.add (
-					getCode (object));
+					getCode (currentObject));
 
 			} else {
 
 				if (specificObjectHelper != null) {
 
-					if (mini) {
+					if (currentMini) {
 
-						mini = false;
+						currentMini = false;
+
 					} else {
 
 						partsToReturn.add (
@@ -361,11 +380,12 @@ class ObjectManagerImplementation
 					partsToReturn.add ("/");
 
 				partsToReturn.add (
-					getCode (object));
+					getCode (
+						currentObject));
 
-				if (mini) {
+				if (currentMini) {
 
-					mini = false;
+					currentMini = false;
 
 				} else {
 
@@ -381,7 +401,7 @@ class ObjectManagerImplementation
 
 			// then move onto the parent
 
-			object =
+			currentObject =
 				parent;
 
 			objectHelper =
@@ -389,12 +409,12 @@ class ObjectManagerImplementation
 
 		} while (
 			! objectHelper.isRoot ()
-			&& object != assumedRoot.orNull ()
+			&& currentObject != assumedRoot.orNull ()
 		);
 
 		if (
 			specificObjectHelper != null
-			&& ! mini
+			&& ! currentMini
 		) {
 
 			partsToReturn.add (
@@ -452,8 +472,9 @@ class ObjectManagerImplementation
 			objectHelperForObjectRequired (
 				object);
 
-		return objectHelper.getGlobalIdGeneric (
-			object);
+		return objectHelper.getGlobalId (
+			genericCastUnchecked (
+				object));
 
 	}
 
@@ -466,8 +487,9 @@ class ObjectManagerImplementation
 			objectHelperForObjectRequired (
 				object);
 
-		return objectHelper.getParentGlobalIdGeneric (
-			object);
+		return objectHelper.getParentGlobalId (
+			genericCastUnchecked (
+				object));
 
 	}
 
@@ -489,7 +511,7 @@ class ObjectManagerImplementation
 			ret.put (
 				objectPath (
 					object,
-					Optional.<Record<?>>fromNullable (
+					optionalFromNullable (
 						root),
 					mini,
 					false),
@@ -523,8 +545,9 @@ class ObjectManagerImplementation
 			objectHelperForClassRequired (
 				object.getClass ());
 
-		return objectHelper.getCodeGeneric (
-			object);
+		return objectHelper.getCode (
+			genericCastUnchecked (
+				object));
 
 	}
 
@@ -697,8 +720,9 @@ class ObjectManagerImplementation
 				return null;
 
 			current =
-				currentHelper.getParentRequiredGeneric (
-					current);
+				currentHelper.getParentRequired (
+					genericCastUnchecked (
+						current));
 
 			currentHelper =
 				objectHelperForObjectRequired (
@@ -710,50 +734,72 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	Object dereference (
-			@NonNull Object object,
+	Either <Optional <Object>, String> dereferenceOrError (
+			@NonNull Object startingObject,
 			@NonNull String path,
 			@NonNull Map <String, Object> hints) {
 
-		// check hints
+		Object currentObject =
+			startingObject;
 
-		for (
-			Map.Entry <String, Object> hintEntry
-				: hints.entrySet ()
-		) {
-
-			if (
-				stringEqualSafe (
-					hintEntry.getKey (),
-					path)
-			) {
-
-				return hintEntry.getValue ();
-
-			} else if (
-				stringStartsWithSimple (
-					hintEntry.getKey () + ".",
-					path)
-			) {
-
-				path =
-					path.substring (
-						hintEntry.getKey ().length () + 1);
-
-				object =
-					hintEntry.getValue ();
-
-				break;
-
-			}
-
-		}
-
-		// iterate through path
+		// check hints and global values
 
 		List <String> pathParts =
 			stringSplitFullStop (
 				path);
+
+		String firstPathPart =
+			listFirstElementRequired (
+				pathParts);
+
+		if (
+			stringEqualSafe (
+				firstPathPart,
+				"root")
+		) {
+
+			// root
+
+			currentObject =
+				rootObjectHelper.findRequired (
+					0l);
+
+			pathParts =
+				listSliceAllButFirstItemRequired (
+					pathParts);
+
+		} else if (
+			stringEqualSafe (
+				firstPathPart,
+				"this")
+		) {
+
+			// same object
+
+			pathParts =
+				listSliceAllButFirstItemRequired (
+					pathParts);
+
+		} else if (
+			mapContainsKey (
+				hints,
+				firstPathPart)
+		) {
+
+			// found in hints
+
+			currentObject =
+				mapItemForKeyRequired (
+					hints,
+					firstPathPart);
+
+			pathParts =
+				listSliceAllButFirstItemRequired (
+					pathParts);
+
+		}
+
+		// iterate through path
 
 		for (
 			String pathPart
@@ -761,77 +807,135 @@ class ObjectManagerImplementation
 		) {
 
 			if (
-				stringEqualSafe (
+				stringInSafe (
 					pathPart,
-					"root")
-			) {
-
-				object =
-					rootObjectHelper.findRequired (
-						0l);
-
-			} else if (
-				stringEqualSafe (
-					pathPart,
-					"this")
-			) {
-
-				// same object
-
-			} else if (
-				isNull (
-					object)
-			) {
-
-				doNothing ();
-
-			} else if (
-				stringEqualSafe (
-					pathPart,
-					"parent")
-			) {
-
-				object =
-					getParentRequired (
-						(Record <?>) object);
-
-			} else if (
-				stringEqualSafe (
-					pathPart,
-					"grandparent")
-			) {
-
-				object =
-					getParentRequired (
-					getParentRequired (
-						(Record <?>)
-						object));
-
-			} else if (
-				stringEqualSafe (
-					pathPart,
+					"parent",
+					"grandparent",
 					"greatgrandparent")
 			) {
 
-				object =
-					getParentRequired (
-					getParentRequired (
-					getParentRequired (
-						(Record <?>)
-						object)));
+				// parent
+
+				Either <Record <?>, String> parentOrError =
+					getParentRequiredOrError (
+						genericCastUnchecked (
+							currentObject));
+
+				if (
+					isError (
+						parentOrError)
+				) {
+
+					return errorResultFormat (
+						"Error getting parent of %s: %s",
+						currentObject.toString (),
+						getError (
+							parentOrError));
+
+				}
+
+				currentObject =
+					resultValueRequired (
+						parentOrError);
+
+				// grandparent
+
+				if (
+					stringInSafe (
+						pathPart,
+						"grandparent",
+						"greatgrandparent")
+				) {
+
+					Either <Record <?>, String> grandparentOrError =
+						getParentRequiredOrError (
+							genericCastUnchecked (
+								currentObject));
+
+					if (
+						isError (
+							grandparentOrError)
+					) {
+
+						return errorResultFormat (
+							"Error getting parent of %s: %s",
+							currentObject.toString (),
+							getError (
+								grandparentOrError));
+
+					}
+
+					currentObject =
+						resultValueRequired (
+							grandparentOrError);
+
+				}
+
+				// great-grandparent
+
+				if (
+					stringInSafe (
+						pathPart,
+						"greatgrandparent")
+				) {
+
+					Either <Record <?>, String> greatGrandparentOrError =
+						getParentRequiredOrError (
+							genericCastUnchecked (
+								currentObject));
+
+					if (
+						isError (
+							greatGrandparentOrError)
+					) {
+
+						return errorResultFormat (
+							"Error getting parent of %s: %s",
+							currentObject.toString (),
+							getError (
+								greatGrandparentOrError));
+
+					}
+
+					currentObject =
+						resultValueRequired (
+							greatGrandparentOrError);
+
+				}
 
 			} else {
 
-				object =
-					PropertyUtils.getProperty (
-						object,
-						pathPart);
+				try {
+
+					currentObject =
+						propertyGetAuto (
+							currentObject,
+							pathPart);
+
+				} catch (RuntimeException runtimeException) {
+
+					return errorResultFormat (
+						"Error getting field '%s' of %s",
+						pathPart,
+						currentObject.toString ());
+
+				}
+
+				if (
+					isNull (
+						currentObject)
+				) {
+					return successResult (
+						optionalAbsent ());
+				}
 
 			}
 
 		}
 
-		return object;
+		return successResult (
+			optionalOf (
+				currentObject));
 
 	}
 
@@ -855,12 +959,15 @@ class ObjectManagerImplementation
 
 	@Override
 	public
-	Optional<Class<?>> dereferenceType (
-			@NonNull Optional<Class<?>> objectClass,
-			@NonNull Optional<String> path) {
+	Optional <Class <?>> dereferenceType (
+			@NonNull Optional <Class <?>> startingObjectClass,
+			@NonNull Optional <String> path) {
 
 		if (! path.isPresent ())
-			return objectClass;
+			return startingObjectClass;
+
+		Optional <Class <?>> currentObjectClass =
+			startingObjectClass;
 
 		List <String> pathParts =
 			stringSplitFullStop (
@@ -871,7 +978,7 @@ class ObjectManagerImplementation
 				: pathParts
 		) {
 
-			if (! objectClass.isPresent ())
+			if (! currentObjectClass.isPresent ())
 				return Optional.absent ();
 
 			if (
@@ -888,9 +995,9 @@ class ObjectManagerImplementation
 					"parent")
 			) {
 
-				objectClass =
+				currentObjectClass =
 					parentType (
-						objectClass);
+						currentObjectClass);
 
 			} else if (
 				stringEqualSafe (
@@ -898,10 +1005,10 @@ class ObjectManagerImplementation
 					"grandparent")
 			) {
 
-				objectClass =
+				currentObjectClass =
 					parentType (
 					parentType (
-						objectClass));
+						currentObjectClass));
 
 			} else if (
 				stringEqualSafe (
@@ -909,11 +1016,11 @@ class ObjectManagerImplementation
 					"greatgrandparent")
 			) {
 
-				objectClass =
+				currentObjectClass =
 					parentType (
 					parentType (
 					parentType (
-						objectClass)));
+						currentObjectClass)));
 
 			} else if (
 				stringEqualSafe (
@@ -921,23 +1028,23 @@ class ObjectManagerImplementation
 					"root")
 			) {
 
-				objectClass =
+				currentObjectClass =
 					Optional.of (
 						rootObjectHelper.objectClass ());
 
 			} else {
 
-				objectClass =
+				currentObjectClass =
 					Optional.of (
 						PropertyUtils.propertyClassForClass (
-							objectClass.get (),
+							currentObjectClass.get (),
 							pathPart));
 
 			}
 
 		}
 
-		return objectClass;
+		return currentObjectClass;
 
 	}
 
@@ -945,8 +1052,11 @@ class ObjectManagerImplementation
 	public
 	<ObjectType extends Record <ObjectType>>
 	Optional <ObjectType> getAncestor (
-			Class <ObjectType> ancestorClass,
-			Record <?> object) {
+			@NonNull Class <ObjectType> ancestorClass,
+			@NonNull Record <?> startingObject) {
+
+		Record <?> currentObject =
+			startingObject;
 
 		for (;;) {
 
@@ -954,12 +1064,12 @@ class ObjectManagerImplementation
 
 			if (
 				ancestorClass.isInstance (
-					object)
+					currentObject)
 			) {
 
 				return optionalOf (
 					ancestorClass.cast (
-						object));
+						currentObject));
 
 			}
 
@@ -967,7 +1077,7 @@ class ObjectManagerImplementation
 
 			if (
 				rootObjectHelper.objectClass ().isInstance (
-					object)
+					currentObject)
 			) {
 
 				return optionalAbsent ();
@@ -976,9 +1086,9 @@ class ObjectManagerImplementation
 
 			// iterate via parent
 
-			object =
+			currentObject =
 				getParentRequired (
-					object);
+					currentObject);
 
 		}
 

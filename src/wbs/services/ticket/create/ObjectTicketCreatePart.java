@@ -119,7 +119,7 @@ class ObjectTicketCreatePart <
 
 		ticketManager =
 			(TicketManagerRec)
-			objectManager.dereference (
+			objectManager.dereferenceObsolete (
 				contextObject,
 				ticketManagerPath);
 
@@ -159,7 +159,7 @@ class ObjectTicketCreatePart <
 
 				ticketFieldValue.setStringValue (
 					(String)
-					objectManager.dereference (
+					objectManager.dereferenceObsolete (
 						contextObject,
 						ticketFieldSpec.valuePath ()));
 
@@ -169,7 +169,7 @@ class ObjectTicketCreatePart <
 
 				ticketFieldValue.setIntegerValue (
 					(Long)
-					objectManager.dereference (
+					objectManager.dereferenceObsolete (
 						contextObject,
 						ticketFieldSpec.valuePath ()));
 
@@ -179,7 +179,7 @@ class ObjectTicketCreatePart <
 
 				ticketFieldValue.setBooleanValue (
 					(Boolean)
-					objectManager.dereference (
+					objectManager.dereferenceObsolete (
 						contextObject,
 						ticketFieldSpec.valuePath ()));
 
@@ -189,7 +189,7 @@ class ObjectTicketCreatePart <
 
 				Record<?> objectValue =
 					(Record<?>)
-					objectManager.dereference (
+					objectManager.dereferenceObsolete (
 						contextObject,
 						ticketFieldSpec.valuePath ());
 

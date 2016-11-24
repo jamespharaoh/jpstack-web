@@ -33,7 +33,7 @@ class WhereNotNullCriteriaSpec
 			Record<?> object) {
 
 		Object fieldValue =
-			PropertyUtils.getProperty (
+			PropertyUtils.propertyGetAuto (
 				object,
 				fieldName);
 

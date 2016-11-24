@@ -5,7 +5,7 @@ import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.etc.Misc.errorResult;
 import static wbs.utils.etc.Misc.getError;
-import static wbs.utils.etc.Misc.getValue;
+import static wbs.utils.etc.Misc.resultValueRequired;
 import static wbs.utils.etc.Misc.isError;
 import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -90,7 +90,7 @@ class TextualRangeFormFieldInterfaceMapping <
 
 		if (
 			optionalIsNotPresent (
-				getValue (
+				resultValueRequired (
 					leftResult))
 		) {
 
@@ -121,7 +121,7 @@ class TextualRangeFormFieldInterfaceMapping <
 
 		if (
 			optionalIsNotPresent (
-				getValue (
+				resultValueRequired (
 					rightResult))
 		) {
 
@@ -137,10 +137,10 @@ class TextualRangeFormFieldInterfaceMapping <
 				stringFormat (
 					"%s to %s",
 					optionalGetRequired (
-						getValue (
+						resultValueRequired (
 							leftResult)),
 					optionalGetRequired (
-						getValue (
+						resultValueRequired (
 							rightResult)))));
 
 	}
@@ -202,7 +202,7 @@ class TextualRangeFormFieldInterfaceMapping <
 
 		if (
 			optionalIsNotPresent (
-				getValue (
+				resultValueRequired (
 					leftResult))
 		) {
 
@@ -234,7 +234,7 @@ class TextualRangeFormFieldInterfaceMapping <
 
 		if (
 			optionalIsNotPresent (
-				getValue (
+				resultValueRequired (
 					rightResult))
 		) {
 
@@ -250,11 +250,11 @@ class TextualRangeFormFieldInterfaceMapping <
 				Range.between (
 
 			optionalGetRequired (
-				getValue (
+				resultValueRequired (
 					leftResult)),
 
 			optionalGetRequired (
-				getValue (
+				resultValueRequired (
 					rightResult))
 
 		)));

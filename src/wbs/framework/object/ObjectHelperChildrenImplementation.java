@@ -1,6 +1,7 @@
 package wbs.framework.object;
 
 import static wbs.utils.etc.TypeUtils.classNotEqual;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,8 +56,9 @@ class ObjectHelperChildrenImplementation <
 
 		List <?> childrenTemp =
 			childHelper.findByParent (
-				objectHelper.getGlobalIdGeneric (
-					object));
+				objectHelper.getGlobalId (
+					genericCastUnchecked (
+						object)));
 
 		@SuppressWarnings ("unchecked")
 		List <ChildType> children =

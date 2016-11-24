@@ -28,17 +28,6 @@ interface ObjectHelperPropertyMethods <
 	GlobalId getGlobalId (
 			RecordType object);
 
-	default
-	GlobalId getGlobalIdGeneric (
-			Record <?> object) {
-
-		return getGlobalId (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object));
-
-	}
-
 	String getName (
 			RecordType object);
 
@@ -56,114 +45,26 @@ interface ObjectHelperPropertyMethods <
 	String getTypeCode (
 			RecordType object);
 
-	default
-	String getTypeCodeGeneric (
-			Record <?> object) {
-
-		return getTypeCode (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object));
-
-	}
-
 	String getCode (
 			RecordType object);
-
-	default
-	String getCodeGeneric (
-			Record <?> object) {
-
-		return getCode (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object));
-
-	}
 
 	String getDescription (
 			RecordType object);
 
-	default
-	String getDescriptionGeneric (
-			Record <?> object) {
-
-		return getDescription (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object));
-
-	}
-
 	Record <?> getParentType (
 			RecordType object);
-
-	default
-	Record <?> getParentTypeGeneric (
-			Record <?> object) {
-
-		return getParentType (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object));
-
-	}
 
 	Long getParentTypeId (
 			RecordType object);
 
-	default
-	Long getParentTypeIdGeneric (
-			Record <?> object) {
-
-		return getParentTypeIdGeneric (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object));
-
-	}
-
 	Long getParentId (
 			RecordType object);
-
-	default
-	Long getParentIdGeneric (
-			Record <?> object) {
-
-		return getParentId (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object));
-
-	}
 
 	GlobalId getParentGlobalId (
 			RecordType object);
 
-	default
-	GlobalId getParentGlobalIdGeneric (
-			Record <?> object) {
-
-		return getParentGlobalId (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object));
-
-	}
-
 	Either <Optional <Record <?>>, String> getParentOrError (
 			RecordType object);
-
-	default
-	Either <Optional <Record <?>>, String> getParentOrErrorGeneric (
-			@NonNull Record <?> object) {
-
-		return getParentOrError (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object));
-
-	}
 
 	default
 	Optional <Record <?>> getParent (
@@ -172,18 +73,6 @@ interface ObjectHelperPropertyMethods <
 		return successOrThrowRuntimeException (
 			getParentOrError (
 				object));
-
-	}
-
-	default
-	Optional <Record <?>> getParentGeneric (
-			@NonNull Record <?> object) {
-
-		return successOrThrowRuntimeException (
-			getParentOrError (
-				dynamicCast (
-					objectHelper ().objectClass (),
-					object)));
 
 	}
 
@@ -198,19 +87,6 @@ interface ObjectHelperPropertyMethods <
 
 	}
 
-	default
-	Record <?> getParentRequiredGeneric (
-			Record <?> object) {
-
-		return optionalGetRequired (
-			successOrThrowRuntimeException (
-				getParentOrError (
-					dynamicCast (
-						objectHelper ().objectClass (),
-						object))));
-
-	}
-
 	@Deprecated
 	default
 	Record <?> getParentOrNull (
@@ -220,18 +96,6 @@ interface ObjectHelperPropertyMethods <
 			successOrThrowRuntimeException (
 				getParentOrError (
 					object)));
-
-	}
-
-	@Deprecated
-	default
-	Record <?> getParentOrNullGeneric (
-			Record <?> object) {
-
-		return getParentOrNull (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object));
 
 	}
 
@@ -251,20 +115,6 @@ interface ObjectHelperPropertyMethods <
 
 	}
 
-	default
-	Boolean getDeletedGeneric (
-			Record <?> object,
-			boolean checkParents) {
-
-		return successOrThrowRuntimeException (
-			getDeletedOrError (
-				dynamicCast (
-					objectHelper ().objectClass (),
-					object),
-				checkParents));
-
-	}
-
 	// hooks
 
 	void setParent (
@@ -275,37 +125,10 @@ interface ObjectHelperPropertyMethods <
 			RecordType object,
 			String name);
 
-	default
-	Object getDynamicGeneric (
-			Record <?> object,
-			String name) {
-
-		return getDynamic (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object),
-			name);
-
-	}
 
 	void setDynamic (
 			RecordType object,
 			String name,
 			Optional <?> value);
-
-	default
-	void setDynamicGeneric (
-			Record <?> object,
-			String name,
-			Optional <?> value) {
-
-		setDynamic (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object),
-			name,
-			value);
-
-	}
 
 }

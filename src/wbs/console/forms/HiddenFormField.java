@@ -138,7 +138,7 @@ class HiddenFormField <Container, Generic, Native>
 
 			Record <?> delegate =
 				(Record <?>)
-				objectManager.dereference (
+				objectManager.dereferenceObsolete (
 					container,
 					delegatePath,
 					hints);
