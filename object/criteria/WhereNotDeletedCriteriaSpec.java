@@ -25,7 +25,7 @@ class WhereNotDeletedCriteriaSpec
 
 		Boolean deleted =
 			(Boolean)
-			PropertyUtils.getProperty (
+			PropertyUtils.propertyGetAuto (
 				object,
 				"deleted");
 

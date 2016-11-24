@@ -491,7 +491,7 @@ class ObjectSearchResultsPart <
 
 				Instant rowTimestamp =
 					(Instant)
-					PropertyUtils.getProperty (
+					PropertyUtils.propertyGetAuto (
 						result,
 						consoleHelper.timestampFieldName ());
 

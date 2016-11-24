@@ -203,7 +203,7 @@ class ObjectCreateAction <
 
 			Record<?> createDelegate =
 				createPrivDelegate != null
-					? (Record<?>) objectManager.dereference (
+					? (Record<?>) objectManager.dereferenceObsolete (
 						parent,
 						createPrivDelegate)
 					: parent;
@@ -249,7 +249,7 @@ class ObjectCreateAction <
 
 		if (consoleHelper.typeCodeExists ()) {
 
-			PropertyUtils.setProperty (
+			PropertyUtils.propertySetAuto (
 				object,
 				consoleHelper.typeCodeFieldName (),
 				typeCode);
@@ -299,14 +299,14 @@ class ObjectCreateAction <
 
 			if (createTimeFieldClass == Instant.class) {
 
-				PropertyUtils.setProperty (
+				PropertyUtils.propertySetAuto (
 					object,
 					createTimeFieldName,
 					transaction.now ());
 
 			} else if (createTimeFieldClass == Date.class) {
 
-				PropertyUtils.setProperty (
+				PropertyUtils.propertySetAuto (
 					object,
 					createTimeFieldName,
 					instantToDateNullSafe (
@@ -324,7 +324,7 @@ class ObjectCreateAction <
 
 		if (createUserFieldName != null) {
 
-			PropertyUtils.setProperty (
+			PropertyUtils.propertySetAuto (
 				object,
 				createUserFieldName,
 				userConsoleLogic.userRequired ());
