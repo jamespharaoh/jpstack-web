@@ -5,8 +5,6 @@
 	<layer name="console">
 		<component class="ConsoleExceptionHandler"/>
 		<component class="ConsoleMiscComponents"/>
-		<component class="HtmlTableCellWriter"/>
-		<component class="HtmlTableCheckWriter"/>
 	</layer>
 
 </plugin>

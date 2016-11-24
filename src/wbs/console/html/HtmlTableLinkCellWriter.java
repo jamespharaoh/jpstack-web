@@ -1,4 +1,4 @@
-package wbs.web.utils;
+package wbs.console.html;
 
 import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapPutOrThrowIllegalStateException;
