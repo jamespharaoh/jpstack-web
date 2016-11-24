@@ -15,6 +15,7 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringToBytes;
 
@@ -416,7 +417,7 @@ class MediaLogicImplementation
 			byte[] data,
 			@NonNull String mimeType,
 			@NonNull String filename,
-			@NonNull Optional<String> encoding) {
+			@NonNull Optional <String> encoding) {
 
 		if (
 			contains (
@@ -434,6 +435,16 @@ class MediaLogicImplementation
 				textualTypes,
 				mimeType)
 		) {
+
+			if (
+				optionalIsNotPresent (
+					encoding)
+			) {
+
+				throw new IllegalArgumentException (
+					"Encoding must be specified for textual content");
+
+			}
 
 			return createTextualMedia (
 				data,
@@ -469,14 +480,19 @@ class MediaLogicImplementation
 			@NonNull byte[] data,
 			@NonNull String mimeType,
 			@NonNull String filename,
-			@NonNull Optional<String> encoding) {
+			@NonNull Optional <String> encoding) {
 
-		return optionalGetRequired (
+		return optionalOrThrow (
 			createMedia (
 				data,
 				mimeType,
 				filename,
-				encoding));
+				encoding),
+			() -> new IllegalArgumentException (
+				stringFormat (
+					"Unable to decode \"%s\" of type \"%s\"",
+					filename,
+					mimeType)));
 
 	}
 
