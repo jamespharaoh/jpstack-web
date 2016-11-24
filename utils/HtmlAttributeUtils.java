@@ -11,7 +11,6 @@ import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
 import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.util.Arrays;
@@ -24,6 +23,7 @@ import lombok.experimental.Accessors;
 
 import wbs.utils.etc.OptionalUtils;
 import wbs.utils.string.FormatWriter;
+
 import wbs.web.utils.HtmlStyleUtils.HtmlStyleRuleEntry;
 
 public
