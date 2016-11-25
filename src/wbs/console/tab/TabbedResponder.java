@@ -1,8 +1,10 @@
 package wbs.console.tab;
 
 import static wbs.utils.collection.CollectionUtils.listSorted;
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
@@ -250,6 +252,9 @@ class TabbedResponder
 	void renderHtmlHeadContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
+debugFormat (
+	"TabbedResponder.renderHtmlHeadContents");
+
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
@@ -261,12 +266,15 @@ class TabbedResponder
 		if (
 
 			isNotNull (
-				pagePartThrew)
-
-			&& isNotNull (
 				pagePart)
 
+			&& isNull (
+				pagePartThrew)
+
 		) {
+
+			debugFormat (
+				"call page part render html content");
 
 			pagePart.renderHtmlHeadContent (
 				taskLogger);
