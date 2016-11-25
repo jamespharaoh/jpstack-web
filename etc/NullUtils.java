@@ -23,6 +23,28 @@ class NullUtils {
 
 	}
 
+	@SafeVarargs
+	public static <Type>
+	Type ifNull (
+			@NonNull Supplier <Type> ... valueSuppliers) {
+
+		for (
+			Supplier <Type> valueSupplier
+				: valueSuppliers
+		) {
+
+			Type value =
+				valueSupplier.get ();
+
+			if (value != null)
+				return value;
+
+		}
+
+		return null;
+
+	}
+
 	public static <Type>
 	Type ifNull (
 			Type input,
