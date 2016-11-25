@@ -1393,7 +1393,7 @@ class ChatUserLogicImplementation
 	public
 	void setScheme (
 			@NonNull ChatUserRec chatUser,
-			@NonNull ChatSchemeRec chatScheme) {
+			@NonNull ChatSchemeRec requestedChatScheme) {
 
 		// do nothing if already set
 
@@ -1402,8 +1402,11 @@ class ChatUserLogicImplementation
 
 		// check for mappings
 
-		Set<ChatSchemeMapRec> chatSchemeMaps =
-			chatScheme.getChatSchemeMaps ();
+		Set <ChatSchemeMapRec> chatSchemeMaps =
+			requestedChatScheme.getChatSchemeMaps ();
+
+		ChatSchemeRec mappedChatScheme =
+			requestedChatScheme;
 
 		if (! chatSchemeMaps.isEmpty ()) {
 
@@ -1428,7 +1431,7 @@ class ChatUserLogicImplementation
 					continue;
 				}
 
-				chatScheme =
+				mappedChatScheme =
 					chatSchemeMap.getTargetChatScheme ();
 
 				break;
@@ -1442,14 +1445,14 @@ class ChatUserLogicImplementation
 		chatUser
 
 			.setChatScheme (
-				chatScheme)
+				mappedChatScheme)
 
 			.setOperatorLabel (
-				chatScheme.getOperatorLabel ())
+				mappedChatScheme.getOperatorLabel ())
 
 			.setCredit (
 				chatUser.getCredit ()
-				+ chatScheme.getInitialCredit ());
+				+ mappedChatScheme.getInitialCredit ());
 
 	}
 

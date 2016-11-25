@@ -53,7 +53,7 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 
 		ModelField modelField =
 			(ModelField)
-			PropertyUtils.get (
+			PropertyUtils.propertyGetSimple (
 				consoleHelper,
 				stringFormat (
 					"%sField",
@@ -65,7 +65,7 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 		// get native object
 
 		Object nativeObject =
-			PropertyUtils.getProperty (
+			PropertyUtils.propertyGetAuto (
 				container,
 				name);
 
@@ -115,7 +115,7 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 
 		ModelField modelField =
 			(ModelField)
-			PropertyUtils.get (
+			PropertyUtils.propertyGetSimple (
 				consoleHelper,
 				stringFormat (
 					"%sField",
@@ -146,7 +146,7 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 
 		// set property
 
-		PropertyUtils.setProperty (
+		PropertyUtils.propertySetAuto (
 			container,
 			name,
 			nativeValue.orNull ());

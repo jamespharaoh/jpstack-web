@@ -35,7 +35,7 @@ class NameFormFieldAccessor <Container>
 
 		return Optional.fromNullable (
 			(String)
-			PropertyUtils.getProperty (
+			PropertyUtils.propertyGetAuto (
 				container,
 				consoleHelper.nameFieldName ()));
 
@@ -47,7 +47,7 @@ class NameFormFieldAccessor <Container>
 			@NonNull Container container,
 			@NonNull Optional <String> nativeValue) {
 
-		PropertyUtils.setProperty (
+		PropertyUtils.propertySetAuto (
 			container,
 			consoleHelper.nameFieldName (),
 			nativeValue.get ());
@@ -58,7 +58,7 @@ class NameFormFieldAccessor <Container>
 				simplifyToCodeRelaxed (
 					nativeValue.get ());
 
-			PropertyUtils.setProperty (
+			PropertyUtils.propertySetAuto (
 				container,
 				consoleHelper.codeFieldName (),
 				codeValue);

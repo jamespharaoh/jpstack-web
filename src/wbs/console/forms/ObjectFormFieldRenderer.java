@@ -12,6 +12,8 @@ import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalValueEqualWithClass;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -119,7 +121,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			root =
 				optionalOf (
 					(Record <?>)
-					objectManager.dereference (
+					objectManager.dereferenceObsolete (
 						container,
 						rootFieldName,
 						hints));
@@ -168,7 +170,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 					successOrElse (
 						entityFinder.getNotDeletedOrErrorCheckParents (
 							item),
-						error -> false)
+						error -> true)
 
 					&& objectManager.canView (
 						item)
@@ -248,29 +250,35 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		// value options
 
 		for (
-			Map.Entry<String,Record<?>> optionEntry
+			Map.Entry <String, Record <?>> optionEntry
 				: sortedOptions.entrySet ()
 		) {
 
 			String optionLabel =
 				optionEntry.getKey ();
 
-			Record<?> optionValue =
+			Record <?> optionValue =
 				optionEntry.getValue ();
 
-			ObjectHelper<?> objectHelper =
+			ObjectHelper <?> objectHelper =
 				objectManager.objectHelperForObjectRequired (
 					optionValue);
 
 			boolean selected =
-				optionValue == currentValue.orNull ();
+				optionalValueEqualWithClass (
+					objectHelper.objectClass (),
+					genericCastUnchecked (
+						currentValue),
+					genericCastUnchecked (
+						optionValue));
 
 			if (
 
 				! selected
 
-				&& objectHelper.getDeletedGeneric (
-					optionValue,
+				&& objectHelper.getDeleted (
+					genericCastUnchecked (
+						optionValue),
 					true)
 
 			) {
@@ -420,7 +428,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			root =
 				optionalOf (
 					(Record <?>)
-					objectManager.dereference (
+					objectManager.dereferenceObsolete (
 						container,
 						rootFieldName));
 
@@ -482,7 +490,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			rootOptional =
 				optionalOf (
 					(Record <?>)
-					objectManager.dereference (
+					objectManager.dereferenceObsolete (
 						container,
 						rootFieldName));
 
@@ -554,7 +562,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			rootOptional =
 				optionalOf (
 					(Record <?>)
-					objectManager.dereference (
+					objectManager.dereferenceObsolete (
 						container,
 						rootFieldName));
 

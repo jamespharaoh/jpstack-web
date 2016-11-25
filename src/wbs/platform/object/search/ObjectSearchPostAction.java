@@ -238,7 +238,7 @@ class ObjectSearchPostAction <
 				throw new RuntimeException ();
 			}
 
-			PropertyUtils.setProperty (
+			PropertyUtils.propertySetAuto (
 				search,
 				parentIdName,
 				parentId);

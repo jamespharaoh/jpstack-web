@@ -151,7 +151,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 
 			Record<?> delegate =
 				(Record<?>)
-				objectManager.dereference (
+				objectManager.dereferenceObsolete (
 					container,
 					delegatePath,
 					hints);

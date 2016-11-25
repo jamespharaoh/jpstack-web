@@ -1,5 +1,6 @@
 package wbs.platform.object.settings;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -106,14 +107,16 @@ class ObjectRemoveAction
 			ephemeralObject);
 
 		Record <?> parentObject =
-			objectHelper.getParentRequiredGeneric (
-				ephemeralObject);
+			objectHelper.getParentRequired (
+				genericCastUnchecked (
+					ephemeralObject));
 
 		eventLogic.createEvent (
 			"object_removed_in",
 			userConsoleLogic.userRequired (),
-			objectHelper.getCodeGeneric (
-				ephemeralObject),
+			objectHelper.getCode (
+				genericCastUnchecked (
+					ephemeralObject)),
 			objectHelper.shortName (),
 			parentObject);
 

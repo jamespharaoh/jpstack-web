@@ -4,9 +4,9 @@ import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.errorResult;
 import static wbs.utils.etc.Misc.errorResultFormat;
 import static wbs.utils.etc.Misc.getError;
-import static wbs.utils.etc.Misc.getValue;
 import static wbs.utils.etc.Misc.isError;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.resultValueRequired;
 import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -180,7 +180,7 @@ class ObjectHelperPropertyImplementation <
 		} else {
 
 			return (Long)
-				PropertyUtils.getProperty (
+				PropertyUtils.propertyGetAuto (
 					object,
 					objectModel.parentIdField ().name ());
 
@@ -194,7 +194,7 @@ class ObjectHelperPropertyImplementation <
 			@NonNull RecordType object,
 			@NonNull Record <?> parent) {
 
-		PropertyUtils.setProperty (
+		PropertyUtils.propertySetAuto (
 			object,
 			objectModel.parentField ().name (),
 			parent);
@@ -367,8 +367,8 @@ class ObjectHelperPropertyImplementation <
 
 				Boolean deletedProperty =
 					genericCastUnchecked (
-						PropertyUtils.getProperty (
-							object,
+						PropertyUtils.propertyGetAuto (
+							currentObject,
 							"deleted"));
 
 				if (deletedProperty) {
@@ -393,91 +393,46 @@ class ObjectHelperPropertyImplementation <
 
 			}
 
-			if (currentHelper.isRooted ()) {
+			Either <Optional <Record <?>>, String> nextObjectOrError =
+				currentHelper.getParentOrError (
+					genericCastUnchecked (
+						currentObject));
 
-				return successResult (
-					false);
+			if (
+				isError (
+					nextObjectOrError)
+			) {
+
+				return errorResult (
+					getError (
+						nextObjectOrError));
+
+			}
+
+			Optional <Record <?>> nextObjectOptional =
+				resultValueRequired (
+					nextObjectOrError);
+
+			if (
+				optionalIsNotPresent (
+					nextObjectOptional)
+			) {
+
+				return errorResultFormat (
+					"Unable to find parent for %s with id %s",
+					currentHelper.objectName (),
+					integerToDecimalString (
+						object.getId ()));
 
 			}
 
-			if (currentHelper.canGetParent ()) {
+			currentObject =
+				optionalGetRequired (
+					nextObjectOptional);
 
-				Either <Optional <Record <?>>, String> nextObjectOrError =
-					currentHelper.getParentOrErrorGeneric (
-						currentObject);
-
-				if (
-					isError (
-						nextObjectOrError)
-				) {
-
-					return errorResult (
-						getError (
-							nextObjectOrError));
-
-				}
-
-				Optional <Record <?>> nextObjectOptional =
-					getValue (
-						nextObjectOrError);
-
-				if (
-					optionalIsNotPresent (
-						nextObjectOptional)
-				) {
-
-					return errorResultFormat (
-						"Unable to find parent for %s with id %s",
-						currentHelper.objectName (),
-						integerToDecimalString (
-							object.getId ()));
-
-				}
-
-				currentObject =
-					optionalGetRequired (
-						nextObjectOptional);
-
-				currentHelper =
-					objectManager.objectHelperForObjectRequired (
-						currentObject);
-
-			} else {
-
-				Record <?> parentType =
-					(Record <?>)
-					objectHelper.getParentTypeGeneric (
-						currentObject);
-
-				Long parentObjectId =
-					getParentIdGeneric (
-						currentObject);
-
-				Optional <ObjectHelper <?>> nextHelperOptional =
-					objectManager.objectHelperForTypeId (
-						parentType.getId ());
-
-				if (
-					optionalIsNotPresent (
-						nextHelperOptional)
-				) {
-
-					return errorResultFormat (
-						"No object helper for object type %s",
-						integerToDecimalString (
-							parentType.getId ()));
-
-				}
-
-				currentHelper =
-					optionalGetRequired (
-						nextHelperOptional);
-
-				currentObject =
-					currentHelper.findRequired (
-						parentObjectId);
-
-			}
+			currentHelper =
+				objectManager.objectHelperForObjectRequired (
+					currentObject);
 
 		}
 

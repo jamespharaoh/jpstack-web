@@ -1,9 +1,17 @@
 package wbs.console.helper.provider;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.resultValue;
+import static wbs.utils.etc.Misc.successOrThrowRuntimeException;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.etc.OptionalUtils.optionalGetOrAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.naivePluralise;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -13,6 +21,8 @@ import static wbs.utils.string.StringUtils.underscoreToCamel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -261,7 +271,7 @@ class GenericConsoleHelperProvider <
 			contextStuff.get (
 				idKey ());
 
-		Record<?> object =
+		Record <?> object =
 			objectHelper.findRequired (
 				id);
 
@@ -296,15 +306,18 @@ class GenericConsoleHelperProvider <
 			} else {
 
 				Object target =
-					contextStuffSpec.delegateName () != null
-						? objectManager.dereference (
-							object,
-							contextStuffSpec.delegateName ())
-						: object;
+					ifNotNullThenElse (
+						contextStuffSpec.delegateName (),
+						() -> optionalOrNull (
+							successOrThrowRuntimeException (
+								objectManager.dereferenceOrError (
+									object,
+									contextStuffSpec.delegateName ()))),
+						() -> object);
 
 				contextStuff.set (
 					contextStuffSpec.name (),
-					PropertyUtils.getProperty (
+					PropertyUtils.propertyGetAuto (
 						target,
 						contextStuffSpec.fieldName ()));
 
@@ -325,7 +338,7 @@ class GenericConsoleHelperProvider <
 
 			Record <?> privObject =
 				privKeySpec.delegateName () != null
-					? (Record <?>) objectManager.dereference (
+					? (Record <?>) objectManager.dereferenceObsolete (
 						object,
 						privKeySpec.delegateName ())
 					: object;
@@ -472,19 +485,37 @@ class GenericConsoleHelperProvider <
 
 		// view privs
 
-		if (viewPrivKeySpecs != null) {
+		if (
+			isNotNull (
+				viewPrivKeySpecs)
+		) {
 
 			for (
 				PrivKeySpec privKeySpec
 					: viewPrivKeySpecs
 			) {
 
+				Optional <Record <?>> privObjectOptional =
+					ifNotNullThenElse (
+						privKeySpec.delegateName (),
+						() -> genericCastUnchecked (
+							optionalGetOrAbsent (
+								resultValue (
+									objectManager.dereferenceOrError (
+										object,
+										privKeySpec.delegateName ())))),
+						() -> optionalOf (
+							object));
+
+				if (
+					optionalIsNotPresent (
+						privObjectOptional)
+				) {
+					return false;
+				}
+
 				Record <?> privObject =
-					privKeySpec.delegateName () != null
-						? (Record <?>) objectManager.dereference (
-							object,
-							privKeySpec.delegateName ())
-						: object;
+					privObjectOptional.get ();
 
 				if (
 					privChecker.canRecursive (
@@ -505,6 +536,8 @@ class GenericConsoleHelperProvider <
 				viewDelegateField)
 		) {
 
+			// special keyword 'public'
+
 			if (
 				stringEqualSafe (
 					viewDelegateField,
@@ -513,13 +546,33 @@ class GenericConsoleHelperProvider <
 				return true;
 			}
 
-			Record <?> delegate =
-				(Record <?>)
-				objectManager.dereference (
-					object,
-					viewDelegateField);
+			// lookup delegate
 
-			if (viewDelegatePrivCode != null) {
+			Optional <Record <?>> delegateOptional =
+				genericCastUnchecked (
+					optionalGetOrAbsent (
+						resultValue (
+							objectManager.dereferenceOrError (
+								object,
+								viewDelegateField))));
+
+			if (
+				optionalIsNotPresent (
+					delegateOptional)
+			) {
+				return false;
+			}
+
+			Record <?> delegate =
+				optionalGetRequired (
+					delegateOptional);
+
+			// check priv
+
+			if (
+				isNotNull (
+					viewDelegatePrivCode)
+			) {
 
 				return privChecker.canRecursive (
 					delegate,

@@ -736,7 +736,7 @@ class ChatMessageLogicImplementation
 	public
 	ApprovalResult checkForApproval (
 			@NonNull ChatRec chat,
-			@NonNull String message) {
+			@NonNull String originalMessage) {
 
 		ApprovalResult approvalResult =
 			new ApprovalResult ();
@@ -752,9 +752,12 @@ class ChatMessageLogicImplementation
 
 		// get and iterate regexps
 
-		List<ChatApprovalRegexpRec> chatApprovalRegexps =
+		List <ChatApprovalRegexpRec> chatApprovalRegexps =
 			chatApprovalRegexpHelper.findByParent (
 				chat);
+
+		String currentMessage =
+			originalMessage;
 
 		for (
 			ChatApprovalRegexpRec chatApprovalRegexp
@@ -769,7 +772,8 @@ class ChatMessageLogicImplementation
 					Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 
 			Matcher matcher =
-				pattern.matcher (message);
+				pattern.matcher (
+					originalMessage);
 
 			if (! matcher.find ())
 				continue;
@@ -811,7 +815,7 @@ class ChatMessageLogicImplementation
 			matcher.appendTail (
 				stringBuffer);
 
-			message =
+			currentMessage =
 				stringBuffer.toString ();
 
 		}
@@ -819,7 +823,7 @@ class ChatMessageLogicImplementation
 		// and return
 
 		approvalResult.message =
-			message;
+			currentMessage;
 
 		return approvalResult;
 

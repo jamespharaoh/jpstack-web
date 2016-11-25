@@ -713,7 +713,7 @@ class ComponentManagerImplementation
 					componentDefinition.name (),
 					valuePropertyEntry.getKey ()));
 
-			PropertyUtils.set (
+			PropertyUtils.propertySetSimple (
 				component,
 				valuePropertyEntry.getKey (),
 				valuePropertyEntry.getValue ());
@@ -753,7 +753,7 @@ class ComponentManagerImplementation
 					entry.getValue (),
 					Object.class);
 
-			PropertyUtils.set (
+			PropertyUtils.propertySetSimple (
 				component,
 				entry.getKey (),
 				target);

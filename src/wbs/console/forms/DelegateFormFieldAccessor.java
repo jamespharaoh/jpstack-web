@@ -40,7 +40,7 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 		@SuppressWarnings ("unchecked")
 		DelegateContainer delegateContainer =
 			(DelegateContainer)
-			objectManager.dereference (
+			objectManager.dereferenceObsolete (
 				principalContainer,
 				path);
 
@@ -64,7 +64,7 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 		@SuppressWarnings ("unchecked")
 		DelegateContainer delegateContainer =
 			(DelegateContainer)
-			objectManager.dereference (
+			objectManager.dereferenceObsolete (
 				principalContainer,
 				path);
 

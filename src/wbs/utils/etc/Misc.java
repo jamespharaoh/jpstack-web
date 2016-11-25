@@ -1,6 +1,8 @@
 package wbs.utils.etc;
 
 import static wbs.utils.etc.LogicUtils.ifThenElse;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -816,8 +818,19 @@ class Misc {
 	}
 
 	public static <Type>
-	Type getValue (
-			@NonNull Either<Type,?> either) {
+	Optional <Type> resultValue (
+			@NonNull Either <Type, ?> either) {
+
+		return either.isLeft ()
+			? optionalOf (
+				either.left ().value ())
+			: optionalAbsent ();
+
+	}
+
+	public static <Type>
+	Type resultValueRequired (
+			@NonNull Either <Type, ?> either) {
 
 		return either.left ().value ();
 
@@ -971,7 +984,10 @@ class Misc {
 	public static <OldValueType, NewValueType, ErrorType>
 	Either <NewValueType, ErrorType> mapSuccess (
 			@NonNull Either <OldValueType, ErrorType> result,
-			@NonNull Function <OldValueType, NewValueType> mapping) {
+			@NonNull Function <
+				? super OldValueType,
+				? extends NewValueType
+			> mapping) {
 
 		if (result.isLeft ()) {
 

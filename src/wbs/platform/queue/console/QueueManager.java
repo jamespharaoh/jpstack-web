@@ -1,6 +1,7 @@
 package wbs.platform.queue.console;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -184,10 +185,10 @@ class QueueManager {
 		}
 
 		Long preferredUserDelay =
-			(Long)
-			objectManager.dereference (
-				queueParent,
-				queueTypeSpec.preferredUserDelay ());
+			genericCastUnchecked (
+				objectManager.dereferenceRequired (
+					queueParent,
+					queueTypeSpec.preferredUserDelay ()));
 
 		return Duration.standardSeconds (
 			preferredUserDelay);

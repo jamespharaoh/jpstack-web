@@ -520,7 +520,7 @@ class ChatUserPendingFormAction
 
 		List <ChatUserImageRec> list =
 			genericCastUnchecked (
-				PropertyUtils.getProperty (
+				PropertyUtils.propertyGetAuto (
 					chatUser,
 					mode.listProperty ()));
 

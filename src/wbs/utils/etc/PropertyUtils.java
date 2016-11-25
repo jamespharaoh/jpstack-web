@@ -17,6 +17,10 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import wbs.utils.exception.RuntimeIllegalAccessException;
+import wbs.utils.exception.RuntimeInvocationTargetException;
+import wbs.utils.exception.RuntimeNoSuchMethodException;
+
 public
 class PropertyUtils {
 
@@ -26,43 +30,46 @@ class PropertyUtils {
 	}
 
 	public static
-	Object getProperty (
+	Object propertyGetAuto (
 			@NonNull Object object,
 			@NonNull String propertyName) {
 
 		try {
 
-			Class<?> objectClass =
+			Class <?> objectClass =
 				object.getClass ();
 
 			Method getter =
-				getPropertyGetter (
+				propertyGetMethodAuto (
 					objectClass,
 					propertyName);
 
-			return getter.invoke (object);
+			return getter.invoke (
+				object);
 
 		} catch (IllegalAccessException exception) {
 
-			throw new RuntimeException (exception);
+			throw new RuntimeIllegalAccessException (
+				exception);
 
 		} catch (InvocationTargetException exception) {
 
-			throw new RuntimeException (exception);
+			throw new RuntimeInvocationTargetException (
+				exception);
 
 		}
 
 	}
 
 	public static
-	Method getPropertyGetter (
+	Method propertyGetMethodAuto (
 			@NonNull Class<?> objectClass,
 			@NonNull String propertyName) {
 
 		try {
 
 			return objectClass.getMethod (
-				getterName (propertyName));
+				propertyGetterName (propertyName));
 
 		} catch (NoSuchMethodException exception) {
 		}
@@ -70,7 +77,7 @@ class PropertyUtils {
 		try {
 
 			return objectClass.getMethod (
-				isGetterName (propertyName));
+				propertyIsGetterName (propertyName));
 
 		} catch (NoSuchMethodException exception) {
 		}
@@ -83,7 +90,7 @@ class PropertyUtils {
 		} catch (NoSuchMethodException exception) {
 		}
 
-		throw new RuntimeException (
+		throw new RuntimeNoSuchMethodException (
 			stringFormat (
 				"Can't find getter for %s on %s",
 				propertyName,
@@ -92,39 +99,43 @@ class PropertyUtils {
 	}
 
 	public static
-	Object get (
+	Object propertyGetSimple (
 			@NonNull Object object,
 			@NonNull String propertyName) {
 
 		try {
 
-			Class<?> objectClass =
+			Class <?> objectClass =
 				object.getClass ();
 
 			Method getter =
 				objectClass.getMethod (
 					propertyName);
 
-			return getter.invoke (object);
+			return getter.invoke (
+				object);
 
 		} catch (NoSuchMethodException exception) {
 
-			throw new RuntimeException (exception);
+			throw new RuntimeNoSuchMethodException (
+				exception);
 
 		} catch (IllegalAccessException exception) {
 
-			throw new RuntimeException (exception);
+			throw new RuntimeIllegalAccessException (
+				exception);
 
 		} catch (InvocationTargetException exception) {
 
-			throw new RuntimeException (exception);
+			throw new RuntimeInvocationTargetException (
+				exception);
 
 		}
 
 	}
 
 	public static
-	void setProperty (
+	void propertySetAuto (
 			@NonNull Object object,
 			@NonNull String propertyName,
 			Object newValue) {
@@ -135,7 +146,7 @@ class PropertyUtils {
 				object.getClass ();
 
 			Method setter =
-				getPropertySetter (
+				propertySetMethodAuto (
 					objectClass,
 					propertyName);
 
@@ -156,12 +167,12 @@ class PropertyUtils {
 	}
 
 	public static
-	Method getPropertySetter (
+	Method propertySetMethodAuto (
 			@NonNull Class<?> objectClass,
 			@NonNull String propertyName) {
 
 		String setterName =
-			setterName (propertyName);
+			propertySetterName (propertyName);
 
 		Method[] methods =
 			objectClass.getMethods ();
@@ -179,8 +190,10 @@ class PropertyUtils {
 
 		}
 
-		for (Method method
-				: methods) {
+		for (
+			Method method
+				: methods
+		) {
 
 			if (method.getParameterTypes ().length != 1)
 				continue;
@@ -192,7 +205,7 @@ class PropertyUtils {
 
 		}
 
-		throw new RuntimeException (
+		throw new RuntimeNoSuchMethodException (
 			stringFormat (
 				"Can't find setter for %s on %s",
 				propertyName,
@@ -201,9 +214,9 @@ class PropertyUtils {
 	}
 
 	public static
-	void set (
-			Object object,
-			String propertyName,
+	void propertySetSimple (
+			@NonNull Object object,
+			@NonNull String propertyName,
 			Object newValue) {
 
 		try {
@@ -256,7 +269,7 @@ class PropertyUtils {
 	}
 
 	public static
-	String getterName (
+	String propertyGetterName (
 			String name) {
 
 		return "get"
@@ -266,7 +279,7 @@ class PropertyUtils {
 	}
 
 	public static
-	String isGetterName (
+	String propertyIsGetterName (
 			String name) {
 
 		return "is"
@@ -276,7 +289,7 @@ class PropertyUtils {
 	}
 
 	public static
-	String setterName (
+	String propertySetterName (
 			String name) {
 
 		return "set"
@@ -290,7 +303,8 @@ class PropertyUtils {
 			String getterName) {
 
 		Matcher matcher =
-			getterPattern.matcher (getterName);
+			getterPattern.matcher (
+				getterName);
 
 		if (! matcher.matches ())
 			throw new IllegalArgumentException ();
@@ -359,7 +373,7 @@ class PropertyUtils {
 			@NonNull String propertyName) {
 
 		Method getter =
-			getPropertyGetter (
+			propertyGetMethodAuto (
 				objectClass,
 				propertyName);
 
@@ -378,7 +392,7 @@ class PropertyUtils {
 		) {
 
 			Object propertyValue =
-				getProperty (
+				propertyGetAuto (
 					object,
 					requiredProperty.name ());
 

@@ -1031,6 +1031,10 @@ class JavaClassWriter
 						method.getAnnotation (
 							DoNotDelegate.class)))
 
+				.filter (
+					method ->
+						! method.isDefault ())
+
 				.map (
 					method -> Pair.of (
 						stringFormat (

@@ -4,7 +4,7 @@ import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
 import static wbs.utils.etc.Misc.eitherGetLeft;
 import static wbs.utils.etc.Misc.getError;
-import static wbs.utils.etc.Misc.getValue;
+import static wbs.utils.etc.Misc.resultValueRequired;
 import static wbs.utils.etc.Misc.isError;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.isRight;
@@ -171,7 +171,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 			Record<?> delegate =
 				(Record<?>)
-				objectManager.dereference (
+				objectManager.dereferenceObsolete (
 					container,
 					delegatePath,
 					hints);
@@ -511,7 +511,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			interfaceMapping.interfaceToGeneric (
 				container,
 				hints,
-				getValue (
+				resultValueRequired (
 					newInterfaceValue));
 
 		if (
