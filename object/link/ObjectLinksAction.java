@@ -127,7 +127,7 @@ class ObjectLinksAction
 
 		Set <Record <?>> contextLinks =
 			genericCastUnchecked (
-				PropertyUtils.getProperty (
+				PropertyUtils.propertyGetAuto (
 					contextObject,
 					contextLinkField));
 
@@ -179,7 +179,7 @@ class ObjectLinksAction
 			@SuppressWarnings ("unchecked")
 			Set<Record<?>> targetLinks =
 				(Set<Record<?>>)
-				PropertyUtils.getProperty (
+				PropertyUtils.propertyGetAuto (
 					targetObject,
 					targetLinkField);
 

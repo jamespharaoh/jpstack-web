@@ -196,7 +196,7 @@ class ObjectSettingsAction <
 						object));
 
 			Object objectRef =
-				PropertyUtils.getProperty (
+				PropertyUtils.propertyGetAuto (
 					object,
 					objectRefName);
 

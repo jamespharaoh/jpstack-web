@@ -108,7 +108,7 @@ class ObjectLinksPart <
 
 		contextLinks =
 			(Set <?>)
-			PropertyUtils.getProperty (
+			PropertyUtils.propertyGetAuto (
 				contextObject,
 				contextLinksField);
 

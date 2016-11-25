@@ -447,7 +447,7 @@ class QueueConsoleLogic {
 
 		Record<?> supervisorDelegate =
 			(Record<?>)
-			objectManager.dereference (
+			objectManager.dereferenceObsolete (
 				queue,
 				supervisorParts [0]);
 
