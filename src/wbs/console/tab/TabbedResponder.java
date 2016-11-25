@@ -252,9 +252,6 @@ class TabbedResponder
 	void renderHtmlHeadContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
-debugFormat (
-	"TabbedResponder.renderHtmlHeadContents");
-
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
@@ -272,9 +269,6 @@ debugFormat (
 				pagePartThrew)
 
 		) {
-
-			debugFormat (
-				"call page part render html content");
 
 			pagePart.renderHtmlHeadContent (
 				taskLogger);
