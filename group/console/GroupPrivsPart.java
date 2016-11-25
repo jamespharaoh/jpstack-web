@@ -1,6 +1,5 @@
 package wbs.platform.group.console;
 
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttributeFormat;
@@ -164,9 +163,6 @@ class GroupPrivsPart
 	void renderHtmlHeadContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-debugFormat (
-	"renderHtmlHeadContent");
-
 		renderScriptBlock ();
 
 	}
@@ -302,9 +298,6 @@ debugFormat (
 
 	private
 	void renderScriptBlock () {
-
-debugFormat (
-	"renderScriptBlock");
 
 		// script block open
 
