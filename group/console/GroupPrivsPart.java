@@ -1,5 +1,6 @@
 package wbs.platform.group.console;
 
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttributeFormat;
@@ -27,12 +28,14 @@ import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.console.PrivConsoleHelper;
 import wbs.platform.priv.model.PrivRec;
@@ -103,7 +106,7 @@ class GroupPrivsPart
 
 		// build the privs tree
 
-		List<PrivRec> privs =
+		List <PrivRec> privs =
 			privHelper.findAll ();
 
 		for (
@@ -151,17 +154,79 @@ class GroupPrivsPart
 
 		// now check which tree nodes to expand initially
 
-		doExpansion (rootNode);
+		doExpansion (
+			rootNode);
+
+	}
+
+	@Override
+	public
+	void renderHtmlHeadContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
+debugFormat (
+	"renderHtmlHeadContent");
+
+		renderScriptBlock ();
+
+	}
+
+	@Override
+	public
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		htmlFormOpenPostAction (
+			requestContext.resolveLocalUrl (
+				"/group.privs"),
+			htmlAttributeFormat (
+				"onsubmit",
+				"javascript:%s = %s",
+				"document.getElementById ('privdata').value",
+				"getUpdateString ()"));
+
+		formatWriter.writeLineFormat (
+			"<input",
+			" type=\"hidden\"",
+			" name=\"privdata\"",
+			" id=\"privdata\"",
+			" value=\"\"",
+			">");
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
+			" type=\"submit\"",
+			" value=\"save changes\"",
+			">");
+
+		htmlParagraphClose ();
+
+		htmlScriptBlockWrite (
+			"document.write (buildTree (treeData, treeOpts));");
+
+		htmlParagraphOpen ();
+
+		formatWriter.writeLineFormat (
+			"<input",
+			" type=\"submit\"",
+			" value=\"save changes\"",
+			">");
+
+		htmlParagraphClose ();
+
+		htmlFormClose ();
 
 	}
 
 	private
 	PrivsNode findNode (
-			Record<?> object) {
+			@NonNull Record <?> object) {
 
 		// end the recursion if we reach the root node
 
-		if ((Object) object instanceof RootRec)
+		if (object instanceof RootRec)
 			return rootNode;
 
 		// check if the node already exists
@@ -190,9 +255,10 @@ class GroupPrivsPart
 		// lookup or create the map containing this node's children of this
 		// type
 
-		Map<String,PrivsNode> typeNodesByCode =
+		Map <String, PrivsNode> typeNodesByCode =
 			parentNode.nodesByCodeByTypeCode.get (
-				objectManager.getObjectTypeCode (object));
+				objectManager.getObjectTypeCode (
+					object));
 
 		if (typeNodesByCode == null) {
 
@@ -200,7 +266,8 @@ class GroupPrivsPart
 				new TreeMap<String,PrivsNode>();
 
 			parentNode.nodesByCodeByTypeCode.put (
-				objectManager.getObjectTypeCode (object),
+				objectManager.getObjectTypeCode (
+					object),
 				typeNodesByCode);
 
 		}
@@ -209,7 +276,8 @@ class GroupPrivsPart
 
 		node =
 			typeNodesByCode.get (
-				objectManager.getCode (object));
+				objectManager.getCode (
+					object));
 
 		if (node == null) {
 
@@ -232,17 +300,11 @@ class GroupPrivsPart
 
 	}
 
-	@Override
-	public
-	void renderHtmlHeadContent (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		renderScriptBlock ();
-
-	}
-
 	private
 	void renderScriptBlock () {
+
+debugFormat (
+	"renderScriptBlock");
 
 		// script block open
 
@@ -505,7 +567,7 @@ class GroupPrivsPart
 
 	}
 
-	public
+	private
 	boolean doExpansion (
 			@NonNull PrivsNode node) {
 
@@ -562,54 +624,7 @@ class GroupPrivsPart
 
 	}
 
-	@Override
-	public
-	void renderHtmlBodyContent (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		htmlFormOpenPostAction (
-			requestContext.resolveLocalUrl (
-				"/group.privs"),
-			htmlAttributeFormat (
-				"onsubmit",
-				"javascript:%s = %s",
-				"document.getElementById ('privdata').value",
-				"getUpdateString ()"));
-
-		formatWriter.writeFormat (
-			"<input",
-			" type=\"hidden\"",
-			" name=\"privdata\"",
-			" id=\"privdata\"",
-			" value=\"\"",
-			">");
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"save changes\"",
-			">");
-
-		htmlParagraphClose ();
-
-		htmlScriptBlockWrite (
-			"document.write (buildTree (treeData, treeOpts));");
-
-		htmlParagraphOpen ();
-
-		formatWriter.writeFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"save changes\"",
-			">");
-
-		htmlParagraphClose ();
-
-		htmlFormClose ();
-
-	}
+	// data types
 
 	static
 	class PrivsNode {

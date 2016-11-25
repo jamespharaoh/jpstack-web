@@ -8,6 +8,11 @@
 			name="currency.manage"
 			priv="manage"/>
 
+		<priv-key
+			name="currency.view"
+			delegate="slice"
+			priv="currency_view"/>
+
 		<context-stuff
 			name="currencyName"
 			field="name"/>
