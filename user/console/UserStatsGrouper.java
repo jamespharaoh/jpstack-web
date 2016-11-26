@@ -11,10 +11,16 @@ import lombok.NonNull;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsGrouper;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+
 import wbs.utils.string.FormatWriter;
 
 @SingletonComponent ("userStatsGrouper")
@@ -26,6 +32,9 @@ class UserStatsGrouper
 
 	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	UserObjectHelper userHelper;
@@ -46,8 +55,14 @@ class UserStatsGrouper
 	@Override
 	public
 	void writeTdForGroup (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Object group) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeTdForGroup");
 
 		UserRec user =
 			userHelper.findRequired (
@@ -55,6 +70,7 @@ class UserStatsGrouper
 				group);
 
 		consoleObjectManager.writeTdForObjectMiniLink (
+			taskLogger,
 			formatWriter,
 			user);
 

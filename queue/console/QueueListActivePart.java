@@ -136,6 +136,7 @@ class QueueListActivePart
 
 			if (
 				! objectManager.canView (
+					taskLogger,
 					queueInfo.queue ())
 			) {
 				continue;
@@ -163,7 +164,7 @@ class QueueListActivePart
 		ConsoleContext queueContext =
 			consoleManager.relatedContextRequired (
 				taskLogger,
-				requestContext.consoleContext (),
+				requestContext.consoleContextRequired (),
 				queueContextType);
 
 		htmlTableHeaderRowWrite (

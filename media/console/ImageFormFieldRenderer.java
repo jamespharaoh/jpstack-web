@@ -25,6 +25,7 @@ import wbs.console.forms.FormType;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
@@ -87,6 +88,7 @@ class ImageFormFieldRenderer <Container>
 	@Override
 	public
 	void renderFormInput (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,

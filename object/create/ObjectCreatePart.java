@@ -274,11 +274,17 @@ class ObjectCreatePart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlParagraphWriteFormat (
 			"Please enter the details for the new %h",
 			consoleHelper.shortName ());
 
 		formFieldLogic.outputFormTable (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			formFieldSet,

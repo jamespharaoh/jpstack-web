@@ -58,7 +58,7 @@
 			name="Currency create"
 			description="Create currencies in a slice"
 			template="yes"/>
-		
+
 		<priv-type
 			subject="slice"
 			name="Currency view"

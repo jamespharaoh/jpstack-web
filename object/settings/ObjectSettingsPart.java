@@ -129,7 +129,7 @@ class ObjectSettingsPart <
 
 		object =
 			objectLookup.lookupObject (
-				requestContext.contextStuff ());
+				requestContext.contextStuffRequired ());
 
 		canEdit = (
 
@@ -210,6 +210,11 @@ class ObjectSettingsPart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		if (canEdit) {
 
 			String enctype =
@@ -241,6 +246,7 @@ class ObjectSettingsPart <
 		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			formFieldSet,

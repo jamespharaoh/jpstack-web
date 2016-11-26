@@ -123,7 +123,7 @@ class ObjectLinksAction
 
 		Record<?> contextObject =
 			contextHelper.lookupObject (
-				requestContext.contextStuff ());
+				requestContext.contextStuffRequired ());
 
 		Set <Record <?>> contextLinks =
 			genericCastUnchecked (

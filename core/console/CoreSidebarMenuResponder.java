@@ -26,10 +26,14 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.menu.console.MenuGroupConsoleHelper;
 import wbs.platform.menu.model.MenuGroupRec;
 import wbs.platform.menu.model.MenuItemRec;
@@ -38,6 +42,7 @@ import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+
 import wbs.web.utils.ABSwap;
 
 @PrototypeComponent ("coreSidebarMenuResponder")
@@ -46,6 +51,9 @@ class CoreSidebarMenuResponder
 	extends HtmlResponder {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MenuGroupConsoleHelper menuGroupHelper;
@@ -140,6 +148,11 @@ class CoreSidebarMenuResponder
 	void renderHtmlBodyContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContents");
+
 		htmlTableOpen (
 			htmlClassAttribute (
 				"menu"),
@@ -165,8 +178,13 @@ class CoreSidebarMenuResponder
 				if (menu.getDeleted ())
 					continue;
 
-				if (! objectManager.canView (menu))
+				if (
+					! objectManager.canView (
+						taskLogger,
+						menu)
+				) {
 					continue;
+				}
 
 				if (! doneGroup) {
 

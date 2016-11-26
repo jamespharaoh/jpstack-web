@@ -101,7 +101,7 @@ class ObjectRemoveAction
 
 		Record <?> ephemeralObject =
 			objectHelper.lookupObject (
-				requestContext.contextStuff ());
+				requestContext.contextStuffRequired ());
 
 		objectHelper.remove (
 			ephemeralObject);
@@ -136,7 +136,7 @@ class ObjectRemoveAction
 		ConsoleContext targetContext =
 			consoleManager.relatedContextRequired (
 				taskLogger,
-				requestContext.consoleContext (),
+				requestContext.consoleContextRequired (),
 				targetContextType);
 
 		consoleManager.changeContext (

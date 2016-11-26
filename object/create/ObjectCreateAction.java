@@ -434,7 +434,7 @@ class ObjectCreateAction <
 			ConsoleContext targetContext =
 				consoleManager.relatedContextRequired (
 					taskLogger,
-					requestContext.consoleContext (),
+					requestContext.consoleContextRequired (),
 					targetContextType);
 
 			consoleManager.changeContext (
@@ -456,7 +456,7 @@ class ObjectCreateAction <
 			ConsoleContext targetParentContext =
 				consoleManager.relatedContextRequired (
 					taskLogger,
-					requestContext.consoleContext (),
+					requestContext.consoleContextRequired (),
 					targetParentContextType);
 
 			ConsoleContextType targetContextType =

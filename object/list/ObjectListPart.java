@@ -1,6 +1,7 @@
 package wbs.platform.object.list;
 
 import static wbs.utils.collection.CollectionUtils.collectionStream;
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -32,7 +33,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
@@ -171,7 +171,9 @@ class ObjectListPart <
 		prepareTabSpec ();
 		prepareCurrentObject ();
 		prepareAllObjects ();
-		prepareSelectedObjects ();
+
+		prepareSelectedObjects (
+			taskLogger);
 
 		prepareTargetContext (
 			taskLogger);
@@ -507,7 +509,14 @@ class ObjectListPart <
 
 	}
 
-	void prepareSelectedObjects () {
+	private
+	void prepareSelectedObjects (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepareSelectedObjects");
 
 		// select which objects we want to display
 
@@ -521,8 +530,11 @@ class ObjectListPart <
 				: allObjects
 		) {
 
-			if (! consoleHelper.canView (
-					object)) {
+			if (
+				! consoleHelper.canView (
+					taskLogger,
+					object)
+			) {
 
 				continue;
 
@@ -574,7 +586,7 @@ class ObjectListPart <
 		targetContext =
 			consoleManager.relatedContextRequired (
 				taskLogger,
-				requestContext.consoleContext (),
+				requestContext.consoleContextRequired (),
 				targetContextType);
 
 	}
@@ -584,9 +596,16 @@ class ObjectListPart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		goBrowser ();
 		goTabs ();
-		goList ();
+
+		goList (
+			taskLogger);
 
 	}
 
@@ -683,7 +702,13 @@ class ObjectListPart <
 
 	}
 
-	void goList () {
+	void goList (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goList");
 
 		htmlTableOpenList ();
 
@@ -730,10 +755,11 @@ class ObjectListPart <
 			);
 
 			formFieldLogic.outputTableCellsList (
+				taskLogger,
 				formatWriter,
 				fields,
 				object,
-				ImmutableMap.of (),
+				emptyMap (),
 				false);
 
 			htmlTableRowClose (

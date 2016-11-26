@@ -331,7 +331,7 @@ class ObjectSearchPostAction <
 			Optional <ConsoleContext> targetContext =
 				consoleManager.relatedContext (
 					taskLogger,
-					requestContext.consoleContext (),
+					requestContext.consoleContextRequired (),
 					targetContextType);
 
 			if (

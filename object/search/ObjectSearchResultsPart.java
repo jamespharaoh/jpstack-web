@@ -3,6 +3,7 @@ package wbs.platform.object.search;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.CollectionUtils.listSlice;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -45,7 +46,6 @@ import java.util.Set;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
@@ -307,7 +307,7 @@ class ObjectSearchResultsPart <
 		targetContext =
 			consoleManager.relatedContext (
 				taskLogger,
-				requestContext.consoleContext (),
+				requestContext.consoleContextRequired (),
 				targetContextType);
 
 	}
@@ -317,10 +317,18 @@ class ObjectSearchResultsPart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		goNewSearch ();
 		goTotalObjects ();
 		goPageNumbers ();
-		goSearchResults ();
+
+		goSearchResults (
+			taskLogger);
+
 		goPageNumbers ();
 
 	}
@@ -413,7 +421,13 @@ class ObjectSearchResultsPart <
 
 	}
 
-	void goSearchResults () {
+	void goSearchResults (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goSearchResults");
 
 		htmlTableOpenList ();
 
@@ -459,9 +473,10 @@ class ObjectSearchResultsPart <
 
 				result instanceof Record
 
-				&& ! consoleHelper.canViewGeneric (
-					(Record <?>)
-					result)
+				&& ! consoleHelper.canView (
+					taskLogger,
+					genericCastUnchecked (
+						result))
 
 			)  {
 
@@ -584,10 +599,11 @@ class ObjectSearchResultsPart <
 			}
 
 			formFieldLogic.outputTableCellsList (
+				taskLogger,
 				formatWriter,
 				formFieldSet,
 				result,
-				ImmutableMap.of (),
+				emptyMap (),
 				false);
 
 			if (
@@ -640,6 +656,7 @@ class ObjectSearchResultsPart <
 				));
 
 				formFieldLogic.outputTableRowsList (
+					taskLogger,
 					formatWriter,
 					rowsFormFieldSet,
 					result,

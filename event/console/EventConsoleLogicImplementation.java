@@ -143,7 +143,7 @@ class EventConsoleLogicImplementation
 				PermanentRecord <?> object =
 					genericCastUnchecked (
 						objectLookup.lookupObject (
-							requestContext.contextStuff ()));
+							requestContext.contextStuffRequired ()));
 
 				return makeEventsPart (
 					object);

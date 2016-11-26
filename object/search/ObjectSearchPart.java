@@ -35,9 +35,12 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -53,6 +56,9 @@ class ObjectSearchPart <
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -180,6 +186,11 @@ class ObjectSearchPart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		// form open
 
 		htmlFormOpenPostAction (
@@ -191,6 +202,7 @@ class ObjectSearchPart <
 		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			fields,
