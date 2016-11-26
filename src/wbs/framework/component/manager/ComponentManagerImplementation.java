@@ -16,8 +16,10 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.ReflectionUtils.fieldSet;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
@@ -817,8 +819,9 @@ class ComponentManagerImplementation
 
 		taskLogger.debugFormat (
 			"Setting injected property %s.%s",
-			componentDefinition.name (),
-			injectedProperty.fieldName ());
+			classNameSimple (
+				injectedProperty.field ().getDeclaringClass ()),
+			injectedProperty.field ().getName ());
 
 		Injection injection =
 			new Injection ();
@@ -951,8 +954,9 @@ class ComponentManagerImplementation
 							integerToDecimalString (
 								targetComponents.size ()),
 							"components into a single field %s.%s",
-							componentDefinition.name (),
-							injectedProperty.fieldName ()));
+							classNameSimple (
+								injectedProperty.field ().getDeclaringClass ()),
+							injectedProperty.field ().getName ()));
 
 				}
 
@@ -1043,32 +1047,14 @@ class ComponentManagerImplementation
 			injection.aggregator.apply (
 				unaggregatedValues);
 
-		try {
+		Field field =
+			injection.injectedProperty.field ();
 
-			Field field =
-				injection.injectedProperty
-					.fieldDeclaringClass ()
-					.getDeclaredField (
-						injection.injectedProperty.fieldName ());
-
-			field.setAccessible (
-				true);
-
-			field.set (
-				injection.component,
-				aggregatedValue);
-
-		} catch (NoSuchFieldException noSuchFieldException) {
-
-			throw new RuntimeException (
-				noSuchFieldException);
-
-		} catch (IllegalAccessException illegalAccessException) {
-
-			throw new RuntimeException (
-				illegalAccessException);
-
-		}
+		fieldSet (
+			field,
+			injection.component,
+			optionalOf (
+				aggregatedValue));
 
 	}
 
@@ -1090,6 +1076,29 @@ class ComponentManagerImplementation
 
 		state =
 			State.initialization;
+
+		// set all fields to accessible
+
+		for (
+			ComponentDefinition componentDefinition
+				: registry.all ()
+		) {
+
+			for (
+				InjectedProperty injectedProperty
+					: componentDefinition.injectedProperties ()
+			) {
+
+				injectedProperty.field ().setAccessible (
+					true);
+
+			}
+
+		}
+
+		//field.setAccessible (
+		//	true);
+
 
 		// instantiate singletons
 

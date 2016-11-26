@@ -16,6 +16,7 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.TypeUtils.classNameFull;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.classNotEqual;
 import static wbs.utils.etc.TypeUtils.classNotInSafe;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
@@ -911,15 +912,15 @@ class ComponentRegistryImplementation
 
 	private
 	void initInjectedPropertyTargetByQualifier (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Annotation qualifier,
 			@NonNull InjectedProperty injectedProperty,
 			@NonNull Boolean weak) {
 
-		taskLogger =
+		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
-				taskLogger,
+				parentTaskLogger,
 				"initInjectedPropertyTargetByQualifier");
 
 		@Cleanup
@@ -947,8 +948,9 @@ class ComponentRegistryImplementation
 						? "prototype"
 						: "singleton",
 					injectedProperty.targetType ().toString (),
-					componentDefinition.name (),
-					injectedProperty.fieldName ());
+					classNameSimple (
+						injectedProperty.field ().getDeclaringClass ()),
+					injectedProperty.field ().getName ());
 
 				return;
 
@@ -961,8 +963,9 @@ class ComponentRegistryImplementation
 					integerToDecimalString (
 						targetComponentDefinitions.size ()),
 					injectedProperty.targetType ().toString (),
-					componentDefinition.name (),
-					injectedProperty.fieldName ());
+					classNameSimple (
+						injectedProperty.field ().getClass ()),
+					injectedProperty.field ().getName ());
 
 				return;
 
@@ -1093,7 +1096,7 @@ class ComponentRegistryImplementation
 
 				.addValueProperty (
 					"componentClass",
-					componentDefinition.componentClass ())
+					field.getDeclaringClass ())
 
 			);
 
@@ -1278,11 +1281,8 @@ class ComponentRegistryImplementation
 					.componentDefinition (
 						componentDefinition)
 
-					.fieldDeclaringClass (
-						field.getDeclaringClass ())
-
-					.fieldName (
-						field.getName ())
+					.field (
+						field)
 
 					.initialized (
 						isNull (
@@ -1330,7 +1330,7 @@ class ComponentRegistryImplementation
 
 	private
 	void initInjectedFieldByName (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull String targetComponentName,
 			@NonNull Field field,
@@ -1338,9 +1338,9 @@ class ComponentRegistryImplementation
 			@NonNull Boolean initialized,
 			@NonNull Boolean weak) {
 
-		taskLogger =
+		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
-				taskLogger,
+				parentTaskLogger,
 				"initInjectedFieldByName");
 
 		@Cleanup
@@ -1391,11 +1391,8 @@ class ComponentRegistryImplementation
 			.componentDefinition (
 				componentDefinition)
 
-			.fieldDeclaringClass (
-				field.getDeclaringClass ())
-
-			.fieldName (
-				field.getName ())
+			.field (
+				field)
 
 			.prototype (
 				prototype)
@@ -1418,14 +1415,14 @@ class ComponentRegistryImplementation
 
 	private
 	void initInjectedPropertyField (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Field field,
 			@NonNull InjectedProperty injectedProperty) {
 
-		taskLogger =
+		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
-				taskLogger,
+				parentTaskLogger,
 				"initInjectedPropertyField");
 
 		@Cleanup
@@ -1573,15 +1570,15 @@ class ComponentRegistryImplementation
 
 	private
 	void initInjectedPropertyTargetByClass (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Field field,
 			@NonNull InjectedProperty injectedProperty,
 			@NonNull Boolean weak) {
 
-		taskLogger =
+		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
-				taskLogger,
+				parentTaskLogger,
 				"initInjectedPropertyTargetByClass");
 
 		@Cleanup
@@ -1684,12 +1681,12 @@ class ComponentRegistryImplementation
 
 	private
 	List <ComponentDefinition> orderByStrongDepedendencies (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull List <ComponentDefinition> definitions) {
 
-		taskLogger =
+		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
-				taskLogger,
+				parentTaskLogger,
 				"orderByStrongDependencies");
 
 		List <ComponentDefinition> unorderedDefinitions =

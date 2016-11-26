@@ -1,5 +1,6 @@
 package wbs.framework.component.registry;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,11 +25,7 @@ class InjectedProperty {
 
 	@DataAttribute
 	@Getter @Setter
-	Class <?> fieldDeclaringClass;
-
-	@DataAttribute
-	@Getter @Setter
-	String fieldName;
+	Field field;
 
 	@DataAttribute
 	@Getter @Setter

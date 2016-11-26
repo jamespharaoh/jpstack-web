@@ -303,11 +303,11 @@ class ComponentManagerBuilder {
 
 	private
 	void registerLayerComponents (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		taskLogger =
+		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
-				taskLogger,
+				parentTaskLogger,
 				"registerLayerComponents");
 
 		for (
