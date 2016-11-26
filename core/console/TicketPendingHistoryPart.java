@@ -1,5 +1,6 @@
 package wbs.services.ticket.core.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingThreeWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
@@ -9,8 +10,6 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import javax.inject.Named;
 
-import com.google.common.collect.ImmutableMap;
-
 import lombok.NonNull;
 
 import wbs.console.forms.FormFieldLogic;
@@ -19,9 +18,13 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.services.ticket.core.model.TicketNoteRec;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
@@ -37,6 +40,9 @@ class TicketPendingHistoryPart
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -100,15 +106,29 @@ class TicketPendingHistoryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		goSummary ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
-		goStateSummary ();
+		goSummary (
+			taskLogger);
 
-		goTicketNotes ();
+		goStateSummary (
+			taskLogger);
+
+		goTicketNotes (
+			taskLogger);
 
 	}
 
-	void goSummary () {
+	void goSummary (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goSummary");
 
 		htmlHeadingThreeWrite (
 			"Summary");
@@ -116,16 +136,23 @@ class TicketPendingHistoryPart
 		htmlTableOpenDetails ();
 
 		formFieldLogic.outputTableRows (
+			taskLogger,
 			formatWriter,
 			ticketFields,
 			ticket,
-			ImmutableMap.of ());
+			emptyMap ());
 
 		htmlTableClose ();
 
 	}
 
-	void goTicketNotes () {
+	void goTicketNotes (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goTicketNotes");
 
 		htmlHeadingThreeWrite (
 			"Notes");
@@ -144,10 +171,11 @@ class TicketPendingHistoryPart
 			htmlTableRowOpen ();
 
 			formFieldLogic.outputTableCellsList (
+				taskLogger,
 				formatWriter,
 				ticketNoteFields,
 				ticketNote,
-				ImmutableMap.of (),
+				emptyMap (),
 				true);
 
 			htmlTableRowClose ();
@@ -158,7 +186,13 @@ class TicketPendingHistoryPart
 
 	}
 
-	void goStateSummary () {
+	void goStateSummary (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goStateSummary");
 
 		htmlHeadingThreeWrite (
 			"State");
@@ -166,10 +200,11 @@ class TicketPendingHistoryPart
 		htmlTableOpenDetails ();
 
 		formFieldLogic.outputTableRows (
+			taskLogger,
 			formatWriter,
 			ticketStateFields,
 			ticket.getTicketState (),
-			ImmutableMap.of ());
+			emptyMap ());
 
 		htmlTableClose ();
 
