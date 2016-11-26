@@ -5,10 +5,12 @@ import static wbs.utils.string.FormatWriterUtils.setCurrentFormatWriter;
 
 import java.io.IOException;
 
-import lombok.NonNull;
-
 import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.WriterFormatWriter;
 
@@ -17,6 +19,9 @@ class ConsolePrintResponder
 	extends ConsoleResponder {
 
 	// dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	protected
@@ -53,16 +58,6 @@ class ConsolePrintResponder
 
 		clearCurrentFormatWriter (
 			formatWriter);
-
-	}
-
-	@Deprecated
-	protected
-	void printFormat (
-			@NonNull String ... arguments) {
-
-		formatWriter.writeFormatArray (
-			arguments);
 
 	}
 

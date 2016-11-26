@@ -21,6 +21,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -112,11 +113,12 @@ class TextFormFieldRenderer <Container>
 	@Override
 	public
 	void renderFormInput (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue,
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 

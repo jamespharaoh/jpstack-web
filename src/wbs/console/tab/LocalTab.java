@@ -57,7 +57,7 @@ class LocalTab
 				: lookups) {
 
 			if (! lookup.lookup (
-					requestContext.contextStuff ()))
+					requestContext.contextStuffRequired ()))
 				return false;
 
 		}

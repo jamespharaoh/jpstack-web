@@ -32,9 +32,12 @@ import lombok.experimental.Accessors;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 import wbs.utils.etc.OptionalUtils;
@@ -49,6 +52,9 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	implements FormFieldRenderer <Container, Interface> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -104,6 +110,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	@Override
 	public
 	void renderFormInput (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
@@ -111,6 +118,11 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 			@NonNull Optional <Interface> interfaceValue,
 			@NonNull FormType formType,
 			@NonNull String formName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderFormInput");
 
 		// lookup root
 
@@ -173,6 +185,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 						error -> true)
 
 					&& objectManager.canView (
+						taskLogger,
 						item)
 
 				) || (
@@ -466,12 +479,18 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	@Override
 	public
 	void renderHtmlTableCellList (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Interface> interfaceValue,
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlTableCellList");
 
 		// work out root
 
@@ -509,6 +528,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		) {
 
 			objectManager.writeTdForObject (
+				taskLogger,
 				formatWriter,
 				interfaceValue.orNull (),
 				rootOptional,
@@ -538,12 +558,18 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	@Override
 	public
 	void renderHtmlTableCellProperties (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Interface> interfaceValue,
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlTableCellProperties");
 
 		// work out root
 
@@ -581,6 +607,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		) {
 
 			objectManager.writeTdForObject (
+				taskLogger,
 				formatWriter,
 				interfaceValue.orNull (),
 				rootOptional,

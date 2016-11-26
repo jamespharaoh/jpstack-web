@@ -1,5 +1,7 @@
 package wbs.services.ticket.create;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
@@ -9,9 +11,6 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import java.util.List;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -237,6 +236,11 @@ class ObjectTicketCreatePart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlParagraphWriteFormat (
 			"Please enter the details for the new ticket");
 
@@ -247,12 +251,13 @@ class ObjectTicketCreatePart <
 		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			formFieldSet,
-			Optional.absent (),
+			optionalAbsent (),
 			ticket,
-			ImmutableMap.of (),
+			emptyMap (),
 			FormType.create,
 			"create");
 

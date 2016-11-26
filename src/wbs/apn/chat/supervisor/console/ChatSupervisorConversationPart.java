@@ -35,8 +35,10 @@ import org.joda.time.LocalDate;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.console.MediaConsoleLogic;
@@ -70,6 +72,9 @@ class ChatSupervisorConversationPart
 
 	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
@@ -175,14 +180,26 @@ class ChatSupervisorConversationPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		renderDetails ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
+		renderDetails (
+			taskLogger);
 
 		renderHistory ();
 
 	}
 
 	private
-	void renderDetails () {
+	void renderDetails (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderDetails");
 
 		htmlTableOpenDetails ();
 
@@ -199,10 +216,12 @@ class ChatSupervisorConversationPart
 			"User number");
 
 		objectManager.writeTdForObjectMiniLink (
+			taskLogger,
 			monitorChatUser,
 			chat);
 
 		objectManager.writeTdForObjectMiniLink (
+			taskLogger,
 			userChatUser,
 			chat);
 

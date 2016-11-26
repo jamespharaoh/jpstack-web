@@ -2,7 +2,9 @@ package wbs.apn.chat.broadcast.console;
 
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingThreeWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
@@ -24,11 +26,6 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.core.console.ChatConsoleHelper;
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
@@ -38,11 +35,21 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.time.TimeFormatter;
+
+import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 
 @PrototypeComponent ("chatBroadcastVerifyPart")
 public
@@ -69,6 +76,9 @@ class ChatBroadcastVerifyPart
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -192,6 +202,11 @@ class ChatBroadcastVerifyPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		// form
 
 		htmlFormOpenPost ();
@@ -308,10 +323,11 @@ class ChatBroadcastVerifyPart
 				() -> fromUser.getInfoText ().getText ()));
 
 		formFieldLogic.outputFormRows (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			messageMessageFields,
-			Optional.absent (),
+			optionalAbsent (),
 			form,
 			formHints,
 			FormType.search,
@@ -348,11 +364,10 @@ class ChatBroadcastVerifyPart
 		htmlHeadingThreeWrite (
 			"Recipients");
 
-		@SuppressWarnings ("unchecked")
 		List <Long> chatUserIds =
-			(List <Long>)
-			requestContext.requestRequired (
-				"chatBroadcastChatUserIds");
+			genericCastUnchecked (
+				requestContext.requestRequired (
+					"chatBroadcastChatUserIds"));
 
 		htmlParagraphOpen ();
 
@@ -378,6 +393,7 @@ class ChatBroadcastVerifyPart
 				chatUserIds);
 
 		formFieldLogic.outputListTable (
+			taskLogger,
 			formatWriter,
 			verifyUserFields,
 			chatUsers,

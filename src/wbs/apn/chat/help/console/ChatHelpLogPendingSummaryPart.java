@@ -24,20 +24,26 @@ import lombok.NonNull;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.currency.logic.CurrencyLogic;
+import wbs.platform.user.console.UserConsoleLogic;
+
+import wbs.sms.message.core.console.MessageConsoleLogic;
+
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.core.console.ChatConsoleLogic;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.part.AbstractPagePart;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.platform.user.console.UserConsoleLogic;
-import wbs.sms.message.core.console.MessageConsoleLogic;
 
 @PrototypeComponent ("chatHelpLogPendingSummaryPart")
 public
@@ -56,13 +62,16 @@ class ChatHelpLogPendingSummaryPart
 	ChatHelpLogConsoleHelper chatHelpLogHelper;
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
-
-	@SingletonDependency
 	CurrencyLogic currencyLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MessageConsoleLogic messageConsoleLogic;
+
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -107,20 +116,33 @@ class ChatHelpLogPendingSummaryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		renderDetails ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
+		renderDetails (
+			taskLogger);
 
 		renderHistory ();
 
 	}
 
 	private
-	void renderDetails () {
+	void renderDetails (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderDetails");
 
 		htmlTableOpenDetails ();
 
 		htmlTableDetailsRowWriteRaw (
 			"User",
 			() -> objectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				chatUser,
 				chatUser.getChat ()));
 

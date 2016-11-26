@@ -4,11 +4,11 @@ import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
 import static wbs.utils.etc.Misc.eitherGetLeft;
 import static wbs.utils.etc.Misc.getError;
-import static wbs.utils.etc.Misc.resultValueRequired;
 import static wbs.utils.etc.Misc.isError;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.isRight;
 import static wbs.utils.etc.Misc.requiredValue;
+import static wbs.utils.etc.Misc.resultValueRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -38,12 +38,15 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -57,6 +60,9 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	implements FormField <Container, Generic, Native, Interface> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -198,11 +204,17 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderTableCellList (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderTableCellList");
 
 		Optional <Native> nativeValue =
 			requiredValue (
@@ -224,6 +236,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 						genericValue)));
 
 		renderer.renderHtmlTableCellList (
+			taskLogger,
 			htmlWriter,
 			container,
 			hints,
@@ -236,22 +249,28 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderTableCellProperties (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints) {
 
-		Optional<Native> nativeValue =
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderTableCellProperties");
+
+		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
 					container));
 
-		Optional<Generic> genericValue =
+		Optional <Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
 					nativeValue));
 
-		Optional<Interface> interfaceValue =
+		Optional <Interface> interfaceValue =
 			requiredValue (
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
@@ -260,6 +279,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 						genericValue)));
 
 		renderer.renderHtmlTableCellProperties (
+			taskLogger,
 			htmlWriter,
 			container,
 			hints,
@@ -312,6 +332,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderFormRow (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Container container,
@@ -319,6 +340,11 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			@NonNull Optional <String> error,
 			@NonNull FormType formType,
 			@NonNull String formName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderFormRow");
 
 		Optional <Native> nativeValue =
 			requiredValue (
@@ -354,6 +380,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 					renderer.propertiesAlign ().name ())));
 
 		renderer.renderFormInput (
+			taskLogger,
 			submission,
 			formatWriter,
 			container,

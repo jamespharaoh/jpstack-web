@@ -2,6 +2,7 @@ package wbs.console.request;
 
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrElse;
 import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
@@ -37,8 +38,6 @@ import wbs.console.notice.ConsoleNotices;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabContext;
 import wbs.console.tab.TabList;
-
-import wbs.framework.entity.record.Record;
 
 import wbs.utils.string.FormatWriter;
 
@@ -339,15 +338,31 @@ interface ConsoleRequestContext {
 
 	void reset ();
 
-	ConsoleContext consoleContext ();
+	Optional <ConsoleContext> consoleContext ();
 
-	ConsoleContextStuff contextStuff ();
+	Optional <ConsoleContextStuff> contextStuff ();
+
+	default
+	ConsoleContext consoleContextRequired () {
+
+		return optionalGetRequired (
+			consoleContext ());
+
+	}
+
+	default
+	ConsoleContextStuff contextStuffRequired () {
+
+		return optionalGetRequired (
+			contextStuff ());
+
+	}
 
 	default
 	Object stuff (
 			@NonNull String key) {
 
-		return contextStuff ()
+		return contextStuffRequired ()
 			.get (key);
 
 	}
@@ -357,7 +372,7 @@ interface ConsoleRequestContext {
 			@NonNull String key) {
 
 		return (Long)
-			contextStuff ().get (
+			contextStuffRequired ().get (
 				key);
 
 	}
@@ -367,16 +382,13 @@ interface ConsoleRequestContext {
 			@NonNull String key) {
 
 		return (String)
-			contextStuff ().get (
+			contextStuffRequired ().get (
 				key);
 
 	}
 
 	boolean canContext (
 			String... privKeys);
-
-	boolean canView (
-			Record<?> object);
 
 	Long requestUnique ();
 

@@ -6,7 +6,9 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalDo;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequiredOrDefault;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringFormatArray;
@@ -17,6 +19,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -25,12 +28,13 @@ import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
 public
-class TaskLogger {
+class TaskLogger
+	implements TaskLogEvent {
 
 	// state
 
 	private final
-	Optional <TaskLogger> parent;
+	Optional <TaskLogger> parentOptional;
 
 	private final
 	LogTarget logTarget;
@@ -40,6 +44,12 @@ class TaskLogger {
 
 	private final
 	String dynamicContext;
+
+	private final
+	long nesting;
+
+	LogSeverity severity =
+		LogSeverity.notice;
 
 	long fatalCount;
 	long errorCount;
@@ -53,17 +63,37 @@ class TaskLogger {
 	List <String> errorMessages =
 		new ArrayList<> ();
 
+	List <TaskLogEvent> events =
+		new ArrayList<> ();
+
 	// constructors
 
 	public
 	TaskLogger (
-			@NonNull Optional <TaskLogger> parent,
+			@NonNull Optional <TaskLogger> parentOptional,
 			@NonNull LogTarget logTarget,
 			@NonNull String staticContext,
 			@NonNull String dynamicContext) {
 
-		this.parent =
-			parent;
+		this.parentOptional =
+			parentOptional;
+
+		if (
+			optionalIsPresent (
+				parentOptional)
+		) {
+
+			parentOptional.get ().events.add (
+				this);
+
+		}
+
+		this.nesting =
+			optionalMapRequiredOrDefault (
+				parent ->
+					parent.nesting + 1l,
+				parentOptional,
+				0l);
 
 		this.logTarget =
 			logTarget;
@@ -122,6 +152,27 @@ class TaskLogger {
 	}
 
 	// accessors
+
+	public
+	TaskLogger findRoot () {
+
+		TaskLogger currentTaskLogger =
+			this;
+
+		while (
+			optionalIsPresent (
+				currentTaskLogger.parentOptional)
+		) {
+
+			currentTaskLogger =
+				optionalGetRequired (
+					currentTaskLogger.parentOptional);
+
+		}
+
+		return currentTaskLogger;
+
+	}
 
 	public
 	long errorCount () {
@@ -213,11 +264,19 @@ class TaskLogger {
 		writeFirstError (
 			LogSeverity.error);
 
+		String message =
+			stringFormatArray (
+				arguments);
+
 		logTarget.writeToLog (
 			LogSeverity.fatal,
-			stringFormatArray (
-				arguments),
+			message,
 			optionalAbsent ());
+
+		events.add (
+			new TaskLogEntryEvent (
+				LogSeverity.fatal,
+				message));
 
 		increaseFatalCount ();
 
@@ -231,12 +290,20 @@ class TaskLogger {
 		writeFirstError (
 			LogSeverity.fatal);
 
+		String message =
+			stringFormatArray (
+				arguments);
+
 		logTarget.writeToLog (
 			LogSeverity.fatal,
-			stringFormatArray (
-				arguments),
+			message,
 			optionalOf (
 				throwable));
+
+		events.add (
+			new TaskLogEntryEvent (
+				LogSeverity.fatal,
+				message));
 
 		increaseFatalCount ();
 
@@ -249,11 +316,19 @@ class TaskLogger {
 		writeFirstError (
 			LogSeverity.error);
 
+		String message =
+			stringFormatArray (
+				arguments);
+
 		logTarget.writeToLog (
 			LogSeverity.error,
-			stringFormatArray (
-				arguments),
+			message,
 			optionalAbsent ());
+
+		events.add (
+			new TaskLogEntryEvent (
+				LogSeverity.error,
+				message));
 
 		increaseErrorCount ();
 
@@ -267,12 +342,20 @@ class TaskLogger {
 		writeFirstError (
 			LogSeverity.error);
 
+		String message =
+			stringFormatArray (
+				arguments);
+
 		logTarget.writeToLog (
 			LogSeverity.error,
-			stringFormatArray (
-				arguments),
+			message,
 			optionalOf (
 				throwable));
+
+		events.add (
+			new TaskLogEntryEvent (
+				LogSeverity.error,
+				message));
 
 		increaseErrorCount ();
 
@@ -285,11 +368,19 @@ class TaskLogger {
 		writeFirstError (
 			LogSeverity.warning);
 
+		String message =
+			stringFormatArray (
+				arguments);
+
 		logTarget.writeToLog (
 			LogSeverity.warning,
-			stringFormatArray (
-				arguments),
+			message,
 			optionalAbsent ());
+
+		events.add (
+			new TaskLogEntryEvent (
+				LogSeverity.warning,
+				message));
 
 		increaseWarningCount ();
 
@@ -303,12 +394,20 @@ class TaskLogger {
 		writeFirstError (
 			LogSeverity.warning);
 
+		String message =
+			stringFormatArray (
+				arguments);
+
 		logTarget.writeToLog (
 			LogSeverity.warning,
-			stringFormatArray (
-				arguments),
+			message,
 			optionalOf (
 				throwable));
+
+		events.add (
+			new TaskLogEntryEvent (
+				LogSeverity.warning,
+				message));
 
 		increaseWarningCount ();
 
@@ -321,11 +420,19 @@ class TaskLogger {
 		writeFirstError (
 			LogSeverity.notice);
 
+		String message =
+			stringFormatArray (
+				arguments);
+
 		logTarget.writeToLog (
 			LogSeverity.notice,
-			stringFormatArray (
-				arguments),
+			message,
 			optionalAbsent ());
+
+		events.add (
+			new TaskLogEntryEvent (
+				LogSeverity.notice,
+				message));
 
 		increaseNoticeCount ();
 
@@ -339,12 +446,20 @@ class TaskLogger {
 		writeFirstError (
 			LogSeverity.notice);
 
+		String message =
+			stringFormatArray (
+				arguments);
+
 		logTarget.writeToLog (
 			LogSeverity.notice,
-			stringFormatArray (
-				arguments),
+			message,
 			optionalOf (
 				throwable));
+
+		events.add (
+			new TaskLogEntryEvent (
+				LogSeverity.notice,
+				message));
 
 		increaseNoticeCount ();
 
@@ -357,11 +472,19 @@ class TaskLogger {
 		writeFirstError (
 			LogSeverity.debug);
 
+		String message =
+			stringFormatArray (
+				arguments);
+
 		logTarget.writeToLog (
 			LogSeverity.debug,
-			stringFormatArray (
-				arguments),
+			message,
 			optionalAbsent ());
+
+		events.add (
+			new TaskLogEntryEvent (
+				LogSeverity.debug,
+				message));
 
 		increaseDebugCount ();
 
@@ -375,12 +498,20 @@ class TaskLogger {
 		writeFirstError (
 			LogSeverity.debug);
 
+		String message =
+			stringFormatArray (
+				arguments);
+
 		logTarget.writeToLog (
 			LogSeverity.debug,
-			stringFormatArray (
-				arguments),
+			message,
 			optionalOf (
 				throwable));
+
+		events.add (
+			new TaskLogEntryEvent (
+				LogSeverity.debug,
+				message));
 
 		increaseDebugCount ();
 
@@ -403,6 +534,11 @@ class TaskLogger {
 				LogSeverity.error,
 				message,
 				optionalAbsent ());
+
+			events.add (
+				new TaskLogEntryEvent (
+					LogSeverity.error,
+					message));
 
 			throw exceptionSupplier.get ();
 
@@ -472,10 +608,10 @@ class TaskLogger {
 
 		if (
 			optionalIsPresent (
-				parent)
+				parentOptional)
 		) {
 
-			parent.get ().writeFirstError (
+			parentOptional.get ().writeFirstError (
 				severity);
 
 			return;
@@ -501,6 +637,11 @@ class TaskLogger {
 					firstError,
 					optionalAbsent ());
 
+				events.add (
+					new TaskLogEntryEvent (
+						LogSeverity.fatal,
+						firstError));
+
 			}
 
 			break;
@@ -521,6 +662,11 @@ class TaskLogger {
 					LogSeverity.error,
 					firstError,
 					optionalAbsent ());
+
+				events.add (
+					new TaskLogEntryEvent (
+						LogSeverity.error,
+						firstError));
 
 			}
 
@@ -545,6 +691,11 @@ class TaskLogger {
 					firstError,
 					optionalAbsent ());
 
+				events.add (
+					new TaskLogEntryEvent (
+						LogSeverity.warning,
+						firstError));
+
 			}
 
 			break;
@@ -568,6 +719,11 @@ class TaskLogger {
 					LogSeverity.notice,
 					firstError,
 					optionalAbsent ());
+
+				events.add (
+					new TaskLogEntryEvent (
+						LogSeverity.notice,
+						firstError));
 
 			}
 
@@ -594,6 +750,11 @@ class TaskLogger {
 					firstError,
 					optionalAbsent ());
 
+				events.add (
+					new TaskLogEntryEvent (
+						LogSeverity.debug,
+						firstError));
+
 			}
 
 			break;
@@ -608,7 +769,7 @@ class TaskLogger {
 		fatalCount ++;
 
 		optionalDo (
-			parent,
+			parentOptional,
 			TaskLogger::increaseFatalCount);
 
 	}
@@ -619,7 +780,7 @@ class TaskLogger {
 		errorCount ++;
 
 		optionalDo (
-			parent,
+			parentOptional,
 			TaskLogger::increaseErrorCount);
 
 	}
@@ -630,7 +791,7 @@ class TaskLogger {
 		warningCount ++;
 
 		optionalDo (
-			parent,
+			parentOptional,
 			TaskLogger::increaseWarningCount);
 
 	}
@@ -641,7 +802,7 @@ class TaskLogger {
 		noticeCount ++;
 
 		optionalDo (
-			parent,
+			parentOptional,
 			TaskLogger::increaseNoticeCount);
 
 	}
@@ -652,8 +813,38 @@ class TaskLogger {
 		debugCount ++;
 
 		optionalDo (
-			parent,
+			parentOptional,
 			TaskLogger::increaseDebugCount);
+
+	}
+
+	// task log event implementation
+
+	@Override
+	public
+	LogSeverity eventSeverity () {
+
+		return severity;
+
+	}
+
+	@Override
+	public
+	String eventText () {
+
+		return stringFormat (
+			"%s.%s",
+			staticContext,
+			dynamicContext);
+
+	}
+
+	@Override
+	public
+	List <TaskLogEvent> eventChildren () {
+
+		return ImmutableList.copyOf (
+			events);
 
 	}
 

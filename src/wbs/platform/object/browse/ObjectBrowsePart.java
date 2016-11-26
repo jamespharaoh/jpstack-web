@@ -1,6 +1,7 @@
 package wbs.platform.object.browse;
 
 import static wbs.utils.collection.CollectionUtils.collectionStream;
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
@@ -270,7 +270,7 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 		targetContext =
 			consoleManager.relatedContextRequired (
 				taskLogger,
-				requestContext.consoleContext (),
+				requestContext.consoleContextRequired (),
 				targetContextType);
 
 	}
@@ -279,6 +279,11 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 	public
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
 		// table open
 
@@ -328,10 +333,11 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 			);
 
 			formFieldLogic.outputTableCellsList (
+				taskLogger,
 				formatWriter,
 				formFieldSet,
 				object,
-				ImmutableMap.of (),
+				emptyMap (),
 				false);
 
 			htmlTableRowClose ();

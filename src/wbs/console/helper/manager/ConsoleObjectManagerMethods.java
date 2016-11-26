@@ -17,6 +17,7 @@ import lombok.NonNull;
 import wbs.console.helper.core.ConsoleHelper;
 
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 import wbs.utils.string.StringFormatWriter;
@@ -72,6 +73,7 @@ interface ConsoleObjectManagerMethods {
 	}
 
 	void writeTdForObject (
+			TaskLogger parentTaskLogger,
 			FormatWriter formatWriter,
 			Record <?> object,
 			Optional <Record <?>> assumedRootOptional,
@@ -81,10 +83,12 @@ interface ConsoleObjectManagerMethods {
 
 	default
 	void writeTdForObjectMiniLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object) {
 
 		writeTdForObject (
+			parentTaskLogger,
 			formatWriter,
 			object,
 			optionalAbsent (),
@@ -96,9 +100,11 @@ interface ConsoleObjectManagerMethods {
 
 	default
 	void writeTdForObjectMiniLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object) {
 
 		writeTdForObject (
+			parentTaskLogger,
 			currentFormatWriter (),
 			object,
 			optionalAbsent (),
@@ -110,11 +116,13 @@ interface ConsoleObjectManagerMethods {
 
 	default
 	void writeTdForObjectMiniLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object,
 			@NonNull Record <?> assumedRoot) {
 
 		writeTdForObject (
+			parentTaskLogger,
 			formatWriter,
 			object,
 			optionalOf (
@@ -127,10 +135,12 @@ interface ConsoleObjectManagerMethods {
 
 	default
 	void writeTdForObjectMiniLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object,
 			@NonNull Record <?> assumedRoot) {
 
 		writeTdForObject (
+			parentTaskLogger,
 			currentFormatWriter (),
 			object,
 			optionalOf (
@@ -143,11 +153,13 @@ interface ConsoleObjectManagerMethods {
 
 	default
 	void writeTdForObjectMiniLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object,
 			@NonNull Long columnSpan) {
 
 		writeTdForObject (
+			parentTaskLogger,
 			formatWriter,
 			object,
 			optionalAbsent (),
@@ -159,10 +171,12 @@ interface ConsoleObjectManagerMethods {
 
 	default
 	void writeTdForObjectMiniLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object,
 			@NonNull Long columnSpan) {
 
 		writeTdForObject (
+			parentTaskLogger,
 			currentFormatWriter (),
 			object,
 			optionalAbsent (),
@@ -174,12 +188,14 @@ interface ConsoleObjectManagerMethods {
 
 	default
 	void writeTdForObjectMiniLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object,
 			@NonNull Record<?> assumedRoot,
 			@NonNull Long columnSpan) {
 
 		writeTdForObject (
+			parentTaskLogger,
 			formatWriter,
 			object,
 			optionalOf (
@@ -192,10 +208,12 @@ interface ConsoleObjectManagerMethods {
 
 	default
 	void writeTdForObjectLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object) {
 
 		writeTdForObject (
+			parentTaskLogger,
 			formatWriter,
 			object,
 			optionalAbsent (),
@@ -207,9 +225,11 @@ interface ConsoleObjectManagerMethods {
 
 	default
 	void writeTdForObjectLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object) {
 
 		writeTdForObject (
+			parentTaskLogger,
 			currentFormatWriter (),
 			object,
 			optionalAbsent (),
@@ -221,11 +241,13 @@ interface ConsoleObjectManagerMethods {
 
 	default
 	void writeTdForObjectLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object,
 			@NonNull Record <?> assumedRoot) {
 
 		writeTdForObject (
+			parentTaskLogger,
 			formatWriter,
 			object,
 			optionalOf (
@@ -238,11 +260,13 @@ interface ConsoleObjectManagerMethods {
 
 	default
 	void writeTdForObjectLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object,
 			@NonNull Long columnSpan) {
 
 		writeTdForObject (
+			parentTaskLogger,
 			formatWriter,
 			object,
 			optionalAbsent (),
@@ -254,12 +278,14 @@ interface ConsoleObjectManagerMethods {
 
 	default
 	void writeTdForObjectLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object,
 			@NonNull Record <?> assumedRoot,
 			@NonNull Long columnSpan) {
 
 		writeTdForObject (
+			parentTaskLogger,
 			formatWriter,
 			object,
 			optionalOf (
@@ -297,6 +323,7 @@ interface ConsoleObjectManagerMethods {
 	}
 
 	boolean canView (
+			TaskLogger parentTaskLogger,
 			Record <?> object);
 
 	String contextName (

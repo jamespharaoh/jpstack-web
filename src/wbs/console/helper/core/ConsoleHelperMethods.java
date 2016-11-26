@@ -8,6 +8,7 @@ import wbs.console.helper.provider.ConsoleHelperProvider;
 
 import wbs.framework.codegen.DoNotDelegate;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 import wbs.utils.string.FormatWriter;
@@ -68,18 +69,8 @@ interface ConsoleHelperMethods <
 	}
 
 	boolean canView (
+			TaskLogger parentTaskLogger,
 			RecordType object);
-
-	default
-	boolean canViewGeneric (
-			Record <?> object) {
-
-		return canView (
-			dynamicCast (
-				objectHelper ().objectClass (),
-				object));
-
-	}
 
 	RecordType findFromContextRequired ();
 

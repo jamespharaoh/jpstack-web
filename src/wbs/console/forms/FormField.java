@@ -11,6 +11,8 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.framework.entity.record.PermanentRecord;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.string.FormatWriter;
 
 public
@@ -35,6 +37,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderTableCellList (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -47,6 +50,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderTableCellProperties (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
@@ -83,6 +87,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderFormRow (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,

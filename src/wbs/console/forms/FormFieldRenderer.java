@@ -11,6 +11,8 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.string.FormatWriter;
 
 import fj.data.Either;
@@ -43,6 +45,7 @@ interface FormFieldRenderer <Container, Interface> {
 			String formName);
 
 	void renderFormInput (
+			TaskLogger parentTaskLogger,
 			FormFieldSubmission submission,
 			FormatWriter htmlWriter,
 			Container container,
@@ -60,6 +63,7 @@ interface FormFieldRenderer <Container, Interface> {
 
 	default
 	void renderHtmlTableCellList (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -87,6 +91,7 @@ interface FormFieldRenderer <Container, Interface> {
 
 	default
 	void renderHtmlTableCellProperties (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,

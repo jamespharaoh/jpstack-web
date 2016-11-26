@@ -1152,7 +1152,7 @@ class ModelRecordGenerator {
 		} else {
 
 			formatWriter.writeLineFormat (
-				"return \"%s(id=\" + getId () + \")\";",
+				"return \"%s (\" + getId () + \")\";",
 				recordClassName);
 
 		}

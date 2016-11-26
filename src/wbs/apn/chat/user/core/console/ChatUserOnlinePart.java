@@ -171,7 +171,7 @@ class ChatUserOnlinePart
 		targetContext =
 			consoleManager.relatedContextRequired (
 				taskLogger,
-				requestContext.consoleContext (),
+				requestContext.consoleContextRequired (),
 				targetContextType);
 
 	}

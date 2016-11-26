@@ -302,7 +302,7 @@ class ConsoleFile
 			privLookup != null
 
 			&& ! privLookup.lookup (
-				consoleRequestContext.contextStuff ())
+				consoleRequestContext.contextStuffRequired ())
 
 		) {
 
@@ -331,7 +331,7 @@ class ConsoleFile
 			privLookup != null
 
 			&& ! privLookup.lookup (
-				consoleRequestContext.contextStuff ())
+				consoleRequestContext.contextStuffRequired ())
 
 		) {
 

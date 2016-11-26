@@ -31,16 +31,21 @@ import org.joda.time.Instant;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
 import wbs.platform.queue.model.QueueItemClaimRec;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
+
 import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("queueUsersPart")
@@ -49,6 +54,9 @@ class QueueUsersPart
 	extends AbstractPagePart {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -142,6 +150,11 @@ class QueueUsersPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlTableOpenList ();
 
 		htmlTableHeaderRowWrite (
@@ -159,6 +172,7 @@ class QueueUsersPart
 			htmlTableRowOpen ();
 
 			objectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				userData.user);
 
 			htmlTableCellWrite (

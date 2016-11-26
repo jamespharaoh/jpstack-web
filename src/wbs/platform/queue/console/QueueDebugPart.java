@@ -1,11 +1,13 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.LogicUtils.booleanToString;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
@@ -27,7 +29,6 @@ import java.util.stream.Collectors;
 import javax.inject.Named;
 import javax.inject.Provider;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
@@ -172,13 +173,19 @@ class QueueDebugPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		formFieldLogic.outputFormTable (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			formFields,
-			Optional.absent (),
+			optionalAbsent (),
 			form,
-			ImmutableMap.of (),
+			emptyMap (),
 			"get",
 			requestContext.resolveLocalUrl (
 				"/queue.debug"),

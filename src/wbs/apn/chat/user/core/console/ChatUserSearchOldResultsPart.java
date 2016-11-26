@@ -173,7 +173,7 @@ class ChatUserSearchOldResultsPart
 		targetContext =
 			consoleManager.relatedContextRequired (
 				taskLogger,
-				requestContext.consoleContext (),
+				requestContext.consoleContextRequired (),
 				targetContextType);
 
 		@SuppressWarnings ("unchecked")

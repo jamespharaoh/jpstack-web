@@ -80,7 +80,7 @@ class ObjectSummaryFieldsPart <
 
 		object =
 			consoleHelper.lookupObject (
-				requestContext.contextStuff ());
+				requestContext.contextStuffRequired ());
 
 		if (formFieldsProvider != null) {
 
@@ -145,9 +145,15 @@ class ObjectSummaryFieldsPart <
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlTableOpenDetails ();
 
 		formFieldLogic.outputTableRows (
+			taskLogger,
 			formatWriter,
 			formFieldSet,
 			object,

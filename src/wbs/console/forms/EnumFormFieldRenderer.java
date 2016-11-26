@@ -23,6 +23,7 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.enums.EnumConsoleHelper;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -79,6 +80,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 	@Override
 	public
 	void renderFormInput (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,

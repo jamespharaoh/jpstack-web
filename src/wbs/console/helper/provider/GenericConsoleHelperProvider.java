@@ -466,12 +466,24 @@ class GenericConsoleHelperProvider <
 	@Override
 	public
 	boolean canView (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLoggerFormat (
+				parentTaskLogger,
+				"canView (%s)",
+				object.toString ());
 
 		// types are always visible
 
 		if (objectHelper.type ()) {
+
+			taskLogger.debugFormat (
+				"Object types are visible to everyone");
+
 			return true;
+
 		}
 
 		// objects with cryptors are always visible
@@ -480,7 +492,12 @@ class GenericConsoleHelperProvider <
 			isNotNull (
 				cryptor)
 		) {
+
+			taskLogger.debugFormat (
+				"Object with encrypted IDs are visible to everyone");
+
 			return true;
+
 		}
 
 		// view privs
@@ -489,6 +506,12 @@ class GenericConsoleHelperProvider <
 			isNotNull (
 				viewPrivKeySpecs)
 		) {
+
+			taskLogger.debugFormat (
+				"Checking view priv keys");
+
+			Boolean visible =
+				false;
 
 			for (
 				PrivKeySpec privKeySpec
@@ -511,7 +534,13 @@ class GenericConsoleHelperProvider <
 					optionalIsNotPresent (
 						privObjectOptional)
 				) {
-					return false;
+
+					taskLogger.debugFormat (
+						"Can't find delegate %s for view priv key",
+						privKeySpec.delegateName ());
+
+					continue;
+
 				}
 
 				Record <?> privObject =
@@ -522,9 +551,37 @@ class GenericConsoleHelperProvider <
 						privObject,
 						privKeySpec.privName ())
 				) {
-					return true;
+
+					taskLogger.debugFormat (
+						"Object is visible because of priv %s on %s",
+						privKeySpec.privName (),
+						objectManager.objectPathMini (
+							privObject));
+
+					visible = true;
+
+				} else if (
+					isNotNull (
+						privKeySpec.delegateName ())
+				) {
+
+					taskLogger.debugFormat (
+						"View priv key with delegate %s priv %s denied",
+						privKeySpec.delegateName (),
+						privKeySpec.privName ());
+
+				} else {
+
+					taskLogger.debugFormat (
+						"View priv key with priv %s denied",
+						privKeySpec.privName ());
+
 				}
 
+			}
+
+			if (visible) {
+				return true;
 			}
 
 		}
@@ -560,7 +617,14 @@ class GenericConsoleHelperProvider <
 				optionalIsNotPresent (
 					delegateOptional)
 			) {
+
+				taskLogger.debugFormat (
+					"Object is not visible because view delegate %s ",
+					viewDelegateField,
+					"is not present");
+
 				return false;
+
 			}
 
 			Record <?> delegate =
@@ -574,6 +638,11 @@ class GenericConsoleHelperProvider <
 					viewDelegatePrivCode)
 			) {
 
+				taskLogger.debugFormat (
+					"Delegating to %s priv %s",
+					viewDelegateField,
+					viewDelegatePrivCode);
+
 				return privChecker.canRecursive (
 					delegate,
 					viewDelegatePrivCode);
@@ -584,14 +653,23 @@ class GenericConsoleHelperProvider <
 					consoleObjectManager.findConsoleHelperRequired (
 						delegate);
 
-				return delegateHelper.canViewGeneric (
-					delegate);
+				taskLogger.debugFormat (
+					"Delegating to %s",
+					viewDelegateField);
+
+				return delegateHelper.canView (
+					taskLogger,
+					genericCastUnchecked (
+						delegate));
 
 			}
 
 		}
 
 		// default
+
+		taskLogger.debugFormat (
+			"Delegating to priv checker");
 
 		return privChecker.canRecursive (
 			object);

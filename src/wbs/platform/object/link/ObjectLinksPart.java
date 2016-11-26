@@ -1,5 +1,6 @@
 package wbs.platform.object.link;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.LogicUtils.booleanToTrueFalse;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
@@ -18,7 +19,6 @@ import java.util.Set;
 
 import javax.inject.Provider;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
@@ -34,12 +34,17 @@ import wbs.console.html.HtmlTableCheckWriter;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.model.UserObjectHelper;
+
 import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
@@ -55,6 +60,9 @@ class ObjectLinksPart <
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
@@ -104,7 +112,7 @@ class ObjectLinksPart <
 
 		contextObject =
 			consoleHelper.lookupObject (
-				requestContext.contextStuff ());
+				requestContext.contextStuffRequired ());
 
 		contextLinks =
 			(Set <?>)
@@ -124,6 +132,11 @@ class ObjectLinksPart <
 	public
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
 		// form open
 
@@ -180,10 +193,11 @@ class ObjectLinksPart <
 			formatWriter.increaseIndent ();
 
 			formFieldLogic.outputTableCellsList (
+				taskLogger,
 				formatWriter,
 				targetFields,
 				targetObject,
-				ImmutableMap.of (),
+				emptyMap (),
 				true);
 
 			htmlTableCheckWriterProvider.get ()

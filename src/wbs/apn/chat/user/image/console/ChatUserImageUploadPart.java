@@ -23,8 +23,10 @@ import wbs.console.forms.FormType;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.user.image.model.ChatUserImageType;
@@ -42,6 +44,9 @@ class ChatUserImageUploadPart
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// state
 
@@ -90,6 +95,11 @@ class ChatUserImageUploadPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlParagraphWrite (
 			"Please upload the photo or video.");
 
@@ -106,6 +116,7 @@ class ChatUserImageUploadPart
 		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			formFieldSet,

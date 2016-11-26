@@ -1,5 +1,6 @@
 package wbs.imchat.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
@@ -50,8 +51,10 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.imchat.model.ImChatConversationRec;
@@ -73,6 +76,9 @@ class ImChatPendingSummaryPart
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -200,6 +206,11 @@ class ImChatPendingSummaryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlDivOpen (
 			htmlClassAttribute (
 				"layout-container"));
@@ -216,7 +227,9 @@ class ImChatPendingSummaryPart
 					"width",
 					"50%")));
 
-		goCustomerSummary ();
+		goCustomerSummary (
+			taskLogger);
+
 		goCustomerDetails ();
 
 		htmlTableCellClose ();
@@ -227,7 +240,9 @@ class ImChatPendingSummaryPart
 					"width",
 					"50%")));
 
-		goProfileSummary ();
+		goProfileSummary (
+			taskLogger);
+
 		goCustomerNotes ();
 
 		htmlTableCellClose ();
@@ -238,7 +253,8 @@ class ImChatPendingSummaryPart
 
 		htmlDivClose ();
 
-		goHistory ();
+		goHistory (
+			taskLogger);
 
 	}
 
@@ -280,12 +296,19 @@ class ImChatPendingSummaryPart
 
 	}
 
-	void goCustomerSummary () {
+	void goCustomerSummary (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goCustomerSummary");
 
 		htmlHeadingThreeWrite (
 			"Customer summary");
 
 		formFieldLogic.outputDetailsTable (
+			taskLogger,
 			formatWriter,
 			customerFields,
 			customer,
@@ -293,12 +316,19 @@ class ImChatPendingSummaryPart
 
 	}
 
-	void goProfileSummary () {
+	void goProfileSummary (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goProfileSummary");
 
 		htmlHeadingThreeWrite (
 			"Profile summary");
 
 		formFieldLogic.outputDetailsTable (
+			taskLogger,
 			formatWriter,
 			profileFields,
 			profile,
@@ -327,7 +357,13 @@ class ImChatPendingSummaryPart
 
 	}
 
-	void goHistory () {
+	void goHistory (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goHistory");
 
 		htmlHeadingThreeWrite (
 			"Conversation history");
@@ -377,10 +413,11 @@ class ImChatPendingSummaryPart
 							historyReply)));
 
 				formFieldLogic.outputTableCellsList (
+					taskLogger,
 					formatWriter,
 					messageFields,
 					historyReply,
-					ImmutableMap.of (),
+					emptyMap (),
 					true);
 
 				htmlTableRowClose ();
@@ -405,10 +442,11 @@ class ImChatPendingSummaryPart
 			)));
 
 			formFieldLogic.outputTableCellsList (
+				taskLogger,
 				formatWriter,
 				messageFields,
 				historyRequest,
-				ImmutableMap.of (),
+				emptyMap (),
 				true);
 
 			htmlTableRowClose ();

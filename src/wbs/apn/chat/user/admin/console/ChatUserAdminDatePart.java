@@ -24,8 +24,10 @@ import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.TimeFormatter;
@@ -51,6 +53,9 @@ class ChatUserAdminDatePart
 
 	@SingletonDependency
 	ChatUserLogic chatUserLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -81,9 +86,15 @@ class ChatUserAdminDatePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		renderForm ();
 
-		renderHistory ();
+		renderHistory (
+			taskLogger);
 
 	}
 
@@ -179,7 +190,13 @@ class ChatUserAdminDatePart
 	}
 
 	private
-	void renderHistory () {
+	void renderHistory (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHistory");
 
 		htmlTableOpenList ();
 
@@ -212,6 +229,7 @@ class ChatUserAdminDatePart
 			) {
 
 				objectManager.writeTdForObjectMiniLink (
+					taskLogger,
 					chatUserDateLogRec.getUser ());
 
 			} else if (
@@ -220,6 +238,7 @@ class ChatUserAdminDatePart
 			) {
 
 				objectManager.writeTdForObjectMiniLink (
+					taskLogger,
 					chatUserDateLogRec.getMessage ());
 
 			} else {

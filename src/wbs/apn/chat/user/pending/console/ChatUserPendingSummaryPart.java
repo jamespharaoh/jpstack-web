@@ -14,17 +14,22 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import lombok.NonNull;
 
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.media.console.MediaConsoleLogic;
+
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
 import wbs.apn.chat.user.image.model.ChatUserImageType;
-import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.part.AbstractPagePart;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.media.console.MediaConsoleLogic;
 
 @PrototypeComponent ("chatUserPendingSummaryPart")
 public
@@ -41,6 +46,9 @@ class ChatUserPendingSummaryPart
 
 	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
@@ -68,6 +76,11 @@ class ChatUserPendingSummaryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlTableOpenDetails ();
 
 		htmlTableHeaderRowWrite (
@@ -78,6 +91,7 @@ class ChatUserPendingSummaryPart
 		htmlTableDetailsRowWriteRaw (
 			"User",
 			() -> consoleObjectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				chatUser,
 				2l));
 

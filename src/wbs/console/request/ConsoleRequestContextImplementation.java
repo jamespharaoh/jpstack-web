@@ -6,6 +6,7 @@ import static wbs.utils.etc.Misc.orNull;
 import static wbs.utils.etc.OptionalUtils.ifNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalValueEqualSafe;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -55,7 +56,6 @@ import wbs.console.tab.TabList;
 
 import wbs.framework.component.annotations.ProxiedRequestComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.entity.record.Record;
 
 import wbs.utils.etc.OptionalUtils;
 import wbs.utils.string.FormatWriter;
@@ -593,21 +593,21 @@ class ConsoleRequestContextImplementation
 
 	@Override
 	public
-	ConsoleContext consoleContext () {
+	Optional <ConsoleContext> consoleContext () {
 
-		return (ConsoleContext)
-			requestRequired (
-				"context");
+		return genericCastUnchecked (
+			request (
+				"context"));
 
 	}
 
 	@Override
 	public
-	ConsoleContextStuff contextStuff () {
+	Optional <ConsoleContextStuff> contextStuff () {
 
-		return (ConsoleContextStuff)
-			requestRequired (
-				"contextStuff");
+		return genericCastUnchecked (
+			request (
+				"contextStuff"));
 
 	}
 
@@ -616,18 +616,8 @@ class ConsoleRequestContextImplementation
 	boolean canContext (
 			@NonNull String... privKeys) {
 
-		return contextStuff ()
+		return contextStuffRequired ()
 			.can (privKeys);
-
-	}
-
-	@Override
-	public
-	boolean canView (
-			@NonNull Record<?> object) {
-
-		return objectManager
-			.canView (object);
 
 	}
 
@@ -662,7 +652,7 @@ class ConsoleRequestContextImplementation
 	void grant (
 			@NonNull String string) {
 
-		contextStuff ()
+		contextStuffRequired ()
 			.grant (string);
 
 	}

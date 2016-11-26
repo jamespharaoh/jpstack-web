@@ -113,9 +113,6 @@ class ManualResponderRequestPendingSummaryPart
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
-
-	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
 	@SingletonDependency
@@ -142,6 +139,9 @@ class ManualResponderRequestPendingSummaryPart
 
 	@SingletonDependency
 	MessageObjectHelper messageHelper;
+
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
@@ -409,6 +409,11 @@ class ManualResponderRequestPendingSummaryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		if (manualResponderRequest == null) {
 
 			formatWriter.writeLineFormat (
@@ -431,14 +436,16 @@ class ManualResponderRequestPendingSummaryPart
 		htmlTableRowOpen ();
 
 		htmlTableCellWriteHtml (
-			this::goRequestDetails,
+			() -> goRequestDetails (
+				taskLogger),
 			htmlAttribute (
 				"style",
 				"width: 50%"));
 
 		htmlTableCellWriteHtml (
 			() -> {
-				goCustomerDetails ();
+				goCustomerDetails (
+					taskLogger);
 				goNotes ();
 			},
 			htmlAttribute (
@@ -463,13 +470,20 @@ class ManualResponderRequestPendingSummaryPart
 
 	}
 
-	void goRequestDetails () {
+	void goRequestDetails (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goRequestDetails");
 
 		htmlTableOpenDetails ();
 
 		htmlTableDetailsRowWriteRaw (
 			"Manual responder",
 			() -> objectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				manualResponder));
 
 		htmlTableDetailsRowWrite (
@@ -485,6 +499,7 @@ class ManualResponderRequestPendingSummaryPart
 			htmlTableDetailsRowWriteRaw (
 				"Number",
 				() -> objectManager.writeTdForObjectMiniLink (
+					taskLogger,
 					number));
 
 		}
@@ -492,11 +507,13 @@ class ManualResponderRequestPendingSummaryPart
 		htmlTableDetailsRowWriteRaw (
 			"Network",
 			() -> objectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				network));
 
 		htmlTableDetailsRowWriteRaw (
 			"Message",
 			() -> objectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				message));
 
 		htmlTableDetailsRowWrite (
@@ -549,7 +566,13 @@ class ManualResponderRequestPendingSummaryPart
 
 	}
 
-	void goCustomerDetails () {
+	void goCustomerDetails (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goCustomerDetails");
 
 		htmlHeadingThreeWrite (
 			"Customer details");
@@ -568,6 +591,7 @@ class ManualResponderRequestPendingSummaryPart
 		}
 
 		formFieldLogic.outputDetailsTable (
+			taskLogger,
 			formatWriter,
 			customerDetailsFields,
 			smsCustomer,

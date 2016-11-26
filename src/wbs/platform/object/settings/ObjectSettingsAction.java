@@ -130,7 +130,7 @@ class ObjectSettingsAction <
 
 		object =
 			objectLookup.lookupObject (
-				requestContext.contextStuff ());
+				requestContext.contextStuffRequired ());
 
 		// perform update
 

@@ -539,7 +539,7 @@ class ChatUserSearchOldAction
 				ConsoleContext targetContext =
 					consoleManager.relatedContextRequired (
 						taskLogger,
-						requestContext.consoleContext (),
+						requestContext.consoleContextRequired (),
 						targetContextType);
 
 				consoleManager.changeContext (

@@ -16,8 +16,11 @@ import wbs.console.reporting.StatsFormatter;
 import wbs.console.reporting.StatsGrouper;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsResolver;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -27,6 +30,9 @@ class SupervisorTableStatsGroupPart
 	extends AbstractPagePart {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	StatsConsoleLogic statsConsoleLogic;
@@ -72,22 +78,19 @@ class SupervisorTableStatsGroupPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		try {
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
-			statsConsoleLogic.writeGroup (
-				formatWriter,
-				statsDataSetsByName,
-				statsPeriod,
-				statsGrouper,
-				statsResolver,
-				statsFormatter);
-
-		} catch (Exception exception) {
-
-			throw new RuntimeException (
-				exception);
-
-		}
+		statsConsoleLogic.writeGroup (
+			taskLogger,
+			formatWriter,
+			statsDataSetsByName,
+			statsPeriod,
+			statsGrouper,
+			statsResolver,
+			statsFormatter);
 
 	}
 

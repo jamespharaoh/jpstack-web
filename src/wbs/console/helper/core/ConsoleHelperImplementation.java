@@ -22,6 +22,8 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 import wbs.utils.string.FormatWriter;
@@ -111,9 +113,11 @@ class ConsoleHelperImplementation <
 	@Override
 	public
 	boolean canView (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object) {
 
 		return consoleHelperProvider.canView (
+			parentTaskLogger,
 			object);
 
 	}

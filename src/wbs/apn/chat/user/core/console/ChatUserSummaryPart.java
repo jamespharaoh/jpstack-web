@@ -9,7 +9,6 @@ import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWrite;
@@ -25,6 +24,22 @@ import java.util.List;
 
 import lombok.NonNull;
 
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.currency.logic.CurrencyLogic;
+import wbs.platform.media.console.MediaConsoleLogic;
+
+import wbs.sms.gazetteer.logic.GazetteerLogic;
+
+import wbs.utils.time.TimeFormatter;
+
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.core.logic.ChatLogicHooks;
@@ -34,15 +49,6 @@ import wbs.apn.chat.scheme.model.ChatSchemeChargesRec;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.part.AbstractPagePart;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.platform.media.console.MediaConsoleLogic;
-import wbs.sms.gazetteer.logic.GazetteerLogic;
-import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("chatUserSummaryPart")
 public
@@ -70,13 +76,16 @@ class ChatUserSummaryPart
 	CurrencyLogic currencyLogic;
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
-
-	@SingletonDependency
 	GazetteerLogic gazetteerLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
+
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -146,6 +155,11 @@ class ChatUserSummaryPart
 	public
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
 		boolean isUser =
 			chatUser.getType () == ChatUserType.user;
@@ -260,11 +274,13 @@ class ChatUserSummaryPart
 			htmlTableDetailsRowWriteRaw (
 				"Number",
 				() -> objectManager.writeTdForObjectMiniLink (
+					taskLogger,
 					chatUser.getOldNumber ()));
 
 			htmlTableDetailsRowWriteRaw (
 				"Scheme",
 				() -> objectManager.writeTdForObjectMiniLink (
+					taskLogger,
 					chatUser.getChatScheme (),
 					chatUser.getChat ()));
 
@@ -273,6 +289,7 @@ class ChatUserSummaryPart
 				() -> ifNotNullThenElse (
 					chatUser.getChatAffiliate (),
 					() -> objectManager.writeTdForObjectMiniLink (
+						taskLogger,
 						chatUser.getChatAffiliate (),
 						chatUser.getChatScheme ()),
 					() -> htmlTableCellWrite (
@@ -387,13 +404,14 @@ class ChatUserSummaryPart
 
 				htmlTableDetailsRowWriteHtml (
 					chatUserCharge.name,
-					stringFormatObsolete (
+					stringFormat (
 						"%s (%h)",
 						chatUserCharge.name,
 						currencyLogic.formatHtml (
 							chatUser.getChat ().getCurrency (),
 							chatUserCharge.charge),
-						chatUserCharge.count));
+						integerToDecimalString (
+							chatUserCharge.count)));
 
 				total += chatUserCharge.charge;
 

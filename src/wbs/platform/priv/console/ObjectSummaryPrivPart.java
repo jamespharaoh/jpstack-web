@@ -1,5 +1,6 @@
 package wbs.platform.priv.console;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
@@ -30,10 +31,14 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.group.console.GroupConsoleHelper;
 import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.model.PrivRec;
@@ -50,6 +55,9 @@ class ObjectSummaryPrivPart
 
 	@SingletonDependency
 	GroupConsoleHelper groupHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -81,14 +89,19 @@ class ObjectSummaryPrivPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		@SuppressWarnings ("unchecked")
-		ObjectLookup<? extends Record<?>> objectLookup =
-			(ObjectLookup<? extends Record<?>>)
-				requestContext.stuff ("dataObjectLookup");
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
+		ObjectLookup <? extends Record <?>> objectLookup =
+			genericCastUnchecked (
+				requestContext.stuff (
+					"dataObjectLookup"));
 
 		object =
 			objectLookup.lookupObject (
-				requestContext.contextStuff ());
+				requestContext.contextStuffRequired ());
 
 		List<PrivRec> privs =
 			objectManager.getChildren (
@@ -172,11 +185,18 @@ class ObjectSummaryPrivPart
 
 		}
 
-		for (UserRec user
-				: userHelper.findAll ()) {
+		for (
+			UserRec user
+				: userHelper.findAll ()
+		) {
 
-			if (! objectManager.canView (user))
+			if (
+				! objectManager.canView (
+					taskLogger,
+					user)
+			) {
 				continue;
+			}
 
 			users.put (
 				objectManager.objectPathMini (
@@ -190,8 +210,13 @@ class ObjectSummaryPrivPart
 				: groupHelper.findAll ()
 		) {
 
-			if (! objectManager.canView (group))
+			if (
+				! objectManager.canView (
+					taskLogger,
+					group)
+			) {
 				continue;
+			}
 
 			groups.put (
 				objectManager.objectPathMini (

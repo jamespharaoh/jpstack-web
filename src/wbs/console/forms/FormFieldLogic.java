@@ -1,6 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NumberUtils.equalToOne;
@@ -48,8 +49,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.entity.record.PermanentRecord;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -58,6 +62,13 @@ import wbs.utils.string.FormatWriter;
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 public
 class FormFieldLogic {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// public implementation
 
 	public <Container>
 	void implicit (
@@ -390,6 +401,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputFormRows (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
@@ -400,6 +412,7 @@ class FormFieldLogic {
 			@NonNull String formName) {
 
 		outputFormRows (
+			parentTaskLogger,
 			requestContextToSubmission (
 				requestContext),
 			htmlWriter,
@@ -544,6 +557,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputFormRows (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
@@ -552,6 +566,11 @@ class FormFieldLogic {
 			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"outputFormRows");
 
 		for (
 			FormField formField
@@ -609,6 +628,7 @@ class FormFieldLogic {
 			}
 
 			formField.renderFormRow (
+				taskLogger,
 				submission,
 				htmlWriter,
 				object,
@@ -648,6 +668,7 @@ class FormFieldLogic {
 
 	public
 	void outputFormTable (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
@@ -661,6 +682,7 @@ class FormFieldLogic {
 			@NonNull String formName) {
 
 		outputFormTable (
+			parentTaskLogger,
 			requestContextToSubmission (
 				requestContext),
 			htmlWriter,
@@ -678,6 +700,7 @@ class FormFieldLogic {
 
 	public
 	void outputFormTable (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
@@ -689,6 +712,11 @@ class FormFieldLogic {
 			@NonNull String submitButtonLabel,
 			@NonNull FormType formType,
 			@NonNull String formName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"outputFormTable");
 
 		String enctype = (
 			(BooleanSupplier)
@@ -721,6 +749,7 @@ class FormFieldLogic {
 			htmlWriter);
 
 		outputFormRows (
+			taskLogger,
 			submission,
 			htmlWriter,
 			formFieldSet,
@@ -751,15 +780,22 @@ class FormFieldLogic {
 
 	public
 	void outputDetailsTable (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object object,
 			@NonNull Map<String,Object> hints) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"outputDetailsTable");
+
 		htmlTableOpenDetails (
 			htmlWriter);
 
 		outputTableRows (
+			taskLogger,
 			htmlWriter,
 			formFieldSet,
 			object,
@@ -771,10 +807,16 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputListTable (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull List <Container> objects,
 			@NonNull Boolean links) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"outputListTable");
 
 		// table open
 
@@ -823,10 +865,11 @@ class FormFieldLogic {
 					htmlWriter);
 
 				outputTableCellsList (
+					taskLogger,
 					htmlWriter,
 					formFieldSet,
 					object,
-					ImmutableMap.of (),
+					emptyMap (),
 					links);
 
 				htmlTableRowClose (
@@ -887,11 +930,17 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputTableCellsList (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Container object,
 			@NonNull Map <String, Object> hints,
 			@NonNull Boolean links) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"outputTableCellsList");
 
 		for (
 			FormField <Container, ?, ?, ?> formField
@@ -899,6 +948,7 @@ class FormFieldLogic {
 		) {
 
 			formField.renderTableCellList (
+				taskLogger,
 				htmlWriter,
 				object,
 				hints,
@@ -911,11 +961,17 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputTableRowsList (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Container object,
 			@NonNull Boolean links,
 			@NonNull Long columnSpan) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"outputTableRowsList");
 
 		for (
 			FormField <Container, ?, ?, ?> formField
@@ -923,6 +979,7 @@ class FormFieldLogic {
 		) {
 
 			formField.renderTableCellList (
+				taskLogger,
 				htmlWriter,
 				object,
 				ImmutableMap.of (),
@@ -935,10 +992,16 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputTableRows (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Container object,
 			@NonNull Map <String, Object> hints) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"outputTableRows");
 
 		for (
 			FormField <Container, ?, ?, ?> formField
@@ -953,6 +1016,7 @@ class FormFieldLogic {
 				formField.label ());
 
 			formField.renderTableCellProperties (
+				taskLogger,
 				htmlWriter,
 				object,
 				hints);

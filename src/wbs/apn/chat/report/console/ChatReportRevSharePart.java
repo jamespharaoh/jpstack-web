@@ -1,5 +1,6 @@
 package wbs.apn.chat.report.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -39,9 +40,11 @@ import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.hibernate.HibernateDatabase;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -129,6 +132,9 @@ class ChatReportRevSharePart
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MessageStatsConsoleHelper messageStatsHelper;
@@ -713,12 +719,26 @@ class ChatReportRevSharePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		goSearchForm ();
-		goReport ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
+		goSearchForm (
+			taskLogger);
+
+		goReport (
+			taskLogger);
 
 	}
 
-	void goSearchForm () {
+	void goSearchForm (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goSearchForm");
 
 		htmlFormOpenGetAction (
 			requestContext.resolveLocalUrl (
@@ -727,6 +747,7 @@ class ChatReportRevSharePart
 		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			searchFields,
@@ -750,7 +771,13 @@ class ChatReportRevSharePart
 
 	}
 
-	void goReport () {
+	void goReport (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReport");
 
 		htmlHeadingTwoWrite (
 			"Stats");
@@ -779,10 +806,11 @@ class ChatReportRevSharePart
 			htmlTableRowOpen ();
 
 			formFieldLogic.outputTableCellsList (
+				taskLogger,
 				formatWriter,
 				resultsFields,
 				chatReport,
-				ImmutableMap.of (),
+				emptyMap (),
 				true);
 
 			htmlTableRowClose ();
@@ -794,6 +822,7 @@ class ChatReportRevSharePart
 		htmlTableRowOpen ();
 
 		formFieldLogic.outputTableCellsList (
+			taskLogger,
 			formatWriter,
 			resultsFields,
 			totalReport,

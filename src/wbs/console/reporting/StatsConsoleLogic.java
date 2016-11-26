@@ -18,21 +18,38 @@ import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.ReadableInstant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.string.FormatWriter;
 
 @SingletonComponent ("statsConsoleLogic")
 public
 class StatsConsoleLogic {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// public implementation
+
 	public
 	void writeGroup (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Map <String, StatsDataSet> dataSetsByName,
 			@NonNull StatsPeriod period,
 			@NonNull StatsGrouper grouper,
 			@NonNull StatsResolver resolver,
 			@NonNull StatsFormatter formatter) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeGroup");
 
 		// aggregate stats via resolver
 
@@ -61,6 +78,7 @@ class StatsConsoleLogic {
 			htmlTableRowOpen ();
 
 			grouper.writeTdForGroup (
+				taskLogger,
 				formatWriter,
 				group);
 

@@ -33,12 +33,15 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -50,6 +53,9 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	implements FormField <Container, Generic, Native, Interface> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -217,11 +223,17 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderTableCellList (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Boolean link,
 			@NonNull Long columnSpan) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderTableCellList");
 
 		Optional <Native> nativeValue =
 			requiredValue (
@@ -243,6 +255,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 						genericValue)));
 
 		renderer.renderHtmlTableCellList (
+			taskLogger,
 			htmlWriter,
 			container,
 			hints,
@@ -255,9 +268,15 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderTableCellProperties (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderTableCellProperties");
 
 		Optional <Native> nativeValue =
 			requiredValue (
@@ -279,6 +298,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 						genericValue)));
 
 		renderer.renderHtmlTableCellProperties (
+			taskLogger,
 			htmlWriter,
 			container,
 			hints,
@@ -291,6 +311,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderFormRow (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,

@@ -19,16 +19,21 @@ import org.joda.time.Interval;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.queue.model.QueueItemProcessedTimeComparator;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
+
 import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("queueSupervisorItemsPart")
@@ -37,6 +42,9 @@ class QueueSupervisorItemsPart
 	extends AbstractPagePart {
 
 	// dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -92,13 +100,27 @@ class QueueSupervisorItemsPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		renderParameterTable ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
-		renderContentTable ();
+		renderParameterTable (
+			taskLogger);
+
+		renderContentTable (
+			taskLogger);
+
 	}
 
 	private
-	void renderParameterTable () {
+	void renderParameterTable (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderParameterTable");
 
 		// open table
 
@@ -110,6 +132,7 @@ class QueueSupervisorItemsPart
 			"User",
 			() ->
 				objectManager.writeTdForObjectMiniLink (
+					taskLogger,
 					user));
 
 		// close table
@@ -119,7 +142,13 @@ class QueueSupervisorItemsPart
 	}
 
 	private
-	void renderContentTable () {
+	void renderContentTable (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderContentTable");
 
 		// open table
 
@@ -157,13 +186,16 @@ class QueueSupervisorItemsPart
 			htmlTableRowOpen ();
 
 			objectManager.writeTdForObjectLink (
+				taskLogger,
 				parent);
 
 			objectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				queue,
 				parent);
 
 			objectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				queueItem,
 				queue);
 

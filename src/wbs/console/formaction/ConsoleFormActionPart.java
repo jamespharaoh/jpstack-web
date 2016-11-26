@@ -121,6 +121,7 @@ class ConsoleFormActionPart <FormState>
 		// write form
 
 		formFieldLogic.outputFormTable (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			formFields,

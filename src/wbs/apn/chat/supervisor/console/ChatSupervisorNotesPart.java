@@ -12,18 +12,23 @@ import java.util.List;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.part.AbstractPagePart;
+import wbs.console.reporting.StatsPeriod;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.time.TimeFormatter;
+
 import wbs.apn.chat.contact.model.ChatContactNoteObjectHelper;
 import wbs.apn.chat.contact.model.ChatContactNoteRec;
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatRec;
-import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.part.AbstractPagePart;
-import wbs.console.reporting.StatsPeriod;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
-import wbs.utils.time.TimeFormatter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatSupervisorNotesPart")
@@ -44,6 +49,9 @@ class ChatSupervisorNotesPart
 
 	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -86,6 +94,11 @@ class ChatSupervisorNotesPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlTableOpenList ();
 
 		htmlTableHeaderRowWrite (
@@ -106,14 +119,17 @@ class ChatSupervisorNotesPart
 				chatContactNote.getNotes ());
 
 			consoleObjectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				chatContactNote.getUser (),
 				chatContactNote.getUser ().getChat ());
 
 			consoleObjectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				chatContactNote.getMonitor (),
 				chatContactNote.getMonitor ().getChat ());
 
 			consoleObjectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				chatContactNote.getConsoleUser ());
 
 			htmlTableCellWrite (

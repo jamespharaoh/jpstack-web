@@ -17,8 +17,11 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormType;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("subscriptionNumberAddRemovePart")
@@ -30,6 +33,9 @@ class SubscriptionNumberAddRemovePart
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	@Named
@@ -70,6 +76,11 @@ class SubscriptionNumberAddRemovePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
 				"/subscriptionNumber.addRemove"));
@@ -77,6 +88,7 @@ class SubscriptionNumberAddRemovePart
 		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			addRemoveFormFieldSet,

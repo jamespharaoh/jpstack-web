@@ -12,6 +12,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
@@ -36,6 +38,7 @@ class UnaryStatsGrouper
 	@Override
 	public
 	void writeTdForGroup (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Object group) {
 

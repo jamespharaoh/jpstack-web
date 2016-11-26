@@ -1,8 +1,5 @@
 package wbs.console.tab;
 
-import static wbs.utils.collection.CollectionUtils.listSorted;
-import static wbs.utils.etc.DebugUtils.debugFormat;
-import static wbs.utils.etc.LogicUtils.booleanToYesNo;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
@@ -30,7 +27,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
@@ -337,9 +333,6 @@ class TabbedResponder
 		renderPagePart (
 			taskLogger);
 
-		renderDebugInformation (
-			taskLogger);
-
 	}
 
 	// private implementation
@@ -471,128 +464,6 @@ class TabbedResponder
 				taskLogger);
 
 		}
-
-	}
-
-	private
-	void renderDebugInformation (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		if (
-			! privChecker.canSimple (
-				GlobalId.root,
-				"debug")
-		) {
-			return;
-		}
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"<!--");
-
-		formatWriter.writeNewline ();
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"Context data");
-
-		formatWriter.writeNewline ();
-
-		formatWriter.writeLineFormat (
-			"Name: %s",
-			requestContext.consoleContext ().name ());
-
-		formatWriter.writeLineFormat (
-			"Type name: %s",
-			requestContext.consoleContext ().typeName ());
-
-		formatWriter.writeLineFormat (
-			"Path prefix: %s",
-			requestContext.consoleContext ().pathPrefix ());
-
-		formatWriter.writeLineFormat (
-			"Global: %s",
-			booleanToYesNo (
-				requestContext.consoleContext ().global ()));
-
-		if (
-			isNotNull (
-				requestContext.consoleContext ().parentContextName ())
-		) {
-
-			formatWriter.writeLineFormat (
-				"Parent context name: %s",
-				requestContext.consoleContext ().parentContextName ());
-
-			formatWriter.writeLineFormat (
-				"Parent context tab name: %s",
-				requestContext.consoleContext ().parentContextTabName ());
-
-		}
-
-		formatWriter.writeLineFormat ();
-
-		formatWriter.writeLineFormat (
-			"Foreign context path: %s",
-			requestContext.foreignContextPath ());
-
-		if (
-			isNotNull (
-				requestContext.changedContextPath ())
-		) {
-
-			formatWriter.writeLineFormat (
-				"Changed context path: %s",
-				requestContext.changedContextPath ());
-
-		}
-
-		formatWriter.decreaseIndent ();
-
-		formatWriter.writeNewline ();
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"Context attributes");
-
-		formatWriter.writeNewline ();
-
-		for (
-			Map.Entry <String, Object> attributeEntry
-				: requestContext.contextStuff ().attributes ().entrySet ()
-		) {
-
-			formatWriter.writeLineFormat (
-				"%s: %s",
-				attributeEntry.getKey (),
-				attributeEntry.getValue ().toString ());
-
-		}
-
-		formatWriter.decreaseIndent ();
-
-		formatWriter.writeNewline ();
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"Context privs");
-
-		formatWriter.writeNewline ();
-
-		for (
-			String priv
-				: listSorted (
-					requestContext.contextStuff ().privs ())
-		) {
-
-			formatWriter.writeLineFormat (
-				"%s",
-				priv);
-
-		}
-
-		formatWriter.decreaseIndent ();
-
-		formatWriter.writeNewline ();
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"-->");
 
 	}
 

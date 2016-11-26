@@ -31,18 +31,22 @@ import lombok.NonNull;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import wbs.apn.chat.core.console.ChatConsoleHelper;
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormType;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 
 @PrototypeComponent ("chatRebillSendPart")
 public
@@ -58,11 +62,14 @@ class ChatRebillSendPart
 	ChatUserConsoleHelper chatUserHelper;
 
 	@SingletonDependency
-	FormFieldLogic formFieldLogic;
-
-	@SingletonDependency
 	@Named
 	ConsoleModule chatRebillConsoleModule;
+
+	@SingletonDependency
+	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// state
 
@@ -173,19 +180,34 @@ class ChatRebillSendPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlParagraphWriteFormat (
 			"This tool allows you to rebill users who have not performed an ",
 			"action recently.");
 
-		renderSearchForm ();
+		renderSearchForm (
+			taskLogger);
 
-		renderBillSearchResults ();
-		renderNonBillSearchResults ();
+		renderBillSearchResults (
+			taskLogger);
+
+		renderNonBillSearchResults (
+			taskLogger);
 
 	}
 
 	private
-	void renderSearchForm () {
+	void renderSearchForm (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderSearchForm");
 
 		htmlFormOpenPostAction (
 			requestContext.resolveLocalUrl (
@@ -194,6 +216,7 @@ class ChatRebillSendPart
 		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			searchFormFields,
@@ -240,7 +263,13 @@ class ChatRebillSendPart
 	}
 
 	private
-	void renderBillSearchResults () {
+	void renderBillSearchResults (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderBillSearchResults");
 
 		if (
 			optionalIsNotPresent (
@@ -280,6 +309,7 @@ class ChatRebillSendPart
 		}
 
 		formFieldLogic.outputListTable (
+			taskLogger,
 			formatWriter,
 			billResultsFormFields,
 			billSearchResults.get (),
@@ -288,7 +318,13 @@ class ChatRebillSendPart
 	}
 
 	private
-	void renderNonBillSearchResults () {
+	void renderNonBillSearchResults (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderNonBillSearchResults");
 
 		if (
 
@@ -315,6 +351,7 @@ class ChatRebillSendPart
 			"settings on the search form.");
 
 		formFieldLogic.outputListTable (
+			taskLogger,
 			formatWriter,
 			nonBillResultsFormFields,
 			nonBillSearchResults.get (),

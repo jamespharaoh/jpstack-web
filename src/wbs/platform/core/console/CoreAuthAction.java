@@ -49,7 +49,7 @@ class CoreAuthAction
 			@NonNull TaskLogger taskLogger) {
 
 		if (! lookup.lookup (
-				requestContext.contextStuff ())) {
+				requestContext.contextStuffRequired ())) {
 
 			requestContext.addError (
 				"Access denied");

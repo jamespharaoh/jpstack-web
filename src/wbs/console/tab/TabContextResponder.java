@@ -155,8 +155,8 @@ class TabContextResponder
 		tabbedPageProvider.get ()
 
 			.tab (
-				requestContext.contextStuff ().getTab (
-					requestContext.consoleContext (),
+				requestContext.contextStuffRequired ().getTab (
+					requestContext.consoleContextRequired (),
 					tab))
 
 			.title (

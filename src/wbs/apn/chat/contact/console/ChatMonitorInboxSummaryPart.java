@@ -67,10 +67,12 @@ import wbs.console.misc.JqueryEditableScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.console.MediaConsoleLogic;
@@ -134,13 +136,16 @@ class ChatMonitorInboxSummaryPart
 	Database database;
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
-
-	@SingletonDependency
 	GazetteerLogic gazetteerLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
+
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -368,13 +373,21 @@ class ChatMonitorInboxSummaryPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlTableOpenDetails ();
 
 		// general details
 
 		goParty ();
 		goPrefs ();
-		goCode ();
+
+		goCode (
+			taskLogger);
+
 		goName ();
 		goInfo ();
 		goPic ();
@@ -503,7 +516,13 @@ class ChatMonitorInboxSummaryPart
 
 	}
 
-	void goCode () {
+	void goCode (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goCode");
 
 		htmlTableRowOpen ();
 
@@ -511,10 +530,12 @@ class ChatMonitorInboxSummaryPart
 			"User number");
 
 		objectManager.writeTdForObjectMiniLink (
+			taskLogger,
 			monitorChatUser,
 			chat);
 
 		objectManager.writeTdForObjectMiniLink (
+			taskLogger,
 			userChatUser,
 			chat);
 

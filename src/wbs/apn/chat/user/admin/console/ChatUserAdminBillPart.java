@@ -22,6 +22,19 @@ import org.joda.time.Instant;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.time.TimeFormatter;
+
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.bill.model.ChatUserBillLogObjectHelper;
 import wbs.apn.chat.bill.model.ChatUserBillLogRec;
@@ -30,14 +43,6 @@ import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.part.AbstractPagePart;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.logging.TaskLogger;
-import wbs.utils.time.TimeFormatter;
 
 @PrototypeComponent ("chatUserAdminBillPart")
 public
@@ -63,6 +68,9 @@ class ChatUserAdminBillPart
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -144,6 +152,11 @@ class ChatUserAdminBillPart
 	public
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
 		if (
 			enumEqualSafe (
@@ -236,6 +249,7 @@ class ChatUserAdminBillPart
 					billLog.getTimestamp ()));
 
 			consoleObjectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				billLog.getUser ());
 
 			htmlTableRowClose ();

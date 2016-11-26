@@ -19,8 +19,6 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.core.console.ChatConsoleHelper;
-import wbs.apn.chat.core.console.ChatConsoleLogic;
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldLogic.UpdateResultSet;
@@ -30,10 +28,17 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.etc.OptionalUtils;
+
+import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.console.ChatConsoleLogic;
 
 @PrototypeComponent ("chatBroadcastSendPart")
 public
@@ -54,6 +59,9 @@ class ChatBroadcastSendPart
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// state
 
@@ -157,6 +165,11 @@ class ChatBroadcastSendPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlFormOpenPost ();
 
 		htmlHeadingThreeWrite (
@@ -217,6 +230,7 @@ class ChatBroadcastSendPart
 			htmlTableOpenDetails ();
 
 			formFieldLogic.outputFormRows (
+				taskLogger,
 				requestContext,
 				formatWriter,
 				numbersFields,
@@ -227,6 +241,7 @@ class ChatBroadcastSendPart
 				"send");
 
 			formFieldLogic.outputFormRows (
+				taskLogger,
 				requestContext,
 				formatWriter,
 				commonFields,
@@ -265,6 +280,7 @@ class ChatBroadcastSendPart
 			htmlTableOpenDetails ();
 
 			formFieldLogic.outputFormRows (
+				taskLogger,
 				requestContext,
 				formatWriter,
 				searchFields,
@@ -275,6 +291,7 @@ class ChatBroadcastSendPart
 				"send");
 
 			formFieldLogic.outputFormRows (
+				taskLogger,
 				requestContext,
 				formatWriter,
 				commonFields,
@@ -312,6 +329,7 @@ class ChatBroadcastSendPart
 		htmlTableOpenDetails ();
 
 		formFieldLogic.outputFormRows (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			messageUserFields,

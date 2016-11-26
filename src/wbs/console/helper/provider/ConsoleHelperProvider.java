@@ -11,6 +11,10 @@ interface ConsoleHelperProvider <
 
 	String objectName ();
 
+	Class <RecordType> objectClass ();
+
+	String idKey ();
+
 	String getPathId (
 			Long objectId);
 
@@ -21,17 +25,14 @@ interface ConsoleHelperProvider <
 			RecordType object);
 
 	boolean canView (
+			TaskLogger parentTaskLogger,
 			RecordType object);
 
 	RecordType lookupObject (
 			ConsoleContextStuff contextStuff);
 
-	Class <RecordType> objectClass ();
-
-	String idKey ();
-
 	void postProcess (
-			TaskLogger taskLogger,
+			TaskLogger parentTaskLogger,
 			ConsoleContextStuff contextStuff);
 
 }

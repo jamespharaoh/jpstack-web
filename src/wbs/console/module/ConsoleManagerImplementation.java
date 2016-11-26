@@ -1155,7 +1155,7 @@ class ConsoleManagerImplementation
 				contextPartSuffix);
 
 		ConsoleContextStuff contextStuff =
-			requestContext.contextStuff ();
+			requestContext.contextStuffRequired ();
 
 		contextStuff.reset ();
 

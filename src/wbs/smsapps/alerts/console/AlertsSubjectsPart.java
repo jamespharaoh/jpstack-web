@@ -16,11 +16,15 @@ import lombok.NonNull;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
 import wbs.smsapps.alerts.model.AlertsSubjectRec;
 
@@ -33,6 +37,9 @@ class AlertsSubjectsPart
 
 	@SingletonDependency
 	AlertsSettingsConsoleHelper alertsSettingsHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -67,6 +74,11 @@ class AlertsSubjectsPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlTableOpenDetails ();
 
 		htmlTableHeaderRowWrite (
@@ -91,6 +103,7 @@ class AlertsSubjectsPart
 				alertsSubject.getObjectType ().getCode ());
 
 			objectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				object);
 
 			htmlTableCellWrite (

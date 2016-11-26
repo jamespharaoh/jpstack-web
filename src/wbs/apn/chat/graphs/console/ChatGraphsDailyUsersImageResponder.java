@@ -90,7 +90,7 @@ class ChatGraphsDailyUsersImageResponder
 
 		Integer chatAffiliateId =
 			(Integer)
-			requestContext.contextStuff ().get ("chatAffiliateId");
+			requestContext.contextStuffRequired ().get ("chatAffiliateId");
 
 		if (chatAffiliateId != null) {
 

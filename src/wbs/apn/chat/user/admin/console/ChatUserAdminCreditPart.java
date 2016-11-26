@@ -24,8 +24,10 @@ import lombok.NonNull;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -52,6 +54,9 @@ class ChatUserAdminCreditPart
 	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
@@ -77,6 +82,11 @@ class ChatUserAdminCreditPart
 	public
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
 		if (
 			enumEqualSafe (
@@ -218,6 +228,7 @@ class ChatUserAdminCreditPart
 				) {
 
 					consoleObjectManager.writeTdForObjectMiniLink (
+						taskLogger,
 						chatUserCredit.getUser ());
 
 				} else {

@@ -26,12 +26,15 @@ import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.html.HtmlTableCellWriter;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
 
@@ -51,6 +54,9 @@ class ConsoleObjectManagerImplementation
 	implements ConsoleObjectManager {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -150,12 +156,18 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	void writeTdForObject (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object,
 			@NonNull Optional <Record <?>> assumedRootOptional,
 			@NonNull Boolean mini,
 			@NonNull Boolean link,
 			@NonNull Long colspan) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeTdForObject");
 
 		ConsoleHelper <?> objectHelper =
 			findConsoleHelperRequired (
@@ -171,6 +183,7 @@ class ConsoleObjectManagerImplementation
 			link
 
 			&& canView (
+				taskLogger,
 				object)
 
 		) {
@@ -294,14 +307,23 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	boolean canView (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLoggerFormat (
+				parentTaskLogger,
+				"canView (%s)",
+				object.toString ());
 
 		ConsoleHelper <?> objectHelper =
 			findConsoleHelperRequired (
 				object);
 
-		return objectHelper.canViewGeneric (
-			object);
+		return objectHelper.canView (
+			taskLogger,
+			genericCastUnchecked (
+				object));
 
 	}
 

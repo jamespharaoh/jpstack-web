@@ -20,8 +20,10 @@ import lombok.NonNull;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.TimeFormatter;
@@ -50,6 +52,9 @@ class ChatUserNotesPart
 
 	@SingletonDependency
 	ChatUserNoteObjectHelper chatUserNoteHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -83,9 +88,15 @@ class ChatUserNotesPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		renderCreateForm ();
 
-		renderHistory ();
+		renderHistory (
+			taskLogger);
 
 	}
 
@@ -124,7 +135,13 @@ class ChatUserNotesPart
 	}
 
 	private
-	void renderHistory () {
+	void renderHistory (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHistory");
 
 		htmlHeadingTwoWrite (
 			"Existing notes");
@@ -153,6 +170,7 @@ class ChatUserNotesPart
 				chatUserNote.getText ().getText ());
 
 			consoleObjectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				chatUserNote.getUser ());
 
 			htmlTableRowClose ();

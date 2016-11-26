@@ -14,14 +14,18 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import lombok.NonNull;
 
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.part.AbstractPagePart;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("chatUserAdminDeletePart")
 public
@@ -35,6 +39,9 @@ class ChatUserAdminDeletePart
 
 	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// state
 
@@ -72,6 +79,11 @@ class ChatUserAdminDeletePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		// can't delete monitors
 
 		if (chatUser.getType () != ChatUserType.user) {
@@ -99,6 +111,7 @@ class ChatUserAdminDeletePart
 		htmlTableDetailsRowWriteRaw (
 			"Number",
 			() -> consoleObjectManager.writeTdForObjectMiniLink (
+				taskLogger,
 				chatUser.getOldNumber ()));
 
 		htmlTableDetailsRowWrite (
