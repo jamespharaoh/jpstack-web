@@ -124,7 +124,7 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canRecursive (
-			@NonNull Record<?> parentObject,
+			@NonNull Record <?> parentObject,
 			@NonNull String... privCodes) {
 
 		return target.canRecursive (
@@ -136,8 +136,8 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canSimple (
-			GlobalId parentGlobalId,
-			String... privCodes) {
+			@NonNull GlobalId parentGlobalId,
+			@NonNull String ... privCodes) {
 
 		return target.canSimple (
 			parentGlobalId,
@@ -148,7 +148,7 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canSimple (
-			@NonNull Record<?> parentObject,
+			@NonNull Record <?> parentObject,
 			@NonNull String... privCodes) {
 
 		return target.canSimple (
@@ -160,7 +160,7 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canRecursive (
-			Map<Object,Collection<String>> map) {
+			Map <Object, Collection <String>> map) {
 
 		return target.canRecursive (
 			map);

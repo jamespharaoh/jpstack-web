@@ -11,8 +11,7 @@
 
 		<context-stuff
 			name="broadcastConfigId"
-			delegate="broadcastConfig"
-			field="id"/>
+			field="broadcastConfig.id"/>
 
 		<run-post-processor
 			name="broadcastConfig"/>

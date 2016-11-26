@@ -11,13 +11,11 @@
 
 		<context-stuff
 			name="imChatId"
-			delegate="imChat"
-			field="id"/>
+			field="imChat.id"/>
 
 		<priv-key
 			name="imChatTemplate.manage"
-			delegate="imChat"
-			priv="manage"/>
+			priv="imChat:manage"/>
 
 		<run-post-processor
 			name="imChat"/>

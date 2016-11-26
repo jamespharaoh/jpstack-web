@@ -5,23 +5,20 @@
 		object-name="messageTemplateEntryValue"
 		view-priv="messageTemplateSet.messageTemplateDatabase:manage">
 
+		<priv-key
+			name="messageTemplateEntryValue.manage"
+			priv="messageTemplateSet.messageTemplateDatabase:manage"/>
+
 		<context-stuff
 			name="messageTemplateEntryValueName"
-			delegate="messageTemplateEntryType"
-			field="name"/>
+			field="messageTemplateEntryType.name"/>
 
 		<context-stuff
 			name="messageTemplateSetId"
-			delegate="messageTemplateSet"
-			field="id"/>
+			field="messageTemplateSet.id"/>
 
 		<run-post-processor
 			name="messageTemplateSet"/>
-
-		<priv-key
-			name="messageTemplateEntryValue.manage"
-			delegate="messageTemplateSet.messageTemplateDatabase"
-			priv="manage"/>
 
 	</console-helper-provider>
 
@@ -70,11 +67,13 @@
 		name="list"
 		object-name="messageTemplateEntryValue">
 
-		<name-field
-			delegate="messageTemplateEntryType"/>
+		<text-field
+			name="name"
+			field="messageTemplateEntryType.name"/>
 
-		<description-field
-			delegate="messageTemplateEntryType"/>
+		<text-field
+			name="description"
+			field="messageTemplateEntryType.description"/>
 
 	</field-set>
 

@@ -7,18 +7,15 @@
 
 		<priv-key
 			name="subscriptionSendNumber.manage"
-			delegate="grandparent"
-			priv="manage"/>
+			priv="grandparent:manage"/>
 
 		<context-stuff
 			name="subscriptionSendNumberName"
-			delegate="number"
-			field="number"/>
+			field="number.number"/>
 
 		<context-stuff
 			name="subscriptionSendId"
-			delegate="subscriptionSend"
-			field="id"/>
+			field="subscriptionSend.id"/>
 
 		<run-post-processor
 			name="subscriptionSend"/>

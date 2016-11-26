@@ -11,8 +11,7 @@
 
 		<context-stuff
 			name="manualResponderId"
-			delegate="manualResponder"
-			field="id"/>
+			field="manualResponder.id"/>
 
 		<run-post-processor
 			name="manualResponder"/>

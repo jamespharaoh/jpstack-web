@@ -10,8 +10,7 @@
 
 		<priv-key
 			name="queue.manage"
-			delegate="parent"
-			priv="manage"/>
+			priv="parent:manage"/>
 
 	</console-helper-provider>
 

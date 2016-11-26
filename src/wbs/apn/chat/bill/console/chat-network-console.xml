@@ -7,18 +7,15 @@
 
 		<context-stuff
 			name="chatNetworkName"
-			delegate="network"
-			field="name"/>
+			field="network.name"/>
 
 		<context-stuff
 			name="chatId"
-			delegate="chat"
-			field="id"/>
+			field="chat.id"/>
 
 		<priv-key
 			name="chatNetwork.manage"
-			delegate="chat"
-			priv="manage"/>
+			priv="chat:manage"/>
 
 		<run-post-processor
 			name="chat"/>

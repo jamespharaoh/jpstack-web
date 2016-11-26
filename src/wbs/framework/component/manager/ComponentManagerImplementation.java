@@ -25,7 +25,6 @@ import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -1096,24 +1095,12 @@ class ComponentManagerImplementation
 
 		}
 
-		//field.setAccessible (
-		//	true);
-
-
 		// instantiate singletons
 
 		for (
 			ComponentDefinition componentDefinition
-				: registry.all ()
+				: registry.singletons ()
 		) {
-
-			if (
-				stringNotEqualSafe (
-					componentDefinition.scope (),
-					"singleton")
-			) {
-				continue;
-			}
 
 			getComponentRequired (
 				taskLogger,

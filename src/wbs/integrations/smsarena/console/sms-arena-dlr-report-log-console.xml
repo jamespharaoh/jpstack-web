@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="smsArenaDlrReportLog.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="smsArenaDlrReportLogName"

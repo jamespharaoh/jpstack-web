@@ -11,13 +11,11 @@
 
 		<context-stuff
 			name="manualResponderAffiliateName"
-			delegate="smsCustomerAffiliate"
-			field="name"/>
+			field="smsCustomerAffiliate.name"/>
 
 		<context-stuff
 			name="manualResponderId"
-			delegate="manualResponder"
-			field="id"/>
+			field="manualResponder.id"/>
 
 		<run-post-processor
 			name="manualResponder"/>

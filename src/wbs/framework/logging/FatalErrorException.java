@@ -6,19 +6,34 @@ import lombok.experimental.Accessors;
 
 @Accessors (fluent = true)
 public
-class LoggedErrorsException
+class FatalErrorException
 	extends RuntimeException {
 
 	@Getter
 	TaskLogger taskLogger;
 
 	public
-	LoggedErrorsException (
+	FatalErrorException (
 			@NonNull TaskLogger taskLogger,
 			@NonNull String message) {
 
 		super (
 			message);
+
+		this.taskLogger =
+			taskLogger;
+
+	}
+
+	public
+	FatalErrorException (
+			@NonNull TaskLogger taskLogger,
+			@NonNull String message,
+			@NonNull Throwable cause) {
+
+		super (
+			message,
+			cause);
 
 		this.taskLogger =
 			taskLogger;

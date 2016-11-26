@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="chatRebillLog.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="chatRebillLogName"
@@ -16,8 +15,7 @@
 
 		<context-stuff
 			name="chatId"
-			delegate="chat"
-			field="id"/>
+			field="chat.id"/>
 
 		<run-post-processor
 			name="chat"/>

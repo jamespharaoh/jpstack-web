@@ -7,13 +7,11 @@
 
 		<priv-key
 			name="smsArena.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<priv-key
 			name="smsArenaConfig.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="smsArenaConfigName"

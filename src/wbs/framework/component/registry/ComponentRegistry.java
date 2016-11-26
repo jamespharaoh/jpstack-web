@@ -17,6 +17,8 @@ interface ComponentRegistry {
 
 	Collection <ComponentDefinition> all ();
 
+	Collection <ComponentDefinition> singletons ();
+
 	Optional <ComponentDefinition> byName (
 			String componentName);
 

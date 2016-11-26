@@ -11,8 +11,7 @@
 
 		<context-stuff
 			name="manualResponderNumberId"
-			delegate="manualResponderNumber"
-			field="id"/>
+			field="manualResponderNumber.id"/>
 
 		<run-post-processor
 			name="manualResponderNumber"/>
@@ -68,12 +67,6 @@
 		<object-field
 			name="number"
 			object-type="number"/>
-
-		<!--
-		<delegate-field
-			delegate="message"
-			name="text"/>
-		-->
 
 	</field-set>
 

@@ -1,9 +1,9 @@
 package wbs.console.forms;
 
-import static wbs.utils.etc.Misc.errorResult;
-import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.ResultUtils.errorResultFormat;
+import static wbs.utils.etc.ResultUtils.successResult;
 
 import java.util.Map;
 
@@ -47,7 +47,7 @@ class IntervalFormFieldInterfaceMapping <Container>
 		) {
 
 			return successResult (
-				Optional.absent ());
+				optionalAbsent ());
 
 		}
 
@@ -91,9 +91,8 @@ class IntervalFormFieldInterfaceMapping <Container>
 				optionalInterval)
 		) {
 
-			return errorResult (
-				stringFormat (
-					"You must enter a valid time, date, or range"));
+			return errorResultFormat (
+				"You must enter a valid time, date, or range");
 
 		}
 

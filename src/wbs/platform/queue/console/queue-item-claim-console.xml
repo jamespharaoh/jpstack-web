@@ -5,22 +5,20 @@
 		object-name="queueItemClaim"
 		view-priv="greatgrandparent:manage">
 
+		<priv-key
+			name="queue.manage"
+			priv="greatgrandparent:manage"/>
+
 		<context-stuff
 			name="queueItemClaimName"
 			field="id"/>
 
 		<context-stuff
 			name="queueItemId"
-			delegate="queueItem"
-			field="id"/>
+			field="queueItem.id"/>
 
 		<run-post-processor
 			name="queueItem"/>
-
-		<priv-key
-			name="queue.manage"
-			delegate="greatgrandparent"
-			priv="manage"/>
 
 	</console-helper-provider>
 

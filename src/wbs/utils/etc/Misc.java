@@ -818,34 +818,7 @@ class Misc {
 	}
 
 	public static <Type>
-	Optional <Type> resultValue (
-			@NonNull Either <Type, ?> either) {
-
-		return either.isLeft ()
-			? optionalOf (
-				either.left ().value ())
-			: optionalAbsent ();
-
-	}
-
-	public static <Type>
-	Type resultValueRequired (
-			@NonNull Either <Type, ?> either) {
-
-		return either.left ().value ();
-
-	}
-
-	public static <Type>
 	Type eitherGetRight (
-			@NonNull Either<?,Type> either) {
-
-		return either.right ().value ();
-
-	}
-
-	public static <Type>
-	Type getError (
 			@NonNull Either<?,Type> either) {
 
 		return either.right ().value ();
@@ -865,66 +838,6 @@ class Misc {
 			@NonNull Either<?,?> either) {
 
 		return either.isRight ();
-
-	}
-
-	public static <LeftType,RightType>
-	Either<LeftType,RightType> successResult (
-			@NonNull LeftType left) {
-
-		return Either.<LeftType,RightType>left (
-			left);
-
-	}
-
-	public static <LeftType,RightType>
-	Either<LeftType,RightType> errorResult (
-			@NonNull RightType right) {
-
-		return Either.<LeftType,RightType>right (
-			right);
-
-	}
-
-	public static <LeftType>
-	Either <LeftType, String> errorResultFormat (
-			@NonNull String ... arguments) {
-
-		return Either.<LeftType, String> right (
-			stringFormatArray (
-				arguments));
-
-	}
-
-	public static
-	boolean isError (
-			@NonNull Either<?,?> either) {
-
-		return either.isRight ();
-
-	}
-
-	public static
-	boolean isSuccess (
-			@NonNull Either<?,?> either) {
-
-		return either.isLeft ();
-
-	}
-
-	public static <Left,Right>
-	Left requiredSuccess (
-			@NonNull Either<Left,Right> either) {
-
-		return either.left ().value ();
-
-	}
-
-	public static <Left,Right>
-	Right requiredError (
-			@NonNull Either<Left,Right> either) {
-
-		return either.right ().value ();
 
 	}
 
@@ -975,29 +888,6 @@ class Misc {
 		} else {
 
 			throw new RuntimeException (
-				result.right ().value ());
-
-		}
-
-	}
-
-	public static <OldValueType, NewValueType, ErrorType>
-	Either <NewValueType, ErrorType> mapSuccess (
-			@NonNull Either <OldValueType, ErrorType> result,
-			@NonNull Function <
-				? super OldValueType,
-				? extends NewValueType
-			> mapping) {
-
-		if (result.isLeft ()) {
-
-			return Either.left (
-				mapping.apply (
-					result.left ().value ()));
-
-		} else {
-
-			return errorResult (
 				result.right ().value ());
 
 		}

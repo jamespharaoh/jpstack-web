@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="menuGroup.manage"
-			delegate="parent"
-			priv="manage"/>
+			priv="parent:manage"/>
 
 		<context-stuff
 			name="menuGroupName"

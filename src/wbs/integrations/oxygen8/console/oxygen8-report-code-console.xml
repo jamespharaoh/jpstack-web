@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="oxygen8ReportCode.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="oxygen8ReportCodeName"
@@ -16,8 +15,7 @@
 
 		<context-stuff
 			name="oxygen8ConfigId"
-			delegate="oxygen8Config"
-			field="id"/>
+			field="oxygen8Config.id"/>
 
 		<run-post-processor
 			name="oxygen8Config"/>

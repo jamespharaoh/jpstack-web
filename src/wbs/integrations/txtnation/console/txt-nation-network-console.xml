@@ -11,8 +11,7 @@
 
 		<priv-key
 			name="txtNationNetwork.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 	</console-helper-provider>
 

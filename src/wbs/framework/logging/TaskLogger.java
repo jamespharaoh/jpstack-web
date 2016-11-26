@@ -51,7 +51,6 @@ class TaskLogger
 	LogSeverity severity =
 		LogSeverity.notice;
 
-	long fatalCount;
 	long errorCount;
 	long warningCount;
 	long noticeCount;
@@ -177,7 +176,7 @@ class TaskLogger
 	public
 	long errorCount () {
 
-		return errorCount + fatalCount;
+		return errorCount;
 
 	}
 
@@ -185,7 +184,7 @@ class TaskLogger
 	boolean errors () {
 
 		return moreThanZero (
-			errorCount + fatalCount);
+			errorCount);
 
 	}
 
@@ -261,9 +260,6 @@ class TaskLogger
 	void fatalFormat (
 			@NonNull String ... arguments) {
 
-		writeFirstError (
-			LogSeverity.error);
-
 		String message =
 			stringFormatArray (
 				arguments);
@@ -278,7 +274,9 @@ class TaskLogger
 				LogSeverity.fatal,
 				message));
 
-		increaseFatalCount ();
+		throw new FatalErrorException (
+			this,
+			message);
 
 	}
 
@@ -286,9 +284,6 @@ class TaskLogger
 	void fatalFormatException (
 			@NonNull Throwable throwable,
 			@NonNull String ... arguments) {
-
-		writeFirstError (
-			LogSeverity.fatal);
 
 		String message =
 			stringFormatArray (
@@ -305,7 +300,10 @@ class TaskLogger
 				LogSeverity.fatal,
 				message));
 
-		increaseFatalCount ();
+		throw new FatalErrorException (
+			this,
+			message,
+			throwable);
 
 	}
 
@@ -313,8 +311,7 @@ class TaskLogger
 	void errorFormat (
 			@NonNull String ... arguments) {
 
-		writeFirstError (
-			LogSeverity.error);
+		writeFirstError ();
 
 		String message =
 			stringFormatArray (
@@ -339,8 +336,7 @@ class TaskLogger
 			@NonNull Throwable throwable,
 			@NonNull String ... arguments) {
 
-		writeFirstError (
-			LogSeverity.error);
+		writeFirstError ();
 
 		String message =
 			stringFormatArray (
@@ -365,9 +361,6 @@ class TaskLogger
 	void warningFormat (
 			@NonNull String ... arguments) {
 
-		writeFirstError (
-			LogSeverity.warning);
-
 		String message =
 			stringFormatArray (
 				arguments);
@@ -390,9 +383,6 @@ class TaskLogger
 	void warningFormatException (
 			@NonNull Throwable throwable,
 			@NonNull String ... arguments) {
-
-		writeFirstError (
-			LogSeverity.warning);
 
 		String message =
 			stringFormatArray (
@@ -417,9 +407,6 @@ class TaskLogger
 	void noticeFormat (
 			@NonNull String ... arguments) {
 
-		writeFirstError (
-			LogSeverity.notice);
-
 		String message =
 			stringFormatArray (
 				arguments);
@@ -442,9 +429,6 @@ class TaskLogger
 	void noticeFormatException (
 			@NonNull Throwable throwable,
 			@NonNull String ... arguments) {
-
-		writeFirstError (
-			LogSeverity.notice);
 
 		String message =
 			stringFormatArray (
@@ -469,9 +453,6 @@ class TaskLogger
 	void debugFormat (
 			@NonNull String ... arguments) {
 
-		writeFirstError (
-			LogSeverity.debug);
-
 		String message =
 			stringFormatArray (
 				arguments);
@@ -494,9 +475,6 @@ class TaskLogger
 	void debugFormatException (
 			@NonNull Throwable throwable,
 			@NonNull String ... arguments) {
-
-		writeFirstError (
-			LogSeverity.debug);
 
 		String message =
 			stringFormatArray (
@@ -528,7 +506,7 @@ class TaskLogger
 					"%s due to %s errors",
 					lastError,
 					integerToDecimalString (
-						errorCount + fatalCount));
+						errorCount));
 
 			logTarget.writeToLog (
 				LogSeverity.error,
@@ -561,7 +539,7 @@ class TaskLogger
 					"%s due to %s errors",
 					lastError,
 					integerToDecimalString (
-						errorCount + fatalCount));
+						errorCount));
 
 			logTarget.writeToLog (
 				LogSeverity.error,
@@ -603,174 +581,36 @@ class TaskLogger
 	// private implementation
 
 	private
-	void writeFirstError (
-			@NonNull LogSeverity severity) {
+	void writeFirstError () {
 
 		if (
 			optionalIsPresent (
 				parentOptional)
 		) {
-
-			parentOptional.get ().writeFirstError (
-				severity);
-
-			return;
-
+			parentOptional.get ().writeFirstError ();
 		}
 
-		switch (severity) {
+		if (
 
-		case fatal:
+			equalToZero (
+				errorCount)
 
-			if (
+			&& isNotNull (
+				firstError)
 
-				equalToZero (
-					fatalCount + errorCount)
+		) {
 
-				&& isNotNull (
-					firstError)
+			logTarget.writeToLog (
+				LogSeverity.error,
+				firstError,
+				optionalAbsent ());
 
-			) {
-
-				logTarget.writeToLog (
-					LogSeverity.fatal,
-					firstError,
-					optionalAbsent ());
-
-				events.add (
-					new TaskLogEntryEvent (
-						LogSeverity.fatal,
-						firstError));
-
-			}
-
-			break;
-
-		case error:
-
-			if (
-
-				equalToZero (
-					errorCount + fatalCount)
-
-				&& isNotNull (
-					firstError)
-
-			) {
-
-				logTarget.writeToLog (
+			events.add (
+				new TaskLogEntryEvent (
 					LogSeverity.error,
-					firstError,
-					optionalAbsent ());
-
-				events.add (
-					new TaskLogEntryEvent (
-						LogSeverity.error,
-						firstError));
-
-			}
-
-			break;
-
-		case warning:
-
-			if (
-
-				equalToZero (
-					+ fatalCount
-					+ errorCount
-					+ warningCount)
-
-				&& isNotNull (
-					firstError)
-
-			) {
-
-				logTarget.writeToLog (
-					LogSeverity.warning,
-					firstError,
-					optionalAbsent ());
-
-				events.add (
-					new TaskLogEntryEvent (
-						LogSeverity.warning,
-						firstError));
-
-			}
-
-			break;
-
-		case notice:
-
-			if (
-
-				equalToZero (
-					+ fatalCount
-					+ errorCount
-					+ warningCount
-					+ noticeCount)
-
-				&& isNotNull (
-					firstError)
-
-			) {
-
-				logTarget.writeToLog (
-					LogSeverity.notice,
-					firstError,
-					optionalAbsent ());
-
-				events.add (
-					new TaskLogEntryEvent (
-						LogSeverity.notice,
-						firstError));
-
-			}
-
-			break;
-
-		case debug:
-
-			if (
-
-				equalToZero (
-					+ fatalCount
-					+ errorCount
-					+ warningCount
-					+ noticeCount
-					+ debugCount)
-
-				&& isNotNull (
-					firstError)
-
-			) {
-
-				logTarget.writeToLog (
-					LogSeverity.debug,
-					firstError,
-					optionalAbsent ());
-
-				events.add (
-					new TaskLogEntryEvent (
-						LogSeverity.debug,
-						firstError));
-
-			}
-
-			break;
+					firstError));
 
 		}
-
-	}
-
-	private
-	void increaseFatalCount () {
-
-		fatalCount ++;
-
-		optionalDo (
-			parentOptional,
-			TaskLogger::increaseFatalCount);
 
 	}
 

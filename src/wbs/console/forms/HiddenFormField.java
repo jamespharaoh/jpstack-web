@@ -2,12 +2,12 @@ package wbs.console.forms;
 
 import static wbs.utils.etc.LogicUtils.equalSafe;
 import static wbs.utils.etc.Misc.eitherGetLeft;
-import static wbs.utils.etc.Misc.isError;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NumberUtils.equalToOne;
 import static wbs.utils.etc.NumberUtils.equalToTwo;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.ResultUtils.isError;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitColon;
 

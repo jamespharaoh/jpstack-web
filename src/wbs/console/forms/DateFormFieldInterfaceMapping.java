@@ -1,9 +1,8 @@
 package wbs.console.forms;
 
-import static wbs.utils.etc.Misc.errorResult;
-import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.ResultUtils.errorResultFormat;
+import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 import java.util.Map;
@@ -96,9 +95,8 @@ class DateFormFieldInterfaceMapping <Container>
 				genericValue)
 		) {
 
-			return errorResult (
-				stringFormat (
-					"You must enter a valid date in yyyy-mm-dd format"));
+			return errorResultFormat (
+				"You must enter a valid date in yyyy-mm-dd format");
 
 		}
 

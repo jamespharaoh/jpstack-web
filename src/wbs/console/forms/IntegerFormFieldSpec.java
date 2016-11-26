@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleModuleData;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
@@ -17,14 +18,16 @@ import wbs.framework.data.annotations.DataClass;
 public
 class IntegerFormFieldSpec {
 
-	@DataAttribute
+	@DataAttribute (
+		required = true)
 	String name;
+
+	@DataAttribute (
+		name = "field")
+	String fieldName;
 
 	@DataAttribute
 	Boolean dynamic;
-
-	@DataAttribute
-	String delegate;
 
 	@DataAttribute
 	String label;

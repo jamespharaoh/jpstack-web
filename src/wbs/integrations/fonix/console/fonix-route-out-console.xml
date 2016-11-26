@@ -7,18 +7,15 @@
 
 		<priv-key
 			name="fonix.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<priv-key
 			name="fonixRouteOut.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="fonixRouteOutName"
-			delegate="route"
-			field="name"/>
+			field="route.name"/>
 
 	</console-helper-provider>
 

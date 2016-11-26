@@ -6,8 +6,7 @@
 
 		<priv-key
 			name="mediaburst.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<section
 			name="proteusRoute"

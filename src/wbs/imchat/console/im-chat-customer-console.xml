@@ -11,21 +11,18 @@
 
 		<context-stuff
 			name="imChatId"
-			delegate="imChat"
-			field="id"/>
+			field="imChat.id"/>
 
 		<run-post-processor
 			name="imChat"/>
 
 		<priv-key
 			name="imChatCustomer.manage"
-			delegate="imChat"
-			priv="manage"/>
+			priv="imChat:manage"/>
 
 		<priv-key
 			name="imChatCustomer.supervisor"
-			delegate="imChat"
-			priv="supervisor"/>
+			priv="imChat:supervisor"/>
 
 	</console-helper-provider>
 

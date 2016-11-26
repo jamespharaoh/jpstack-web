@@ -7,18 +7,15 @@
 
 		<priv-key
 			name="messageTemplateFieldValue.manage"
-			delegate="messageTemplateFieldType.messageTemplateEntryType.messageTemplateDatabase"
-			priv="manage"/>
+			priv="messageTemplateFieldType.messageTemplateEntryType.messageTemplateDatabase:manage"/>
 
 		<context-stuff
 			name="messageTemplateFieldValueName"
-			delegate="messageTemplateFieldType"
-			field="name"/>
+			field="messageTemplateFieldType.name"/>
 
 		<context-stuff
 			name="messageTemplateEntryValueId"
-			delegate="messageTemplateEntryValue"
-			field="id"/>
+			field="messageTemplateEntryValue.id"/>
 
 		<run-post-processor
 			name="messageTemplateEntryValue"/>

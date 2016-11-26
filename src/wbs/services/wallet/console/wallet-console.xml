@@ -11,8 +11,7 @@
 
 		<context-stuff
 			name="walletServiceId"
-			delegate="walletService"
-			field="id"/>
+			field="walletService.id"/>
 
 		<run-post-processor
 			name="walletService"/>

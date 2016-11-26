@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="simulatorRoute.manage"
-			delegate="parent"
-			priv="manage"/>
+			priv="parent:manage"/>
 
 		<context-stuff
 			name="simulatorRouteName"
@@ -16,8 +15,7 @@
 
 		<context-stuff
 			name="simulatorId"
-			delegate="simulator"
-			field="id"/>
+			field="simulator.id"/>
 
 		<run-post-processor
 			name="simulator"/>

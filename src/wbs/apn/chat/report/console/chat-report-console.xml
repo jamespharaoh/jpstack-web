@@ -156,10 +156,10 @@
 
 		<code-field/>
 
-		<code-field
+		<text-field
 			name="number"
-			label="Number"
-			delegate="number"/>
+			field="number.number"
+			label="Number"/>
 
 		<enum-field
 			name="gender"/>
@@ -211,8 +211,9 @@
 			field="chatUser.chat"
 			object-type="chat"/>
 
-		<code-field
-			delegate="chatUser"
+		<text-field
+			name="chatUserCode"
+			field="chatUser.code"
 			label="User"/>
 
 		<timestamp-field

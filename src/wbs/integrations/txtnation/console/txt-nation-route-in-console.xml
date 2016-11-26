@@ -7,13 +7,11 @@
 
 		<context-stuff
 			name="txtNationRouteInName"
-			delegate="route"
-			field="name"/>
+			field="route.name"/>
 
 		<priv-key
 			name="txtNationRouteIn.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 	</console-helper-provider>
 

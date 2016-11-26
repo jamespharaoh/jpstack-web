@@ -1,14 +1,14 @@
 package wbs.console.forms;
 
-import static wbs.utils.etc.Misc.errorResult;
-import static wbs.utils.etc.Misc.getError;
-import static wbs.utils.etc.Misc.resultValueRequired;
-import static wbs.utils.etc.Misc.isError;
-import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.ResultUtils.errorResult;
+import static wbs.utils.etc.ResultUtils.getError;
+import static wbs.utils.etc.ResultUtils.isError;
+import static wbs.utils.etc.ResultUtils.resultValueRequired;
+import static wbs.utils.etc.ResultUtils.successResult;
 
 import java.util.Map;
 
@@ -59,7 +59,7 @@ class RangeFormFieldInterfaceMapping <
 		) {
 
 			return successResult (
-				Optional.absent ());
+				optionalAbsent ());
 
 		}
 
@@ -90,7 +90,7 @@ class RangeFormFieldInterfaceMapping <
 		) {
 
 			return successResult (
-				Optional.absent ());
+				optionalAbsent ());
 
 		}
 

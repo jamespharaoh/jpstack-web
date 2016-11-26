@@ -3,15 +3,15 @@ package wbs.console.forms;
 import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveTwoElements;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
-import static wbs.utils.etc.Misc.errorResult;
-import static wbs.utils.etc.Misc.getError;
-import static wbs.utils.etc.Misc.resultValueRequired;
-import static wbs.utils.etc.Misc.isError;
-import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.ResultUtils.errorResult;
+import static wbs.utils.etc.ResultUtils.getError;
+import static wbs.utils.etc.ResultUtils.isError;
+import static wbs.utils.etc.ResultUtils.resultValueRequired;
+import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitSimple;
 
@@ -64,7 +64,7 @@ class TextualRangeFormFieldInterfaceMapping <
 		) {
 
 			return successResult (
-				Optional.absent ());
+				optionalAbsent ());
 
 		}
 

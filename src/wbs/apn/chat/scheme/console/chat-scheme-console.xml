@@ -10,8 +10,7 @@
 
 		<context-stuff
 			name="chatId"
-			delegate="chat"
-			field="id"/>
+			field="chat.id"/>
 
 		<priv-key
 			name="chatScheme.manage"

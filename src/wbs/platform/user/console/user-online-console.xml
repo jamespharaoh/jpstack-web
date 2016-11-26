@@ -3,14 +3,12 @@
 
 	<console-helper-provider
 		object-name="userOnline"
-		id-key="userId">
-
+		id-key="userId"
 		view-priv="user:manage">
 
 		<context-stuff
 			name="userOnlineName"
-			delegate="user"
-			field="username"/>
+			field="user.username"/>
 
 		<run-post-processor
 			name="user"/>

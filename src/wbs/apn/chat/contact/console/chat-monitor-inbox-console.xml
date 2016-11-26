@@ -10,8 +10,7 @@
 
 		<context-stuff
 			name="chatId"
-			delegate="monitorChatUser.chat"
-			field="id"/>
+			field="monitorChatUser.chat.id"/>
 
 		<run-post-processor
 			name="chat"/>

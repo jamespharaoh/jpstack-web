@@ -1,8 +1,9 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.ResultUtils.successResult;
 
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
@@ -65,7 +67,7 @@ class ObjectCsvFormFieldInterfaceMapping <
 		) {
 
 			return successResult (
-				Optional.<String>of (
+				optionalOf (
 					""));
 
 		} else {

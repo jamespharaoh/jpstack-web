@@ -3,7 +3,6 @@ package wbs.console.forms;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,8 +62,8 @@ class FloatingPointFormFieldBuilder {
 	requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	Provider <DereferenceFormFieldAccessor>
+	dereferenceFormFieldAccessorProvider;
 
 	@PrototypeDependency
 	Provider <TextFormFieldRenderer>
@@ -95,13 +94,10 @@ class FloatingPointFormFieldBuilder {
 		String name =
 			spec.name ();
 
-		String fullName =
-			spec.delegate () == null
-				? name
-				: stringFormat (
-					"%s.%s",
-					spec.delegate (),
-					name);
+		String fieldName =
+			ifNull (
+				spec.fieldName (),
+				name);
 
 		String label =
 			ifNull (
@@ -133,26 +129,13 @@ class FloatingPointFormFieldBuilder {
 		// accessor
 
 		FormFieldAccessor accessor =
-			simpleFormFieldAccessorProvider.get ()
+			dereferenceFormFieldAccessorProvider.get ()
 
-			.name (
-				name)
+			.path (
+				fieldName)
 
 			.nativeClass (
 				Double.class);
-
-		if (spec.delegate () != null) {
-
-			accessor =
-				delegateFormFieldAccessorProvider.get ()
-
-				.path (
-					spec.delegate ())
-
-				.delegateFormFieldAccessor (
-					accessor);
-
-		}
 
 		// native mapping
 
@@ -201,7 +184,7 @@ class FloatingPointFormFieldBuilder {
 			textFormFieldRendererProvider.get ()
 
 			.name (
-				fullName)
+				name)
 
 			.label (
 				label)
@@ -227,7 +210,7 @@ class FloatingPointFormFieldBuilder {
 				updatableFormFieldProvider.get ()
 
 				.name (
-					fullName)
+					name)
 
 				.label (
 					label)
@@ -261,7 +244,7 @@ class FloatingPointFormFieldBuilder {
 				readOnlyFormFieldProvider.get ()
 
 				.name (
-					fullName)
+					name)
 
 				.label (
 					label)

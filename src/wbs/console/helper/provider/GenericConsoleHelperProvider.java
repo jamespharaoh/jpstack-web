@@ -1,9 +1,10 @@
 package wbs.console.helper.provider;
 
-import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
+import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.resultValue;
-import static wbs.utils.etc.Misc.successOrThrowRuntimeException;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalGetOrAbsent;
@@ -11,6 +12,7 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.ResultUtils.resultValue;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.naivePluralise;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -52,7 +54,6 @@ import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectManager;
 
-import wbs.utils.etc.PropertyUtils;
 import wbs.utils.string.StringSubstituter;
 
 @Accessors (fluent = true)
@@ -289,13 +290,6 @@ class GenericConsoleHelperProvider <
 				throw new RuntimeException ();
 			}
 
-			if (
-				contextStuffSpec.delegateName () != null
-				&& contextStuffSpec.fieldName () == null
-			) {
-				throw new RuntimeException ();
-			}
-
 			if (contextStuffSpec.template () != null) {
 
 				contextStuff.set (
@@ -305,20 +299,10 @@ class GenericConsoleHelperProvider <
 
 			} else {
 
-				Object target =
-					ifNotNullThenElse (
-						contextStuffSpec.delegateName (),
-						() -> optionalOrNull (
-							successOrThrowRuntimeException (
-								objectManager.dereferenceOrError (
-									object,
-									contextStuffSpec.delegateName ()))),
-						() -> object);
-
 				contextStuff.set (
 					contextStuffSpec.name (),
-					PropertyUtils.propertyGetAuto (
-						target,
+					objectManager.dereferenceRequired (
+						object,
 						contextStuffSpec.fieldName ()));
 
 			}
@@ -336,17 +320,50 @@ class GenericConsoleHelperProvider <
 				: consoleHelperProviderSpec.privKeys ()
 		) {
 
-			Record <?> privObject =
-				privKeySpec.delegateName () != null
-					? (Record <?>) objectManager.dereferenceObsolete (
-						object,
-						privKeySpec.delegateName ())
-					: object;
+			List <String> privCodeParts =
+				stringSplitColon (
+					privKeySpec.privCode ());
+
+			Record <?> privObject;
+			String privCode;
+
+			if (
+				collectionHasOneElement (
+					privCodeParts)
+			) {
+
+				privObject =
+					object;
+
+				privCode =
+					privKeySpec.privCode ();
+
+			} else if (
+				collectionHasTwoElements (
+					privCodeParts)
+			) {
+
+				privObject =
+					genericCastUnchecked (
+						objectManager.dereferenceRequired (
+							object,
+							listFirstElementRequired (
+								privCodeParts)));
+
+				privCode =
+					listSecondElementRequired (
+						privCodeParts);
+
+			} else {
+
+				throw new RuntimeException ();
+
+			}
 
 			if (
 				privChecker.canRecursive (
 					privObject,
-					privKeySpec.privName ())
+					privCode)
 			) {
 
 				contextStuff.grant (
@@ -518,17 +535,52 @@ class GenericConsoleHelperProvider <
 					: viewPrivKeySpecs
 			) {
 
-				Optional <Record <?>> privObjectOptional =
-					ifNotNullThenElse (
-						privKeySpec.delegateName (),
-						() -> genericCastUnchecked (
-							optionalGetOrAbsent (
-								resultValue (
-									objectManager.dereferenceOrError (
-										object,
-										privKeySpec.delegateName ())))),
-						() -> optionalOf (
-							object));
+				List <String> privCodeParts =
+					stringSplitColon (
+						privKeySpec.privCode ());
+
+				String privObjectPath;
+				Optional <Record <?>> privObjectOptional;
+				String privCode;
+
+				if (
+					collectionHasOneElement (
+						privCodeParts)
+				) {
+
+					privObjectPath = null;
+
+					privObjectOptional =
+						optionalOf (
+							object);
+
+					privCode =
+						privKeySpec.privCode ();
+
+				} else if (
+					collectionHasTwoElements (
+						privCodeParts)
+				) {
+
+					privObjectPath =
+						listFirstElementRequired (
+							privCodeParts);
+
+					privObjectOptional =
+						genericCastUnchecked (
+							objectManager.dereferenceOrError (
+								object,
+								privObjectPath));
+
+					privCode =
+						listSecondElementRequired (
+							privCodeParts);
+
+				} else {
+
+					throw new RuntimeException ();
+
+				}
 
 				if (
 					optionalIsNotPresent (
@@ -537,7 +589,7 @@ class GenericConsoleHelperProvider <
 
 					taskLogger.debugFormat (
 						"Can't find delegate %s for view priv key",
-						privKeySpec.delegateName ());
+						privObjectPath);
 
 					continue;
 
@@ -549,12 +601,12 @@ class GenericConsoleHelperProvider <
 				if (
 					privChecker.canRecursive (
 						privObject,
-						privKeySpec.privName ())
+						privCode)
 				) {
 
 					taskLogger.debugFormat (
-						"Object is visible because of priv %s on %s",
-						privKeySpec.privName (),
+						"Object is visible because of priv '%s' on: %s",
+						privCode,
 						objectManager.objectPathMini (
 							privObject));
 
@@ -562,19 +614,19 @@ class GenericConsoleHelperProvider <
 
 				} else if (
 					isNotNull (
-						privKeySpec.delegateName ())
+						privObjectPath)
 				) {
 
 					taskLogger.debugFormat (
-						"View priv key with delegate %s priv %s denied",
-						privKeySpec.delegateName (),
-						privKeySpec.privName ());
+						"Not granted visibility because of priv '%s' on: %s",
+						privCode,
+						privObjectPath);
 
 				} else {
 
 					taskLogger.debugFormat (
-						"View priv key with priv %s denied",
-						privKeySpec.privName ());
+						"Not granted visibility because of priv '%s'",
+						privCode);
 
 				}
 

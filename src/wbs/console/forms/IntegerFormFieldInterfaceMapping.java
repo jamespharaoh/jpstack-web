@@ -1,11 +1,11 @@
 package wbs.console.forms;
 
-import static wbs.utils.etc.Misc.errorResult;
-import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.NumberUtils.equalToZero;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.ResultUtils.errorResultFormat;
+import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 import java.util.Map;
@@ -55,7 +55,7 @@ class IntegerFormFieldInterfaceMapping<Container>
 		) {
 
 			return successResult (
-				Optional.<Long>absent ());
+				optionalAbsent ());
 
 		}
 
@@ -70,9 +70,8 @@ class IntegerFormFieldInterfaceMapping<Container>
 
 		} catch (NumberFormatException exception) {
 
-			return errorResult (
-				stringFormat (
-					"You must enter a whole number using digits"));
+			return errorResultFormat (
+				"You must enter a whole number using digits");
 
 		}
 

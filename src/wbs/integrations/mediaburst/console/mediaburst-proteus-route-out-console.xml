@@ -7,18 +7,15 @@
 
 		<priv-key
 			name="mediaburst.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<priv-key
 			name="mediaburstProteusRouteOut.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="mediaburstProteusRouteOutName"
-			delegate="route"
-			field="name"/>
+			field="route.name"/>
 
 	</console-helper-provider>
 

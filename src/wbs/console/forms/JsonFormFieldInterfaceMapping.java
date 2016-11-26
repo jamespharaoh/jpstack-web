@@ -1,7 +1,8 @@
 package wbs.console.forms;
 
-import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.StringWriter;
@@ -79,7 +80,7 @@ class JsonFormFieldInterfaceMapping <Container>
 			"\n</pre>");
 
 		return successResult (
-			Optional.of (
+			optionalOf (
 				stringWriter.toString ()));
 
 	}

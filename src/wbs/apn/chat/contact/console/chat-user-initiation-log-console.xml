@@ -11,13 +11,11 @@
 
 		<context-stuff
 			name="chatUserId"
-			delegate="chatUser"
-			field="id"/>
+			field="chatUser.id"/>
 
 		<priv-key
 			name="chatUserInitiationLog.manage"
-			delegate="chatUser.chat"
-			priv="manage"/>
+			priv="chatUser.chat:manage"/>
 
 		<run-post-processor
 			name="chatUser"/>

@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="clockworkSmsInboundLog.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="clockworkSmsInboundLogName"

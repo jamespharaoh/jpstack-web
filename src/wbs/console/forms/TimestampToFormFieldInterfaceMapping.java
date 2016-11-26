@@ -1,10 +1,10 @@
 package wbs.console.forms;
 
-import static wbs.utils.etc.Misc.errorResult;
-import static wbs.utils.etc.Misc.successResult;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.ResultUtils.errorResultFormat;
+import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 import java.util.Map;
@@ -64,7 +64,7 @@ class TimestampToFormFieldInterfaceMapping <Container>
 		) {
 
 			return successResult (
-				Optional.<Instant>absent ());
+				optionalAbsent ());
 
 		}
 
@@ -82,10 +82,9 @@ class TimestampToFormFieldInterfaceMapping <Container>
 
 		} catch (IllegalArgumentException exception) {
 
-			return errorResult (
-				stringFormat (
-					"Please enter a valid timestamp for %s",
-					name ()));
+			return errorResultFormat (
+				"Please enter a valid timestamp for %s",
+				name ());
 
 		}
 
@@ -93,10 +92,10 @@ class TimestampToFormFieldInterfaceMapping <Container>
 
 	@Override
 	public
-	Either<Optional<String>,String> genericToInterface (
+	Either <Optional <String>, String> genericToInterface (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Instant> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Instant> genericValue) {
 
 		if (
 			optionalIsNotPresent (

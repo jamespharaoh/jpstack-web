@@ -5,19 +5,17 @@
 		object-name="manualResponderNumber"
 		view-priv="manualResponder:manage">
 
+		<priv-key
+			name="manualResponderNumber.manage"
+			priv="manualResponder:manage"/>
+
 		<context-stuff
 			name="manualResponderNumberName"
 			field="id"/>
 
 		<context-stuff
 			name="manualResponderId"
-			delegate="manualResponder"
-			field="id"/>
-
-		<priv-key
-			name="manualResponderNumber.manage"
-			delegate="manualResponder"
-			priv="manage"/>
+			field="manualResponder.id"/>
 
 		<run-post-processor
 			name="manualResponder"/>

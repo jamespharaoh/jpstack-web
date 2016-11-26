@@ -3,16 +3,17 @@ package wbs.console.forms;
 import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
 import static wbs.utils.etc.Misc.eitherGetLeft;
-import static wbs.utils.etc.Misc.getError;
-import static wbs.utils.etc.Misc.isError;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.isRight;
 import static wbs.utils.etc.Misc.requiredValue;
-import static wbs.utils.etc.Misc.resultValueRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
+import static wbs.utils.etc.ResultUtils.getError;
+import static wbs.utils.etc.ResultUtils.isError;
+import static wbs.utils.etc.ResultUtils.resultValueRequired;
 import static wbs.utils.string.StringUtils.stringSplitColon;
 import static wbs.web.utils.HtmlAttributeUtils.htmlStyleAttribute;
 import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
@@ -526,7 +527,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 					false)
 
 				.error (
-					Optional.of (
+					optionalOf (
 						getError (
 							newInterfaceValue)));
 
@@ -534,7 +535,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 		// convert to generic
 
-		Either<Optional<Generic>,String> interfaceToGenericResult =
+		Either <Optional <Generic>, String> interfaceToGenericResult =
 			interfaceMapping.interfaceToGeneric (
 				container,
 				hints,

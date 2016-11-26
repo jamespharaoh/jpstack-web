@@ -1,23 +1,25 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.LogicUtils.booleanEqual;
-import static wbs.utils.etc.Misc.errorResult;
-import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.ResultUtils.errorResultFormat;
+import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.util.Map;
 
 import com.google.common.base.Optional;
 
-import fj.data.Either;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+
+import fj.data.Either;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("yesNoCsvFormFieldInterfaceMapping")
@@ -50,7 +52,7 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 		) {
 
 			return successResult (
-				Optional.of (
+				optionalOf (
 					true));
 
 		} else if (
@@ -76,7 +78,7 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 
 			} else {
 
-				return errorResult (
+				return errorResultFormat (
 					"This is a required field");
 
 			}
@@ -85,12 +87,12 @@ class YesNoCsvFormFieldInterfaceMapping<Container>
 
 			if (nullable ()) {
 
-				return errorResult (
+				return errorResultFormat (
 					"This field must contain 'yes' or 'no', or be empty");
 
 			} else {
 
-				return errorResult (
+				return errorResultFormat (
 					"This field must contain 'yes' or 'no'");
 
 			}

@@ -23,8 +23,7 @@
 
 		<context-stuff
 			name="subscriptionId"
-			delegate="subscription"
-			field="id"/>
+			field="subscription.id"/>
 
 		<run-post-processor
 			name="subscription"/>

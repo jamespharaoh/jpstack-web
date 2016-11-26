@@ -7,18 +7,15 @@
 
 		<priv-key
 			name="smsArena.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<priv-key
 			name="smsArenaRouteOut.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="smsArenaRouteOutName"
-			delegate="route"
-			field="name"/>
+			field="route.name"/>
 
 	</console-helper-provider>
 

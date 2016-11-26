@@ -6,8 +6,8 @@ import static wbs.utils.etc.LogicUtils.booleanToTrueFalseNone;
 import static wbs.utils.etc.LogicUtils.booleanToYesNoNone;
 import static wbs.utils.etc.LogicUtils.parseBooleanYesNoNone;
 import static wbs.utils.etc.Misc.doNothing;
-import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;

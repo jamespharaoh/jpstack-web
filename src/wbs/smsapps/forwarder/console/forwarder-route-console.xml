@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="forwarderRoute.manage"
-			delegate="forwarder"
-			priv="manage"/>
+			priv="forwarder:manage"/>
 
 		<context-stuff
 			name="forwarderRouteName"
@@ -16,8 +15,7 @@
 
 		<context-stuff
 			name="forwarderId"
-			delegate="forwarder"
-			field="id"/>
+			field="forwarder.id"/>
 
 		<run-post-processor
 			name="forwarder"/>

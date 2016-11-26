@@ -6,8 +6,7 @@
 
 		<priv-key
 			name="fonix.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-link
 			name="config"

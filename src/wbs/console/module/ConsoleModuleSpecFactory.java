@@ -11,6 +11,7 @@ import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.LogContext;
+import wbs.framework.logging.LoggedErrorsException;
 import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
@@ -43,11 +44,19 @@ class ConsoleModuleSpecFactory
 				parentTaskLogger,
 				"makeComponent");
 
+		taskLogger.firstErrorFormat (
+			"Error reading console module spec: %s",
+			xmlResourceName);
+
 		try {
 
 			return consoleSpecReader.readClasspath (
 				taskLogger,
 				xmlResourceName);
+
+		} catch (LoggedErrorsException loggedErrorsException) {
+
+			throw taskLogger.makeException ();
 
 		} catch (Exception exception) {
 

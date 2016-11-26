@@ -7,13 +7,11 @@
 
 		<context-stuff
 			name="broadcastNumberName"
-			delegate="number"
-			field="number"/>
+			field="number.number"/>
 
 		<context-stuff
 			name="broadcastId"
-			delegate="broadcast"
-			field="id"/>
+			field="broadcast.id"/>
 
 		<run-post-processor
 			name="broadcast"/>

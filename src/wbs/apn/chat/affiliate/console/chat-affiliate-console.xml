@@ -10,8 +10,7 @@
 
 		<context-stuff
 			name="chatSchemeId"
-			delegate="chatScheme"
-			field="id"/>
+			field="chatSCheme:id"/>
 
 		<priv-key
 			name="chatAffiliate.manage"
@@ -98,8 +97,9 @@
 		name="list"
 		object-name="chatAffiliate">
 
-		<name-field
-			delegate="chatScheme"
+		<text-field
+			name="chatSchemeName"
+			field="chatScheme.name"
 			label="Scheme"/>
 
 		<name-field/>

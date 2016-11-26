@@ -10,8 +10,7 @@
 
 		<context-stuff
 			name="alertsSettingsId"
-			delegate="alertsSettings"
-			field="id"/>
+			field="alertsSettings.id"/>
 
 		<run-post-processor
 			name="alertsSettings"/>

@@ -7,18 +7,15 @@
 
 		<context-stuff
 			name="chatRouteName"
-			delegate="route"
-			field="name"/>
+			field="route.name"/>
 
 		<context-stuff
 			name="chatId"
-			delegate="chat"
-			field="id"/>
+			field="chat.id"/>
 
 		<priv-key
 			name="chatRoute.manage"
-			delegate="chat"
-			priv="manage"/>
+			priv="chat:manage"/>
 
 		<run-post-processor
 			name="chat"/>

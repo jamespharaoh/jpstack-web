@@ -154,6 +154,12 @@ class ComponentRegistryImplementation
 
 	@Override
 	public
+	List <ComponentDefinition> singletons () {
+		return singletons;
+	}
+
+	@Override
+	public
 	Optional <ComponentDefinition> byName (
 			@NonNull String componentName) {
 

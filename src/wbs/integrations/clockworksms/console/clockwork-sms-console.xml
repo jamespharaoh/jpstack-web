@@ -6,8 +6,7 @@
 
 		<priv-key
 			name="clockworkSms.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-link
 			name="config"

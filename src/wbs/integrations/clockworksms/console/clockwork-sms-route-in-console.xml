@@ -7,18 +7,15 @@
 
 		<priv-key
 			name="clockworkSms.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<priv-key
 			name="clockworkSmsRouteIn.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="clockworkSmsRouteInName"
-			delegate="route"
-			field="name"/>
+			field="route.name"/>
 
 	</console-helper-provider>
 

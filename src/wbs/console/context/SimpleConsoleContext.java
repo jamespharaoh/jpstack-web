@@ -1,6 +1,10 @@
 package wbs.console.context;
 
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringSplitColon;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -15,6 +19,7 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.spec.PrivKeySpec;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.tab.ConsoleContextTab;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -24,6 +29,7 @@ import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.file.WebFile;
 
 @Accessors (fluent = true)
@@ -143,20 +149,39 @@ class SimpleConsoleContext
 				: privKeySpecs
 		) {
 
+			List <String> privCodeParts =
+				stringSplitColon (
+					privKeySpec.privCode ());
+
 			if (
-				stringNotEqualSafe (
-					privKeySpec.delegateName (),
-					"root")
+				collectionHasTwoElements (
+					privCodeParts)
 			) {
+
+				if (
+					stringNotEqualSafe (
+						listFirstElementRequired (
+							privCodeParts),
+						"root")
+				) {
+					throw new RuntimeException ();
+				}
+
+				if (
+					privChecker.canRecursive (
+						GlobalId.root,
+						listSecondElementRequired (
+							privCodeParts))
+				) {
+
+					contextStuff.grant (
+						privKeySpec.name ());
+
+				}
+
+			} else {
+
 				throw new RuntimeException ();
-			}
-
-			if (privChecker.canRecursive (
-					GlobalId.root,
-					privKeySpec.privName ())) {
-
-				contextStuff.grant (
-					privKeySpec.name ());
 
 			}
 

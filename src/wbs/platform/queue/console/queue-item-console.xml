@@ -5,19 +5,17 @@
 		object-name="queueItem"
 		view-priv="grandparent:manage">
 
+		<priv-key
+			name="queueItem.manage"
+			priv="queueSubject.queue.parent:manage"/>
+
 		<context-stuff
 			name="queueItemName"
 			field="id"/>
 
 		<context-stuff
 			name="queueSubjectId"
-			delegate="queueSubject"
-			field="id"/>
-
-		<priv-key
-			name="queueItem.manage"
-			delegate="queueSubject.queue.parent"
-			priv="manage"/>
+			field="queueSubject.id"/>
 
 		<run-post-processor
 			name="queueSubject"/>
@@ -84,7 +82,7 @@
 
 		<integer-field
 			name="id"
-			delegate="queueSubject"
+			field="queueSubject.id"
 			label="Subject"/>
 
 		<index-field/>

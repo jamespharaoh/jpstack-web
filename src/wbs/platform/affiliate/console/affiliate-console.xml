@@ -11,18 +11,15 @@
 
 		<priv-key
 			name="affiliate.manage"
-			delegate="parent"
-			priv="manage"/>
+			priv="parent:manage"/>
 
 		<priv-key
 			name="affiliate.messages"
-			delegate="parent"
-			priv="messages"/>
+			priv="parent:messages"/>
 
 		<priv-key
 			name="affiliate.stats"
-			delegate="parent"
-			priv="stats"/>
+			priv="parent:stats"/>
 
 	</console-helper-provider>
 

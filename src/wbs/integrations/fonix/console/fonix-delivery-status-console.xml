@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="fonixDeliveryStatus.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="fonixDeliveryStatusName"
@@ -16,8 +15,7 @@
 
 		<context-stuff
 			name="fonixConfigId"
-			delegate="fonixConfig"
-			field="id"/>
+			field="fonixConfig.id"/>
 
 		<run-post-processor
 			name="fonixConfig"/>

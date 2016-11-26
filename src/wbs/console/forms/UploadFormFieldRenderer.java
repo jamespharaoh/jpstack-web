@@ -1,8 +1,8 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.doNothing;
-import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;

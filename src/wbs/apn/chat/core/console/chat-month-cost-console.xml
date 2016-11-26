@@ -8,8 +8,7 @@
 
 		<context-stuff
 			name="chatId"
-			delegate="chat"
-			field="id"/>
+			field="chat.id"/>
 
 		<context-stuff
 			name="chatMonthCostName"
@@ -17,8 +16,7 @@
 
 		<priv-key
 			name="chatMonthCost.manage"
-			delegate="chat"
-			priv="manage"/>
+			priv="chat:manage"/>
 
 		<run-post-processor
 			name="chat"/>

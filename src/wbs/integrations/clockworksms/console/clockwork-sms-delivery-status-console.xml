@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="clockworkSmsDeliveryStatus.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="clockworkSmsDeliveryStatusName"
@@ -16,8 +15,7 @@
 
 		<context-stuff
 			name="clockworkSmsConfigId"
-			delegate="clockworkSmsConfig"
-			field="id"/>
+			field="clockworkSmsConfig.id"/>
 
 		<run-post-processor
 			name="clockworkSmsConfig"/>

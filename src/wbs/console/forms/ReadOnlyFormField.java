@@ -5,7 +5,6 @@ import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.eitherGetLeft;
 import static wbs.utils.etc.Misc.isNull;
-import static wbs.utils.etc.Misc.requiredSuccess;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -44,6 +43,8 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
+
+import fj.data.Either;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("readOnlyFormField")
@@ -419,6 +420,13 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			"\"%s\"",
 			csvValue.replace ("\"", "\"\""));
 
+	}
+
+	private Optional <String> requiredSuccess (
+			Either <Optional <String>, String> genericToInterface) {
+
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

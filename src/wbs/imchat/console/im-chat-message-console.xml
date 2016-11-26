@@ -15,8 +15,7 @@
 
 		<context-stuff
 			name="imChatConversationId"
-			delegate="imChatConversation"
-			field="id"/>
+			field="imChatConversation.id"/>
 
 		<run-post-processor
 			name="imChatConversation"/>

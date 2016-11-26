@@ -6,7 +6,6 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,8 +72,8 @@ class IntegerFormFieldBuilder {
 	requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <SimpleFormFieldAccessor>
-	simpleFormFieldAccessorProvider;
+	Provider <DereferenceFormFieldAccessor>
+	dereferenceFormFieldAccessorProvider;
 
 	@PrototypeDependency
 	Provider <TextualRangeFormFieldInterfaceMapping>
@@ -111,13 +110,10 @@ class IntegerFormFieldBuilder {
 		String name =
 			spec.name ();
 
-		String fullName =
-			spec.delegate () == null
-				? name
-				: stringFormat (
-					"%s.%s",
-					spec.delegate (),
-					name);
+		String fieldName =
+			ifNull (
+				spec.fieldName (),
+				name);
 
 		String label =
 			ifNull (
@@ -201,10 +197,10 @@ class IntegerFormFieldBuilder {
 		} else {
 
 			accessor =
-				simpleFormFieldAccessorProvider.get ()
+				dereferenceFormFieldAccessorProvider.get ()
 
-				.name (
-					name)
+				.path (
+					fieldName)
 
 				.nativeClass (
 					propertyClass);
@@ -280,7 +276,7 @@ class IntegerFormFieldBuilder {
 			textFormFieldRendererProvider.get ()
 
 			.name (
-				fullName)
+				name)
 
 			.label (
 				label)
@@ -309,7 +305,7 @@ class IntegerFormFieldBuilder {
 				updatableFormFieldProvider.get ()
 
 				.name (
-					fullName)
+					name)
 
 				.label (
 					label)
@@ -346,7 +342,7 @@ class IntegerFormFieldBuilder {
 				readOnlyFormFieldProvider.get ()
 
 				.name (
-					fullName)
+					name)
 
 				.label (
 					label)

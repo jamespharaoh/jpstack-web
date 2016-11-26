@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.LogicUtils.booleanInverseFunction;
-import static wbs.utils.etc.Misc.mapSuccess;
+import static wbs.utils.etc.ResultUtils.mapSuccess;
 
 import java.util.List;
 import java.util.stream.Collectors;

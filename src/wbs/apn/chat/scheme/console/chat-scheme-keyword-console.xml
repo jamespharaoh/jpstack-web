@@ -11,13 +11,11 @@
 
 		<context-stuff
 			name="chatSchemeId"
-			delegate="chatScheme"
-			field="id"/>
+			field="chatScheme.id"/>
 
 		<priv-key
 			name="chatSchemeKeyword.manage"
-			delegate="chatScheme"
-			priv="manage"/>
+			priv="chatScheme:manage"/>
 
 		<run-post-processor
 			name="chatScheme"/>

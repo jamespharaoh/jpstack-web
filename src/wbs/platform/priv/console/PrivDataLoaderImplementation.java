@@ -1,14 +1,14 @@
 package wbs.platform.priv.console;
 
-import static wbs.utils.etc.Misc.getError;
-import static wbs.utils.etc.Misc.resultValueRequired;
-import static wbs.utils.etc.Misc.isError;
-import static wbs.utils.etc.Misc.isSuccess;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.ResultUtils.getError;
+import static wbs.utils.etc.ResultUtils.isError;
+import static wbs.utils.etc.ResultUtils.isSuccess;
+import static wbs.utils.etc.ResultUtils.resultValueRequired;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 

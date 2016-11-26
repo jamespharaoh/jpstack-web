@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="imChatPricePoint.manage"
-			delegate="imChat"
-			priv="manage"/>
+			priv="imChat:manage"/>
 
 		<context-stuff
 			name="imChatPricePointName"
@@ -16,8 +15,7 @@
 
 		<context-stuff
 			name="imChatId"
-			delegate="imChat"
-			field="id"/>
+			field="imChat.id"/>
 
 		<run-post-processor
 			name="imChat"/>

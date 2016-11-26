@@ -10,8 +10,7 @@
 
 		<context-stuff
 			name="sliceId"
-			delegate="slice"
-			field="id"/>
+			field="slice.id"/>
 
 		<priv-key
 			name="imChat.manage"

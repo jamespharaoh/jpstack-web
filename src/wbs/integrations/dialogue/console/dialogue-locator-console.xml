@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="dialogueLocator.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="dialogueLocatorName"

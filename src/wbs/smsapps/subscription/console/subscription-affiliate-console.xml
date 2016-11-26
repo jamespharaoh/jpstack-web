@@ -6,8 +6,7 @@
 
 		<priv-key
 			name="subscriptionAffiliate.manage"
-			delegate="subscription"
-			priv="manage"/>
+			priv="subscription:manage"/>
 
 		<context-stuff
 			name="subscriptionAffiliateName"
@@ -15,8 +14,7 @@
 
 		<context-stuff
 			name="subscriptionId"
-			delegate="subscription"
-			field="id"/>
+			field="subscription.id"/>
 
 		<run-post-processor
 			name="subscription"/>

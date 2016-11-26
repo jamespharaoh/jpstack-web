@@ -3,9 +3,7 @@ package wbs.console.forms;
 import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.requiredSuccess;
 import static wbs.utils.etc.Misc.successOrElse;
-import static wbs.utils.etc.Misc.successResult;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThanOne;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
@@ -13,6 +11,7 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalValueEqualWithClass;
+import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -314,6 +313,13 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 		formatWriter.writeLineFormat (
 			"</select>");
 
+	}
+
+	private Optional <Interface> requiredSuccess (
+			Either <Optional <Interface>, String> formToInterface) {
+
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

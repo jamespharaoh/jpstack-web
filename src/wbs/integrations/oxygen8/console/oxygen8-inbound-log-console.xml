@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="oxygen8InboundLog.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="oxygen8InboundLogName"

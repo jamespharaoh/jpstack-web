@@ -7,18 +7,15 @@
 
 		<priv-key
 			name="clockworkSmsNetwork.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="clockworkSmsNetworkName"
-			delegate="network"
-			field="name"/>
+			field="network.name"/>
 
 		<context-stuff
 			name="clockworkSmsConfigId"
-			delegate="clockworkSmsConfig"
-			field="id"/>
+			field="clockworkSmsConfig.id"/>
 
 		<run-post-processor
 			name="clockworkSmsConfig"/>

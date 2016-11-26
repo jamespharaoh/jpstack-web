@@ -11,23 +11,19 @@
 
 		<context-stuff
 			name="chatId"
-			delegate="chat"
-			field="id"/>
+			field="chat.id"/>
 
 		<priv-key
 			name="chatPromo.manage"
-			delegate="parent"
-			priv="manage"/>
+			priv="parent:manage"/>
 
 		<priv-key
 			name="chatPromo.messages"
-			delegate="parent"
-			priv="messages"/>
+			priv="parent:messages"/>
 
 		<priv-key
 			name="chatPromo.stats"
-			delegate="parent"
-			priv="stats"/>
+			priv="parent:stats"/>
 
 		<run-post-processor
 			name="chat"/>

@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="fonixInboundLog.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="fonixInboundLogName"

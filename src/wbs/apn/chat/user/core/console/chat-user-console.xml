@@ -11,18 +11,15 @@
 
 		<context-stuff
 			name="chatId"
-			delegate="chat"
-			field="id"/>
+			field="chat.id"/>
 
 		<priv-key
 			name="chatUser.view"
-			delegate="chat"
-			priv="supervisor"/>
+			priv="chat:supervisor"/>
 
 		<priv-key
 			name="chatUser.manage"
-			delegate="chat"
-			priv="manage"/>
+			priv="chat:manage"/>
 
 		<run-post-processor
 			name="chat"/>

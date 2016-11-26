@@ -1,13 +1,13 @@
 package wbs.framework.object;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
-import static wbs.utils.etc.Misc.mapSuccess;
 import static wbs.utils.etc.Misc.successOrElse;
 import static wbs.utils.etc.Misc.successOrThrowRuntimeException;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.ResultUtils.mapSuccess;
 
 import java.util.Collection;
 import java.util.List;
