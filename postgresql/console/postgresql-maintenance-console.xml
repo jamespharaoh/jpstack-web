@@ -10,8 +10,7 @@
 
 		<priv-key
 			name="postgresqMaintenenance.manage"
-			delegate="parent"
-			priv="manage"/>
+			priv="parent:manage"/>
 
 	</console-helper-provider>
 

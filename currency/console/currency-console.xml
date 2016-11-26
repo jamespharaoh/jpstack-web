@@ -16,8 +16,7 @@
 
 		<priv-key
 			name="currency.view"
-			delegate="slice"
-			priv="currency_view"/>
+			priv="slice:currency_view"/>
 
 		<!-- context stuff -->
 

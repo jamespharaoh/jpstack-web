@@ -11,16 +11,14 @@
 
 		<context-stuff
 			name="queueId"
-			delegate="queue"
-			field="id"/>
+			field="queue.id"/>
 
 		<run-post-processor
 			name="queue"/>
 
 		<priv-key
 			name="queueSubject.manage"
-			delegate="grandparent"
-			priv="manage"/>
+			priv="grandparent:manage"/>
 
 	</console-helper-provider>
 

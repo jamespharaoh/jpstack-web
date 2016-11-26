@@ -7,8 +7,7 @@
 
 		<priv-key
 			name="exceptionLog.manage"
-			delegate="root"
-			priv="manage"/>
+			priv="root:manage"/>
 
 		<context-stuff
 			name="exceptionLogName"
@@ -24,8 +23,7 @@
 
 			<priv-key
 				name="exceptionLog.manage"
-				delegate="root"
-				priv="manage"/>
+				priv="root:manage"/>
 
 			<object-search-page
 				search-fields="search"

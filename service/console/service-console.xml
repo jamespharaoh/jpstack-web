@@ -11,18 +11,15 @@
 
 		<priv-key
 			name="service.manage"
-			delegate="parent"
-			priv="manage"/>
+			priv="parent:manage"/>
 
 		<priv-key
 			name="service.messages"
-			delegate="parent"
-			priv="messages"/>
+			priv="parent:messages"/>
 
 		<priv-key
 			name="service.stats"
-			delegate="parent"
-			priv="stats"/>
+			priv="parent:stats"/>
 
 	</console-helper-provider>
 

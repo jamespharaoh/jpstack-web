@@ -11,8 +11,7 @@
 
 		<context-stuff
 			name="userId"
-			delegate="user"
-			field="id"/>
+			field="user.id"/>
 
 		<run-post-processor
 			name="user"/>

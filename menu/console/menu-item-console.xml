@@ -10,13 +10,11 @@
 
 		<context-stuff
 			name="menuGroupId"
-			delegate="menuGroup"
-			field="id"/>
+			field="menuGroup.id"/>
 
 		<priv-key
 			name="menuItem.manage"
-			delegate="parent"
-			priv="manage"/>
+			priv="parent:manage"/>
 
 		<run-post-processor
 			name="menuGroup"/>
