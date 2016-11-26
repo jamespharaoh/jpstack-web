@@ -1,6 +1,8 @@
 package wbs.web.pathhandler;
 
+import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
+import static wbs.utils.string.StringUtils.stringEndsWith;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.HashMap;
@@ -11,11 +13,12 @@ import javax.servlet.ServletException;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.file.WebFile;
@@ -25,13 +28,15 @@ import wbs.web.responder.WebModule;
  * Implementation of PathHandler which delegates to other PathHandlers or
  * WebFiles based on simple string mappings.
  */
-@Log4j
 @PrototypeComponent ("delegatingPathHandler")
 public
 class DelegatingPathHandler
 	implements PathHandler {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	Map <String, WebModule> servletModules;
@@ -50,7 +55,13 @@ class DelegatingPathHandler
 
 	@NormalLifecycleSetup
 	public
-	void afterPropertiesSet () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
 
 		Map <String, String> pathDeclaredByModule =
 			new HashMap<> ();
@@ -96,11 +107,11 @@ class DelegatingPathHandler
 
 						throw new RuntimeException (
 							stringFormat (
-							"Duplicated path '%s' (in %s and %s)",
-							modulePathName,
-							pathDeclaredByModule.get (
-								modulePathName),
-							servletModuleName));
+								"Duplicated path '%s' (in %s and %s)",
+								modulePathName,
+								pathDeclaredByModule.get (
+									modulePathName),
+								servletModuleName));
 
 					}
 
@@ -108,8 +119,9 @@ class DelegatingPathHandler
 						modulePathName,
 						servletModuleName);
 
-					log.debug (
-						"Adding path " + modulePathName);
+					taskLogger.debugFormat (
+						"Adding path %s",
+						modulePathName);
 
 					paths.put (
 						modulePathName,
@@ -153,8 +165,9 @@ class DelegatingPathHandler
 						moduleFileName,
 						servletModuleName);
 
-					log.debug (
-						"Adding file " + moduleFileName);
+					taskLogger.debugFormat (
+						"Adding file %s",
+						moduleFileName);
 
 					files.put (
 						moduleFileName,
@@ -171,35 +184,43 @@ class DelegatingPathHandler
 	@Override
 	public
 	WebFile processPath (
-			@NonNull TaskLogger taskLogger,
-			@NonNull String path)
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String originalPath)
 		throws ServletException {
 
-		log.debug (
-			stringFormat (
-				"processPath \"%s\"",
-				path));
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"processPath");
+
+		taskLogger.debugFormat (
+			"processPath (\"%s\")",
+			originalPath);
 
 		// strip any trailing '/'
 
-		if (path.endsWith ("/")) {
 
-			path =
-				path.substring (
+		String currentPath =
+			ifThenElse (
+				stringEndsWith (
+					"/",
+					originalPath),
+				() -> originalPath.substring (
 					0,
-					path.length () - 1);
-
-		}
+					originalPath.length () - 1),
+				() -> originalPath);
 
 		// check for a file with the exact path
 
 		if (files != null) {
 
 			WebFile webFile =
-				files.get (path);
+				files.get (
+					currentPath);
 
-			if (webFile != null)
+			if (webFile != null) {
 				return webFile;
+			}
 
 		}
 
@@ -212,7 +233,8 @@ class DelegatingPathHandler
 			while (true) {
 
 				PathHandler pathHandler =
-					paths.get (path);
+					paths.get (
+						currentPath);
 
 				if (pathHandler != null) {
 
@@ -223,7 +245,8 @@ class DelegatingPathHandler
 				}
 
 				int slashPosition =
-					path.lastIndexOf ('/');
+					currentPath.lastIndexOf (
+						'/');
 
 				if (slashPosition == 0)
 					return null;
@@ -233,12 +256,12 @@ class DelegatingPathHandler
 
 				remain =
 					joinWithoutSeparator (
-						path.substring (
+						currentPath.substring (
 							slashPosition),
 						remain);
 
-				path =
-					path.substring (
+				currentPath =
+					currentPath.substring (
 						0,
 						slashPosition);
 
