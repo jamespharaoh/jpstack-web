@@ -15,8 +15,7 @@
 
 		<context-stuff
 			name="ticketId"
-			delegate="ticket"
-			field="id"/>
+			field="ticket.id"/>
 
 		<run-post-processor
 			name="ticket"/>
