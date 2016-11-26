@@ -15,8 +15,7 @@
 
 		<context-stuff
 			name="messageTemplateEntryTypeId"
-			delegate="messageTemplateEntryType"
-			field="id"/>
+			field="messageTemplateEntryType.id"/>
 
 		<run-post-processor
 			name="messageTemplateEntryType"/>

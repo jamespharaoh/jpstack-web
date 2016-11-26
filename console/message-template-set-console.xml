@@ -5,22 +5,20 @@
 		object-name="messageTemplateSet"
 		view-priv="parent:manage">
 
+		<priv-key
+			name="messageTemplateSet.manage"
+			priv="messageTemplateDatabase:manage"/>
+
 		<context-stuff
 			name="messageTemplateSetName"
 			field="name"/>
 
 		<context-stuff
 			name="messageTemplateDatabaseId"
-			delegate="messageTemplateDatabase"
-			field="id"/>
+			field="messageTemplateDatabase.id"/>
 
 		<run-post-processor
 			name="messageTemplateDatabase"/>
-
-		<priv-key
-			name="messageTemplateSet.manage"
-			delegate="messageTemplateDatabase"
-			priv="manage"/>
 
 	</console-helper-provider>
 
