@@ -1,5 +1,6 @@
 package wbs.platform.text.web;
 
+import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.PrintWriter;
@@ -38,6 +39,9 @@ class TextResponder
 	String contentType =
 		"text/plain";
 
+	@Getter @Setter
+	String filename;
+
 	@Override
 	public
 	void execute (
@@ -48,6 +52,19 @@ class TextResponder
 			stringFormat (
 				"%s; charset=utf-8",
 				contentType));
+
+		if (
+			isNotNull (
+				filename)
+		) {
+
+			requestContext.setHeader (
+				"Content-Disposition",
+				stringFormat (
+					"attachment; filename=%s",
+					filename));
+
+		}
 
 		PrintWriter out =
 			requestContext.writer ();

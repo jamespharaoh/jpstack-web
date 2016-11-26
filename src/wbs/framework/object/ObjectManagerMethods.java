@@ -298,6 +298,33 @@ interface ObjectManagerMethods {
 	}
 
 	default
+	Optional <Object> dereference (
+			@NonNull Object object,
+			@NonNull String path,
+			@NonNull Map <String, Object> hints) {
+
+		return successOrThrowRuntimeException (
+			dereferenceOrError (
+				object,
+				path,
+				hints));
+
+	}
+
+	default
+	Optional <Object> dereference (
+			@NonNull Object object,
+			@NonNull String path) {
+
+		return successOrThrowRuntimeException (
+			dereferenceOrError (
+				object,
+				path,
+				emptyMap ()));
+
+	}
+
+	default
 	Object dereferenceRequired (
 			@NonNull Object object,
 			@NonNull String path,

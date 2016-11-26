@@ -5,6 +5,7 @@ import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleModuleData;
 import wbs.console.module.ConsoleModuleSpec;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
@@ -25,7 +26,8 @@ class ContextTabFormActionPageSpec {
 
 	// attributes
 
-	@DataAttribute
+	@DataAttribute (
+		required = true)
 	String name;
 
 	@DataAttribute (
@@ -35,7 +37,8 @@ class ContextTabFormActionPageSpec {
 	@DataAttribute
 	String helpText;
 
-	@DataAttribute
+	@DataAttribute (
+		required = true)
 	String submitLabel;
 
 	@DataAttribute (

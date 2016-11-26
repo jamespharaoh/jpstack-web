@@ -568,7 +568,7 @@ class GenericConsoleHelperProvider <
 
 					privObjectOptional =
 						genericCastUnchecked (
-							objectManager.dereferenceOrError (
+							objectManager.dereference (
 								object,
 								privObjectPath));
 

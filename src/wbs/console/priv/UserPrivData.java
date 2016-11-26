@@ -43,25 +43,28 @@ class UserPrivData {
 
 	public
 	boolean canChain (
-			@NonNull Long privId) {
+			@NonNull Long originalPrivId) {
 
-		while (true) {
+		Long currentPrivId =
+			originalPrivId;
+
+		for (;;) {
 
 			if (
 				canSingle (
-					privId)
+					currentPrivId)
 			) {
 				return true;
 			}
 
 			Long nextPrivId =
 				sharedData.chainedPrivIds.get (
-					privId);
+					currentPrivId);
 
 			if (nextPrivId == null)
 				return false;
 
-			privId =
+			currentPrivId =
 				nextPrivId;
 
 		}

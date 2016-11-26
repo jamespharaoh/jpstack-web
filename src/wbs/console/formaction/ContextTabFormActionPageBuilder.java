@@ -1,5 +1,6 @@
 package wbs.console.formaction;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -15,7 +16,6 @@ import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
-import wbs.console.part.PagePart;
 import wbs.console.part.PagePartFactory;
 import wbs.console.responder.ConsoleFile;
 import wbs.console.tab.ConsoleContextTab;
@@ -147,8 +147,11 @@ class ContextTabFormActionPageBuilder
 	void initFormFields () {
 
 		formFields =
-			consoleModule.formFieldSets ().get (
-				spec.fieldsName ());
+			ifNotNullThenElse (
+				spec.fieldsName (),
+				() -> consoleModule.formFieldSets ().get (
+					spec.fieldsName ()),
+				() -> new FormFieldSet ());
 
 	}
 
@@ -180,36 +183,26 @@ class ContextTabFormActionPageBuilder
 	void buildPagePartFactory () {
 
 		pagePartFactory =
-			new PagePartFactory () {
+			parentTaskLogger ->
+				consoleFormActionPartProvider.get ()
 
-			@Override
-			public
-			PagePart buildPagePart (
-					@NonNull TaskLogger parentTaskLogger) {
+			.name (
+				"action")
 
-				return consoleFormActionPartProvider.get ()
+			.formActionHelper (
+				formActionHelperProvider.get ())
 
-					.name (
-						"action")
+			.formFields (
+				formFields)
 
-					.formActionHelper (
-						formActionHelperProvider.get ())
+			.helpText (
+				spec.helpText ())
 
-					.formFields (
-						formFields)
+			.submitLabel (
+				spec.submitLabel ())
 
-					.helpText (
-						spec.helpText ())
-
-					.submitLabel (
-						spec.submitLabel ())
-
-					.localFile (
-						"/" + localFile);
-
-			}
-
-		};
+			.localFile (
+				"/" + localFile);
 
 	}
 
@@ -217,6 +210,9 @@ class ContextTabFormActionPageBuilder
 
 		actionProvider =
 			() -> consoleFormActionActionProvider.get ()
+
+			.name (
+				"action")
 
 			.fields (
 				formFields)
