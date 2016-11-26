@@ -8,14 +8,31 @@
 			name="currency.manage"
 			priv="manage"/>
 
+		<!-- view privs -->
+
+		<priv-key
+			name="currency.view"
+			priv="view"/>
+
 		<priv-key
 			name="currency.view"
 			delegate="slice"
 			priv="currency_view"/>
 
+		<!-- context stuff -->
+
 		<context-stuff
 			name="currencyName"
 			field="name"/>
+
+		<context-stuff
+			name="sliceId"
+			field="slice.id"/>
+
+		<!-- link parent -->
+
+		<run-post-processor
+			name="slice"/>
 
 	</console-helper-provider>
 

@@ -51,6 +51,20 @@
 			description="View a currency"
 			template="yes"/>
 
+		<!-- slice -->
+
+		<priv-type
+			subject="slice"
+			name="Currency create"
+			description="Create currencies in a slice"
+			template="yes"/>
+		
+		<priv-type
+			subject="slice"
+			name="Currency view"
+			description="View all currencies in a slice"
+			template="yes"/>
+
 	</priv-types>
 
 </model-meta>
