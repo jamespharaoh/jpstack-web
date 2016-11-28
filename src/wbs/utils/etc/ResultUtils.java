@@ -17,20 +17,20 @@ class ResultUtils {
 
 	// result factories
 
-	public static <LeftType,RightType>
-	Either<LeftType,RightType> successResult (
+	public static <LeftType, RightType>
+	Either <LeftType, RightType> successResult (
 			@NonNull LeftType left) {
 
-		return Either.<LeftType,RightType>left (
+		return Either.<LeftType, RightType> left (
 			left);
 
 	}
 
-	public static <LeftType,RightType>
-	Either<LeftType,RightType> errorResult (
+	public static <LeftType, RightType>
+	Either <LeftType, RightType> errorResult (
 			@NonNull RightType right) {
 
-		return Either.<LeftType,RightType>right (
+		return Either.<LeftType, RightType>right (
 			right);
 
 	}
