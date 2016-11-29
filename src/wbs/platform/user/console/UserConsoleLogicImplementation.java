@@ -13,11 +13,15 @@ import org.joda.time.DateTimeZone;
 
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+
+import wbs.platform.feature.console.FeatureConsoleHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserRec;
+
 import wbs.utils.time.TimeFormatter;
 
 @SingletonComponent ("userConsoleLogic")
@@ -28,6 +32,9 @@ class UserConsoleLogicImplementation
 		UserConsoleLogic {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	FeatureConsoleHelper featureHelper;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;

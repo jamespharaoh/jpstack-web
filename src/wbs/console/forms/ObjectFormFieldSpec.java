@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleModuleData;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
@@ -45,5 +46,17 @@ class ObjectFormFieldSpec {
 	@DataAttribute (
 		name = "root-field")
 	String rootFieldName;
+
+	@DataAttribute (
+		name = "view-priv")
+	String viewPrivCode;
+
+	@DataAttribute (
+		name = "manage-priv")
+	String managePrivCode;
+
+	@DataAttribute (
+		name = "feature")
+	String featureCode;
 
 }

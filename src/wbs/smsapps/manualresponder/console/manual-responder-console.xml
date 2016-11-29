@@ -143,6 +143,11 @@
 			object-type="numberList"/>
 
 		<object-field
+			name="smsSpendLimiter"
+			object-type="smsSpendLimiter"
+			feature="sms_spend_limit"/>
+
+		<object-field
 			name="smsCustomerManager"
 			object-type="smsCustomerManager"/>
 
@@ -207,6 +212,12 @@
 			name="unblockNumberList"
 			object-type="numberList"
 			nullable="yes"/>
+
+		<object-field
+			name="smsSpendLimiter"
+			object-type="smsSpendLimiter"
+			nullable="yes"
+			feature="sms_spend_limit"/>
 
 		<object-field
 			name="smsCustomerManager"

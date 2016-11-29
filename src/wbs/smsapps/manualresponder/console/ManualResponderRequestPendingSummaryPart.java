@@ -8,6 +8,8 @@ import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
@@ -40,6 +42,7 @@ import java.util.Set;
 
 import javax.inject.Named;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -89,6 +92,7 @@ import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
+import wbs.sms.spendlimit.logic.SmsSpendLimitLogic;
 
 import wbs.smsapps.manualresponder.model.ManualResponderNumberObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
@@ -156,6 +160,9 @@ class ManualResponderRequestPendingSummaryPart
 	SmsCustomerSessionObjectHelper smsCustomerSessionHelper;
 
 	@SingletonDependency
+	SmsSpendLimitLogic smsSpendLimitLogic;
+
+	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	// state
@@ -169,18 +176,20 @@ class ManualResponderRequestPendingSummaryPart
 	SmsCustomerRec smsCustomer;
 	SmsCustomerSessionRec smsCustomerSession;
 
+	Optional <Long> spendAvailable;
+
 	MessageRec message;
 	NumberRec number;
 	NetworkRec network;
 
-	List<ManualResponderRequestRec> oldRequests;
-	List<RouteBillInfo> routeBillInfos;
+	List <ManualResponderRequestRec> oldRequests;
+	List <RouteBillInfo> routeBillInfos;
 
 	// details
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
 		return ImmutableSet.<ScriptRef>builder ()
 
@@ -391,6 +400,25 @@ class ManualResponderRequestPendingSummaryPart
 		Collections.sort (
 			routeBillInfos);
 
+		// check spend limit
+
+		if (
+			isNotNull (
+				manualResponder.getSmsSpendLimiter ())
+		) {
+
+			spendAvailable =
+				smsSpendLimitLogic.spendCheck (
+					manualResponder.getSmsSpendLimiter (),
+					manualResponderRequest.getNumber ());
+
+		} else {
+
+			spendAvailable =
+				optionalAbsent ();
+
+		}
+
 		// get request history
 
 		oldRequests =
@@ -501,6 +529,31 @@ class ManualResponderRequestPendingSummaryPart
 				() -> objectManager.writeTdForObjectMiniLink (
 					taskLogger,
 					number));
+
+		}
+
+		if (
+			optionalIsPresent (
+				spendAvailable)
+		) {
+
+			htmlTableDetailsRowWrite (
+				"Daily limit",
+				currencyLogic.formatText (
+					manualResponder
+						.getSmsSpendLimiter ()
+							.getCurrency (),
+					manualResponder
+						.getSmsSpendLimiter ()
+						.getDailySpendLimitAmount ()));
+
+			htmlTableDetailsRowWrite (
+				"Available to spend",
+				currencyLogic.formatText (
+					manualResponder
+						.getSmsSpendLimiter ()
+							.getCurrency (),
+					spendAvailable.get ()));
 
 		}
 

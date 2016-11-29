@@ -4,6 +4,7 @@ import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.eitherGetLeft;
+import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -28,6 +29,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.console.feature.FeatureChecker;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
@@ -54,6 +56,9 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	implements FormField <Container, Generic, Native, Interface> {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	FeatureChecker featureChecker;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -88,6 +93,10 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	@Getter @Setter
 	String viewPriv;
 
+	@DataAttribute
+	@Getter @Setter
+	String featureCode;
+
 	@Getter @Setter
 	Set<ScriptRef> scriptRefs =
 		new LinkedHashSet<ScriptRef> ();
@@ -119,7 +128,23 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	public
 	boolean canView (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map <String, Object> hints) {
+
+		// check feature
+
+		if (
+
+			isNotNull (
+				featureCode)
+
+			&& ! featureChecker.checkFeatureAccess (
+				featureCode)
+
+		) {
+			return false;
+		}
+
+		// check view priv
 
 		if (
 			isNull (

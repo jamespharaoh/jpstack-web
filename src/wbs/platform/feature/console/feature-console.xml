@@ -1,0 +1,40 @@
+<console-module
+	name="feature">
+
+	<console-helper-provider
+		object-name="feature"
+		view-priv="root:manage">
+
+		<priv-key
+			name="feature.manage"
+			priv="root:manage"/>
+
+		<context-stuff
+			name="featureName"
+			field="name"/>
+
+	</console-helper-provider>
+
+	<object-context
+		name="feature"
+		object-name="feature">
+
+		<list>
+
+			<object-list-page/>
+
+			<object-create-page/>
+
+		</list>
+
+		<object>
+
+			<object-summary-page/>
+
+			<object-events-page/>
+
+		</object>
+
+	</object-context>
+
+</console-module>

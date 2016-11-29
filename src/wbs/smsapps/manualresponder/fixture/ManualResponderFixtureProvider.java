@@ -20,6 +20,7 @@ import wbs.sms.keyword.model.KeywordObjectHelper;
 import wbs.sms.keyword.model.KeywordSetObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.router.model.RouterObjectHelper;
+import wbs.sms.spendlimit.model.SmsSpendLimiterObjectHelper;
 
 import wbs.smsapps.manualresponder.model.ManualResponderObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
@@ -70,6 +71,9 @@ class ManualResponderFixtureProvider
 
 	@SingletonDependency
 	SmsCustomerManagerObjectHelper smsCustomerManagerHelper;
+
+	@SingletonDependency
+	SmsSpendLimiterObjectHelper smsSpendLimiterHelper;
 
 	// implementation
 
@@ -144,6 +148,12 @@ class ManualResponderFixtureProvider
 					GlobalId.root,
 					"test",
 					"gbp"))
+
+			.setSmsSpendLimiter (
+				smsSpendLimiterHelper.findByCodeRequired (
+					GlobalId.root,
+					"test",
+					"test_sms_spend_limiter"))
 
 			.setSmsCustomerManager (
 				smsCustomerManagerHelper.findByCodeRequired (

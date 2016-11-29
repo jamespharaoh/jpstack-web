@@ -141,7 +141,7 @@ class UserPrivData {
 	public
 	boolean canList (
 			@NonNull GlobalId parentObjectId,
-			@NonNull Collection<String> privCodes,
+			@NonNull Collection <String> privCodes,
 			@NonNull Boolean recurse) {
 
 		ObjectData objectData =

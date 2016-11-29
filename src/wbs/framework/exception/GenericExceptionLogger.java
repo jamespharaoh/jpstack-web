@@ -5,29 +5,29 @@ import com.google.common.base.Optional;
 import wbs.framework.entity.record.Record;
 
 public
-interface GenericExceptionLogger<Resolution> {
+interface GenericExceptionLogger <Resolution> {
 
-	Record<?> logSimple (
+	Record <?> logSimple (
 			String typeCode,
 			String source,
 			String summary,
 			String dump,
-			Optional<Long> userId,
+			Optional <Long> userId,
 			Resolution resolution);
 
-	Record<?> logThrowable (
+	Record <?> logThrowable (
 			String typeCode,
 			String source,
 			Throwable throwable,
-			Optional<Long> userId,
+			Optional <Long> userId,
 			Resolution resolution);
 
-	Record<?> logThrowableWithSummary (
+	Record <?> logThrowableWithSummary (
 			String typeCode,
 			String source,
 			String summary,
 			Throwable throwable,
-			Optional<Long> userId,
+			Optional <Long> userId,
 			Resolution resolution);
 
 }

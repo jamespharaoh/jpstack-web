@@ -368,7 +368,7 @@ class HibernateDao {
 
 	protected
 	List <Long> findIdsOnly (
-			@NonNull List<?> list) {
+			@NonNull List <?> list) {
 
 		List <Long> idList =
 			new ArrayList<> ();

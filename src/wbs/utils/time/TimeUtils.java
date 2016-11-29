@@ -5,6 +5,8 @@ import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import lombok.NonNull;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
@@ -15,8 +17,6 @@ import org.joda.time.ReadableInstant;
 import org.joda.time.Years;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
-import lombok.NonNull;
 
 public
 class TimeUtils {
@@ -138,6 +138,48 @@ class TimeUtils {
 	boolean notLaterThan (
 			@NonNull ReadableInstant left,
 			@NonNull ReadableInstant right) {
+
+		return ! left.isAfter (
+			right);
+
+	}
+
+	// ---------- date comparison
+
+	public static
+	boolean earlierThan (
+			@NonNull LocalDate left,
+			@NonNull LocalDate right) {
+
+		return left.isBefore (
+			right);
+
+	}
+
+	public static
+	boolean notEarlierThan (
+			@NonNull LocalDate left,
+			@NonNull LocalDate right) {
+
+		return ! left.isBefore (
+			right);
+
+	}
+
+	public static
+	boolean laterThan (
+			@NonNull LocalDate left,
+			@NonNull LocalDate right) {
+
+		return left.isAfter (
+			right);
+
+	}
+
+	public static
+	boolean notLaterThan (
+			@NonNull LocalDate left,
+			@NonNull LocalDate right) {
 
 		return ! left.isAfter (
 			right);

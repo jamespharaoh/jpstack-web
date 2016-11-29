@@ -339,6 +339,12 @@ class ObjectFormFieldBuilder {
 				.updateHook (
 					updateHook)
 
+				.viewPriv (
+					spec.viewPrivCode ())
+
+				.featureCode (
+					spec.featureCode ())
+
 			);
 
 		} else {
@@ -366,6 +372,12 @@ class ObjectFormFieldBuilder {
 
 				.renderer (
 					renderer)
+
+				.viewPriv (
+					spec.viewPrivCode ())
+
+				.featureCode (
+					spec.featureCode ())
 
 			);
 

@@ -125,7 +125,7 @@ class UserPrivCheckerImplementation
 	public
 	boolean canRecursive (
 			@NonNull Record <?> parentObject,
-			@NonNull String... privCodes) {
+			@NonNull String ... privCodes) {
 
 		return target.canRecursive (
 			parentObject,

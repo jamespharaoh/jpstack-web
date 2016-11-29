@@ -3,8 +3,10 @@ package wbs.smsapps.manualresponder.console;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.lessThan;
+import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThan;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -12,6 +14,8 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.List;
 
 import javax.inject.Provider;
+
+import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
@@ -29,6 +33,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
@@ -42,6 +47,7 @@ import wbs.sms.keyword.logic.KeywordLogic;
 import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
+import wbs.sms.spendlimit.logic.SmsSpendLimitLogic;
 
 import wbs.smsapps.manualresponder.logic.ManualResponderLogic;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
@@ -69,7 +75,7 @@ class ManualResponderRequestPendingFormAction
 	ConsoleObjectManager consoleObjectManager;
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
+	CurrencyLogic currencyLogic;
 
 	@SingletonDependency
 	Database database;
@@ -93,10 +99,16 @@ class ManualResponderRequestPendingFormAction
 	QueueLogic queueLogic;
 
 	@SingletonDependency
+	ConsoleRequestContext requestContext;
+
+	@SingletonDependency
 	RouterLogic routerLogic;
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
+
+	@SingletonDependency
+	SmsSpendLimitLogic smsSpendLimitLogic;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -373,6 +385,65 @@ class ManualResponderRequestPendingFormAction
 			routerLogic.resolveRouter (
 				template.getRouter ());
 
+		// check spend limit
+
+		if (
+			isNotNull (
+				manualResponder.getSmsSpendLimiter ())
+		) {
+
+			Long amountToSpend =
+				route.getOutCharge ()
+				* messageParts.size ();
+
+			Optional <Long> spendAvailable =
+				smsSpendLimitLogic.spendCheck (
+					manualResponder.getSmsSpendLimiter (),
+					manualResponderNumber.getNumber ());
+
+			if (
+				optionalIsPresent (
+					spendAvailable)
+			) {
+
+				if (
+					equalToZero (
+						spendAvailable.get ())
+				) {
+
+					requestContext.addErrorFormat (
+						"User has reached their daily spend limit");
+
+					return null;
+
+				} else if (
+					moreThan (
+						amountToSpend,
+						spendAvailable.get ())
+				) {
+
+					requestContext.addErrorFormat (
+						"User has only %s left to spend, ",
+						currencyLogic.formatText (
+							manualResponder
+								.getSmsSpendLimiter ()
+								.getCurrency (),
+							spendAvailable.get ()),
+						"so can not spend %s",
+						currencyLogic.formatText (
+							manualResponder
+								.getSmsSpendLimiter ()
+								.getCurrency (),
+							amountToSpend));
+
+					return null;
+
+				}
+
+			}
+
+		}
+
 		// create reply
 
 		ManualResponderReplyRec reply =
@@ -475,6 +546,22 @@ class ManualResponderRequestPendingFormAction
 				+ route.getOutCharge () > 0
 					? effectiveParts
 					: 0l);
+
+		// record spend
+
+		if (
+			isNotNull (
+				manualResponder.getSmsSpendLimiter ())
+		) {
+
+			smsSpendLimitLogic.spend (
+				manualResponder.getSmsSpendLimiter (),
+				manualResponderNumber.getNumber (),
+				reply.getMessages (),
+				request.getMessage ().getThreadId (),
+				request.getMessage ().getNumTo ());
+
+		}
 
 		// check if we can send again
 

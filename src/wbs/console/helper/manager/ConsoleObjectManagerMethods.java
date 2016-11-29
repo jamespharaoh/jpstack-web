@@ -53,7 +53,7 @@ interface ConsoleObjectManagerMethods {
 				objectClass),
 			() -> new NoSuchElementException (
 				stringFormat (
-					"No console helper for %s",
+					"No console helper for class %s",
 					classNameSimple (
 						objectClass))));
 
@@ -66,9 +66,13 @@ interface ConsoleObjectManagerMethods {
 	ConsoleHelper <?> findConsoleHelperRequired (
 			@NonNull String objectTypeName) {
 
-		return optionalGetRequired (
+		return optionalOrThrow (
 			findConsoleHelper (
-				objectTypeName));
+				objectTypeName),
+			() -> new NoSuchElementException (
+				stringFormat (
+					"No console helper for object type %s",
+					objectTypeName)));
 
 	}
 

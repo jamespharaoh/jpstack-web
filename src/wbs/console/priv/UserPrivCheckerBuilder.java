@@ -111,8 +111,8 @@ class UserPrivCheckerBuilder {
 		@Override
 		public
 		boolean canRecursive (
-				@NonNull Record<?> parentObject,
-				@NonNull String... privCodes) {
+				@NonNull Record <?> parentObject,
+				@NonNull String ... privCodes) {
 
 			Long parentObjectTypeId =
 				userPrivData.coreGetObjectTypeId (

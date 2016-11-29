@@ -56,6 +56,10 @@
 			nullable="yes"/>
 
 		<reference-field
+			type="smsSpendLimiter"
+			nullable="yes"/>
+
+		<reference-field
 			type="smsCustomerManager"
 			nullable="yes"/>
 
