@@ -134,29 +134,8 @@ class DevopsScript
 				"-t",
 				[
 					"rm -rf",
-					"#{@deployment_path}/work/bin",
-					"#{@deployment_path}/work/generated",
+					"#{@deployment_path}/work",
 				].join(" ")
-
-		when "console-clean"
-
-			title "#{@config_name} console clean"
-
-			ssh \
-				"-t",
-				"rm -rf #{@deployment_path}/work/console"
-
-			;;
-
-		when "api-clean"
-
-			title "#{@config_name} api clean"
-
-			ssh \
-				"-t",
-				"rm -rf #{@deployment_path}/work/api"
-
-			;;
 
 		when "top"
 
