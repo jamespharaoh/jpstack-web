@@ -1008,6 +1008,14 @@ class FormFieldLogic {
 				: formFieldSet.formFields ()
 		) {
 
+			if (
+				! formField.canView (
+					object,
+					hints)
+			) {
+				continue;
+			}
+
 			htmlTableRowOpen (
 				htmlWriter);
 
