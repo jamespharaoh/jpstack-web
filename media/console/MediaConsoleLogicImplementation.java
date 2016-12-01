@@ -8,6 +8,7 @@ import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 import static wbs.utils.string.StringUtils.stringIsNotEmpty;
+import static wbs.utils.string.StringUtils.utf8ToString;
 
 import java.util.Map;
 
@@ -297,13 +298,22 @@ class MediaConsoleLogicImplementation
 		MediaTypeRec mediaType =
 			media.getMediaType ();
 
-		if (! mediaLogic.isImage (media)) {
+		if (
+			mediaLogic.isTextual (
+				media)
+		) {
 
 			formatWriter.writeLineFormat (
-				"(unable to display %s)",
-				mediaType.getMimeType ());
+				"<pre",
+				" style=\"margin: 0\"",
+				">%h</pre>",
+				utf8ToString (
+					media.getContent ().getData ()));
 
-		} else {
+		} else if (
+			mediaLogic.isImage (
+				media)
+		) {
 
 			formatWriter.writeLineFormat (
 				"<img src=\"%h\">",
@@ -311,6 +321,12 @@ class MediaConsoleLogicImplementation
 					media,
 					width,
 					height));
+
+		} else {
+
+			formatWriter.writeLineFormat (
+				"(unable to display %s)",
+				mediaType.getMimeType ());
 
 		}
 

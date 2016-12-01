@@ -1,9 +1,15 @@
 package wbs.platform.media.logic;
 
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
+import static wbs.utils.string.StringUtils.stringFormat;
+
 import java.awt.image.BufferedImage;
 import java.util.Set;
 
 import com.google.common.base.Optional;
+
+import lombok.NonNull;
 
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaRec;
@@ -15,17 +21,32 @@ interface MediaLogic {
 	ContentRec findOrCreateContent (
 			byte[] data);
 
-	Optional<MediaRec> createMedia (
+	Optional <MediaRec> createMedia (
 			byte[] data,
 			String mimeType,
 			String filename,
 			Optional <String> encoding);
 
+	default
 	MediaRec createMediaRequired (
-			byte[] data,
-			String mimeType,
-			String filename,
-			Optional <String> encoding);
+			@NonNull byte[] data,
+			@NonNull String mimeType,
+			@NonNull String filename,
+			@NonNull Optional <String> encoding) {
+
+		return optionalOrThrow (
+			createMedia (
+				data,
+				mimeType,
+				filename,
+				encoding),
+			() -> new IllegalArgumentException (
+				stringFormat (
+					"Unable to decode \"%s\" of type \"%s\"",
+					filename,
+					mimeType)));
+
+	}
 
 	MediaRec createMediaFromImage (
 			BufferedImage image,
@@ -104,8 +125,18 @@ interface MediaLogic {
 			BufferedImage image,
 			float jpegQuality);
 
-	BufferedImage getImage (
+	Optional <BufferedImage> getImage (
 			MediaRec media);
+
+	default
+	BufferedImage getImageRequired (
+			@NonNull MediaRec media) {
+
+		return optionalGetRequired (
+			getImage (
+				media));
+
+	}
 
 	BufferedImage resampleImageToFit (
 			BufferedImage image,
@@ -174,6 +205,15 @@ interface MediaLogic {
 			MediaTypeRec mediaType);
 
 	boolean isText (
+			MediaRec media);
+
+	boolean isTextual (
+			String mimeType);
+
+	boolean isTextual (
+			MediaTypeRec mediaType);
+
+	boolean isTextual (
 			MediaRec media);
 
 	boolean isVideo (
