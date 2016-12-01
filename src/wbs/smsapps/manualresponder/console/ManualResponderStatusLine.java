@@ -19,6 +19,7 @@ import lombok.experimental.Accessors;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
+import wbs.console.feature.FeatureChecker;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 
@@ -50,6 +51,9 @@ class ManualResponderStatusLine
 	Database database;
 
 	@SingletonDependency
+	FeatureChecker featureChecker;
+
+	@SingletonDependency
 	ManualResponderRequestObjectHelper manualResponderRequestHelper;
 
 	@SingletonDependency
@@ -69,7 +73,7 @@ class ManualResponderStatusLine
 
 	// state
 
-	Map<Long,PerOperatorCaches> cachesByUserId =
+	Map <Long, PerOperatorCaches> cachesByUserId =
 		new HashMap<> ();
 
 	// details
@@ -92,7 +96,17 @@ class ManualResponderStatusLine
 
 	@Override
 	public
-	Future<String> getUpdateScript () {
+	Future <String> getUpdateScript () {
+
+		if (
+			! featureChecker.checkFeatureAccess (
+				"queue_items_status_line")
+		) {
+
+			return futureValue (
+				"updateManualResponder (0, 0);\n");
+
+		}
 
 		// find or create per-operator caches
 
@@ -194,7 +208,7 @@ class ManualResponderStatusLine
 		}
 
 		class NumThisHourCache
-			extends CachedGetter<Long> {
+			extends CachedGetter <Long> {
 
 			public
 			NumThisHourCache () {
@@ -221,7 +235,7 @@ class ManualResponderStatusLine
 						.plusHours (hourOfDay)
 						.toInstant ();
 
-				List<ManualResponderOperatorReport> reports =
+				List <ManualResponderOperatorReport> reports =
 					manualResponderRequestHelper.searchOperatorReports (
 						new ManualResponderRequestSearch ()
 
