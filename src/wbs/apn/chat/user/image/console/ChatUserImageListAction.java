@@ -208,11 +208,11 @@ class ChatUserImageListAction
 						index);
 
 				BufferedImage smallImage =
-					mediaLogic.getImage (
+					mediaLogic.getImageRequired (
 						chatUserImage.getMedia ());
 
 				BufferedImage fullImage =
-					mediaLogic.getImage (
+					mediaLogic.getImageRequired (
 						chatUserImage.getFullMedia ());
 
 				if (

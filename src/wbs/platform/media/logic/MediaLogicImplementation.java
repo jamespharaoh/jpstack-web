@@ -15,7 +15,6 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.etc.OptionalUtils.optionalOrThrow;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringToBytes;
 
@@ -109,10 +108,10 @@ class MediaLogicImplementation
 		FfmpegVideoProfile (
 				boolean twoPass,
 				@NonNull String fileExtension,
-				@NonNull Optional<String> videoCodec,
-				@NonNull Optional<String> videoResolution,
-				@NonNull Optional<String> videoBitrate,
-				@NonNull Optional<String> videoDuration) {
+				@NonNull Optional <String> videoCodec,
+				@NonNull Optional <String> videoResolution,
+				@NonNull Optional <String> videoBitrate,
+				@NonNull Optional <String> videoDuration) {
 
 			super (
 				fileExtension);
@@ -474,28 +473,6 @@ class MediaLogicImplementation
 
 	}
 
-	@Override
-	public
-	MediaRec createMediaRequired (
-			@NonNull byte[] data,
-			@NonNull String mimeType,
-			@NonNull String filename,
-			@NonNull Optional <String> encoding) {
-
-		return optionalOrThrow (
-			createMedia (
-				data,
-				mimeType,
-				filename,
-				encoding),
-			() -> new IllegalArgumentException (
-				stringFormat (
-					"Unable to decode \"%s\" of type \"%s\"",
-					filename,
-					mimeType)));
-
-	}
-
 	private final static
 	String defaultMimeType = "image/jpeg";
 
@@ -527,7 +504,7 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	Optional<MediaRec> createMediaFromImage (
+	Optional <MediaRec> createMediaFromImage (
 			@NonNull byte[] data,
 			@NonNull String mimeType,
 			@NonNull String filename) {
@@ -1064,10 +1041,10 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	BufferedImage getImage (
+	Optional <BufferedImage> getImage (
 			@NonNull MediaRec media) {
 
-		return readImageRequired (
+		return readImage (
 			media.getContent ().getData (),
 			media.getMediaType ().getMimeType ());
 
@@ -1637,6 +1614,36 @@ class MediaLogicImplementation
 			@NonNull MediaRec media) {
 
 		return isText (
+			media.getMediaType ());
+
+	}
+
+	@Override
+	public
+	boolean isTextual (
+			@NonNull String mimeType) {
+
+		return textualTypes.contains (
+			mimeType);
+
+	}
+
+	@Override
+	public
+	boolean isTextual (
+			@NonNull MediaTypeRec mediaType) {
+
+		return isTextual (
+			mediaType.getMimeType ());
+
+	}
+
+	@Override
+	public
+	boolean isTextual (
+			@NonNull MediaRec media) {
+
+		return isTextual (
 			media.getMediaType ());
 
 	}
