@@ -31,6 +31,8 @@
 
 			<object-summary-page/>
 
+			<object-settings-page/>
+
 			<object-events-page/>
 
 		</object>
