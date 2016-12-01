@@ -6,6 +6,7 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.ResultUtils.resultValueRequired;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.hyphenToCamel;
@@ -94,7 +95,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 			formValuePresent (
 					submission,
 					formName)
-				? requiredSuccess (
+				? resultValueRequired (
 					formToInterface (
 						submission,
 						formName))
@@ -162,13 +163,6 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 		htmlWriter.writeLineFormatDecreaseIndent (
 			"</select>");
 
-	}
-
-	private Optional <Interface> requiredSuccess (
-			Either <Optional <Interface>, String> formToInterface) {
-
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
