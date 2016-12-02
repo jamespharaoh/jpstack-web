@@ -21,7 +21,7 @@ class TextDaoHibernate
 	TextRec findByTextNoFlush (
 			@NonNull String textValue) {
 
-		return findOne (
+		return findOneOrNull (
 			"findByText (textValue)",
 			TextRec.class,
 

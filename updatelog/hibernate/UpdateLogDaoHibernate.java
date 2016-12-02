@@ -21,7 +21,7 @@ class UpdateLogDaoHibernate
 			@NonNull String table,
 			@NonNull Long ref) {
 
-		return findOne (
+		return findOneOrNull (
 			"findByTableAndRef (table, ref)",
 			UpdateLogRec.class,
 

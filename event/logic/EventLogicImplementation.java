@@ -134,12 +134,12 @@ class EventLogicImplementation
 
 	EventLinkRec createEventLink (
 			@NonNull EventRec event,
-			@NonNull Object linkObject,
+			@NonNull Object originalLinkObject,
 			@NonNull Long index) {
 
-		linkObject =
+		Object linkObject =
 			normaliseLinkObject (
-				linkObject,
+				originalLinkObject,
 				index);
 
 		// handle permanent records as object ids
@@ -248,59 +248,50 @@ class EventLogicImplementation
 	}
 
 	Object normaliseLinkObject (
-			@NonNull Object linkObject,
+			@NonNull Object originalLinkObject,
 			@NonNull Long index) {
 
-		// don't allow null
-
-		if (linkObject == null) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Null passed as link parameter %s",
-					integerToDecimalString (
-						index)));
-
-		}
+		Object currentLinkObject =
+			originalLinkObject;
 
 		// convert to string, continue processing
 
 		if (
-			linkObject instanceof Float
-			|| linkObject instanceof Double
-			|| linkObject instanceof Enum<?>
-			|| linkObject instanceof LocalDate
+			currentLinkObject instanceof Float
+			|| currentLinkObject instanceof Double
+			|| currentLinkObject instanceof Enum <?>
+			|| currentLinkObject instanceof LocalDate
 		) {
 
-			linkObject =
-				linkObject.toString ();
+			currentLinkObject =
+				currentLinkObject.toString ();
 
 		}
 
 		// convert to long, continue processing
 
-		if (linkObject instanceof Integer) {
+		if (currentLinkObject instanceof Integer) {
 
-			linkObject =
+			currentLinkObject =
 				fromJavaInteger (
 					(Integer)
-					linkObject);
+					currentLinkObject);
 
 		}
 
 		// handle strings as text objects
 
-		if (linkObject instanceof String) {
+		if (currentLinkObject instanceof String) {
 
 			return textHelper.findOrCreate (
 				(String)
-				linkObject);
+				currentLinkObject);
 
 		}
 
 		// return object unchanged
 
-		return linkObject;
+		return currentLinkObject;
 
 	}
 
