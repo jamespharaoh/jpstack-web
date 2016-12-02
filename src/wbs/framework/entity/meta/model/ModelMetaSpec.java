@@ -34,6 +34,9 @@ class ModelMetaSpec {
 		required = true)
 	String name;
 
+	@DataAttribute
+	String oldName;
+
 	@DataAttribute (
 		required = true)
 	ModelMetaType type;

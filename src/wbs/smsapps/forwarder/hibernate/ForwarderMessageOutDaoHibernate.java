@@ -24,7 +24,7 @@ class ForwarderMessageOutDaoHibernate
 			@NonNull ForwarderRec forwarder,
 			@NonNull String otherId) {
 
-		return findOne (
+		return findOneOrNull (
 			"findByOtherId (forwarder, otherId)",
 			ForwarderMessageOutRec.class,
 

@@ -24,7 +24,7 @@ class BroadcastNumberDaoHibernate
 			@NonNull BroadcastRec broadcast,
 			@NonNull NumberRec number) {
 
-		return findOne (
+		return findOneOrNull (
 			"find (broadcast, number)",
 			BroadcastNumberRec.class,
 

@@ -24,7 +24,7 @@ class ChatNetworkDaoHibernate
 			@NonNull ChatRec chat,
 			@NonNull NetworkRec network) {
 
-		return findOne (
+		return findOneOrNull (
 			"find (chat, network)",
 			ChatNetworkRec.class,
 

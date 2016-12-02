@@ -18,7 +18,7 @@ class ImChatPurchaseDaoHibernate
 	ImChatPurchaseRec findByToken (
 			@NonNull String token) {
 
-		return findOne (
+		return findOneOrNull (
 			"findByToken (token)",
 			ImChatPurchaseRec.class,
 

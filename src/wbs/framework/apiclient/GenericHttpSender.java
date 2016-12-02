@@ -38,6 +38,7 @@ import org.json.simple.JSONObject;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.io.RuntimeIoException;
 
@@ -357,7 +358,8 @@ class GenericHttpSender <
 		RequestType,
 		ResponseType,
 		HelperType
-	> decode () {
+	> decode (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// check and set temporary state
 

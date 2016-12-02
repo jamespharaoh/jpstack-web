@@ -28,7 +28,7 @@ class ChatContactDaoHibernate
 			@NonNull ChatUserRec toChatUser) {
 
 		return optionalFromNullable (
-			findOne (
+			findOneOrNull (
 				"find (fromChatUser, toChatUser)",
 				ChatContactRec.class,
 

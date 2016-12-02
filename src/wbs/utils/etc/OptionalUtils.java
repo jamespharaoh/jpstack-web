@@ -4,7 +4,10 @@ import static wbs.utils.etc.TypeUtils.dynamicCast;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
+import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -592,6 +595,26 @@ class OptionalUtils {
 
 		return Optional.presentInstances (
 			collection);
+
+	}
+
+	public static <KeyType, ValueType>
+	Iterator <? extends Map.Entry <KeyType, ValueType>> presentInstances (
+			@NonNull Map <KeyType, Optional <ValueType>> map) {
+
+		return map.entrySet ().stream ()
+
+			.filter (
+				entry ->
+					entry.getValue ().isPresent ())
+
+			.map (
+				entry ->
+					new AbstractMap.SimpleEntry <KeyType, ValueType> (
+						entry.getKey (),
+						entry.getValue ().get ()))
+
+			.iterator ();
 
 	}
 

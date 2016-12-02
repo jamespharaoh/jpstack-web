@@ -732,6 +732,17 @@ class LogicUtils {
 	}
 
 	public static
+	String booleanToZeroOne (
+			@NonNull Boolean value) {
+
+		return booleanToString (
+			value,
+			"0",
+			"1");
+
+	}
+
+	public static
 	enum Ordering {
 		less,
 		equal,

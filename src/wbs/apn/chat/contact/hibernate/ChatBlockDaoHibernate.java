@@ -20,7 +20,7 @@ class ChatBlockDaoHibernate
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatUserRec blockedChatUser) {
 
-		return findOne (
+		return findOneOrNull (
 			"find (chatUser, blockedChatUser)",
 			ChatBlockRec.class,
 

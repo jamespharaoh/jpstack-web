@@ -637,8 +637,8 @@
 			package="wbs.integrations.mediaburst"/>
 
 		<plugin
-			name="oxygen8"
-			package="wbs.integrations.oxygen8"/>
+			name="oxygenate"
+			package="wbs.integrations.oxygenate"/>
 
 		<plugin
 			name="paypal"

@@ -33,7 +33,7 @@ class ManualResponderNumberDaoHibernate
 			@NonNull ManualResponderRec manualResponder,
 			@NonNull NumberRec number) {
 
-		return findOne (
+		return findOneOrNull (
 			"findOne (manualResponder, number)",
 			ManualResponderNumberRec.class,
 

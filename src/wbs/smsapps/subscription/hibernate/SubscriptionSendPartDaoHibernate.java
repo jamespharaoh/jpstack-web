@@ -21,7 +21,7 @@ class SubscriptionSendPartDaoHibernate
 			@NonNull SubscriptionSendRec subscriptionSend,
 			@NonNull SubscriptionListRec subscriptionList) {
 
-		return findOne (
+		return findOneOrNull (
 			"find (subscriptionSend, subscriptionList)",
 			SubscriptionSendPartRec.class,
 

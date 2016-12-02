@@ -26,7 +26,7 @@ class SubscriptionNumberDaoHibernate
 			@NonNull SubscriptionRec subscription,
 			@NonNull NumberRec number) {
 
-		return findOne (
+		return findOneOrNull (
 			"find (subscription, number)",
 			SubscriptionNumberRec.class,
 

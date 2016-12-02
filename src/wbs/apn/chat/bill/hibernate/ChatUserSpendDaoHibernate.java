@@ -21,7 +21,7 @@ class ChatUserSpendDaoHibernate
 			@NonNull ChatUserRec chatUser,
 			@NonNull LocalDate date) {
 
-		return findOne (
+		return findOneOrNull (
 			"findByDate (chatUser, date)",
 			ChatUserSpendRec.class,
 

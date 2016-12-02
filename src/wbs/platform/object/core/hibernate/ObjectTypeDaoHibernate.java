@@ -107,7 +107,7 @@ class ObjectTypeDaoHibernate
 	ObjectTypeRec findByCode (
 			@NonNull String code) {
 
-		return findOne (
+		return findOneOrNull (
 			"findByCode (code)",
 			ObjectTypeRec.class,
 

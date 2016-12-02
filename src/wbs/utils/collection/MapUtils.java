@@ -3,6 +3,8 @@ package wbs.utils.collection;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
+import java.util.AbstractMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
@@ -16,6 +18,39 @@ import lombok.NonNull;
 
 public
 class MapUtils {
+
+	// constructors
+
+	public static <KeyType, ValueType>
+	Map <KeyType, ValueType> immutableMap (
+			@NonNull Iterator <
+				? extends Map.Entry <
+					? extends KeyType,
+					? extends ValueType
+				>
+			> iterator) {
+
+		ImmutableMap.Builder <KeyType, ValueType> builder =
+			ImmutableMap.builder ();
+
+		while (iterator.hasNext ()) {
+
+			Map.Entry <
+				? extends KeyType,
+				? extends ValueType
+			> entry =
+				iterator.next ();
+
+			builder.put (
+				new AbstractMap.SimpleEntry <KeyType, ValueType> (
+					entry.getKey (),
+					entry.getValue ()));
+
+		}
+	
+		return builder.build ();
+	
+	}
 
 	// empty
 

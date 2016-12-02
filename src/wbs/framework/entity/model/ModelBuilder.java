@@ -2,10 +2,10 @@ package wbs.framework.entity.model;
 
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.TypeUtils.classForNameRequired;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToUnderscore;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.uncapitalise;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -124,11 +124,10 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 				plugin.packageName (),
 				recordClassName);
 
-		@SuppressWarnings ("unchecked")
 		Class <RecordType> recordClassTemp =
-			(Class <RecordType>)
-			classForNameRequired (
-				recordClassNameFull);
+			genericCastUnchecked (
+				classForNameRequired (
+					recordClassNameFull));
 
 		recordClass =
 			recordClassTemp;
@@ -147,11 +146,10 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 				plugin.packageName (),
 				objectHelperClassName);
 
-		@SuppressWarnings ("unchecked")
 		Class <ObjectHelper <RecordType>> objectHelperClassTemp =
-			(Class <ObjectHelper <RecordType>>)
-			classForNameRequired (
-				objectHelperClassNameFull);
+			genericCastUnchecked (
+				classForNameRequired (
+					objectHelperClassNameFull));
 
 		objectHelperClass =
 			objectHelperClassTemp;
@@ -165,12 +163,16 @@ class ModelBuilder <RecordType extends Record <RecordType>> {
 				recordClass)
 
 			.objectName (
-				uncapitalise (
-					modelMeta.name ()))
+				modelMeta.name ())
+
+			.oldObjectName (
+				modelMeta.oldName ())
 
 			.objectTypeCode (
 				camelToUnderscore (
-					modelMeta.name ()))
+					ifNull (
+						modelMeta.oldName (),
+						modelMeta.name ())))
 
 			.tableName (
 				ifNull (

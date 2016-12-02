@@ -27,7 +27,7 @@ class ExceptionLogDaoHibernate
 	public
 	Long countWithAlert () {
 
-		return findOne (
+		return findOneOrNull (
 			"countWithAlert ()",
 			Long.class,
 
@@ -51,7 +51,7 @@ class ExceptionLogDaoHibernate
 	public
 	Long countWithAlertAndFatal () {
 
-		return findOne (
+		return findOneOrNull (
 			"countWithAlertAndFatal ()",
 			Long.class,
 

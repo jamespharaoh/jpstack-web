@@ -45,7 +45,7 @@ class ChatUserAlarmDaoHibernate
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatUserRec monitorChatUser) {
 
-		return findOne (
+		return findOneOrNull (
 			"find (chatUser, monitorChatUser)",
 			ChatUserAlarmRec.class,
 

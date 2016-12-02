@@ -44,6 +44,9 @@ class ModelImplementation <RecordType extends Record <RecordType>>
 	// database stuff
 
 	@DataAttribute
+	String oldObjectName;
+
+	@DataAttribute
 	String tableName;
 
 	@DataAttribute

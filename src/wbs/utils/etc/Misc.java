@@ -104,25 +104,6 @@ class Misc {
 	}
 
 	public static
-	String urlEncode (
-			String string) {
-
-		try {
-
-			return URLEncoder.encode (
-				string,
-				"utf8");
-
-		} catch (UnsupportedEncodingException exception) {
-
-			throw new RuntimeException (
-				exception);
-
-		}
-
-	}
-
-	public static
 	RuntimeException rethrow (
 			Throwable throwable) {
 

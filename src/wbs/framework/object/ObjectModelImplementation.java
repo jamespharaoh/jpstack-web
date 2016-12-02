@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.Record;
@@ -50,6 +51,12 @@ class ObjectModelImplementation <RecordType extends Record <RecordType>>
 	public
 	String objectName () {
 		return model.objectName ();
+	}
+
+	@Override
+	public
+	String oldObjectName () {
+		return model.oldObjectName ();
 	}
 
 	@Override

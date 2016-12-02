@@ -28,7 +28,7 @@ class ImChatCustomerDaoHibernate
 			@NonNull ImChatRec imChat,
 			@NonNull String email) {
 
-		return findOne (
+		return findOneOrNull (
 			"findByEmail (imChat, email)",
 			ImChatCustomerRec.class,
 

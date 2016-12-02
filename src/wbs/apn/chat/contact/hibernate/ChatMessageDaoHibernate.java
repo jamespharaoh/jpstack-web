@@ -34,7 +34,7 @@ class ChatMessageDaoHibernate
 	ChatMessageRec findSignup (
 			@NonNull ChatUserRec chatUser) {
 
-		return findOne (
+		return findOneOrNull (
 			"findSignup (chatUser)",
 			ChatMessageRec.class,
 
@@ -403,7 +403,7 @@ class ChatMessageDaoHibernate
 	Long count (
 			@NonNull ChatUserRec chatUser) {
 
-		return findOne (
+		return findOneOrNull (
 			"count (chatUser)",
 			Long.class,
 

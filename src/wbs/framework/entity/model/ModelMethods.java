@@ -15,6 +15,7 @@ interface ModelMethods <RecordType extends Record <RecordType>> {
 	Class <RecordType> objectClass ();
 	String objectTypeCode ();
 
+	String oldObjectName ();
 	String tableName ();
 
 	// fields

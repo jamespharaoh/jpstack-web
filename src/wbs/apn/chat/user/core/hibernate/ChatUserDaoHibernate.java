@@ -54,7 +54,7 @@ class ChatUserDaoHibernate
 			@NonNull ChatRec chat,
 			@NonNull NumberRec number) {
 
-		return findOne (
+		return findOneOrNull (
 			"find (chat, number)",
 			ChatUserRec.class,
 
@@ -82,7 +82,7 @@ class ChatUserDaoHibernate
 			@NonNull ChatRec chat,
 			@NonNull ChatUserType type) {
 
-		return findOne (
+		return findOneOrNull (
 			"countOnline (chat, type)",
 			Long.class,
 

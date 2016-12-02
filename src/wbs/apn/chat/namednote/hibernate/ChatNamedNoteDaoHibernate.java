@@ -26,7 +26,7 @@ public
 			@NonNull ChatUserRec otherChatUser,
 			@NonNull ChatNoteNameRec chatNoteName) {
 
-		return findOne (
+		return findOneOrNull (
 			"find (thisChatUser, otherChatUser, chatNoteName",
 			ChatNamedNoteRec.class,
 

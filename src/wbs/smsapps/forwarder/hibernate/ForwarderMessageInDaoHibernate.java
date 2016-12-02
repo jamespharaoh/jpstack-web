@@ -25,7 +25,7 @@ class ForwarderMessageInDaoHibernate
 			@NonNull Instant now,
 			@NonNull ForwarderRec forwarder) {
 
-		return findOne (
+		return findOneOrNull (
 			"findNext (now, forwarder)",
 			ForwarderMessageInRec.class,
 

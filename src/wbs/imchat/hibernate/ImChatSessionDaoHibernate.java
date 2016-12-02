@@ -18,7 +18,7 @@ class ImChatSessionDaoHibernate
 	ImChatSessionRec findBySecret (
 			@NonNull String secret) {
 
-		return findOne (
+		return findOneOrNull (
 			"findBySecret (secret)",
 			ImChatSessionRec.class,
 

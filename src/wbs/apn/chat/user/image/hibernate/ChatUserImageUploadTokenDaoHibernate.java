@@ -18,7 +18,7 @@ class ChatUserImageUploadTokenDaoHibernate
 	ChatUserImageUploadTokenRec findByToken (
 			@NonNull String token) {
 
-		return findOne (
+		return findOneOrNull (
 			"findByToken (token)",
 			ChatUserImageUploadTokenRec.class,
 

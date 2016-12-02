@@ -20,7 +20,7 @@ class ChatMonitorInboxDaoHibernate
 			@NonNull ChatUserRec monitorChatUser,
 			@NonNull ChatUserRec userChatUser) {
 
-		return findOne (
+		return findOneOrNull (
 			"find (monitorChatUser, userChatUser)",
 			ChatMonitorInboxRec.class,
 

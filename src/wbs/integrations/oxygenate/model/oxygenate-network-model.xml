@@ -1,0 +1,28 @@
+<model-meta
+	name="oxygenateNetwork"
+	old-name="oxygen8Network"
+	table="oxygen8_network"
+	type="minor">
+
+	<fields>
+
+		<!-- id -->
+
+		<generated-id-field/>
+
+		<!-- identity -->
+
+		<parent-field
+			type="oxygenateConfig"/>
+
+		<identity-reference-field
+			type="network"/>
+
+		<!-- settings -->
+
+		<string-field
+			name="channel"/>
+
+	</fields>
+
+</model-meta>

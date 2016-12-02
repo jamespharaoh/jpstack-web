@@ -1,0 +1,485 @@
+package wbs.integrations.oxygenate.api;
+
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.string.StringUtils.stringIsEmpty;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Provider;
+
+import com.google.common.base.Optional;
+
+import lombok.Cleanup;
+import lombok.NonNull;
+
+import org.apache.commons.fileupload.FileItem;
+
+import org.joda.time.Instant;
+
+import wbs.api.mvc.ApiAction;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.integrations.oxygenate.model.OxygenateNetworkObjectHelper;
+import wbs.integrations.oxygenate.model.OxygenateRouteInObjectHelper;
+import wbs.integrations.oxygenate.model.OxygenateRouteInRec;
+
+import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.model.MediaRec;
+import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.text.model.TextRec;
+import wbs.platform.text.web.TextResponder;
+
+import wbs.sms.message.core.model.MessageTypeObjectHelper;
+import wbs.sms.message.core.model.MessageTypeRec;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
+import wbs.sms.network.model.NetworkObjectHelper;
+import wbs.sms.network.model.NetworkRec;
+import wbs.sms.number.core.model.NumberObjectHelper;
+import wbs.sms.route.core.model.RouteObjectHelper;
+import wbs.sms.route.core.model.RouteRec;
+
+import wbs.web.context.RequestContext;
+import wbs.web.responder.Responder;
+
+@PrototypeComponent ("oxygenateRouteInMmsOldAction")
+public
+class OxygenateRouteInMmsOldAction
+	extends ApiAction {
+
+	// singleton dependencies
+
+	@SingletonDependency
+	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
+	MediaLogic mediaLogic;
+
+	@SingletonDependency
+	MessageTypeObjectHelper messageTypeHelper;
+
+	@SingletonDependency
+	NetworkObjectHelper networkHelper;
+
+	@SingletonDependency
+	OxygenateNetworkObjectHelper oxygenateNetworkHelper;
+
+	@SingletonDependency
+	OxygenateRouteInObjectHelper oxygenateRouteInHelper;
+
+	@SingletonDependency
+	RequestContext requestContext;
+
+	@SingletonDependency
+	RouteObjectHelper routeHelper;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
+
+	@SingletonDependency
+	NumberObjectHelper smsNumberHelper;
+
+	@SingletonDependency
+	TextObjectHelper textHelper;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <TextResponder> textResponderProvider;
+
+	// state
+
+	Long routeId;
+
+	String mmsMessageId;
+	String mmsMessageType;
+	String mmsSenderAddress;
+	String mmsRecipientAddress;
+	Optional<String> mmsSubject;
+	Instant mmsDate;
+	String mmsNetwork;
+
+	String messageString;
+	TextRec messageText;
+
+	List<MediaRec> medias =
+		new ArrayList<MediaRec> ();
+
+	// implementation
+
+	@Override
+	protected
+	Responder goApi (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goApi");
+
+		@Cleanup
+		Transaction transaction =
+			database.beginReadWrite (
+				"Oxygen8InboundMmsAction.goApi ()",
+				this);
+
+		processRequestHeaders (
+			taskLogger);
+
+		processRequestBody (
+			taskLogger);
+
+		updateDatabase ();
+
+		transaction.commit ();
+
+		return createResponse ();
+
+	}
+
+	void processRequestHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"processRequestHeaders");
+
+		// route id
+
+		routeId =
+			requestContext.requestIntegerRequired (
+				"routeId");
+
+		// message id
+
+		mmsMessageId =
+			requestContext.header (
+				"X-Mms-Message-Id");
+
+		if (mmsMessageId == null) {
+
+			taskLogger.errorFormat (
+				"Required header missing: X-Mms-Message-Id");
+
+		} else if (mmsMessageId.length () != 32) {
+
+			taskLogger.errorFormat (
+				"Header expected to be 32 characters but was %s: ",
+				integerToDecimalString (
+					mmsMessageId.length ()),
+				"X-Mms-Message-Id");
+
+		}
+
+		// message type
+
+		mmsMessageType =
+			requestContext.header (
+				"X-Mms-Message-Type");
+
+		if (
+			isNull (
+				mmsMessageType)
+		) {
+
+			taskLogger.errorFormat (
+				"Required header missing: X-Mms-Message-Type");
+
+		} else if (
+			stringNotEqualSafe (
+				mmsMessageType,
+				"MO_MMS")
+		) {
+
+			taskLogger.errorFormat (
+				"Header expected to equal 'MO_MMS' but was '%s': ",
+				mmsMessageType,
+				"X-Mms-Message-Type");
+
+		}
+
+		// sender address
+
+		mmsSenderAddress =
+			requestContext.header (
+				"X-Mms-Sender-Address");
+
+		if (
+			isNull (
+				mmsSenderAddress)
+		) {
+
+			taskLogger.errorFormat (
+				"Required header missing: X-Mms-Sender-Address");
+
+		} else if (
+			stringIsEmpty (
+				mmsSenderAddress)
+		) {
+
+			taskLogger.errorFormat (
+				"Required header empty: X-Mms-Sender-Address");
+
+		}
+
+		// recipient address
+
+		mmsRecipientAddress =
+			requestContext.header (
+				"X-Mms-Recipient-Address");
+
+		if (
+			isNull (
+				mmsRecipientAddress)
+		) {
+
+			taskLogger.errorFormat (
+				"Required header missing: X-Mms-Recipient-Address");
+
+		} else if (
+			stringIsEmpty (
+				mmsRecipientAddress)
+		) {
+
+			taskLogger.errorFormat (
+				"Required header empty: X-Mms-Recipient-Address");
+
+		}
+
+		// subject
+
+		mmsSubject =
+			optionalFromNullable (
+				requestContext.header (
+					"X-Mms-Subject"));
+
+		// date
+
+		String mmsDateParam =
+			requestContext.header (
+				"X-Mms-Date");
+
+		if (
+			isNull (
+				mmsDateParam)
+		) {
+
+			taskLogger.errorFormat (
+				"Required header missing: X-Mms-Date");
+
+		} else {
+
+			try {
+
+				mmsDate =
+					Instant.parse (
+						mmsDateParam);
+
+			} catch (Exception exception) {
+
+				taskLogger.errorFormat (
+					"Error parsing header: X-Mms-Date");
+
+			}
+
+		}
+
+		// network
+
+		mmsNetwork =
+			requestContext.header (
+				"X-Mms-Network");
+
+		if (
+			isNull (
+				mmsNetwork)
+		) {
+
+			taskLogger.errorFormat (
+				"Required header missing: X-Mms-Network");
+
+		}
+
+		// errors
+
+		taskLogger.makeException (
+			);
+
+	}
+
+	void processRequestBody (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"processRequestBody");
+
+		for (
+			FileItem fileItem
+				: requestContext.fileItems ()
+		) {
+
+			Matcher matcher =
+				contentTypePattern.matcher (
+					fileItem.getContentType ());
+
+			if (! matcher.matches ()) {
+
+				taskLogger.errorFormat (
+					"Invalid content type: %s",
+					fileItem.getContentType ());
+
+				continue;
+
+			}
+
+			String type =
+				matcher.group (1);
+
+			String charset =
+				matcher.group (2);
+
+			medias.add (
+				mediaLogic.createMediaRequired (
+					fileItem.get (),
+					type,
+					fileItem.getName (),
+					Optional.of (
+						charset)));
+
+			if (
+
+				messageString == null
+
+				&& mediaLogic.isText (
+					type)
+
+				&& fileItem.getString () != null
+
+				&& ! fileItem.getString ().isEmpty ()
+
+			) {
+
+				messageString =
+					fileItem.getString ();
+
+			}
+
+		}
+
+		if (messageString == null) {
+			messageString = "";
+		}
+
+		taskLogger.makeException ();
+
+	}
+
+	void updateDatabase () {
+
+		// lookup route
+
+		OxygenateRouteInRec oxygenateRouteIn =
+			oxygenateRouteInHelper.findRequired (
+				routeId);
+
+		RouteRec route =
+			oxygenateRouteIn.getRoute ();
+
+		// check route supports inbound mms
+
+		if (! route.getCanReceive ())
+			throw new RuntimeException ();
+
+		MessageTypeRec mmsMessageType =
+			messageTypeHelper.findByCodeRequired (
+				GlobalId.root,
+				"mms");
+
+		if (! route.getInboundMessageTypes ().contains (
+				mmsMessageType))
+			throw new RuntimeException ();
+
+		// lookup network
+
+		/*
+		Oxygen8NetworkRec oxygen8Network =
+			oxygen8NetworkHelper.findByChannel (
+				oxygen8RouteIn.getOxygen8Config (),
+				mmsNetwork);
+
+		if (oxygen8Network == null) {
+
+			throw new RuntimeException (
+				stringFormat (
+					"No oxygen8 network for channel: %s",
+					mmsNetwork));
+
+		}
+
+		NetworkRec network =
+			oxygen8Network.getNetwork ();
+		*/
+
+		NetworkRec network =
+			networkHelper.findRequired (
+				0l);
+
+		// insert message
+
+		TextRec messageText =
+			textHelper.findOrCreate (
+				messageString);
+
+		smsInboxLogic.inboxInsert (
+			optionalOf (
+				mmsMessageId),
+			messageText,
+			smsNumberHelper.findOrCreate (
+				mmsSenderAddress),
+			mmsRecipientAddress,
+			route,
+			optionalOf (
+				network),
+			optionalOf (
+				mmsDate),
+			medias,
+			optionalAbsent (),
+			mmsSubject);
+
+	}
+
+	Responder createResponse () {
+
+		return textResponderProvider.get ()
+			.text ("success");
+
+	}
+
+	public final static
+	Pattern contentTypePattern =
+		Pattern.compile (
+			"(\\S+); charset=(\\S+)");
+
+}

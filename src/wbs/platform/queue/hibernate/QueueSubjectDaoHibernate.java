@@ -50,7 +50,7 @@ class QueueSubjectDaoHibernate
 			@NonNull QueueRec queue,
 			@NonNull Record<?> object) {
 
-		return findOne (
+		return findOneOrNull (
 			"find (queue, object)",
 			QueueSubjectRec.class,
 

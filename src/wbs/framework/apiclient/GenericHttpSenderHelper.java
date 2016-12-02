@@ -2,6 +2,7 @@ package wbs.framework.apiclient;
 
 import static wbs.utils.etc.NumberUtils.integerRangeAsSet;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,6 +21,7 @@ interface GenericHttpSenderHelper <
 
 	String url ();
 	Map <String, String> requestHeaders ();
+	Map <String, List <String>> requestParameters ();
 	String requestBody ();
 
 	// work methods

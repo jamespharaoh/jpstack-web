@@ -21,7 +21,7 @@ class UserPrivDaoHibernate
 			@NonNull UserRec user,
 			@NonNull PrivRec priv) {
 
-		return findOne (
+		return findOneOrNull (
 			"find (user, priv)",
 			UserPrivRec.class,
 

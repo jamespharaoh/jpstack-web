@@ -6,6 +6,7 @@ import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -15,6 +16,50 @@ import lombok.NonNull;
 
 public
 class CollectionUtils {
+
+	public static <ValueType>
+	ImmutableList <ValueType> singletonList (
+			@NonNull ValueType item) {
+
+		return ImmutableList.<ValueType> of (
+			item);
+
+	}
+
+	public static <ValueType>
+	ImmutableList <ValueType> immutableList (
+			@NonNull Iterator <ValueType> iterator) {
+
+		ImmutableList.Builder <ValueType> builder =
+			ImmutableList.<ValueType> builder ();
+
+		while (iterator.hasNext ()) {
+
+			builder.add (
+				iterator.next ());
+
+		}
+
+		return builder.build ();
+
+	}
+
+	public static <ValueType>
+	ImmutableList <ValueType> listFromNullable (
+			ValueType value) {
+
+		if (value != null) {
+
+			return ImmutableList.of (
+				value);
+
+		} else {
+
+			return ImmutableList.of ();
+
+		} 
+
+	}
 
 	public static
 	boolean collectionIsEmpty (

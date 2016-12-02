@@ -87,7 +87,7 @@ class FonixMessageSenderHelper
 	public
 	void encode () {
 
-		// construct request parameter map
+		// construct request headers
 
 		requestHeaders =
 			ImmutableMap.<String, String> builder ()
@@ -101,6 +101,8 @@ class FonixMessageSenderHelper
 				request.apiKey ())
 
 			.build ();
+
+		// construct request parameters
 
 		requestParameters =
 			ImmutableMap.<String, List <String>> builder ()

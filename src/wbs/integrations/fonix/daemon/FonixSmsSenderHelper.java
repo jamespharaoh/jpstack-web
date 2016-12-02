@@ -16,10 +16,12 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -47,6 +49,9 @@ public class FonixSmsSenderHelper
 
 	@SingletonDependency
 	FonixRouteOutObjectHelper fonixRouteOutHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -246,6 +251,11 @@ public class FonixSmsSenderHelper
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FonixMessageSender fonixSender) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"performSend");
+
 		PerformSendResult result =
 			new PerformSendResult ();
 
@@ -260,7 +270,8 @@ public class FonixSmsSenderHelper
 			result.responseTrace (
 				fonixSender.responseTrace ());
 
-			fonixSender.decode ();
+			fonixSender.decode (
+				taskLogger);
 
 			return result
 
