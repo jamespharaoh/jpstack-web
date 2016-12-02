@@ -47,9 +47,9 @@ class MapUtils {
 					entry.getValue ()));
 
 		}
-	
+
 		return builder.build ();
-	
+
 	}
 
 	// empty
@@ -112,6 +112,32 @@ class MapUtils {
 		} else {
 
 			return optionalAbsent ();
+
+		}
+
+	}
+
+	public static <KeyType, ValueType>
+	ValueType mapItemForKeyOrDefault (
+			@NonNull Map <KeyType, ValueType> map,
+			@NonNull KeyType key,
+			@NonNull ValueType defaultValue) {
+
+		ValueType value =
+			map.get (
+				key);
+
+		if (value != null) {
+
+			return value;
+
+		} else if (map.containsKey (key)) {
+
+			throw new NullPointerException ();
+
+		} else {
+
+			return defaultValue;
 
 		}
 
