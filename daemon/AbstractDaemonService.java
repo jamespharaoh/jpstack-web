@@ -1,28 +1,31 @@
 package wbs.platform.daemon;
 
 import static wbs.utils.etc.TypeUtils.classNameSimple;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PreDestroy;
+import lombok.NonNull;
 
-import lombok.extern.log4j.Log4j;
-
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.NormalLifecycleTeardown;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.thread.ThreadManager;
 
 /**
  * AffiliateObjectHelper class for those wishing to implement DaemonService.
  */
-@Log4j
 public abstract
 class AbstractDaemonService {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	protected
@@ -35,6 +38,13 @@ class AbstractDaemonService {
 
 	protected
 	AbstractDaemonService () {
+	}
+
+	// method stubs
+
+	protected
+	boolean checkEnabled () {
+		return true;
 	}
 
 	/**
@@ -67,7 +77,8 @@ class AbstractDaemonService {
 	void registerThread (
 			Thread thread) {
 
-		threads.add (thread);
+		threads.add (
+			thread);
 
 	}
 
@@ -116,18 +127,36 @@ class AbstractDaemonService {
 	 */
 	@NormalLifecycleSetup
 	public synchronized
-	void startService () {
+	void startService (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"startService");
+
+		// check if we are enabled
+
+		if (! checkEnabled ()) {
+
+			taskLogger.noticeFormat (
+				"Not starting %s (disabled)",
+				classNameSimple (
+					getClass ()));
+
+			return;
+
+		}
 
 		// if already running do nothing
 
 		if (threads != null)
 			return;
 
-		log.info (
-			stringFormat (
-				"Starting %s",
-				classNameSimple (
-					getClass ())));
+		taskLogger.noticeFormat (
+			"Starting %s",
+			classNameSimple (
+				getClass ()));
 
 		// call init
 
@@ -136,7 +165,7 @@ class AbstractDaemonService {
 		// ok start threads
 
 		threads =
-			new ArrayList<Thread> ();
+			new ArrayList<> ();
 
 		createThreads ();
 
@@ -147,19 +176,24 @@ class AbstractDaemonService {
 	 * startService () has never been called or stopService () has been called
 	 * since.
 	 */
-	@PreDestroy
+	@NormalLifecycleTeardown
 	public synchronized
-	void stopService () {
+	void stopService (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"stopService");
 
 		// if we have never started anything, do nothing
 
 		if (threads == null)
 			return;
 
-		log.info (
-			stringFormat (
-				"Stopping %s",
-				getClass ().getSimpleName ()));
+		taskLogger.noticeFormat (
+			"Stopping %s",
+			getClass ().getSimpleName ());
 
 		// interrupt all the threads
 
