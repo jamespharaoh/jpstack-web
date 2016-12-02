@@ -1,11 +1,11 @@
 package wbs.integrations.oxygenate.daemon;
 
-import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 
 import wbs.sms.message.outbox.daemon.GenericSmsSenderService;
 
-@PrototypeComponent ("oxygenateSmsSenderService")
+@SingletonComponent ("oxygenateSmsSenderService")
 public
 class OxygenateSmsSenderService
 	extends GenericSmsSenderService {

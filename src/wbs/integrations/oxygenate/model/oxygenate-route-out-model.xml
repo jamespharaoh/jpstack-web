@@ -19,7 +19,8 @@
 		<!-- settings -->
 
 		<reference-field
-			type="oxygenateConfig"/>
+			type="oxygenateConfig"
+			column="oxygen8_config_id"/>
 
 		<string-field
 			name="relayUrl"/>

@@ -57,7 +57,7 @@ class CollectionUtils {
 
 			return ImmutableList.of ();
 
-		} 
+		}
 
 	}
 

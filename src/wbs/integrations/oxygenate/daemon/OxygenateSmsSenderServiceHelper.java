@@ -271,7 +271,7 @@ class OxygenateSmsSenderServiceHelper
 	PerformSendResult performSend (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull OxygenateSmsSender sender) {
-	
+
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,

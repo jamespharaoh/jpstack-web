@@ -123,7 +123,12 @@ class DevopsScript
 				[
 					"cd #{@deployment_project_path}",
 					"ant daemon-deploy",
-					"sudo restart #{@config_services["daemon"]}",
+					[
+						"if status #{@config_services["daemon"]} | grep -q stop/",
+						"then sudo start #{@config_services["daemon"]}",
+						"else sudo restart #{@config_services["daemon"]}",
+						"fi",
+					].join("; "),
 				].join(" && ")
 
 		when "clean"

@@ -1,5 +1,7 @@
 package wbs.smsapps.forwarder.daemon;
 
+import static wbs.utils.collection.MapUtils.mapItemForKeyOrDefault;
+import static wbs.utils.etc.LogicUtils.parseBooleanYesNoRequired;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
@@ -22,15 +24,17 @@ import java.util.regex.Pattern;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.AbstractDaemonService;
 import wbs.platform.daemon.QueueBuffer;
@@ -38,7 +42,6 @@ import wbs.platform.daemon.QueueBuffer;
 import wbs.smsapps.forwarder.model.ForwarderMessageInObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
 
-@Log4j
 @SingletonComponent ("forwarderDaemon")
 public
 class ForwarderDaemon
@@ -50,6 +53,9 @@ class ForwarderDaemon
 	int bufferSize = 100;
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	Database database;
@@ -76,62 +82,69 @@ class ForwarderDaemon
 			Set<Long> activeIds =
 				buffer.getKeys ();
 
-			List<ForwarderMessageInRec> forwarderMessageIns;
+			List <ForwarderMessageInRec> forwarderMessageIns;
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadOnly (
-					"ForwarderDaemon.MainThread.doQuery ()",
-					this);
+			try (
 
-			// get the list
+				Transaction transaction =
+					database.beginReadOnly (
+						"ForwarderDaemon.MainThread.doQuery ()",
+						this);
 
-			forwarderMessageIns =
-				forwarderMessageInHelper.findNextLimit (
-					transaction.now (),
-					buffer.getFullSize ());
-
-			// initialise any proxies
-
-			for (
-				ForwarderMessageInRec forwarderMessageIn
-					: forwarderMessageIns
 			) {
 
-				forwarderMessageIn
-					.getMessage ()
-					.getText ()
-					.getText ();
+				// get the list
 
-				forwarderMessageIn
-					.getForwarder ()
-					.getUrl ();
+				forwarderMessageIns =
+					forwarderMessageInHelper.findNextLimit (
+						transaction.now (),
+						buffer.getFullSize ());
 
-			}
+				// initialise any proxies
 
-			transaction.close ();
-
-			int numRetrieved = 0;
-
-			for (ForwarderMessageInRec forwarderMessageIn
-					: forwarderMessageIns) {
-
-				numRetrieved ++;
-
-				if (
-					activeIds.contains (
-						forwarderMessageIn.getId ())
+				for (
+					ForwarderMessageInRec forwarderMessageIn
+						: forwarderMessageIns
 				) {
-					continue;
+
+					forwarderMessageIn
+						.getMessage ()
+						.getText ()
+						.getText ();
+
+					forwarderMessageIn
+						.getForwarder ()
+						.getUrl ();
+
 				}
 
-				buffer.add (
-					forwarderMessageIn.getId (),
-					forwarderMessageIn.getId ());
+				transaction.close ();
+
+				int numRetrieved = 0;
+
+				for (
+					ForwarderMessageInRec forwarderMessageIn
+						: forwarderMessageIns
+				) {
+
+					numRetrieved ++;
+
+					if (
+						activeIds.contains (
+							forwarderMessageIn.getId ())
+					) {
+						continue;
+					}
+
+					buffer.add (
+						forwarderMessageIn.getId (),
+						forwarderMessageIn.getId ());
+
+				}
+
+				return numRetrieved == buffer.getFullSize ();
 
 			}
-
-			return numRetrieved == buffer.getFullSize ();
 
 		}
 
@@ -363,7 +376,13 @@ class ForwarderDaemon
 
 		private
 		boolean doSend (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull ForwarderMessageInRec forwarderMessageIn) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"WorkerThread.doSend");
 
 			if (
 
@@ -403,7 +422,9 @@ class ForwarderDaemon
 
 			} catch (IOException exception) {
 
-				log.warn("IO exception forwarding message: " + exception);
+				taskLogger.warningFormat (
+					"IO exception forwarding message: %s",
+					exception.getMessage ());
 
 				return false;
 
@@ -413,7 +434,13 @@ class ForwarderDaemon
 
 		private
 		void doMessage (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Long forwarderMessageInId) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"WorkerThread.doMessage");
 
 			@Cleanup
 			Transaction checkTransaction =
@@ -474,6 +501,7 @@ class ForwarderDaemon
 
 			boolean success =
 				doSend (
+					taskLogger,
 					forwarderMessageIn);
 
 			@Cleanup
@@ -557,7 +585,12 @@ class ForwarderDaemon
 
 				}
 
+				TaskLogger taskLogger =
+					logContext.createTaskLogger (
+						"WorkerThread.run");
+
 				doMessage (
+					taskLogger,
 					forwarderMessageInId);
 
 				buffer.remove (
@@ -573,6 +606,18 @@ class ForwarderDaemon
 	protected
 	String getThreadName () {
 		throw new UnsupportedOperationException ();
+	}
+
+	@Override
+	protected
+	boolean checkEnabled () {
+
+		return parseBooleanYesNoRequired (
+			mapItemForKeyOrDefault (
+				wbsConfig.runtimeSettings (),
+				"forwarder-daemon.enable",
+				"yes"));
+
 	}
 
 	@Override

@@ -35,9 +35,6 @@ class OxygenateSmsSendHelper
 	// request properties
 
 	@Getter @Setter
-	String url;
-
-	@Getter @Setter
 	Map <String, String> requestHeaders;
 
 	@Getter @Setter
@@ -65,6 +62,14 @@ class OxygenateSmsSendHelper
 
 	@Getter @Setter
 	OxygenateSmsSendResponse response;
+
+	// property accessors
+
+	@Override
+	public
+	String url () {
+		return request.relayUrl ();
+	}
 
 	// public implementation
 

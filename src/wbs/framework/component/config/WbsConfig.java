@@ -2,6 +2,7 @@ package wbs.framework.component.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 
@@ -76,6 +77,15 @@ class WbsConfig {
 	@DataAttribute (
 		required = true)
 	String cryptorSeed;
+
+	// runtime controls
+
+	@DataChildren (
+		childrenElement = "runtime-settings",
+		childElement = "runtime-setting",
+		keyAttribute = "name",
+		valueAttribute = "value")
+	Map <String, String> runtimeSettings;
 
 	// test and development
 

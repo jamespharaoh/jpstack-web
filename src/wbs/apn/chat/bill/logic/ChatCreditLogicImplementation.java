@@ -880,7 +880,7 @@ class ChatCreditLogicImplementation
 				reasonOptional)
 		) {
 
-			log.warn (
+			log.debug (
 				reasonOptional.get ());
 
 		} else {
@@ -1260,7 +1260,7 @@ class ChatCreditLogicImplementation
 
 			if (! chatNetworkOptional.isPresent ()) {
 
-				log.warn (
+				log.debug (
 					stringFormat (
 						"Not sending credit hint to %s ",
 						integerToDecimalString (
