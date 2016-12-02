@@ -25,7 +25,7 @@ class TicketDaoHibernate
 			@NonNull TicketRec ticket,
 			@NonNull TicketFieldTypeRec ticketFieldType) {
 
-		return findOne (
+		return findOneOrNull (
 			"findTicketFieldValue (ticket, ticketFieldType)",
 			TicketFieldValueRec.class,
 
