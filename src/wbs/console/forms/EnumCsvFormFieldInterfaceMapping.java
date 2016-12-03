@@ -1,6 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 
@@ -16,26 +17,22 @@ import fj.data.Either;
 
 @PrototypeComponent ("enumCsvFormFieldInterfaceMapping")
 public
-class EnumCsvFormFieldInterfaceMapping<Container,Generic extends Enum<Generic>>
-	implements FormFieldInterfaceMapping<Container,Generic,String> {
+class EnumCsvFormFieldInterfaceMapping <
+	Container,
+	Generic extends Enum <Generic>
+>
+	implements FormFieldInterfaceMapping <
+		Container,
+		Generic,
+		String
+	> {
 
 	@Override
 	public
-	Either<Optional<Generic>,String> interfaceToGeneric (
+	Either <Optional <String>, String> genericToInterface (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
-
-		throw new UnsupportedOperationException ();
-
-	}
-
-	@Override
-	public
-	Either<Optional<String>,String> genericToInterface (
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Generic> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Generic> genericValue) {
 
 		if (
 			optionalIsNotPresent (
@@ -43,13 +40,13 @@ class EnumCsvFormFieldInterfaceMapping<Container,Generic extends Enum<Generic>>
 		) {
 
 			return successResult (
-				Optional.of (
+				optionalOf (
 					""));
 
 		} else {
 
 			return successResult (
-				Optional.of (
+				optionalOf (
 					camelToHyphen (
 						genericValue.get ().toString ())));
 

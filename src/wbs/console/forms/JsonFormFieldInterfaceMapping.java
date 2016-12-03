@@ -3,7 +3,6 @@ package wbs.console.forms;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ResultUtils.successResult;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.StringWriter;
 import java.util.Map;
@@ -27,25 +26,10 @@ class JsonFormFieldInterfaceMapping <Container>
 
 	@Override
 	public
-	Either<Optional <String>, String> interfaceToGeneric (
+	Either <Optional <String>, String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
-			@NonNull Optional <String> interfaceValue) {
-
-		throw new UnsupportedOperationException (
-			stringFormat (
-				"%s.%s",
-				getClass ().getSimpleName (),
-				"interfaceToGeneric (...)"));
-
-	}
-
-	@Override
-	public
-	Either<Optional<String>,String> genericToInterface (
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> genericValue) {
+			@NonNull Optional <String> genericValue) {
 
 		if (
 			optionalIsNotPresent (

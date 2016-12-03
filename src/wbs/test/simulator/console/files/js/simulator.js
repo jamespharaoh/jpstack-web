@@ -86,11 +86,19 @@ $(function () {
 					if (event.type == "message_in")
 						tr.addClass ("messageIn");
 
-					if (event.type == "message_out" && event.data.route.outCharge == 0)
+					if (
+						event.type == "message_out"
+						&& event.data.route.outCharge == 0
+					) {
 						tr.addClass ("messageOut");
+					}
 
-					if (event.type == "message_out" && event.data.route.outCharge > 0)
+					if (
+						event.type == "message_out"
+						&& event.data.route.outCharge > 0
+					) {
 						tr.addClass ("messageBill");
+					}
 
 					if (event.type == "message_in"
 						|| event.type == "message_out") {

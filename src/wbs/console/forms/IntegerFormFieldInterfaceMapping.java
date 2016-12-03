@@ -24,8 +24,8 @@ import fj.data.Either;
 @Accessors (fluent = true)
 @PrototypeComponent ("integerFormFieldInterfaceMapping")
 public
-class IntegerFormFieldInterfaceMapping<Container>
-	implements FormFieldInterfaceMapping<Container,Long,String> {
+class IntegerFormFieldInterfaceMapping <Container>
+	implements FormFieldInterfaceMapping <Container, Long, String> {
 
 	// properties
 
@@ -36,10 +36,10 @@ class IntegerFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Either<Optional<Long>,String> interfaceToGeneric (
+	Either <Optional <Long>, String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue) {
 
 		// handle not present or empty
 

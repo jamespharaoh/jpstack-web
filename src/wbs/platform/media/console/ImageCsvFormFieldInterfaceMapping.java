@@ -24,21 +24,10 @@ class ImageCsvFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Either<Optional<MediaRec>,String> interfaceToGeneric (
+	Either <Optional <String>, String> genericToInterface (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
-
-		throw new UnsupportedOperationException ();
-
-	}
-
-	@Override
-	public
-	Either<Optional<String>,String> genericToInterface (
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<MediaRec> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <MediaRec> genericValue) {
 
 		if (
 			optionalIsNotPresent (

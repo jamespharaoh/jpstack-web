@@ -1,9 +1,11 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.util.Map;
 
@@ -45,21 +47,10 @@ class ObjectCsvFormFieldInterfaceMapping <
 
 	@Override
 	public
-	Either<Optional<Generic>,String> interfaceToGeneric (
+	Either <Optional <String>, String> genericToInterface (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
-
-		throw new UnsupportedOperationException ();
-
-	}
-
-	@Override
-	public
-	Either<Optional<String>,String> genericToInterface (
-			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Generic> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Generic> genericValue) {
 
 		if (
 			optionalIsNotPresent (
@@ -72,7 +63,7 @@ class ObjectCsvFormFieldInterfaceMapping <
 
 		} else {
 
-			Optional<Record<?>> root;
+			Optional <Record <?>> root;
 
 			if (
 				isNotNull (
@@ -80,21 +71,21 @@ class ObjectCsvFormFieldInterfaceMapping <
 			) {
 
 				root =
-					Optional.<Record<?>>of (
-						(Record<?>)
-						objectManager.dereferenceObsolete (
-							container,
-							rootFieldName));
+					optionalOf (
+						genericCastUnchecked (
+							objectManager.dereferenceObsolete (
+								container,
+								rootFieldName)));
 
 			} else {
 
 				root =
-					Optional.<Record<?>>absent ();
+					optionalAbsent ();
 
 			}
 
 			return successResult (
-				Optional.of (
+				optionalOf (
 					objectManager.objectPathMini (
 						genericValue.get (),
 						root)));

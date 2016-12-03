@@ -34,17 +34,6 @@ class EventDetailsFormFieldInterfaceMapping
 
 	@Override
 	public
-	Either <Optional <EventRec>, String> interfaceToGeneric (
-			@NonNull EventRec container,
-			@NonNull Map <String, Object> hints,
-			@NonNull Optional <String> interfaceValue) {
-
-		throw new UnsupportedOperationException ();
-
-	}
-
-	@Override
-	public
 	Either <Optional <String>, String> genericToInterface (
 			@NonNull EventRec container,
 			@NonNull Map <String, Object> hints,

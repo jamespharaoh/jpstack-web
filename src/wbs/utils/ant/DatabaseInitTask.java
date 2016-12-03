@@ -106,7 +106,6 @@ class DatabaseInitTask
 
 			Process proc =
 				new ProcessBuilder ()
-//					.inheritIO ()
 					.directory (getProject ().getBaseDir ())
 					.command (args)
 					.start ();

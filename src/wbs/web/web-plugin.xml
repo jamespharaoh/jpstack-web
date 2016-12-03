@@ -2,7 +2,7 @@
 	name="web"
 	package="wbs.web">
 
-i	<layer name="web">
+	<layer name="web">
 
 		<component class="action.ActionRequestHandler"/>
 
