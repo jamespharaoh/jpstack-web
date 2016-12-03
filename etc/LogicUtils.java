@@ -732,13 +732,13 @@ class LogicUtils {
 	}
 
 	public static
-	String booleanToZeroOne (
+	String booleanToOneZero (
 			@NonNull Boolean value) {
 
 		return booleanToString (
 			value,
-			"0",
-			"1");
+			"1",
+			"0");
 
 	}
 
