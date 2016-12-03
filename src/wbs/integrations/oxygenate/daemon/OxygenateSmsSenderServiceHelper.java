@@ -1,6 +1,6 @@
 package wbs.integrations.oxygenate.daemon;
 
-import static wbs.utils.etc.LogicUtils.booleanToZeroOne;
+import static wbs.utils.etc.LogicUtils.booleanToOneZero;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -204,7 +204,7 @@ class OxygenateSmsSenderServiceHelper
 				oxygenateRouteOut.getPassword ())
 
 			.multipart (
-				booleanToZeroOne (
+				booleanToOneZero (
 					oxygenateRouteOut.getMultipart ()))
 
 			.shortcode (
@@ -232,8 +232,8 @@ class OxygenateSmsSenderServiceHelper
 				smsMessage.getText ().getText ())
 
 			.premium (
-				booleanToZeroOne (
-					smsRoute.getOutCharge () > 0))
+				booleanToOneZero (
+					oxygenateRouteOut.getPremium ()))
 
 		;
 
