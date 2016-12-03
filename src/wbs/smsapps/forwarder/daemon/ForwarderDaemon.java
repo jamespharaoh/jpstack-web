@@ -1,7 +1,9 @@
 package wbs.smsapps.forwarder.daemon;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrDefault;
 import static wbs.utils.etc.LogicUtils.parseBooleanYesNoRequired;
+import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
@@ -614,7 +616,9 @@ class ForwarderDaemon
 
 		return parseBooleanYesNoRequired (
 			mapItemForKeyOrDefault (
-				wbsConfig.runtimeSettings (),
+				ifNull (
+					wbsConfig.runtimeSettings (),
+					emptyMap ()),
 				"forwarder-daemon.enable",
 				"yes"));
 
