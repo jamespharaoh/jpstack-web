@@ -9,7 +9,6 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 
-import wbs.platform.feature.console.FeatureConsoleHelper;
 import wbs.platform.feature.model.FeatureRec;
 
 @SingletonComponent ("featureChecker")
