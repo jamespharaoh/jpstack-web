@@ -139,6 +139,11 @@ class OxygenateSmsSendHelper
 					request.mask ()))
 
 			.put (
+				"Channel",
+				listFromNullable (
+					request.channel ()))
+
+			.put (
 				"MSISDN",
 				singletonList (
 					request.msisdn ()))
