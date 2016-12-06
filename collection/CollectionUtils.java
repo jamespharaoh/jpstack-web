@@ -2,14 +2,18 @@ package wbs.utils.collection;
 
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
@@ -197,7 +201,21 @@ class CollectionUtils {
 	Type listFirstElementRequired (
 			@NonNull List <Type> list) {
 
-		return list.get (0);
+		if (list.size () < 1) {
+			throw new NoSuchElementException ();
+		}
+
+		Type value =
+			list.get (0);
+
+		if (
+			isNull (
+				value)
+		) {
+			throw new NullPointerException ();
+		}
+
+		return value;
 
 	}
 
@@ -205,7 +223,22 @@ class CollectionUtils {
 	Type listSecondElementRequired (
 			@NonNull List <Type> list) {
 
-		return list.get (1);
+		if (list.size () < 2) {
+			throw new NoSuchElementException ();
+		}
+
+		Type value =
+			list.get (1);
+
+		if (
+			isNull (
+				value)
+		) {
+			throw new NullPointerException ();
+		}
+
+		return value;
+
 
 	}
 
@@ -213,7 +246,44 @@ class CollectionUtils {
 	Type listThirdElementRequired (
 			@NonNull List <Type> list) {
 
-		return list.get (2);
+		if (list.size () < 3) {
+			throw new NoSuchElementException ();
+		}
+
+		Type value =
+			list.get (2);
+
+		if (
+			isNull (
+				value)
+		) {
+			throw new NullPointerException ();
+		}
+
+		return value;
+
+	}
+
+	public static <Type>
+	Optional <Type> listThirdElement (
+			@NonNull List <Type> list) {
+
+		if (list.size () < 3) {
+			return optionalAbsent ();
+		}
+
+		Type value =
+			list.get (2);
+
+		if (
+			isNull (
+				value)
+		) {
+			throw new NullPointerException ();
+		}
+
+		return optionalOf (
+			value);
 
 	}
 
