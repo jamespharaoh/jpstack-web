@@ -1,12 +1,14 @@
 package wbs.integrations.oxygenate.foreignapi;
 
 import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveThreeElements;
+import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveTwoElements;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listFromNullable;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
-import static wbs.utils.collection.CollectionUtils.listThirdElementRequired;
+import static wbs.utils.collection.CollectionUtils.listThirdElement;
 import static wbs.utils.collection.CollectionUtils.singletonList;
 import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.OptionalUtils.optionalOrElse;
 import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.utils.string.StringUtils.stringSplitNewline;
 import static wbs.web.utils.UrlUtils.urlEncodeParameters;
@@ -177,8 +179,13 @@ class OxygenateSmsSendHelper
 				responseBody ());
 
 		if (
-			collectionDoesNotHaveThreeElements (
+
+			collectionDoesNotHaveTwoElements (
 				responseLines)
+
+			&& collectionDoesNotHaveThreeElements (
+				responseLines)
+
 		) {
 
 			throw new RuntimeException (
@@ -198,8 +205,10 @@ class OxygenateSmsSendHelper
 					responseLines))
 
 			.messageReferences (
-				listThirdElementRequired (
-					responseLines))
+				optionalOrElse (
+					listThirdElement (
+						responseLines),
+					() -> ""))
 
 		);
 		
