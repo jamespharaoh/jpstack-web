@@ -205,7 +205,7 @@ class OxygenateSmsSenderServiceHelper
 
 			.multipart (
 				booleanToOneZero (
-					oxygenateRouteOut.getMultipart ()))
+					needMultipart))
 
 			.shortcode (
 				ifThenElse (
