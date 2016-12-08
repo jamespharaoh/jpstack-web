@@ -1,23 +1,23 @@
 <console-module
-	name="oxygen8-inbound-log">
+	name="oxygenate-inbound-log">
 
 	<console-helper-provider
-		object-name="oxygen8InboundLog"
+		object-name="oxygenateInboundLog"
 		view-priv="root:manage">
 
 		<priv-key
-			name="oxygen8InboundLog.manage"
+			name="oxygenateInboundLog.manage"
 			priv="root:manage"/>
 
 		<context-stuff
-			name="oxygen8InboundLogName"
+			name="oxygenadteInboundLogName"
 			field="id"/>
 
 	</console-helper-provider>
 
 	<object-context
-		name="oxygen8InboundLog"
-		object-name="oxygen8InboundLog">
+		name="oxygenateInboundLog"
+		object-name="oxygenateInboundLog">
 
 		<list>
 
@@ -38,7 +38,7 @@
 
 	<field-set
 		name="search"
-		class="wbs.integrations.oxygen8.model.Oxygen8InboundLogSearch">
+		class="wbs.integrations.oxygenate.model.OxygenateInboundLogSearch">
 
 		<object-field
 			name="routeId"
@@ -66,7 +66,7 @@
 
 	<field-set
 		name="results"
-		object-name="oxygen8InboundLog">
+		object-name="oxygenateInboundLog">
 
 		<timestamp-field
 			name="timestamp"/>
@@ -85,7 +85,7 @@
 
 	<field-set
 		name="summary"
-		object-name="oxygen8InboundLog">
+		object-name="oxygenateInboundLog">
 
 		<id-field/>
 

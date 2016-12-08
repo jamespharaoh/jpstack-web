@@ -1,30 +1,30 @@
 <console-module
-	name="oxygen8-report-code">
+	name="oxygenate-report-code">
 
 	<console-helper-provider
-		object-name="oxygen8ReportCode"
+		object-name="oxygenateReportCode"
 		view-priv="root:manage">
 
 		<priv-key
-			name="oxygen8ReportCode.manage"
+			name="oxygenateReportCode.manage"
 			priv="root:manage"/>
 
 		<context-stuff
-			name="oxygen8ReportCodeName"
+			name="oxygenateReportCodeName"
 			field="code"/>
 
 		<context-stuff
-			name="oxygen8ConfigId"
-			field="oxygen8Config.id"/>
+			name="oxygenateConfigId"
+			field="oxygenateConfig.id"/>
 
 		<run-post-processor
-			name="oxygen8Config"/>
+			name="oxygenateConfig"/>
 
 	</console-helper-provider>
 
 	<object-context
-		name="oxygen8ReportCode"
-		object-name="oxygen8ReportCode">
+		name="oxygenateReportCode"
+		object-name="oxygenateReportCode">
 
 		<list>
 
@@ -54,7 +54,7 @@
 
 	<field-set
 		name="list"
-		object-name="oxygen8ReportCode">
+		object-name="oxygenateReportCode">
 
 		<code-field/>
 		<description-field/>
@@ -66,7 +66,7 @@
 
 	<field-set
 		name="create"
-		object-name="oxygen8ReportCode">
+		object-name="oxygenateReportCode">
 
 		<code-field pattern=".+"/>
 		<description-field/>
@@ -81,7 +81,7 @@
 
 	<field-set
 		name="summary"
-		object-name="oxygen8ReportCode">
+		object-name="oxygenateReportCode">
 
 		<id-field/>
 		<parent-field/>
@@ -98,7 +98,7 @@
 
 	<field-set
 		name="settings"
-		object-name="oxygen8ReportCode">
+		object-name="oxygenateReportCode">
 
 		<code-field pattern=".+"/>
 		<description-field/>

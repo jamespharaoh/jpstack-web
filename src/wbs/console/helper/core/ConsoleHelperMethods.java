@@ -72,6 +72,8 @@ interface ConsoleHelperMethods <
 			TaskLogger parentTaskLogger,
 			RecordType object);
 
+	Optional <RecordType> findFromContext ();
+
 	RecordType findFromContextRequired ();
 
 	void writeHtml (

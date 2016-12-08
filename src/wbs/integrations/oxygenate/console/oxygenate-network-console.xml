@@ -1,30 +1,30 @@
 <console-module
-	name="oxygen8-network">
+	name="oxygenate-network">
 
 	<console-helper-provider
-		object-name="oxygen8Network"
+		object-name="oxygenateNetwork"
 		view-priv="root:manage">
 
 		<priv-key
-			name="oxygen8Network.manage"
+			name="oxygenateNetwork.manage"
 			priv="root:manage"/>
 
 		<context-stuff
-			name="oxygen8NetworkName"
+			name="oxygenateNetworkName"
 			field="network.name"/>
 
 		<context-stuff
-			name="oxygen8ConfigId"
-			field="oxygen8Config.id"/>
+			name="oxygenateConfigId"
+			field="oxygenateConfig.id"/>
 
 		<run-post-processor
-			name="oxygen8Config"/>
+			name="oxygenateConfig"/>
 
 	</console-helper-provider>
 
 	<object-context
-		name="oxygen8Network"
-		object-name="oxygen8Network">
+		name="oxygenateNetwork"
+		object-name="oxygenateNetwork">
 
 		<list>
 
@@ -54,7 +54,7 @@
 
 	<field-set
 		name="list"
-		object-name="oxygen8Network">
+		object-name="oxygenateNetwork">
 
 		<object-field
 			name="network"
@@ -67,7 +67,7 @@
 
 	<field-set
 		name="create"
-		object-name="oxygen8Network">
+		object-name="oxygenateNetwork">
 
 		<object-field
 			name="network"
@@ -80,7 +80,7 @@
 
 	<field-set
 		name="summary"
-		object-name="oxygen8Network">
+		object-name="oxygenateNetwork">
 
 		<id-field/>
 		<parent-field/>
@@ -96,7 +96,7 @@
 
 	<field-set
 		name="settings"
-		object-name="oxygen8Network">
+		object-name="oxygenateNetwork">
 
 		<object-field
 			name="network"

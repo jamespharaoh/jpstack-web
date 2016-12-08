@@ -116,24 +116,33 @@ class ConsoleFormActionPart <FormState>
 
 		formActionHelper.writePreamble (
 			taskLogger,
-			formatWriter);
+			formatWriter,
+			isNotNull (
+				submitLabel));
 
 		// write form
 
-		formFieldLogic.outputFormTable (
-			taskLogger,
-			requestContext,
-			formatWriter,
-			formFields,
-			optionalAbsent (),
-			formState,
-			emptyMap (),
-			"post",
-			requestContext.resolveLocalUrl (
-				localFile),
-			submitLabel,
-			FormType.perform,
-			name);
+		if (
+			isNotNull (
+				submitLabel)
+		) {
+	
+			formFieldLogic.outputFormTable (
+				taskLogger,
+				requestContext,
+				formatWriter,
+				formFields,
+				optionalAbsent (),
+				formState,
+				emptyMap (),
+				"post",
+				requestContext.resolveLocalUrl (
+					localFile),
+				submitLabel,
+				FormType.perform,
+				name);
+
+		}
 
 	}
 

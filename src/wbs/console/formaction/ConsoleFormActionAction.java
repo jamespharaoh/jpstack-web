@@ -5,7 +5,6 @@ import javax.servlet.ServletException;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -76,33 +75,38 @@ class ConsoleFormActionAction <FormState>
 		FormState formState =
 			formActionHelper.constructFormState ();
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ContextFormActionAction.goReal ()",
-				this);
+		try (
 
-		formActionHelper.updatePassiveFormState (
-			formState);
+			Transaction transaction =
+				database.beginReadWrite (
+					"ContextFormActionAction.goReal ()",
+					this);
 
-		UpdateResultSet updateResultSet =
-			formFieldLogic.update (
-				requestContext,
-				fields,
-				formState,
-				ImmutableMap.of (),
-				name);
+		) {
 
-		if (updateResultSet.errorCount () > 0) {
-			return null;
-		}
-
-		Optional <Responder> responder =
-			formActionHelper.processFormSubmission (
-				transaction,
+			formActionHelper.updatePassiveFormState (
 				formState);
 
-		return responder.orNull ();
+			UpdateResultSet updateResultSet =
+				formFieldLogic.update (
+					requestContext,
+					fields,
+					formState,
+					ImmutableMap.of (),
+					name);
+
+			if (updateResultSet.errorCount () > 0) {
+				return null;
+			}
+
+			Optional <Responder> responder =
+				formActionHelper.processFormSubmission (
+					transaction,
+					formState);
+
+			return responder.orNull ();
+
+		}
 
 	}
 

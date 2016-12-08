@@ -1,7 +1,9 @@
 package wbs.console.formaction;
 
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalOrElse;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -18,6 +20,7 @@ import lombok.NonNull;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.context.ConsoleContextBuilderContainer;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
+import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleMetaManager;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.part.PagePartFactory;
@@ -191,12 +194,16 @@ class ContextTabFormActionsPageBuilder
 					actionHelper))
 
 			.formFields (
-				consoleModule.formFieldSetRequired (
-					ifNull (
-						actionSpec.fieldsName (),
-						stringFormat (
-							"%s-form",
-							actionSpec.name ()))))
+				ifNotNullThenElse (
+					actionSpec.fieldsName (),
+					() -> consoleModule.formFieldSetRequired (
+						actionSpec.fieldsName ()),
+					() -> optionalOrElse (
+						consoleModule.formFieldSet (
+							stringFormat (
+								"%s-form",
+								actionSpec.name ())),
+						() -> new FormFieldSet ())))
 
 			.heading (
 				capitalise (

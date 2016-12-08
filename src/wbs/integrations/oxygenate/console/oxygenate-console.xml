@@ -1,18 +1,18 @@
 <console-module
-	name="oxygen8">
+	name="oxygenate">
 
 	<simple-context
-		name="oxygen8">
+		name="oxygenate">
 
 		<priv-key
-			name="oxygen8.manage"
+			name="oxygenate.manage"
 			priv="root:manage"/>
 
 		<context-link
 			name="config"
-			link="oxygen8Config"
+			link="oxygenateConfig"
 			label="Configs"
-			priv-key="oxygen8.manage"/>
+			priv-key="oxygenate.manage"/>
 
 		<section
 			name="route"
@@ -20,15 +20,15 @@
 
 			<context-link
 				name="in"
-				link="oxygen8RouteIn"
+				link="oxygenateRouteIn"
 				label="Inbound routes routes"
-				priv-key="oxygen8.manage"/>
+				priv-key="oxygenate.manage"/>
 
 			<context-link
 				name="out"
-				link="oxygen8RouteOut"
+				link="oxygenateRouteOut"
 				label="Outbound routes"
-				priv-key="oxygen8.manage"/>
+				priv-key="oxygenate.manage"/>
 
 		</section>
 
@@ -38,9 +38,9 @@
 
 			<context-link
 				name="Inbound"
-				link="oxygen8InboundLog"
+				link="oxygenateInboundLog"
 				label="Inbound"
-				priv-key="oxygen8.manage"/>
+				priv-key="oxygenate.manage"/>
 
 		</section>
 

@@ -94,7 +94,12 @@ class DevopsScript
 				[
 					"cd #{@deployment_project_path}",
 					"ant console-deploy",
-					"sudo restart #{@config_services["console"]}",
+					[
+						"if status #{@config_services["console"]} | grep -q stop/",
+						"then sudo start #{@config_services["console"]}",
+						"else sudo restart #{@config_services["console"]}",
+						"fi",
+					].join("; "),
 				].join(" && ")
 
 		when "api-auto"

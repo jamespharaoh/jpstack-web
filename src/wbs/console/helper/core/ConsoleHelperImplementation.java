@@ -23,7 +23,6 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
-import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 import wbs.utils.string.FormatWriter;
@@ -119,6 +118,16 @@ class ConsoleHelperImplementation <
 		return consoleHelperProvider.canView (
 			parentTaskLogger,
 			object);
+
+	}
+
+	@Override
+	public
+	Optional <RecordType> findFromContext () {
+
+		return objectHelper.find (
+			requestContext.stuffInteger (
+				idKey ()));
 
 	}
 

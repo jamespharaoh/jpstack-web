@@ -98,7 +98,7 @@ class OxygenateSmsSendHelper
 	void verify () {
 
 		doNothing ();
-		
+
 	}
 
 	@Override
@@ -229,7 +229,7 @@ class OxygenateSmsSendHelper
 					() -> ""))
 
 		);
-		
+
 	}
 
 }

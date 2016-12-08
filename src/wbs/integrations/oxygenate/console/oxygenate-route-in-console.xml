@@ -1,27 +1,27 @@
 <console-module
-	name="oxygen8-route-in">
+	name="oxygenate-route-in">
 
 	<console-helper-provider
-		object-name="oxygen8RouteIn"
+		object-name="oxygenateRouteIn"
 		view-priv="root:manage">
 
 		<priv-key
-			name="oxygen8.manage"
+			name="oxygenate.manage"
 			priv="root:manage"/>
 
 		<priv-key
-			name="oxygen8RouteIn.manage"
+			name="oxygenateRouteIn.manage"
 			priv="root:manage"/>
 
 		<context-stuff
-			name="oxygen8RouteInName"
+			name="oxygenateRouteInName"
 			field="route.name"/>
 
 	</console-helper-provider>
 
 	<object-context
-		name="oxygen8RouteIn"
-		object-name="oxygen8RouteIn">
+		name="oxygenateRouteIn"
+		object-name="oxygenateRouteIn">
 
 		<list>
 
@@ -49,14 +49,14 @@
 
 	<field-set
 		name="list"
-		object-name="oxygen8RouteIn">
+		object-name="oxygenateRouteIn">
 
 		<parent-field/>
 
 		<object-field
-			name="oxygen8Config"
+			name="oxygenateConfig"
 			label="Config"
-			object-type="oxygen8Config"/>
+			object-type="oxygenateConfig"/>
 
 		<enum-field
 			name="type"/>
@@ -65,13 +65,13 @@
 
 	<field-set
 		name="create"
-		object-name="oxygen8RouteIn">
+		object-name="oxygenateRouteIn">
 
 		<parent-field/>
 
 		<object-field
-			name="oxygen8Config"
-			object-type="oxygen8Config"/>
+			name="oxygenateConfig"
+			object-type="oxygenateConfig"/>
 
 		<enum-field
 			name="type"/>
@@ -80,14 +80,14 @@
 
 	<field-set
 		name="summary"
-		object-name="oxygen8RouteIn">
+		object-name="oxygenateRouteIn">
 
 		<id-field/>
 		<parent-field/>
 
 		<object-field
-			name="oxygen8Config"
-			object-type="oxygen8Config"/>
+			name="oxygenateConfig"
+			object-type="oxygenateConfig"/>
 
 		<enum-field
 			name="type"/>
@@ -96,13 +96,13 @@
 
 	<field-set
 		name="settings"
-		object-name="oxygen8RouteIn">
+		object-name="oxygenateRouteIn">
 
 		<parent-field/>
 
 		<object-field
-			name="oxygen8Config"
-			object-type="oxygen8Config"/>
+			name="oxygenateConfig"
+			object-type="oxygenateConfig"/>
 
 		<enum-field
 			name="type"/>

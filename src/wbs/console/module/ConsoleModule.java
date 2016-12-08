@@ -1,5 +1,6 @@
 package wbs.console.module;
 
+import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -8,6 +9,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import javax.inject.Provider;
+
+import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
@@ -47,6 +50,16 @@ interface ConsoleModule
 	Map <String, SupervisorConfig> supervisorConfigs ();
 
 	// implementation
+
+	default
+	Optional <FormFieldSet <?>> formFieldSet (
+			@NonNull String name) {
+
+		return mapItemForKey (
+			formFieldSets (),
+			name);
+
+	}
 
 	default
 	FormFieldSet <?> formFieldSetRequired (

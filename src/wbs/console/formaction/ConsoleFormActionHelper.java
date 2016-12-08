@@ -14,6 +14,8 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
 
@@ -25,16 +27,19 @@ public
 interface ConsoleFormActionHelper <FormState> {
 
 	default
-	Boolean canBePerformed () {
+	Pair <Boolean, Boolean> canBePerformed () {
 
-		return true;
+		return Pair.of (
+			true,
+			true);
 
 	}
 
 	default
 	void writePreamble (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull FormatWriter formatWriter) {
+			@NonNull FormatWriter formatWriter,
+			@NonNull Boolean submit) {
 
 		doNothing ();
 

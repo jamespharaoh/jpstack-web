@@ -1,7 +1,9 @@
 package wbs.console.formaction;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.etc.TypeUtils.genericCastUncheckedNullSafe;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 
 import java.util.List;
@@ -14,6 +16,8 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.console.part.PagePart;
@@ -65,33 +69,42 @@ class ConsoleFormActionsPart
 		pageParts =
 			formActions.stream ()
 
-			.filter (
-				formAction ->
-					formAction.helper ().canBePerformed ())
-
 			.map (
 				formAction ->
+					Pair.of (
+						formAction.helper ().canBePerformed (),
+						formAction))
+
+			.filter (
+				showSubmitFormAction ->
+					showSubmitFormAction.getLeft ().getLeft ())
+
+			.map (
+				showSubmitFormAction ->
 					consoleFormActionPartProvider.get ()
 
 				.name (
-					formAction.name ())
+					showSubmitFormAction.getRight ().name ())
 
 				.formActionHelper (
 					genericCastUnchecked (
-						formAction.helper ()))
+						showSubmitFormAction.getRight ().helper ()))
 
 				.formFields (
-					genericCastUnchecked (
-						formAction.formFields))
+					genericCastUncheckedNullSafe (
+						showSubmitFormAction.getRight ().formFields ()))
 
 				.heading (
-					formAction.heading ())
+					showSubmitFormAction.getRight ().heading ())
 
 				.helpText (
-					formAction.helpText ())
+					showSubmitFormAction.getRight ().helpText ())
 
 				.submitLabel (
-					formAction.submitLabel ())
+					ifThenElse (
+						showSubmitFormAction.getLeft ().getRight (),
+						() -> showSubmitFormAction.getRight ().submitLabel (),
+						() -> null))
 
 				.localFile (
 					localFile)
