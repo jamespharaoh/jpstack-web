@@ -587,4 +587,14 @@ class TypeUtils {
 
 	}
 
+	@SuppressWarnings ("unchecked")
+	public static <ToClass>
+	ToClass genericCastUncheckedNullSafe (
+			Object object) {
+
+		return (ToClass)
+			object;
+
+	}
+
 }
