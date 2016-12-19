@@ -8,6 +8,7 @@ import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.collection.CollectionUtils.listThirdElement;
 import static wbs.utils.collection.CollectionUtils.singletonList;
 import static wbs.utils.etc.Misc.doNothing;
+import static wbs.utils.etc.NumberUtils.integerRangeAsSet;
 import static wbs.utils.etc.OptionalUtils.optionalOrElse;
 import static wbs.utils.string.StringUtils.joinWithSemicolonAndSpace;
 import static wbs.utils.string.StringUtils.stringSplitNewline;
@@ -15,6 +16,7 @@ import static wbs.web.utils.UrlUtils.urlEncodeParameters;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -71,6 +73,22 @@ class OxygenateSmsSendHelper
 	public
 	String url () {
 		return request.relayUrl ();
+	}
+
+	// details
+
+	public final static
+	Set <Long> validStatusCodes =
+		integerRangeAsSet (
+			200l,
+			600l);
+
+	@Override
+	public
+	Set <Long> validStatusCodes () {
+
+		return validStatusCodes;
+
 	}
 
 	// public implementation
