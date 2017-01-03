@@ -394,7 +394,7 @@ interface ObjectManagerMethods {
 
 	// object helpers
 
-	List<ObjectHelper<?>> objectHelpers ();
+	List <ObjectHelper <?>> objectHelpers ();
 
 	ObjectHelper <?> objectHelperForObjectNameRequired (
 			String objectName);

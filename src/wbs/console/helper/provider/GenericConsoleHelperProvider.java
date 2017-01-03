@@ -126,7 +126,7 @@ class GenericConsoleHelperProvider <
 
 	// state
 
-	List<PrivKeySpec> viewPrivKeySpecs;
+	List <PrivKeySpec> viewPrivKeySpecs;
 
 	// init
 
