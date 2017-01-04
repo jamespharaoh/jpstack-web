@@ -106,7 +106,7 @@ public
 class ChatMonitorInboxSummaryPart
 	extends AbstractPagePart {
 
-	// singleont dependencies
+	// singleton dependencies
 
 	@SingletonDependency
 	ChatContactNoteObjectHelper chatContactNoteHelper;
@@ -486,31 +486,41 @@ class ChatMonitorInboxSummaryPart
 
 		htmlTableCellWriteFormat (
 			"%s %s (%s)",
+
 			ifNotNullThenElseEmDash (
 				monitorChatUser.getOrient (),
 				() -> enumName (
 					monitorChatUser.getOrient ())),
+
 			ifNotNullThenElseEmDash (
 				monitorChatUser.getGender (),
 				() -> enumName (
 					monitorChatUser.getGender ())),
+
 			ifNotNullThenElseEmDash (
 				monitorChatUser.getCategory (),
-				() -> monitorChatUser.getCategory ().getName ()));
+				() -> monitorChatUser.getCategory ().getName ())
+
+		);
 
 		htmlTableCellWriteFormat (
 			"%s %s (%s)",
+
 			ifNotNullThenElseEmDash (
 				userChatUser.getOrient (),
 				() -> enumName (
 					userChatUser.getOrient ())),
+
 			ifNotNullThenElseEmDash (
 				userChatUser.getGender (),
 				() -> enumName (
-					userChatUser.getOrient ())),
+					userChatUser.getGender ())),
+
 			ifNotNullThenElseEmDash (
 				userChatUser.getCategory (),
-				() -> userChatUser.getCategory ().getName ()));
+				() -> userChatUser.getCategory ().getName ())
+
+		);
 
 		htmlTableRowClose ();
 
