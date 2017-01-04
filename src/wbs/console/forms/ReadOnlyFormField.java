@@ -9,6 +9,7 @@ import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.ResultUtils.resultValueRequired;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitColon;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
@@ -45,8 +46,6 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
-
-import fj.data.Either;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("readOnlyFormField")
@@ -419,7 +418,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 					nativeValue));
 
 		Optional <String> csvValueOptional =
-			requiredSuccess (
+			resultValueRequired (
 				csvMapping.genericToInterface (
 					container,
 					hints,
@@ -445,13 +444,6 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			"\"%s\"",
 			csvValue.replace ("\"", "\"\""));
 
-	}
-
-	private Optional <String> requiredSuccess (
-			Either <Optional <String>, String> genericToInterface) {
-
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
