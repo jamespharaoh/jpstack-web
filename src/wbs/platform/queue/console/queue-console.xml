@@ -168,6 +168,11 @@
 			nullable="yes"/>
 
 		<object-field
+			name="claimedUserId"
+			object-type="user"
+			nullable="yes"/>
+
+		<object-field
 			name="processedUserId"
 			object-type="user"
 			nullable="yes"/>

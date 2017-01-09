@@ -22,6 +22,7 @@ class QueueItemSearch
 
 	TextualInterval createdTime;
 
+	Long claimedUserId;
 	Long processedUserId;
 
 	QueueItemState state;
