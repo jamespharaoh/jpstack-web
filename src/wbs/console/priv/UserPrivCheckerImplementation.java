@@ -66,7 +66,8 @@ class UserPrivCheckerImplementation
 
 		if (! consoleUserHelper.loggedIn ()) {
 
-			target = null;
+			target =
+				new NullUserPrivChecker ();
 
 		} else {
 
