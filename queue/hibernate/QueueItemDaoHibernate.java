@@ -63,6 +63,16 @@ class QueueItemDaoHibernate
 			.createAlias (
 				"_processedUser.slice",
 				"_processedUserSlice",
+				JoinType.LEFT_OUTER_JOIN)
+
+			.createAlias (
+				"_queueItem.queueItemClaim",
+				"_queueItemClaim",
+				JoinType.LEFT_OUTER_JOIN)
+
+			.createAlias (
+				"_queueItemClaim.user",
+				"_claimedUser",
 				JoinType.LEFT_OUTER_JOIN);
 
 		if (
@@ -127,6 +137,18 @@ class QueueItemDaoHibernate
 				Restrictions.lt (
 					"_queueItem.createdTime",
 					search.createdTime ().end ()));
+
+		}
+
+		if (
+			isNotNull (
+				search.claimedUserId ())
+		) {
+
+			criteria.add (
+				Restrictions.eq (
+					"_claimedUser.id",
+					search.claimedUserId ()));
 
 		}
 
