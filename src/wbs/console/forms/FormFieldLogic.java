@@ -47,10 +47,13 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.console.forms.FormField.UpdateResult;
+import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
@@ -67,6 +70,9 @@ class FormFieldLogic {
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	UserPrivChecker privChecker;
 
 	// public implementation
 
@@ -627,15 +633,27 @@ class FormFieldLogic {
 
 			}
 
-			formField.renderFormRow (
-				taskLogger,
-				submission,
-				htmlWriter,
-				object,
-				hints,
-				error,
-				formType,
-				formName);
+			try {
+
+				formField.renderFormRow (
+					taskLogger,
+					submission,
+					htmlWriter,
+					object,
+					hints,
+					error,
+					formType,
+					formName);
+
+			} catch (Exception exception) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Error rendering field %s",
+						formField.name ()),
+					exception);
+
+			}
 
 		}
 
@@ -702,7 +720,7 @@ class FormFieldLogic {
 	void outputFormTable (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
-			@NonNull FormatWriter htmlWriter,
+			@NonNull FormatWriter formatWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Optional <UpdateResultSet> updateResultSet,
 			@NonNull Object object,
@@ -718,6 +736,13 @@ class FormFieldLogic {
 				parentTaskLogger,
 				"outputFormTable");
 
+		outputFormDebug (
+			taskLogger,
+			formatWriter,
+			formFieldSet,
+			object,
+			hints);
+
 		String enctype = (
 			(BooleanSupplier)
 			() -> {
@@ -732,12 +757,12 @@ class FormFieldLogic {
 			: "application/x-www-form-urlencoded";
 
 		htmlFormOpenMethodActionEncoding (
-			htmlWriter,
+			formatWriter,
 			method,
 			actionUrl,
 			enctype);
 
-		htmlWriter.writeLineFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"hidden\"",
 			" name=\"form.name\"",
@@ -746,12 +771,12 @@ class FormFieldLogic {
 			">");
 
 		htmlTableOpenDetails (
-			htmlWriter);
+			formatWriter);
 
 		outputFormRows (
 			taskLogger,
 			submission,
-			htmlWriter,
+			formatWriter,
 			formFieldSet,
 			updateResultSet,
 			object,
@@ -760,12 +785,12 @@ class FormFieldLogic {
 			formName);
 
 		htmlTableClose (
-			htmlWriter);
+			formatWriter);
 
 		htmlParagraphOpen (
-			htmlWriter);
+			formatWriter);
 
-		htmlWriter.writeLineFormat (
+		formatWriter.writeLineFormat (
 			"<input",
 			" type=\"submit\"",
 			" value=\"%h\"",
@@ -1033,6 +1058,54 @@ class FormFieldLogic {
 				htmlWriter);
 
 		}
+
+	}
+
+	public <Container>
+	void outputFormDebug (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FormatWriter formatWriter,
+			@NonNull FormFieldSet formFieldSet,
+			@NonNull Container object,
+			@NonNull Map <String, Object> hints) {
+
+		if (
+			! privChecker.canSimple (
+				GlobalId.root,
+				"debug")
+		) {
+			return;
+		}
+
+		// open comment
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"<!--");
+
+		// hints
+
+		formatWriter.writeNewline ();
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"Hints");
+
+		formatWriter.writeNewline ();
+
+		hints.entrySet ().forEach (
+			hintEntry ->
+				formatWriter.writeLineFormat (
+					"%s = %s",
+					hintEntry.getKey (),
+					hintEntry.getValue ().toString ()));
+
+		formatWriter.decreaseIndent ();
+
+		// close comment
+
+		formatWriter.writeNewline ();
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"-->");
 
 	}
 

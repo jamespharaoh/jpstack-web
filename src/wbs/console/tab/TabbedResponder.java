@@ -441,7 +441,7 @@ class TabbedResponder
 				"Unable to show page contents.");
 
 			if (
-				privChecker.canRecursive (
+				privChecker.canSimple (
 					GlobalId.root,
 					"debug")
 			) {

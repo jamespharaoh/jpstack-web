@@ -129,15 +129,30 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 
 		Optional <Record <?>> root;
 
-		if (rootFieldName != null) {
+		if (
+			isNotNull (
+				rootFieldName)
+		) {
 
 			root =
-				optionalOf (
-					(Record <?>)
-					objectManager.dereferenceObsolete (
+				genericCastUnchecked (
+					objectManager.dereference (
 						container,
 						rootFieldName,
 						hints));
+
+			if (
+				optionalIsNotPresent (
+					root)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Failed to look up root for %s: %s",
+						name (),
+						rootFieldName));
+
+			}
 
 		} else {
 

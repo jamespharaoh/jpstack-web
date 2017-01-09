@@ -10,7 +10,7 @@
 
 		<context-stuff
 			name="chatSchemeId"
-			field="chatSCheme:id"/>
+			field="chatScheme:id"/>
 
 		<priv-key
 			name="chatAffiliate.manage"

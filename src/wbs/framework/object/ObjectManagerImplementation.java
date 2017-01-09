@@ -1,6 +1,9 @@
 package wbs.framework.object;
 
+import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
+import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.CollectionUtils.listSlice;
 import static wbs.utils.collection.CollectionUtils.listSliceAllButFirstItemRequired;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
@@ -10,6 +13,7 @@ import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.NumberUtils.notMoreThan;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -26,6 +30,7 @@ import static wbs.utils.etc.ResultUtils.resultValueRequired;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isSubclassOf;
+import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringInSafe;
@@ -742,60 +747,92 @@ class ObjectManagerImplementation
 		Object currentObject =
 			startingObject;
 
-		// check hints and global values
-
 		List <String> pathParts =
 			stringSplitFullStop (
 				path);
 
-		String firstPathPart =
-			listFirstElementRequired (
-				pathParts);
+		// check hints
+
+		for (
+			long numParts = 1l;
+			notMoreThan (
+				numParts,
+				collectionSize (
+					pathParts));
+			numParts ++
+		) {
+
+			String pathPrefix =
+				joinWithFullStop (
+					listSlice (
+						pathParts,
+						0,
+						numParts));
+
+			if (
+				mapContainsKey (
+					hints,
+					pathPrefix)
+			) {
+
+				// found in hints
+	
+				currentObject =
+					mapItemForKeyRequired (
+						hints,
+						pathPrefix);
+
+				pathParts =
+					listSlice (
+						pathParts,
+						numParts,
+						collectionSize (
+							pathParts));
+
+			}
+
+		}
+
+		// check global values
 
 		if (
-			stringEqualSafe (
-				firstPathPart,
-				"root")
+			collectionIsNotEmpty (
+				pathParts)
 		) {
 
-			// root
-
-			currentObject =
-				rootObjectHelper.findRequired (
-					0l);
-
-			pathParts =
-				listSliceAllButFirstItemRequired (
+			String firstPathPart =
+				listFirstElementRequired (
 					pathParts);
-
-		} else if (
-			stringEqualSafe (
-				firstPathPart,
-				"this")
-		) {
-
-			// same object
-
-			pathParts =
-				listSliceAllButFirstItemRequired (
-					pathParts);
-
-		} else if (
-			mapContainsKey (
-				hints,
-				firstPathPart)
-		) {
-
-			// found in hints
-
-			currentObject =
-				mapItemForKeyRequired (
-					hints,
-					firstPathPart);
-
-			pathParts =
-				listSliceAllButFirstItemRequired (
-					pathParts);
+	
+			if (
+				stringEqualSafe (
+					firstPathPart,
+					"root")
+			) {
+	
+				// root
+	
+				currentObject =
+					rootObjectHelper.findRequired (
+						0l);
+	
+				pathParts =
+					listSliceAllButFirstItemRequired (
+						pathParts);
+	
+			} else if (
+				stringEqualSafe (
+					firstPathPart,
+					"this")
+			) {
+	
+				// same object
+	
+				pathParts =
+					listSliceAllButFirstItemRequired (
+						pathParts);
+	
+			}
 
 		}
 
