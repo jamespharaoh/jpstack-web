@@ -205,7 +205,7 @@ class ObjectCreatePart <
 
 		Long grandParentId =
 			requestContext.stuffInteger (
-				grandParentHelper.objectName () + "Id");
+				grandParentHelper.idKey ());
 
 		if (grandParentId != null) {
 
@@ -219,7 +219,7 @@ class ObjectCreatePart <
 
 			// set grandparent hints
 
-			Record<?> grandparent =
+			Record <?> grandparent =
 				grandParentHelper.findRequired (
 					grandParentId);
 
