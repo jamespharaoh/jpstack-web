@@ -6,6 +6,7 @@ import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -29,6 +30,7 @@ import org.apache.commons.compress.utils.IOUtils;
 
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -151,6 +153,27 @@ class GenericHttpSender <
 		httpPost =
 			new HttpPost (
 				helper.url ());
+
+		// configure request
+
+		httpPost.setConfig (
+			RequestConfig.custom ()
+
+			.setConnectionRequestTimeout (
+				toJavaIntegerRequired (
+					helper.connectionRequestTimeout ().getMillis ()))
+
+			.setConnectTimeout (
+				toJavaIntegerRequired (
+					helper.connectTimeout ().getMillis ()))
+
+			.setSocketTimeout (
+				toJavaIntegerRequired (
+					helper.socketTimeout ().getMillis ()))
+
+			.build ()
+
+		);
 
 		// convert to binary representation
 

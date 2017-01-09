@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.joda.time.Duration;
+
 public
 interface GenericHttpSenderHelper <
 	RequestType,
@@ -40,9 +42,22 @@ interface GenericHttpSenderHelper <
 
 	default
 	Set <Long> validStatusCodes () {
-
 		return validStatusCodesDefault;
+	}
 
+	default
+	Duration connectionRequestTimeout () {
+		return Duration.standardSeconds (10);
+	}
+
+	default
+	Duration connectTimeout () {
+		return Duration.standardSeconds (10);
+	}
+
+	default
+	Duration socketTimeout () {
+		return Duration.standardSeconds (10);
 	}
 
 	// response information setters
