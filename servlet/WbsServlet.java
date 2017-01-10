@@ -77,7 +77,8 @@ class WbsServlet
 
 		TaskLogger taskLogger =
 			logContext.createTaskLogger (
-				"doGet");
+				"doGet",
+				false);
 
 		try {
 
