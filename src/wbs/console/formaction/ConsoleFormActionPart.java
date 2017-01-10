@@ -126,7 +126,7 @@ class ConsoleFormActionPart <FormState>
 			isNotNull (
 				submitLabel)
 		) {
-	
+
 			formFieldLogic.outputFormTable (
 				taskLogger,
 				requestContext,

@@ -22,11 +22,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
-import lombok.experimental.Accessors;
 
-import wbs.utils.string.FormatWriter;
-
-@Accessors (fluent = true)
 public
 class TaskLogger
 	implements TaskLogEvent {
@@ -47,6 +43,9 @@ class TaskLogger
 
 	private final
 	long nesting;
+
+	private final
+	Boolean debugEnabled;
 
 	LogSeverity severity =
 		LogSeverity.notice;
@@ -72,20 +71,11 @@ class TaskLogger
 			@NonNull Optional <TaskLogger> parentOptional,
 			@NonNull LogTarget logTarget,
 			@NonNull String staticContext,
-			@NonNull String dynamicContext) {
+			@NonNull String dynamicContext,
+			@NonNull Optional <Boolean> debugEnabled) {
 
 		this.parentOptional =
 			parentOptional;
-
-		if (
-			optionalIsPresent (
-				parentOptional)
-		) {
-
-			parentOptional.get ().events.add (
-				this);
-
-		}
 
 		this.nesting =
 			optionalMapRequiredOrDefault (
@@ -103,50 +93,43 @@ class TaskLogger
 		this.dynamicContext =
 			dynamicContext;
 
-	}
+		if (
+			optionalIsPresent (
+				debugEnabled)
+		) {
 
-	public
-	TaskLogger (
-			@NonNull TaskLogger parent,
-			@NonNull LogTarget logTarget,
-			@NonNull String staticContext,
-			@NonNull String dynamicContext) {
+			this.debugEnabled =
+				optionalGetRequired (
+					debugEnabled);
 
-		this (
-			optionalOf (
-				parent),
-			logTarget,
-			staticContext,
-			dynamicContext);
+		} else {
 
-	}
+			this.debugEnabled = (
 
-	public
-	TaskLogger (
-			@NonNull LogTarget logTarget,
-			@NonNull String staticContext,
-			@NonNull String dynamicContext) {
+				logTarget.debugEnabled ()
 
-		this (
-			optionalAbsent (),
-			logTarget,
-			staticContext,
-			dynamicContext);
+				&& optionalMapRequiredOrDefault (
+					TaskLogger::debugEnabled,
+					parentOptional,
+					true)
 
-	}
+			);
 
-	public
-	TaskLogger (
-			@NonNull FormatWriter formatWriter,
-			@NonNull String staticContext,
-			@NonNull String dynamicContext) {
+		}
 
-		this (
-			optionalAbsent (),
-			new FormatWriterLogTarget (
-				formatWriter),
-			staticContext,
-			dynamicContext);
+		if (
+
+			this.debugEnabled
+
+			&& optionalIsPresent (
+				parentOptional)
+
+		) {
+
+			parentOptional.get ().events.add (
+				this);
+
+		}
 
 	}
 
@@ -575,7 +558,7 @@ class TaskLogger
 
 	public
 	boolean debugEnabled () {
-		return logTarget.debugEnabled ();
+		return debugEnabled;
 	}
 
 	// private implementation
@@ -583,11 +566,15 @@ class TaskLogger
 	private
 	void writeFirstError () {
 
+		// recurse up through parents
+
 		if (
 			optionalIsPresent (
 				parentOptional)
 		) {
+
 			parentOptional.get ().writeFirstError ();
+
 		}
 
 		if (
@@ -599,6 +586,24 @@ class TaskLogger
 				firstError)
 
 		) {
+
+			// add to parent if we didn't already
+
+			if (
+
+				optionalIsPresent (
+					parentOptional)
+
+				&& ! debugEnabled
+
+			) {
+
+				parentOptional.get ().events.add (
+					this);
+
+			}
+
+			// write first error
 
 			logTarget.writeToLog (
 				LogSeverity.error,

@@ -776,7 +776,7 @@ class ObjectManagerImplementation
 			) {
 
 				// found in hints
-	
+
 				currentObject =
 					mapItemForKeyRequired (
 						hints,
@@ -803,35 +803,35 @@ class ObjectManagerImplementation
 			String firstPathPart =
 				listFirstElementRequired (
 					pathParts);
-	
+
 			if (
 				stringEqualSafe (
 					firstPathPart,
 					"root")
 			) {
-	
+
 				// root
-	
+
 				currentObject =
 					rootObjectHelper.findRequired (
 						0l);
-	
+
 				pathParts =
 					listSliceAllButFirstItemRequired (
 						pathParts);
-	
+
 			} else if (
 				stringEqualSafe (
 					firstPathPart,
 					"this")
 			) {
-	
+
 				// same object
-	
+
 				pathParts =
 					listSliceAllButFirstItemRequired (
 						pathParts);
-	
+
 			}
 
 		}

@@ -1,5 +1,6 @@
 package wbs.framework.logging;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormatArray;
 
@@ -11,21 +12,58 @@ public
 interface LogContext {
 
 	TaskLogger createTaskLogger (
-			String dynamicContext);
+			String dynamicContext,
+			Optional <Boolean> debugEnabled);
+
+	default
+	TaskLogger createTaskLogger (
+			String dynamicContext) {
+
+		return createTaskLogger (
+			dynamicContext,
+			optionalAbsent ());
+
+	}
+
+	default
+	TaskLogger createTaskLogger (
+			@NonNull String dynamicContext,
+			@NonNull Boolean debugEnabled) {
+
+		return createTaskLogger (
+			dynamicContext,
+			optionalOf (
+				debugEnabled));
+
+	}
 
 	TaskLogger nestTaskLogger (
 			Optional <TaskLogger> parent,
-			String dynamicContext);
+			String dynamicContext,
+			Optional <Boolean> debugEnabled);
 
 	default
 	TaskLogger nestTaskLogger (
-			@NonNull TaskLogger parent,
-			@NonNull String dynamicContext) {
+			Optional <TaskLogger> parent,
+			String dynamicContext) {
+
+		return nestTaskLogger (
+			parent,
+			dynamicContext,
+			optionalAbsent ());
+
+	}
+
+	default
+	TaskLogger nestTaskLogger (
+			TaskLogger parent,
+			String dynamicContext) {
 
 		return nestTaskLogger (
 			optionalOf (
 				parent),
-			dynamicContext);
+			dynamicContext,
+			optionalAbsent ());
 
 	}
 
@@ -35,9 +73,11 @@ interface LogContext {
 			@NonNull String ... dynamicContextArguments) {
 
 		return nestTaskLogger (
-			parent,
+			optionalOf (
+				parent),
 			stringFormatArray (
-				dynamicContextArguments));
+				dynamicContextArguments),
+			optionalAbsent ());
 
 	}
 

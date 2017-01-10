@@ -99,7 +99,7 @@ class NullUserPrivChecker
 			@NonNull TaskLogger taskLogger) {
 
 		doNothing ();
-		
+
 	}
 
 }
