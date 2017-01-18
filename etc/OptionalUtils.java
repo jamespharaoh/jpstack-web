@@ -710,6 +710,15 @@ class OptionalUtils {
 
 	}
 
+	public static
+	String optionalOrEmptyString (
+			Optional <String> optional) {
+
+		return optional.or (
+			"");
+
+	}
+
 	@SafeVarargs
 	public static <Type>
 	Type ifNotPresent (
@@ -854,7 +863,7 @@ class OptionalUtils {
 	public static <From,To>
 	Optional<To> optionalMapRequired (
 			@NonNull Optional <From> optionalValue,
-			@NonNull Function<? super From,To> mappingFunction) {
+			@NonNull Function <? super From, To> mappingFunction) {
 
 		if (
 			optionalIsPresent (

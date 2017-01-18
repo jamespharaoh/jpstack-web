@@ -198,6 +198,29 @@ class CollectionUtils {
 	}
 
 	public static <Type>
+	Optional <Type> listFirstElement (
+			@NonNull List <Type> list) {
+
+		if (list.size () < 1) {
+			return optionalAbsent ();
+		}
+
+		Type value =
+			list.get (0);
+
+		if (
+			isNull (
+				value)
+		) {
+			throw new NullPointerException ();
+		}
+
+		return optionalOf (
+			value);
+
+	}
+
+	public static <Type>
 	Type listFirstElementRequired (
 			@NonNull List <Type> list) {
 

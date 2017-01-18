@@ -4,6 +4,7 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -247,6 +248,21 @@ class MapUtils {
 		}
 
 		return builder.build ();
+
+	}
+
+	public static <KeyType, ValueType>
+	Map <KeyType, ValueType> mapWithDerivedKey (
+			@NonNull ValueType [] values,
+			@NonNull Function <
+				? super ValueType,
+				? extends KeyType
+			> keyFunction) {
+
+		return mapWithDerivedKey (
+			Arrays.asList (
+				values),
+			keyFunction);
 
 	}
 

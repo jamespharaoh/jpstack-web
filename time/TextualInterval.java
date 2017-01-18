@@ -1,13 +1,28 @@
 package wbs.utils.time;
 
+import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveThreeElements;
+import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveTwoElements;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
+import static wbs.utils.collection.CollectionUtils.listThirdElementRequired;
+import static wbs.utils.etc.Misc.stringTrim;
+import static wbs.utils.etc.NumberUtils.lessThanOne;
+import static wbs.utils.etc.NumberUtils.parseInteger;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.lowercase;
+import static wbs.utils.string.StringUtils.stringContains;
+import static wbs.utils.string.StringUtils.stringEndsWithSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringInSafe;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.utils.string.StringUtils.stringSplitSimple;
+import static wbs.utils.string.StringUtils.stringSplitSpace;
+import static wbs.utils.string.StringUtils.stringStartsWithSimple;
 import static wbs.utils.time.TimeUtils.millisToInstant;
 
 import java.util.List;
@@ -79,40 +94,134 @@ class TextualInterval {
 
 	public static
 	boolean valid (
-			@NonNull String string) {
+			@NonNull String originalString) {
 
-		List <String> parts =
-			stringSplitSimple (
+		String string =
+			stringTrim (
+				originalString);
+
+		if (
+			stringContains (
 				" to ",
-				string);
+				string)
+		) {
 
-		if (parts.size () == 1) {
+			List <String> parts =
+				stringSplitSimple (
+					" to ",
+					string);
 
-			return validPartial (
-				string.trim ());
-
-		} else if (parts.size () == 2) {
+			if (
+				collectionDoesNotHaveTwoElements (
+					parts)
+			) {
+				return false;
+			}
 
 			return (
 
 				validPartial (
-					parts.get (0).trim ())
+					stringTrim (
+						listFirstElementRequired (
+							parts)))
 
 				&& validPartial (
-					parts.get (1).trim ())
+					stringTrim (
+						listSecondElementRequired (
+							parts)))
 
 			);
 
+		} else if (
+			stringStartsWithSimple (
+				"last ",
+				string)
+		) {
+
+			if (
+
+				stringEndsWithSimple (
+					" years",
+					string)
+
+				|| stringEndsWithSimple (
+					" months",
+					string)
+
+				|| stringEndsWithSimple (
+					" days",
+					string)
+
+				|| stringEndsWithSimple (
+					" hours",
+					string)
+
+				|| stringEndsWithSimple (
+					" minutes",
+					string)
+
+				|| stringEndsWithSimple (
+					" seconds",
+					string)
+
+			) {
+
+				List <String> parts =
+					stringSplitSpace (
+						string);
+
+				if (
+					collectionDoesNotHaveThreeElements (
+						parts)
+				) {
+					return false;
+				}
+
+				String numericPart =
+					listSecondElementRequired (
+						parts);
+
+				Optional <Long> numberOptional =
+					parseInteger (
+						numericPart);
+
+				if (
+					optionalIsNotPresent (
+						numberOptional)
+				) {
+					return false;
+				}
+
+				Long number =
+					optionalGetRequired (
+						numberOptional);
+
+				if (
+					lessThanOne (
+						number)
+				) {
+					return false;
+				}
+
+				return true;
+
+			} else {
+
+				return false;
+
+			}
+
 		} else {
 
-			return false;
+			return validPartial (
+				string);
 
 		}
 
 	}
 
 	public static
-	Optional<Pair<Interval,String>> parsePartialSymbolic (
+	Optional <Pair <Interval, String>> parsePartialSymbolic (
 			@NonNull DateTimeZone timezone,
 			@NonNull String string,
 			@NonNull Long hourOffset) {
@@ -228,6 +337,161 @@ class TextualInterval {
 		}
 
 		return Optional.absent ();
+
+	}
+
+	public static
+	Optional <TextualInterval> parseRecent (
+			@NonNull DateTimeZone timezone,
+			@NonNull String string) {
+
+		List <String> parts =
+			stringSplitSpace (
+				stringTrim (
+					string));
+
+		if (
+			collectionDoesNotHaveThreeElements (
+				parts)
+		) {
+			return optionalAbsent ();
+		}
+
+		if (
+			stringNotEqualSafe (
+				"last",
+				listFirstElementRequired (
+					parts))
+		) {
+			return optionalAbsent ();
+		}
+
+		String numericPart =
+			listSecondElementRequired (
+				parts);
+
+		Optional <Long> numberOptional =
+			parseInteger (
+				numericPart);
+
+		if (
+			optionalIsNotPresent (
+				numberOptional)
+		) {
+			return optionalAbsent ();
+		}
+
+		Long number =
+			optionalGetRequired (
+				numberOptional);
+
+		if (
+			lessThanOne (
+				number)
+		) {
+			return optionalAbsent ();
+		}
+
+		String unitPart =
+			listThirdElementRequired (
+				parts);
+
+		DateTime now =
+			DateTime.now (
+				timezone);
+
+		DateTime start;
+
+		if (
+			stringInSafe (
+				unitPart,
+				"year",
+				"years")
+		) {
+
+			start =
+				now.toDateTime ().minusYears (
+					toJavaIntegerRequired (
+						number));
+
+		} else if (
+			stringInSafe (
+				unitPart,
+				"month",
+				"months")
+		) {
+
+			start =
+				now.toDateTime ().minusMonths (
+					toJavaIntegerRequired (
+						number));
+
+		} else if (
+			stringInSafe (
+				unitPart,
+				"day",
+				"days")
+		) {
+
+			start =
+				now.toDateTime ().minusDays (
+					toJavaIntegerRequired (
+						number));
+
+		} else if (
+			stringInSafe (
+				unitPart,
+				"hour",
+				"hours")
+		) {
+
+			start =
+				now.toDateTime ().minusHours (
+					toJavaIntegerRequired (
+						number));
+
+		} else if (
+			stringInSafe (
+				unitPart,
+				"minute",
+				"minutes")
+		) {
+
+			start =
+				now.toDateTime ().minusMinutes (
+					toJavaIntegerRequired (
+						number));
+
+		} else if (
+			stringInSafe (
+				unitPart,
+				"second",
+				"seconds")
+		) {
+
+			start =
+				now.toDateTime ().minusSeconds (
+					toJavaIntegerRequired (
+						number));
+
+		} else {
+
+			return optionalAbsent ();
+
+		}
+
+		return optionalOf (
+			new TextualInterval (
+				string,
+				stringFormat (
+					"%s to %s",
+					start.toString (
+						timestampFormat),
+					now.toString (
+						timestampFormat)),
+				new Interval (
+					start,
+					now)));
 
 	}
 
@@ -391,7 +655,7 @@ class TextualInterval {
 	}
 
 	public static
-	Optional<Pair<Interval,String>> parsePartial (
+	Optional <Pair <Interval, String>> parsePartial (
 			@NonNull DateTimeZone timeZone,
 			@NonNull String string,
 			@NonNull Long hourOffset) {
@@ -427,40 +691,34 @@ class TextualInterval {
 	}
 
 	public static
-	Optional<TextualInterval> parse (
+	Optional <TextualInterval> parse (
 			@NonNull DateTimeZone timezone,
-			@NonNull String source,
+			@NonNull String orignalSource,
 			@NonNull Long hourOffset) {
 
-		List <String> parts =
-			stringSplitSimple (
+		String source =
+			stringTrim (
+				orignalSource);
+
+		if (
+			stringContains (
 				" to ",
-				source);
+				source)
+		) {
 
-		if (parts.size () == 1) {
-
-			Optional <Pair <Interval, String>> optionalInterval =
-				parsePartial (
-					timezone,
-					source.trim (),
-					hourOffset);
+			List <String> parts =
+				stringSplitSimple (
+					" to ",
+					source);
 
 			if (
-				optionalIsNotPresent (
-					optionalInterval)
+				collectionDoesNotHaveTwoElements (
+					parts)
 			) {
-				return Optional.absent ();
+				return optionalAbsent ();
 			}
 
-			return Optional.of (
-				new TextualInterval (
-					source.trim (),
-					optionalInterval.get ().getRight (),
-					optionalInterval.get ().getLeft ()));
-
-		} else if (parts.size () == 2) {
-
-			Optional<Pair<Interval,String>> optionalFirstInterval =
+			Optional <Pair <Interval, String>> optionalFirstInterval =
 				parsePartial (
 					timezone,
 					parts.get (0).trim (),
@@ -473,7 +731,7 @@ class TextualInterval {
 				return Optional.absent ();
 			}
 
-			Optional<Pair<Interval,String>> optionalSecondInterval =
+			Optional <Pair <Interval, String>> optionalSecondInterval =
 				parsePartial (
 					timezone,
 					parts.get (1).trim (),
@@ -500,9 +758,36 @@ class TextualInterval {
 						optionalSecondInterval.get ().getRight ()),
 					interval));
 
+		} else if (
+			stringStartsWithSimple (
+				"last ",
+				source)
+		) {
+
+			return parseRecent (
+				timezone,
+				source);
+
 		} else {
 
-			return Optional.absent ();
+			Optional <Pair <Interval, String>> optionalInterval =
+				parsePartial (
+					timezone,
+					source.trim (),
+					hourOffset);
+
+			if (
+				optionalIsNotPresent (
+					optionalInterval)
+			) {
+				return optionalAbsent ();
+			}
+
+			return optionalOf (
+				new TextualInterval (
+					source.trim (),
+					optionalInterval.get ().getRight (),
+					optionalInterval.get ().getLeft ()));
 
 		}
 
@@ -586,9 +871,9 @@ class TextualInterval {
 	}
 
 	public static
-	Optional<TextualInterval> forInterval (
+	Optional <TextualInterval> forInterval (
 			@NonNull DateTimeZone timezone,
-			@NonNull Optional<Interval> interval) {
+			@NonNull Optional <Interval> interval) {
 
 		if (
 			optionalIsPresent (
@@ -675,7 +960,7 @@ class TextualInterval {
 			"yyyy-MM");
 
 	private final static
-	List<Pattern> partialPatterns =
+	List <Pattern> partialPatterns =
 		ImmutableList.<Pattern>of (
 
 		Pattern.compile (
