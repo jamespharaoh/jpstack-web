@@ -2,7 +2,7 @@ package wbs.web.pathhandler;
 
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
-import static wbs.utils.string.StringUtils.stringEndsWith;
+import static wbs.utils.string.StringUtils.stringEndsWithSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.HashMap;
@@ -202,7 +202,7 @@ class DelegatingPathHandler
 
 		String currentPath =
 			ifThenElse (
-				stringEndsWith (
+				stringEndsWithSimple (
 					"/",
 					originalPath),
 				() -> originalPath.substring (
