@@ -1,5 +1,6 @@
 package wbs.apn.chat.supervisor.console;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
@@ -72,13 +73,12 @@ class ChatSupervisorNotesPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		statsPeriod =
-			(StatsPeriod)
-			parameters.get ("statsPeriod");
+			genericCastUnchecked (
+				parameters.get (
+					"statsPeriod"));
 
 		chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
 		// get notes
 

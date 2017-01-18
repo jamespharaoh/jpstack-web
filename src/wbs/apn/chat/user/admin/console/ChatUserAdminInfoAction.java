@@ -3,8 +3,24 @@ package wbs.apn.chat.user.admin.console;
 import static wbs.framework.entity.record.IdObject.objectId;
 import static wbs.utils.etc.Misc.toEnum;
 
-import lombok.Cleanup;
 import lombok.NonNull;
+
+import wbs.console.action.ConsoleAction;
+import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.text.model.TextRec;
+import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.model.UserObjectHelper;
+
+import wbs.sms.command.model.CommandObjectHelper;
 
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.core.model.ChatRec;
@@ -14,19 +30,6 @@ import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.info.model.ChatUserInfoObjectHelper;
 import wbs.apn.chat.user.info.model.ChatUserInfoRec;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
-import wbs.console.action.ConsoleAction;
-import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.text.model.TextRec;
-import wbs.platform.user.console.UserConsoleLogic;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.sms.command.model.CommandObjectHelper;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatUserAdminInfoAction")
@@ -116,105 +119,108 @@ class ChatUserAdminInfoAction
 
 		// transaction...
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserAdminInfoAction.goReal ()",
-				this);
+		try (
 
-		// load database objects
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserAdminInfoAction.goReal ()",
+					this);
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+		) {
 
-		ChatRec chat =
-			chatUser.getChat ();
+			// load database objects
 
-		TextRec newInfoText =
-			newInfo != null
-				? textHelper.findOrCreate (newInfo)
-				: null;
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-		TextRec oldInfoText =
-			chatUser.getInfoText ();
+			ChatRec chat =
+				chatUser.getChat ();
 
-		if (newInfoText != oldInfoText) {
+			TextRec newInfoText =
+				newInfo != null
+					? textHelper.findOrCreate (newInfo)
+					: null;
 
-			ChatUserInfoRec chatUserInfo =
-				chatUserInfoHelper.insert (
-					chatUserInfoHelper.createInstance ()
+			TextRec oldInfoText =
+				chatUser.getInfoText ();
 
-				.setChatUser (
-					chatUser)
+			if (newInfoText != oldInfoText) {
 
-				.setCreationTime (
-					transaction.now ())
+				ChatUserInfoRec chatUserInfo =
+					chatUserInfoHelper.insert (
+						chatUserInfoHelper.createInstance ()
 
-				.setOriginalText (
-					oldInfoText)
+					.setChatUser (
+						chatUser)
 
-				.setEditedText (
-					newInfoText)
+					.setCreationTime (
+						transaction.now ())
 
-				.setStatus (
-					ChatUserInfoStatus.console)
+					.setOriginalText (
+						oldInfoText)
 
-				.setModerator (
-					userConsoleLogic.userRequired ())
+					.setEditedText (
+						newInfoText)
 
-				.setEditReason (
-					editReason)
+					.setStatus (
+						ChatUserInfoStatus.console)
 
-			);
+					.setModerator (
+						userConsoleLogic.userRequired ())
 
-			chatUser
+					.setEditReason (
+						editReason)
 
-				.setInfoText (
-					newInfoText);
+				);
 
-			chatUser.getChatUserInfos ().add (
-				chatUserInfo);
+				chatUser
 
-			if (newInfoText == null) {
+					.setInfoText (
+						newInfoText);
 
-				// TODO use a template
+				chatUser.getChatUserInfos ().add (
+					chatUserInfo);
 
-				TextRec messageText =
-					textHelper.findOrCreate (
-						"Please reply with a message we can send out " +
-						"to people to introduce you. Say where you " +
-						"are, describe yourself and say what you are " +
-						"looking for.");
+				if (newInfoText == null) {
 
-				chatSendLogic.sendMessageMagic (
-					chatUser,
-					null,
-					messageText,
-					commandHelper.findByCodeRequired (
-						chat,
-						"magic"),
-					serviceHelper.findByCodeRequired (
-						chat,
-						"system"),
-					objectId (
+					// TODO use a template
+
+					TextRec messageText =
+						textHelper.findOrCreate (
+							"Please reply with a message we can send out " +
+							"to people to introduce you. Say where you " +
+							"are, describe yourself and say what you are " +
+							"looking for.");
+
+					chatSendLogic.sendMessageMagic (
+						chatUser,
+						null,
+						messageText,
 						commandHelper.findByCodeRequired (
 							chat,
-							"join_info")));
+							"magic"),
+						serviceHelper.findByCodeRequired (
+							chat,
+							"system"),
+						objectId (
+							commandHelper.findByCodeRequired (
+								chat,
+								"join_info")));
+
+				}
 
 			}
 
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"User's info updated");
+
+			requestContext.setEmptyFormData ();
+
+			return null;
+
 		}
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"User's info updated");
-
-		requestContext.setEmptyFormData ();
-
-		return null;
 
 	}
 

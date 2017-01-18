@@ -75,9 +75,7 @@ class SendSmsConfigSendFormActionHelper
 			@NonNull SendSmsConfigSendForm form) {
 
 		SendSmsConfigRec sendSmsConfig =
-			sendSmsConfigHelper.findRequired (
-				requestContext.stuffInteger (
-					"sendSmsConfigId"));
+			sendSmsConfigHelper.findFromContextRequired ();
 
 		form
 
@@ -95,9 +93,7 @@ class SendSmsConfigSendFormActionHelper
 		// send message
 
 		SendSmsConfigRec sendSmsConfig =
-			sendSmsConfigHelper.findRequired (
-				requestContext.stuffInteger (
-					"sendSmsConfigId"));
+			sendSmsConfigHelper.findFromContextRequired ();
 
 		NumberRec smsNumber =
 			smsNumberHelper.findOrCreate (

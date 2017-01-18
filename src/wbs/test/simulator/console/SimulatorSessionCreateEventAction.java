@@ -15,7 +15,6 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.json.simple.JSONValue;
@@ -49,12 +48,9 @@ import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
 import wbs.sms.route.core.model.RouteRec;
 
-import wbs.test.simulator.model.SimulatorEventObjectHelper;
 import wbs.test.simulator.model.SimulatorRec;
 import wbs.test.simulator.model.SimulatorRouteRec;
-import wbs.test.simulator.model.SimulatorSessionNumberObjectHelper;
 import wbs.test.simulator.model.SimulatorSessionNumberRec;
-import wbs.test.simulator.model.SimulatorSessionObjectHelper;
 import wbs.test.simulator.model.SimulatorSessionRec;
 import wbs.web.responder.JsonResponder;
 import wbs.web.responder.Responder;
@@ -94,13 +90,13 @@ class SimulatorSessionCreateEventAction
 	RouteConsoleHelper routeHelper;
 
 	@SingletonDependency
-	SimulatorEventObjectHelper simulatorEventHelper;
+	SimulatorEventConsoleHelper simulatorEventHelper;
 
 	@SingletonDependency
-	SimulatorSessionObjectHelper simulatorSessionHelper;
+	SimulatorSessionConsoleHelper simulatorSessionHelper;
 
 	@SingletonDependency
-	SimulatorSessionNumberObjectHelper simulatorSessionNumberHelper;
+	SimulatorSessionNumberConsoleHelper simulatorSessionNumberHelper;
 
 	@SingletonDependency
 	SliceConsoleHelper sliceHelper;
@@ -211,251 +207,257 @@ class SimulatorSessionCreateEventAction
 
 	Responder sendMessage () {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"SimulatorSessionCreateEventAction.sendMessage ()",
-				this);
+		try (
 
-		SimulatorSessionRec simulatorSession =
-			simulatorSessionHelper.findRequired (
-				requestContext.stuffInteger (
-					"simulatorSessionId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"SimulatorSessionCreateEventAction.sendMessage ()",
+					this);
 
-		SimulatorRec simulator =
-			simulatorSession.getSimulator ();
+		) {
 
-		String numFrom =
-			requestContext.formRequired (
-				"numFrom");
+			SimulatorSessionRec simulatorSession =
+				simulatorSessionHelper.findFromContextRequired ();
 
-		String numTo =
-			requestContext.formRequired (
-				"numTo");
+			SimulatorRec simulator =
+				simulatorSession.getSimulator ();
 
-		String messageText =
-			requestContext.formRequired (
-				"message");
+			String numFrom =
+				requestContext.formRequired (
+					"numFrom");
 
-		NetworkRec network =
-			networkHelper.findRequired (
-				parseIntegerRequired (
-					requestContext.formRequired (
-						"networkId")));
+			String numTo =
+				requestContext.formRequired (
+					"numTo");
 
-		// store in session
+			String messageText =
+				requestContext.formRequired (
+					"message");
 
-		requestContext.session (
-			"simulatorNumFrom",
-			numFrom);
+			NetworkRec network =
+				networkHelper.findRequired (
+					parseIntegerRequired (
+						requestContext.formRequired (
+							"networkId")));
 
-		requestContext.session (
-			"simulatorNumTo",
-			numTo);
+			// store in session
 
-		requestContext.session (
-			"simulatorMessage",
-			messageText);
-
-		requestContext.session (
-			"simulatorNetworkId",
-			network.getId ().toString ());
-
-		// work out route
-
-		Optional <RouteRec> routeOption =
-			resolveRoute (
-				simulator,
-				numTo);
-
-		if (! routeOption.isPresent ()) {
-
-			throw new AjaxException (
-				"No route configured for that number");
-
-		}
-
-		RouteRec route =
-			routeOption.get ();
-
-		// insert inbox
-
-		MessageRec message =
-			smsInboxLogic.inboxInsert (
-				optionalAbsent (),
-				textHelper.findOrCreate (
-					messageText),
-				smsNumberHelper.findOrCreate (
-					numFrom),
-				numTo,
-				route,
-				optionalOf (
-					network),
-				optionalAbsent (),
-				emptyList (),
-				optionalAbsent (),
-				optionalAbsent ());
-
-		// create event data
-
-		Object data =
-			ImmutableMap.<String,Object>builder ()
-				.put ("message", ImmutableMap.<String,Object>builder ()
-					.put ("id", message.getId ())
-					.put ("numFrom", numFrom)
-					.put ("numTo", numTo)
-					.put ("text", messageText)
-					.build ())
-				.put ("route", ImmutableMap.<String,Object>builder ()
-					.put ("id", route.getId ())
-					.put ("code", route.getCode ())
-					.build ())
-				.put ("network", ImmutableMap.<String,Object>builder ()
-					.put ("id", network.getId ())
-					.put ("code", network.getCode ())
-					.build ())
-				.build ();
-
-		// create event
-
-		simulatorEventHelper.insert (
-			simulatorEventHelper.createInstance ()
-
-			.setSimulatorSession (
-				simulatorSession)
-
-			.setType (
-				"message_in")
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setData (
-				JSONValue.toJSONString (data))
-
-		);
-
-		// associate number with session
-
-		transaction.flush ();
-
-		NumberRec number =
-			smsNumberHelper.findOrCreate (
+			requestContext.session (
+				"simulatorNumFrom",
 				numFrom);
 
-		SimulatorSessionNumberRec simulatorSessionNumber =
-			simulatorSessionNumberHelper.findOrCreate (
-				number);
+			requestContext.session (
+				"simulatorNumTo",
+				numTo);
 
-		simulatorSessionNumber
+			requestContext.session (
+				"simulatorMessage",
+				messageText);
 
-			.setSimulatorSession (
-				simulatorSession);
+			requestContext.session (
+				"simulatorNetworkId",
+				network.getId ().toString ());
 
-		// done
+			// work out route
 
-		transaction.commit ();
+			Optional <RouteRec> routeOption =
+				resolveRoute (
+					simulator,
+					numTo);
 
-		return jsonResponderProvider.get ()
-			.value (
-				ImmutableMap.<Object,Object>builder ()
-					.put ("success", true)
-					.build ());
+			if (! routeOption.isPresent ()) {
+
+				throw new AjaxException (
+					"No route configured for that number");
+
+			}
+
+			RouteRec route =
+				routeOption.get ();
+
+			// insert inbox
+
+			MessageRec message =
+				smsInboxLogic.inboxInsert (
+					optionalAbsent (),
+					textHelper.findOrCreate (
+						messageText),
+					smsNumberHelper.findOrCreate (
+						numFrom),
+					numTo,
+					route,
+					optionalOf (
+						network),
+					optionalAbsent (),
+					emptyList (),
+					optionalAbsent (),
+					optionalAbsent ());
+
+			// create event data
+
+			Object data =
+				ImmutableMap.<String,Object>builder ()
+					.put ("message", ImmutableMap.<String,Object>builder ()
+						.put ("id", message.getId ())
+						.put ("numFrom", numFrom)
+						.put ("numTo", numTo)
+						.put ("text", messageText)
+						.build ())
+					.put ("route", ImmutableMap.<String,Object>builder ()
+						.put ("id", route.getId ())
+						.put ("code", route.getCode ())
+						.build ())
+					.put ("network", ImmutableMap.<String,Object>builder ()
+						.put ("id", network.getId ())
+						.put ("code", network.getCode ())
+						.build ())
+					.build ();
+
+			// create event
+
+			simulatorEventHelper.insert (
+				simulatorEventHelper.createInstance ()
+
+				.setSimulatorSession (
+					simulatorSession)
+
+				.setType (
+					"message_in")
+
+				.setTimestamp (
+					transaction.now ())
+
+				.setData (
+					JSONValue.toJSONString (data))
+
+			);
+
+			// associate number with session
+
+			transaction.flush ();
+
+			NumberRec number =
+				smsNumberHelper.findOrCreate (
+					numFrom);
+
+			SimulatorSessionNumberRec simulatorSessionNumber =
+				simulatorSessionNumberHelper.findOrCreate (
+					number);
+
+			simulatorSessionNumber
+
+				.setSimulatorSession (
+					simulatorSession);
+
+			// done
+
+			transaction.commit ();
+
+			return jsonResponderProvider.get ()
+				.value (
+					ImmutableMap.<Object,Object>builder ()
+						.put ("success", true)
+						.build ());
+
+		}
 
 	}
 
 	Responder deliveryReport () {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"SimulatorSessionCreateEventAction.deliveryReport ()",
-				this);
+		try (
 
-		SimulatorSessionRec simulatorSession =
-			simulatorSessionHelper.findRequired (
-				requestContext.stuffInteger (
-					"simulatorSessionId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"SimulatorSessionCreateEventAction.deliveryReport ()",
+					this);
 
-		Long messageId =
-			parseIntegerRequired (
-				requestContext.formRequired (
-					"messageId"));
+		) {
 
-		Boolean success =
-			parseBooleanTrueFalseRequired (
-				requestContext.formRequired (
-					"success"));
+			SimulatorSessionRec simulatorSession =
+				simulatorSessionHelper.findFromContextRequired ();
 
-		// submit delivery report
+			Long messageId =
+				parseIntegerRequired (
+					requestContext.formRequired (
+						"messageId"));
 
-		reportLogic.deliveryReport (
-			messageId,
-			ifThenElse (
-				success,
-				() -> MessageStatus.delivered,
-				() -> MessageStatus.undelivered),
-			Optional.absent (),
-			Optional.absent (),
-			Optional.absent (),
-			Optional.absent ());
+			Boolean success =
+				parseBooleanTrueFalseRequired (
+					requestContext.formRequired (
+						"success"));
 
-		// create event data
+			// submit delivery report
 
-		Object data =
-			ImmutableMap.<String,Object>builder ()
+			reportLogic.deliveryReport (
+				messageId,
+				ifThenElse (
+					success,
+					() -> MessageStatus.delivered,
+					() -> MessageStatus.undelivered),
+				Optional.absent (),
+				Optional.absent (),
+				Optional.absent (),
+				Optional.absent ());
 
-			.put (
-				"deliveryReport",
+			// create event data
+
+			Object data =
 				ImmutableMap.<String,Object>builder ()
 
 				.put (
-					"messageId",
-					messageId)
+					"deliveryReport",
+					ImmutableMap.<String,Object>builder ()
 
-				.put (
-					"success",
-					success)
+					.put (
+						"messageId",
+						messageId)
 
-				.build ()
+					.put (
+						"success",
+						success)
 
-			)
+					.build ()
 
-			.build ();
+				)
 
-		// create event
+				.build ();
 
-		simulatorEventHelper.insert (
-			simulatorEventHelper.createInstance ()
+			// create event
 
-			.setSimulatorSession (
-				simulatorSession)
+			simulatorEventHelper.insert (
+				simulatorEventHelper.createInstance ()
 
-			.setType (
-				"delivery_report")
+				.setSimulatorSession (
+					simulatorSession)
 
-			.setTimestamp (
-				transaction.now ())
+				.setType (
+					"delivery_report")
 
-			.setData (
-				JSONValue.toJSONString (data)));
+				.setTimestamp (
+					transaction.now ())
 
-		// done
+				.setData (
+					JSONValue.toJSONString (data)));
 
-		transaction.commit ();
+			// done
 
-		return jsonResponderProvider.get ()
+			transaction.commit ();
 
-			.value (
-				ImmutableMap.<Object,Object>builder ()
+			return jsonResponderProvider.get ()
 
-				.put (
-					"success",
-					true)
+				.value (
+					ImmutableMap.<Object,Object>builder ()
 
-				.build ()
+					.put (
+						"success",
+						true)
 
-			);
+					.build ()
+
+				);
+
+		}
 
 	}
 

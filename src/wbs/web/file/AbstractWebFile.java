@@ -1,5 +1,7 @@
 package wbs.web.file;
 
+import static wbs.utils.etc.NumberUtils.fromJavaInteger;
+
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -9,6 +11,7 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.context.RequestContext;
 
 public
@@ -31,7 +34,8 @@ class AbstractWebFile
 			IOException {
 
 		requestContext.sendError (
-			HttpServletResponse.SC_METHOD_NOT_ALLOWED,
+			fromJavaInteger (
+				HttpServletResponse.SC_METHOD_NOT_ALLOWED),
 			requestContext.requestUri ());
 
 	}
@@ -45,7 +49,8 @@ class AbstractWebFile
 			IOException {
 
 		requestContext.sendError (
-			HttpServletResponse.SC_METHOD_NOT_ALLOWED,
+			fromJavaInteger (
+				HttpServletResponse.SC_METHOD_NOT_ALLOWED),
 			requestContext.requestUri ());
 
 	}

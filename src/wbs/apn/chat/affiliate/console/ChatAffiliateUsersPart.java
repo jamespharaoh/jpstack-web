@@ -14,14 +14,15 @@ import java.util.List;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.affiliate.model.ChatAffiliateObjectHelper;
-import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 
 @PrototypeComponent ("chatAffiliateUsersPart")
 public
@@ -31,7 +32,7 @@ class ChatAffiliateUsersPart
 	// singleton dependencies
 
 	@SingletonDependency
-	ChatAffiliateObjectHelper chatAffiliateHelper;
+	ChatAffiliateConsoleHelper chatAffiliateHelper;
 
 	@SingletonDependency
 	ChatUserObjectHelper chatUserHelper;
@@ -48,9 +49,7 @@ class ChatAffiliateUsersPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		ChatAffiliateRec chatAffiliate =
-			chatAffiliateHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatAffiliateId"));
+			chatAffiliateHelper.findFromContextRequired ();
 
 		chatUsers =
 			chatUserHelper.find (

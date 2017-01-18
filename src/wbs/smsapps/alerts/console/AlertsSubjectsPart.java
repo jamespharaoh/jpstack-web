@@ -56,9 +56,7 @@ class AlertsSubjectsPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		AlertsSettingsRec alertsSettings =
-			alertsSettingsHelper.findRequired (
-				requestContext.stuffInteger (
-					"alertsSettingsId"));
+			alertsSettingsHelper.findFromContextRequired ();
 
 		alertsSubjects =
 			new ArrayList<> (

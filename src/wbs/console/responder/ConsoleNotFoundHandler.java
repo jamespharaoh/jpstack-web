@@ -1,6 +1,7 @@
 package wbs.console.responder;
 
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOrEmptyString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -11,7 +12,6 @@ import javax.servlet.ServletException;
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.misc.ConsoleUserHelper;
 import wbs.console.part.NotFoundPart;
@@ -31,7 +31,6 @@ import wbs.framework.logging.TaskLogger;
 
 import wbs.web.handler.WebNotFoundHandler;
 
-@Log4j
 @SingletonComponent ("notFoundHandler")
 public
 class ConsoleNotFoundHandler
@@ -105,9 +104,8 @@ class ConsoleNotFoundHandler
 				stringFormat (
 					"%s%s",
 					requestContext.servletPath (),
-					requestContext.pathInfo () != null
-						? requestContext.pathInfo ()
-						: "");
+					optionalOrEmptyString (
+						requestContext.pathInfo ()));
 
 			exceptionLogger.logSimple (
 				"console",
@@ -119,8 +117,10 @@ class ConsoleNotFoundHandler
 
 		} catch (RuntimeException exception) {
 
-			log.fatal (
-				"Error creating not found log: " + exception.getMessage ());
+			taskLogger.fatalFormatException (
+				exception,
+				"Error creating not found log: %s",
+				 exception.getMessage ());
 
 		}
 

@@ -52,7 +52,6 @@ import wbs.platform.currency.logic.CurrencyLogic;
 
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerRec;
-import wbs.imchat.model.ImChatMessageObjectHelper;
 import wbs.imchat.model.ImChatMessageRec;
 import wbs.imchat.model.ImChatRec;
 import wbs.imchat.model.ImChatTemplateRec;
@@ -68,7 +67,7 @@ class ImChatPendingFormResponder
 	CurrencyLogic currencyLogic;
 
 	@SingletonDependency
-	ImChatMessageObjectHelper imChatMessageHelper;
+	ImChatMessageConsoleHelper imChatMessageHelper;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -134,9 +133,7 @@ class ImChatPendingFormResponder
 			taskLogger);
 
 		message =
-			imChatMessageHelper.findRequired (
-				requestContext.stuffInteger (
-					"imChatMessageId"));
+			imChatMessageHelper.findFromContextRequired ();
 
 		conversation =
 			message.getImChatConversation ();

@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -23,16 +22,20 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.updatelog.logic.UpdateManager;
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.utils.etc.PropertyUtils;
+
 import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
@@ -115,212 +118,216 @@ class ObjectLinksAction
 	Responder goReal (
 			@NonNull TaskLogger taskLogger) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ObjectLinksAction.goReal ()",
-				this);
+		try (
 
-		Record<?> contextObject =
-			contextHelper.lookupObject (
-				requestContext.contextStuffRequired ());
-
-		Set <Record <?>> contextLinks =
-			genericCastUnchecked (
-				PropertyUtils.propertyGetAuto (
-					contextObject,
-					contextLinkField));
-
-		List <String> params =
-			requestContext.getParameterValues (
-				"old_link");
-
-		List <Record <?>> updatedTargetObjects =
-			new ArrayList<> ();
-
-		for (
-			String param
-				: params
+			Transaction transaction =
+				database.beginReadWrite (
+					"ObjectLinksAction.goReal ()",
+					this);
 		) {
 
-			Matcher matcher =
-				oldGroupPattern.matcher (
-					param);
+			Record <?> contextObject =
+				contextHelper.lookupObject (
+					requestContext.consoleContextStuffRequired ());
 
-			if (! matcher.matches ()) {
-
-				requestContext.addError (
-					"Internal error");
-
-				return null;
-
-			}
-
-			Long linkId =
-				Long.parseLong (
-					matcher.group (
-						1));
-
-			boolean oldIsMember =
-				matcher.group (2).equals ("true");
-
-			boolean newIsMember =
-				optionalIsPresent (
-					requestContext.parameter (
-						"link_" + linkId));
-
-			if (oldIsMember == newIsMember)
-				continue;
-
-			Record<?> targetObject =
-				targetHelper.findRequired (
-					linkId);
-
-			@SuppressWarnings ("unchecked")
-			Set<Record<?>> targetLinks =
-				(Set<Record<?>>)
-				PropertyUtils.propertyGetAuto (
-					targetObject,
-					targetLinkField);
-
-			if (
-				! privChecker.canRecursive (
-					targetObject,
-					"manage")
-			) {
-				continue;
-			}
-
-			if (
-
-				newIsMember
-
-				&& doesNotContain (
-					contextLinks,
-					targetObject)
-
-			) {
-
-				contextLinks.add (
-					targetObject);
-
-				targetLinks.add (
-					contextObject);
-
-				if (eventOrder == EventOrder.contextThenTarget) {
-
-					eventLogic.createEvent (
-						addEventName,
-						userConsoleLogic.userRequired (),
+			Set <Record <?>> contextLinks =
+				genericCastUnchecked (
+					PropertyUtils.propertyGetAuto (
 						contextObject,
+						contextLinkField));
+
+			List <String> params =
+				requestContext.parameterValues (
+					"old_link");
+
+			List <Record <?>> updatedTargetObjects =
+				new ArrayList<> ();
+
+			for (
+				String param
+					: params
+			) {
+
+				Matcher matcher =
+					oldGroupPattern.matcher (
+						param);
+
+				if (! matcher.matches ()) {
+
+					requestContext.addError (
+						"Internal error");
+
+					return null;
+
+				}
+
+				Long linkId =
+					Long.parseLong (
+						matcher.group (
+							1));
+
+				boolean oldIsMember =
+					matcher.group (2).equals ("true");
+
+				boolean newIsMember =
+					optionalIsPresent (
+						requestContext.parameter (
+							"link_" + linkId));
+
+				if (oldIsMember == newIsMember)
+					continue;
+
+				Record<?> targetObject =
+					targetHelper.findRequired (
+						linkId);
+
+				@SuppressWarnings ("unchecked")
+				Set<Record<?>> targetLinks =
+					(Set<Record<?>>)
+					PropertyUtils.propertyGetAuto (
+						targetObject,
+						targetLinkField);
+
+				if (
+					! privChecker.canRecursive (
+						targetObject,
+						"manage")
+				) {
+					continue;
+				}
+
+				if (
+
+					newIsMember
+
+					&& doesNotContain (
+						contextLinks,
+						targetObject)
+
+				) {
+
+					contextLinks.add (
 						targetObject);
 
-				}
-
-				if (eventOrder == EventOrder.targetThenContext) {
-
-					eventLogic.createEvent (
-						addEventName,
-						userConsoleLogic.userRequired (),
-						targetObject,
+					targetLinks.add (
 						contextObject);
 
+					if (eventOrder == EventOrder.contextThenTarget) {
+
+						eventLogic.createEvent (
+							addEventName,
+							userConsoleLogic.userRequired (),
+							contextObject,
+							targetObject);
+
+					}
+
+					if (eventOrder == EventOrder.targetThenContext) {
+
+						eventLogic.createEvent (
+							addEventName,
+							userConsoleLogic.userRequired (),
+							targetObject,
+							contextObject);
+
+					}
+
 				}
 
-			}
+				if (
 
-			if (
+					oldIsMember
 
-				oldIsMember
+					&& contains (
+						contextLinks,
+						targetObject)
 
-				&& contains (
-					contextLinks,
-					targetObject)
+				) {
 
-			) {
-
-				contextLinks.remove (
-					targetObject);
-
-				targetLinks.remove (
-					contextObject);
-
-				if (eventOrder == EventOrder.contextThenTarget) {
-
-					eventLogic.createEvent (
-						removeEventName,
-						userConsoleLogic.userRequired (),
-						contextObject,
+					contextLinks.remove (
 						targetObject);
 
-				}
-
-				if (eventOrder == EventOrder.targetThenContext) {
-
-					eventLogic.createEvent (
-						removeEventName,
-						userConsoleLogic.userRequired (),
-						targetObject,
+					targetLinks.remove (
 						contextObject);
 
+					if (eventOrder == EventOrder.contextThenTarget) {
+
+						eventLogic.createEvent (
+							removeEventName,
+							userConsoleLogic.userRequired (),
+							contextObject,
+							targetObject);
+
+					}
+
+					if (eventOrder == EventOrder.targetThenContext) {
+
+						eventLogic.createEvent (
+							removeEventName,
+							userConsoleLogic.userRequired (),
+							targetObject,
+							contextObject);
+
+					}
+
 				}
 
-			}
-
-			updatedTargetObjects.add (
-				targetObject);
-
-		}
-
-		if (
-			collectionIsNotEmpty (
-				updatedTargetObjects)
-		) {
-
-			if (
-				isNotNull (
-					contextUpdateSignalName)
-			) {
-
-				updateManager.signalUpdate (
-					contextUpdateSignalName,
-					contextObject.getId ());
+				updatedTargetObjects.add (
+					targetObject);
 
 			}
 
 			if (
-				isNotNull (
-					targetUpdateSignalName)
+				collectionIsNotEmpty (
+					updatedTargetObjects)
 			) {
 
-				for (
-					Record<?> targetObject
-						: updatedTargetObjects
+				if (
+					isNotNull (
+						contextUpdateSignalName)
 				) {
 
 					updateManager.signalUpdate (
-						targetUpdateSignalName,
-						targetObject.getId ());
+						contextUpdateSignalName,
+						contextObject.getId ());
+
+				}
+
+				if (
+					isNotNull (
+						targetUpdateSignalName)
+				) {
+
+					for (
+						Record<?> targetObject
+							: updatedTargetObjects
+					) {
+
+						updateManager.signalUpdate (
+							targetUpdateSignalName,
+							targetObject.getId ());
+
+					}
 
 				}
 
 			}
 
+			transaction.commit ();
+
+			if (
+				collectionIsNotEmpty (
+					updatedTargetObjects)
+			) {
+
+				requestContext.addNotice (
+					successNotice);
+
+			}
+
+			return null;
+
 		}
-
-		transaction.commit ();
-
-		if (
-			collectionIsNotEmpty (
-				updatedTargetObjects)
-		) {
-
-			requestContext.addNotice (
-				successNotice);
-
-		}
-
-		return null;
 
 	}
 

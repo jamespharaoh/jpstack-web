@@ -1,5 +1,7 @@
 package wbs.integrations.g8wave.api;
 
+import static wbs.utils.etc.OptionalUtils.optionalOrEmptyString;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -9,6 +11,7 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.context.RequestContext;
 import wbs.web.file.WebFile;
 import wbs.web.servlet.WbsServlet;
@@ -53,7 +56,8 @@ class G8waveApiServlet
 			@NonNull TaskLogger taskLogger) {
 
 		String path =
-			requestContext.pathInfo ();
+			optionalOrEmptyString (
+				requestContext.pathInfo ());
 
 		Matcher matcher;
 

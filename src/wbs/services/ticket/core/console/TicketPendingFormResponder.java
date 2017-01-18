@@ -41,13 +41,15 @@ import wbs.console.context.ConsoleContextScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.responder.HtmlResponder;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.currency.logic.CurrencyLogic;
-import wbs.services.ticket.core.model.TicketObjectHelper;
+
 import wbs.services.ticket.core.model.TicketRec;
 import wbs.services.ticket.core.model.TicketStateRec;
 import wbs.services.ticket.core.model.TicketTemplateRec;
@@ -69,7 +71,7 @@ class TicketPendingFormResponder
 	UserPrivChecker privChecker;
 
 	@SingletonDependency
-	TicketObjectHelper ticketHelper;
+	TicketConsoleHelper ticketHelper;
 
 	// state
 
@@ -114,9 +116,7 @@ class TicketPendingFormResponder
 			taskLogger);
 
 		ticket =
-			ticketHelper.findRequired (
-				requestContext.stuffInteger (
-					"ticketId"));
+			ticketHelper.findFromContextRequired ();
 
 		ticketState =
 			ticket.getTicketState ();

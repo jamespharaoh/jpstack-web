@@ -6,7 +6,6 @@ import static wbs.utils.etc.NumberUtils.maximumJavaInteger;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -77,288 +76,291 @@ class ImChatPendingFormAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatPendingFormAction.goReal ()",
-				this);
+		try (
 
-		// find message
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatPendingFormAction.goReal ()",
+					this);
 
-		ImChatMessageRec customerMessage =
-			imChatMessageHelper.findRequired (
-				requestContext.stuffInteger (
-					"imChatMessageId"));
-
-		ImChatConversationRec conversation =
-			customerMessage.getImChatConversation ();
-
-		ImChatCustomerRec customer =
-			conversation.getImChatCustomer ();
-
-		ImChatRec imChat =
-			customer.getImChat ();
-
-		// sanity check
-
-		if (customerMessage.getQueueItem () == null)
-			throw new RuntimeException ();
-
-		// select template
-
-		String templateString =
-			requestContext.parameterRequired (
-				"template");
-
-		boolean bill;
-		boolean ignore;
-
-		long minLength;
-		long maxLength;
-
-		ImChatTemplateRec template;
-
-		String messageText;
-
-		if (
-			stringEqualSafe (
-				templateString,
-				"bill")
 		) {
 
-			bill = true;
-			ignore = false;
-			template = null;
+			// find message
 
-			messageText =
-				requestContext.parameterRequired (
-					"message-bill");
+			ImChatMessageRec customerMessage =
+				imChatMessageHelper.findFromContextRequired ();
 
-			minLength =
-				imChat.getBillMessageMinChars ();
+			ImChatConversationRec conversation =
+				customerMessage.getImChatConversation ();
 
-			maxLength =
-				imChat.getBillMessageMaxChars ();
+			ImChatCustomerRec customer =
+				conversation.getImChatCustomer ();
 
-		} else if (
-			stringEqualSafe (
-				templateString,
-				"free")
-		) {
+			ImChatRec imChat =
+				customer.getImChat ();
 
-			bill = false;
-			ignore = false;
-			template = null;
+			// sanity check
 
-			messageText =
-				requestContext.parameterRequired (
-					"message-free");
-
-			minLength =
-				imChat.getFreeMessageMinChars ();
-
-			maxLength =
-				imChat.getFreeMessageMaxChars ();
-
-		} else if (
-			stringEqualSafe (
-				templateString,
-				"ignore")
-		) {
-
-			bill = false;
-			ignore = true;
-
-			template = null;
-			messageText = null;
-
-			minLength = 0;
-			maxLength = 0;
-
-		} else {
-
-			bill = false;
-			ignore = false;
-
-			template =
-				imChatTemplateHelper.findRequired (
-					Long.parseLong (
-						templateString));
-
-			if (template.getImChat () != imChat)
+			if (customerMessage.getQueueItem () == null)
 				throw new RuntimeException ();
 
-			messageText =
-				template.getText ();
+			// select template
 
-			minLength = 0;
-			maxLength = maximumJavaInteger;
+			String templateString =
+				requestContext.parameterRequired (
+					"template");
 
-		}
+			boolean bill;
+			boolean ignore;
 
-		// check message type
+			long minLength;
+			long maxLength;
 
-		if (
-			bill
-			&& customer.getBalance () < imChat.getMessageCost ()
-		) {
+			ImChatTemplateRec template;
 
-			requestContext.addError (
-				stringFormat (
-					"Billed message price is %s, ",
-					currencyLogic.formatText (
-						imChat.getCreditCurrency (),
-						imChat.getMessageCost ()),
-					"but customer's balance is only %s",
-					currencyLogic.formatText (
-						imChat.getCreditCurrency (),
-						customer.getBalance ())));
+			String messageText;
 
-		}
+			if (
+				stringEqualSafe (
+					templateString,
+					"bill")
+			) {
 
-		// check length
+				bill = true;
+				ignore = false;
+				template = null;
 
-		if (! ignore) {
+				messageText =
+					requestContext.parameterRequired (
+						"message-bill");
 
-			int messageLength =
-				messageText.length ();
+				minLength =
+					imChat.getBillMessageMinChars ();
 
-			if (messageLength < minLength) {
+				maxLength =
+					imChat.getBillMessageMaxChars ();
 
-				requestContext.addErrorFormat (
-					"Message has %s ",
-					integerToDecimalString (
-						messageLength),
-					"characters, but the minimum is %s, ",
-					integerToDecimalString (
-						minLength),
-					"please add %s more",
-					integerToDecimalString (
-						minLength - messageLength));
+			} else if (
+				stringEqualSafe (
+					templateString,
+					"free")
+			) {
 
-				return null;
+				bill = false;
+				ignore = false;
+				template = null;
+
+				messageText =
+					requestContext.parameterRequired (
+						"message-free");
+
+				minLength =
+					imChat.getFreeMessageMinChars ();
+
+				maxLength =
+					imChat.getFreeMessageMaxChars ();
+
+			} else if (
+				stringEqualSafe (
+					templateString,
+					"ignore")
+			) {
+
+				bill = false;
+				ignore = true;
+
+				template = null;
+				messageText = null;
+
+				minLength = 0;
+				maxLength = 0;
+
+			} else {
+
+				bill = false;
+				ignore = false;
+
+				template =
+					imChatTemplateHelper.findRequired (
+						Long.parseLong (
+							templateString));
+
+				if (template.getImChat () != imChat)
+					throw new RuntimeException ();
+
+				messageText =
+					template.getText ();
+
+				minLength = 0;
+				maxLength = maximumJavaInteger;
 
 			}
 
-			if (messageLength > maxLength) {
+			// check message type
 
-				requestContext.addErrorFormat (
-					"Message has %s ",
-					integerToDecimalString (
-						messageLength),
-					"characters, but the maximum is %s, ",
-					integerToDecimalString (
-						maxLength),
-					"please remove %s",
-					integerToDecimalString (
-						messageLength - maxLength));
+			if (
+				bill
+				&& customer.getBalance () < imChat.getMessageCost ()
+			) {
 
-				return null;
+				requestContext.addError (
+					stringFormat (
+						"Billed message price is %s, ",
+						currencyLogic.formatText (
+							imChat.getCreditCurrency (),
+							imChat.getMessageCost ()),
+						"but customer's balance is only %s",
+						currencyLogic.formatText (
+							imChat.getCreditCurrency (),
+							customer.getBalance ())));
 
 			}
 
-			// create reply
+			// check length
 
-			ImChatMessageRec operatorMessage =
-				imChatMessageHelper.insert (
-					imChatMessageHelper.createInstance ()
+			if (! ignore) {
 
-				.setImChatConversation (
-					conversation)
+				int messageLength =
+					messageText.length ();
 
-				.setIndex (
-					conversation.getNumMessages ())
+				if (messageLength < minLength) {
 
-				.setSenderUser (
-					userConsoleLogic.userRequired ())
+					requestContext.addErrorFormat (
+						"Message has %s ",
+						integerToDecimalString (
+							messageLength),
+						"characters, but the minimum is %s, ",
+						integerToDecimalString (
+							minLength),
+						"please add %s more",
+						integerToDecimalString (
+							minLength - messageLength));
 
-				.setTimestamp (
-					transaction.now ())
+					return null;
 
-				.setMessageText (
-					messageText)
+				}
 
-				.setImChatTemplate (
-					template)
+				if (messageLength > maxLength) {
 
-				.setPartnerImChatMessage (
-					customerMessage)
+					requestContext.addErrorFormat (
+						"Message has %s ",
+						integerToDecimalString (
+							messageLength),
+						"characters, but the maximum is %s, ",
+						integerToDecimalString (
+							maxLength),
+						"please remove %s",
+						integerToDecimalString (
+							messageLength - maxLength));
 
-				.setPrice (
-					bill
-						? imChat.getMessageCost ()
-						: null)
+					return null;
 
-			);
+				}
 
-			customerMessage
+				// create reply
 
-				.setPartnerImChatMessage (
-					operatorMessage);
+				ImChatMessageRec operatorMessage =
+					imChatMessageHelper.insert (
+						imChatMessageHelper.createInstance ()
 
-			// update conversation
+					.setImChatConversation (
+						conversation)
 
-			conversation
+					.setIndex (
+						conversation.getNumMessages ())
 
-				.setNumMessages (
-					conversation.getNumMessages () + 1)
+					.setSenderUser (
+						userConsoleLogic.userRequired ())
 
-				.setPendingReply (
-					false);
+					.setTimestamp (
+						transaction.now ())
 
-			// update customer
+					.setMessageText (
+						messageText)
 
-			customer
+					.setImChatTemplate (
+						template)
 
-				.setBalance (
-					+ customer.getBalance ()
-					- ifNull (
-						operatorMessage.getPrice (),
-						0l))
+					.setPartnerImChatMessage (
+						customerMessage)
 
-				.setTotalSpend (
-					+ customer.getTotalSpend ()
-					+ ifNull (
-						operatorMessage.getPrice (),
-						0l));
+					.setPrice (
+						bill
+							? imChat.getMessageCost ()
+							: null)
 
-		} else {
+				);
 
-			// update conversation
+				customerMessage
 
-			conversation
+					.setPartnerImChatMessage (
+						operatorMessage);
 
-				.setPendingReply (
-					false);
+				// update conversation
+
+				conversation
+
+					.setNumMessages (
+						conversation.getNumMessages () + 1)
+
+					.setPendingReply (
+						false);
+
+				// update customer
+
+				customer
+
+					.setBalance (
+						+ customer.getBalance ()
+						- ifNull (
+							operatorMessage.getPrice (),
+							0l))
+
+					.setTotalSpend (
+						+ customer.getTotalSpend ()
+						+ ifNull (
+							operatorMessage.getPrice (),
+							0l));
+
+			} else {
+
+				// update conversation
+
+				conversation
+
+					.setPendingReply (
+						false);
+
+			}
+
+			// remove queue item
+
+			queueLogic.processQueueItem (
+				customerMessage.getQueueItem (),
+				userConsoleLogic.userRequired ());
+
+			// done
+
+			transaction.commit ();
+
+			if (ignore) {
+
+				requestContext.addNotice (
+					"Message ignored");
+
+			} else {
+
+				requestContext.addNotice (
+					"Reply sent");
+
+			}
+
+			// return
+
+			return responder (
+				"queueHomeResponder");
 
 		}
-
-		// remove queue item
-
-		queueLogic.processQueueItem (
-			customerMessage.getQueueItem (),
-			userConsoleLogic.userRequired ());
-
-		// done
-
-		transaction.commit ();
-
-		if (ignore) {
-
-			requestContext.addNotice (
-				"Message ignored");
-
-		} else {
-
-			requestContext.addNotice (
-				"Reply sent");
-
-		}
-
-		// return
-
-		return responder (
-			"queueHomeResponder");
 
 	}
 

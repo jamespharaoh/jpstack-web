@@ -29,9 +29,7 @@ import wbs.framework.logging.TaskLogger;
 import wbs.utils.time.TimeFormatter;
 
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserNoteObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserNoteRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 
 @PrototypeComponent ("chatUserNotesPart")
@@ -45,13 +43,13 @@ class ChatUserNotesPart
 	ConsoleObjectManager consoleObjectManager;
 
 	@SingletonDependency
-	ChatUserObjectHelper chatUserHelper;
+	ChatUserConsoleHelper chatUserHelper;
 
 	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
 	@SingletonDependency
-	ChatUserNoteObjectHelper chatUserNoteHelper;
+	ChatUserNoteConsoleHelper chatUserNoteHelper;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -73,9 +71,7 @@ class ChatUserNotesPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			chatUserHelper.findFromContextRequired ();
 
 		chatUserNotes =
 			chatUserNoteHelper.find (

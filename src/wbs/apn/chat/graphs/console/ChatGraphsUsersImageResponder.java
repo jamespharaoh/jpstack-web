@@ -12,16 +12,20 @@ import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.core.model.ChatStatsObjectHelper;
-import wbs.apn.chat.core.model.ChatStatsRec;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.platform.graph.console.GraphScale;
+
 import wbs.utils.time.TimeFormatter;
+
+import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.console.ChatStatsConsoleHelper;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.core.model.ChatStatsRec;
 
 @PrototypeComponent ("chatGraphsUsersImageResponder")
 public
@@ -31,13 +35,13 @@ class ChatGraphsUsersImageResponder
 	// singleton dependencies
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
 	@SingletonDependency
-	ChatStatsObjectHelper chatStatsHelper;
+	ChatStatsConsoleHelper chatStatsHelper;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -73,9 +77,7 @@ class ChatGraphsUsersImageResponder
 	void prepareData () {
 
 		chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
 		timezone =
 			chatMiscLogic.timezone (

@@ -12,6 +12,7 @@ import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
@@ -308,7 +309,8 @@ class ChatApiServletModule
 				) {
 
 					requestContext.status (
-						HttpStatus.SC_NOT_FOUND);
+						fromJavaInteger (
+							HttpStatus.SC_NOT_FOUND));
 
 					return;
 
@@ -354,7 +356,8 @@ class ChatApiServletModule
 								format);
 
 							requestContext.status (
-								HttpStatus.SC_NOT_FOUND);
+								fromJavaInteger (
+									HttpStatus.SC_NOT_FOUND));
 
 							return;
 
@@ -367,7 +370,8 @@ class ChatApiServletModule
 							 mimeType);
 
 						requestContext.status (
-							HttpStatus.SC_NOT_FOUND);
+							fromJavaInteger (
+								HttpStatus.SC_NOT_FOUND));
 
 						return;
 

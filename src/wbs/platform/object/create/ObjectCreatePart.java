@@ -1,6 +1,9 @@
 package wbs.platform.object.create;
 
 import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 
@@ -183,17 +186,21 @@ class ObjectCreatePart <
 
 		}
 
-		Long parentId =
+		Optional <Long> parentIdOptional =
 			requestContext.stuffInteger (
 				parentHelper.idKey ());
 
-		if (parentId != null) {
+		if (
+			optionalIsNotPresent (
+				parentIdOptional)
+		) {
 
 			// use specific parent
 
 			parent =
 				parentHelper.findRequired (
-					parentId);
+					optionalGetRequired (
+						parentIdOptional));
 
 			return;
 
@@ -203,11 +210,14 @@ class ObjectCreatePart <
 			objectManager.findConsoleHelperRequired (
 				parentHelper.parentClass ());
 
-		Long grandParentId =
+		Optional <Long> grandParentIdOptional =
 			requestContext.stuffInteger (
 				grandParentHelper.idKey ());
 
-		if (grandParentId != null) {
+		if (
+			optionalIsPresent (
+				grandParentIdOptional)
+		) {
 
 			// show parents based on grand parent
 
@@ -215,13 +225,15 @@ class ObjectCreatePart <
 				parentHelper.findByParent (
 					new GlobalId (
 						grandParentHelper.objectTypeId (),
-						grandParentId));
+						optionalGetRequired (
+							grandParentIdOptional)));
 
 			// set grandparent hints
 
 			Record <?> grandparent =
 				grandParentHelper.findRequired (
-					grandParentId);
+					optionalGetRequired (
+						grandParentIdOptional));
 
 			hints.put (
 				"grandparent",

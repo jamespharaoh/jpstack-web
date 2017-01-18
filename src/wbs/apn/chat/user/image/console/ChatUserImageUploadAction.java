@@ -3,6 +3,7 @@ package wbs.apn.chat.user.image.console;
 import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -15,7 +16,6 @@ import javax.inject.Named;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -210,93 +210,96 @@ class ChatUserImageUploadAction
 
 		}
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserImageUploadAction.goReal ()",
-				this);
+		try (
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserImageUploadAction.goReal ()",
+					this);
 
-		// create media
+		) {
 
-		MediaRec media =
-			mediaLogic.createMediaRequired (
-				resampledData,
-				resultType,
-				chatUser.getCode () + "." + extension,
-				Optional.<String>absent ());
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-		// create chat user image
+			// create media
 
-		List<ChatUserImageRec> chatUserImageList =
-			chatUserLogic.getChatUserImageListByType (
-				chatUser,
-				chatUserImageType);
+			MediaRec media =
+				mediaLogic.createMediaRequired (
+					resampledData,
+					resultType,
+					chatUser.getCode () + "." + extension,
+					optionalAbsent ());
 
-		ChatUserImageRec chatUserImage =
-			chatUserImageHelper.insert (
-				chatUserImageHelper.createInstance ()
+			// create chat user image
 
-			.setChatUser (
-				chatUser)
+			List <ChatUserImageRec> chatUserImageList =
+				chatUserLogic.getChatUserImageListByType (
+					chatUser,
+					chatUserImageType);
 
-			.setMedia (
-				media)
+			ChatUserImageRec chatUserImage =
+				chatUserImageHelper.insert (
+					chatUserImageHelper.createInstance ()
 
-			.setFullMedia (
-				media)
+				.setChatUser (
+					chatUser)
 
-			.setStatus (
-				ChatUserInfoStatus.console)
+				.setMedia (
+					media)
 
-			.setTimestamp (
-				transaction.now ())
+				.setFullMedia (
+					media)
 
-			.setModerator (
-				userConsoleLogic.userRequired ())
+				.setStatus (
+					ChatUserInfoStatus.console)
 
-			.setModerationTime (
-				transaction.now ())
+				.setTimestamp (
+					transaction.now ())
 
-			.setType (
-				chatUserImageType)
+				.setModerator (
+					userConsoleLogic.userRequired ())
 
-			.setIndex (
-				fromJavaInteger (
-					chatUserImageList.size ()))
+				.setModerationTime (
+					transaction.now ())
 
-		);
+				.setType (
+					chatUserImageType)
 
-		// add to chat user
+				.setIndex (
+					fromJavaInteger (
+						chatUserImageList.size ()))
 
-		chatUserImageList.add (
-			chatUserImage);
+			);
 
-		if (uploadForm.setAsPrimary ()) {
+			// add to chat user
 
-			chatUserLogic.setMainChatUserImageByType (
-				chatUser,
-				chatUserImageType,
-				Optional.of (
-					chatUserImage));
+			chatUserImageList.add (
+				chatUserImage);
+
+			if (uploadForm.setAsPrimary ()) {
+
+				chatUserLogic.setMainChatUserImageByType (
+					chatUser,
+					chatUserImageType,
+					Optional.of (
+						chatUserImage));
+
+			}
+
+			// commit and finish up
+
+			transaction.commit ();
+
+			requestContext.addNoticeFormat (
+				"%s uploaded",
+				capitalise (
+					chatUserImageType.name ()));
+
+			return responder (
+				"chatUserImageListResponder");
 
 		}
-
-		// commit and finish up
-
-		transaction.commit ();
-
-		requestContext.addNoticeFormat (
-			"%s uploaded",
-			capitalise (
-				chatUserImageType.name ()));
-
-		return responder (
-			"chatUserImageListResponder");
 
 	}
 

@@ -8,10 +8,11 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
-import wbs.smsapps.subscription.model.SubscriptionObjectHelper;
+
 import wbs.smsapps.subscription.model.SubscriptionRec;
 
 @PrototypeComponent ("subscriptionNumberOverviewPart")
@@ -22,7 +23,7 @@ class SubscriptionNumberOverviewPart
 	// singleton dependencies
 
 	@SingletonDependency
-	SubscriptionObjectHelper subscriptionHelper;
+	SubscriptionConsoleHelper subscriptionHelper;
 
 	// state
 
@@ -36,9 +37,7 @@ class SubscriptionNumberOverviewPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		subscription =
-			subscriptionHelper.findRequired (
-				requestContext.stuffInteger (
-					"subscriptionId"));
+			subscriptionHelper.findFromContextRequired ();
 
 	}
 

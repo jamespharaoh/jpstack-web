@@ -19,19 +19,20 @@ import java.util.List;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
-import wbs.apn.chat.user.core.model.ChatUserDao;
-import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.apn.chat.user.core.model.ChatUserSearch;
-import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserSearch;
+import wbs.apn.chat.user.core.model.ChatUserType;
 
 @PrototypeComponent ("chatSettingsMonitorsPart")
 public
@@ -41,13 +42,10 @@ class ChatSettingsMonitorsPart
 	// singleton dependencies
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
-
-	@SingletonDependency
-	ChatUserDao chatUserDao;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -85,9 +83,7 @@ class ChatSettingsMonitorsPart
 				"prepare");
 
 		ChatRec chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
 		List <Long> onlineMonitorIds =
 			chatUserHelper.searchIds (

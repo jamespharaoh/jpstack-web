@@ -180,7 +180,7 @@ class AbstractObjectContext
 		if (stuff () != null) {
 
 			for (
-				Map.Entry<String,? extends Object> entry
+				Map.Entry <String, ? extends Object> entry
 					: stuff ().entrySet ()
 			) {
 

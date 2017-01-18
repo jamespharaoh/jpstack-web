@@ -116,9 +116,7 @@ class ChatRebillSendAction
 		) {
 
 			ChatRec chat =
-				chatHelper.findRequired (
-					requestContext.stuffInteger (
-						"chatId"));
+				chatHelper.findFromContextRequired ();
 
 			// process form submission
 

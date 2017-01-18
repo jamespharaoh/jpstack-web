@@ -81,22 +81,19 @@ import wbs.sms.gazetteer.logic.GazetteerLogic;
 
 import wbs.utils.time.TimeFormatter;
 
-import wbs.apn.chat.contact.model.ChatContactNoteObjectHelper;
 import wbs.apn.chat.contact.model.ChatContactNoteRec;
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.contact.model.ChatMessageStatus;
-import wbs.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.namednote.model.ChatNamedNoteObjectHelper;
+import wbs.apn.chat.namednote.console.ChatNamedNoteConsoleHelper;
+import wbs.apn.chat.namednote.console.ChatNoteNameConsoleHelper;
 import wbs.apn.chat.namednote.model.ChatNamedNoteRec;
-import wbs.apn.chat.namednote.model.ChatNoteNameObjectHelper;
 import wbs.apn.chat.namednote.model.ChatNoteNameRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.apn.chat.user.core.console.ChatUserAlarmConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
@@ -109,25 +106,25 @@ class ChatMonitorInboxSummaryPart
 	// singleton dependencies
 
 	@SingletonDependency
-	ChatContactNoteObjectHelper chatContactNoteHelper;
+	ChatContactNoteConsoleHelper chatContactNoteHelper;
 
 	@SingletonDependency
-	ChatMessageObjectHelper chatMessageHelper;
+	ChatMessageConsoleHelper chatMessageHelper;
 
 	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
 	@SingletonDependency
-	ChatMonitorInboxObjectHelper chatMonitorInboxHelper;
+	ChatMonitorInboxConsoleHelper chatMonitorInboxHelper;
 
 	@SingletonDependency
-	ChatNamedNoteObjectHelper chatNamedNoteHelper;
+	ChatNamedNoteConsoleHelper chatNamedNoteHelper;
 
 	@SingletonDependency
-	ChatNoteNameObjectHelper chatNoteNameHelper;
+	ChatNoteNameConsoleHelper chatNoteNameHelper;
 
 	@SingletonDependency
-	ChatUserAlarmObjectHelper chatUserAlarmHelper;
+	ChatUserAlarmConsoleHelper chatUserAlarmHelper;
 
 	@SingletonDependency
 	ChatUserLogic chatUserLogic;
@@ -218,9 +215,7 @@ class ChatMonitorInboxSummaryPart
 			transaction.now ();
 
 		monitorInbox =
-			chatMonitorInboxHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatMonitorInboxId"));
+			chatMonitorInboxHelper.findFromContextRequired ();
 
 		monitorChatUser =
 			monitorInbox.getMonitorChatUser ();

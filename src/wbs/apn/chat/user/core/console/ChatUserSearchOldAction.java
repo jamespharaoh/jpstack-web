@@ -254,12 +254,12 @@ class ChatUserSearchOldAction
 
 		// create basic criteria
 
-		Map<String,Object> searchMap =
+		Map <String, Object> searchMap =
 			new LinkedHashMap<> ();
 
 		searchMap.put (
 			"chatId",
-			requestContext.stuffInteger (
+			requestContext.stuffIntegerRequired (
 				"chatId"));
 
 		// check we are not being stupid

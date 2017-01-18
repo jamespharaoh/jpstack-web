@@ -1,29 +1,36 @@
 package wbs.platform.core.console;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringInSafe;
 
-import lombok.Cleanup;
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.logic.UserLogic;
+import wbs.platform.user.model.UserRec;
+import wbs.platform.user.model.UserSessionRec;
 
 import wbs.web.responder.Responder;
 
-@Log4j
 @PrototypeComponent ("coreLogonAction")
 public
 class CoreLogonAction
@@ -32,10 +39,13 @@ class CoreLogonAction
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
+	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
-	Database database;
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
@@ -62,7 +72,12 @@ class CoreLogonAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// get params
 
@@ -93,52 +108,89 @@ class CoreLogonAction
 			return null;
 		}
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"CoreLogonAction.goReal ()",
-				this);
+		Optional <Long> userIdOptional;
 
-		// attempt logon
+		try (
 
-		Long userId =
-			userLogic.userLogonTry (
-				slice.toLowerCase (),
-				username.toLowerCase (),
-				password,
-				requestContext.sessionId (),
-				requestContext.header (
-					"User-Agent"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"CoreLogonAction.goReal ()",
+					this);
 
-		transaction.commit ();
+		) {
+
+			// attempt logon
+
+			Optional <UserSessionRec> userSessionOptional =
+				userLogic.userLogonTry (
+					slice.toLowerCase (),
+					username.toLowerCase (),
+					password,
+					requestContext.sessionId (),
+					requestContext.header (
+						"User-Agent"),
+					requestContext.cookie (
+						"txt2_console"));
+
+			if (
+				optionalIsPresent (
+					userSessionOptional)
+			) {
+
+				UserSessionRec userSession =
+					optionalGetRequired (
+						userSessionOptional);
+
+				UserRec user =
+					userSession.getUser ();
+
+				userIdOptional =
+					optionalOf (
+						user.getId ());
+
+			} else {
+
+				userIdOptional =
+					optionalAbsent ();
+
+			}
+
+			transaction.commit ();
+
+		}
 
 		// if it failed show the logon page again
 
-		if (userId == null) {
+		if (
+			optionalIsNotPresent (
+				userIdOptional)
+		) {
 
-			requestContext.addWarning (
-				"Sorry, the details you entered did not match. Please try " +
+			requestContext.addWarningFormat (
+				"Sorry, the details you entered did not match. Please try ",
 				"again, or contact an appropriate person for help.");
 
-			log.warn (
-				stringFormat (
-					"Failed logon attempt for %s.%s",
-					slice,
-					username));
+			taskLogger.warningFormat (
+				"Failed logon attempt for %s.%s",
+				slice,
+				username);
 
 			return null;
 
 		}
 
+		Long userId =
+			optionalGetRequired (
+				userIdOptional);
+
 		// save the userid
 
-		log.info (
-			stringFormat (
-				"Successful logon for %s.%s (%s)",
-				slice,
-				username,
-				integerToDecimalString (
-					userId)));
+		taskLogger.noticeFormat (
+			"Successful logon for %s.%s (%s)",
+			slice,
+			username,
+			integerToDecimalString (
+				userId));
 
 		userConsoleLogic.login (
 			userId);

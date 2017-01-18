@@ -7,8 +7,6 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
-import java.io.PrintWriter;
-
 import lombok.Cleanup;
 import lombok.NonNull;
 
@@ -30,7 +28,7 @@ import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
 
-import wbs.utils.string.StringFormatter;
+import wbs.utils.string.FormatWriter;
 
 import wbs.web.context.RequestContext;
 import wbs.web.file.AbstractWebFile;
@@ -225,12 +223,11 @@ class TxtNationRouteInFile
 
 		// send response
 
-		PrintWriter out =
-			requestContext.writer ();
+		FormatWriter formatWriter =
+			requestContext.formatWriter ();
 
-		StringFormatter.printWriterFormat (
-			out,
-			"OK\n");
+		formatWriter.writeLineFormat (
+			"OK");
 
 	}
 

@@ -43,9 +43,8 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
-import wbs.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
+import wbs.apn.chat.user.core.console.ChatUserAlarmConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.apn.chat.user.core.model.ChatUserOperatorLabel;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -59,10 +58,10 @@ class ChatMonitorInboxFormResponder
 	// singleton dependencies
 
 	@SingletonDependency
-	ChatMonitorInboxObjectHelper chatMonitorInboxHelper;
+	ChatMonitorInboxConsoleHelper chatMonitorInboxHelper;
 
 	@SingletonDependency
-	ChatUserAlarmObjectHelper chatUserAlarmHelper;
+	ChatUserAlarmConsoleHelper chatUserAlarmHelper;
 
 	@SingletonDependency
 	ConsoleManager consoleManager;
@@ -107,9 +106,7 @@ class ChatMonitorInboxFormResponder
 			@NonNull TaskLogger parentTaskLogger) {
 
 		Optional <ChatMonitorInboxRec> chatMonitorInboxOptional =
-			chatMonitorInboxHelper.find (
-				requestContext.stuffInteger (
-					"chatMonitorInboxId"));
+			chatMonitorInboxHelper.findFromContext ();
 
 		if (
 			optionalIsNotPresent (
@@ -123,7 +120,7 @@ class ChatMonitorInboxFormResponder
 				stringFormat (
 					"Chat monitor inbox not found: %s",
 					integerToDecimalString (
-						requestContext.stuffInteger (
+						requestContext.stuffIntegerRequired (
 							"chatMonitorInboxId"))));
 
 			return;

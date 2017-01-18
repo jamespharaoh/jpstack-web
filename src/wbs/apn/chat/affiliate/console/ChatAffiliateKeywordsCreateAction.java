@@ -127,9 +127,7 @@ class ChatAffiliateKeywordsCreateAction
 		) {
 
 			ChatAffiliateRec chatAffiliate =
-				chatAffiliateHelper.findRequired (
-					requestContext.stuffInteger (
-						"chatAffiliateId"));
+				chatAffiliateHelper.findFromContextRequired ();
 
 			ChatSchemeRec chatScheme =
 				chatAffiliate.getChatScheme ();

@@ -16,6 +16,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataToJson;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.context.RequestContext;
 
 @Accessors (fluent = true)
@@ -49,7 +50,7 @@ class JsonResponder
 			"application/json");
 
 		PrintWriter out =
-			requestContext.writer ();
+			requestContext.printWriter ();
 
 		DataToJson dataToJson =
 			new DataToJson ();

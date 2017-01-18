@@ -5,7 +5,9 @@ import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToSpaces;
@@ -307,16 +309,20 @@ class ObjectListPart <
 					objectManager.findConsoleHelperRequired (
 						parentHelper.parentClass ());
 
-				Long grandParentId =
+				Optional <Long> grandParentIdOptional =
 					requestContext.stuffInteger (
 						grandParentHelper.idKey ());
 
-				if (grandParentId != null) {
+				if (
+					optionalIsPresent (
+						grandParentIdOptional)
+				) {
 
 					prepareAllObjectsViaGrandParent (
 						parentHelper,
 						grandParentHelper,
-						grandParentId);
+						optionalGetRequired (
+							grandParentIdOptional));
 
 					return;
 

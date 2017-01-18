@@ -1,8 +1,9 @@
 package wbs.platform.object.search;
 
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
@@ -147,19 +148,19 @@ class ObjectSearchPart <
 				objectManager.findConsoleHelperRequired (
 					consoleHelper.parentClass ());
 
-			Long parentId =
+			Optional <Long> parentIdOptional =
 				requestContext.stuffInteger (
 					parentHelper.idKey ());
 
 			if (
-				isNotNull (
-					parentId)
+				optionalIsPresent (
+					parentIdOptional)
 			) {
 
 				Record <?> parent =
 					parentHelper.findRequired (
-						requestContext.stuffInteger (
-							parentHelper.idKey ()));
+						optionalGetRequired (
+							parentIdOptional));
 
 				formHintsBuilder.put (
 					consoleHelper.parentFieldName (),

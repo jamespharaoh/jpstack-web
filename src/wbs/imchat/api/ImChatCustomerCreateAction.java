@@ -2,6 +2,7 @@ package wbs.imchat.api;
 
 import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -22,14 +23,17 @@ import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.text.model.TextObjectHelper;
+
+import wbs.utils.random.RandomLogic;
+
 import wbs.imchat.model.ImChatCustomerObjectHelper;
 import wbs.imchat.model.ImChatCustomerRec;
 import wbs.imchat.model.ImChatObjectHelper;
 import wbs.imchat.model.ImChatRec;
 import wbs.imchat.model.ImChatSessionObjectHelper;
 import wbs.imchat.model.ImChatSessionRec;
-import wbs.platform.text.model.TextObjectHelper;
-import wbs.utils.random.RandomLogic;
 import wbs.web.action.Action;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.JsonResponder;
@@ -253,7 +257,8 @@ class ImChatCustomerCreateAction
 					createRequest.userAgent ()))
 
 			.setIpAddress (
-				requestContext.realIp ())
+				optionalOrNull (
+					requestContext.realIp ()))
 
 		);
 

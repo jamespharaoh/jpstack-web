@@ -26,19 +26,22 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
+import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.time.IntervalFormatter;
+import wbs.utils.time.TextualInterval;
+
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
-import wbs.apn.chat.core.model.ChatObjectHelper;
+import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserSearch;
-import wbs.console.part.AbstractPagePart;
-import wbs.console.priv.UserPrivChecker;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
-import wbs.utils.time.IntervalFormatter;
-import wbs.utils.time.TextualInterval;
 
 @PrototypeComponent ("chatAffiliateComparePart")
 public
@@ -48,7 +51,7 @@ class ChatAffiliateComparePart
 	// dependencies
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
@@ -94,9 +97,7 @@ class ChatAffiliateComparePart
 		// get objects
 
 		ChatRec chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
 		// work out first join time
 

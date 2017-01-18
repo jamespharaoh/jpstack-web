@@ -7,13 +7,16 @@ import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPost;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.media.console.MediaConsoleLogic;
+
+import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 
 @PrototypeComponent ("chatUserImageRemovePart")
 public
@@ -40,9 +43,7 @@ class ChatUserImageRemovePart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			chatUserHelper.findFromContextRequired ();
 
 	}
 

@@ -7,11 +7,13 @@ import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
-import wbs.platform.media.model.MediaObjectHelper;
+
 import wbs.platform.media.model.MediaRec;
+
 import wbs.utils.io.RuntimeIoException;
 
 @PrototypeComponent ("mediaAudioResponder")
@@ -22,7 +24,7 @@ class MediaAudioResponder
 	// singleton dependencies
 
 	@SingletonDependency
-	MediaObjectHelper mediaHelper;
+	MediaConsoleHelper mediaHelper;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -46,9 +48,7 @@ class MediaAudioResponder
 			@NonNull TaskLogger parentTaskLogger) {
 
 		MediaRec media =
-			mediaHelper.findRequired (
-				requestContext.stuffInteger (
-					"mediaId"));
+			mediaHelper.findFromContextRequired ();
 
 		data =
 			media.getContent ().getData ();

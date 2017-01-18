@@ -10,6 +10,7 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
@@ -129,19 +130,16 @@ class ChatRebillSendPart
 
 			.put (
 				"chat",
-				chatHelper.findRequired (
-					requestContext.stuffInteger (
-						"chatId")))
+				chatHelper.findFromContextRequired ())
 
 			.build ();
 
 		// get search results
 
-		@SuppressWarnings ("unchecked")
 		Optional <List <Long>> billSearchResultsTemp =
-			(Optional <List <Long>>)
-			requestContext.request (
-				"billSearchResults");
+			genericCastUnchecked (
+				requestContext.request (
+					"billSearchResults"));
 
 		billSearchResults =
 			optionalMapRequired (
@@ -151,11 +149,10 @@ class ChatRebillSendPart
 						chatUserHelper::findRequired,
 						list));
 
-		@SuppressWarnings ("unchecked")
 		Optional <List <Pair <Long, String>>> nonBillSearchResultsTemp =
-			(Optional <List <Pair <Long, String>>>)
-			requestContext.request (
-				"nonBillSearchResults");
+			genericCastUnchecked (
+				requestContext.request (
+					"nonBillSearchResults"));
 
 		nonBillSearchResults =
 			optionalMapRequired (

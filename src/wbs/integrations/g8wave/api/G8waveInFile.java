@@ -3,9 +3,9 @@ package wbs.integrations.g8wave.api;
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 
@@ -26,6 +26,8 @@ import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.web.context.RequestContext;
 import wbs.web.file.WebFile;
@@ -96,24 +98,21 @@ class G8waveInFile
 		// get params in local variables
 
 		String numFromParam =
-			requestContext.parameterOrNull ("telno");
+			requestContext.parameterRequired (
+				"telno");
 
 		String numToParam =
-			requestContext.parameterOrNull ("shortcode");
+			requestContext.parameterRequired (
+				"shortcode");
 
 		String networkParam =
-			requestContext.parameterOrNull ("network");
+			optionalOrNull (
+				requestContext.parameter (
+					"network"));
 
 		String messageParam =
-			requestContext.parameterOrNull ("message");
-
-		if (
-			numFromParam == null
-			|| numToParam == null
-			|| messageParam == null
-		) {
-			throw new ServletException ("Parameter not supplied");
-		}
+			requestContext.parameterRequired (
+				"message");
 
 		Long networkId = null;
 
@@ -170,10 +169,11 @@ class G8waveInFile
 
 		transaction.commit ();
 
-		PrintWriter out =
-			requestContext.writer ();
+		FormatWriter formatWriter =
+			requestContext.formatWriter ();
 
-		out.println ("OK");
+		formatWriter.writeLineFormat (
+			"OK");
 
 	}
 

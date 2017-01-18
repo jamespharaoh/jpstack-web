@@ -1,9 +1,11 @@
 package wbs.platform.object.summary;
 
-import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
@@ -80,7 +82,7 @@ class ObjectSummaryFieldsPart <
 
 		object =
 			consoleHelper.lookupObject (
-				requestContext.contextStuffRequired ());
+				requestContext.consoleContextStuffRequired ());
 
 		if (formFieldsProvider != null) {
 
@@ -109,20 +111,21 @@ class ObjectSummaryFieldsPart <
 
 		}
 
-		Long parentId =
+		Optional <Long> parentIdOptional =
 			requestContext.stuffInteger (
 				parentHelper.idKey ());
 
 		if (
-			isNotNull (
-				parentId)
+			optionalIsPresent (
+				parentIdOptional)
 		) {
 
 			// use specific parent
 
 			parent =
 				parentHelper.findRequired (
-					parentId);
+					optionalGetRequired (
+						parentIdOptional));
 
 			return;
 

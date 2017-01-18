@@ -6,26 +6,28 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
-import wbs.apn.chat.bill.model.ChatUserCreditObjectHelper;
-import wbs.apn.chat.bill.model.ChatUserCreditRec;
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.param.FixedParamChecker;
 import wbs.console.param.ParamChecker;
 import wbs.console.param.ParamCheckerSet;
 import wbs.console.param.RegexpParamChecker;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
+
+import wbs.apn.chat.bill.model.ChatUserCreditObjectHelper;
+import wbs.apn.chat.bill.model.ChatUserCreditRec;
+import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatUserAdminCreditAction")
@@ -107,64 +109,67 @@ class ChatUserAdminCreditAction
 			params.get (
 				"details");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserAdminCreditAction.goReal ()",
-				this);
+		try (
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserAdminCreditAction.goReal ()",
+					this);
 
-		ChatUserCreditRec chatUserCredit =
-			chatUserCreditHelper.insert (
-				chatUserCreditHelper.createInstance ()
+		) {
 
-			.setChatUser (
-				chatUser)
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-			.setTimestamp (
-				transaction.now ())
+			ChatUserCreditRec chatUserCredit =
+				chatUserCreditHelper.insert (
+					chatUserCreditHelper.createInstance ()
 
-			.setCreditAmount (
-				creditAmount)
+				.setChatUser (
+					chatUser)
 
-			.setBillAmount (
-				billAmount)
+				.setTimestamp (
+					transaction.now ())
 
-			.setUser (
-				userConsoleLogic.userRequired ())
+				.setCreditAmount (
+					creditAmount)
 
-			.setGift (
-				billAmount == 0)
+				.setBillAmount (
+					billAmount)
 
-			.setDetails (
-				details)
+				.setUser (
+					userConsoleLogic.userRequired ())
 
-		);
+				.setGift (
+					billAmount == 0)
 
-		chatUser
+				.setDetails (
+					details)
 
-			.setCredit (
-				+ chatUser.getCredit ()
-				+ creditAmount)
+			);
 
-			.setCreditBought (
-				+ chatUser.getCreditBought ()
-				+ creditAmount);
+			chatUser
 
-		transaction.commit ();
+				.setCredit (
+					+ chatUser.getCredit ()
+					+ creditAmount)
 
-		requestContext.setEmptyFormData ();
+				.setCreditBought (
+					+ chatUser.getCreditBought ()
+					+ creditAmount);
 
-		requestContext.addNoticeFormat (
-			"Credit adjusted, reference = %h",
-			integerToDecimalString (
-				chatUserCredit.getId ()));
+			transaction.commit ();
 
-		return null;
+			requestContext.setEmptyFormData ();
+
+			requestContext.addNoticeFormat (
+				"Credit adjusted, reference = %h",
+				integerToDecimalString (
+					chatUserCredit.getId ()));
+
+			return null;
+
+		}
 
 	}
 

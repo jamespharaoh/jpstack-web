@@ -11,28 +11,32 @@ import java.util.regex.Pattern;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.text.web.TextResponder;
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.sms.customer.model.SmsCustomerRec;
 import wbs.sms.number.core.console.NumberConsoleHelper;
 import wbs.sms.number.core.model.NumberRec;
+
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
+
 import wbs.web.responder.Responder;
 import wbs.web.utils.HtmlUtils;
 
@@ -132,48 +136,51 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 		// start transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ManualResponderRequestPendingNumberNoteUpdateAction.goReal ()",
-				this);
+		try (
 
-		manualResponder =
-			manualResponderHelper.findRequired (
-				requestContext.stuffInteger (
-					"manualResponderId"));
-
-		number =
-			numberHelper.findRequired (
-				numberId);
-
-		// find or create number
-
-		manualResponderNumber =
-			manualResponderNumberHelper.findOrCreate (
-				manualResponder,
-				number);
-
-		customer =
-			manualResponderNumber.getSmsCustomer ();
-
-		if (
-
-			isNull (
-				customer)
-
-			|| isNotNull (
-				manualResponderNumber.getNotesText ())
+			Transaction transaction =
+				database.beginReadWrite (
+					"ManualResponderRequestPendingNumberNoteUpdateAction.goReal ()",
+					this);
 
 		) {
 
-			return updateNumber (
-				transaction);
+			manualResponder =
+				manualResponderHelper.findFromContextRequired ();
 
-		} else {
+			number =
+				numberHelper.findRequired (
+					numberId);
 
-			return updateCustomer (
-				transaction);
+			// find or create number
+
+			manualResponderNumber =
+				manualResponderNumberHelper.findOrCreate (
+					manualResponder,
+					number);
+
+			customer =
+				manualResponderNumber.getSmsCustomer ();
+
+			if (
+
+				isNull (
+					customer)
+
+				|| isNotNull (
+					manualResponderNumber.getNotesText ())
+
+			) {
+
+				return updateNumber (
+					transaction);
+
+			} else {
+
+				return updateCustomer (
+					transaction);
+
+			}
 
 		}
 

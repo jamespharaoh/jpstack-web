@@ -107,9 +107,7 @@ class ChatHelpLogPendingFormResponder
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chatHelpLog =
-			chatHelpLogHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatHelpLogId"));
+			chatHelpLogHelper.findFromContextRequired ();
 
 		chatHelpTemplates =
 			chatHelpTemplateHelper.findByParentAndType (

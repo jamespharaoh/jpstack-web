@@ -1,7 +1,8 @@
 package wbs.platform.object.settings;
 
-import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
@@ -129,7 +130,7 @@ class ObjectSettingsPart <
 
 		object =
 			objectLookup.lookupObject (
-				requestContext.contextStuffRequired ());
+				requestContext.consoleContextStuffRequired ());
 
 		canEdit = (
 
@@ -167,20 +168,21 @@ class ObjectSettingsPart <
 
 		}
 
-		Long parentId =
+		Optional <Long> parentIdOptional =
 			requestContext.stuffInteger (
 				parentHelper.idKey ());
 
 		if (
-			isNotNull (
-				parentId)
+			optionalIsPresent (
+				parentIdOptional)
 		) {
 
 			// use specific parent
 
 			parent =
 				parentHelper.findRequired (
-					parentId);
+					optionalGetRequired (
+						parentIdOptional));
 
 			return;
 

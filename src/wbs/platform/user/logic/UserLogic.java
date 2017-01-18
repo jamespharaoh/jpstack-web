@@ -3,33 +3,26 @@ package wbs.platform.user.logic;
 import com.google.common.base.Optional;
 
 import wbs.platform.user.model.UserRec;
+import wbs.platform.user.model.UserSessionRec;
 
 public
 interface UserLogic {
 
-	/**
-	 * Logs the specified user onto the system. This will first call userLogoff
-	 * to end any existing session. The user record is then updated and a new
-	 * UserSession created.
-	 */
-	void userLogon (
+	UserSessionRec userLogon (
 			UserRec user,
 			String sessionId,
-			Optional<String> userAgent);
+			Optional <String> userAgent,
+			Optional <String> consoleDeployment);
 
-	/**
-	 * Logs the specified user off the system. This includes updating all
-	 * relevant fields and updating the UserSession. This does nothing if the
-	 * user is not currently online.
-	 */
 	void userLogoff (
 			UserRec user);
 
-	Long userLogonTry (
+	Optional <UserSessionRec> userLogonTry (
 			String sliceCode,
 			String username,
 			String password,
 			String sessionId,
-			Optional<String> userAgent);
+			Optional <String> userAgent,
+			Optional <String> consoleDeployment);
 
 }

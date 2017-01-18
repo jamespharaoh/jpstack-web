@@ -120,7 +120,7 @@ class ChatMonitorInboxFormAction
 		// get stuff
 
 		Long monitorInboxId =
-			requestContext.stuffInteger (
+			requestContext.stuffIntegerRequired (
 				"chatMonitorInboxId");
 
 		// get params

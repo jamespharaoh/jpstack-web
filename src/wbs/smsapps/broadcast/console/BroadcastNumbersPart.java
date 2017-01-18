@@ -13,9 +13,11 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.smsapps.broadcast.model.BroadcastRec;
 
 @Accessors (fluent = true)
@@ -41,9 +43,7 @@ class BroadcastNumbersPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		broadcast =
-			broadcastHelper.findRequired (
-				requestContext.stuffInteger (
-					"broadcastId"));
+			broadcastHelper.findFromContextRequired ();
 
 	}
 

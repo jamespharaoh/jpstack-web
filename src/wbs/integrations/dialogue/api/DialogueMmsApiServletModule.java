@@ -12,7 +12,6 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.utils.time.TimeUtils.dateToInstantNullSafe;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,6 +53,8 @@ import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.web.context.RequestContext;
 import wbs.web.file.AbstractWebFile;
@@ -149,139 +150,145 @@ class DialogueMmsApiServletModule
 					parentTaskLogger,
 					"inFile.doPost");
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"DialogueMmsApiServletModule.inFile.doPost ()",
-					this);
+			try (
 
-			requestContext.debugDump (
-				taskLogger);
+				Transaction transaction =
+					database.beginReadWrite (
+						"DialogueMmsApiServletModule.inFile.doPost ()",
+						this);
 
-			// process attachments
-
-			String text =
-				nullIfEmptyString (
-					requestContext.header (
-						"x-mms-subject"));
-
-			List<MediaRec> medias =
-				new ArrayList<MediaRec> ();
-
-			for (
-				FileItem item
-					: requestContext.fileItems ()
 			) {
 
-				Matcher matcher =
-					contentTypePattern.matcher (
-						item.getContentType ());
+				requestContext.debugDump (
+					taskLogger);
 
-				if (! matcher.matches ()) {
+				// process attachments
 
-					throw new RuntimeException (
-						"Content type error");
+				String text =
+					nullIfEmptyString (
+						requestContext.headerOrEmptyString (
+							"x-mms-subject"));
 
-				}
+				List <MediaRec> medias =
+					new ArrayList<> ();
 
-				String type =
-					matcher.group (1);
-
-				String charset =
-					matcher.group (2);
-
-				medias.add (
-					mediaLogic.createMediaRequired (
-						item.get (),
-						type,
-						item.getName (),
-						Optional.of (
-							charset)));
-
-				if (
-
-					isNull (
-						text)
-
-					&& stringEqualSafe (
-						type,
-						"text/plain")
+				for (
+					FileItem item
+						: requestContext.fileItems ()
 				) {
 
-					text =
-						nullIfEmptyString (
-							item.getString ());
+					Matcher matcher =
+						contentTypePattern.matcher (
+							item.getContentType ());
+
+					if (! matcher.matches ()) {
+
+						throw new RuntimeException (
+							"Content type error");
+
+					}
+
+					String type =
+						matcher.group (1);
+
+					String charset =
+						matcher.group (2);
+
+					medias.add (
+						mediaLogic.createMediaRequired (
+							item.get (),
+							type,
+							item.getName (),
+							Optional.of (
+								charset)));
+
+					if (
+
+						isNull (
+							text)
+
+						&& stringEqualSafe (
+							type,
+							"text/plain")
+					) {
+
+						text =
+							nullIfEmptyString (
+								item.getString ());
+
+					}
 
 				}
 
+				if (text == null)
+					text = "";
+
+				String mmsMessageId =
+					requestContext.headerRequired (
+						"x-mms-message-id");
+
+				String mmsSenderAddress =
+					requestContext.headerRequired (
+						"x-mms-sender-address");
+
+				String mmsRecipientAddress =
+					requestContext.headerRequired (
+						"x-mms-recipient-address");
+
+				RouteRec route =
+					routeHelper.findRequired (
+						requestContext.requestIntegerRequired (
+							"routeId"));
+
+				Instant mmsDate;
+
+				try {
+
+					mmsDate =
+						dateToInstantNullSafe (
+							getDateFormat ().parse (
+								requestContext.headerRequired (
+									"x-mms-date")));
+
+				} catch (ParseException parseException) {
+
+					throw new RuntimeException (
+						parseException);
+
+				}
+
+				String mmsSubject =
+					requestContext.headerRequired (
+						"x-mms-subject");
+
+				// insert into inbox
+
+				smsInboxLogic.inboxInsert (
+					optionalOf (
+						mmsMessageId),
+					textHelper.findOrCreate (
+						text),
+					smsNumberHelper.findOrCreate (
+						mmsSenderAddress),
+					mmsRecipientAddress,
+					route,
+					optionalAbsent (),
+					optionalOf (
+						mmsDate),
+					medias,
+					optionalAbsent (),
+					optionalFromNullable (
+						mmsSubject));
+
+				transaction.commit ();
+
+				FormatWriter formatWriter =
+					requestContext.formatWriter ();
+
+				formatWriter.writeLineFormat (
+					"OK");
+
 			}
-
-			if (text == null)
-				text = "";
-
-			String mmsMessageId =
-				requestContext.header (
-					"x-mms-message-id");
-
-			String mmsSenderAddress =
-				requestContext.header (
-					"x-mms-sender-address");
-
-			String mmsRecipientAddress =
-				requestContext.header (
-					"x-mms-recipient-address");
-
-			RouteRec route =
-				routeHelper.findRequired (
-					requestContext.requestIntegerRequired (
-						"routeId"));
-
-			Instant mmsDate;
-
-			try {
-
-				mmsDate =
-					dateToInstantNullSafe (
-						getDateFormat ().parse (
-							requestContext.header (
-								"x-mms-date")));
-
-			} catch (ParseException parseException) {
-
-				throw new RuntimeException (
-					parseException);
-
-			}
-
-			String mmsSubject =
-				requestContext.header (
-					"x-mms-subject");
-
-			// insert into inbox
-
-			smsInboxLogic.inboxInsert (
-				optionalOf (
-					mmsMessageId),
-				textHelper.findOrCreate (
-					text),
-				smsNumberHelper.findOrCreate (
-					mmsSenderAddress),
-				mmsRecipientAddress,
-				route,
-				optionalAbsent (),
-				optionalOf (
-					mmsDate),
-				medias,
-				optionalAbsent (),
-				optionalFromNullable (
-					mmsSubject));
-
-			transaction.commit ();
-
-			PrintWriter out =
-				requestContext.writer ();
-
-			out.println ("OK");
 
 		}
 
@@ -343,10 +350,10 @@ class DialogueMmsApiServletModule
 			// int routeId = requestContext.getRequestInt ("routeId");
 
 			String userKeyParam =
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"X-Mms-User-Key");
 
-			final Long messageId;
+			Long messageId;
 
 			try {
 
@@ -380,15 +387,8 @@ class DialogueMmsApiServletModule
 			}
 
 			String deliveryReportParam =
-				requestContext.parameterOrNull (
+				requestContext.parameterRequired (
 					"X-Mms-Delivery-Report");
-
-			if (deliveryReportParam == null) {
-
-				throw new ServletException (
-					"Unrecognised MMS report for " + messageId);
-
-			}
 
 			MessageStatus newMessageStatus = null;
 

@@ -15,10 +15,13 @@ import lombok.NonNull;
 import org.joda.time.Instant;
 
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.smsapps.subscription.model.SubscriptionSendRec;
 
 @PrototypeComponent ("subscriptionSendControlPart")
@@ -46,9 +49,7 @@ class SubscriptionSendControlPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		subscriptionSend =
-			subscriptionSendHelper.findRequired (
-				requestContext.stuffInteger (
-					"subscriptionSendId"));
+			subscriptionSendHelper.findFromContextRequired ();
 
 	}
 

@@ -6,7 +6,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -93,59 +92,64 @@ class ObjectRemoveAction
 	Responder goReal (
 			@NonNull TaskLogger taskLogger) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ObjectRemoveAction.goReal ()",
-				this);
+		try (
 
-		Record <?> ephemeralObject =
-			objectHelper.lookupObject (
-				requestContext.contextStuffRequired ());
+			Transaction transaction =
+				database.beginReadWrite (
+					"ObjectRemoveAction.goReal ()",
+					this);
 
-		objectHelper.remove (
-			ephemeralObject);
+		) {
 
-		Record <?> parentObject =
-			objectHelper.getParentRequired (
-				genericCastUnchecked (
-					ephemeralObject));
+			Record <?> ephemeralObject =
+				objectHelper.lookupObject (
+					requestContext.consoleContextStuffRequired ());
 
-		eventLogic.createEvent (
-			"object_removed_in",
-			userConsoleLogic.userRequired (),
-			objectHelper.getCode (
-				genericCastUnchecked (
-					ephemeralObject)),
-			objectHelper.shortName (),
-			parentObject);
+			objectHelper.remove (
+				ephemeralObject);
 
-		transaction.commit ();
+			Record <?> parentObject =
+				objectHelper.getParentRequired (
+					genericCastUnchecked (
+						ephemeralObject));
 
-		requestContext.addNotice (
-			stringFormat (
-				"%s deleted",
-				capitalise (
-					objectHelper.friendlyName ())));
+			eventLogic.createEvent (
+				"object_removed_in",
+				userConsoleLogic.userRequired (),
+				objectHelper.getCode (
+					genericCastUnchecked (
+						ephemeralObject)),
+				objectHelper.shortName (),
+				parentObject);
 
-		ConsoleContextType targetContextType =
-			consoleManager.contextType (
-				nextContextTypeName,
-				true);
+			transaction.commit ();
 
-		ConsoleContext targetContext =
-			consoleManager.relatedContextRequired (
+			requestContext.addNotice (
+				stringFormat (
+					"%s deleted",
+					capitalise (
+						objectHelper.friendlyName ())));
+
+			ConsoleContextType targetContextType =
+				consoleManager.contextType (
+					nextContextTypeName,
+					true);
+
+			ConsoleContext targetContext =
+				consoleManager.relatedContextRequired (
+					taskLogger,
+					requestContext.consoleContextRequired (),
+					targetContextType);
+
+			consoleManager.changeContext (
 				taskLogger,
-				requestContext.consoleContextRequired (),
-				targetContextType);
+				targetContext,
+				"/" + parentObject.getId ());
 
-		consoleManager.changeContext (
-			taskLogger,
-			targetContext,
-			"/" + parentObject.getId ());
+			return listResponder
+				.get ();
 
-		return listResponder
-			.get ();
+		}
 
 	}
 

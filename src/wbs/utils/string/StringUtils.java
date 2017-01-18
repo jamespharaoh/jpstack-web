@@ -100,12 +100,25 @@ class StringUtils {
 
 	public static
 	String joinWithoutSeparator (
-			Iterable<String> parts) {
+			@NonNull Iterable <String> parts) {
 
 		return joinWithSeparator (
 			"",
 			"",
 			parts,
+			"");
+
+	}
+
+	public static
+	String joinWithoutSeparator (
+			@NonNull String ... parts) {
+
+		return joinWithSeparator (
+			"",
+			"",
+			Arrays.asList (
+				parts),
 			"");
 
 	}
@@ -130,18 +143,6 @@ class StringUtils {
 
 		return joinWithSeparator (
 			separator,
-			"",
-			Arrays.asList (parts),
-			"");
-
-	}
-
-	public static
-	String joinWithoutSeparator (
-			@NonNull String... parts) {
-
-		return joinWithSeparator (
-			"",
 			"",
 			Arrays.asList (parts),
 			"");
@@ -681,6 +682,16 @@ class StringUtils {
 	}
 
 	public static
+	List <String> stringSplitSpace (
+			@NonNull String source) {
+
+		return stringSplitSimple (
+			" ",
+			source);
+
+	}
+
+	public static
 	List <String> stringSplitComma (
 			@NonNull String source) {
 
@@ -910,11 +921,11 @@ class StringUtils {
 
 		if (
 
-			stringEndsWith (
+			stringEndsWithSimple (
 				"s",
 				singular)
 
-			|| stringEndsWith (
+			|| stringEndsWithSimple (
 				"x",
 				singular)
 
@@ -932,21 +943,21 @@ class StringUtils {
 
 	public static
 	boolean stringStartsWithSimple (
-			@NonNull String suffix,
-			@NonNull String subject) {
+			@NonNull CharSequence prefix,
+			@NonNull CharSequence subject) {
 
-		return subject.startsWith (
-			suffix);
+		return subject.toString ().startsWith (
+			prefix.toString ());
 
 	}
 
 	public static
-	boolean stringEndsWith (
-			@NonNull String suffix,
-			@NonNull String subject) {
+	boolean stringEndsWithSimple (
+			@NonNull CharSequence suffix,
+			@NonNull CharSequence subject) {
 
-		return subject.endsWith (
-			suffix);
+		return subject.toString ().endsWith (
+			suffix.toString ());
 
 	}
 
@@ -1517,6 +1528,16 @@ class StringUtils {
 				string);
 
 		return ! matcher.matches ();
+
+	}
+
+	public static
+	boolean stringContains (
+			@NonNull CharSequence substring,
+			@NonNull CharSequence string) {
+
+		return string.toString ().contains (
+			substring);
 
 	}
 

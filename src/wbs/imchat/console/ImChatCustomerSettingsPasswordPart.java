@@ -15,17 +15,20 @@ import java.util.stream.Collectors;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-import wbs.imchat.model.ImChatCustomerRec;
+
 import wbs.platform.event.console.EventConsoleLogic;
 import wbs.platform.event.console.EventLinkConsoleHelper;
 import wbs.platform.event.model.EventLinkRec;
 import wbs.platform.event.model.EventRec;
+
+import wbs.imchat.model.ImChatCustomerRec;
 
 @PrototypeComponent ("imChatCustomerSettingsPasswordPart")
 public
@@ -61,9 +64,7 @@ class ImChatCustomerSettingsPasswordPart
 		// get customer
 
 		customer =
-			imChatCustomerHelper.findRequired (
-				requestContext.stuffInteger (
-					"imChatCustomerId"));
+			imChatCustomerHelper.findFromContextRequired ();
 
 		// get recent password change events
 

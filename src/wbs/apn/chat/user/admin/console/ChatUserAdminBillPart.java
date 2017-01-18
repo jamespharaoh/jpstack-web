@@ -35,8 +35,8 @@ import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.TimeFormatter;
 
+import wbs.apn.chat.bill.console.ChatUserBillLogConsoleHelper;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
-import wbs.apn.chat.bill.model.ChatUserBillLogObjectHelper;
 import wbs.apn.chat.bill.model.ChatUserBillLogRec;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -55,7 +55,7 @@ class ChatUserAdminBillPart
 	ChatCreditLogic chatCreditLogic;
 
 	@SingletonDependency
-	ChatUserBillLogObjectHelper chatUserBillLogHelper;
+	ChatUserBillLogConsoleHelper chatUserBillLogHelper;
 
 	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
@@ -95,9 +95,7 @@ class ChatUserAdminBillPart
 			database.currentTransaction ();
 
 		chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			chatUserHelper.findFromContextRequired ();
 
 		if (
 			enumEqualSafe (

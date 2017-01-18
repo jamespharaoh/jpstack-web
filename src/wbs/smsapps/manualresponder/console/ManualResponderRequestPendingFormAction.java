@@ -140,7 +140,7 @@ class ManualResponderRequestPendingFormAction
 			@NonNull TaskLogger taskLogger) {
 
 		Long manualResponderRequestId =
-			requestContext.stuffInteger (
+			requestContext.stuffIntegerRequired (
 				"manualResponderRequestId");
 
 		String templateIdStr =

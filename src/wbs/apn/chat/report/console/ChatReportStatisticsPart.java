@@ -18,17 +18,19 @@ import java.util.List;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.affiliate.model.ChatAffiliateUsersSummaryObjectHelper;
-import wbs.apn.chat.affiliate.model.ChatAffiliateUsersSummaryRec;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.model.ChatUsersSummaryObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUsersSummaryRec;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.affiliate.console.ChatAffiliateUsersSummaryConsoleHelper;
+import wbs.apn.chat.affiliate.model.ChatAffiliateUsersSummaryRec;
+import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.console.ChatUsersSummaryConsoleHelper;
+import wbs.apn.chat.user.core.model.ChatUsersSummaryRec;
 
 @PrototypeComponent ("chatReportStatisticsPart")
 public
@@ -38,13 +40,13 @@ class ChatReportStatisticsPart
 	// singleton dependencies
 
 	@SingletonDependency
-	ChatAffiliateUsersSummaryObjectHelper chatAffiliateUsersSummaryHelper;
+	ChatAffiliateUsersSummaryConsoleHelper chatAffiliateUsersSummaryHelper;
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
-	ChatUsersSummaryObjectHelper chatUsersSummaryHelper;
+	ChatUsersSummaryConsoleHelper chatUsersSummaryHelper;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
@@ -79,9 +81,7 @@ class ChatReportStatisticsPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
 		List <ChatAffiliateUsersSummaryRec> chatAffiliateUsersSummaries =
 			chatAffiliateUsersSummaryHelper.findByParent (

@@ -6,19 +6,21 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemState;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
+
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("queueItemActionsAction")
@@ -69,58 +71,61 @@ class QueueItemActionsAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"QueueItemActionsAction.goReal ()",
-				this);
+		try (
 
-		// load data
+			Transaction transaction =
+				database.beginReadWrite (
+					"QueueItemActionsAction.goReal ()",
+					this);
 
-		user =
-			userConsoleLogic.userRequired ();
-
-		queueItem =
-			queueItemHelper.findRequired (
-				requestContext.stuffInteger (
-					"queueItemId"));
-
-		canSupervise =
-			queueConsoleLogic.canSupervise (
-				queueItem.getQueue ());
-
-		if (! canSupervise) {
-
-			requestContext.addError (
-				"Permission denied");
-
-			return null;
-
-		}
-
-		// hand off to appropriate method
-
-		if (
-			optionalIsPresent (
-				requestContext.parameter (
-					"unclaim"))
 		) {
 
-			return unclaimQueueItem (
-				transaction);
+			// load data
 
-		} else if (
-			optionalIsPresent (
-				requestContext.parameter (
-					"reclaim"))
-		) {
+			user =
+				userConsoleLogic.userRequired ();
 
-			return reclaimQueueItem (
-				transaction);
+			queueItem =
+				queueItemHelper.findFromContextRequired ();
 
-		} else {
+			canSupervise =
+				queueConsoleLogic.canSupervise (
+					queueItem.getQueue ());
 
-			throw new RuntimeException ();
+			if (! canSupervise) {
+
+				requestContext.addError (
+					"Permission denied");
+
+				return null;
+
+			}
+
+			// hand off to appropriate method
+
+			if (
+				optionalIsPresent (
+					requestContext.parameter (
+						"unclaim"))
+			) {
+
+				return unclaimQueueItem (
+					transaction);
+
+			} else if (
+				optionalIsPresent (
+					requestContext.parameter (
+						"reclaim"))
+			) {
+
+				return reclaimQueueItem (
+					transaction);
+
+			} else {
+
+				throw new RuntimeException ();
+
+			}
 
 		}
 

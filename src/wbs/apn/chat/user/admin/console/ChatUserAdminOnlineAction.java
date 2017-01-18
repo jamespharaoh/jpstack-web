@@ -4,7 +4,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -67,53 +66,90 @@ class ChatUserAdminOnlineAction
 			return null;
 		}
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserAdminOnlineAction.goReal ()",
-				this);
+		try (
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserAdminOnlineAction.goReal ()",
+					this);
 
-		String userType =
-			capitalise (
-				chatUser.getType ().name ());
-
-		if (
-			optionalIsPresent (
-				requestContext.parameter (
-					"online"))
 		) {
 
-			if (chatUser.getOnline ()) {
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-				requestContext.addNotice (
-					stringFormat (
-						"%s already online",
-						userType));
+			String userType =
+				capitalise (
+					chatUser.getType ().name ());
 
-				return null;
+			if (
+				optionalIsPresent (
+					requestContext.parameter (
+						"online"))
+			) {
 
-			}
+				if (chatUser.getOnline ()) {
 
-			if (chatUser.getDeliveryMethod () == ChatMessageMethod.iphone) {
+					requestContext.addNotice (
+						stringFormat (
+							"%s already online",
+							userType));
 
-				requestContext.addWarning (
-					"Can't change online status for iphone users");
+					return null;
 
-				return null;
+				}
 
-			}
+				if (chatUser.getDeliveryMethod () == ChatMessageMethod.iphone) {
 
-			if (chatUser.getType () == ChatUserType.monitor) {
+					requestContext.addWarning (
+						"Can't change online status for iphone users");
+
+					return null;
+
+				}
+
+				if (chatUser.getType () == ChatUserType.monitor) {
+
+					chatUser
+
+						.setOnline (
+							true);
+
+					eventLogic.createEvent (
+						"chat_user_online",
+						userConsoleLogic.userRequired (),
+						chatUser);
+
+					transaction.commit ();
+
+					requestContext.addNotice (
+						"monitor brought online");
+
+					return null;
+
+				}
+
+				/*
+				if (chatUser.getFirstJoin () == null) {
+
+					requestContext.addError (
+						"user must complete signup process before joining");
+
+					return null;
+
+				}
+				*/
 
 				chatUser
 
-					.setOnline (
-						true);
+					.setLastAction (
+						transaction.now ());
+
+				chatMiscLogic.userJoin (
+					chatUser,
+					true,
+					null,
+					chatUser.getDeliveryMethod ());
 
 				eventLogic.createEvent (
 					"chat_user_online",
@@ -123,98 +159,64 @@ class ChatUserAdminOnlineAction
 				transaction.commit ();
 
 				requestContext.addNotice (
-					"monitor brought online");
+					"user brought online");
 
 				return null;
 
 			}
 
-			/*
-			if (chatUser.getFirstJoin () == null) {
+			if (
+				optionalIsPresent (
+					requestContext.parameter (
+						"offline"))
+			) {
 
-				requestContext.addError (
-					"user must complete signup process before joining");
+				if (! chatUser.getOnline ()) {
 
-				return null;
+					requestContext.addNotice (
+						stringFormat (
+							"%s already offline",
+							userType));
 
-			}
-			*/
+					return null;
 
-			chatUser
+				}
 
-				.setLastAction (
-					transaction.now ());
+				if (chatUser.getType () == ChatUserType.monitor) {
 
-			chatMiscLogic.userJoin (
-				chatUser,
-				true,
-				null,
-				chatUser.getDeliveryMethod ());
+					chatUser
 
-			eventLogic.createEvent (
-				"chat_user_online",
-				userConsoleLogic.userRequired (),
-				chatUser);
+						.setOnline (
+							false);
 
-			transaction.commit ();
+				} else {
 
-			requestContext.addNotice (
-				"user brought online");
+					chatMiscLogic.userLogoffWithMessage (
+						chatUser,
+						null,
+						false);
 
-			return null;
+				}
 
-		}
+				eventLogic.createEvent (
+					"chat_user_offline",
+					userConsoleLogic.userRequired (),
+					chatUser);
 
-		if (
-			optionalIsPresent (
-				requestContext.parameter (
-					"offline"))
-		) {
-
-			if (! chatUser.getOnline ()) {
+				transaction.commit ();
 
 				requestContext.addNotice (
 					stringFormat (
-						"%s already offline",
+						"%s taken offline",
 						userType));
 
 				return null;
 
 			}
 
-			if (chatUser.getType () == ChatUserType.monitor) {
-
-				chatUser
-
-					.setOnline (
-						false);
-
-			} else {
-
-				chatMiscLogic.userLogoffWithMessage (
-					chatUser,
-					null,
-					false);
-
-			}
-
-			eventLogic.createEvent (
-				"chat_user_offline",
-				userConsoleLogic.userRequired (),
-				chatUser);
-
-			transaction.commit ();
-
-			requestContext.addNotice (
-				stringFormat (
-					"%s taken offline",
-					userType));
-
-			return null;
+			throw new RuntimeException ();
 
 		}
-
-		throw new RuntimeException ();
 
 	}
 

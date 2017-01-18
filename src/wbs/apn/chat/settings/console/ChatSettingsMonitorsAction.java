@@ -1,20 +1,21 @@
 package wbs.apn.chat.settings.console;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatSettingsMonitorsAction")
@@ -28,13 +29,13 @@ class ChatSettingsMonitorsAction
 	ChatMiscLogic chatMiscLogic;
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
-
-	@SingletonDependency
-	ConsoleRequestContext requestContext;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
 	Database database;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// details
 
@@ -99,61 +100,64 @@ class ChatSettingsMonitorsAction
 
 		}
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatSettingsMonitorsAction.goReal ()",
-				this);
+		try (
 
-		ChatRec chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatSettingsMonitorsAction.goReal ()",
+					this);
 
-		chatMiscLogic.monitorsToTarget (
-			chat,
-			Gender.male,
-			Orient.gay,
-			gayMale);
+		) {
 
-		chatMiscLogic.monitorsToTarget (
-			chat,
-			Gender.female,
-			Orient.gay,
-			gayFemale);
+			ChatRec chat =
+				chatHelper.findFromContextRequired ();
 
-		chatMiscLogic.monitorsToTarget (
-			chat,
-			Gender.male,
-			Orient.bi,
-			biMale);
+			chatMiscLogic.monitorsToTarget (
+				chat,
+				Gender.male,
+				Orient.gay,
+				gayMale);
 
-		chatMiscLogic.monitorsToTarget (
-			chat,
-			Gender.female,
-			Orient.bi,
-			biFemale);
+			chatMiscLogic.monitorsToTarget (
+				chat,
+				Gender.female,
+				Orient.gay,
+				gayFemale);
 
-		chatMiscLogic.monitorsToTarget (
-			chat,
-			Gender.male,
-			Orient.straight,
-			straightMale);
+			chatMiscLogic.monitorsToTarget (
+				chat,
+				Gender.male,
+				Orient.bi,
+				biMale);
 
-		chatMiscLogic.monitorsToTarget (
-			chat,
-			Gender.female,
-			Orient.straight,
-			straightFemale);
+			chatMiscLogic.monitorsToTarget (
+				chat,
+				Gender.female,
+				Orient.bi,
+				biFemale);
 
-		transaction.commit ();
+			chatMiscLogic.monitorsToTarget (
+				chat,
+				Gender.male,
+				Orient.straight,
+				straightMale);
 
-		requestContext.addNotice (
-			"Chat monitors updated");
+			chatMiscLogic.monitorsToTarget (
+				chat,
+				Gender.female,
+				Orient.straight,
+				straightFemale);
 
-		requestContext.setEmptyFormData ();
+			transaction.commit ();
 
-		return null;
+			requestContext.addNotice (
+				"Chat monitors updated");
+
+			requestContext.setEmptyFormData ();
+
+			return null;
+
+		}
 
 	}
 

@@ -10,10 +10,13 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.media.model.MediaRec;
+
 import wbs.utils.io.RuntimeIoException;
 
 @Log4j
@@ -51,9 +54,7 @@ class MediaVideoResponder
 			@NonNull TaskLogger parentTaskLogger) {
 
 		MediaRec media =
-			mediaHelper.findRequired (
-				requestContext.stuffInteger (
-					"mediaId"));
+			mediaHelper.findFromContextRequired ();
 
 		try {
 

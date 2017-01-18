@@ -9,13 +9,15 @@ import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserType;
 
 @PrototypeComponent ("chatUserAdminOnlinePart")
 public
@@ -37,9 +39,7 @@ class ChatUserAdminOnlinePart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			chatUserHelper.findFromContextRequired ();
 
 	}
 

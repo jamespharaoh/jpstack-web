@@ -148,13 +148,11 @@ class ChatBroadcastSendPart
 					"chatBroadcastUpdates"));
 
 		formHints =
-			ImmutableMap.<String,Object>builder ()
+			ImmutableMap.<String, Object> builder ()
 
 			.put (
 				"chat",
-				chatHelper.findRequired (
-					requestContext.stuffInteger (
-						"chatId")))
+				chatHelper.findFromContextRequired ())
 
 			.build ();
 

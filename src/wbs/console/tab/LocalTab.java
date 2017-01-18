@@ -2,6 +2,7 @@ package wbs.console.tab;
 
 import wbs.console.lookup.BooleanLookup;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.SingletonDependency;
 
 public
@@ -53,12 +54,17 @@ class LocalTab
 	public
 	boolean isAvailable () {
 
-		for (BooleanLookup lookup
-				: lookups) {
+		for (
+			BooleanLookup lookup
+				: lookups
+		) {
 
-			if (! lookup.lookup (
-					requestContext.contextStuffRequired ()))
+			if (
+				! lookup.lookup (
+					requestContext.consoleContextStuffRequired ())
+			) {
 				return false;
+			}
 
 		}
 

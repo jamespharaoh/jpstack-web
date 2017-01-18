@@ -1,26 +1,28 @@
 package wbs.apn.chat.help.console;
 
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 
-import com.google.common.base.Optional;
-
-import lombok.Cleanup;
 import lombok.NonNull;
 
-import wbs.apn.chat.help.logic.ChatHelpLogic;
-import wbs.apn.chat.help.model.ChatHelpLogRec;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
+
 import wbs.sms.gsm.GsmUtils;
+
+import wbs.apn.chat.help.logic.ChatHelpLogic;
+import wbs.apn.chat.help.model.ChatHelpLogRec;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatHelpLogPendingFormAction")
@@ -108,51 +110,55 @@ class ChatHelpLogPendingFormAction
 
 		}
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatHelpLogPendingFormAction.goReal ()",
-				this);
+		try (
 
-		// load objects from database
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatHelpLogPendingFormAction.goReal ()",
+					this);
 
-		ChatHelpLogRec helpRequest =
-			chatHelpLogHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatHelpLogId"));
+		) {
 
-		ChatUserRec chatUser =
-			helpRequest.getChatUser ();
+			// load objects from database
 
-		// send message
+			ChatHelpLogRec helpRequest =
+				chatHelpLogHelper.findFromContextRequired ();
 
-		if (! ignore) {
+			ChatUserRec chatUser =
+				helpRequest.getChatUser ();
 
-			chatHelpLogic.sendHelpMessage (
-				userConsoleLogic.userRequired (),
-				chatUser,
-				text,
-				Optional.of (
-					helpRequest.getMessage ().getThreadId ()),
-				Optional.of (
-					helpRequest));
+			// send message
+
+			if (! ignore) {
+
+				chatHelpLogic.sendHelpMessage (
+					userConsoleLogic.userRequired (),
+					chatUser,
+					text,
+					optionalOf (
+						helpRequest.getMessage ().getThreadId ()),
+					optionalOf (
+						helpRequest));
+
+			}
+
+			// unqueue the request
+
+			queueLogic.processQueueItem (
+				helpRequest.getQueueItem (),
+				userConsoleLogic.userRequired ());
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				ignore
+					? "Request ignored"
+					: "Reply sent");
+
+			return responder (
+				"queueHomeResponder");
 
 		}
-
-		// unqueue the request
-
-		queueLogic.processQueueItem (
-			helpRequest.getQueueItem (),
-			userConsoleLogic.userRequired ());
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			ignore
-				? "Request ignored"
-				: "Reply sent");
-
-		return responder ("queueHomeResponder");
 
 	}
 

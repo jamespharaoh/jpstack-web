@@ -14,10 +14,13 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.smsapps.broadcast.model.BroadcastRec;
 
 @PrototypeComponent ("broadcastSendPart")
@@ -45,9 +48,7 @@ class BroadcastSendPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		broadcast =
-			broadcastHelper.findRequired (
-				requestContext.stuffInteger (
-					"broadcastId"));
+			broadcastHelper.findFromContextRequired ();
 
 	}
 

@@ -3,17 +3,18 @@ package wbs.platform.group.console;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.console.PrivConsoleHelper;
@@ -22,6 +23,7 @@ import wbs.platform.updatelog.logic.UpdateManager;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("groupPrivsAction")
@@ -76,92 +78,103 @@ class GroupPrivsAction
 		long numRevoked = 0;
 		long numGranted = 0;
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"GroupPrivsAction.goReal ()",
-				this);
+		try (
 
-		GroupRec group =
-			groupHelper.findRequired (
-				requestContext.stuffInteger (
-					"groupId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"GroupPrivsAction.goReal ()",
+					this);
 
-		Matcher matcher =
-			privDataPattern.matcher (
-				requestContext.parameterRequired (
-					"privdata"));
+		) {
 
-		while (matcher.find ()) {
+			GroupRec group =
+				groupHelper.findFromContextRequired ();
 
-			Long privId =
-				Long.parseLong (
-					matcher.group (1));
+			Matcher matcher =
+				privDataPattern.matcher (
+					requestContext.parameterRequired (
+						"privdata"));
 
-			boolean newCan =
-				matcher.group (2).equals ("1");
+			while (matcher.find ()) {
 
-			PrivRec priv =
-				privHelper.findRequired (
-					privId);
+				Long privId =
+					Long.parseLong (
+						matcher.group (1));
 
-			boolean oldCan =
-				group.getPrivs ().contains (priv);
+				boolean newCan =
+					matcher.group (2).equals ("1");
 
-			// check we have permission to update this priv
+				PrivRec priv =
+					privHelper.findRequired (
+						privId);
 
-			if (! privChecker.canGrant (priv.getId ()))
-				continue;
+				boolean oldCan =
+					group.getPrivs ().contains (priv);
 
-			if (! oldCan && newCan) {
+				// check we have permission to update this priv
 
-				group.getPrivs ().add (
-					priv);
+				if (! privChecker.canGrant (priv.getId ()))
+					continue;
 
-				eventLogic.createEvent (
-					"group_grant",
-					userConsoleLogic.userRequired (),
-					priv,
-					group);
+				if (! oldCan && newCan) {
 
-				numGranted ++;
+					group.getPrivs ().add (
+						priv);
 
-			} else if (oldCan && !newCan) {
+					eventLogic.createEvent (
+						"group_grant",
+						userConsoleLogic.userRequired (),
+						priv,
+						group);
 
-				group.getPrivs().remove(priv);
+					numGranted ++;
 
-				eventLogic.createEvent (
-					"group_revoke",
-					userConsoleLogic.userRequired (),
-					priv,
-					group);
+				} else if (oldCan && !newCan) {
 
-				numRevoked++;
+					group.getPrivs().remove(priv);
+
+					eventLogic.createEvent (
+						"group_revoke",
+						userConsoleLogic.userRequired (),
+						priv,
+						group);
+
+					numRevoked++;
+
+				}
 
 			}
 
+			for (
+				UserRec user
+					: group.getUsers ()
+			) {
+
+				updateManager.signalUpdate (
+					"user_privs",
+					user.getId ());
+
+			}
+
+			transaction.commit ();
+
+			if (numGranted > 0) {
+
+				requestContext.addNotice (
+					"" + numGranted + " privileges granted");
+
+			}
+
+			if (numRevoked > 0) {
+
+				requestContext.addNotice (
+					"" + numRevoked + " privileges revoked");
+
+			}
+
+			return null;
+
 		}
-
-		for (
-			UserRec user
-				: group.getUsers ()
-		) {
-
-			updateManager.signalUpdate (
-				"user_privs",
-				user.getId ());
-
-		}
-
-		transaction.commit();
-
-		if (numGranted > 0)
-			requestContext.addNotice ("" + numGranted + " privileges granted");
-
-		if (numRevoked > 0)
-			requestContext.addNotice ("" + numRevoked + " privileges revoked");
-
-		return null;
 
 	}
 

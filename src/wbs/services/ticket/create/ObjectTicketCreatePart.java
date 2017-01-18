@@ -112,9 +112,7 @@ class ObjectTicketCreatePart <
 		// find context object
 
 		Record <?> contextObject =
-			consoleHelper.findRequired (
-				requestContext.stuffInteger (
-					consoleHelper.idKey ()));
+			consoleHelper.findFromContextRequired ();
 
 		ticketManager =
 			(TicketManagerRec)

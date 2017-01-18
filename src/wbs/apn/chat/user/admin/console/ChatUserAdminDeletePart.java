@@ -56,9 +56,7 @@ class ChatUserAdminDeletePart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			chatUserHelper.findFromContextRequired ();
 
 		if (
 			isNotNull (

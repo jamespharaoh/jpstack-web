@@ -3,8 +3,6 @@ package wbs.platform.text.web;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import java.io.PrintWriter;
-
 import javax.inject.Provider;
 
 import lombok.Getter;
@@ -15,6 +13,8 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
@@ -66,10 +66,10 @@ class TextResponder
 
 		}
 
-		PrintWriter out =
-			requestContext.writer ();
+		FormatWriter formatWriter =
+			requestContext.formatWriter ();
 
-		out.print (
+		formatWriter.writeString (
 			text);
 
 	}

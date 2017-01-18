@@ -360,18 +360,25 @@ class HtmlResponder
 
 			formatWriter.writeLineFormat ();
 
-			formatWriter.writeLineFormat (
-				"Foreign context path: %s",
-				requestContext.foreignContextPath ());
+			if (
+				optionalIsPresent (
+					requestContext.foreignContextPath ())
+			) {
+
+				formatWriter.writeLineFormat (
+					"Foreign context path: %s",
+					requestContext.foreignContextPathRequired ());
+
+			}
 
 			if (
-				isNotNull (
+				optionalIsPresent (
 					requestContext.changedContextPath ())
 			) {
 
 				formatWriter.writeLineFormat (
 					"Changed context path: %s",
-					requestContext.changedContextPath ());
+					requestContext.changedContextPathRequired ());
 
 			}
 
@@ -383,7 +390,7 @@ class HtmlResponder
 
 		if (
 			optionalIsPresent (
-				requestContext.contextStuff ())
+				requestContext.consoleContextStuff ())
 		) {
 
 			formatWriter.writeLineFormatIncreaseIndent (
@@ -393,7 +400,7 @@ class HtmlResponder
 
 			for (
 				Map.Entry <String, Object> attributeEntry
-					: requestContext.contextStuffRequired ()
+					: requestContext.consoleContextStuffRequired ()
 						.attributes ()
 						.entrySet ()
 			) {
@@ -417,7 +424,7 @@ class HtmlResponder
 			for (
 				String priv
 					: listSorted (
-						requestContext.contextStuffRequired ().privs ())
+						requestContext.consoleContextStuffRequired ().privs ())
 			) {
 
 				formatWriter.writeLineFormat (

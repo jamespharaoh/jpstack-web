@@ -19,8 +19,31 @@ import java.util.List;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
+
+import wbs.console.action.ConsoleAction;
+import wbs.console.helper.manager.ConsoleObjectManager;
+import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.queue.logic.QueueLogic;
+import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.text.model.TextRec;
+import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.model.UserObjectHelper;
+import wbs.platform.user.model.UserRec;
+
+import wbs.sms.command.model.CommandObjectHelper;
+import wbs.sms.gsm.GsmUtils;
+import wbs.sms.message.core.model.MessageRec;
+
+import wbs.utils.etc.PropertyUtils;
 
 import wbs.apn.chat.contact.console.ChatMessageConsoleHelper;
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
@@ -40,25 +63,6 @@ import wbs.apn.chat.user.image.model.ChatUserImageType;
 import wbs.apn.chat.user.info.model.ChatUserInfoRec;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.apn.chat.user.info.model.ChatUserNameRec;
-import wbs.console.action.ConsoleAction;
-import wbs.console.helper.manager.ConsoleObjectManager;
-import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.queue.logic.QueueLogic;
-import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.text.model.TextRec;
-import wbs.platform.user.console.UserConsoleLogic;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserRec;
-import wbs.sms.command.model.CommandObjectHelper;
-import wbs.sms.gsm.GsmUtils;
-import wbs.sms.message.core.model.MessageRec;
-import wbs.utils.etc.PropertyUtils;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatUserPendingFormAction")
@@ -119,19 +123,22 @@ class ChatUserPendingFormAction
 	protected
 	Responder backupResponder () {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserPendingFormAction.backupResponder ()",
-				this);
+		try (
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserPendingFormAction.backupResponder ()",
+					this);
 
-		return nextResponder (
-			chatUser);
+		) {
+
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
+
+			return nextResponder (
+				chatUser);
+
+		}
 
 	}
 
@@ -258,220 +265,229 @@ class ChatUserPendingFormAction
 	private
 	Responder goDismiss () {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserPendingFormAction.goDismiss ()",
-				this);
+		try (
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserPendingFormAction.goDismiss ()",
+					this);
 
-		Responder responder =
-			updateQueueItem (
-				chatUser,
-				userConsoleLogic.userRequired ());
+		) {
 
-		transaction.commit ();
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-		return responder;
+			Responder responder =
+				updateQueueItem (
+					chatUser,
+					userConsoleLogic.userRequired ());
+
+			transaction.commit ();
+
+			return responder;
+
+		}
 
 	}
 
 	private
 	Responder goApproveName () {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserPendingFormAction.goApproveName ()",
-				this);
+		try (
 
-		// get database objects
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserPendingFormAction.goApproveName ()",
+					this);
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
-
-		// confirm there is something to approve
-
-		if (chatUser.getNewChatUserName () == null) {
-
-			requestContext.addError (
-				"No name to approve");
-
-			return nextResponder (
-				chatUser);
-
-		}
-
-		// update the chat user and stuff
-
-		ChatUserNameRec chatUserName =
-			chatUser.getNewChatUserName ();
-
-		if (
-			enumNotEqualSafe (
-				chatUserName.getStatus (),
-				ChatUserInfoStatus.moderatorPending)
 		) {
 
-			throw new RuntimeException ();
+			// get database objects
+
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
+
+			// confirm there is something to approve
+
+			if (chatUser.getNewChatUserName () == null) {
+
+				requestContext.addError (
+					"No name to approve");
+
+				return nextResponder (
+					chatUser);
+
+			}
+
+			// update the chat user and stuff
+
+			ChatUserNameRec chatUserName =
+				chatUser.getNewChatUserName ();
+
+			if (
+				enumNotEqualSafe (
+					chatUserName.getStatus (),
+					ChatUserInfoStatus.moderatorPending)
+			) {
+
+				throw new RuntimeException ();
+
+			}
+
+			String editedName =
+				requestContext.parameterRequired (
+					"name");
+
+			chatUserName
+
+				.setModerator (
+					userConsoleLogic.userRequired ())
+
+				.setStatus (
+					ifThenElse (
+						stringEqualSafe (
+							editedName,
+							chatUserName.getOriginalName ()),
+						() -> ChatUserInfoStatus.moderatorApproved,
+						() -> ChatUserInfoStatus.moderatorEdited))
+
+				.setModerationTime (
+					transaction.now ())
+
+				.setEditedName (
+					editedName);
+
+			chatUser
+
+				.setName (
+					editedName)
+
+				.setNewChatUserName (
+					null);
+
+			// remove the queue item and create any new one
+
+			Responder responder =
+				updateQueueItem (
+					chatUser,
+					userConsoleLogic.userRequired ());
+
+			transaction.commit ();
+
+			// add a notice
+
+			requestContext.addNotice (
+				"Chat user name approved");
+
+			// and return
+
+			return responder;
 
 		}
-
-		String editedName =
-			requestContext.parameterRequired (
-				"name");
-
-		chatUserName
-
-			.setModerator (
-				userConsoleLogic.userRequired ())
-
-			.setStatus (
-				ifThenElse (
-					stringEqualSafe (
-						editedName,
-						chatUserName.getOriginalName ()),
-					() -> ChatUserInfoStatus.moderatorApproved,
-					() -> ChatUserInfoStatus.moderatorEdited))
-
-			.setModerationTime (
-				transaction.now ())
-
-			.setEditedName (
-				editedName);
-
-		chatUser
-
-			.setName (
-				editedName)
-
-			.setNewChatUserName (
-				null);
-
-		// remove the queue item and create any new one
-
-		Responder responder =
-			updateQueueItem (
-				chatUser,
-				userConsoleLogic.userRequired ());
-
-		transaction.commit ();
-
-		// add a notice
-
-		requestContext.addNotice (
-			"Chat user name approved");
-
-		// and return
-
-		return responder;
 
 	}
 
 	private
 	Responder goApproveInfo () {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserPendingFormAction.goApproveInfo ()",
-				this);
+		try (
 
-		// get database objects
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserPendingFormAction.goApproveInfo ()",
+					this);
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
-
-		// confirm there is something to approve
-
-		if (
-			isNull (
-				chatUser.getNewChatUserInfo ())
 		) {
 
-			requestContext.addError (
-				"No info to approve");
+			// get database objects
 
-			return nextResponder (
-				chatUser);
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
+
+			// confirm there is something to approve
+
+			if (
+				isNull (
+					chatUser.getNewChatUserInfo ())
+			) {
+
+				requestContext.addError (
+					"No info to approve");
+
+				return nextResponder (
+					chatUser);
+
+			}
+
+			// update the chat user and stuff
+
+			ChatUserInfoRec chatUserInfo =
+				chatUser.getNewChatUserInfo ();
+
+			if (
+				enumNotEqualSafe (
+					chatUserInfo.getStatus (),
+					ChatUserInfoStatus.moderatorPending)
+			) {
+
+				throw new RuntimeException ();
+
+			}
+
+			String editedInfo =
+				requestContext.parameterRequired (
+					"info");
+
+			TextRec editedText =
+				textHelper.findOrCreate (
+					editedInfo);
+
+			chatUserInfo
+
+				.setModerator (
+					userConsoleLogic.userRequired ())
+
+				.setStatus (
+					ifThenElse (
+						stringEqualSafe (
+							editedInfo,
+							chatUserInfo.getOriginalText ().getText ()),
+						() -> ChatUserInfoStatus.moderatorApproved,
+						() -> ChatUserInfoStatus.moderatorEdited))
+
+				.setModerationTime (
+					transaction.now ())
+
+				.setEditedText (
+					editedText);
+
+			chatUser
+
+				.setInfoText (
+					editedText)
+
+				.setNewChatUserInfo (
+					null);
+
+			// update queue item stuff
+
+			Responder responder =
+				updateQueueItem (
+					chatUser,
+					userConsoleLogic.userRequired ());
+
+			transaction.commit ();
+
+			// add a notice
+
+			requestContext.addNotice (
+				"Chat user info approved");
+
+			// and we're done
+
+			return responder;
 
 		}
-
-		// update the chat user and stuff
-
-		ChatUserInfoRec chatUserInfo =
-			chatUser.getNewChatUserInfo ();
-
-		if (
-			enumNotEqualSafe (
-				chatUserInfo.getStatus (),
-				ChatUserInfoStatus.moderatorPending)
-		) {
-
-			throw new RuntimeException ();
-
-		}
-
-		String editedInfo =
-			requestContext.parameterRequired (
-				"info");
-
-		TextRec editedText =
-			textHelper.findOrCreate (
-				editedInfo);
-
-		chatUserInfo
-
-			.setModerator (
-				userConsoleLogic.userRequired ())
-
-			.setStatus (
-				ifThenElse (
-					stringEqualSafe (
-						editedInfo,
-						chatUserInfo.getOriginalText ().getText ()),
-					() -> ChatUserInfoStatus.moderatorApproved,
-					() -> ChatUserInfoStatus.moderatorEdited))
-
-			.setModerationTime (
-				transaction.now ())
-
-			.setEditedText (
-				editedText);
-
-		chatUser
-
-			.setInfoText (
-				editedText)
-
-			.setNewChatUserInfo (
-				null);
-
-		// update queue item stuff
-
-		Responder responder =
-			updateQueueItem (
-				chatUser,
-				userConsoleLogic.userRequired ());
-
-		transaction.commit ();
-
-		// add a notice
-
-		requestContext.addNotice (
-			"Chat user info approved");
-
-		// and we're done
-
-		return responder;
 
 	}
 
@@ -484,123 +500,126 @@ class ChatUserPendingFormAction
 		ChatUserImageType imageType =
 			chatUserLogic.imageTypeForMode (mode);
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserPendingFormAction.goApproveImage",
-				this);
+		try (
 
-		// get database objects
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserPendingFormAction.goApproveImage",
+					this);
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
-
-		// confirm there is something to approve
-
-		ChatUserImageRec chatUserImage =
-			chatUserLogic.chatUserPendingImage (
-				chatUser,
-				imageType);
-
-		if (chatUserImage == null) {
-
-			requestContext.addErrorFormat (
-				"No %s to approve",
-				enumNameSpaces (
-					mode));
-
-			return nextResponder (
-				chatUser);
-
-		}
-
-		// update the chat user and stuff
-
-		List <ChatUserImageRec> list =
-			genericCastUnchecked (
-				PropertyUtils.propertyGetAuto (
-					chatUser,
-					mode.listProperty ()));
-
-		if (
-			enumNotEqualSafe (
-				chatUserImage.getStatus (),
-				ChatUserInfoStatus.moderatorPending)
 		) {
 
-			throw new RuntimeException ();
+			// get database objects
 
-		}
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-		chatUserImage
+			// confirm there is something to approve
 
-			.setModerator (
-				userConsoleLogic.userRequired ())
-
-			.setStatus (
-				ChatUserInfoStatus.moderatorApproved)
-
-			.setModerationTime (
-				transaction.now ())
-
-			.setIndex (
-				fromJavaInteger (
-					list.size ()))
-
-			.setClassification (
-				requestContext.parameterRequired (
-					"classification"));
-
-		// update main image if not in append mode
-
-		if (! chatUserImage.getAppend ()) {
-
-			ChatUserImageRec oldChatUserImage =
-				chatUserLogic.getMainChatUserImageByType (
+			ChatUserImageRec chatUserImage =
+				chatUserLogic.chatUserPendingImage (
 					chatUser,
 					imageType);
 
-			if (oldChatUserImage != null) {
+			if (chatUserImage == null) {
 
-				long index =
-					oldChatUserImage.getIndex ();
+				requestContext.addErrorFormat (
+					"No %s to approve",
+					enumNameSpaces (
+						mode));
 
-				oldChatUserImage.setIndex (null);
-
-				transaction.flush ();
-
-				chatUserImage
-
-					.setIndex (
-						index);
+				return nextResponder (
+					chatUser);
 
 			}
 
-			chatUserLogic.setMainChatUserImageByType (
-				chatUser,
-				imageType,
-				Optional.of (
-					chatUserImage));
+			// update the chat user and stuff
+
+			List <ChatUserImageRec> list =
+				genericCastUnchecked (
+					PropertyUtils.propertyGetAuto (
+						chatUser,
+						mode.listProperty ()));
+
+			if (
+				enumNotEqualSafe (
+					chatUserImage.getStatus (),
+					ChatUserInfoStatus.moderatorPending)
+			) {
+
+				throw new RuntimeException ();
+
+			}
+
+			chatUserImage
+
+				.setModerator (
+					userConsoleLogic.userRequired ())
+
+				.setStatus (
+					ChatUserInfoStatus.moderatorApproved)
+
+				.setModerationTime (
+					transaction.now ())
+
+				.setIndex (
+					fromJavaInteger (
+						list.size ()))
+
+				.setClassification (
+					requestContext.parameterRequired (
+						"classification"));
+
+			// update main image if not in append mode
+
+			if (! chatUserImage.getAppend ()) {
+
+				ChatUserImageRec oldChatUserImage =
+					chatUserLogic.getMainChatUserImageByType (
+						chatUser,
+						imageType);
+
+				if (oldChatUserImage != null) {
+
+					long index =
+						oldChatUserImage.getIndex ();
+
+					oldChatUserImage.setIndex (null);
+
+					transaction.flush ();
+
+					chatUserImage
+
+						.setIndex (
+							index);
+
+				}
+
+				chatUserLogic.setMainChatUserImageByType (
+					chatUser,
+					imageType,
+					Optional.of (
+						chatUserImage));
+
+			}
+
+			responder =
+				updateQueueItem (
+					chatUser,
+					userConsoleLogic.userRequired ());
+
+			transaction.commit ();
+
+			// add a notice
+
+			requestContext.addNotice (
+				"Chat user image approved");
+
+			// and we're done
+
+			return responder;
 
 		}
-
-		responder =
-			updateQueueItem (
-				chatUser,
-				userConsoleLogic.userRequired ());
-
-		transaction.commit ();
-
-		// add a notice
-
-		requestContext.addNotice (
-			"Chat user image approved");
-
-		// and we're done
-
-		return responder;
 
 	}
 
@@ -632,74 +651,77 @@ class ChatUserPendingFormAction
 
 		}
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserPendingFormAction.goRejectName ()",
-				this);
+		try (
 
-		// get database objects
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserPendingFormAction.goRejectName ()",
+					this);
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
-
-		if (
-			isNull (
-				chatUser.getNewChatUserName ())
 		) {
 
-			requestContext.addError (
-				"No name to approve");
+			// get database objects
 
-			return nextResponder (
-				chatUser);
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
+
+			if (
+				isNull (
+					chatUser.getNewChatUserName ())
+			) {
+
+				requestContext.addError (
+					"No name to approve");
+
+				return nextResponder (
+					chatUser);
+
+			}
+
+			ChatUserNameRec chatUserName =
+				chatUser.getNewChatUserName ();
+
+			if (chatUserName.getStatus () != ChatUserInfoStatus.moderatorPending)
+				throw new RuntimeException ();
+
+			chatUserName
+
+				.setStatus (
+					ChatUserInfoStatus.moderatorRejected)
+
+				.setModerationTime (
+					transaction.now ())
+
+				.setModerator (
+					userConsoleLogic.userRequired ());
+
+			chatUser
+
+				.setNewChatUserName (
+					null);
+
+			// send rejection
+
+			sendRejection (
+				userConsoleLogic.userRequired (),
+				chatUser,
+				Optional.fromNullable (
+					chatUserName.getThreadId ()),
+				messageParam);
+
+			Responder responder =
+				updateQueueItem (
+					chatUser,
+					userConsoleLogic.userRequired ());
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Rejection sent");
+
+			return responder;
 
 		}
-
-		ChatUserNameRec chatUserName =
-			chatUser.getNewChatUserName ();
-
-		if (chatUserName.getStatus () != ChatUserInfoStatus.moderatorPending)
-			throw new RuntimeException ();
-
-		chatUserName
-
-			.setStatus (
-				ChatUserInfoStatus.moderatorRejected)
-
-			.setModerationTime (
-				transaction.now ())
-
-			.setModerator (
-				userConsoleLogic.userRequired ());
-
-		chatUser
-
-			.setNewChatUserName (
-				null);
-
-		// send rejection
-
-		sendRejection (
-			userConsoleLogic.userRequired (),
-			chatUser,
-			Optional.fromNullable (
-				chatUserName.getThreadId ()),
-			messageParam);
-
-		Responder responder =
-			updateQueueItem (
-				chatUser,
-				userConsoleLogic.userRequired ());
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Rejection sent");
-
-		return responder;
 
 	}
 
@@ -731,87 +753,90 @@ class ChatUserPendingFormAction
 
 		}
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserPendingFormAction.goRejectInfo ()",
-				this);
+		try (
 
-		// get database objects
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserPendingFormAction.goRejectInfo ()",
+					this);
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
-
-		// confirm there is something to approve
-
-		if (
-			isNull (
-				chatUser.getNewChatUserInfo ())
 		) {
 
-			requestContext.addError (
-				"No info to approve");
+			// get database objects
 
-			return nextResponder (
-				chatUser);
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-		}
+			// confirm there is something to approve
 
-		// update chat user info
+			if (
+				isNull (
+					chatUser.getNewChatUserInfo ())
+			) {
 
-		ChatUserInfoRec chatUserInfo =
-			chatUser.getNewChatUserInfo ();
+				requestContext.addError (
+					"No info to approve");
 
-		if (
-			enumNotEqualSafe (
-				chatUserInfo.getStatus (),
-				ChatUserInfoStatus.moderatorPending)
-		) {
+				return nextResponder (
+					chatUser);
 
-			throw new RuntimeException ();
+			}
 
-		}
+			// update chat user info
 
-		chatUserInfo
+			ChatUserInfoRec chatUserInfo =
+				chatUser.getNewChatUserInfo ();
 
-			.setStatus (
-				ChatUserInfoStatus.moderatorRejected)
+			if (
+				enumNotEqualSafe (
+					chatUserInfo.getStatus (),
+					ChatUserInfoStatus.moderatorPending)
+			) {
 
-			.setModerationTime (
-				transaction.now ())
+				throw new RuntimeException ();
 
-			.setModerator (
-				userConsoleLogic.userRequired ());
+			}
 
-		// update chat user
+			chatUserInfo
 
-		chatUser
+				.setStatus (
+					ChatUserInfoStatus.moderatorRejected)
 
-			.setNewChatUserInfo (
-				null);
+				.setModerationTime (
+					transaction.now ())
 
-		// send rejection
+				.setModerator (
+					userConsoleLogic.userRequired ());
 
-		sendRejection (
-			userConsoleLogic.userRequired (),
-			chatUser,
-			Optional.fromNullable (
-				chatUserInfo.getThreadId ()),
-			messageParam);
+			// update chat user
 
-		Responder responder =
-			updateQueueItem (
+			chatUser
+
+				.setNewChatUserInfo (
+					null);
+
+			// send rejection
+
+			sendRejection (
+				userConsoleLogic.userRequired (),
 				chatUser,
-				userConsoleLogic.userRequired ());
+				Optional.fromNullable (
+					chatUserInfo.getThreadId ()),
+				messageParam);
 
-		transaction.commit ();
+			Responder responder =
+				updateQueueItem (
+					chatUser,
+					userConsoleLogic.userRequired ());
 
-		requestContext.addNotice (
-			"Rejection sent");
+			transaction.commit ();
 
-		return responder;
+			requestContext.addNotice (
+				"Rejection sent");
+
+			return responder;
+
+		}
 
 	}
 
@@ -966,162 +991,165 @@ class ChatUserPendingFormAction
 
 		// start transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserPendingFormAction.goRejectImage ()",
-				this);
+		try (
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
-
-		ChatRec chat =
-			chatUser.getChat ();
-
-		ChatUserImageRec chatUserImage =
-			chatUserLogic.chatUserPendingImage (
-				chatUser,
-				ChatUserImageType.valueOf (
-					mode.toString ()));
-
-		// checks involving database
-
-		if (chatUserImage == null) {
-
-			requestContext.addError (
-				"No photo to approve");
-
-			return nextResponder (
-				chatUser);
-
-		}
-
-		if (chatUserImage.getStatus ()
-				!= ChatUserInfoStatus.moderatorPending)
-			throw new RuntimeException ();
-
-		// update image
-
-		chatUserImage
-
-			.setStatus (
-				ChatUserInfoStatus.moderatorRejected)
-
-			.setModerationTime (
-				transaction.now ())
-
-			.setModerator (
-				userConsoleLogic.userRequired ());
-
-		// send message
-
-		MessageRec message = null;
-		ChatMessageRec chatMessage = null;
-
-		if (
-
-			enumInSafe (
-				chatUser.getDeliveryMethod (),
-				ChatMessageMethod.iphone,
-				ChatMessageMethod.web)
-
-			&& isNotNull (
-				chat.getSystemChatUser ())
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserPendingFormAction.goRejectImage ()",
+					this);
 
 		) {
 
-			// iphone/web
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-			TextRec messageText =
-				textHelper.findOrCreate (messageParam);
+			ChatRec chat =
+				chatUser.getChat ();
 
-			chatMessage =
-				chatMessageHelper.insert (
-					chatMessageHelper.createInstance ()
+			ChatUserImageRec chatUserImage =
+				chatUserLogic.chatUserPendingImage (
+					chatUser,
+					ChatUserImageType.valueOf (
+						mode.toString ()));
 
-				.setFromUser (
-					chat.getSystemChatUser ())
+			// checks involving database
 
-				.setToUser (
-					chatUser)
+			if (chatUserImage == null) {
 
-				.setTimestamp (
-					transaction.now ())
+				requestContext.addError (
+					"No photo to approve");
 
-				.setChat (
-					chat)
+				return nextResponder (
+					chatUser);
 
-				.setSender (
-					userConsoleLogic.userRequired ())
+			}
 
-				.setChat (
-					chat)
+			if (chatUserImage.getStatus ()
+					!= ChatUserInfoStatus.moderatorPending)
+				throw new RuntimeException ();
 
-				.setOriginalText (
-					messageText)
+			// update image
 
-				.setEditedText (
-					messageText)
+			chatUserImage
 
 				.setStatus (
-					ChatMessageStatus.sent)
+					ChatUserInfoStatus.moderatorRejected)
 
-			);
+				.setModerationTime (
+					transaction.now ())
 
-			chatMessageLogic.chatMessageDeliverToUser (
-				chatMessage);
+				.setModerator (
+					userConsoleLogic.userRequired ());
 
-		} else {
+			// send message
 
-			// sms
+			MessageRec message = null;
+			ChatMessageRec chatMessage = null;
 
-			message =
-				chatSendLogic.sendMessageMmsFree (
-					chatUser,
-					Optional.<Long>absent (),
-					messageParam,
+			if (
+
+				enumInSafe (
+					chatUser.getDeliveryMethod (),
+					ChatMessageMethod.iphone,
+					ChatMessageMethod.web)
+
+				&& isNotNull (
+					chat.getSystemChatUser ())
+
+			) {
+
+				// iphone/web
+
+				TextRec messageText =
+					textHelper.findOrCreate (messageParam);
+
+				chatMessage =
+					chatMessageHelper.insert (
+						chatMessageHelper.createInstance ()
+
+					.setFromUser (
+						chat.getSystemChatUser ())
+
+					.setToUser (
+						chatUser)
+
+					.setTimestamp (
+						transaction.now ())
+
+					.setChat (
+						chat)
+
+					.setSender (
+						userConsoleLogic.userRequired ())
+
+					.setChat (
+						chat)
+
+					.setOriginalText (
+						messageText)
+
+					.setEditedText (
+						messageText)
+
+					.setStatus (
+						ChatMessageStatus.sent)
+
+				);
+
+				chatMessageLogic.chatMessageDeliverToUser (
+					chatMessage);
+
+			} else {
+
+				// sms
+
+				message =
+					chatSendLogic.sendMessageMmsFree (
+						chatUser,
+						Optional.<Long>absent (),
+						messageParam,
+						commandHelper.findByCodeRequired (
+							chat,
+							mode.commandCode ()),
+						serviceHelper.findByCodeRequired (
+							chat,
+							"system"));
+
+			}
+
+			// log message sent
+
+			chatHelpLogLogic.createChatHelpLogOut (
+				chatUser,
+				Optional.<ChatHelpLogRec>absent (),
+				Optional.of (
+					userConsoleLogic.userRequired ()),
+				message,
+				Optional.fromNullable (
+					chatMessage),
+				messageParam,
+				Optional.of (
 					commandHelper.findByCodeRequired (
 						chat,
-						mode.commandCode ()),
-					serviceHelper.findByCodeRequired (
-						chat,
-						"system"));
+						mode.commandCode ())));
+
+			// clear queue item
+
+			Responder responder =
+				updateQueueItem (
+					chatUser,
+					userConsoleLogic.userRequired ());
+
+			// wrap up
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Rejection sent");
+
+			return responder;
 
 		}
-
-		// log message sent
-
-		chatHelpLogLogic.createChatHelpLogOut (
-			chatUser,
-			Optional.<ChatHelpLogRec>absent (),
-			Optional.of (
-				userConsoleLogic.userRequired ()),
-			message,
-			Optional.fromNullable (
-				chatMessage),
-			messageParam,
-			Optional.of (
-				commandHelper.findByCodeRequired (
-					chat,
-					mode.commandCode ())));
-
-		// clear queue item
-
-		Responder responder =
-			updateQueueItem (
-				chatUser,
-				userConsoleLogic.userRequired ());
-
-		// wrap up
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Rejection sent");
-
-		return responder;
 
 	}
 

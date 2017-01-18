@@ -1,6 +1,8 @@
 package wbs.platform.object.settings;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import javax.inject.Provider;
@@ -130,7 +132,7 @@ class ObjectSettingsAction <
 
 		object =
 			objectLookup.lookupObject (
-				requestContext.contextStuffRequired ());
+				requestContext.consoleContextStuffRequired ());
 
 		// perform update
 
@@ -240,17 +242,21 @@ class ObjectSettingsAction <
 
 		}
 
-		Long parentId =
+		Optional <Long> parentIdOptional =
 			requestContext.stuffInteger (
 				parentHelper.idKey ());
 
-		if (parentId != null) {
+		if (
+			optionalIsPresent (
+				parentIdOptional)
+		) {
 
 			// use specific parent
 
 			parent =
 				parentHelper.findRequired (
-					parentId);
+					optionalGetRequired (
+						parentIdOptional));
 
 			return;
 

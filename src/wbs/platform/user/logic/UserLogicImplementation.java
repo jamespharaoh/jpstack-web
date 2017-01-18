@@ -1,7 +1,9 @@
 package wbs.platform.user.logic;
 
 import static wbs.utils.etc.Misc.hashSha1Base64;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -16,6 +18,7 @@ import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
+
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.model.UserObjectHelper;
@@ -57,10 +60,11 @@ class UserLogicImplementation
 
 	@Override
 	public
-	void userLogon (
+	UserSessionRec userLogon (
 			@NonNull UserRec user,
 			@NonNull String sessionId,
-			@NonNull Optional <String> userAgent) {
+			@NonNull Optional <String> userAgent,
+			@NonNull Optional <String> consoleDeploymentCode) {
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -107,6 +111,8 @@ class UserLogicImplementation
 
 		);
 
+		return session;
+
 	}
 
 	@Override
@@ -149,16 +155,17 @@ class UserLogicImplementation
 
 	@Override
 	public
-	Long userLogonTry (
+	Optional <UserSessionRec> userLogonTry (
 			@NonNull String sliceCode,
 			@NonNull String username,
 			@NonNull String password,
 			@NonNull String sessionId,
-			@NonNull Optional<String> userAgent) {
+			@NonNull Optional <String> userAgent,
+			@NonNull Optional <String> consoleDeploymentCode) {
 
 		// lookup the user
 
-		Optional<UserRec> userOptional =
+		Optional <UserRec> userOptional =
 			userHelper.findByCode (
 				GlobalId.root,
 				sliceCode,
@@ -168,7 +175,7 @@ class UserLogicImplementation
 			optionalIsNotPresent (
 				userOptional)
 		) {
-			return null;
+			return optionalAbsent ();
 		}
 
 		UserRec user =
@@ -182,20 +189,23 @@ class UserLogicImplementation
 				password)
 		) {
 
-			return null;
+			return optionalAbsent ();
 
 		}
 
 		// update user (bring online)
 
-		userLogon (
-			user,
-			sessionId,
-			userAgent);
+		UserSessionRec userSession =
+			userLogon (
+				user,
+				sessionId,
+				userAgent,
+				consoleDeploymentCode);
 
 		// and return
 
-		return user.getId ();
+		return optionalOf (
+			userSession);
 
 	}
 

@@ -55,9 +55,7 @@ class OxygenateRouteSummaryAdditionalPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		route =
-			routeHelper.findRequired (
-				requestContext.stuffInteger (
-					"routeId"));
+			routeHelper.findFromContextRequired ();
 
 		oxygen8RouteOut =
 			oxygen8RouteOutHelper.findRequired (

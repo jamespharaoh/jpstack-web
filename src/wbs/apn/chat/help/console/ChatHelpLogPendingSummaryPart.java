@@ -92,9 +92,7 @@ class ChatHelpLogPendingSummaryPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chatHelpLog =
-			chatHelpLogHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatHelpLogId"));
+			chatHelpLogHelper.findFromContextRequired ();
 
 		chatUser =
 			chatHelpLog.getChatUser ();

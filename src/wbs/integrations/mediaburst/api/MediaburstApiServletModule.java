@@ -7,14 +7,14 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.lowercase;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringIsNotEmpty;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 
 import javax.servlet.ServletException;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -53,6 +54,8 @@ import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.web.context.RequestContext;
 import wbs.web.file.AbstractWebFile;
@@ -208,165 +211,175 @@ class MediaburstApiServletModule
 					parentTaskLogger,
 					"inFile.doPost");
 
-			// logger.info("MB: "+requestContext.getRequest().getQueryString());
+			try (
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"MediaburstApiServletModule.inFile.doPost ()",
-					this);
+				Transaction transaction =
+					database.beginReadWrite (
+						"MediaburstApiServletModule.inFile.doPost ()",
+						this);
 
-			// debugging
-
-			requestContext.debugParameters (
-				taskLogger);
-
-			// get request stuff
-
-			Long routeId =
-				requestContext.requestIntegerRequired (
-					"routeId");
-
-			// get params in local variables
-
-			String numFromParam =
-				requestContext.parameterOrNull ("phonenumber");
-
-			String numToParam =
-				requestContext.parameterOrNull ("tonumber");
-
-			String networkParam =
-				requestContext.parameterOrNull ("netid");
-
-			String messageParam =
-				requestContext.parameterOrNull ("message");
-
-			String msgIdParam =
-				requestContext.parameterOrNull ("msg_id");
-
-			String udhParam =
-				requestContext.parameterOrNull ("udh");
-
-			Long networkId = null;
-
-			if (networkParam != null) {
-				if (networkParam.equals("51"))
-					networkId = 1l;
-				else if (networkParam.equals("81"))
-					networkId = 2l;
-				else if (networkParam.equals("3"))
-					networkId = 3l;
-				else if (networkParam.equals("1"))
-					networkId = 4l;
-				else if (networkParam.equals("9"))
-					networkId = 6l;
-				// else throw new RuntimeException ("Unknown network: " +
-				// networkParam);
-			}
-
-			/*
-			messageParam =
-				testContent (
-					messageParam);
-			*/
-
-			// load the stuff
-
-			RouteRec route =
-				routeHelper.findRequired (
-					routeId);
-
-			NetworkRec network =
-				networkId == null
-					? null
-					: networkHelper.findRequired (
-						networkId);
-
-			// check for concatenation
-
-			UserDataHeader userDataHeader;
-
-			if (
-				stringIsNotEmpty (
-					udhParam)
 			) {
 
-				userDataHeader =
-					UserDataHeader.decode (
-						ByteBuffer.wrap (
-							bytesFromHex (
-								udhParam)));
+				// debugging
 
-			} else {
+				requestContext.debugParameters (
+					taskLogger);
 
-				userDataHeader =
-					null;
+				// get request stuff
+
+				Long routeId =
+					requestContext.requestIntegerRequired (
+						"routeId");
+
+				// get params in local variables
+
+				String numFromParam =
+					requestContext.parameterRequired (
+						"phonenumber");
+
+				String numToParam =
+					requestContext.parameterRequired (
+						"tonumber");
+
+				Optional <String> networkParamOptional =
+					requestContext.parameter (
+						"netid");
+
+				String messageParam =
+					requestContext.parameterRequired (
+						"message");
+
+				String msgIdParam =
+					requestContext.parameterRequired (
+						"msg_id");
+
+				Optional <String> udhParamOptional =
+					requestContext.parameter (
+						"udh");
+
+				Long networkId = null;
+
+				if (
+					optionalIsPresent (
+						networkParamOptional)
+				) {
+
+					String networkParam =
+						optionalGetRequired (
+							networkParamOptional);
+
+					networkId =
+						networkMap.get (
+							networkParam);
+
+				}
+
+				// load the stuff
+
+				RouteRec route =
+					routeHelper.findRequired (
+						routeId);
+
+				NetworkRec network =
+					networkId == null
+						? null
+						: networkHelper.findRequired (
+							networkId);
+
+				// check for concatenation
+
+				UserDataHeader userDataHeader;
+
+				if (
+					optionalIsPresent (
+						udhParamOptional)
+				) {
+
+					String udhParam =
+						optionalGetRequired (
+							udhParamOptional);
+
+					userDataHeader =
+						UserDataHeader.decode (
+							ByteBuffer.wrap (
+								bytesFromHex (
+									udhParam)));
+
+				} else {
+
+					userDataHeader =
+						null;
+
+				}
+
+				ConcatenatedInformationElement concatenatedInformationElement;
+
+				if (
+					userDataHeader != null
+				) {
+
+					concatenatedInformationElement =
+						userDataHeader.find (
+							ConcatenatedInformationElement.class);
+
+				} else {
+
+					concatenatedInformationElement =
+						null;
+
+				}
+
+				// insert the message
+
+				TextRec messageText =
+					textHelper.findOrCreate (messageParam);
+
+				if (concatenatedInformationElement != null) {
+
+					inboxMultipartLogic.insertInboxMultipart (
+						route,
+						concatenatedInformationElement.getRef (),
+						concatenatedInformationElement.getSeqMax (),
+						concatenatedInformationElement.getSeqNum (),
+						numToParam,
+						numFromParam,
+						null,
+						network,
+						msgIdParam,
+						messageText.getText ());
+
+				} else {
+
+					smsInboxLogic.inboxInsert (
+						optionalOf (
+							msgIdParam),
+						messageText,
+						smsNumberHelper.findOrCreate (
+							numFromParam),
+						numToParam,
+						route,
+						optionalFromNullable (
+							network),
+						optionalAbsent (),
+						emptyList (),
+						optionalAbsent (),
+						optionalAbsent ());
+
+				}
+
+				// commit
+
+				transaction.commit ();
 
 			}
 
-			ConcatenatedInformationElement concatenatedInformationElement;
+			// send response
 
-			if (
-				userDataHeader != null
-			) {
+			FormatWriter formatWriter =
+				requestContext.formatWriter ();
 
-				concatenatedInformationElement =
-					userDataHeader.find (
-						ConcatenatedInformationElement.class);
-
-			} else {
-
-				concatenatedInformationElement =
-					null;
-
-			}
-
-			// insert the message
-
-			TextRec messageText =
-				textHelper.findOrCreate (messageParam);
-
-			if (concatenatedInformationElement != null) {
-
-				inboxMultipartLogic.insertInboxMultipart (
-					route,
-					concatenatedInformationElement.getRef (),
-					concatenatedInformationElement.getSeqMax (),
-					concatenatedInformationElement.getSeqNum (),
-					numToParam,
-					numFromParam,
-					null,
-					network,
-					msgIdParam,
-					messageText.getText ());
-
-			} else {
-
-				smsInboxLogic.inboxInsert (
-					optionalOf (
-						msgIdParam),
-					messageText,
-					smsNumberHelper.findOrCreate (
-						numFromParam),
-					numToParam,
-					route,
-					optionalFromNullable (
-						network),
-					optionalAbsent (),
-					emptyList (),
-					optionalAbsent (),
-					optionalAbsent ());
-
-			}
-
-			// commit etc
-
-			transaction.commit ();
-
-			PrintWriter out =
-				requestContext.writer ();
-
-			out.println ("OK");
+			formatWriter.writeLineFormat (
+				"OK");
 
 		}
 
@@ -470,7 +483,7 @@ class MediaburstApiServletModule
 						integerToDecimalString (
 							requestContext.requestIntegerRequired (
 								"routeId")),
-						requestContext.parameterOrNull (
+						requestContext.parameterRequired (
 							"msg_id")));
 
 			} catch (InvalidMessageStateException exception) {
@@ -481,7 +494,7 @@ class MediaburstApiServletModule
 						integerToDecimalString (
 							requestContext.requestIntegerRequired (
 								"routeId")),
-						requestContext.parameterOrNull (
+						requestContext.parameterRequired (
 							"msg_id"),
 						exception.getMessage ()));
 
@@ -545,5 +558,19 @@ class MediaburstApiServletModule
 	Map<String,WebFile> files () {
 		return null;
 	}
+
+	// data
+
+	public final static
+	Map <String, Long> networkMap =
+		ImmutableMap.<String, Long> builder ()
+
+		.put ("51", 1l)
+		.put ("81", 2l)
+		.put ("3", 3l)
+		.put ("1", 4l)
+		.put ("9", 6l)
+
+		.build ();
 
 }

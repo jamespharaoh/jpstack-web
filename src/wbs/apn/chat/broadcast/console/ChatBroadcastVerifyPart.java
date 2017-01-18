@@ -134,9 +134,7 @@ class ChatBroadcastVerifyPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
 		searchFields =
 			chatBroadcastConsoleModule.formFieldSet (
@@ -174,13 +172,11 @@ class ChatBroadcastVerifyPart
 				"chatBroadcastForm");
 
 		formHints =
-			ImmutableMap.<String,Object>builder ()
+			ImmutableMap.<String, Object> builder ()
 
 			.put (
 				"chat",
-				chatHelper.findRequired (
-					requestContext.stuffInteger (
-						"chatId")))
+				chatHelper.findFromContextRequired ())
 
 			.build ();
 

@@ -61,7 +61,6 @@ import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerDetailTypeRec;
 import wbs.imchat.model.ImChatCustomerDetailValueRec;
 import wbs.imchat.model.ImChatCustomerRec;
-import wbs.imchat.model.ImChatMessageObjectHelper;
 import wbs.imchat.model.ImChatMessageRec;
 import wbs.imchat.model.ImChatProfileRec;
 import wbs.imchat.model.ImChatRec;
@@ -88,7 +87,7 @@ class ImChatPendingSummaryPart
 	ConsoleModule imChatPendingConsoleModule;
 
 	@SingletonDependency
-	ImChatMessageObjectHelper imChatMessageHelper;
+	ImChatMessageConsoleHelper imChatMessageHelper;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
@@ -176,9 +175,7 @@ class ImChatPendingSummaryPart
 		// load data
 
 		message =
-			imChatMessageHelper.findRequired (
-				requestContext.stuffInteger (
-					"imChatMessageId"));
+			imChatMessageHelper.findFromContextRequired ();
 
 		conversation =
 			message.getImChatConversation ();

@@ -24,7 +24,6 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.smsapps.alerts.model.AlertsNumberRec;
-import wbs.smsapps.alerts.model.AlertsSettingsObjectHelper;
 import wbs.smsapps.alerts.model.AlertsSettingsRec;
 
 @PrototypeComponent ("alertsSettingsNumbersPart")
@@ -35,7 +34,7 @@ class AlertsSettingsNumbersPart
 	// singleton dependencies
 
 	@SingletonDependency
-	AlertsSettingsObjectHelper alertsSettingsHelper;
+	AlertsSettingsConsoleHelper alertsSettingsHelper;
 
 	// state
 
@@ -49,9 +48,7 @@ class AlertsSettingsNumbersPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		alertsSettings =
-			alertsSettingsHelper.findRequired (
-				requestContext.stuffInteger (
-					"alertsSettingsId"));
+			alertsSettingsHelper.findFromContextRequired ();
 
 	}
 

@@ -73,9 +73,9 @@ import wbs.apn.chat.bill.model.ChatUserCreditRec;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.contact.model.ChatMessageSearch;
+import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.console.ChatMonthCostConsoleHelper;
 import wbs.apn.chat.core.model.ChatMonthCostRec;
-import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -100,7 +100,7 @@ class ChatReportRevSharePart
 	ChatMessageObjectHelper chatMessageHelper;
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
 	ChatMonthCostConsoleHelper chatMonthCostHelper;
@@ -199,9 +199,7 @@ class ChatReportRevSharePart
 			"search");
 
 		chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
 		totalReport =
 			new ChatReportRevShareItem ()

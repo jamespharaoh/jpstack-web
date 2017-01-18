@@ -10,10 +10,25 @@ import com.google.common.base.Optional;
 import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.console.action.ConsoleAction;
+import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.exception.logic.ExceptionLogLogic;
+import wbs.platform.queue.logic.QueueLogic;
+import wbs.platform.text.console.TextConsoleHelper;
+import wbs.platform.user.console.UserConsoleHelper;
+import wbs.platform.user.console.UserConsoleLogic;
+
+import wbs.sms.gsm.GsmUtils;
+
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
-import wbs.apn.chat.contact.model.ChatContactObjectHelper;
 import wbs.apn.chat.contact.model.ChatContactRec;
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.contact.model.ChatMessageStatus;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
@@ -21,19 +36,6 @@ import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.logic.ChatHelpLogic;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
-import wbs.console.action.ConsoleAction;
-import wbs.console.request.ConsoleRequestContext;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.framework.logging.TaskLogger;
-import wbs.platform.exception.logic.ExceptionLogLogic;
-import wbs.platform.queue.logic.QueueLogic;
-import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.user.console.UserConsoleLogic;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.sms.gsm.GsmUtils;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatMessagePendingFormAction")
@@ -44,13 +46,13 @@ class ChatMessagePendingFormAction
 	// singleton dependencies
 
 	@SingletonDependency
-	ChatContactObjectHelper chatContactHelper;
+	ChatContactConsoleHelper chatContactHelper;
 
 	@SingletonDependency
 	ChatHelpLogic chatHelpLogic;
 
 	@SingletonDependency
-	ChatMessageObjectHelper chatMessageHelper;
+	ChatMessageConsoleHelper chatMessageHelper;
 
 	@SingletonDependency
 	ChatMessageLogic chatMessageLogic;
@@ -71,13 +73,13 @@ class ChatMessagePendingFormAction
 	QueueLogic queueLogic;
 
 	@SingletonDependency
-	TextObjectHelper textHelper;
+	TextConsoleHelper textHelper;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
 	@SingletonDependency
-	UserObjectHelper userHelper;
+	UserConsoleHelper userHelper;
 
 	// details
 
@@ -139,184 +141,189 @@ class ChatMessagePendingFormAction
 			requestContext.parameterRequired (
 				"message");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatMessagePendingFormAction.goSend ()",
-				this);
+		try (
 
-		// get database objects
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatMessagePendingFormAction.goSend ()",
+					this);
 
-		ChatMessageRec chatMessage =
-			chatMessageHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatMessageId"));
-
-		ChatRec chat =
-			chatMessage.getChat ();
-
-		// check message is ok
-
-		if (
-			optionalIsNotPresent (
-				requestContext.parameter (
-					"sendWithoutApproval"))
 		) {
 
-			ChatMessageLogic.ApprovalResult approvalResult =
-				chatMessageLogic.checkForApproval (
-					chat,
-					messageParam);
+			// get database objects
 
-			if (approvalResult.status
-					!= ChatMessageLogic.ApprovalResult.Status.clean) {
+			ChatMessageRec chatMessage =
+				chatMessageHelper.findFromContextRequired ();
 
-				requestContext.addWarning (
-					"Message still contains questionable content, use " +
-					"the 'no warning' button to send anyway");
+			ChatRec chat =
+				chatMessage.getChat ();
 
-				requestContext.request (
-					"showSendWithoutApproval",
-					true);
+			// check message is ok
 
-				return null;
+			if (
+				optionalIsNotPresent (
+					requestContext.parameter (
+						"sendWithoutApproval"))
+			) {
+
+				ChatMessageLogic.ApprovalResult approvalResult =
+					chatMessageLogic.checkForApproval (
+						chat,
+						messageParam);
+
+				if (approvalResult.status
+						!= ChatMessageLogic.ApprovalResult.Status.clean) {
+
+					requestContext.addWarning (
+						"Message still contains questionable content, use " +
+						"the 'no warning' button to send anyway");
+
+					requestContext.request (
+						"showSendWithoutApproval",
+						true);
+
+					return null;
+
+				}
 
 			}
 
-		}
+			// confirm message status
 
-		// confirm message status
+			if (chatMessage.getStatus ()
+					!= ChatMessageStatus.moderatorPending) {
 
-		if (chatMessage.getStatus ()
-				!= ChatMessageStatus.moderatorPending) {
+				requestContext.addError (
+					"Message is already approved");
 
-			requestContext.addError (
-				"Message is already approved");
+				return responder ("queueHomeResponder");
 
-			return responder ("queueHomeResponder");
+			}
 
-		}
+			// process the queue item
 
-		// process the queue item
+			queueLogic.processQueueItem (
+				chatMessage.getQueueItem (),
+				userConsoleLogic.userRequired ());
 
-		queueLogic.processQueueItem (
-			chatMessage.getQueueItem (),
-			userConsoleLogic.userRequired ());
-
-		// update the chat message
-
-		chatMessage
-
-			.setModerator (
-				userConsoleLogic.userRequired ())
-
-			.setModeratorTimestamp (
-				transaction.now ());
-
-		if (
-			stringEqualSafe (
-				messageParam,
-				chatMessage.getOriginalText ().getText ())
-		) {
-
-			// original message was approved
+			// update the chat message
 
 			chatMessage
 
-				.setStatus (
-					ChatMessageStatus.moderatorApproved)
+				.setModerator (
+					userConsoleLogic.userRequired ())
 
-				.setEditedText (
-					chatMessage.getOriginalText ());
+				.setModeratorTimestamp (
+					transaction.now ());
 
-		} else if (
-			stringEqualSafe (
-				messageParam,
-				chatMessage.getEditedText ().getText ())
-		) {
+			if (
+				stringEqualSafe (
+					messageParam,
+					chatMessage.getOriginalText ().getText ())
+			) {
 
-			// automatically edited message was accepted
+				// original message was approved
 
-			chatMessage
+				chatMessage
 
-				.setStatus (
-					ChatMessageStatus.moderatorAutoEdited);
+					.setStatus (
+						ChatMessageStatus.moderatorApproved)
 
-			chatMessageLogic.chatUserRejectionCountInc (
-				chatMessage.getFromUser (),
-				chatMessage.getThreadId ());
+					.setEditedText (
+						chatMessage.getOriginalText ());
 
-			chatMessageLogic.chatUserRejectionCountInc (
-				chatMessage.getToUser (),
-				chatMessage.getThreadId ());
+			} else if (
+				stringEqualSafe (
+					messageParam,
+					chatMessage.getEditedText ().getText ())
+			) {
 
-		} else {
+				// automatically edited message was accepted
 
-			// moderator made changes to message
+				chatMessage
 
-			chatMessage
-				.setStatus (ChatMessageStatus.moderatorEdited)
-				.setEditedText (
-					textHelper.findOrCreate (messageParam));
+					.setStatus (
+						ChatMessageStatus.moderatorAutoEdited);
 
-			chatMessageLogic.chatUserRejectionCountInc (
-				chatMessage.getFromUser (),
-				chatMessage.getThreadId ());
-
-			chatMessageLogic.chatUserRejectionCountInc (
-				chatMessage.getToUser (),
-				chatMessage.getThreadId ());
-
-		}
-
-		// update chat user contact
-
-		ChatContactRec chatContact =
-			chatContactHelper.findOrCreate (
-				chatMessage.getFromUser (),
-				chatMessage.getToUser ());
-
-		chatContact
-
-			.setLastDeliveredMessageTime (
-				transaction.now ());
-
-		// and send it
-
-		switch (chatMessage.getToUser ().getType ()) {
-
-		case user:
-
-			chatMessageLogic.chatMessageDeliverToUser (
-				chatMessage);
-
-			break;
-
-		case monitor:
-
-			ChatMonitorInboxRec chatMonitorInbox =
-				chatMessageLogic.findOrCreateChatMonitorInbox (
-					chatMessage.getToUser (),
+				chatMessageLogic.chatUserRejectionCountInc (
 					chatMessage.getFromUser (),
-					false);
+					chatMessage.getThreadId ());
 
-			chatMonitorInbox.setInbound (true);
+				chatMessageLogic.chatUserRejectionCountInc (
+					chatMessage.getToUser (),
+					chatMessage.getThreadId ());
 
-			break;
+			} else {
 
-		default:
+				// moderator made changes to message
 
-			throw new RuntimeException ("Not a user or monitor");
+				chatMessage
+					.setStatus (ChatMessageStatus.moderatorEdited)
+					.setEditedText (
+						textHelper.findOrCreate (messageParam));
+
+				chatMessageLogic.chatUserRejectionCountInc (
+					chatMessage.getFromUser (),
+					chatMessage.getThreadId ());
+
+				chatMessageLogic.chatUserRejectionCountInc (
+					chatMessage.getToUser (),
+					chatMessage.getThreadId ());
+
+			}
+
+			// update chat user contact
+
+			ChatContactRec chatContact =
+				chatContactHelper.findOrCreate (
+					chatMessage.getFromUser (),
+					chatMessage.getToUser ());
+
+			chatContact
+
+				.setLastDeliveredMessageTime (
+					transaction.now ());
+
+			// and send it
+
+			switch (chatMessage.getToUser ().getType ()) {
+
+			case user:
+
+				chatMessageLogic.chatMessageDeliverToUser (
+					chatMessage);
+
+				break;
+
+			case monitor:
+
+				ChatMonitorInboxRec chatMonitorInbox =
+					chatMessageLogic.findOrCreateChatMonitorInbox (
+						chatMessage.getToUser (),
+						chatMessage.getFromUser (),
+						false);
+
+				chatMonitorInbox.setInbound (true);
+
+				break;
+
+			default:
+
+				throw new RuntimeException ("Not a user or monitor");
+
+			}
+
+			transaction.commit ();
+
+			// we're done
+
+			requestContext.addNotice (
+				"Message approved");
+
+			return responder (
+				"queueHomeResponder");
 
 		}
-
-		transaction.commit ();
-
-		// we're done
-
-		requestContext.addNotice ("Message approved");
-
-		return responder ("queueHomeResponder");
 
 	}
 
@@ -357,9 +364,7 @@ class ChatMessagePendingFormAction
 		// get database objects
 
 		ChatMessageRec chatMessage =
-			chatMessageHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatMessageId"));
+			chatMessageHelper.findFromContextRequired ();
 
 		// confirm message status
 

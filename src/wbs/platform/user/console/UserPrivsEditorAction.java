@@ -3,25 +3,25 @@ package wbs.platform.user.console;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.priv.console.PrivConsoleHelper;
 import wbs.platform.priv.model.PrivRec;
 import wbs.platform.updatelog.logic.UpdateManager;
-import wbs.platform.user.model.UserObjectHelper;
-import wbs.platform.user.model.UserPrivObjectHelper;
 import wbs.platform.user.model.UserPrivRec;
 import wbs.platform.user.model.UserRec;
+
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("userPrivsEditorAction")
@@ -53,10 +53,10 @@ class UserPrivsEditorAction
 	UserConsoleLogic userConsoleLogic;
 
 	@SingletonDependency
-	UserObjectHelper userHelper;
+	UserConsoleHelper userHelper;
 
 	@SingletonDependency
-	UserPrivObjectHelper userPrivHelper;
+	UserPrivConsoleHelper userPrivHelper;
 
 	static
 	Pattern privDataPattern =
@@ -73,162 +73,166 @@ class UserPrivsEditorAction
 	Responder goReal (
 			@NonNull TaskLogger taskLogger) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"UserPrivsEditorAction.goReal ()",
-				this);
+		try (
 
-		UserRec user =
-			userHelper.findRequired (
-				requestContext.stuffInteger (
-					"userId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"UserPrivsEditorAction.goReal ()",
+					this);
 
-		Matcher matcher =
-			privDataPattern.matcher (
-				requestContext.parameterRequired (
-					"privdata"));
+		) {
 
-		while (matcher.find ()) {
+			UserRec user =
+				userHelper.findFromContextRequired ();
 
-			Long privId =
-				Long.parseLong (
-					matcher.group (
-						1));
+			Matcher matcher =
+				privDataPattern.matcher (
+					requestContext.parameterRequired (
+						"privdata"));
 
-			boolean grant =
-				matcher.group (2).equals ("cangrant");
+			while (matcher.find ()) {
 
-			boolean can =
-				matcher.group (3).equals ("1");
+				Long privId =
+					Long.parseLong (
+						matcher.group (
+							1));
 
-			PrivRec priv =
-				privHelper.findRequired (
-					privId);
+				boolean grant =
+					matcher.group (2).equals ("cangrant");
 
-			UserPrivRec userPriv =
-				userPrivHelper.find (
-					user,
-					priv);
+				boolean can =
+					matcher.group (3).equals ("1");
 
-			// check we have permission to update this priv
+				PrivRec priv =
+					privHelper.findRequired (
+						privId);
 
-			if (! privChecker.canGrant (priv.getId ()))
-				continue;
+				UserPrivRec userPriv =
+					userPrivHelper.find (
+						user,
+						priv);
 
-			boolean changed = false;
+				// check we have permission to update this priv
 
-			if (userPriv == null) {
+				if (! privChecker.canGrant (priv.getId ()))
+					continue;
 
-				// create new UserPriv
+				boolean changed = false;
 
-				if (can) {
+				if (userPriv == null) {
 
-					userPriv =
-						userPrivHelper.createInstance ()
+					// create new UserPriv
 
-						.setPriv (
-							priv)
+					if (can) {
 
-						.setUser (
-							user);
+						userPriv =
+							userPrivHelper.createInstance ()
 
-					if (grant) {
+							.setPriv (
+								priv)
 
-						userPriv
+							.setUser (
+								user);
 
-							.setCan (
-								false)
+						if (grant) {
 
-							.setCanGrant (
-								true);
+							userPriv
 
-					} else {
+								.setCan (
+									false)
 
-						userPriv
+								.setCanGrant (
+									true);
 
-							.setCan (
-								true)
+						} else {
 
-							.setCanGrant (
-								false);
+							userPriv
+
+								.setCan (
+									true)
+
+								.setCanGrant (
+									false);
+
+						}
+
+						userPrivHelper.insert (
+							userPriv);
+
+						changed = true;
 
 					}
 
-					userPrivHelper.insert (
-						userPriv);
-
-					changed = true;
-
-				}
-
-			} else {
-
-				// update userpriv
-
-				if (grant) {
-
-					if (userPriv.getCanGrant () != can)
-						changed = true;
-
-					userPriv.setCanGrant (can);
-
 				} else {
 
-					if (userPriv.getCan () != can)
-						changed = true;
+					// update userpriv
 
-					userPriv.setCan (can);
+					if (grant) {
+
+						if (userPriv.getCanGrant () != can)
+							changed = true;
+
+						userPriv.setCanGrant (can);
+
+					} else {
+
+						if (userPriv.getCan () != can)
+							changed = true;
+
+						userPriv.setCan (can);
+
+					}
+
+					// remove if necessary
+
+					if (! userPriv.getCan ()
+							&& ! userPriv.getCanGrant ()) {
+
+						userPrivHelper.remove (
+							userPriv);
+
+					}
 
 				}
 
-				// remove if necessary
+				// create event
 
-				if (! userPriv.getCan ()
-						&& ! userPriv.getCanGrant ()) {
+				if (changed) {
 
-					userPrivHelper.remove (
-						userPriv);
+					eventLogic.createEvent (
+						can
+							? (grant
+								? "user_grant_grant"
+								: "user_grant")
+							: (grant
+								? "user_revoke_grant"
+								: "user_revoke"),
+						userConsoleLogic.userRequired (),
+						priv,
+						user);
 
 				}
 
 			}
 
-			// create event
+			// signal the privs have been updated
 
-			if (changed) {
+			updateManager.signalUpdate (
+				"user_privs",
+				user.getId ());
 
-				eventLogic.createEvent (
-					can
-						? (grant
-							? "user_grant_grant"
-							: "user_grant")
-						: (grant
-							? "user_revoke_grant"
-							: "user_revoke"),
-					userConsoleLogic.userRequired (),
-					priv,
-					user);
+			updateManager.signalUpdate (
+				"privs",
+				0l);
 
-			}
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Updated user privileges");
+
+			return null;
 
 		}
-
-		// signal the privs have been updated
-
-		updateManager.signalUpdate (
-			"user_privs",
-			user.getId ());
-
-		updateManager.signalUpdate (
-			"privs",
-			0l);
-
-		transaction.commit ();
-
-		requestContext.addNotice ("Updated user privileges");
-
-		return null;
 
 	}
 

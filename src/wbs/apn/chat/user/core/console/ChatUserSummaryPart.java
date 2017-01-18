@@ -107,19 +107,17 @@ class ChatUserSummaryPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			chatUserHelper.findFromContextRequired ();
 
 		creditCheckResult =
 			chatCreditLogic.userCreditCheck (
 				chatUser);
 
 		internalChatUserCharges =
-			new ArrayList<ChatLogicHooks.ChatUserCharge> ();
+			new ArrayList<> ();
 
 		externalChatUserCharges =
-			new ArrayList<ChatLogicHooks.ChatUserCharge> ();
+			new ArrayList<> ();
 
 		chatHooks.collectChatUserCharges (
 			chatUser,

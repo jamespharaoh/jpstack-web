@@ -54,19 +54,21 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.currency.logic.CurrencyLogic;
+
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
-import wbs.smsapps.manualresponder.model.ManualResponderNumberObjectHelper;
+
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
-import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
 
@@ -84,10 +86,10 @@ class ManualResponderRequestPendingFormResponder
 	LogContext logContext;
 
 	@SingletonDependency
-	ManualResponderNumberObjectHelper manualResponderNumberHelper;
+	ManualResponderNumberConsoleHelper manualResponderNumberHelper;
 
 	@SingletonDependency
-	ManualResponderRequestObjectHelper manualResponderRequestHelper;
+	ManualResponderRequestConsoleHelper manualResponderRequestHelper;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
@@ -160,9 +162,7 @@ class ManualResponderRequestPendingFormResponder
 			taskLogger);
 
 		request =
-			manualResponderRequestHelper.findRequired (
-				requestContext.stuffInteger (
-					"manualResponderRequestId"));
+			manualResponderRequestHelper.findFromContextRequired ();
 
 		manualResponderNumber =
 			request.getManualResponderNumber ();

@@ -9,32 +9,36 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
 import wbs.sms.number.list.console.NumberListNumberConsoleHelper;
+
 import wbs.smsapps.broadcast.logic.BroadcastLogic;
 import wbs.smsapps.broadcast.model.BroadcastConfigRec;
 import wbs.smsapps.broadcast.model.BroadcastNumberRec;
 import wbs.smsapps.broadcast.model.BroadcastNumberState;
 import wbs.smsapps.broadcast.model.BroadcastRec;
 import wbs.smsapps.broadcast.model.BroadcastState;
+
 import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
@@ -99,265 +103,268 @@ class BroadcastNumbersAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"BroadcastNumbersAction.goReal ()",
-				this);
+		try (
 
-		BroadcastRec broadcast =
-			broadcastHelper.findRequired (
-				requestContext.stuffInteger (
-					"broadcastId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"BroadcastNumbersAction.goReal ()",
+					this);
 
-		BroadcastConfigRec broadcastConfig =
-			broadcast.getBroadcastConfig ();
-
-		// parse numbers
-
-		List<String> numbers;
-
-		try {
-
-			numbers =
-				numberFormatLogic.parseLines (
-					broadcastConfig.getNumberFormat (),
-					requestContext.parameterRequired (
-						"numbers"));
-
-		} catch (WbsNumberFormatException exception) {
-
-			requestContext.addNotice (
-				"Invalid number format");
-
-			return null;
-
-		}
-
-		// check permissions
-
-		if (! privChecker.canRecursive (
-				broadcastConfig,
-				"manage"))
-			throw new RuntimeException ();
-
-		// check state
-
-		if (broadcast.getState () != BroadcastState.unsent) {
-
-			requestContext.addErrorFormat (
-				"Can't modify numbers for broadcast in %s state",
-				enumNameSpaces (
-					broadcast.getState ()));
-
-			return null;
-
-		}
-
-		// add numbers
-
-		BroadcastLogic.AddResult addResult;
-
-		if (
-			optionalIsPresent (
-				requestContext.parameter (
-					"add"))
 		) {
 
-			addResult =
-				broadcastLogic.addNumbers (
-					broadcast,
-					numbers,
-					userConsoleLogic.userRequired ());
+			BroadcastRec broadcast =
+				broadcastHelper.findFromContextRequired ();
 
-		} else {
+			BroadcastConfigRec broadcastConfig =
+				broadcast.getBroadcastConfig ();
 
-			addResult =
-				new BroadcastLogic.AddResult ();
+			// parse numbers
 
-		}
+			List<String> numbers;
 
-		// remove numbers
+			try {
 
-		int numAlreadyRemoved = 0;
-		int numRemoved = 0;
+				numbers =
+					numberFormatLogic.parseLines (
+						broadcastConfig.getNumberFormat (),
+						requestContext.parameterRequired (
+							"numbers"));
 
-		if (
-			optionalIsPresent (
-				requestContext.parameter (
-					"remove"))
-		) {
+			} catch (WbsNumberFormatException exception) {
 
-			for (
-				String numberString
-					: numbers
+				requestContext.addNotice (
+					"Invalid number format");
+
+				return null;
+
+			}
+
+			// check permissions
+
+			if (! privChecker.canRecursive (
+					broadcastConfig,
+					"manage"))
+				throw new RuntimeException ();
+
+			// check state
+
+			if (broadcast.getState () != BroadcastState.unsent) {
+
+				requestContext.addErrorFormat (
+					"Can't modify numbers for broadcast in %s state",
+					enumNameSpaces (
+						broadcast.getState ()));
+
+				return null;
+
+			}
+
+			// add numbers
+
+			BroadcastLogic.AddResult addResult;
+
+			if (
+				optionalIsPresent (
+					requestContext.parameter (
+						"add"))
 			) {
 
-				NumberRec numberRecord =
-					numberHelper.findOrCreate (
-						numberString);
-
-				BroadcastNumberRec broadcastNumber =
-					broadcastNumberHelper.find (
+				addResult =
+					broadcastLogic.addNumbers (
 						broadcast,
-						numberRecord);
+						numbers,
+						userConsoleLogic.userRequired ());
 
-				if (broadcastNumber == null) {
+			} else {
 
-					numAlreadyRemoved ++;
+				addResult =
+					new BroadcastLogic.AddResult ();
 
-					continue;
+			}
 
-				}
+			// remove numbers
 
-				switch (broadcastNumber.getState ()) {
+			int numAlreadyRemoved = 0;
+			int numRemoved = 0;
 
-				case removed:
+			if (
+				optionalIsPresent (
+					requestContext.parameter (
+						"remove"))
+			) {
 
-					numAlreadyRemoved ++;
+				for (
+					String numberString
+						: numbers
+				) {
 
-					break;
+					NumberRec numberRecord =
+						numberHelper.findOrCreate (
+							numberString);
 
-				case accepted:
+					BroadcastNumberRec broadcastNumber =
+						broadcastNumberHelper.find (
+							broadcast,
+							numberRecord);
 
-					broadcastNumber
+					if (broadcastNumber == null) {
 
-						.setState (
-							BroadcastNumberState.removed)
+						numAlreadyRemoved ++;
 
-						.setRemovedByUser (
-							userConsoleLogic.userRequired ());
+						continue;
 
-					broadcast
+					}
 
-						.setNumAccepted (
-							broadcast.getNumAccepted () - 1)
+					switch (broadcastNumber.getState ()) {
 
-						.setNumRemoved (
-							broadcast.getNumRemoved () + 1)
+					case removed:
 
-						.setNumTotal (
-							broadcast.getNumTotal () - 1);
+						numAlreadyRemoved ++;
 
-					numRemoved ++;
+						break;
 
-					break;
+					case accepted:
 
-				case rejected:
+						broadcastNumber
 
-					broadcastNumber
+							.setState (
+								BroadcastNumberState.removed)
 
-						.setState (
-							BroadcastNumberState.removed)
+							.setRemovedByUser (
+								userConsoleLogic.userRequired ());
 
-						.setRemovedByUser (
-							userConsoleLogic.userRequired ());
+						broadcast
 
-					broadcast
+							.setNumAccepted (
+								broadcast.getNumAccepted () - 1)
 
-						.setNumRejected (
-							broadcast.getNumRejected () - 1)
+							.setNumRemoved (
+								broadcast.getNumRemoved () + 1)
 
-						.setNumRemoved (
-							broadcast.getNumRemoved () + 1);
+							.setNumTotal (
+								broadcast.getNumTotal () - 1);
 
-					numRemoved ++;
+						numRemoved ++;
 
-					break;
+						break;
 
-				case sent:
+					case rejected:
 
-					shouldNeverHappen ();
+						broadcastNumber
+
+							.setState (
+								BroadcastNumberState.removed)
+
+							.setRemovedByUser (
+								userConsoleLogic.userRequired ());
+
+						broadcast
+
+							.setNumRejected (
+								broadcast.getNumRejected () - 1)
+
+							.setNumRemoved (
+								broadcast.getNumRemoved () + 1);
+
+						numRemoved ++;
+
+						break;
+
+					case sent:
+
+						shouldNeverHappen ();
+
+					}
 
 				}
 
 			}
 
+			// events
+
+			if (addResult.numAdded () > 0) {
+
+				eventLogic.createEvent (
+					"broadcast_numbers_added",
+					userConsoleLogic.userRequired (),
+					addResult.numAdded (),
+					broadcast);
+
+			}
+
+			if (numRemoved > 0) {
+
+				eventLogic.createEvent (
+					"broadcast_numbers_removed",
+					userConsoleLogic.userRequired (),
+					numRemoved,
+					broadcast);
+
+			}
+
+			// commit
+
+			transaction.commit ();
+
+			// report changes
+
+			if (addResult.numAlreadyAdded () > 0) {
+
+				requestContext.addWarningFormat (
+					"%s numbers already added",
+					integerToDecimalString (
+						addResult.numAlreadyAdded ()));
+
+			}
+
+			if (addResult.numAlreadyRejected () > 0) {
+
+				requestContext.addWarningFormat (
+					"%s numbers already rejected",
+					integerToDecimalString (
+						addResult.numAlreadyRejected ()));
+
+			}
+
+			if (addResult.numAdded () > 0) {
+
+				requestContext.addNoticeFormat (
+					"%s numbers added",
+					integerToDecimalString (
+						addResult.numAdded ()));
+
+			}
+
+			if (addResult.numRejected () > 0) {
+
+				requestContext.addWarningFormat (
+					"%s numbers rejected",
+					integerToDecimalString (
+						addResult.numRejected ()));
+
+			}
+
+			if (numAlreadyRemoved > 0) {
+
+				requestContext.addWarningFormat (
+					"%s numbers already removed or never added",
+					integerToDecimalString (
+						numAlreadyRemoved));
+
+			}
+
+			if (numRemoved > 0) {
+
+				requestContext.addNoticeFormat (
+					"%s numbers removed",
+					integerToDecimalString (
+						numRemoved));
+
+			}
+
+			return null;
+
 		}
-
-		// events
-
-		if (addResult.numAdded () > 0) {
-
-			eventLogic.createEvent (
-				"broadcast_numbers_added",
-				userConsoleLogic.userRequired (),
-				addResult.numAdded (),
-				broadcast);
-
-		}
-
-		if (numRemoved > 0) {
-
-			eventLogic.createEvent (
-				"broadcast_numbers_removed",
-				userConsoleLogic.userRequired (),
-				numRemoved,
-				broadcast);
-
-		}
-
-		// commit
-
-		transaction.commit ();
-
-		// report changes
-
-		if (addResult.numAlreadyAdded () > 0) {
-
-			requestContext.addWarningFormat (
-				"%s numbers already added",
-				integerToDecimalString (
-					addResult.numAlreadyAdded ()));
-
-		}
-
-		if (addResult.numAlreadyRejected () > 0) {
-
-			requestContext.addWarningFormat (
-				"%s numbers already rejected",
-				integerToDecimalString (
-					addResult.numAlreadyRejected ()));
-
-		}
-
-		if (addResult.numAdded () > 0) {
-
-			requestContext.addNoticeFormat (
-				"%s numbers added",
-				integerToDecimalString (
-					addResult.numAdded ()));
-
-		}
-
-		if (addResult.numRejected () > 0) {
-
-			requestContext.addWarningFormat (
-				"%s numbers rejected",
-				integerToDecimalString (
-					addResult.numRejected ()));
-
-		}
-
-		if (numAlreadyRemoved > 0) {
-
-			requestContext.addWarningFormat (
-				"%s numbers already removed or never added",
-				integerToDecimalString (
-					numAlreadyRemoved));
-
-		}
-
-		if (numRemoved > 0) {
-
-			requestContext.addNoticeFormat (
-				"%s numbers removed",
-				integerToDecimalString (
-					numRemoved));
-
-		}
-
-		return null;
 
 	}
 

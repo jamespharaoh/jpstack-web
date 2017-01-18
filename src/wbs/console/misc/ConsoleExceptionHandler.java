@@ -2,9 +2,9 @@ package wbs.console.misc;
 
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringSplitNewline;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +29,7 @@ import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.utils.string.StringFormatter;
+import wbs.utils.string.FormatWriter;
 
 import wbs.web.handler.WebExceptionHandler;
 
@@ -65,10 +65,6 @@ class ConsoleExceptionHandler
 
 	@PrototypeDependency
 	Provider <ErrorResponder> errorPageProvider;
-
-	// state
-
-	PrintWriter out;
 
 	// implementation
 
@@ -144,22 +140,22 @@ class ConsoleExceptionHandler
 
 			} else {
 
-				out =
-					requestContext.writer ();
+				FormatWriter formatWriter =
+					requestContext.formatWriter ();
 
-				printFormat (
-					"<p class=\"error\">Internal error</p>\n");
+				formatWriter.writeLineFormat (
+					"<p class=\"error\">Internal error</p>");
 
-				printFormat (
+				formatWriter.writeLineFormat (
 					"<p>This page cannot be displayed properly, due to an ",
-					"internal error.</p>\n");
+					"internal error.</p>");
 
-				printFormat (
-					"<form method=\"%h\">\n",
+				formatWriter.writeLineFormatIncreaseIndent (
+					"<form method=\"%h\">",
 					requestContext.method ());
 
 				for (
-					Map.Entry<String,List<String>> entry
+					Map.Entry <String, List <String>> entry
 						: requestContext.parameterMap ().entrySet ()
 				) {
 
@@ -179,52 +175,56 @@ class ConsoleExceptionHandler
 
 					for (String value : values) {
 
-						printFormat (
+						formatWriter.writeLineFormat (
 							"<input",
 							" type=\"hidden\"",
 							" name=\"%h\"",
 							name,
 							" value=\"%h\"",
 							value,
-							">\n");
+							">");
 					}
 
-					printFormat (
+					formatWriter.writeLineFormat (
 						"<input",
 						" type=\"submit\"",
 						" name=\"__repost\"",
 						" value=\"try again\"",
-						">\n");
+						">");
 
 				}
 
-				printFormat (
-					"</form>\n");
+				formatWriter.writeLineFormatDecreaseIndent (
+					"</form>");
 
-				if (privChecker.canRecursive (
+				if (
+					privChecker.canSimple (
 						GlobalId.root,
-						"debug")) {
+						"debug")
+				) {
 
-					printFormat (
-						"<p><pre>%h</pre></p>\n",
-						exceptionLogic.throwableDump (
-							throwable));
+					formatWriter.writeLineFormatIncreaseIndent (
+						"<pre>");
+
+					List <String> exceptionDumpLines =
+						stringSplitNewline (
+							exceptionLogic.throwableDump (
+								throwable));
+
+					exceptionDumpLines.forEach (
+						exceptionDumpLine ->
+							formatWriter.writeLineFormat (
+								"%s",
+								exceptionDumpLine));
+
+					formatWriter.writeLineFormatDecreaseIndent (
+						"</pre>");
 
 				}
 
 			}
 
 		}
-
-	}
-
-	protected
-	void printFormat (
-			@NonNull Object... args) {
-
-		out.print (
-			StringFormatter.standard (
-				args));
 
 	}
 

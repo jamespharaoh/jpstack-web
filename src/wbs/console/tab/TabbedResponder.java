@@ -2,6 +2,7 @@ package wbs.console.tab;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalOrEmptyString;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
@@ -209,9 +210,8 @@ class TabbedResponder
 				String path =
 					joinWithoutSeparator (
 						requestContext.servletPath (),
-						requestContext.pathInfo () != null
-							? requestContext.pathInfo ()
-							: "");
+						optionalOrEmptyString (
+							requestContext.pathInfo ()));
 
 				// log the exception
 

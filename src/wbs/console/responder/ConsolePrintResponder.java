@@ -42,7 +42,7 @@ class ConsolePrintResponder
 
 		formatWriter =
 			new WriterFormatWriter (
-				requestContext.writer ())
+				requestContext.printWriter ())
 
 			.indentString (
 				"  ");

@@ -63,9 +63,7 @@ class ChatUserAdminLocationFormActionHelper
 			@NonNull ChatUserAdminLocationForm formState) {
 
 		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			chatUserHelper.findFromContextRequired ();
 
 		formState
 
@@ -104,9 +102,7 @@ class ChatUserAdminLocationFormActionHelper
 		// perform update
 
 		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			chatUserHelper.findFromContextRequired ();
 
 		boolean success =
 			chatUserLogic.setPlace (

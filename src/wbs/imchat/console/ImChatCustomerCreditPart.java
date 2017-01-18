@@ -102,9 +102,7 @@ class ImChatCustomerCreditPart
 		);
 
 		request.customer (
-			imChatCustomerHelper.findRequired (
-				requestContext.stuffInteger (
-					"imChatCustomerId")));
+			imChatCustomerHelper.findFromContextRequired ());
 
 		updateResultSet =
 			optionalCast (

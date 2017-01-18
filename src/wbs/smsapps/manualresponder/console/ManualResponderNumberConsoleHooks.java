@@ -1,14 +1,20 @@
 package wbs.smsapps.manualresponder.console;
 
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+
 import lombok.NonNull;
 
 import wbs.console.helper.core.ConsoleHooks;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.platform.event.logic.EventLogic;
+
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberSearch;
+
 import wbs.utils.random.RandomLogic;
 
 @SingletonComponent ("manualResponderNumberConsoleHooks")
@@ -35,13 +41,13 @@ class ManualResponderNumberConsoleHooks
 			@NonNull Object searchObject) {
 
 		ManualResponderNumberSearch search =
-			(ManualResponderNumberSearch)
-			searchObject;
+			genericCastUnchecked (
+				searchObject);
 
 		search
 
 			.manualResponderId (
-				requestContext.stuffInteger (
+				requestContext.stuffIntegerRequired (
 					"manualResponderId"));
 
 	}

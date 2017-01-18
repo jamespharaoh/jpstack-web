@@ -187,13 +187,16 @@ class StatusUpdateResponder
 			@NonNull TaskLogger parentTaskLogger) {
 
 		Element statusUpdateElem =
-			new Element ("status-update");
+			new Element (
+				"status-update");
 
 		Document document =
-			new Document (statusUpdateElem);
+			new Document (
+				statusUpdateElem);
 
 		Element javascriptElem =
-			new Element ("javascript");
+			new Element (
+				"javascript");
 
 		statusUpdateElem.addContent (
 			javascriptElem);
@@ -209,7 +212,7 @@ class StatusUpdateResponder
 
 			xmlOutputter.output (
 				document,
-				requestContext.writer ());
+				requestContext.printWriter ());
 
 		} catch (IOException ioException) {
 

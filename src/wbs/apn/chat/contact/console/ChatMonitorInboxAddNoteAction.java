@@ -2,9 +2,6 @@ package wbs.apn.chat.contact.console;
 
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.servlet.ServletException;
-
-import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
@@ -17,10 +14,9 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
-import wbs.platform.user.model.UserObjectHelper;
 
-import wbs.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
@@ -38,7 +34,7 @@ class ChatMonitorInboxAddNoteAction
 	ChatContactNoteConsoleHelper chatContactNoteHelper;
 
 	@SingletonDependency
-	ChatMonitorInboxObjectHelper chatMonitorInboxHelper;
+	ChatMonitorInboxConsoleHelper chatMonitorInboxHelper;
 
 	@SingletonDependency
 	Database database;
@@ -50,7 +46,7 @@ class ChatMonitorInboxAddNoteAction
 	UserConsoleLogic userConsoleLogic;
 
 	@SingletonDependency
-	UserObjectHelper userHelper;
+	UserConsoleHelper userHelper;
 
 	// details
 
@@ -58,73 +54,76 @@ class ChatMonitorInboxAddNoteAction
 	public
 	Responder backupResponder () {
 
-		return responder ("chatMonitorInboxSummaryResponder");
+		return responder (
+			"chatMonitorInboxSummaryResponder");
 
 	}
 
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger)
-		throws ServletException {
+			@NonNull TaskLogger taskLogger) {
 
 		String newNote =
 			requestContext.parameterRequired (
 				"moreNotes");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatMonitorInboxAddNoteAction.goReal ()",
-				this);
+		try (
 
-		ChatMonitorInboxRec chatMonitorInbox =
-			chatMonitorInboxHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatMonitorInboxId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatMonitorInboxAddNoteAction.goReal ()",
+					this);
 
-		ChatUserRec userChatUser =
-			chatMonitorInbox.getUserChatUser ();
+		) {
 
-		ChatUserRec monitorChatUser =
-			chatMonitorInbox.getMonitorChatUser ();
+			ChatMonitorInboxRec chatMonitorInbox =
+				chatMonitorInboxHelper.findFromContextRequired ();
 
-		ChatRec chat =
-			userChatUser.getChat ();
+			ChatUserRec userChatUser =
+				chatMonitorInbox.getUserChatUser ();
 
-		if (newNote != null) {
+			ChatUserRec monitorChatUser =
+				chatMonitorInbox.getMonitorChatUser ();
 
-			log.info (
-				stringFormat (
-					"Adding note to %s",
-					chatMonitorInbox.getMonitorChatUser ().getName ()));
+			ChatRec chat =
+				userChatUser.getChat ();
 
-			chatContactNoteHelper.insert (
-				chatContactNoteHelper.createInstance ()
+			if (newNote != null) {
 
-				.setChat (
-					chat)
+				log.info (
+					stringFormat (
+						"Adding note to %s",
+						chatMonitorInbox.getMonitorChatUser ().getName ()));
 
-				.setUser (
-					userChatUser)
+				chatContactNoteHelper.insert (
+					chatContactNoteHelper.createInstance ()
 
-				.setMonitor (
-					monitorChatUser)
+					.setChat (
+						chat)
 
-				.setNotes (
-					newNote)
+					.setUser (
+						userChatUser)
 
-				.setTimestamp (
-					transaction.now ())
+					.setMonitor (
+						monitorChatUser)
 
-				.setConsoleUser (
-					userConsoleLogic.userRequired ()));
+					.setNotes (
+						newNote)
+
+					.setTimestamp (
+						transaction.now ())
+
+					.setConsoleUser (
+						userConsoleLogic.userRequired ()));
+
+			}
+
+			transaction.commit ();
+
+			return null;
 
 		}
-
-		transaction.commit ();
-
-		return null;
 
 	}
 

@@ -15,23 +15,28 @@ import java.util.List;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.help.model.ChatHelpLogRec;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.service.console.ServiceConsoleHelper;
 import wbs.platform.service.model.ServiceRec;
+
 import wbs.sms.message.core.model.MessageDirection;
 import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageSearch;
 import wbs.sms.message.core.model.MessageSearch.MessageSearchOrder;
 import wbs.sms.number.core.model.NumberRec;
+
 import wbs.utils.time.TimeFormatter;
+
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.help.model.ChatHelpLogRec;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.web.utils.HtmlUtils;
 
 @PrototypeComponent ("chatHelpLogPendingMessagesPart")
@@ -72,9 +77,7 @@ class ChatHelpLogPendingMessagesPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chatHelpLog =
-			chatHelpLogHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatHelpLogId"));
+			chatHelpLogHelper.findFromContextRequired ();
 
 		chatUser =
 			chatHelpLog.getChatUser ();

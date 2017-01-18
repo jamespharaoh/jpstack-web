@@ -1,22 +1,27 @@
 package wbs.apn.chat.graphs.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+
 import java.util.List;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.user.core.model.ChatUserSearch;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+
 import wbs.utils.time.TextualInterval;
+
+import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserSearch;
 
 @PrototypeComponent ("chatGraphsJoinersImageResponder")
 public
@@ -26,7 +31,7 @@ class ChatGraphsJoinersImageResponder
 	// dependencies
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
@@ -69,11 +74,9 @@ class ChatGraphsJoinersImageResponder
 			Instant maxTime) {
 
 		ChatRec chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
-		List<Long> chatUserIds =
+		List <Long> chatUserIds =
 			chatUserHelper.searchIds (
 				new ChatUserSearch ()
 
@@ -88,8 +91,9 @@ class ChatGraphsJoinersImageResponder
 						maxTime)))
 
 			.chatAffiliateId (
-				requestContext.stuffInteger (
-					"chatAffiliateId"))
+				optionalOrNull (
+					requestContext.stuffInteger (
+						"chatAffiliateId")))
 
 		);
 

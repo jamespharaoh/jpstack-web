@@ -196,4 +196,18 @@ interface FormatWriter
 
 	}
 
+	@SuppressWarnings ("resource")
+	default
+	StringFormatWriter stringBuffer () {
+
+		return new StringFormatWriter ()
+
+			.indentString (
+				indentString ())
+
+			.indentSize (
+				indentSize ());
+
+	}
+
 }

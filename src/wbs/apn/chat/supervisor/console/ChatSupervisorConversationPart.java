@@ -45,10 +45,10 @@ import wbs.platform.media.console.MediaConsoleLogic;
 
 import wbs.utils.time.TimeFormatter;
 
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
+import wbs.apn.chat.contact.console.ChatMessageConsoleHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
@@ -62,10 +62,10 @@ class ChatSupervisorConversationPart
 	// singleton dependencies
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
-	ChatMessageObjectHelper chatMessageHelper;
+	ChatMessageConsoleHelper chatMessageHelper;
 
 	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
@@ -102,9 +102,7 @@ class ChatSupervisorConversationPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
 		long chatUserId1 =
 			requestContext.parameterIntegerRequired (

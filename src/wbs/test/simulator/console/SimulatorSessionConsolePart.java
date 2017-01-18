@@ -1,6 +1,5 @@
 package wbs.test.simulator.console;
 
-import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlDataAttribute;
 import static wbs.web.utils.HtmlBlockUtils.htmlDivClose;
@@ -181,10 +180,8 @@ class SimulatorSessionConsolePart
 			() -> htmlSelect (
 				"network",
 				networkOptions,
-				emptyStringIfNull (
-					(String)
-					requestContext.session (
-						"simulatorNetworkId")),
+				requestContext.sessionOrEmptyString (
+					"simulatorNetworkId"),
 				htmlClassAttribute (
 					"networkSelect")));
 
@@ -195,10 +192,8 @@ class SimulatorSessionConsolePart
 				" class=\"numFromText\"",
 				" type=\"text\"",
 				" value=\"%h\">",
-				emptyStringIfNull (
-					(String)
-					requestContext.session (
-						"simulatorNumFrom"))));
+				requestContext.sessionOrEmptyString (
+					"simulatorNumFrom")));
 
 		htmlTableDetailsRowWriteHtml (
 			"Num to",
@@ -207,10 +202,8 @@ class SimulatorSessionConsolePart
 				" class=\"numToText\"",
 				" type=\"text\"",
 				" value=\"%h\"",
-				emptyStringIfNull (
-					(String)
-					requestContext.session (
-						"simulatorNumTo")),
+				requestContext.sessionOrEmptyString (
+					"simulatorNumTo"),
 				">"));
 
 		htmlTableDetailsRowWriteHtml (
@@ -220,10 +213,8 @@ class SimulatorSessionConsolePart
 				" class=\"messageText\"",
 				" type=\"text\"",
 				" value=\"%h\"",
-				emptyStringIfNull (
-					(String)
-					requestContext.session (
-						"simulatorMessage")),
+				requestContext.sessionOrEmptyString (
+					"simulatorMessage"),
 				">"));
 
 		htmlTableClose ();

@@ -3,8 +3,11 @@ package wbs.web.responder;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import lombok.NonNull;
+
 import wbs.utils.string.StringFormatter;
 
+@Deprecated
 public abstract
 class PrintResponder
 	extends AbstractResponder {
@@ -18,7 +21,7 @@ class PrintResponder
 		throws IOException {
 
 		writer =
-			requestContext.writer ();
+			requestContext.printWriter ();
 
 		super.setup ();
 
@@ -26,10 +29,11 @@ class PrintResponder
 
 	protected
 	void printFormat (
-			Object... args) {
+			@NonNull Object ... args) {
 
 		writer.print (
-			StringFormatter.standard (args));
+			StringFormatter.standard (
+				args));
 
 	}
 

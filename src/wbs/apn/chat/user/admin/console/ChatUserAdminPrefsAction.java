@@ -7,22 +7,24 @@ import static wbs.utils.string.StringUtils.nullIfEmptyString;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleLogic;
+
+import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatUserAdminPrefsAction")
@@ -33,7 +35,7 @@ class ChatUserAdminPrefsAction
 	// singleton dependencies
 
 	@SingletonDependency
-	ChatUserObjectHelper chatUserHelper;
+	ChatUserConsoleHelper chatUserHelper;
 
 	@SingletonDependency
 	Database database;
@@ -65,12 +67,6 @@ class ChatUserAdminPrefsAction
 	Responder goReal (
 			@NonNull TaskLogger taskLogger) {
 
-		// get stuff
-
-		Long chatUserId =
-			requestContext.stuffInteger (
-				"chatUserId");
-
 		// get params
 
 		String genderParam =
@@ -94,71 +90,75 @@ class ChatUserAdminPrefsAction
 
 		}
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserAdminPrefsAction.goReal ()",
-				this);
+		try (
 
-		// lookup database stuff
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserAdminPrefsAction.goReal ()",
+					this);
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				chatUserId);
+		) {
 
-		// check changes
+			// lookup database stuff
 
-		Optional <Gender> oldGenderOptional =
-			optionalFromNullable (
-				chatUser.getGender ());
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-		Gender newGender =
-			Gender.valueOf (
-				genderParam);
+			// check changes
 
-		Optional <Orient> oldOrientOptional =
-			optionalFromNullable (
-				chatUser.getOrient ());
+			Optional <Gender> oldGenderOptional =
+				optionalFromNullable (
+					chatUser.getGender ());
 
-		Orient newOrient =
-			Orient.valueOf (
-				orientParam);
+			Gender newGender =
+				Gender.valueOf (
+					genderParam);
 
-		if (anyOf (
+			Optional <Orient> oldOrientOptional =
+				optionalFromNullable (
+					chatUser.getOrient ());
 
-			() -> optionalValueNotEqualSafe (
-				oldGenderOptional,
-				newGender),
+			Orient newOrient =
+				Orient.valueOf (
+					orientParam);
 
-			() -> optionalValueNotEqualSafe (
-				oldOrientOptional,
-				newOrient)
+			if (anyOf (
 
-		)) {
+				() -> optionalValueNotEqualSafe (
+					oldGenderOptional,
+					newGender),
 
-			chatUser
+				() -> optionalValueNotEqualSafe (
+					oldOrientOptional,
+					newOrient)
 
-				.setGender (
-					newGender)
+			)) {
 
-				.setOrient (
-					newOrient);
+				chatUser
 
-			eventLogic.createEvent (
-				"chat_user_prefs",
-				userConsoleLogic.userRequired (),
-				chatUser,
-				chatUser.getGender ().toString (),
-				chatUser.getOrient ().toString ());
+					.setGender (
+						newGender)
+
+					.setOrient (
+						newOrient);
+
+				eventLogic.createEvent (
+					"chat_user_prefs",
+					userConsoleLogic.userRequired (),
+					chatUser,
+					chatUser.getGender ().toString (),
+					chatUser.getOrient ().toString ());
+
+			}
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Chat user prefs updated");
+
+			return null;
 
 		}
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Chat user prefs updated");
-
-		return null;
 
 	}
 

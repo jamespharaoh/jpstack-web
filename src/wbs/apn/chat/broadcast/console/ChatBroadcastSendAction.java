@@ -72,7 +72,7 @@ import wbs.apn.chat.broadcast.model.ChatBroadcastObjectHelper;
 import wbs.apn.chat.broadcast.model.ChatBroadcastRec;
 import wbs.apn.chat.broadcast.model.ChatBroadcastState;
 import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.core.model.ChatObjectHelper;
+import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
@@ -112,7 +112,7 @@ class ChatBroadcastSendAction
 	ChatCreditLogic chatCreditLogic;
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
 	ChatUserDao chatUserDao;
@@ -244,14 +244,12 @@ class ChatBroadcastSendAction
 				.includeOptedOut (
 					false);
 
-			Map<String,Object> formHints =
+			Map <String, Object> formHints =
 				ImmutableMap.<String,Object>builder ()
 
 				.put (
 					"chat",
-					chatHelper.findRequired (
-						requestContext.stuffInteger (
-							"chatId")))
+					chatHelper.findFromContextRequired ())
 
 				.build ();
 
@@ -372,9 +370,7 @@ class ChatBroadcastSendAction
 					"start transaction");
 
 				ChatRec chat =
-					chatHelper.findRequired (
-						requestContext.stuffInteger (
-							"chatId"));
+					chatHelper.findFromContextRequired ();
 
 				// lookup user
 

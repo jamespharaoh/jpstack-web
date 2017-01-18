@@ -1,5 +1,7 @@
 package wbs.apn.chat.graphs.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -8,18 +10,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Optional;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.apn.chat.user.core.model.ChatUserSessionObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserSessionRec;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+
+import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.console.ChatUserSessionConsoleHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserSessionRec;
 
 @PrototypeComponent ("chatGraphsDailyUsersImageResponder")
 public
@@ -29,13 +35,13 @@ class ChatGraphsDailyUsersImageResponder
 	// dependencies
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
 
 	@SingletonDependency
-	ChatUserSessionObjectHelper chatUserSessionHelper;
+	ChatUserSessionConsoleHelper chatUserSessionHelper;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -68,8 +74,8 @@ class ChatGraphsDailyUsersImageResponder
 			Instant minTime,
 			Instant maxTime) {
 
-		Map<String,Object> searchMap =
-			new LinkedHashMap<String,Object> ();
+		Map <String, Object> searchMap =
+			new LinkedHashMap<> ();
 
 		searchMap.put (
 			"startTimeAfter",
@@ -80,27 +86,28 @@ class ChatGraphsDailyUsersImageResponder
 			maxTime);
 
 		ChatRec chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
 		searchMap.put (
 			"chatId",
 			chat.getId ());
 
-		Integer chatAffiliateId =
-			(Integer)
-			requestContext.contextStuffRequired ().get ("chatAffiliateId");
+		Optional <Long> chatAffiliateIdOptional =
+			requestContext.stuffInteger (
+				"chatAffiliateId");
 
-		if (chatAffiliateId != null) {
+		if (
+			optionalIsPresent (
+				chatAffiliateIdOptional)
+		) {
 
 			searchMap.put (
 				"chatAffiliateId",
-				chatAffiliateId);
+				chatAffiliateIdOptional.get ());
 
 		}
 
-		Collection<ChatUserSessionRec> chatUserSessions =
+		Collection <ChatUserSessionRec> chatUserSessions =
 			chatUserSessionHelper.search (
 				searchMap);
 

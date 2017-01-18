@@ -4,6 +4,7 @@ import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.instantToDateNullSafe;
 import static wbs.utils.time.TimeUtils.millisToInstant;
 import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
@@ -135,7 +136,11 @@ class EventConsoleLogicImplementation
 
 				Transaction transaction =
 					database.beginReadOnly (
-						"EventConsoleLogic.makeEventsPartFactory.buildPagePart ()",
+						stringFormat (
+							"%s.%s.%s ()",
+							"EventConsoleLogic",
+							"makeEventsPartFactory",
+							"buildPagePart"),
 						this);
 
 			) {
@@ -143,7 +148,7 @@ class EventConsoleLogicImplementation
 				PermanentRecord <?> object =
 					genericCastUnchecked (
 						objectLookup.lookupObject (
-							requestContext.contextStuffRequired ()));
+							requestContext.consoleContextStuffRequired ()));
 
 				return makeEventsPart (
 					object);

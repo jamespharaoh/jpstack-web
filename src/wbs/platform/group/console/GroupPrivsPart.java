@@ -137,9 +137,7 @@ class GroupPrivsPart
 		// and fill the current priv data sets
 
 		GroupRec group =
-			groupHelper.findRequired (
-				requestContext.stuffInteger (
-					"groupId"));
+			groupHelper.findFromContextRequired ();
 
 		for (
 			PrivRec priv

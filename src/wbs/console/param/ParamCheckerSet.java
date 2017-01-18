@@ -1,13 +1,15 @@
 package wbs.console.param;
 
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Getter;
-
 import com.google.common.collect.ImmutableMap;
+
+import lombok.Getter;
 
 import wbs.console.request.ConsoleRequestContext;
 
@@ -38,18 +40,23 @@ class ParamCheckerSet {
 			new ArrayList<String> ();
 
 		for (
-			Map.Entry<String,ParamChecker<?>> ent
+			Map.Entry <String, ParamChecker<?>> ent
 				: paramCheckers.entrySet ()
 		) {
 
-			String key = ent.getKey ();
-			ParamChecker<?> paramChecker = ent.getValue ();
+			String key =
+				ent.getKey ();
+
+			ParamChecker <?> paramChecker =
+				ent.getValue ();
 
 			try {
 
 				Object value =
 					paramChecker.get (
-						requestContext.parameterOrNull (key));
+						optionalOrNull (
+							requestContext.parameter (
+								key)));
 
 				if (ret != null)
 					ret.put (key, value);

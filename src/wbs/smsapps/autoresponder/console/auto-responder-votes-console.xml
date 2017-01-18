@@ -12,4 +12,13 @@
 
 	</extend-context>
 
+	<field-set
+		name="auto-responder-votes"
+		class="wbs.smsapps.autoresponder.console.AutoResponderVotesForm">
+
+		<interval-field
+			name="timePeriod"/>
+
+	</field-set>
+
 </console-module>

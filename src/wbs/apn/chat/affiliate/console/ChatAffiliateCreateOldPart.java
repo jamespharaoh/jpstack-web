@@ -39,8 +39,8 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.console.ChatKeywordJoinTypeConsoleHelper;
-import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 
@@ -56,7 +56,7 @@ class ChatAffiliateCreateOldPart
 	ChatKeywordJoinTypeConsoleHelper chatKeywordJoinTypeConsoleHelper;
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -84,9 +84,7 @@ class ChatAffiliateCreateOldPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		ChatRec chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
 		chatSchemes =
 			chat.getChatSchemes ().stream ()

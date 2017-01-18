@@ -14,13 +14,16 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.media.console.MediaConsoleLogic;
+
+import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 
 @PrototypeComponent ("chatUserImageRotatePart")
 public
@@ -47,9 +50,7 @@ class ChatUserImageRotatePart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			chatUserHelper.findFromContextRequired ();
 
 	}
 

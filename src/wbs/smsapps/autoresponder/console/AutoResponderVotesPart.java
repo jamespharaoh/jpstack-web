@@ -1,12 +1,12 @@
 package wbs.smsapps.autoresponder.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.simplify;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
-import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
-import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
-import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
@@ -17,11 +17,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.inject.Named;
+
 import lombok.NonNull;
 
-import org.joda.time.Duration;
-import org.joda.time.Instant;
-
+import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
+import wbs.console.forms.FormFieldSet;
+import wbs.console.forms.FormType;
+import wbs.console.misc.ConsoleUserHelper;
+import wbs.console.module.ConsoleModule;
 import wbs.console.part.AbstractPagePart;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -39,7 +44,6 @@ import wbs.sms.message.core.model.MessageObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageSearch;
 
-import wbs.smsapps.autoresponder.model.AutoResponderObjectHelper;
 import wbs.smsapps.autoresponder.model.AutoResponderRec;
 
 import wbs.utils.time.IntervalFormatter;
@@ -53,7 +57,17 @@ class AutoResponderVotesPart
 	// singleton dependencies
 
 	@SingletonDependency
-	AutoResponderObjectHelper autoResponderHelper;
+	@Named
+	ConsoleModule autoResponderVotesConsoleModule;
+
+	@SingletonDependency
+	AutoResponderConsoleHelper autoResponderHelper;
+
+	@SingletonDependency
+	ConsoleUserHelper consoleUserHelper;
+
+	@SingletonDependency
+	FormFieldLogic formFieldLogic;
 
 	@SingletonDependency
 	IntervalFormatter intervalFormatter;
@@ -72,7 +86,10 @@ class AutoResponderVotesPart
 
 	// state
 
-	String timePeriodString;
+	FormFieldSet <AutoResponderVotesForm> formFields;
+	AutoResponderVotesForm formValue;
+	UpdateResultSet formUpdate;
+
 	Map <String, Long> votes;
 
 	// implementation
@@ -82,54 +99,51 @@ class AutoResponderVotesPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		@SuppressWarnings ("unused")
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
 				"prepare");
 
-		// check units
+		// get fields
 
-		timePeriodString =
-			requestContext.parameterOrDefault (
-				"timePeriod",
-				"12 hours");
+		formFields =
+			autoResponderVotesConsoleModule.formFieldSet (
+				"auto-responder-votes",
+				AutoResponderVotesForm.class);
 
-		Long timePeriodSeconds =
-			intervalFormatter.parseIntervalStringSecondsRequired (
-				timePeriodString);
+		// process form
 
-		if (timePeriodSeconds == null) {
+		formValue =
+			new AutoResponderVotesForm ()
 
-			requestContext.addError (
-				"Invalid time period");
+			.timePeriod (
+				TextualInterval.parseRequired (
+					consoleUserHelper.timezone (),
+					"last 12 hours",
+					consoleUserHelper.hourOffset ()));
 
+		formUpdate =
+			formFieldLogic.update (
+				requestContext,
+				formFields,
+				formValue,
+				emptyMap (),
+				"votes");
+
+		if (formUpdate.errors ()) {
 			return;
-
 		}
 
 		// lookup objects
 
 		AutoResponderRec autoResponder =
-			autoResponderHelper.findRequired (
-				requestContext.stuffInteger (
-					"autoResponderId"));
+			autoResponderHelper.findFromContextRequired ();
 
 		ServiceRec autoResponderService =
 			serviceHelper.findByCodeRequired (
 				autoResponder,
 				"default");
-
-		// workout start time
-
-		Instant startTime =
-			transaction.now ().minus (
-				Duration.standardSeconds (
-					timePeriodSeconds));
-
-		taskLogger.debugFormat (
-			"Searching from %s",
-			userConsoleLogic.timestampWithoutTimezoneString (
-				startTime));
 
 		// retrieve messages
 
@@ -140,9 +154,7 @@ class AutoResponderVotesPart
 				autoResponderService.getId ())
 
 			.createdTime (
-				TextualInterval.after (
-					userConsoleLogic.timezone (),
-					startTime))
+				formValue.timePeriod ())
 
 			.direction (
 				MessageDirection.in);
@@ -183,37 +195,37 @@ class AutoResponderVotesPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		htmlFormOpenGet ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
-		// time period
+		// form
 
-		htmlParagraphOpen ();
-
-		formatWriter.writeLineFormat (
-			"Time period<br>");
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"text\"",
-			" name=\"timePeriod\"",
-			" value=\"%h\"",
-			timePeriodString,
-			">");
-
-		formatWriter.writeLineFormat (
-			"<input",
-			" type=\"submit\"",
-			" value=\"ok\"",
-			">");
-
-		htmlParagraphClose ();
-
-		htmlFormClose ();
+		formFieldLogic.outputFormTable (
+			taskLogger,
+			requestContext,
+			formatWriter,
+			formFields,
+			optionalOf (
+				formUpdate),
+			formValue,
+			emptyMap (),
+			"get",
+			requestContext.resolveLocalUrl (
+				"/autoResponder.votes"),
+			"search",
+			FormType.search,
+			"votes");
 
 		// votes
 
-		if (votes == null)
+		if (
+			isNull (
+				votes)
+		) {
 			return;
+		}
 
 		htmlHeadingTwoWrite (
 			"Vote summary");
@@ -241,12 +253,6 @@ class AutoResponderVotesPart
 		}
 
 		htmlTableClose ();
-
-	}
-
-	private void htmlFormOpenGet () {
-
-		// TODO Auto-generated method stub
 
 	}
 

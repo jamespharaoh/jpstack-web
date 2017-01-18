@@ -8,11 +8,14 @@ import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
+
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
+
 import wbs.utils.io.RuntimeIoException;
 
 public abstract
@@ -55,7 +58,7 @@ class AbstractMediaImageResponder
 
 		media =
 			mediaHelper.findRequired (
-				requestContext.stuffInteger (
+				requestContext.stuffIntegerRequired (
 					"mediaId"));
 
 		transform ();

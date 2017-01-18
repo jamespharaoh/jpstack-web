@@ -3,9 +3,6 @@ package wbs.apn.chat.contact.console;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.servlet.ServletException;
-
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.joda.time.DateTimeZone;
@@ -22,20 +19,18 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
-import wbs.platform.user.model.UserObjectHelper;
 
 import wbs.utils.time.TextualInterval;
 import wbs.utils.time.TimeFormatException;
 import wbs.utils.time.TimeFormatter;
 
-import wbs.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
-import wbs.apn.chat.contact.model.ChatUserInitiationLogObjectHelper;
 import wbs.apn.chat.contact.model.ChatUserInitiationReason;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
-import wbs.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
+import wbs.apn.chat.user.core.console.ChatUserAlarmConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.web.responder.Responder;
@@ -48,13 +43,13 @@ class ChatMonitorInboxAlarmAction
 	// singleton dependencies
 
 	@SingletonDependency
-	ChatMonitorInboxObjectHelper chatMonitorInboxHelper;
+	ChatMonitorInboxConsoleHelper chatMonitorInboxHelper;
 
 	@SingletonDependency
-	ChatUserAlarmObjectHelper chatUserAlarmHelper;
+	ChatUserAlarmConsoleHelper chatUserAlarmHelper;
 
 	@SingletonDependency
-	ChatUserInitiationLogObjectHelper chatUserInitiationLogHelper;
+	ChatUserInitiationLogConsoleHelper chatUserInitiationLogHelper;
 
 	@SingletonDependency
 	Database database;
@@ -69,7 +64,7 @@ class ChatMonitorInboxAlarmAction
 	UserConsoleLogic userConsoleLogic;
 
 	@SingletonDependency
-	UserObjectHelper userHelper;
+	UserConsoleHelper userHelper;
 
 	// state
 
@@ -91,237 +86,239 @@ class ChatMonitorInboxAlarmAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger)
-		throws ServletException {
+			@NonNull TaskLogger taskLogger) {
 
 		// start transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatMonitorInboxAlarmAction.goReal ()",
-				this);
+		try (
 
-		ChatMonitorInboxRec chatMonitorInbox =
-			chatMonitorInboxHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatMonitorInboxId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatMonitorInboxAlarmAction.goReal ()",
+					this);
 
-		ChatUserRec userChatUser =
-			chatMonitorInbox.getUserChatUser ();
+		) {
 
-		ChatUserRec monitorChatUser =
-			chatMonitorInbox.getMonitorChatUser ();
+			ChatMonitorInboxRec chatMonitorInbox =
+				chatMonitorInboxHelper.findFromContextRequired ();
 
-		ChatRec chat =
-			userChatUser.getChat ();
+			ChatUserRec userChatUser =
+				chatMonitorInbox.getUserChatUser ();
 
-		ChatSchemeRec chatScheme =
-			userChatUser.getChatScheme ();
+			ChatUserRec monitorChatUser =
+				chatMonitorInbox.getMonitorChatUser ();
 
-		ChatUserAlarmRec chatUserAlarm =
-			chatUserAlarmHelper.find (
-				userChatUser,
-				monitorChatUser);
+			ChatRec chat =
+				userChatUser.getChat ();
 
-		timeZone =
-			DateTimeZone.forID (
-				chatScheme.getTimezone ());
+			ChatSchemeRec chatScheme =
+				userChatUser.getChatScheme ();
 
-		// pull in parameters
+			ChatUserAlarmRec chatUserAlarm =
+				chatUserAlarmHelper.find (
+					userChatUser,
+					monitorChatUser);
 
-		boolean save =
-			optionalIsPresent (
-				requestContext.parameter (
-					"alarmSet"));
+			timeZone =
+				DateTimeZone.forID (
+					chatScheme.getTimezone ());
 
-		boolean clear =
-			optionalIsPresent (
-				requestContext.parameter (
-					"alarmCancel"));
+			// pull in parameters
 
-		boolean sticky =
-			Boolean.parseBoolean (
-				requestContext.parameterRequired (
-					"alarmSticky"));
+			boolean save =
+				optionalIsPresent (
+					requestContext.parameter (
+						"alarmSet"));
 
-		Instant alarmTime = null;
+			boolean clear =
+				optionalIsPresent (
+					requestContext.parameter (
+						"alarmCancel"));
 
-		if (save) {
+			boolean sticky =
+				Boolean.parseBoolean (
+					requestContext.parameterRequired (
+						"alarmSticky"));
 
-			// parse alarm time from form
+			Instant alarmTime = null;
 
-			try {
+			if (save) {
 
-				String timestampString =
-					stringFormat (
-						"%s %s",
-						requestContext.parameterRequired (
-							"alarmDate"),
-						requestContext.parameterRequired (
-							"alarmTime"));
+				// parse alarm time from form
 
-				TextualInterval interval =
-					TextualInterval.parseRequired (
-						timeZone,
-						timestampString,
-						0l);
+				try {
 
-				alarmTime =
-					interval.start ();
+					String timestampString =
+						stringFormat (
+							"%s %s",
+							requestContext.parameterRequired (
+								"alarmDate"),
+							requestContext.parameterRequired (
+								"alarmTime"));
 
-			} catch (TimeFormatException exception) {
+					TextualInterval interval =
+						TextualInterval.parseRequired (
+							timeZone,
+							timestampString,
+							0l);
 
-				requestContext.addError (
-					"Alarm time invalid");
+					alarmTime =
+						interval.start ();
 
-				return null;
-			}
+				} catch (TimeFormatException exception) {
 
-			// ensure time is not in past
+					requestContext.addError (
+						"Alarm time invalid");
 
-			if (alarmTime.isBefore (Instant.now ())) {
+					return null;
+				}
 
-				requestContext.addError (
-					"Alarm time is in past");
+				// ensure time is not in past
 
-				return null;
-			}
+				if (alarmTime.isBefore (Instant.now ())) {
 
-		}
+					requestContext.addError (
+						"Alarm time is in past");
 
-		// check alarm is within allowed range
-
-		if (save) {
-
-			Seconds secondsTillAlarm =
-				Seconds.secondsBetween (
-					transaction.now (),
-					alarmTime);
-
-			if (secondsTillAlarm.getSeconds () > chat.getMaxAlarmTime ()) {
-
-				requestContext.addError (
-					stringFormat (
-						"Alarm time exceeds maximum of %s",
-						timeFormatter.prettyDuration (
-							Duration.standardSeconds (
-								chat.getMaxAlarmTime ()))));
-
-				return null;
+					return null;
+				}
 
 			}
 
-		}
+			// check alarm is within allowed range
 
-		// remove existing alarm if required
+			if (save) {
 
-		if (chatUserAlarm != null && (clear || alarmTime == null)) {
+				Seconds secondsTillAlarm =
+					Seconds.secondsBetween (
+						transaction.now (),
+						alarmTime);
 
-			chatUserAlarmHelper.remove (
-				chatUserAlarm);
+				if (secondsTillAlarm.getSeconds () > chat.getMaxAlarmTime ()) {
 
-			// and create log
+					requestContext.addError (
+						stringFormat (
+							"Alarm time exceeds maximum of %s",
+							timeFormatter.prettyDuration (
+								Duration.standardSeconds (
+									chat.getMaxAlarmTime ()))));
 
-			chatUserInitiationLogHelper.insert (
-				chatUserInitiationLogHelper.createInstance ()
+					return null;
 
-				.setChatUser (
-					userChatUser)
+				}
 
-				.setMonitorChatUser (
-					monitorChatUser)
+			}
 
-				.setReason (
-					ChatUserInitiationReason.alarmCancel)
+			// remove existing alarm if required
 
-				.setTimestamp (
-					transaction.now ())
+			if (chatUserAlarm != null && (clear || alarmTime == null)) {
 
-				.setMonitorUser (
-					userConsoleLogic.userRequired ())
+				chatUserAlarmHelper.remove (
+					chatUserAlarm);
 
-				.setAlarmTime (
-					chatUserAlarm.getAlarmTime ())
+				// and create log
 
-			);
-
-		}
-
-		if (save && alarmTime != null) {
-
-			// create alarm if required
-
-			boolean insert = false;
-
-			if (chatUserAlarm == null) {
-
-				chatUserAlarm =
-					chatUserAlarmHelper.createInstance ()
+				chatUserInitiationLogHelper.insert (
+					chatUserInitiationLogHelper.createInstance ()
 
 					.setChatUser (
 						userChatUser)
 
 					.setMonitorChatUser (
-						monitorChatUser);
+						monitorChatUser)
 
-				insert = true;
+					.setReason (
+						ChatUserInitiationReason.alarmCancel)
 
-			}
+					.setTimestamp (
+						transaction.now ())
 
-			// and update it
+					.setMonitorUser (
+						userConsoleLogic.userRequired ())
 
-			chatUserAlarm
+					.setAlarmTime (
+						chatUserAlarm.getAlarmTime ())
 
-				.setAlarmTime (
-					alarmTime)
-
-				.setResetTime (
-					transaction.now ().plus (
-						Duration.standardHours (1)))
-
-				.setSticky (
-					sticky);
-
-			// insert it if needed
-
-			if (insert) {
-
-				chatUserAlarmHelper.insert (
-					chatUserAlarm);
+				);
 
 			}
 
-			// create log
+			if (save && alarmTime != null) {
 
-			chatUserInitiationLogHelper.insert (
-				chatUserInitiationLogHelper.createInstance ()
+				// create alarm if required
 
-				.setChatUser (
-					userChatUser)
+				boolean insert = false;
 
-				.setMonitorChatUser (
-					monitorChatUser)
+				if (chatUserAlarm == null) {
 
-				.setReason (
-					ChatUserInitiationReason.alarmSet)
+					chatUserAlarm =
+						chatUserAlarmHelper.createInstance ()
 
-				.setAlarmTime (
-					alarmTime)
+						.setChatUser (
+							userChatUser)
 
-				.setTimestamp (
-					transaction.now ())
+						.setMonitorChatUser (
+							monitorChatUser);
 
-				.setMonitorUser (
-					userConsoleLogic.userRequired ())
+					insert = true;
 
-			);
+				}
+
+				// and update it
+
+				chatUserAlarm
+
+					.setAlarmTime (
+						alarmTime)
+
+					.setResetTime (
+						transaction.now ().plus (
+							Duration.standardHours (1)))
+
+					.setSticky (
+						sticky);
+
+				// insert it if needed
+
+				if (insert) {
+
+					chatUserAlarmHelper.insert (
+						chatUserAlarm);
+
+				}
+
+				// create log
+
+				chatUserInitiationLogHelper.insert (
+					chatUserInitiationLogHelper.createInstance ()
+
+					.setChatUser (
+						userChatUser)
+
+					.setMonitorChatUser (
+						monitorChatUser)
+
+					.setReason (
+						ChatUserInitiationReason.alarmSet)
+
+					.setAlarmTime (
+						alarmTime)
+
+					.setTimestamp (
+						transaction.now ())
+
+					.setMonitorUser (
+						userConsoleLogic.userRequired ())
+
+				);
+
+			}
+
+			transaction.commit ();
+
+			return null;
 
 		}
-
-		transaction.commit ();
-
-		return null;
 
 	}
 

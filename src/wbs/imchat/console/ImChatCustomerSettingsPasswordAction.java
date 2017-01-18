@@ -6,7 +6,6 @@ import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -71,52 +70,55 @@ class ImChatCustomerSettingsPasswordAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChaCustomerSettingsPasswordAction.goReal ()",
-				this);
+		try (
 
-		// find customer
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChaCustomerSettingsPasswordAction.goReal ()",
+					this);
 
-		ImChatCustomerRec customer =
-			imChatCustomerHelper.findRequired (
-				requestContext.stuffInteger (
-					"imChatCustomerId"));
+		) {
 
-		// generate new password
+			// find customer
 
-		imChatLogic.customerPasswordGenerate (
-			customer,
-			Optional.of (
-				userConsoleLogic.userRequired ()));
+			ImChatCustomerRec customer =
+				imChatCustomerHelper.findFromContextRequired ();
 
-		// complete transaction
+			// generate new password
 
-		transaction.commit ();
+			imChatLogic.customerPasswordGenerate (
+				customer,
+				Optional.of (
+					userConsoleLogic.userRequired ()));
 
-		requestContext.addNotice (
-			stringFormat (
-				"New password generated: %s",
-				customer.getPassword ()));
+			// complete transaction
 
-		requestContext.addNotice (
-			stringFormat (
-				"This password has been automatically emailed to: %s",
-				customer.getEmail ()));
+			transaction.commit ();
 
-		requestContext.addWarning (
-			stringFormat (
-				"This password cannot be retrieved, please make a note of it ",
-				"immediately and communicate it to the customer."));
+			requestContext.addNotice (
+				stringFormat (
+					"New password generated: %s",
+					customer.getPassword ()));
 
-		requestContext.addWarning (
-			stringFormat (
-				"This new password replaces all previous passwords for this ",
-				"customer account, none of which will function from this ",
-				"moment."));
+			requestContext.addNotice (
+				stringFormat (
+					"This password has been automatically emailed to: %s",
+					customer.getEmail ()));
 
-		return null;
+			requestContext.addWarning (
+				stringFormat (
+					"This password cannot be retrieved, please make a note of it ",
+					"immediately and communicate it to the customer."));
+
+			requestContext.addWarning (
+				stringFormat (
+					"This new password replaces all previous passwords for this ",
+					"customer account, none of which will function from this ",
+					"moment."));
+
+			return null;
+
+		}
 
 	}
 

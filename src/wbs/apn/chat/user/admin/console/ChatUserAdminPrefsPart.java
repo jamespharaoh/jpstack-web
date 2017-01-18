@@ -17,14 +17,16 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 
 import lombok.NonNull;
 
+import wbs.console.part.AbstractPagePart;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
-import wbs.console.part.AbstractPagePart;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("chatUserAdminPrefsPart")
 public
@@ -46,9 +48,8 @@ class ChatUserAdminPrefsPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			chatUserHelper.findFromContextRequired ();
+
 	}
 
 	@Override

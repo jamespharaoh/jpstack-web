@@ -9,12 +9,7 @@ import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiAction;
-import wbs.apn.chat.contact.logic.ChatMessageLogic;
-import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
-import wbs.apn.chat.infosite.model.ChatInfoSiteRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -22,6 +17,13 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.contact.logic.ChatMessageLogic;
+import wbs.apn.chat.contact.model.ChatMessageMethod;
+import wbs.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
+import wbs.apn.chat.infosite.model.ChatInfoSiteRec;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
 
@@ -93,7 +95,7 @@ class ChatInfoSiteRespondAction
 		chatMessageLogic.chatMessageSendFromUser (
 			infoSite.getChatUser (),
 			otherUser,
-			requestContext.parameterOrNull (
+			requestContext.parameterRequired (
 				"text"),
 			Optional.absent (),
 			ChatMessageMethod.infoSite,

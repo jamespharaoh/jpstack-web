@@ -51,9 +51,7 @@ class DigitalSelectRouteSummaryAdditionalPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		route =
-			routeHelper.findRequired (
-				requestContext.stuffInteger (
-					"routeId"));
+			routeHelper.findFromContextRequired ();
 
 		digitalSelectRouteOut =
 			digitalSelectRouteOutHelper.findRequired (

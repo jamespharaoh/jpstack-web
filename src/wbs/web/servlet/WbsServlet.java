@@ -1,5 +1,6 @@
 package wbs.web.servlet;
 
+import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -312,12 +313,12 @@ class WbsServlet
 			IOException {
 
 		taskLogger.warningFormat (
-			"RCX not found %s %s",
-			requestContext.servletPath (),
-			requestContext.pathInfo ());
+			"RCX not found %s",
+			requestContext.requestUri ());
 
 		requestContext.sendError (
-			HttpServletResponse.SC_NOT_FOUND,
+			fromJavaInteger (
+				HttpServletResponse.SC_NOT_FOUND),
 			requestContext.requestUri ());
 
 	}
@@ -330,12 +331,12 @@ class WbsServlet
 			IOException {
 
 		taskLogger.warningFormat (
-			"RCX method not allowed %s %s",
-			requestContext.servletPath (),
-			requestContext.pathInfo ());
+			"method not allowed %s",
+			requestContext.requestUri ());
 
 		requestContext.sendError (
-			HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+			fromJavaInteger (
+				HttpServletResponse.SC_METHOD_NOT_ALLOWED));
 
 	}
 
@@ -348,12 +349,12 @@ class WbsServlet
 			IOException {
 
 		taskLogger.warningFormat (
-			"RCX forbidden %s %s",
-			requestContext.servletPath (),
-			requestContext.pathInfo ());
+			"RCX forbidden %s",
+			requestContext.requestUri ());
 
 		requestContext.sendError (
-			HttpServletResponse.SC_FORBIDDEN);
+			fromJavaInteger (
+				HttpServletResponse.SC_FORBIDDEN));
 
 	}
 

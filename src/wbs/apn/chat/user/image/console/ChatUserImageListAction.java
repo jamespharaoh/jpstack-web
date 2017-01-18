@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -89,283 +88,286 @@ class ChatUserImageListAction
 
 		String notice = null;
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserImageListAction.goReal ()",
-				this);
+		try (
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserImageListAction.goReal ()",
+					this);
 
-		ChatUserImageType type =
-			toEnum (
-				ChatUserImageType.class,
-				requestContext.stuffString (
-					"chatUserImageType"));
-
-		List<ChatUserImageRec> list =
-			chatUserLogic.getChatUserImageListByType (
-				chatUser,
-				type);
-
-		for (
-			String key
-				: requestContext.parameterMap ().keySet ()
 		) {
 
-			Matcher matcher =
-				keyPattern.matcher (
-					key);
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-			if (! matcher.matches ())
-				continue;
+			ChatUserImageType type =
+				toEnum (
+					ChatUserImageType.class,
+					requestContext.stuffString (
+						"chatUserImageType"));
 
-			String command =
-				matcher.group (1);
+			List <ChatUserImageRec> list =
+				chatUserLogic.getChatUserImageListByType (
+					chatUser,
+					type);
 
-			long index =
-				parseIntegerRequired (
-					matcher.group (2));
-
-			if (index >= list.size ())
-				throw new RuntimeException ();
-
-			if (
-				stringEqualSafe (
-					command,
-					"remove")
+			for (
+				String key
+					: requestContext.parameterMap ().keySet ()
 			) {
 
-				ChatUserImageRec itemToRemove =
-					listItemAtIndexRequired (
-						list,
-						index);
+				Matcher matcher =
+					keyPattern.matcher (
+						key);
+
+				if (! matcher.matches ())
+					continue;
+
+				String command =
+					matcher.group (1);
+
+				long index =
+					parseIntegerRequired (
+						matcher.group (2));
+
+				if (index >= list.size ())
+					throw new RuntimeException ();
 
 				if (
-					optionalValueEqualWithClass (
-						ChatUserImageRec.class,
-						optionalFromNullable (
-							chatUserLogic.getMainChatUserImageByType (
-								chatUser,
-								type)),
-						itemToRemove)
+					stringEqualSafe (
+						command,
+						"remove")
 				) {
 
-					chatUserLogic.setMainChatUserImageByType (
-						chatUser,
-						type,
-						Optional.absent ());
+					ChatUserImageRec itemToRemove =
+						listItemAtIndexRequired (
+							list,
+							index);
+
+					if (
+						optionalValueEqualWithClass (
+							ChatUserImageRec.class,
+							optionalFromNullable (
+								chatUserLogic.getMainChatUserImageByType (
+									chatUser,
+									type)),
+							itemToRemove)
+					) {
+
+						chatUserLogic.setMainChatUserImageByType (
+							chatUser,
+							type,
+							Optional.absent ());
+
+					}
+
+					itemToRemove
+
+						.setIndex (
+							null);
+
+					for (
+						long otherIndex = index + 1;
+						otherIndex < list.size ();
+						otherIndex ++
+					) {
+
+						ChatUserImageRec otherItem =
+							listItemAtIndexRequired (
+								list,
+								otherIndex);
+
+						otherItem
+
+							.setIndex (
+								otherIndex - 1l);
+
+					}
+
+					notice =
+						"Image/video removed";
 
 				}
 
-				itemToRemove
+				if (
 
-					.setIndex (
-						null);
+					enumNotEqualSafe (
+						type,
+						ChatUserImageType.video)
 
-				for (
-					long otherIndex = index + 1;
-					otherIndex < list.size ();
-					otherIndex ++
+					&& stringInSafe (
+						command,
+						"rotate_cw",
+						"rotate_ccw")
+
 				) {
 
-					ChatUserImageRec otherItem =
+					ChatUserImageRec chatUserImage =
+						listItemAtIndexRequired (
+							list,
+							index);
+
+					BufferedImage smallImage =
+						mediaLogic.getImageRequired (
+							chatUserImage.getMedia ());
+
+					BufferedImage fullImage =
+						mediaLogic.getImageRequired (
+							chatUserImage.getFullMedia ());
+
+					if (
+						stringEqualSafe (
+							command,
+							"rotate_ccw")
+					) {
+
+						smallImage =
+							mediaLogic.rotateImage270 (smallImage);
+
+						fullImage =
+							mediaLogic.rotateImage270 (fullImage);
+
+					}
+
+					if (
+						stringEqualSafe (
+							command,
+							"rotate_cw")
+					) {
+
+						smallImage =
+							mediaLogic.rotateImage90 (smallImage);
+
+						fullImage =
+							mediaLogic.rotateImage90 (fullImage);
+
+					}
+
+					String filename =
+						chatUser.getCode () + ".jpg";
+
+					chatUserImage.setMedia (
+						mediaLogic.createMediaFromImage (
+							smallImage,
+							"image/jpeg",
+							filename));
+
+					chatUserImage.setFullMedia (
+						mediaLogic.createMediaFromImage (
+							fullImage,
+							"image/jpeg",
+							filename));
+
+					notice =
+						"Image/video rotated";
+
+				}
+
+				if (
+					stringInSafe (
+						command,
+						"move_up",
+						"move_down")
+				) {
+
+					long diff =
+						ifThenElse (
+							stringEqualSafe (
+								command,
+								"move_up"),
+							() -> -1l,
+							() -> 1l);
+
+					long otherIndex = (
+						+ index
+						+ list.size ()
+						+ diff
+					) % list.size ();
+
+					ChatUserImageRec thisImage =
+						listItemAtIndexRequired (
+							list,
+							index);
+
+					ChatUserImageRec otherImage =
 						listItemAtIndexRequired (
 							list,
 							otherIndex);
 
-					otherItem
+					thisImage.setIndex (null);
+					otherImage.setIndex (null);
 
-						.setIndex (
-							otherIndex - 1l);
+					transaction.flush ();
 
-				}
-
-				notice =
-					"Image/video removed";
-
-			}
-
-			if (
-
-				enumNotEqualSafe (
-					type,
-					ChatUserImageType.video)
-
-				&& stringInSafe (
-					command,
-					"rotate_cw",
-					"rotate_ccw")
-
-			) {
-
-				ChatUserImageRec chatUserImage =
-					listItemAtIndexRequired (
-						list,
-						index);
-
-				BufferedImage smallImage =
-					mediaLogic.getImageRequired (
-						chatUserImage.getMedia ());
-
-				BufferedImage fullImage =
-					mediaLogic.getImageRequired (
-						chatUserImage.getFullMedia ());
-
-				if (
-					stringEqualSafe (
-						command,
-						"rotate_ccw")
-				) {
-
-					smallImage =
-						mediaLogic.rotateImage270 (smallImage);
-
-					fullImage =
-						mediaLogic.rotateImage270 (fullImage);
-
-				}
-
-				if (
-					stringEqualSafe (
-						command,
-						"rotate_cw")
-				) {
-
-					smallImage =
-						mediaLogic.rotateImage90 (smallImage);
-
-					fullImage =
-						mediaLogic.rotateImage90 (fullImage);
-
-				}
-
-				String filename =
-					chatUser.getCode () + ".jpg";
-
-				chatUserImage.setMedia (
-					mediaLogic.createMediaFromImage (
-						smallImage,
-						"image/jpeg",
-						filename));
-
-				chatUserImage.setFullMedia (
-					mediaLogic.createMediaFromImage (
-						fullImage,
-						"image/jpeg",
-						filename));
-
-				notice =
-					"Image/video rotated";
-
-			}
-
-			if (
-				stringInSafe (
-					command,
-					"move_up",
-					"move_down")
-			) {
-
-				long diff =
-					ifThenElse (
-						stringEqualSafe (
-							command,
-							"move_up"),
-						() -> -1l,
-						() -> 1l);
-
-				long otherIndex = (
-					+ index
-					+ list.size ()
-					+ diff
-				) % list.size ();
-
-				ChatUserImageRec thisImage =
-					listItemAtIndexRequired (
-						list,
-						index);
-
-				ChatUserImageRec otherImage =
-					listItemAtIndexRequired (
-						list,
+					thisImage.setIndex (
 						otherIndex);
 
-				thisImage.setIndex (null);
-				otherImage.setIndex (null);
-
-				transaction.flush ();
-
-				thisImage.setIndex (
-					otherIndex);
-
-				otherImage.setIndex (
-					index);
-
-				notice =
-					"Image/video moved";
-
-			}
-
-			if (
-				stringInSafe (
-					command,
-					"select")
-			) {
-
-				ChatUserImageRec chatUserImage =
-					listItemAtIndexRequired (
-						list,
+					otherImage.setIndex (
 						index);
 
+					notice =
+						"Image/video moved";
+
+				}
+
 				if (
-					optionalValueEqualWithClass (
-						ChatUserImageRec.class,
-						optionalFromNullable (
-							chatUserLogic.getMainChatUserImageByType (
-								chatUser,
-								type)),
-						chatUserImage)
+					stringInSafe (
+						command,
+						"select")
 				) {
 
-					chatUserLogic.setMainChatUserImageByType (
-						chatUser,
-						type,
-						Optional.absent ());
+					ChatUserImageRec chatUserImage =
+						listItemAtIndexRequired (
+							list,
+							index);
 
-					notice =
-						"Image unselected";
+					if (
+						optionalValueEqualWithClass (
+							ChatUserImageRec.class,
+							optionalFromNullable (
+								chatUserLogic.getMainChatUserImageByType (
+									chatUser,
+									type)),
+							chatUserImage)
+					) {
 
-				} else {
+						chatUserLogic.setMainChatUserImageByType (
+							chatUser,
+							type,
+							Optional.absent ());
 
-					chatUserLogic.setMainChatUserImageByType (
-						chatUser,
-						type,
-						Optional.of (
-							chatUserImage));
+						notice =
+							"Image unselected";
 
-					notice =
-						"Image selected";
+					} else {
+
+						chatUserLogic.setMainChatUserImageByType (
+							chatUser,
+							type,
+							Optional.of (
+								chatUserImage));
+
+						notice =
+							"Image selected";
+
+					}
 
 				}
 
 			}
 
+			transaction.commit ();
+
+			if (notice != null) {
+
+				requestContext.addNotice (
+					notice);
+
+			}
+
+			return null;
+
 		}
-
-		transaction.commit ();
-
-		if (notice != null) {
-
-			requestContext.addNotice (
-				notice);
-
-		}
-
-		return null;
 
 	}
 

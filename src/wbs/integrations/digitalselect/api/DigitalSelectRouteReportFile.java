@@ -145,7 +145,7 @@ class DigitalSelectRouteReportFile
 					msgidParam));
 
 			requestContext.sendError (
-				409,
+				409l,
 				"Message does not exist");
 
 			return;

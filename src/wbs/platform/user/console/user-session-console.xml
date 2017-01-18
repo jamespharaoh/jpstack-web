@@ -53,6 +53,9 @@
 		<text-field
 			name="userAgent"/>
 
+		<object-field
+			name="consoleDeployment"/>
+
 	</field-set>
 
 	<field-set
@@ -70,6 +73,9 @@
 
 		<text-field
 			name="userAgent"/>
+
+		<object-field
+			name="consoleDeployment"/>
 
 	</field-set>
 

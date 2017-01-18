@@ -14,7 +14,6 @@ import javax.inject.Named;
 
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -22,24 +21,26 @@ import wbs.console.forms.FormFieldLogic;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
+
 import wbs.smsapps.subscription.model.SubscriptionAffiliateRec;
 import wbs.smsapps.subscription.model.SubscriptionListRec;
-import wbs.smsapps.subscription.model.SubscriptionNumberObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionNumberRec;
-import wbs.smsapps.subscription.model.SubscriptionObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionRec;
-import wbs.smsapps.subscription.model.SubscriptionSubObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionSubRec;
+
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("subscriptionNumberAddRemoveAction")
@@ -65,17 +66,17 @@ class SubscriptionNumberAddRemoveAction
 	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
-	SubscriptionObjectHelper subscriptionHelper;
+	SubscriptionConsoleHelper subscriptionHelper;
 
 	@SingletonDependency
 	@Named
 	ConsoleModule subscriptionNumberConsoleModule;
 
 	@SingletonDependency
-	SubscriptionNumberObjectHelper subscriptionNumberHelper;
+	SubscriptionNumberConsoleHelper subscriptionNumberHelper;
 
 	@SingletonDependency
-	SubscriptionSubObjectHelper subscriptionSubHelper;
+	SubscriptionSubConsoleHelper subscriptionSubHelper;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -98,324 +99,327 @@ class SubscriptionNumberAddRemoveAction
 	Responder goReal (
 			@NonNull TaskLogger taskLogger) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"SubscriptionNumberAddRemoveAction.goReal ()",
-				this);
+		try (
 
-		SubscriptionRec subscription =
-			subscriptionHelper.findRequired (
-				requestContext.stuffInteger (
-					"subscriptionId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"SubscriptionNumberAddRemoveAction.goReal ()",
+					this);
 
-		// process form
-
-		FormFieldSet <SubscriptionNumberAddRemoveForm> addRemoveFormFieldSet =
-			subscriptionNumberConsoleModule.formFieldSet (
-				"addRemoveForm",
-				SubscriptionNumberAddRemoveForm.class);
-
-		SubscriptionNumberAddRemoveForm addRemoveForm =
-			new SubscriptionNumberAddRemoveForm ();
-
-		formFieldLogic.update (
-			requestContext,
-			addRemoveFormFieldSet,
-			addRemoveForm,
-			ImmutableMap.of (),
-			"update");
-
-		// parse numbers
-
-		List<String> numberStrings;
-
-		try {
-
-			numberStrings =
-				numberFormatLogic.parseLines (
-					addRemoveForm.numberFormat (),
-					addRemoveForm.numbers ());
-
-		} catch (WbsNumberFormatException exception) {
-
-			requestContext.addError (
-				"Invalid number format");
-
-			return null;
-
-		}
-
-		// lookup numbers
-
-		List<NumberRec> numbers =
-			new ArrayList<NumberRec> ();
-
-		for (
-			String numberString
-				: numberStrings
 		) {
 
-			NumberRec number =
-				numberHelper.findOrCreate (
-					numberString);
+			SubscriptionRec subscription =
+				subscriptionHelper.findFromContextRequired ();
 
-			numbers.add (
-				number);
+			// process form
 
-		}
+			FormFieldSet <SubscriptionNumberAddRemoveForm> addRemoveFormFieldSet =
+				subscriptionNumberConsoleModule.formFieldSet (
+					"addRemoveForm",
+					SubscriptionNumberAddRemoveForm.class);
 
-		// add numbers
+			SubscriptionNumberAddRemoveForm addRemoveForm =
+				new SubscriptionNumberAddRemoveForm ();
 
-		if (
-			optionalIsPresent (
-				requestContext.parameter (
-					"add"))
-		) {
+			formFieldLogic.update (
+				requestContext,
+				addRemoveFormFieldSet,
+				addRemoveForm,
+				ImmutableMap.of (),
+				"update");
 
-			int numAdded = 0;
-			int numAlreadyAdded = 0;
+			// parse numbers
+
+			List<String> numberStrings;
+
+			try {
+
+				numberStrings =
+					numberFormatLogic.parseLines (
+						addRemoveForm.numberFormat (),
+						addRemoveForm.numbers ());
+
+			} catch (WbsNumberFormatException exception) {
+
+				requestContext.addError (
+					"Invalid number format");
+
+				return null;
+
+			}
+
+			// lookup numbers
+
+			List<NumberRec> numbers =
+				new ArrayList<NumberRec> ();
 
 			for (
-				NumberRec number
-					: numbers
+				String numberString
+					: numberStrings
 			) {
 
-				SubscriptionNumberRec subscriptionNumber =
-					subscriptionNumberHelper.findOrCreate (
-						subscription,
-						number);
+				NumberRec number =
+					numberHelper.findOrCreate (
+						numberString);
 
-				if (
-					isNotNull (
-						subscriptionNumber.getActiveSubscriptionSub ())
+				numbers.add (
+					number);
+
+			}
+
+			// add numbers
+
+			if (
+				optionalIsPresent (
+					requestContext.parameter (
+						"add"))
+			) {
+
+				int numAdded = 0;
+				int numAlreadyAdded = 0;
+
+				for (
+					NumberRec number
+						: numbers
 				) {
 
-					numAlreadyAdded ++;
+					SubscriptionNumberRec subscriptionNumber =
+						subscriptionNumberHelper.findOrCreate (
+							subscription,
+							number);
 
-					continue;
+					if (
+						isNotNull (
+							subscriptionNumber.getActiveSubscriptionSub ())
+					) {
 
-				}
+						numAlreadyAdded ++;
 
-				SubscriptionAffiliateRec newSubscriptionAffiliate =
-					ifNull (
-						subscriptionNumber.getSubscriptionAffiliate (),
-						addRemoveForm.subscriptionAffiliate ());
+						continue;
 
-				SubscriptionListRec newSubscriptionList =
-					addRemoveForm.subscriptionList ();
+					}
 
-				SubscriptionSubRec subscriptionSub =
-					subscriptionSubHelper.insert (
-						subscriptionSubHelper.createInstance ()
-
-					.setSubscriptionNumber (
-						subscriptionNumber)
-
-					.setIndex (
-						subscriptionNumber.getNumSubs ())
-
-					.setSubscriptionList (
-						newSubscriptionList)
-
-					.setSubscriptionAffiliate (
-						newSubscriptionAffiliate)
-
-					.setStarted (
-						transaction.now ())
-
-					.setStartedBy (
-						userConsoleLogic.userRequired ())
-
-					.setActive (
-						true)
-
-				);
-
-				subscriptionNumber
-
-					.setActive (
-						true)
-
-					.setActiveSubscriptionSub (
-						subscriptionSub)
-
-					.setSubscriptionAffiliate (
-						newSubscriptionAffiliate)
-
-					.setSubscriptionList (
-						newSubscriptionList)
-
-					.setNumSubs (
-						subscriptionNumber.getNumSubs () + 1)
-
-					.setFirstJoin (
+					SubscriptionAffiliateRec newSubscriptionAffiliate =
 						ifNull (
-							subscriptionNumber.getFirstJoin (),
-							transaction.now ()))
+							subscriptionNumber.getSubscriptionAffiliate (),
+							addRemoveForm.subscriptionAffiliate ());
 
-					.setLastJoin (
-						transaction.now ());
+					SubscriptionListRec newSubscriptionList =
+						addRemoveForm.subscriptionList ();
 
-				subscription
+					SubscriptionSubRec subscriptionSub =
+						subscriptionSubHelper.insert (
+							subscriptionSubHelper.createInstance ()
 
-					.setNumSubscribers (
-						subscription.getNumSubscribers () + 1);
+						.setSubscriptionNumber (
+							subscriptionNumber)
 
-				newSubscriptionAffiliate
+						.setIndex (
+							subscriptionNumber.getNumSubs ())
 
-					.setNumSubscribers (
-						newSubscriptionAffiliate.getNumSubscribers () + 1);
+						.setSubscriptionList (
+							newSubscriptionList)
 
-				newSubscriptionList
+						.setSubscriptionAffiliate (
+							newSubscriptionAffiliate)
 
-					.setNumSubscribers (
-						newSubscriptionList.getNumSubscribers () + 1);
+						.setStarted (
+							transaction.now ())
 
-				numAdded ++;
+						.setStartedBy (
+							userConsoleLogic.userRequired ())
 
-			}
+						.setActive (
+							true)
 
-			// commit etc
+					);
 
-			transaction.commit ();
+					subscriptionNumber
 
-			if (numAdded > 0) {
+						.setActive (
+							true)
 
-				requestContext.addNoticeFormat (
-					"%s numbers added",
-					integerToDecimalString (
-						numAdded));
+						.setActiveSubscriptionSub (
+							subscriptionSub)
 
-			}
+						.setSubscriptionAffiliate (
+							newSubscriptionAffiliate)
 
-			if (numAlreadyAdded > 0) {
+						.setSubscriptionList (
+							newSubscriptionList)
 
-				requestContext.addWarningFormat (
-					"%s numbers already added",
-					integerToDecimalString (
-						numAlreadyAdded));
+						.setNumSubs (
+							subscriptionNumber.getNumSubs () + 1)
 
-			}
+						.setFirstJoin (
+							ifNull (
+								subscriptionNumber.getFirstJoin (),
+								transaction.now ()))
 
-			return null;
+						.setLastJoin (
+							transaction.now ());
 
-		}
+					subscription
 
-		// remove numbers
+						.setNumSubscribers (
+							subscription.getNumSubscribers () + 1);
 
-		if (
-			optionalIsPresent (
-				requestContext.parameter (
-					"remove"))
-		) {
+					newSubscriptionAffiliate
 
-			int numRemoved = 0;
-			int numAlreadyRemoved = 0;
+						.setNumSubscribers (
+							newSubscriptionAffiliate.getNumSubscribers () + 1);
 
-			for (
-				NumberRec number
-					: numbers
-			) {
+					newSubscriptionList
 
-				SubscriptionNumberRec subscriptionNumber =
-					subscriptionNumberHelper.findOrCreate (
-						subscription,
-						number);
+						.setNumSubscribers (
+							newSubscriptionList.getNumSubscribers () + 1);
 
-				if (
-					isNull (
-						subscriptionNumber.getActiveSubscriptionSub ())
-				) {
-
-					numAlreadyRemoved ++;
-
-					continue;
+					numAdded ++;
 
 				}
 
-				SubscriptionSubRec activeSubscriptionSub =
-					subscriptionNumber.getActiveSubscriptionSub ();
+				// commit etc
 
-				SubscriptionListRec activeSubscriptionList =
-					activeSubscriptionSub.getSubscriptionList ();
+				transaction.commit ();
 
-				SubscriptionAffiliateRec activeSubscriptionAffiliate =
-					activeSubscriptionSub.getSubscriptionAffiliate ();
+				if (numAdded > 0) {
 
-				activeSubscriptionSub
+					requestContext.addNoticeFormat (
+						"%s numbers added",
+						integerToDecimalString (
+							numAdded));
 
-					.setEnded (
-						transaction.now ())
+				}
 
-					.setEndedBy (
-						userConsoleLogic.userRequired ())
+				if (numAlreadyAdded > 0) {
 
-					.setActive (
-						false);
+					requestContext.addWarningFormat (
+						"%s numbers already added",
+						integerToDecimalString (
+							numAlreadyAdded));
 
-				subscriptionNumber
+				}
 
-					.setActive (
-						false)
-
-					.setActiveSubscriptionSub (
-						null);
-
-				subscription
-
-					.setNumSubscribers (
-						subscription.getNumSubscribers () - 1);
-
-				activeSubscriptionAffiliate
-
-					.setNumSubscribers (
-						activeSubscriptionAffiliate.getNumSubscribers () - 1);
-
-				activeSubscriptionList
-
-					.setNumSubscribers (
-						activeSubscriptionList.getNumSubscribers () - 1);
-
-				numRemoved ++;
+				return null;
 
 			}
 
-			// commit etc
-
-			transaction.commit ();
+			// remove numbers
 
 			if (
-				moreThanZero (
-					numRemoved)
+				optionalIsPresent (
+					requestContext.parameter (
+						"remove"))
 			) {
 
-				requestContext.addNoticeFormat (
-					"%s numbers removed",
-					integerToDecimalString (
-						numRemoved));
+				int numRemoved = 0;
+				int numAlreadyRemoved = 0;
+
+				for (
+					NumberRec number
+						: numbers
+				) {
+
+					SubscriptionNumberRec subscriptionNumber =
+						subscriptionNumberHelper.findOrCreate (
+							subscription,
+							number);
+
+					if (
+						isNull (
+							subscriptionNumber.getActiveSubscriptionSub ())
+					) {
+
+						numAlreadyRemoved ++;
+
+						continue;
+
+					}
+
+					SubscriptionSubRec activeSubscriptionSub =
+						subscriptionNumber.getActiveSubscriptionSub ();
+
+					SubscriptionListRec activeSubscriptionList =
+						activeSubscriptionSub.getSubscriptionList ();
+
+					SubscriptionAffiliateRec activeSubscriptionAffiliate =
+						activeSubscriptionSub.getSubscriptionAffiliate ();
+
+					activeSubscriptionSub
+
+						.setEnded (
+							transaction.now ())
+
+						.setEndedBy (
+							userConsoleLogic.userRequired ())
+
+						.setActive (
+							false);
+
+					subscriptionNumber
+
+						.setActive (
+							false)
+
+						.setActiveSubscriptionSub (
+							null);
+
+					subscription
+
+						.setNumSubscribers (
+							subscription.getNumSubscribers () - 1);
+
+					activeSubscriptionAffiliate
+
+						.setNumSubscribers (
+							activeSubscriptionAffiliate.getNumSubscribers () - 1);
+
+					activeSubscriptionList
+
+						.setNumSubscribers (
+							activeSubscriptionList.getNumSubscribers () - 1);
+
+					numRemoved ++;
+
+				}
+
+				// commit etc
+
+				transaction.commit ();
+
+				if (
+					moreThanZero (
+						numRemoved)
+				) {
+
+					requestContext.addNoticeFormat (
+						"%s numbers removed",
+						integerToDecimalString (
+							numRemoved));
+
+				}
+
+				if (
+					moreThanZero (
+						numAlreadyRemoved)
+				) {
+
+					requestContext.addWarningFormat (
+						"%s numbers already removed",
+						integerToDecimalString (
+							numAlreadyRemoved));
+
+				}
+
+				return null;
 
 			}
 
-			if (
-				moreThanZero (
-					numAlreadyRemoved)
-			) {
+			// error
 
-				requestContext.addWarningFormat (
-					"%s numbers already removed",
-					integerToDecimalString (
-						numAlreadyRemoved));
-
-			}
-
-			return null;
+			throw new RuntimeException ();
 
 		}
-
-		// error
-
-		throw new RuntimeException ();
 
 	}
 

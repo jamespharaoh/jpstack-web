@@ -177,9 +177,7 @@ class ChatAffiliateCreateOldAction
 		) {
 
 			ChatRec chat =
-				chatHelper.findRequired (
-					requestContext.stuffInteger (
-						"chatId"));
+				chatHelper.findFromContextRequired ();
 
 			ChatSchemeRec chatScheme =
 				chatSchemeHelper.findRequired (

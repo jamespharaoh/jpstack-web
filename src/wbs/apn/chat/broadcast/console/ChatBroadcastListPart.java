@@ -27,10 +27,9 @@ import wbs.platform.currency.logic.CurrencyLogic;
 
 import wbs.utils.time.TimeFormatter;
 
-import wbs.apn.chat.broadcast.model.ChatBroadcastObjectHelper;
 import wbs.apn.chat.broadcast.model.ChatBroadcastRec;
+import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.core.model.ChatObjectHelper;
 import wbs.apn.chat.core.model.ChatRec;
 
 @PrototypeComponent ("chatBroadcastListPart")
@@ -41,10 +40,10 @@ class ChatBroadcastListPart
 	// singleton dependencies
 
 	@SingletonDependency
-	ChatBroadcastObjectHelper chatBroadcastHelper;
+	ChatBroadcastConsoleHelper chatBroadcastHelper;
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
@@ -71,9 +70,7 @@ class ChatBroadcastListPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
 		broadcasts =
 			chatBroadcastHelper.findRecentWindow (

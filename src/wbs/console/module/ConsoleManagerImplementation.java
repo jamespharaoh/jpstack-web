@@ -124,16 +124,16 @@ class ConsoleManagerImplementation
 		new HashMap<> ();
 
 	Map <String, Provider <Responder>> responders =
-		new HashMap <String, Provider <Responder>> ();
+		new HashMap<> ();
 
-	Map<Pair<String,String>,List<ConsoleContext>> contextsByParentAndType =
-		new HashMap<Pair<String,String>,List<ConsoleContext>> ();
+	Map <Pair <String, String>, List <ConsoleContext>> contextsByParentAndType =
+		new HashMap<> ();
 
-	Map<String,List<ConsoleContext>> contextsWithoutParentByType =
-		new HashMap<String,List<ConsoleContext>> ();
+	Map <String, List <ConsoleContext>> contextsWithoutParentByType =
+		new HashMap<> ();
 
-	Map<String,SupervisorConfig> supervisorConfigs =
-		new HashMap<String,SupervisorConfig> ();
+	Map <String, SupervisorConfig> supervisorConfigs =
+		new HashMap<> ();
 
 	// implementation
 
@@ -257,7 +257,7 @@ class ConsoleManagerImplementation
 			new HashMap<String,String> ();
 
 		for (
-			Map.Entry<String,ConsoleModule> ent
+			Map.Entry <String, ConsoleModule> ent
 				: consoleModules.entrySet ()
 		) {
 
@@ -788,8 +788,8 @@ class ConsoleManagerImplementation
 
 			if (context.parentContextName () != null) {
 
-				Pair<String,String> key =
-					Pair.<String,String>of (
+				Pair <String, String> key =
+					Pair.of (
 						context.parentContextName (),
 						context.typeName ());
 
@@ -799,7 +799,7 @@ class ConsoleManagerImplementation
 				if (contextsForParentAndType == null) {
 
 					contextsForParentAndType =
-						new ArrayList<ConsoleContext> ();
+						new ArrayList<> ();
 
 					contextsByParentAndType.put (
 						key,
@@ -812,14 +812,14 @@ class ConsoleManagerImplementation
 
 			} else {
 
-				List<ConsoleContext> contextsForType =
+				List <ConsoleContext> contextsForType =
 					contextsWithoutParentByType.get (
 						context.typeName ());
 
 				if (contextsForType == null) {
 
 					contextsForType =
-						new ArrayList<ConsoleContext> ();
+						new ArrayList<> ();
 
 					contextsWithoutParentByType.put (
 						context.typeName (),
@@ -1024,8 +1024,8 @@ class ConsoleManagerImplementation
 				parentTaskLogger,
 				"paths");
 
-		Map<String,ConsoleContext> contextsByPathPrefix =
-			new HashMap<String,ConsoleContext> ();
+		Map <String, ConsoleContext> contextsByPathPrefix =
+			new HashMap<> ();
 
 		for (
 			ConsoleContext context
@@ -1155,7 +1155,7 @@ class ConsoleManagerImplementation
 				contextPartSuffix);
 
 		ConsoleContextStuff contextStuff =
-			requestContext.contextStuffRequired ();
+			requestContext.consoleContextStuffRequired ();
 
 		contextStuff.reset ();
 
@@ -1178,8 +1178,7 @@ class ConsoleManagerImplementation
 		if (pathParts.size () > 0)
 			throw new RuntimeException ();
 
-		requestContext.request (
-			"context",
+		requestContext.consoleContext (
 			context);
 
 	}
@@ -1370,12 +1369,10 @@ class ConsoleManagerImplementation
 						"file name is %s",
 						file);
 
-					requestContext.request (
-						"context",
+					requestContext.consoleContext (
 						consoleContext);
 
-					requestContext.request (
-						"contextStuff",
+					requestContext.consoleContextStuff (
 						contextStuff);
 
 					WebFile webFile =
@@ -1540,23 +1537,23 @@ class ConsoleManagerImplementation
 
 	@Override
 	public
-	Optional<ConsoleContext> contextWithParentOfType (
+	Optional <ConsoleContext> contextWithParentOfType (
 			@NonNull ConsoleContext parentContext,
 			@NonNull ConsoleContextType contextType,
 			boolean required) {
 
-		List<ConsoleContext> contexts =
+		List <ConsoleContext> contexts =
 			ifNull (
 				contextsByParentAndType.get (
-					Pair.<String,String>of (
+					Pair.of (
 						parentContext.name (),
 						contextType.name ())),
-				Collections.<ConsoleContext>emptyList ());
+				emptyList ());
 
 		if (contexts.size () > 1) {
 
-			List<String> contextNames =
-				new ArrayList<String> ();
+			List <String> contextNames =
+				new ArrayList<> ();
 
 			for (
 				ConsoleContext context
@@ -1590,7 +1587,7 @@ class ConsoleManagerImplementation
 
 			} else {
 
-				return Optional.<ConsoleContext>absent ();
+				return optionalAbsent ();
 
 			}
 
@@ -1603,7 +1600,7 @@ class ConsoleManagerImplementation
 
 	@Override
 	public
-	Optional<ConsoleContext> contextWithParentOfType (
+	Optional <ConsoleContext> contextWithParentOfType (
 			@NonNull ConsoleContext parentContext,
 			@NonNull ConsoleContextType contextType) {
 
@@ -1630,11 +1627,11 @@ class ConsoleManagerImplementation
 
 	@Override
 	public
-	Optional<ConsoleContext> contextWithoutParentOfType (
+	Optional <ConsoleContext> contextWithoutParentOfType (
 			@NonNull ConsoleContextType contextType,
 			boolean required) {
 
-		List<ConsoleContext> contexts =
+		List <ConsoleContext> contexts =
 			ifNull (
 				contextsWithoutParentByType.get (
 					contextType.name ()),

@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -119,14 +120,8 @@ class ConsoleContextStuff {
 
 	public
 	Tab getTab (
-			ConsoleContext consoleContext,
-			Object object) {
-
-		if (consoleContext == null)
-			throw new NullPointerException ("context");
-
-		if (object == null)
-			throw new NullPointerException ("object");
+			@NonNull ConsoleContext consoleContext,
+			@NonNull Object object) {
 
 		if (object instanceof Tab)
 			return (Tab) object;

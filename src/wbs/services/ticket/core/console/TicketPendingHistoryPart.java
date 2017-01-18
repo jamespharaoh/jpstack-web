@@ -26,9 +26,7 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.services.ticket.core.model.TicketNoteRec;
-import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
-import wbs.services.ticket.core.model.TicketStateObjectHelper;
 import wbs.services.ticket.core.model.TicketStateRec;
 
 @PrototypeComponent ("ticketPendingHistoryPart")
@@ -52,10 +50,10 @@ class TicketPendingHistoryPart
 	ConsoleModule ticketPendingConsoleModule;
 
 	@SingletonDependency
-	TicketStateObjectHelper ticketStateHelper;
+	TicketStateConsoleHelper ticketStateHelper;
 
 	@SingletonDependency
-	TicketObjectHelper ticketHelper;
+	TicketConsoleHelper ticketHelper;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
@@ -95,9 +93,7 @@ class TicketPendingHistoryPart
 		// load data
 
 		ticket =
-			ticketHelper.findRequired (
-				requestContext.stuffInteger (
-					"ticketId"));
+			ticketHelper.findFromContextRequired ();
 
 	}
 

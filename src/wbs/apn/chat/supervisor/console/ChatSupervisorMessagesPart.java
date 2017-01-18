@@ -20,23 +20,27 @@ import lombok.NonNull;
 
 import org.joda.time.Interval;
 
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageRec;
-import wbs.apn.chat.core.console.ChatConsoleLogic;
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
 import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+
 import wbs.utils.time.TimeFormatter;
+
+import wbs.apn.chat.contact.console.ChatMessageConsoleHelper;
+import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.console.ChatConsoleLogic;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.core.model.ChatRec;
 
 @PrototypeComponent ("chatSupervisorMessagesPart")
 public
@@ -49,10 +53,10 @@ class ChatSupervisorMessagesPart
 	ChatConsoleLogic chatConsoleLogic;
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
-	ChatMessageObjectHelper chatMessageHelper;
+	ChatMessageConsoleHelper chatMessageHelper;
 
 	@SingletonDependency
 	ChatMiscLogic chatMiscLogic;
@@ -101,9 +105,7 @@ class ChatSupervisorMessagesPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
 		Interval interval =
 			timeFormatter.isoStringToInterval (

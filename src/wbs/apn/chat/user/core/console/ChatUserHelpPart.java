@@ -78,12 +78,10 @@ class ChatUserHelpPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			chatUserHelper.findFromContextRequired ();
 
 		chatHelpLogs =
-			new TreeSet<ChatHelpLogRec> (
+			new TreeSet<> (
 				chatUser.getChatHelpLogs ());
 
 	}

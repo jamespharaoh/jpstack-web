@@ -1,22 +1,24 @@
 package wbs.apn.chat.user.core.console;
 
-import com.google.common.base.Optional;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
-import wbs.apn.chat.help.logic.ChatHelpLogic;
-import wbs.apn.chat.help.model.ChatHelpLogRec;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.sms.gsm.GsmUtils;
+
+import wbs.apn.chat.help.logic.ChatHelpLogic;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatUserHelpFormAction")
@@ -79,36 +81,39 @@ class ChatUserHelpFormAction
 			return null;
 		}
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserHelpFormAction.goReal ()",
-				this);
+		try (
 
-		// get objects
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserHelpFormAction.goReal ()",
+					this);
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+		) {
 
-		// send message
+			// get objects
 
-		chatHelpLogic.sendHelpMessage (
-			userConsoleLogic.userRequired (),
-			chatUser,
-			text,
-			Optional.<Long>absent (),
-			Optional.<ChatHelpLogRec>absent ());
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-		transaction.commit ();
+			// send message
 
-		// return
+			chatHelpLogic.sendHelpMessage (
+				userConsoleLogic.userRequired (),
+				chatUser,
+				text,
+				optionalAbsent (),
+				optionalAbsent ());
 
-		requestContext.addNotice (
-			"Message sent");
+			transaction.commit ();
 
-		return null;
+			// return
+
+			requestContext.addNotice (
+				"Message sent");
+
+			return null;
+
+		}
 
 	}
 

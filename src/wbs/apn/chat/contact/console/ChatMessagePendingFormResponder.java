@@ -36,7 +36,6 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.help.console.ChatHelpTemplateConsoleHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
@@ -52,7 +51,7 @@ class ChatMessagePendingFormResponder
 	ChatHelpTemplateConsoleHelper chatHelpTemplateHelper;
 
 	@SingletonDependency
-	ChatMessageObjectHelper chatMessageHelper;
+	ChatMessageConsoleHelper chatMessageHelper;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -74,9 +73,7 @@ class ChatMessagePendingFormResponder
 			@NonNull TaskLogger parentTaskLogger) {
 
 		chatMessage =
-			chatMessageHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatMessageId"));
+			chatMessageHelper.findFromContextRequired ();
 
 		chatHelpTemplates =
 			chatHelpTemplateHelper.findByParentAndType (

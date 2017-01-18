@@ -1,5 +1,7 @@
 package wbs.web.exceptions;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
 
 import java.util.List;
@@ -25,6 +27,15 @@ class HttpBadRequestException
 				statusMessage,
 				"Bad request"),
 			errors);
+
+	}
+
+	public
+	HttpBadRequestException () {
+
+		this (
+			optionalAbsent (),
+			emptyList ());
 
 	}
 

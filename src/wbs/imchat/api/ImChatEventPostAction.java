@@ -191,7 +191,8 @@ class ImChatEventPostAction
 				.setSource (
 					requestContext.header ("x-forwarded-for") != null
 						? joinWithCommaAndSpace (
-							requestContext.header ("x-forwarded-for"),
+							requestContext.headerRequired (
+								"x-forwarded-for"),
 							requestContext.request ().getRemoteHost ())
 						: requestContext.request ().getRemoteHost ())
 

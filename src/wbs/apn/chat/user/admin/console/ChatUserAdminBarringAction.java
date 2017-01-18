@@ -4,22 +4,24 @@ import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
-import wbs.apn.chat.user.core.logic.ChatUserLogic;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
+
+import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
+import wbs.apn.chat.user.core.logic.ChatUserLogic;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatUserAdminBarringAction")
@@ -80,20 +82,14 @@ class ChatUserAdminBarringAction
 
 		}
 
-		// get stuff
-
-		Long chatUserId =
-			requestContext.stuffInteger (
-				"chatUserId");
-
 		// get params
 
 		Boolean barOn =
-			requestContext.parameterIsOn (
+			requestContext.parameterOn (
 				"bar_on");
 
 		Boolean barOff =
-			requestContext.parameterIsOn (
+			requestContext.parameterOn (
 				"bar_off");
 
 		String reason =
@@ -119,75 +115,79 @@ class ChatUserAdminBarringAction
 
 		}
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserAdminBarringAction.goReal ()",
-				this);
+		try (
 
-		// lookup database stuff
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserAdminBarringAction.goReal ()",
+					this);
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				chatUserId);
+		) {
 
-		// do the work
+			// lookup database stuff
 
-		String eventType = null;
-		String notice = null;
+			ChatUserRec chatUser =
+				chatUserHelper.findFromContextRequired ();
 
-		if (barOn) {
+			// do the work
 
-			chatUserLogic.logoff (
-				chatUser,
-				true);
+			String eventType = null;
+			String notice = null;
 
-			chatUser
+			if (barOn) {
 
-				.setBarred (
+				chatUserLogic.logoff (
+					chatUser,
 					true);
 
-			eventType =
-				"chat_user_barred";
+				chatUser
 
-			notice =
-				"Chat user barred";
+					.setBarred (
+						true);
 
-		} else if (barOff) {
+				eventType =
+					"chat_user_barred";
 
-			chatUser
+				notice =
+					"Chat user barred";
 
-				.setBarred (
-					false);
+			} else if (barOff) {
 
-			eventType =
-				"chat_user_unbarred";
+				chatUser
 
-			notice =
-				"Chat user unbarred";
+					.setBarred (
+						false);
 
-		} else {
+				eventType =
+					"chat_user_unbarred";
 
-			throw shouldNeverHappen ();
+				notice =
+					"Chat user unbarred";
+
+			} else {
+
+				throw shouldNeverHappen ();
+
+			}
+
+			// create an event
+
+			eventLogic.createEvent (
+				eventType,
+				userConsoleLogic.userRequired (),
+				chatUser,
+				reason);
+
+			transaction.commit ();
+
+			// return
+
+			requestContext.addNotice (
+				notice);
+
+			return null;
 
 		}
-
-		// create an event
-
-		eventLogic.createEvent (
-			eventType,
-			userConsoleLogic.userRequired (),
-			chatUser,
-			reason);
-
-		transaction.commit ();
-
-		// return
-
-		requestContext.addNotice (
-			notice);
-
-		return null;
 
 	}
 

@@ -126,7 +126,7 @@ class ConsoleHelperImplementation <
 	Optional <RecordType> findFromContext () {
 
 		return objectHelper.find (
-			requestContext.stuffInteger (
+			requestContext.stuffIntegerRequired (
 				idKey ()));
 
 	}
@@ -136,7 +136,7 @@ class ConsoleHelperImplementation <
 	RecordType findFromContextRequired () {
 
 		return objectHelper.findRequired (
-			requestContext.stuffInteger (
+			requestContext.stuffIntegerRequired (
 				idKey ()));
 
 	}

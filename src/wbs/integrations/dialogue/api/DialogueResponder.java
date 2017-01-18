@@ -1,13 +1,13 @@
 package wbs.integrations.dialogue.api;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.string.FormatWriter;
+
 import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
 
@@ -26,15 +26,19 @@ class DialogueResponder
 	@Override
 	public
 	void execute (
-			@NonNull TaskLogger parentTaskLogger)
-		throws IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		PrintWriter out =
-			requestContext.writer ();
+		FormatWriter formatWriter =
+			requestContext.formatWriter ();
 
-		out.println ("<HTML>");
-		out.println ("<!-- X-E3-Submission-Report: \"00\" -->");
-		out.println ("</HTML>");
+		formatWriter.writeLineFormat (
+			"<HTML>");
+
+		formatWriter.writeLineFormat (
+			"<!-- X-E3-Submission-Report: \"00\" -->");
+
+		formatWriter.writeLineFormat (
+			"</HTML>");
 
 	}
 

@@ -90,9 +90,7 @@ class ChatUserImageListPart
 					"chatUserImageType"));
 
 		chatUser =
-			chatUserHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatUserId"));
+			chatUserHelper.findFromContextRequired ();
 
 		switch (type) {
 

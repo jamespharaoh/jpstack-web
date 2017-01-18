@@ -1,6 +1,5 @@
 package wbs.integrations.oxygenate.api;
 
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
@@ -173,15 +172,10 @@ class OxygenateRouteInMmsOldAction
 		// message id
 
 		mmsMessageId =
-			requestContext.header (
+			requestContext.headerRequired (
 				"X-Mms-Message-Id");
 
-		if (mmsMessageId == null) {
-
-			taskLogger.errorFormat (
-				"Required header missing: X-Mms-Message-Id");
-
-		} else if (mmsMessageId.length () != 32) {
+		if (mmsMessageId.length () != 32) {
 
 			taskLogger.errorFormat (
 				"Header expected to be 32 characters but was %s: ",
@@ -194,18 +188,10 @@ class OxygenateRouteInMmsOldAction
 		// message type
 
 		mmsMessageType =
-			requestContext.header (
+			requestContext.headerRequired (
 				"X-Mms-Message-Type");
 
 		if (
-			isNull (
-				mmsMessageType)
-		) {
-
-			taskLogger.errorFormat (
-				"Required header missing: X-Mms-Message-Type");
-
-		} else if (
 			stringNotEqualSafe (
 				mmsMessageType,
 				"MO_MMS")
@@ -221,18 +207,10 @@ class OxygenateRouteInMmsOldAction
 		// sender address
 
 		mmsSenderAddress =
-			requestContext.header (
+			requestContext.headerRequired (
 				"X-Mms-Sender-Address");
 
 		if (
-			isNull (
-				mmsSenderAddress)
-		) {
-
-			taskLogger.errorFormat (
-				"Required header missing: X-Mms-Sender-Address");
-
-		} else if (
 			stringIsEmpty (
 				mmsSenderAddress)
 		) {
@@ -245,18 +223,10 @@ class OxygenateRouteInMmsOldAction
 		// recipient address
 
 		mmsRecipientAddress =
-			requestContext.header (
+			requestContext.headerRequired (
 				"X-Mms-Recipient-Address");
 
 		if (
-			isNull (
-				mmsRecipientAddress)
-		) {
-
-			taskLogger.errorFormat (
-				"Required header missing: X-Mms-Recipient-Address");
-
-		} else if (
 			stringIsEmpty (
 				mmsRecipientAddress)
 		) {
@@ -270,60 +240,37 @@ class OxygenateRouteInMmsOldAction
 
 		mmsSubject =
 			optionalFromNullable (
-				requestContext.header (
+				requestContext.headerRequired (
 					"X-Mms-Subject"));
 
 		// date
 
 		String mmsDateParam =
-			requestContext.header (
+			requestContext.headerRequired (
 				"X-Mms-Date");
 
-		if (
-			isNull (
-				mmsDateParam)
-		) {
+		try {
+
+			mmsDate =
+				Instant.parse (
+					mmsDateParam);
+
+		} catch (Exception exception) {
 
 			taskLogger.errorFormat (
-				"Required header missing: X-Mms-Date");
-
-		} else {
-
-			try {
-
-				mmsDate =
-					Instant.parse (
-						mmsDateParam);
-
-			} catch (Exception exception) {
-
-				taskLogger.errorFormat (
-					"Error parsing header: X-Mms-Date");
-
-			}
+				"Error parsing header: X-Mms-Date");
 
 		}
 
 		// network
 
 		mmsNetwork =
-			requestContext.header (
+			requestContext.headerRequired (
 				"X-Mms-Network");
-
-		if (
-			isNull (
-				mmsNetwork)
-		) {
-
-			taskLogger.errorFormat (
-				"Required header missing: X-Mms-Network");
-
-		}
 
 		// errors
 
-		taskLogger.makeException (
-			);
+		taskLogger.makeException ();
 
 	}
 

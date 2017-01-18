@@ -2,26 +2,24 @@ package wbs.apn.chat.contact.console;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 
-import javax.servlet.ServletException;
-
-import lombok.Cleanup;
 import lombok.NonNull;
 
-import wbs.apn.chat.contact.model.ChatContactNoteObjectHelper;
-import wbs.apn.chat.contact.model.ChatContactNoteRec;
-import wbs.apn.chat.contact.model.ChatMonitorInboxObjectHelper;
-import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
+
+import wbs.apn.chat.contact.model.ChatContactNoteRec;
+import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatMonitorInboxUpdateNoteAction")
@@ -32,10 +30,10 @@ class ChatMonitorInboxUpdateNoteAction
 	// singleton dependencies
 
 	@SingletonDependency
-	ChatContactNoteObjectHelper chatContactNoteHelper;
+	ChatContactNoteConsoleHelper chatContactNoteHelper;
 
 	@SingletonDependency
-	ChatMonitorInboxObjectHelper chatMonitorInboxHelper;
+	ChatMonitorInboxConsoleHelper chatMonitorInboxHelper;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -66,91 +64,93 @@ class ChatMonitorInboxUpdateNoteAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger)
-		throws ServletException {
+			@NonNull TaskLogger taskLogger) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatMonitorInboxUpdateNodeAction.goReal ()",
-				this);
+		try (
 
-		ChatMonitorInboxRec chatMonitorInbox =
-			chatMonitorInboxHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatMonitorInboxId"));
-
-		ChatUserRec monitorChatUser =
-			chatMonitorInbox.getMonitorChatUser ();
-
-		ChatContactNoteRec note =
-			chatContactNoteHelper.findRequired (
-				requestContext.parameterIntegerRequired (
-					"id"));
-
-		if (
-			requestContext.formIsPresent (
-				"deleteNote")
-		) {
-
-			taskLogger.noticeFormat (
-				"deleting note from %s",
-				monitorChatUser.getName ());
-
-			objectManager.remove (
-				note);
-
-			transaction.commit ();
-
-			requestContext.addNotice (
-				"Note deleted");
-
-		} else if (
-			requestContext.formIsPresent (
-				"pegNote")
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatMonitorInboxUpdateNodeAction.goReal ()",
+					this);
 
 		) {
 
-			note.setPegged (true);
+			ChatMonitorInboxRec chatMonitorInbox =
+				chatMonitorInboxHelper.findFromContextRequired ();
 
-			transaction.commit ();
+			ChatUserRec monitorChatUser =
+				chatMonitorInbox.getMonitorChatUser ();
 
-			taskLogger.noticeFormat (
-				"User %s pegged chat user contact note %s",
-				integerToDecimalString (
-					userConsoleLogic.userIdRequired ()),
-				integerToDecimalString (
-					note.getId ()));
+			ChatContactNoteRec note =
+				chatContactNoteHelper.findRequired (
+					requestContext.parameterIntegerRequired (
+						"id"));
 
-			requestContext.addNotice (
-				"Note pegged");
+			if (
+				requestContext.formIsPresent (
+					"deleteNote")
+			) {
 
-		} else if (
-			requestContext.formIsPresent (
-				"unpegNote")
-		) {
+				taskLogger.noticeFormat (
+					"deleting note from %s",
+					monitorChatUser.getName ());
 
-			note.setPegged (false);
+				objectManager.remove (
+					note);
 
-			transaction.commit ();
+				transaction.commit ();
 
-			taskLogger.noticeFormat (
-				"User %s unpegged chat user contact note %s",
-				integerToDecimalString (
-					userConsoleLogic.userIdRequired ()),
-				integerToDecimalString (
-					note.getId ()));
+				requestContext.addNotice (
+					"Note deleted");
 
-			requestContext.addNotice (
-				"Note unpegged");
+			} else if (
+				requestContext.formIsPresent (
+					"pegNote")
 
-		} else {
+			) {
 
-			throw new RuntimeException ();
+				note.setPegged (true);
+
+				transaction.commit ();
+
+				taskLogger.noticeFormat (
+					"User %s pegged chat user contact note %s",
+					integerToDecimalString (
+						userConsoleLogic.userIdRequired ()),
+					integerToDecimalString (
+						note.getId ()));
+
+				requestContext.addNotice (
+					"Note pegged");
+
+			} else if (
+				requestContext.formIsPresent (
+					"unpegNote")
+			) {
+
+				note.setPegged (false);
+
+				transaction.commit ();
+
+				taskLogger.noticeFormat (
+					"User %s unpegged chat user contact note %s",
+					integerToDecimalString (
+						userConsoleLogic.userIdRequired ()),
+					integerToDecimalString (
+						note.getId ()));
+
+				requestContext.addNotice (
+					"Note unpegged");
+
+			} else {
+
+				throw new RuntimeException ();
+
+			}
+
+			return null;
 
 		}
-
-		return null;
 
 	}
 

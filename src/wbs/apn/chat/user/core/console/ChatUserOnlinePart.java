@@ -25,12 +25,6 @@ import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.core.console.ChatConsoleLogic;
-import wbs.apn.chat.core.logic.ChatMiscLogic;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.context.ConsoleContext;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.html.HtmlLink;
@@ -39,6 +33,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -46,10 +41,19 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.media.console.MediaConsoleLogic;
+
 import wbs.sms.gazetteer.logic.GazetteerLogic;
 import wbs.sms.gazetteer.model.GazetteerEntryRec;
+
 import wbs.utils.time.TimeFormatter;
+
+import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.console.ChatConsoleLogic;
+import wbs.apn.chat.core.logic.ChatMiscLogic;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 
 @PrototypeComponent ("chatUserOnlinePart")
 public
@@ -65,10 +69,10 @@ class ChatUserOnlinePart
 	ChatMiscLogic chatLogic;
 
 	@SingletonDependency
-	ChatObjectHelper chatHelper;
+	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
-	ChatUserObjectHelper chatUserHelper;
+	ChatUserConsoleHelper chatUserHelper;
 
 	@SingletonDependency
 	ConsoleManager consoleManager;
@@ -151,12 +155,10 @@ class ChatUserOnlinePart
 			database.currentTransaction ();
 
 		ChatRec chat =
-			chatHelper.findRequired (
-				requestContext.stuffInteger (
-					"chatId"));
+			chatHelper.findFromContextRequired ();
 
 		users =
-			new TreeSet<ChatUserRec> (
+			new TreeSet<> (
 				ChatUserOnlineComparator.INSTANCE);
 
 		users.addAll (

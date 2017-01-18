@@ -94,11 +94,9 @@ import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
 import wbs.sms.spendlimit.logic.SmsSpendLimitLogic;
 
-import wbs.smsapps.manualresponder.model.ManualResponderNumberObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
-import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderTemplateRec;
 
@@ -126,10 +124,10 @@ class ManualResponderRequestPendingSummaryPart
 	LogContext logContext;
 
 	@SingletonDependency
-	ManualResponderNumberObjectHelper manualResponderNumberHelper;
+	ManualResponderNumberConsoleHelper manualResponderNumberHelper;
 
 	@SingletonDependency
-	ManualResponderRequestObjectHelper manualResponderRequestHelper;
+	ManualResponderRequestConsoleHelper manualResponderRequestHelper;
 
 	@SingletonDependency
 	@Named
@@ -228,9 +226,7 @@ class ManualResponderRequestPendingSummaryPart
 				SmsCustomerRec.class);
 
 		manualResponderRequest =
-			manualResponderRequestHelper.findRequired (
-				requestContext.stuffInteger (
-					"manualResponderRequestId"));
+			manualResponderRequestHelper.findFromContextRequired ();
 
 		manualResponderNumber =
 			manualResponderRequest.getManualResponderNumber ();

@@ -6,7 +6,6 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.Collections;
@@ -51,6 +50,8 @@ import wbs.sms.network.model.NetworkRec;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.route.core.model.RouteObjectHelper;
 import wbs.sms.route.core.model.RouteRec;
+
+import wbs.utils.string.FormatWriter;
 
 import wbs.web.action.Action;
 import wbs.web.context.RequestContext;
@@ -158,25 +159,32 @@ class DialogueApiServletModule
 			// get params in local variables
 
 			String numFromParam =
-				requestContext.parameterOrNull ("X-E3-Originating-Address");
+				requestContext.parameterRequired (
+					"X-E3-Originating-Address");
 
 			String numToParam =
-				requestContext.parameterOrNull ("X-E3-Recipients");
+				requestContext.parameterRequired (
+					"X-E3-Recipients");
 
 			String idParam =
-				requestContext.parameterOrNull ("X-E3-ID");
+				requestContext.parameterRequired (
+					"X-E3-ID");
 
 			String networkParam =
-				requestContext.parameterOrNull ("X-E3-Network");
+				requestContext.parameterRequired (
+					"X-E3-Network");
 
 			String hexMessageParam =
-				requestContext.parameterOrNull ("X-E3-Hex-Message");
+				requestContext.parameterRequired (
+					"X-E3-Hex-Message");
 
 			String userDataHeaderIndicatorParam =
-				requestContext.parameterOrNull ("X-E3-User-Data-Header-Indicator");
+				requestContext.parameterRequired (
+					"X-E3-User-Data-Header-Indicator");
 
 			String dataCodingSchemeParam =
-				requestContext.parameterOrNull ("X-E3-Data-Coding-Scheme");
+				requestContext.parameterRequired (
+					"X-E3-Data-Coding-Scheme");
 
 			// decode the network
 
@@ -187,7 +195,9 @@ class DialogueApiServletModule
 			// determine the character set from the data coding scheme
 
 			int dataCodingScheme =
-				Integer.parseInt (dataCodingSchemeParam, 16);
+				Integer.parseInt (
+					dataCodingSchemeParam,
+					16);
 
 			String charset =
 				((dataCodingScheme & 0x08) == 0x08)
@@ -373,12 +383,17 @@ class DialogueApiServletModule
 
 			transaction.commit ();
 
-			PrintWriter out =
-				requestContext.writer ();
+			FormatWriter formatWriter =
+				requestContext.formatWriter ();
 
-			out.println ("<HTML>");
-			out.println ("<!-- X-E3-Submission-Report: \"00\" -->");
-			out.println ("</HTML>");
+			formatWriter.writeLineFormat (
+				"<HTML>");
+
+			formatWriter.writeLineFormat (
+				"<!-- X-E3-Submission-Report: \"00\" -->");
+
+			formatWriter.writeLineFormat (
+				"</HTML>");
 
 		}
 
@@ -399,21 +414,27 @@ class DialogueApiServletModule
 					"reportAction.handle");
 
 			String idParam =
-				requestContext.parameterOrNull ("X-E3-ID");
+				requestContext.parameterRequired (
+					"X-E3-ID");
 
 			String deliveryReportParam =
-				requestContext.parameterOrNull ("X-E3-Delivery-Report");
+				requestContext.parameterRequired (
+					"X-E3-Delivery-Report");
 
 			String submissionReportParam =
-				requestContext.parameterOrNull ("X-E3-Submission-Report");
+				requestContext.parameterRequired (
+					"X-E3-Submission-Report");
 
 			String userKeyParam =
-				requestContext.parameterOrNull ("X-E3-User-Key");
+				requestContext.parameterRequired (
+					"X-E3-User-Key");
 
-			// [TEMP] dump params
+			// TODO dump params
 
-			for (Map.Entry<String,List<String>> entry
-					: requestContext.parameterMap ().entrySet ()) {
+			for (
+				Map.Entry<String,List<String>> entry
+					: requestContext.parameterMap ().entrySet ()
+			) {
 
 				String name =
 					entry.getKey ();
