@@ -101,9 +101,9 @@ class ObjectSummaryPrivPart
 
 		object =
 			objectLookup.lookupObject (
-				requestContext.contextStuffRequired ());
+				requestContext.consoleContextStuffRequired ());
 
-		List<PrivRec> privs =
+		List <PrivRec> privs =
 			objectManager.getChildren (
 				object,
 				PrivRec.class);

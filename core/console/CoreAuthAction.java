@@ -10,9 +10,11 @@ import lombok.experimental.Accessors;
 import wbs.console.action.ConsoleAction;
 import wbs.console.lookup.BooleanLookup;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
@@ -48,8 +50,10 @@ class CoreAuthAction
 	Responder goReal (
 			@NonNull TaskLogger taskLogger) {
 
-		if (! lookup.lookup (
-				requestContext.contextStuffRequired ())) {
+		if (
+			! lookup.lookup (
+				requestContext.consoleContextStuffRequired ())
+		) {
 
 			requestContext.addError (
 				"Access denied");

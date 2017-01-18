@@ -6,6 +6,9 @@ import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -502,15 +505,15 @@ class ObjectCreateAction <
 
 		// get parent id from context
 
-		Long parentId =
+		Optional <Long> parentIdOptional =
 			requestContext.stuffInteger (
 				parentHelper.idKey ());
 
 		// or from form
 
 		if (
-			isNull (
-				parentId)
+			optionalIsNotPresent (
+				parentIdOptional)
 		) {
 
 			String parentIdString =
@@ -525,9 +528,10 @@ class ObjectCreateAction <
 					parentIdString)
 			) {
 
-				parentId =
-					Long.parseLong (
-						parentIdString);
+				parentIdOptional =
+					optionalOf (
+						Long.parseLong (
+							parentIdString));
 
 			}
 
@@ -536,8 +540,8 @@ class ObjectCreateAction <
 		// error if not found
 
 		if (
-			isNull (
-				parentId)
+			optionalIsNotPresent (
+				parentIdOptional)
 		) {
 
 			requestContext.addError (
@@ -551,7 +555,8 @@ class ObjectCreateAction <
 
 		parent =
 			parentHelper.findRequired (
-				parentId);
+				optionalGetRequired (
+					parentIdOptional));
 
 	}
 

@@ -22,14 +22,15 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.model.PrivRec;
-import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserPrivRec;
 import wbs.platform.user.model.UserRec;
 
@@ -50,7 +51,7 @@ class UserPrivsSummaryPart
 	UserConsoleLogic userConsoleLogic;
 
 	@SingletonDependency
-	UserObjectHelper userHelper;
+	UserConsoleHelper userHelper;
 
 	// state
 
@@ -63,13 +64,11 @@ class UserPrivsSummaryPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		Map<Long,PrivStuff> privStuffsByPrivId =
+		Map <Long, PrivStuff> privStuffsByPrivId =
 			new HashMap<> ();
 
 		UserRec user =
-			userHelper.findRequired (
-				requestContext.stuffInteger (
-					"userId"));
+			userHelper.findFromContextRequired ();
 
 		// load up some info about the acting user
 

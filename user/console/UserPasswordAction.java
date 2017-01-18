@@ -5,7 +5,6 @@ import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.apache.commons.codec.binary.Base64;
@@ -13,14 +12,16 @@ import org.apache.commons.codec.binary.Base64;
 import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.logic.EventLogic;
-import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("userPasswordAction")
@@ -46,7 +47,7 @@ class UserPasswordAction
 	UserConsoleLogic userConsoleLogic;
 
 	@SingletonDependency
-	UserObjectHelper userHelper;
+	UserConsoleHelper userHelper;
 
 	// details
 
@@ -69,108 +70,111 @@ class UserPasswordAction
 			requestContext.parameterRequired (
 				"password_2");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"UserPasswordAction.goReal ()",
-				this);
+		try (
 
-		// load user
-
-		UserRec user =
-			userHelper.findRequired (
-				requestContext.stuffInteger (
-					"userId"));
-
-		// check privs
-
-		if (
-
-			referenceNotEqualWithClass (
-				UserRec.class,
-				user,
-				userConsoleLogic.userRequired ())
-
-			&& ! privChecker.canRecursive (
-				user,
-				"manage")
+			Transaction transaction =
+				database.beginReadWrite (
+					"UserPasswordAction.goReal ()",
+					this);
 
 		) {
 
-			requestContext.addError (
-				"Access denied");
+			// load user
+
+			UserRec user =
+				userHelper.findFromContextRequired ();
+
+			// check privs
+
+			if (
+
+				referenceNotEqualWithClass (
+					UserRec.class,
+					user,
+					userConsoleLogic.userRequired ())
+
+				&& ! privChecker.canRecursive (
+					user,
+					"manage")
+
+			) {
+
+				requestContext.addError (
+					"Access denied");
+
+				return null;
+
+			}
+
+			// check for password
+
+			if (password1.length () == 0
+				&& password2.length () == 0) {
+
+				requestContext.addError (
+					"No password supplied");
+
+				return null;
+
+			}
+
+			// check passwords match
+
+			if (! password1.equals (password2)) {
+
+				requestContext.addError (
+					"Passwords do not match");
+
+				return null;
+
+			}
+
+			// digest password
+
+			String hash;
+
+			try {
+
+				MessageDigest messageDigest =
+					MessageDigest.getInstance ("SHA-1");
+
+				messageDigest.update (
+					password1.getBytes ());
+
+				hash =
+					Base64.encodeBase64String (
+						messageDigest.digest ());
+
+			} catch (NoSuchAlgorithmException exception) {
+
+				requestContext.addError (
+					"Internal error");
+
+				return null;
+
+			}
+
+			// update user
+
+			user.setPassword (hash);
+
+			// create an event
+
+			eventLogic.createEvent (
+				"user_password_reset",
+				userConsoleLogic.userRequired (),
+				user);
+
+			transaction.commit ();
+
+			// return
+
+			requestContext.addNotice (
+				"Password updated");
 
 			return null;
 
 		}
-
-		// check for password
-
-		if (password1.length () == 0
-			&& password2.length () == 0) {
-
-			requestContext.addError (
-				"No password supplied");
-
-			return null;
-
-		}
-
-		// check passwords match
-
-		if (! password1.equals (password2)) {
-
-			requestContext.addError (
-				"Passwords do not match");
-
-			return null;
-
-		}
-
-		// digest password
-
-		String hash;
-
-		try {
-
-			MessageDigest messageDigest =
-				MessageDigest.getInstance ("SHA-1");
-
-			messageDigest.update (
-				password1.getBytes ());
-
-			hash =
-				Base64.encodeBase64String (
-					messageDigest.digest ());
-
-		} catch (NoSuchAlgorithmException exception) {
-
-			requestContext.addError (
-				"Internal error");
-
-			return null;
-
-		}
-
-		// update user
-
-		user.setPassword (hash);
-
-		// create an event
-
-		eventLogic.createEvent (
-			"user_password_reset",
-			userConsoleLogic.userRequired (),
-			user);
-
-		transaction.commit ();
-
-		// return
-
-		requestContext.addNotice (
-			"Password updated");
-
-		return null;
 
 	}
 

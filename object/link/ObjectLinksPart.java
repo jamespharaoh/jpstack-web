@@ -3,6 +3,7 @@ package wbs.platform.object.link;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.LogicUtils.booleanToTrueFalse;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
@@ -112,13 +113,13 @@ class ObjectLinksPart <
 
 		contextObject =
 			consoleHelper.lookupObject (
-				requestContext.contextStuffRequired ());
+				requestContext.consoleContextStuffRequired ());
 
 		contextLinks =
-			(Set <?>)
-			PropertyUtils.propertyGetAuto (
-				contextObject,
-				contextLinksField);
+			genericCastUnchecked (
+				PropertyUtils.propertyGetAuto (
+					contextObject,
+					contextLinksField));
 
 		targetObjects =
 			targetHelper.findAll ();

@@ -2,7 +2,9 @@ package wbs.platform.object.browse;
 
 import static wbs.utils.collection.CollectionUtils.collectionStream;
 import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -17,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.Getter;
@@ -136,15 +139,19 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 
 	void prepareCurrentObject () {
 
-		Long objectId =
+		Optional <Long> objectIdOptional =
 			requestContext.stuffInteger (
 				consoleHelper.objectName () + "Id");
 
-		if (objectId != null) {
+		if (
+			optionalIsPresent (
+				objectIdOptional)
+		) {
 
 			currentObject =
 				consoleHelper.findRequired (
-					objectId);
+					optionalGetRequired (
+						objectIdOptional));
 
 		}
 
@@ -158,16 +165,20 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 			objectManager.findConsoleHelperRequired (
 				consoleHelper.parentClass ());
 
-		Long parentId =
+		Optional <Long> parentIdOptional =
 			requestContext.stuffInteger (
 				parentHelper.idKey ());
 
-		if (parentId != null) {
+		if (
+			optionalIsPresent (
+				parentIdOptional)
+		) {
 
 			GlobalId parentGlobalId =
 				new GlobalId (
 					parentHelper.objectTypeId (),
-					parentId);
+					optionalGetRequired (
+						parentIdOptional));
 
 			if (typeCode != null) {
 
@@ -194,16 +205,20 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 			objectManager.findConsoleHelperRequired (
 				parentHelper.parentClass ());
 
-		Long grandParentId =
+		Optional <Long> grandParentIdOptional =
 			requestContext.stuffInteger (
 				grandParentHelper.idKey ());
 
-		if (grandParentId != null) {
+		if (
+			optionalIsPresent (
+				grandParentIdOptional)
+		) {
 
 			GlobalId grandParentGlobalId =
 				GlobalId.of (
 					grandParentHelper.objectTypeId (),
-					grandParentId);
+					optionalGetRequired (
+						grandParentIdOptional));
 
 			List <? extends Record<?>> parentObjects =
 				parentHelper.findByParent (

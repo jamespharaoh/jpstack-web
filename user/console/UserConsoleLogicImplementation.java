@@ -1,9 +1,10 @@
 package wbs.platform.user.console;
 
-import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.isNull;
-import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import com.google.common.base.Optional;
 
@@ -99,10 +100,9 @@ class UserConsoleLogicImplementation
 
 	@Override
 	public
-	Optional<Long> userId () {
+	Optional <Long> userId () {
 
-		return Optional.fromNullable (
-			(Long)
+		return genericCastUnchecked (
 			requestContext.session (
 				LOGGED_IN_USER_ID_SESSION_KEY));
 
@@ -112,10 +112,10 @@ class UserConsoleLogicImplementation
 	public
 	Long userIdRequired () {
 
-		return requiredValue (
-			(Long)
-			requestContext.session (
-				LOGGED_IN_USER_ID_SESSION_KEY));
+		return optionalGetRequired (
+			genericCastUnchecked (
+				requestContext.session (
+					LOGGED_IN_USER_ID_SESSION_KEY)));
 
 	}
 
@@ -142,7 +142,7 @@ class UserConsoleLogicImplementation
 	public
 	boolean loggedIn () {
 
-		return isNotNull (
+		return optionalIsPresent (
 			requestContext.session (
 				LOGGED_IN_USER_ID_SESSION_KEY));
 
@@ -152,7 +152,7 @@ class UserConsoleLogicImplementation
 	public
 	boolean notLoggedIn () {
 
-		return isNull (
+		return optionalIsNotPresent (
 			requestContext.session (
 				LOGGED_IN_USER_ID_SESSION_KEY));
 

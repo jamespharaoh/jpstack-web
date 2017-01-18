@@ -35,7 +35,6 @@ import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
-import wbs.utils.string.WriterFormatWriter;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchCsvResponder")
@@ -82,8 +81,7 @@ class ObjectSearchCsvResponder <RecordType>
 	void setup () {
 
 		formatWriter =
-			new WriterFormatWriter (
-				requestContext.writer ());
+			requestContext.formatWriter ();
 
 	}
 
@@ -103,12 +101,11 @@ class ObjectSearchCsvResponder <RecordType>
 
 		// get object ids
 
-		@SuppressWarnings ("unchecked")
-		List<Long> objectIdsTemp =
-			(List<Long>)
-			requiredValue (
-				requestContext.session (
-					sessionKey + "Results"));
+		List <Long> objectIdsTemp =
+			genericCastUnchecked (
+				requiredValue (
+					requestContext.session (
+						sessionKey + "Results")));
 
 		objectIds =
 			objectIdsTemp;

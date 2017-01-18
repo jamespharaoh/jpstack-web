@@ -13,9 +13,11 @@ import lombok.NonNull;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -60,9 +62,7 @@ class QueueItemActionsPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		queueItem =
-			queueItemHelper.findRequired (
-				requestContext.stuffInteger (
-					"queueItemId"));
+			queueItemHelper.findFromContextRequired ();
 
 		canSupervise =
 			queueConsoleLogic.canSupervise (

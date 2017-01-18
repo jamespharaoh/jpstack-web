@@ -1,5 +1,6 @@
 package wbs.platform.core.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalOrEmptyString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingOneWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
@@ -116,9 +117,8 @@ class CoreTitledResponder
 					stringFormat (
 						"%s%s",
 						requestContext.servletPath (),
-						requestContext.pathInfo () != null
-							? requestContext.pathInfo ()
-							: "");
+						optionalOrEmptyString (
+							requestContext.pathInfo ()));
 
 				exceptionLogger.logThrowable (
 					"console",

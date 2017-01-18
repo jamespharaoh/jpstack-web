@@ -38,7 +38,6 @@ import wbs.platform.group.model.GroupRec;
 import wbs.platform.priv.console.PrivConsoleHelper;
 import wbs.platform.priv.model.PrivRec;
 import wbs.platform.scaffold.model.RootRec;
-import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserPrivRec;
 import wbs.platform.user.model.UserRec;
 
@@ -59,7 +58,7 @@ class UserPrivsEditorPart
 	PrivConsoleHelper privHelper;
 
 	@SingletonDependency
-	UserObjectHelper userHelper;
+	UserConsoleHelper userHelper;
 
 	// state
 
@@ -146,9 +145,7 @@ class UserPrivsEditorPart
 		// and fill the current priv data sets
 
 		UserRec user =
-			userHelper.findRequired (
-				requestContext.stuffInteger (
-					"userId"));
+			userHelper.findFromContextRequired ();
 
 		for (
 			UserPrivRec userPriv
