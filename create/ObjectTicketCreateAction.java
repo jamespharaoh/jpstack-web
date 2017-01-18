@@ -8,7 +8,6 @@ import java.util.List;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -171,281 +170,284 @@ class ObjectTicketCreateAction <
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ObjectTicketCreateAction.goReal ()",
-				this);
+		try (
 
-		// find context object
+			Transaction transaction =
+				database.beginReadWrite (
+					"ObjectTicketCreateAction.goReal ()",
+					this);
 
-		Record<?> contextObject =
-			consoleHelper.findRequired (
-				requestContext.stuffInteger (
-					consoleHelper.idKey ()));
+		) {
 
-		// determine ticket
+			// find context object
 
-		ticketManager =
-			(TicketManagerRec)
-			objectManager.dereferenceObsolete (
-				contextObject,
-				ticketManagerPath);
+			Record <?> contextObject =
+				consoleHelper.findFromContextRequired ();
 
-		if (ticketManager == null)
-			return null;
+			// determine ticket
 
-		// check permissions
+			ticketManager =
+				(TicketManagerRec)
+				objectManager.dereferenceObsolete (
+					contextObject,
+					ticketManagerPath);
 
-		if (createPrivCode != null) {
+			if (ticketManager == null)
+				return null;
 
-			Record<?> createDelegate =
-				createPrivDelegate != null
-					? (Record<?>) objectManager.dereferenceObsolete (
-							ticketManager,
-						createPrivDelegate)
-					: ticketManager;
+			// check permissions
 
-			if (! privChecker.canRecursive (
-					createDelegate,
-					createPrivCode)) {
+			if (createPrivCode != null) {
 
-				requestContext.addError (
-					"Permission denied");
+				Record<?> createDelegate =
+					createPrivDelegate != null
+						? (Record<?>) objectManager.dereferenceObsolete (
+								ticketManager,
+							createPrivDelegate)
+						: ticketManager;
+
+				if (! privChecker.canRecursive (
+						createDelegate,
+						createPrivCode)) {
+
+					requestContext.addError (
+						"Permission denied");
+
+					return null;
+
+				}
+
+			}
+
+			// create new record and set parent
+
+			TicketRec ticket =
+				ticketHelper.createInstance ()
+
+				.setTicketManager (
+					ticketManager);
+
+			for (
+				ObjectTicketCreateSetFieldSpec ticketFieldSpec
+					: ticketFieldSpecs
+			) {
+
+				TicketFieldTypeRec ticketFieldType =
+					ticketFieldTypeHelper.findByCodeRequired (
+						ticketManager,
+						ticketFieldSpec.fieldTypeCode ());
+
+				TicketFieldValueRec ticketFieldValue =
+					ticketFieldValueHelper.createInstance ()
+
+					.setTicket (
+						ticket)
+
+					.setTicketFieldType (
+						ticketFieldType);
+
+				switch (ticketFieldType.getDataType ()) {
+
+				case string:
+
+					ticketFieldValue.setStringValue (
+						(String)
+						objectManager.dereferenceObsolete (
+							contextObject,
+							ticketFieldSpec.valuePath ()));
+
+					break;
+
+				case number:
+
+					ticketFieldValue.setIntegerValue (
+						(Long)
+						objectManager.dereferenceObsolete (
+							contextObject,
+							ticketFieldSpec.valuePath ()));
+
+					break;
+
+				case bool:
+
+					ticketFieldValue.setBooleanValue (
+						(Boolean)
+						objectManager.dereferenceObsolete (
+							contextObject,
+							ticketFieldSpec.valuePath ()));
+
+					break;
+
+				case object:
+
+					Long objectId = (
+						(Record <?>)
+						objectManager.dereferenceObsolete (
+							contextObject,
+							ticketFieldSpec.valuePath ())
+					).getId ();
+
+					ticketFieldValue
+
+						.setIntegerValue (
+							objectId);
+
+					break;
+
+				default:
+
+					throw new RuntimeException ();
+
+				}
+
+				ticket
+
+					.setNumFields (
+						ticket.getNumFields () + 1);
+
+				ticket.getTicketFieldValues ().put (
+					ticketFieldType.getId (),
+					ticketFieldValue);
+
+			}
+
+			// set type code
+
+			if (consoleHelper.typeCodeExists ()) {
+
+				PropertyUtils.propertySetAuto (
+					ticket,
+					consoleHelper.typeCodeFieldName (),
+					typeCode);
+
+			}
+
+			// perform updates
+
+			if (formFieldsProvider != null) {
+
+				prepareFieldSet (
+					taskLogger);
+
+			}
+
+			UpdateResultSet updateResultSet =
+				formFieldLogic.update (
+					requestContext,
+					fields,
+					ticket,
+					ImmutableMap.of (),
+					"create");
+
+			if (updateResultSet.errorCount () > 0) {
+
+				formFieldLogic.reportErrors (
+					requestContext,
+					updateResultSet,
+					"create");
 
 				return null;
 
 			}
 
-		}
+			// set create time
 
-		// create new record and set parent
+			if (createTimeFieldName != null) {
 
-		TicketRec ticket =
-			ticketHelper.createInstance ()
-
-			.setTicketManager (
-				ticketManager);
-
-		for (
-			ObjectTicketCreateSetFieldSpec ticketFieldSpec
-				: ticketFieldSpecs
-		) {
-
-			TicketFieldTypeRec ticketFieldType =
-				ticketFieldTypeHelper.findByCodeRequired (
-					ticketManager,
-					ticketFieldSpec.fieldTypeCode ());
-
-			TicketFieldValueRec ticketFieldValue =
-				ticketFieldValueHelper.createInstance ()
-
-				.setTicket (
-					ticket)
-
-				.setTicketFieldType (
-					ticketFieldType);
-
-			switch (ticketFieldType.getDataType ()) {
-
-			case string:
-
-				ticketFieldValue.setStringValue (
-					(String)
-					objectManager.dereferenceObsolete (
-						contextObject,
-						ticketFieldSpec.valuePath ()));
-
-				break;
-
-			case number:
-
-				ticketFieldValue.setIntegerValue (
-					(Long)
-					objectManager.dereferenceObsolete (
-						contextObject,
-						ticketFieldSpec.valuePath ()));
-
-				break;
-
-			case bool:
-
-				ticketFieldValue.setBooleanValue (
-					(Boolean)
-					objectManager.dereferenceObsolete (
-						contextObject,
-						ticketFieldSpec.valuePath ()));
-
-				break;
-
-			case object:
-
-				Long objectId = (
-					(Record <?>)
-					objectManager.dereferenceObsolete (
-						contextObject,
-						ticketFieldSpec.valuePath ())
-				).getId ();
-
-				ticketFieldValue
-
-					.setIntegerValue (
-						objectId);
-
-				break;
-
-			default:
-
-				throw new RuntimeException ();
+				PropertyUtils.propertySetAuto (
+					ticket,
+					createTimeFieldName,
+					transaction.now ());
 
 			}
 
-			ticket
+			// set create user
 
-				.setNumFields (
-					ticket.getNumFields () + 1);
+			if (createUserFieldName != null) {
 
-			ticket.getTicketFieldValues ().put (
-				ticketFieldType.getId (),
-				ticketFieldValue);
+				PropertyUtils.propertySetAuto (
+					ticket,
+					createUserFieldName,
+					userConsoleLogic.userRequired ());
 
-		}
+			}
 
-		// set type code
+			// insert
 
-		if (consoleHelper.typeCodeExists ()) {
+			ticketHelper.insert (
+				ticket);
 
-			PropertyUtils.propertySetAuto (
-				ticket,
-				consoleHelper.typeCodeFieldName (),
-				typeCode);
+			// create event
 
-		}
+			Object objectRef =
+				consoleHelper.codeExists ()
+					? consoleHelper.getCode (ticket)
+					: ticket.getId ();
 
-		// perform updates
+			if (consoleHelper.ephemeral ()) {
 
-		if (formFieldsProvider != null) {
+				eventLogic.createEvent (
+					"object_created_in",
+					userConsoleLogic.userRequired (),
+					objectRef,
+					consoleHelper.shortName (),
+					ticketManager);
 
-			prepareFieldSet (
-				taskLogger);
+			} else {
 
-		}
+				eventLogic.createEvent (
+					"object_created",
+					userConsoleLogic.userRequired (),
+					ticket,
+					ticketManager);
 
-		UpdateResultSet updateResultSet =
-			formFieldLogic.update (
-				requestContext,
-				fields,
-				ticket,
-				ImmutableMap.of (),
-				"create");
+			}
 
-		if (updateResultSet.errorCount () > 0) {
+			// update events
 
-			formFieldLogic.reportErrors (
-				requestContext,
-				updateResultSet,
-				"create");
+			if (ticket instanceof PermanentRecord) {
+
+				formFieldLogic.runUpdateHooks (
+					fields,
+					updateResultSet,
+					ticket,
+					(PermanentRecord<?>) ticket,
+					Optional.<Object>absent (),
+					Optional.<String>absent (),
+					"create");
+
+			} else {
+
+				formFieldLogic.runUpdateHooks (
+					fields,
+					updateResultSet,
+					ticket,
+					(PermanentRecord<?>) ticketManager,
+					Optional.of (
+						objectRef),
+					Optional.of (
+						consoleHelper.shortName ()),
+					"create");
+
+			}
+
+			// commit transaction
+
+			transaction.commit ();
+
+			// prepare next page
+
+			requestContext.addNotice (
+				stringFormat (
+					"%s created",
+					capitalise (
+						consoleHelper.shortName ())));
+
+			requestContext.setEmptyFormData ();
 
 			return null;
 
 		}
-
-		// set create time
-
-		if (createTimeFieldName != null) {
-
-			PropertyUtils.propertySetAuto (
-				ticket,
-				createTimeFieldName,
-				transaction.now ());
-
-		}
-
-		// set create user
-
-		if (createUserFieldName != null) {
-
-			PropertyUtils.propertySetAuto (
-				ticket,
-				createUserFieldName,
-				userConsoleLogic.userRequired ());
-
-		}
-
-		// insert
-
-		ticketHelper.insert (
-			ticket);
-
-		// create event
-
-		Object objectRef =
-			consoleHelper.codeExists ()
-				? consoleHelper.getCode (ticket)
-				: ticket.getId ();
-
-		if (consoleHelper.ephemeral ()) {
-
-			eventLogic.createEvent (
-				"object_created_in",
-				userConsoleLogic.userRequired (),
-				objectRef,
-				consoleHelper.shortName (),
-				ticketManager);
-
-		} else {
-
-			eventLogic.createEvent (
-				"object_created",
-				userConsoleLogic.userRequired (),
-				ticket,
-				ticketManager);
-
-		}
-
-		// update events
-
-		if (ticket instanceof PermanentRecord) {
-
-			formFieldLogic.runUpdateHooks (
-				fields,
-				updateResultSet,
-				ticket,
-				(PermanentRecord<?>) ticket,
-				Optional.<Object>absent (),
-				Optional.<String>absent (),
-				"create");
-
-		} else {
-
-			formFieldLogic.runUpdateHooks (
-				fields,
-				updateResultSet,
-				ticket,
-				(PermanentRecord<?>) ticketManager,
-				Optional.of (
-					objectRef),
-				Optional.of (
-					consoleHelper.shortName ()),
-				"create");
-
-		}
-
-		// commit transaction
-
-		transaction.commit ();
-
-		// prepare next page
-
-		requestContext.addNotice (
-			stringFormat (
-				"%s created",
-				capitalise (
-					consoleHelper.shortName ())));
-
-		requestContext.setEmptyFormData ();
-
-		return null;
 
 	}
 

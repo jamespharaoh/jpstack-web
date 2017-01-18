@@ -3,7 +3,6 @@ package wbs.services.ticket.core.console;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.joda.time.Instant;
@@ -75,128 +74,131 @@ class TicketPendingFormAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"TicketPendingFormAction.goReal ()",
-				this);
+		try (
 
-		// find message
+			Transaction transaction =
+				database.beginReadWrite (
+					"TicketPendingFormAction.goReal ()",
+					this);
 
-		TicketRec ticket =
-			ticketHelper.findRequired (
-				requestContext.stuffInteger (
-					"ticketId"));
-
-		// sanity check
-
-		if (ticket.getQueueItem () == null)
-			throw new RuntimeException ();
-
-		// select template
-
-		TicketTemplateRec template;
-
-		// action to be performed
-
-		template =
-			ticketTemplateHelper.findRequired (
-				requestContext.parameterIntegerRequired (
-					"template"));
-
-		// remove old queue item
-
-		queueLogic.processQueueItem (
-			ticket.getQueueItem (),
-			userConsoleLogic.userRequired ());
-
-		ticket
-
-			.setQueueItem (
-				null);
-
-		// update ticket timestamp
-
-		String timpestampString =
-			requestContext.parameterRequired (
-				stringFormat (
-					"timestamp-%s",
-					integerToDecimalString (
-						template.getTicketState ().getId ())));
-
-		Integer timestamp =
-			Integer.parseInt (
-				timpestampString);
-
-		if (
-			timestamp >= template.getTicketState ().getMinimum ()
-			&& timestamp <= template.getTicketState ().getMaximum ()
 		) {
 
-			// update ticket state
+			// find message
+
+			TicketRec ticket =
+				ticketHelper.findFromContextRequired ();
+
+			// sanity check
+
+			if (ticket.getQueueItem () == null)
+				throw new RuntimeException ();
+
+			// select template
+
+			TicketTemplateRec template;
+
+			// action to be performed
+
+			template =
+				ticketTemplateHelper.findRequired (
+					requestContext.parameterIntegerRequired (
+						"template"));
+
+			// remove old queue item
+
+			queueLogic.processQueueItem (
+				ticket.getQueueItem (),
+				userConsoleLogic.userRequired ());
 
 			ticket
 
-				.setTicketState (
-					template.getTicketState ());
+				.setQueueItem (
+					null);
 
-			// set new timestamp
+			// update ticket timestamp
 
-			ticket.setTimestamp(
-				Instant.now ()
-					.plus(timestamp * 1000));
+			String timpestampString =
+				requestContext.parameterRequired (
+					stringFormat (
+						"timestamp-%s",
+						integerToDecimalString (
+							template.getTicketState ().getId ())));
 
-			ticket.setQueued (
-				false);
+			Integer timestamp =
+				Integer.parseInt (
+					timpestampString);
 
-		} else {
+			if (
+				timestamp >= template.getTicketState ().getMinimum ()
+				&& timestamp <= template.getTicketState ().getMaximum ()
+			) {
 
-			throw new RuntimeException (
-				"Timestamp out of bounds");
+				// update ticket state
+
+				ticket
+
+					.setTicketState (
+						template.getTicketState ());
+
+				// set new timestamp
+
+				ticket.setTimestamp(
+					Instant.now ()
+						.plus(timestamp * 1000));
+
+				ticket.setQueued (
+					false);
+
+			} else {
+
+				throw new RuntimeException (
+					"Timestamp out of bounds");
+
+			}
+
+			// check if a new note was added
+
+			String noteText =
+				requestContext.parameterRequired (
+					"note-text");
+
+			if (! noteText.isEmpty ()) {
+
+				ticketNoteHelper.insert (
+					ticketNoteHelper.createInstance ()
+
+					.setTicket (
+						ticket)
+
+					.setIndex (
+						ticket.getNumNotes ())
+
+					.setNoteText (
+						noteText)
+
+				);
+
+				ticket
+
+					.setNumNotes (
+						ticket.getNumNotes () + 1);
+
+			}
+
+			// done
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Ticket state changed to " +
+				template.getTicketState().toString());
+
+			// return
+
+			return responder (
+				"queueHomeResponder");
 
 		}
-
-		// check if a new note was added
-
-		String noteText =
-			requestContext.parameterRequired (
-				"note-text");
-
-		if (! noteText.isEmpty ()) {
-
-			ticketNoteHelper.insert (
-				ticketNoteHelper.createInstance ()
-
-				.setTicket (
-					ticket)
-
-				.setIndex (
-					ticket.getNumNotes ())
-
-				.setNoteText (
-					noteText)
-
-			);
-
-			ticket
-
-				.setNumNotes (
-					ticket.getNumNotes () + 1);
-
-		}
-
-		// done
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Ticket state changed to " +
-			template.getTicketState().toString());
-
-		// return
-
-		return responder (
-			"queueHomeResponder");
 
 	}
 
