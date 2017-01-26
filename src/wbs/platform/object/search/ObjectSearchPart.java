@@ -1,6 +1,5 @@
 package wbs.platform.object.search;
 
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -49,7 +48,7 @@ import wbs.framework.logging.TaskLogger;
 public
 class ObjectSearchPart <
 	ObjectType extends Record <ObjectType>,
-	SearchType
+	SearchType extends Serializable
 >
 	extends AbstractPagePart {
 
@@ -114,24 +113,10 @@ class ObjectSearchPart <
 
 		search =
 			genericCastUnsafe (
-				requestContext.session (
-					sessionKey + "Fields"));
-
-		if (
-			isNull (
-				search)
-		) {
-
-			search =
-				classInstantiate (
-					searchClass);
-
-			requestContext.session (
-				sessionKey + "Fields",
-				(Serializable)
-				search);
-
-		}
+				requestContext.sessionOrElseSetRequired (
+					sessionKey + "Fields",
+					() -> classInstantiate (
+						searchClass)));
 
 		updateResultSet =
 			optionalCast (

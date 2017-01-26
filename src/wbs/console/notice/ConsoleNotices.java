@@ -5,8 +5,6 @@ import static wbs.utils.string.StringUtils.stringFormatArray;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletRequest;
-
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
@@ -88,70 +86,6 @@ class ConsoleNotices {
 		}
 
 		return stringBuilder.toString ();
-
-	}
-
-	public static
-	void add (
-			ServletRequest request,
-			String notice,
-			ConsoleNoticeType type) {
-
-		ConsoleNotices notices =
-			(ConsoleNotices)
-			request.getAttribute (
-				"wbs.notices");
-
-		if (notices == null) {
-
-			notices =
-				new ConsoleNotices ();
-
-			request.setAttribute (
-				"wbs.notices",
-				notices);
-
-		}
-
-		notices.add (
-			type,
-			notice);
-
-	}
-
-	public static
-	void addNotice (
-			@NonNull ServletRequest request,
-			@NonNull String notice) {
-
-		add (
-			request,
-			notice,
-			ConsoleNoticeType.notice);
-
-	}
-
-	public static
-	void addWarning (
-			@NonNull ServletRequest request,
-			@NonNull String notice) {
-
-		add (
-			request,
-			notice,
-			ConsoleNoticeType.warning);
-
-	}
-
-	public static
-	void addError (
-			@NonNull ServletRequest request,
-			@NonNull String notice) {
-
-		add (
-			request,
-			notice,
-			ConsoleNoticeType.error);
 
 	}
 

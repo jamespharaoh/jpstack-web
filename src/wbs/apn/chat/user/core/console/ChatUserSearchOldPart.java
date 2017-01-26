@@ -1,6 +1,7 @@
 package wbs.apn.chat.user.core.console;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.objectToStringNullSafe;
 import static wbs.web.utils.HtmlInputUtils.htmlSelect;
@@ -17,6 +18,7 @@ import lombok.NonNull;
 
 import wbs.console.helper.enums.EnumConsoleHelper;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -96,17 +98,11 @@ class ChatUserSearchOldPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		@SuppressWarnings ("unchecked")
 		Map <String, String> params =
-			ifNull (
-
-			(Map <String, String>)
-			requestContext.session (
-				"chatUserSearchParams"),
-
-			new HashMap<> ()
-
-		);
+			genericCastUnchecked (
+				requestContext.sessionOrElseSetRequired (
+					"chatUserSearchParams",
+					() -> new HashMap<> ()));
 
 		formatWriter.writeFormat (
 			"<form",

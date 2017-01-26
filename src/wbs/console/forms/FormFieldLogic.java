@@ -150,12 +150,26 @@ class FormFieldLogic {
 				: formFieldSet.formFields ()
 		) {
 
-			UpdateResult updateResult =
-				formField.update (
-					submission,
-					container,
-					hints,
-					formName);
+			UpdateResult updateResult;
+
+			try {
+
+				updateResult =
+					formField.update (
+						submission,
+						container,
+						hints,
+						formName);
+
+			} catch (Exception exception) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Error updating field %s",
+						formField.name ()),
+					exception);
+
+			}
 
 			if (
 				optionalIsPresent (

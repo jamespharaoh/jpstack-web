@@ -1,6 +1,8 @@
 package wbs.web.servlet;
 
+import static wbs.utils.etc.LogicUtils.parseBooleanYesNoRequired;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
+import static wbs.utils.etc.OptionalUtils.optionalOr;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
@@ -79,7 +81,11 @@ class WbsServlet
 		TaskLogger taskLogger =
 			logContext.createTaskLogger (
 				"doGet",
-				false);
+				parseBooleanYesNoRequired (
+					optionalOr (
+						requestContext.cookie (
+							"wbs-debug"),
+						"no")));
 
 		try {
 
@@ -127,7 +133,12 @@ class WbsServlet
 
 		TaskLogger taskLogger =
 			logContext.createTaskLogger (
-				"doPost");
+				"doPost",
+				parseBooleanYesNoRequired (
+					optionalOr (
+						requestContext.cookie (
+							"wbs-debug"),
+						"no")));
 
 		try {
 
@@ -165,7 +176,12 @@ class WbsServlet
 
 		TaskLogger taskLogger =
 			logContext.createTaskLogger (
-				"doOptions");
+				"doOptions",
+				parseBooleanYesNoRequired (
+					optionalOr (
+						requestContext.cookie (
+							"wbs-debug"),
+						"no")));
 
 		try (
 

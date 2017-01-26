@@ -172,45 +172,50 @@ class ManualResponderRequestPendingFormAction
 
 		// start transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				stringFormat (
-					"%s.%s (%s)",
-					"ManualResponderRequestPendingFormAction",
-					"goIgnore",
+		try (
+
+			Transaction transaction =
+				database.beginReadWrite (
 					stringFormat (
-						"manualResponderRequestId = %s",
-						integerToDecimalString (
-							manualResponderRequestId))),
-				this);
+						"%s.%s (%s)",
+						"ManualResponderRequestPendingFormAction",
+						"goIgnore",
+						stringFormat (
+							"manualResponderRequestId = %s",
+							integerToDecimalString (
+								manualResponderRequestId))),
+					this);
 
-		ManualResponderRequestRec manualResponderRequest =
-			manualResponderRequestHelper.findRequired (
-				manualResponderRequestId);
+		) {
 
-		// remove queue item
+			ManualResponderRequestRec manualResponderRequest =
+				manualResponderRequestHelper.findRequired (
+					manualResponderRequestId);
 
-		queueLogic.processQueueItem (
-			manualResponderRequest.getQueueItem (),
-			userConsoleLogic.userRequired ());
+			// remove queue item
 
-		// mark request as not pending
+			queueLogic.processQueueItem (
+				manualResponderRequest.getQueueItem (),
+				userConsoleLogic.userRequired ());
 
-		manualResponderRequest
+			// mark request as not pending
 
-			.setPending (
-				false);
+			manualResponderRequest
 
-		// done
+				.setPending (
+					false);
 
-		transaction.commit ();
+			// done
 
-		requestContext.addNotice (
-			"Request ignored");
+			transaction.commit ();
 
-		return responder (
-			"queueHomeResponder");
+			requestContext.addNotice (
+				"Request ignored");
+
+			return responder (
+				"queueHomeResponder");
+
+		}
 
 	}
 
@@ -236,399 +241,404 @@ class ManualResponderRequestPendingFormAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ManualResponderRequestPendingFormAction.goSend (...)",
-				this);
+		try (
 
-		ManualResponderRequestRec request =
-			manualResponderRequestHelper.findRequired (
-				manualResponderRequestId);
-
-		ManualResponderNumberRec manualResponderNumber =
-			request.getManualResponderNumber ();
-
-		ManualResponderRec manualResponder =
-			manualResponderNumber.getManualResponder ();
-
-		ManualResponderTemplateRec template =
-			manualResponderTemplateHelper.findRequired (
-				templateId);
-
-		// consistency checks
-
-		if (
-			referenceNotEqualWithClass (
-				ManualResponderRec.class,
-				template.getManualResponder (),
-				manualResponder)
-		) {
-
-			requestContext.addError (
-				"Internal error");
-
-			return null;
-
-		}
-
-		boolean customisable =
-			template.getCustomisable ();
-
-		if (
-			(customisable && messageParam == null)
-			|| (! customisable && messageParam != null)
-		) {
-
-			requestContext.addError (
-				"Internal error");
-
-			return null;
-
-		}
-
-		// work out message text
-
-		String messageString =
-			template.getCustomisable ()
-				? messageParam
-				: template.getDefaultText ();
-
-		if (! GsmUtils.gsmStringIsValid (messageString)) {
-
-			requestContext.addError (
-				"Message contains characters which cannot be sent via SMS");
-
-			return null;
-
-		}
-
-		TextRec messageText =
-			textHelper.findOrCreate (
-				messageString);
-
-		boolean shortMessageParts =
-			request
-				.getNumber ()
-				.getNetwork ()
-				.getShortMultipartMessages ();
-
-		long maxLengthPerMultipartMessage =
-			shortMessageParts
-				? 134l
-				: 153l;
-
-		Pair<List<String>,Long> splitResult =
-			manualResponderLogic.splitMessage (
-				template,
-				maxLengthPerMultipartMessage,
-				messageString);
-
-		List<String> messageParts =
-			splitResult.getLeft ();
-
-		long effectiveParts =
-			splitResult.getRight ();
-
-		// enforce minimum parts
-
-		if (
-
-			template.getMinimumMessageParts () != null
-
-			&& lessThan (
-				effectiveParts,
-				template.getMinimumMessageParts ())
+			Transaction transaction =
+				database.beginReadWrite (
+					"ManualResponderRequestPendingFormAction.goSend (...)",
+					this);
 
 		) {
 
-			requestContext.addErrorFormat (
-				"Message is too short at %s parts, ",
-				integerToDecimalString (
-					effectiveParts),
-				"minimum is %s parts",
-				integerToDecimalString (
-					template.getMinimumMessageParts ()));
+			ManualResponderRequestRec request =
+				manualResponderRequestHelper.findRequired (
+					manualResponderRequestId);
 
-			return null;
+			ManualResponderNumberRec manualResponderNumber =
+				request.getManualResponderNumber ();
 
-		}
+			ManualResponderRec manualResponder =
+				manualResponderNumber.getManualResponder ();
 
-		// enforce maximum parts
+			ManualResponderTemplateRec template =
+				manualResponderTemplateHelper.findRequired (
+					templateId);
 
-		if (
-
-			isNotNull (
-				template.getMaximumMessages ())
-
-			&& moreThan (
-				effectiveParts,
-				template.getMaximumMessages ())
-
-		) {
-
-			requestContext.addErrorFormat (
-				"Message is too long at %s parts, ",
-				integerToDecimalString (
-					messageParts.size ()),
-				"minimum is %s parts",
-				integerToDecimalString (
-					template.getMaximumMessages ()));
-
-			return null;
-
-		}
-
-		// resolve route
-
-		RouteRec route =
-			routerLogic.resolveRouter (
-				template.getRouter ());
-
-		// check spend limit
-
-		if (
-			isNotNull (
-				manualResponder.getSmsSpendLimiter ())
-		) {
-
-			Long amountToSpend =
-				route.getOutCharge ()
-				* messageParts.size ();
-
-			Optional <Long> spendAvailable =
-				smsSpendLimitLogic.spendCheck (
-					manualResponder.getSmsSpendLimiter (),
-					manualResponderNumber.getNumber ());
+			// consistency checks
 
 			if (
-				optionalIsPresent (
-					spendAvailable)
+				referenceNotEqualWithClass (
+					ManualResponderRec.class,
+					template.getManualResponder (),
+					manualResponder)
 			) {
 
+				requestContext.addError (
+					"Internal error");
+
+				return null;
+
+			}
+
+			boolean customisable =
+				template.getCustomisable ();
+
+			if (
+				(customisable && messageParam == null)
+				|| (! customisable && messageParam != null)
+			) {
+
+				requestContext.addError (
+					"Internal error");
+
+				return null;
+
+			}
+
+			// work out message text
+
+			String messageString =
+				template.getCustomisable ()
+					? messageParam
+					: template.getDefaultText ();
+
+			if (! GsmUtils.gsmStringIsValid (messageString)) {
+
+				requestContext.addError (
+					"Message contains characters which cannot be sent via SMS");
+
+				return null;
+
+			}
+
+			TextRec messageText =
+				textHelper.findOrCreate (
+					messageString);
+
+			boolean shortMessageParts =
+				request
+					.getNumber ()
+					.getNetwork ()
+					.getShortMultipartMessages ();
+
+			long maxLengthPerMultipartMessage =
+				shortMessageParts
+					? 134l
+					: 153l;
+
+			Pair<List<String>,Long> splitResult =
+				manualResponderLogic.splitMessage (
+					template,
+					maxLengthPerMultipartMessage,
+					messageString);
+
+			List<String> messageParts =
+				splitResult.getLeft ();
+
+			long effectiveParts =
+				splitResult.getRight ();
+
+			// enforce minimum parts
+
+			if (
+
+				template.getMinimumMessageParts () != null
+
+				&& lessThan (
+					effectiveParts,
+					template.getMinimumMessageParts ())
+
+			) {
+
+				requestContext.addErrorFormat (
+					"Message is too short at %s parts, ",
+					integerToDecimalString (
+						effectiveParts),
+					"minimum is %s parts",
+					integerToDecimalString (
+						template.getMinimumMessageParts ()));
+
+				return null;
+
+			}
+
+			// enforce maximum parts
+
+			if (
+
+				isNotNull (
+					template.getMaximumMessages ())
+
+				&& moreThan (
+					effectiveParts,
+					template.getMaximumMessages ())
+
+			) {
+
+				requestContext.addErrorFormat (
+					"Message is too long at %s parts, ",
+					integerToDecimalString (
+						messageParts.size ()),
+					"minimum is %s parts",
+					integerToDecimalString (
+						template.getMaximumMessages ()));
+
+				return null;
+
+			}
+
+			// resolve route
+
+			RouteRec route =
+				routerLogic.resolveRouter (
+					template.getRouter ());
+
+			// check spend limit
+
+			if (
+				isNotNull (
+					manualResponder.getSmsSpendLimiter ())
+			) {
+
+				Long amountToSpend =
+					route.getOutCharge ()
+					* messageParts.size ();
+
+				Optional <Long> spendAvailable =
+					smsSpendLimitLogic.spendCheck (
+						manualResponder.getSmsSpendLimiter (),
+						manualResponderNumber.getNumber ());
+
 				if (
-					equalToZero (
-						spendAvailable.get ())
+					optionalIsPresent (
+						spendAvailable)
 				) {
 
-					requestContext.addErrorFormat (
-						"User has reached their daily spend limit");
+					if (
+						equalToZero (
+							spendAvailable.get ())
+					) {
 
-					return null;
+						requestContext.addErrorFormat (
+							"User has reached their daily spend limit");
 
-				} else if (
-					moreThan (
-						amountToSpend,
-						spendAvailable.get ())
-				) {
+						return null;
 
-					requestContext.addErrorFormat (
-						"User has only %s left to spend, ",
-						currencyLogic.formatText (
-							manualResponder
-								.getSmsSpendLimiter ()
-								.getCurrency (),
-							spendAvailable.get ()),
-						"so can not spend %s",
-						currencyLogic.formatText (
-							manualResponder
-								.getSmsSpendLimiter ()
-								.getCurrency (),
-							amountToSpend));
+					} else if (
+						moreThan (
+							amountToSpend,
+							spendAvailable.get ())
+					) {
 
-					return null;
+						requestContext.addErrorFormat (
+							"User has only %s left to spend, ",
+							currencyLogic.formatText (
+								manualResponder
+									.getSmsSpendLimiter ()
+									.getCurrency (),
+								spendAvailable.get ()),
+							"so can not spend %s",
+							currencyLogic.formatText (
+								manualResponder
+									.getSmsSpendLimiter ()
+									.getCurrency (),
+								amountToSpend));
+
+						return null;
+
+					}
 
 				}
 
 			}
 
-		}
+			// create reply
 
-		// create reply
+			ManualResponderReplyRec reply =
+				manualResponderReplyHelper.insert (
+					manualResponderReplyHelper.createInstance ()
 
-		ManualResponderReplyRec reply =
-			manualResponderReplyHelper.insert (
-				manualResponderReplyHelper.createInstance ()
+				.setManualResponderRequest (
+					request)
 
-			.setManualResponderRequest (
-				request)
-
-			.setUser (
-				userConsoleLogic.userRequired ())
-
-			.setText (
-				messageText)
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setNumFreeMessages (
-				route.getOutCharge () == 0
-					? effectiveParts
-					: 0l)
-
-			.setNumBilledMessages (
-				route.getOutCharge () > 0
-					? effectiveParts
-					: 0l)
-
-		);
-
-		// send messages
-
-		boolean first = true;
-
-		for (
-			String messagePart
-				: messageParts
-		) {
-
-			reply.getMessages ().add (
-				messageSenderProvider.get ()
-
-				.threadId (
-					request.getMessage ().getThreadId ())
-
-				.number (
-					request.getNumber ())
-
-				.messageString (
-					messagePart)
-
-				.numFrom (
-					template.getNumber ())
-
-				.routerResolve (
-					template.getRouter ())
-
-				.serviceLookup (
-					manualResponder,
-					"default")
-
-				.affiliate (
-					optionalOrNull (
-						manualResponderLogic.customerAffiliate (
-							manualResponderNumber)))
-
-				.user (
+				.setUser (
 					userConsoleLogic.userRequired ())
 
-				.deliveryTypeCode (
-					"manual_responder")
+				.setText (
+					messageText)
 
-				.ref (
-					reply.getId ())
+				.setTimestamp (
+					transaction.now ())
 
-				.sendNow (
-					first
-					|| ! template.getSequenceParts ())
+				.setNumFreeMessages (
+					route.getOutCharge () == 0
+						? effectiveParts
+						: 0l)
 
-				.send ()
+				.setNumBilledMessages (
+					route.getOutCharge () > 0
+						? effectiveParts
+						: 0l)
 
 			);
 
-			first = false;
+			// send messages
 
-		}
+			boolean first = true;
 
-		// update request
+			for (
+				String messagePart
+					: messageParts
+			) {
 
-		request
+				reply.getMessages ().add (
+					messageSenderProvider.get ()
 
-			.setNumFreeMessages (
-				+ request.getNumFreeMessages ()
-				+ route.getOutCharge () == 0
-					? effectiveParts
-					: 0l)
+					.threadId (
+						request.getMessage ().getThreadId ())
 
-			.setNumBilledMessages (
-				+ request.getNumBilledMessages ()
-				+ route.getOutCharge () > 0
-					? effectiveParts
-					: 0l);
+					.number (
+						request.getNumber ())
 
-		// record spend
+					.messageString (
+						messagePart)
 
-		if (
-			isNotNull (
-				manualResponder.getSmsSpendLimiter ())
-		) {
+					.numFrom (
+						template.getNumber ())
 
-			smsSpendLimitLogic.spend (
-				manualResponder.getSmsSpendLimiter (),
-				manualResponderNumber.getNumber (),
-				reply.getMessages (),
-				request.getMessage ().getThreadId (),
-				request.getMessage ().getNumTo ());
+					.routerResolve (
+						template.getRouter ())
 
-		}
+					.serviceLookup (
+						manualResponder,
+						"default")
 
-		// check if we can send again
+					.affiliate (
+						optionalOrNull (
+							manualResponderLogic.customerAffiliate (
+								manualResponderNumber)))
 
-		if (manualResponder.getCanSendMultiple ()) {
+					.user (
+						userConsoleLogic.userRequired ())
 
-			sendAgain = true;
+					.deliveryTypeCode (
+						"manual_responder")
 
-		} else {
+					.ref (
+						reply.getId ())
 
-			// process queue item
+					.sendNow (
+						first
+						|| ! template.getSequenceParts ())
 
-			queueLogic.processQueueItem (
-				request.getQueueItem (),
-				userConsoleLogic.userRequired ());
+					.send ()
+
+				);
+
+				first = false;
+
+			}
 
 			// update request
 
 			request
 
-				.setPending (
-					false)
+				.setNumFreeMessages (
+					+ request.getNumFreeMessages ()
+					+ route.getOutCharge () == 0
+						? effectiveParts
+						: 0l)
 
-				.setUser (
-					userConsoleLogic.userRequired ())
+				.setNumBilledMessages (
+					+ request.getNumBilledMessages ()
+					+ route.getOutCharge () > 0
+						? effectiveParts
+						: 0l);
 
-				.setProcessedTime (
-					transaction.now ());
+			// record spend
 
-		}
+			if (
+				isNotNull (
+					manualResponder.getSmsSpendLimiter ())
+			) {
 
-		// create keyword set fallback if appropriate
+				smsSpendLimitLogic.spend (
+					manualResponder.getSmsSpendLimiter (),
+					manualResponderNumber.getNumber (),
+					reply.getMessages (),
+					request.getMessage ().getThreadId (),
+					request.getMessage ().getNumTo ());
 
-		if (
-			isNotNull (
-				template.getReplyKeywordSet ())
-		) {
+			}
 
-			CommandRec command =
-				commandHelper.findByCodeRequired (
-					manualResponder,
-					"default");
+			// check if we can send again
 
-			keywordLogic.createOrUpdateKeywordSetFallback (
-				template.getReplyKeywordSet (),
-				request.getNumber (),
-				command);
+			if (manualResponder.getCanSendMultiple ()) {
 
-		}
+				sendAgain = true;
 
-		// done
+			} else {
 
-		transaction.commit ();
+				// process queue item
 
-		requestContext.addNotice (
-			"Reply sent");
+				queueLogic.processQueueItem (
+					request.getQueueItem (),
+					userConsoleLogic.userRequired ());
 
-		// choose appropriate responder
+				// update request
 
-		if (sendAgain) {
+				request
 
-			return responder (
-				"manualResponderRequestPendingFormResponder");
+					.setPending (
+						false)
 
-		} else {
+					.setUser (
+						userConsoleLogic.userRequired ())
 
-			return responder (
-				"queueHomeResponder");
+					.setProcessedTime (
+						transaction.now ());
+
+			}
+
+			// create keyword set fallback if appropriate
+
+			if (
+				isNotNull (
+					template.getReplyKeywordSet ())
+			) {
+
+				CommandRec command =
+					commandHelper.findByCodeRequired (
+						manualResponder,
+						"default");
+
+				keywordLogic.createOrUpdateKeywordSetFallback (
+					template.getReplyKeywordSet (),
+					request.getNumber (),
+					command);
+
+			}
+
+			// done
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Reply sent");
+
+			// choose appropriate responder
+
+			if (sendAgain) {
+
+				return responder (
+					"manualResponderRequestPendingFormResponder");
+
+			} else {
+
+				return responder (
+					"queueHomeResponder");
+
+			}
 
 		}
 

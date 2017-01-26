@@ -1,8 +1,12 @@
 package wbs.platform.object.search;
 
-import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
+import java.io.Serializable;
 import java.util.List;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -11,9 +15,11 @@ import lombok.experimental.Accessors;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.responder.Responder;
 
 @Accessors (fluent = true)
@@ -56,22 +62,22 @@ class ObjectSearchGetAction
 	Responder goReal (
 			@NonNull TaskLogger taskLogger) {
 
-		Object searchObject =
+		Optional <Serializable> searchOptional =
 			requestContext.session (
 				sessionKey + "Fields");
 
-		List<?> objectIds =
-			(List<?>)
-			requestContext.session (
-				sessionKey + "Results");
+		Optional <List <?>> objectIdsOptional =
+			genericCastUnchecked (
+				requestContext.session (
+					sessionKey + "Results"));
 
 		if (
 
-			isNull (
-				searchObject)
+			optionalIsNotPresent (
+				searchOptional)
 
-			|| isNull (
-				objectIds)
+			|| optionalIsNotPresent (
+				objectIdsOptional)
 
 		) {
 

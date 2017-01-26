@@ -1,5 +1,6 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import com.google.common.base.Optional;
@@ -75,7 +76,7 @@ class SimpleFormFieldAccessor <Container, Native>
 
 		// cast and return
 
-		return Optional.<Native>of (
+		return optionalOf (
 			nativeClass.cast (
 				nativeObject));
 

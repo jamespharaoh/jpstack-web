@@ -25,10 +25,12 @@ interface ConsoleRequestContextNoticeMethods
 			@NonNull ConsoleNoticeType type,
 			@NonNull String message) {
 
-		ConsoleNotices.add (
-			requestContext ().request (),
-			message,
-			type);
+		State state =
+			consoleRequestContextNoticeMethodsState ();
+
+		state.notices.add (
+			type,
+			message);
 
 	}
 
