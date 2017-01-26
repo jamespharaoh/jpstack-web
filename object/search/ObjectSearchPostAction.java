@@ -1,8 +1,12 @@
 package wbs.platform.object.search;
 
+import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.PropertyUtils.propertySetAuto;
 import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
@@ -17,9 +21,7 @@ import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -36,15 +38,15 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.RedirectResponder;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-
-import wbs.utils.etc.PropertyUtils;
 
 import wbs.web.responder.Responder;
 
@@ -68,6 +70,9 @@ class ObjectSearchPostAction <
 
 	@SingletonDependency
 	FormFieldLogic fieldsLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -129,8 +134,13 @@ class ObjectSearchPostAction <
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws ServletException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// handle new/repeat search buttons
 
@@ -139,6 +149,9 @@ class ObjectSearchPostAction <
 				requestContext.parameter (
 					"new-search"))
 		) {
+
+			taskLogger.debugFormat (
+				"New search");
 
 			requestContext.session (
 				sessionKey + "Results",
@@ -158,6 +171,9 @@ class ObjectSearchPostAction <
 					"repeat-search"))
 		) {
 
+			taskLogger.debugFormat (
+				"Repeat search");
+
 			requestContext.session (
 				sessionKey + "Results",
 				null);
@@ -169,6 +185,9 @@ class ObjectSearchPostAction <
 				requestContext.parameter (
 					"download-csv"))
 		) {
+
+			taskLogger.debugFormat (
+				"Download CSV");
 
 			return objectSearchCsvResponderProvider.get ()
 
@@ -188,199 +207,217 @@ class ObjectSearchPostAction <
 
 		// perform search
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ObjectSearchPostAction.goReal ()",
-				this);
+		taskLogger.debugFormat (
+			"Process search form");
 
-		SearchType search =
-			genericCastUnchecked (
-				requestContext.session (
-					sessionKey + "Fields"));
+		try (
 
-		if (search == null) {
+			Transaction transaction =
+				database.beginReadOnly (
+					"ObjectSearchPostAction.goReal ()",
+					this);
 
-			search =
-				classInstantiate (
-					searchClass);
+		) {
 
-			requestContext.session (
-				sessionKey + "Fields",
+			SearchType search =
+				genericCastUnchecked (
+					requestContext.sessionOrElseSetRequired (
+						sessionKey + "Fields",
+						() -> classInstantiate (
+							searchClass)));
+
+			fieldsLogic.implicit (
+				searchFormFieldSet,
 				search);
 
-		}
-
-		fieldsLogic.implicit (
-			searchFormFieldSet,
-			search);
-
-		consoleHelper.consoleHooks ().applySearchFilter (
-			search);
-
-		if (
-			parentIdKey != null
-			|| parentIdName != null
-		) {
+			consoleHelper.consoleHooks ().applySearchFilter (
+				search);
 
 			if (
-				parentIdKey == null
-				|| parentIdName == null
+				parentIdKey != null
+				|| parentIdName != null
 			) {
-				throw new RuntimeException ();
+
+				if (
+					parentIdKey == null
+					|| parentIdName == null
+				) {
+					throw new RuntimeException ();
+				}
+
+				Object parentId =
+					requestContext.stuff (
+						parentIdKey);
+
+				if (parentId == null) {
+					throw new RuntimeException ();
+				}
+
+				propertySetAuto (
+					search,
+					parentIdName,
+					parentId);
+
 			}
 
-			Object parentId =
-				requestContext.stuff (
-					parentIdKey);
+			// update search details
 
-			if (parentId == null) {
-				throw new RuntimeException ();
+			UpdateResultSet updateResultSet =
+				fieldsLogic.update (
+					requestContext,
+					searchFormFieldSet,
+					search,
+					emptyMap (),
+					"search");
+
+			if (updateResultSet.errorCount () > 0) {
+
+				taskLogger.debugFormat (
+					"Found %s errors processing search form",
+					integerToDecimalString (
+						updateResultSet.errorCount ()));
+
+				fieldsLogic.reportErrors (
+					requestContext,
+					updateResultSet,
+					"search");
+
+				requestContext.request (
+					"objectSearchUpdateResultSet",
+					updateResultSet);
+
+				return responder (
+					searchResponderName);
+
 			}
 
-			PropertyUtils.propertySetAuto (
-				search,
-				parentIdName,
-				parentId);
+			// perform search
 
-		}
+			taskLogger.debugFormat (
+				"Perform search");
 
-		// update search details
-
-		UpdateResultSet updateResultSet =
-			fieldsLogic.update (
-				requestContext,
-				searchFormFieldSet,
-				search,
-				ImmutableMap.of (),
-				"search");
-
-		if (updateResultSet.errorCount () > 0) {
-
-			fieldsLogic.reportErrors (
-				requestContext,
-				updateResultSet,
-				"search");
-
-			requestContext.request (
-				"objectSearchUpdateResultSet",
-				updateResultSet);
-
-			return responder (
-				searchResponderName);
-
-		}
-
-		// perform search
-
-		List <Long> objectIds;
-
-		if (
-			isNotNull (
-				searchDaoMethodName)
-		) {
-
-			Method method =
-				methodGetRequired (
-					consoleHelper.getClass (),
-					searchDaoMethodName,
-					ImmutableList.<Class <?>> of (
-						searchClass));
-
-			objectIds =
-				genericCastUnchecked (
-					methodInvoke (
-						method,
-						consoleHelper,
-						search));
-
-		} else {
-
-			objectIds =
-				consoleHelper.searchIds (
-					search);
-
-		}
-
-		if (objectIds.isEmpty ()) {
-
-			// no results
-
-			requestContext.addError (
-				"No results returned from search");
-
-			return responder (
-				searchResponderName);
-
-		} else if (
-
-			objectIds.size () == 1
-
-			&& isNull (
-				resultsDaoMethodName)
-
-		) {
-
-			// single result
-
-			ConsoleContextType targetContextType =
-				consoleManager.contextType (
-					consoleHelper.objectName () + ":combo",
-					true);
-
-			Optional <ConsoleContext> targetContext =
-				consoleManager.relatedContext (
-					taskLogger,
-					requestContext.consoleContextRequired (),
-					targetContextType);
+			List <Long> objectIds;
 
 			if (
-				optionalIsPresent (
-					targetContext)
+				isNotNull (
+					searchDaoMethodName)
 			) {
 
-				return redirectResponderProvider.get ()
+				Method method =
+					methodGetRequired (
+						consoleHelper.getClass (),
+						searchDaoMethodName,
+						ImmutableList.<Class <?>> of (
+							searchClass));
 
-					.targetUrl (
-						requestContext.resolveContextUrlFormat (
-							"%s",
-							targetContext.get ().pathPrefix (),
-							"/%s",
-							consoleHelper.getPathId (
-								objectIds.get (
-									0))));
+				objectIds =
+					genericCastUnchecked (
+						methodInvoke (
+							method,
+							consoleHelper,
+							search));
 
 			} else {
 
-				Record <?> object =
-					consoleHelper.findRequired (
-						objectIds.get (
-							0));
+				objectIds =
+					consoleHelper.searchIds (
+						search);
+
+			}
+
+			if (objectIds.isEmpty ()) {
+
+				// no results
+
+				taskLogger.debugFormat (
+					"Search returned no results");
+
+				requestContext.addError (
+					"No results returned from search");
+
+				return responder (
+					searchResponderName);
+
+			} else if (
+
+				objectIds.size () == 1
+
+				&& isNull (
+					resultsDaoMethodName)
+
+			) {
+
+				// single result
+
+				taskLogger.debugFormat (
+					"Search returned single result");
+
+				ConsoleContextType targetContextType =
+					consoleManager.contextType (
+						consoleHelper.objectName () + ":combo",
+						true);
+
+				Optional <ConsoleContext> targetContext =
+					consoleManager.relatedContext (
+						taskLogger,
+						requestContext.consoleContextRequired (),
+						targetContextType);
+
+				if (
+					optionalIsPresent (
+						targetContext)
+				) {
+
+					return redirectResponderProvider.get ()
+
+						.targetUrl (
+							requestContext.resolveContextUrlFormat (
+								"%s",
+								targetContext.get ().pathPrefix (),
+								"/%s",
+								consoleHelper.getPathId (
+									objectIds.get (
+										0))));
+
+				} else {
+
+					Record <?> object =
+						consoleHelper.findRequired (
+							objectIds.get (
+								0));
+
+					return redirectResponderProvider.get ()
+
+						.targetUrl (
+							requestContext.resolveLocalUrl (
+								consoleHelper.getDefaultLocalPathGeneric (
+									object)));
+
+
+				}
+
+			} else {
+
+				// multiple results
+
+				taskLogger.debugFormat (
+					"Search returned %s results",
+					integerToDecimalString (
+						collectionSize (
+							objectIds)));
+
+				requestContext.session (
+					sessionKey + "Results",
+					(Serializable)
+					objectIds);
 
 				return redirectResponderProvider.get ()
 
 					.targetUrl (
 						requestContext.resolveLocalUrl (
-							consoleHelper.getDefaultLocalPathGeneric (
-								object)));
-
+							"/" + fileName));
 
 			}
-
-		} else {
-
-			// multiple results
-
-			requestContext.session (
-				sessionKey + "Results",
-				(Serializable)
-				objectIds);
-
-			return redirectResponderProvider.get ()
-
-				.targetUrl (
-					requestContext.resolveLocalUrl (
-						"/" + fileName));
 
 		}
 

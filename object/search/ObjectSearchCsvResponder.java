@@ -1,7 +1,6 @@
 package wbs.platform.object.search;
 
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
@@ -95,17 +94,15 @@ class ObjectSearchCsvResponder <RecordType>
 		// set search object
 
 		searchObject =
-			requiredValue (
-				requestContext.session (
-					sessionKey + "Fields"));
+			requestContext.sessionRequired (
+				sessionKey + "Fields");
 
 		// get object ids
 
 		List <Long> objectIdsTemp =
 			genericCastUnchecked (
-				requiredValue (
-					requestContext.session (
-						sessionKey + "Results")));
+				requestContext.sessionRequired (
+					sessionKey + "Results"));
 
 		objectIds =
 			objectIdsTemp;

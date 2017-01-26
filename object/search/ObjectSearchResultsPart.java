@@ -5,9 +5,9 @@ import static wbs.utils.collection.CollectionUtils.listSlice;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -186,16 +186,19 @@ class ObjectSearchResultsPart <
 				resultsClass)
 		) {
 
-			Long currentObjectId =
-				(Long)
-				requestContext.stuff (
+			Optional <Long> currentObjectIdOptional =
+				requestContext.stuffInteger (
 					consoleHelper.objectName () + "Id");
 
-			if (currentObjectId != null) {
+			if (
+				optionalIsPresent (
+					currentObjectIdOptional)
+			) {
 
 				currentObject =
 					consoleHelper.findRequired (
-						currentObjectId);
+						optionalGetRequired (
+							currentObjectIdOptional));
 
 			}
 
@@ -204,17 +207,15 @@ class ObjectSearchResultsPart <
 		// set search object
 
 		Object searchObject =
-			requiredValue (
-				requestContext.session (
-					sessionKey + "Fields"));
+			requestContext.sessionRequired (
+				sessionKey + "Fields");
 
 		// get search results for page
 
 		List <Long> allObjectIds =
 			genericCastUnchecked (
-				requiredValue (
-					requestContext.session (
-						sessionKey + "Results")));
+				requestContext.sessionRequired (
+					sessionKey + "Results"));
 
 		totalObjects =
 			allObjectIds.size ();
