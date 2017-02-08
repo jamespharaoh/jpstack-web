@@ -4,6 +4,7 @@ import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
@@ -112,7 +113,7 @@ class ObjectSearchPart <
 			@NonNull TaskLogger parentTaskLogger) {
 
 		search =
-			genericCastUnsafe (
+			genericCastUnchecked (
 				requestContext.sessionOrElseSetRequired (
 					sessionKey + "Fields",
 					() -> classInstantiate (
@@ -158,13 +159,6 @@ class ObjectSearchPart <
 		formHints =
 			formHintsBuilder.build ();
 
-	}
-
-	private SearchType genericCastUnsafe (
-			Serializable session) {
-
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
