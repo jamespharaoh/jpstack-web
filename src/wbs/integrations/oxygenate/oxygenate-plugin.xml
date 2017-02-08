@@ -46,7 +46,7 @@
 	</layer>
 
 	<api-modules>
-		<api-module name="oxygen8"/>
+		<api-module name="oxygenate"/>
 	</api-modules>
 
 	<console-modules>

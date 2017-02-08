@@ -1,5 +1,6 @@
 package wbs.integrations.oxygenate.api;
 
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -71,7 +72,7 @@ class OxygenateRouteReportAction
 
 	// state
 
-	Long routeId;
+	Long smsRouteId;
 
 	String reference;
 	String status;
@@ -86,16 +87,17 @@ class OxygenateRouteReportAction
 			@NonNull TaskLogger taskLogger,
 			@NonNull FormatWriter debugWriter) {
 
-		routeId =
-			requestContext.requestIntegerRequired (
-				"routeId");
+		smsRouteId =
+			parseIntegerRequired (
+				requestContext.requestStringRequired (
+					"smsRouteId"));
 
 		reference =
-			requestContext.parameterOrNull (
+			requestContext.parameterRequired (
 				"Reference");
 
 		status =
-			requestContext.parameterOrNull (
+			requestContext.parameterRequired (
 				"Status");
 
 	}
@@ -105,52 +107,57 @@ class OxygenateRouteReportAction
 	void updateDatabase (
 			@NonNull TaskLogger taskLogger) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				stringFormat (
-					"%s.%s ()",
-					getClass ().getSimpleName (),
-					"updateDatabase"),
-				this);
+		try (
 
-		OxygenateRouteOutRec routeOut =
-			oxygenateRouteOutCodeHelper.findRequired (
-				routeId);
+			Transaction transaction =
+				database.beginReadWrite (
+					stringFormat (
+						"%s.%s ()",
+						getClass ().getSimpleName (),
+						"updateDatabase"),
+					this);
 
-		if (! routeOut.getRoute ().getDeliveryReports ()) {
+		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Delivery reports are not enabled for route %s.%s",
-					routeOut.getRoute ().getSlice ().getCode (),
-					routeOut.getRoute ().getCode ()));
+			OxygenateRouteOutRec routeOut =
+				oxygenateRouteOutCodeHelper.findRequired (
+					smsRouteId);
+	
+			if (! routeOut.getRoute ().getDeliveryReports ()) {
+	
+				throw new RuntimeException (
+					stringFormat (
+						"Delivery reports are not enabled for route %s.%s",
+						routeOut.getRoute ().getSlice ().getCode (),
+						routeOut.getRoute ().getCode ()));
+	
+			}
+	
+			OxygenateReportCodeRec reportCode =
+				oxygenateReportCodeHelper.findByCodeRequired (
+					routeOut.getOxygenateConfig (),
+					status);
+	
+			RouteRec route =
+				smsRouteHelper.findRequired (
+					smsRouteId);
+	
+			reportLogic.deliveryReport (
+				route,
+				reference,
+				reportCode.getMessageStatus (),
+				optionalOf (
+					status),
+				optionalOf (
+					reportCode.getDescription ()),
+				optionalAbsent (),
+				optionalAbsent ());
+	
+			transaction.commit ();
+	
+			success = true;
 
 		}
-
-		OxygenateReportCodeRec reportCode =
-			oxygenateReportCodeHelper.findByCodeRequired (
-				routeOut.getOxygenateConfig (),
-				status);
-
-		RouteRec route =
-			smsRouteHelper.findRequired (
-				routeId);
-
-		reportLogic.deliveryReport (
-			route,
-			reference,
-			reportCode.getMessageStatus (),
-			optionalOf (
-				status),
-			optionalOf (
-				reportCode.getDescription ()),
-			optionalAbsent (),
-			optionalAbsent ());
-
-		transaction.commit ();
-
-		success = true;
 
 	}
 
@@ -207,7 +214,7 @@ class OxygenateRouteReportAction
 
 			.setRoute (
 				smsRouteHelper.findRequired (
-					routeId))
+					smsRouteId))
 
 			.setType (
 				OxygenateInboundLogType.smsDelivery)

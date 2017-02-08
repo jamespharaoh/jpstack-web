@@ -113,15 +113,15 @@ class OxygenateRouteInMmsOldAction
 	String mmsMessageType;
 	String mmsSenderAddress;
 	String mmsRecipientAddress;
-	Optional<String> mmsSubject;
+	Optional <String> mmsSubject;
 	Instant mmsDate;
 	String mmsNetwork;
 
 	String messageString;
 	TextRec messageText;
 
-	List<MediaRec> medias =
-		new ArrayList<MediaRec> ();
+	List <MediaRec> medias =
+		new ArrayList<> ();
 
 	// implementation
 
@@ -135,23 +135,28 @@ class OxygenateRouteInMmsOldAction
 				parentTaskLogger,
 				"goApi");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"Oxygen8InboundMmsAction.goApi ()",
-				this);
+		try (
 
-		processRequestHeaders (
-			taskLogger);
+			Transaction transaction =
+				database.beginReadWrite (
+					"Oxygen8InboundMmsAction.goApi ()",
+					this);
 
-		processRequestBody (
-			taskLogger);
+		) {
 
-		updateDatabase ();
+			processRequestHeaders (
+				taskLogger);
+	
+			processRequestBody (
+				taskLogger);
+	
+			updateDatabase ();
+	
+			transaction.commit ();
+	
+			return createResponse ();
 
-		transaction.commit ();
-
-		return createResponse ();
+		}
 
 	}
 

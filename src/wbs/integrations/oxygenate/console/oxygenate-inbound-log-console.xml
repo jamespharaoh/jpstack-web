@@ -10,7 +10,7 @@
 			priv="root:manage"/>
 
 		<context-stuff
-			name="oxygenadteInboundLogName"
+			name="oxygenateInboundLogName"
 			field="id"/>
 
 	</console-helper-provider>

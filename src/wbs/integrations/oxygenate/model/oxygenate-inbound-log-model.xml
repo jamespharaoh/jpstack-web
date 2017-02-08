@@ -8,7 +8,8 @@
 
 		<!-- id -->
 
-		<generated-id-field/>
+		<generated-id-field
+			sequence="oxygen8_inbound_log_id_seq"/>
 
 		<!-- identity -->
 

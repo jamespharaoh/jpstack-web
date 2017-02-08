@@ -3,6 +3,7 @@ package wbs.integrations.oxygenate.api;
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.BinaryUtils.bytesFromHex;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -17,7 +18,6 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiAction;
@@ -100,7 +100,7 @@ class OxygenateRouteInSmsAction
 	StringBuilder debugLog =
 		new StringBuilder ();
 
-	Long routeId;
+	Long smsRouteId;
 
 	String channel;
 	String reference;
@@ -229,45 +229,52 @@ class OxygenateRouteInSmsAction
 
 	void storeLog () {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"Oxygen8InboundSmsAction.storeLog ()",
-				this);
+		try (
 
-		oxygenateInboundLogHelper.insert (
-			oxygenateInboundLogHelper.createInstance ()
+			Transaction transaction =
+				database.beginReadWrite (
+					"Oxygen8InboundSmsAction.storeLog ()",
+					this);
 
-			.setRoute (
-				routeHelper.findRequired (
-					requestContext.requestIntegerRequired (
-						"routeId")))
+		) {
 
-			.setType (
-				OxygenateInboundLogType.smsMessage)
+			oxygenateInboundLogHelper.insert (
+				oxygenateInboundLogHelper.createInstance ()
+	
+				.setRoute (
+					routeHelper.findRequired (
+						parseIntegerRequired (
+							requestContext.requestStringRequired (
+								"smsRouteId"))))
+	
+				.setType (
+					OxygenateInboundLogType.smsMessage)
+	
+				.setTimestamp (
+					transaction.now ())
+	
+				.setDetails (
+					debugLog.toString ())
+	
+				.setSuccess (
+					success)
+	
+			);
+	
+			transaction.commit ();
+	
+			success = true;
 
-			.setTimestamp (
-				transaction.now ())
-
-			.setDetails (
-				debugLog.toString ())
-
-			.setSuccess (
-				success)
-
-		);
-
-		transaction.commit ();
-
-		success = true;
+		}
 
 	}
 
 	void processRequest () {
 
-		routeId =
-			requestContext.requestIntegerRequired (
-				"routeId");
+		smsRouteId =
+			parseIntegerRequired (
+				requestContext.requestStringRequired (
+					"smsRouteId"));
 
 		channel =
 			requestContext.parameterOrNull (
@@ -328,72 +335,79 @@ class OxygenateRouteInSmsAction
 
 		dateReceived =
 			Long.parseLong (
-				requestContext.parameterOrNull ("DateReceived"));
+				requestContext.parameterOrNull (
+					"DateReceived"));
 
 		campaignId =
 			Integer.parseInt (
-				requestContext.parameterOrNull ("CampaignID"));
+				requestContext.parameterOrNull (
+					"CampaignID"));
 
 	}
 
 	void updateDatabase () {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"Oxygen8InboundSmsAction.updateDatabase ()",
-				this);
+		try (
 
-		RouteRec route =
-			routeHelper.findRequired (
-				routeId);
+			Transaction transaction =
+				database.beginReadWrite (
+					"Oxygen8InboundSmsAction.updateDatabase ()",
+					this);
 
-		OxygenateRouteInRec oxygenateRouteIn =
-			oxygenateRouteInHelper.findRequired (
-				route.getId ());
-
-		OxygenateConfigRec oxygenateConfig =
-			oxygenateRouteIn.getOxygenateConfig ();
-
-		Optional <OxygenateNetworkRec> oxygenateNetworkOptional =
-			oxygenateNetworkHelper.findByChannel (
-				oxygenateConfig,
-				channel);
-
-		if (
-			optionalIsNotPresent (
-				oxygenateNetworkOptional)
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Oxygen8 channel not recognised: %s",
-					channel));
+			RouteRec route =
+				routeHelper.findRequired (
+					smsRouteId);
+	
+			OxygenateRouteInRec oxygenateRouteIn =
+				oxygenateRouteInHelper.findRequired (
+					route.getId ());
+	
+			OxygenateConfigRec oxygenateConfig =
+				oxygenateRouteIn.getOxygenateConfig ();
+	
+			Optional <OxygenateNetworkRec> oxygenateNetworkOptional =
+				oxygenateNetworkHelper.findByChannel (
+					oxygenateConfig,
+					channel);
+	
+			if (
+				optionalIsNotPresent (
+					oxygenateNetworkOptional)
+			) {
+	
+				throw new RuntimeException (
+					stringFormat (
+						"Oxygen8 channel not recognised: %s",
+						channel));
+	
+			}
+	
+			OxygenateNetworkRec oxygenateNetwork =
+				oxygenateNetworkOptional.get ();
+	
+			smsInboxLogic.inboxInsert (
+				optionalOf (
+					reference),
+				textHelper.findOrCreate (
+					textContent),
+				smsNumberHelper.findOrCreate (
+					msisdn),
+				shortcode,
+				route,
+				optionalOf (
+					oxygenateNetwork.getNetwork ()),
+				optionalOf (
+					secondsToInstant (
+						dateReceived)),
+				emptyList (),
+				optionalAbsent (),
+				optionalAbsent ());
+	
+			transaction.commit ();
 
 		}
-
-		OxygenateNetworkRec oxygenateNetwork =
-			oxygenateNetworkOptional.get ();
-
-		smsInboxLogic.inboxInsert (
-			optionalOf (
-				reference),
-			textHelper.findOrCreate (
-				textContent),
-			smsNumberHelper.findOrCreate (
-				msisdn),
-			shortcode,
-			route,
-			optionalOf (
-				oxygenateNetwork.getNetwork ()),
-			optionalOf (
-				secondsToInstant (
-					dateReceived)),
-			emptyList (),
-			optionalAbsent (),
-			optionalAbsent ());
-
-		transaction.commit ();
 
 	}
 
