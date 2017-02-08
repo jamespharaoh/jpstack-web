@@ -3,6 +3,7 @@ package wbs.web.context;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
@@ -33,7 +34,9 @@ interface RequestContextCookieMethods
 
 			state.cookiesByName =
 				mapWithDerivedKey (
-					request ().getCookies (),
+					ifNull (
+						request ().getCookies (),
+						new Cookie [] {}),
 					Cookie::getName);
 
 		}
