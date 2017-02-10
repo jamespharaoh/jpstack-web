@@ -157,7 +157,7 @@
 		<yes-no-field
 			name="active"/>
 
-		<text-field
+		<timezone-field
 			name="defaultTimezone"/>
 
 	</field-set>
@@ -179,7 +179,7 @@
 		<yes-no-field
 			name="active"/>
 
-		<text-field
+		<timezone-field
 			name="defaultTimezone"
 			nullable="yes"/>
 

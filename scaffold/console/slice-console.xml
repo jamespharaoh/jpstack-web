@@ -65,7 +65,7 @@
 		<text-field
 			name="adminEmail"/>
 
-		<text-field
+		<timezone-field
 			name="defaultTimezone"/>
 
 		<integer-field
@@ -106,7 +106,7 @@
 		<text-field
 			name="adminEmail"/>
 
-		<text-field
+		<timezone-field
 			name="defaultTimezone"
 			nullable="yes"/>
 
