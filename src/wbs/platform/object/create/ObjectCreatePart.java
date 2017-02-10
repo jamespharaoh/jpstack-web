@@ -2,8 +2,8 @@ package wbs.platform.object.create;
 
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 
@@ -173,11 +173,10 @@ class ObjectCreatePart <
 
 		if (parentHelper.isRoot ()) {
 
-			@SuppressWarnings ("unchecked")
 			ParentType parentTemp =
-				(ParentType)
-				rootHelper.findRequired (
-					0l);
+				genericCastUnchecked (
+					rootHelper.findRequired (
+						0l));
 
 			parent =
 				parentTemp;
@@ -191,7 +190,7 @@ class ObjectCreatePart <
 				parentHelper.idKey ());
 
 		if (
-			optionalIsNotPresent (
+			optionalIsPresent (
 				parentIdOptional)
 		) {
 

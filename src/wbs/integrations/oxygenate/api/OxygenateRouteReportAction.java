@@ -122,26 +122,26 @@ class OxygenateRouteReportAction
 			OxygenateRouteOutRec routeOut =
 				oxygenateRouteOutCodeHelper.findRequired (
 					smsRouteId);
-	
+
 			if (! routeOut.getRoute ().getDeliveryReports ()) {
-	
+
 				throw new RuntimeException (
 					stringFormat (
 						"Delivery reports are not enabled for route %s.%s",
 						routeOut.getRoute ().getSlice ().getCode (),
 						routeOut.getRoute ().getCode ()));
-	
+
 			}
-	
+
 			OxygenateReportCodeRec reportCode =
 				oxygenateReportCodeHelper.findByCodeRequired (
 					routeOut.getOxygenateConfig (),
 					status);
-	
+
 			RouteRec route =
 				smsRouteHelper.findRequired (
 					smsRouteId);
-	
+
 			reportLogic.deliveryReport (
 				route,
 				reference,
@@ -152,9 +152,9 @@ class OxygenateRouteReportAction
 					reportCode.getDescription ()),
 				optionalAbsent (),
 				optionalAbsent ());
-	
+
 			transaction.commit ();
-	
+
 			success = true;
 
 		}

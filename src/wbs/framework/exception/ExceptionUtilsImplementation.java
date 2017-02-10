@@ -1,13 +1,18 @@
 package wbs.framework.exception;
 
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
@@ -18,8 +23,6 @@ import org.json.simple.JSONObject;
 
 import wbs.framework.component.annotations.SingletonComponent;
 
-import com.google.common.collect.ImmutableMap;
-
 @Log4j
 @SingletonComponent ("exceptionUtils")
 public
@@ -29,7 +32,10 @@ class ExceptionUtilsImplementation
 	@Override
 	public
 	String throwableSummary (
-			@NonNull Throwable throwable) {
+			@NonNull Throwable originalThrowable) {
+
+		Throwable currentThrowable =
+			originalThrowable;
 
 		try {
 
@@ -39,13 +45,17 @@ class ExceptionUtilsImplementation
 			for (;;) {
 
 				stringBuilder.append (
-					throwable.toString ());
+					currentThrowable.toString ());
 
-				throwable =
-					throwable.getCause ();
+				currentThrowable =
+					currentThrowable.getCause ();
 
-				if (throwable == null)
+				if (
+					isNull (
+						currentThrowable)
+				) {
 					return stringBuilder.toString ();
+				}
 
 				stringBuilder.append ("\n");
 
@@ -103,6 +113,31 @@ class ExceptionUtilsImplementation
 
 		throwable.printStackTrace (
 			printWriter);
+
+		if (throwable instanceof DetailedException) {
+
+			DetailedException detailedException =
+				genericCastUnchecked (
+					throwable);
+
+			detailedException.details ().entrySet ().forEach (
+				detailsEntry -> {
+
+				printWriter.print (
+					stringFormat (
+						"\n%s:\n\n",
+						detailsEntry.getKey ()));
+
+				detailsEntry.getValue ().forEach (
+					detailLine ->
+						printWriter.print (
+							stringFormat (
+								"%s\n",
+								detailLine)));
+
+			});
+
+		}
 
 		if (throwable instanceof JDBCException) {
 
@@ -166,19 +201,22 @@ class ExceptionUtilsImplementation
 
 	public static
 	void writeSqlException (
-			@NonNull SQLException sqlException,
+			@NonNull SQLException originalSqlException,
 			@NonNull PrintWriter out) {
 
 		out.write (
 			"\nSQL EXCEPTION:\n\n");
 
-		while (sqlException != null) {
+		SQLException currentSqlException =
+			originalSqlException;
+
+		while (currentSqlException != null) {
 
 			out.write (
-				sqlException.getMessage () + "\n");
+				currentSqlException.getMessage () + "\n");
 
-			sqlException =
-				sqlException.getNextException ();
+			currentSqlException =
+				currentSqlException.getNextException ();
 
 		}
 

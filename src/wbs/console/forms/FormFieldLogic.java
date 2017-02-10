@@ -1,6 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.etc.Misc.doNothing;
@@ -55,6 +56,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.PermanentRecord;
+import wbs.framework.exception.DetailedException;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -661,11 +663,13 @@ class FormFieldLogic {
 
 			} catch (Exception exception) {
 
-				throw new RuntimeException (
+				throw new DetailedException (
 					stringFormat (
 						"Error rendering field %s",
 						formField.name ()),
-					exception);
+					exception,
+					exceptionDetails (
+						hints));
 
 			}
 
@@ -1120,6 +1124,26 @@ class FormFieldLogic {
 
 		formatWriter.writeLineFormatDecreaseIndent (
 			"-->");
+
+	}
+
+	public
+	Map <String, List <String>> exceptionDetails (
+			@NonNull Map <String, Object> hints) {
+
+		return ImmutableMap.<String, List <String>> builder ()
+
+			.put (
+				"Form hints",
+				iterableMapToList (
+					hintEntry ->
+						stringFormat (
+							"%s = %s",
+							hintEntry.getKey (),
+							hintEntry.getValue ().toString ()),
+					hints.entrySet ()))
+
+			.build ();
 
 	}
 

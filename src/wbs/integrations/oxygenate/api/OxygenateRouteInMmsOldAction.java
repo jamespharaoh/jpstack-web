@@ -16,7 +16,6 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.apache.commons.fileupload.FileItem;
@@ -146,14 +145,14 @@ class OxygenateRouteInMmsOldAction
 
 			processRequestHeaders (
 				taskLogger);
-	
+
 			processRequestBody (
 				taskLogger);
-	
+
 			updateDatabase ();
-	
+
 			transaction.commit ();
-	
+
 			return createResponse ();
 
 		}

@@ -240,29 +240,29 @@ class OxygenateRouteInSmsAction
 
 			oxygenateInboundLogHelper.insert (
 				oxygenateInboundLogHelper.createInstance ()
-	
+
 				.setRoute (
 					routeHelper.findRequired (
 						parseIntegerRequired (
 							requestContext.requestStringRequired (
 								"smsRouteId"))))
-	
+
 				.setType (
 					OxygenateInboundLogType.smsMessage)
-	
+
 				.setTimestamp (
 					transaction.now ())
-	
+
 				.setDetails (
 					debugLog.toString ())
-	
+
 				.setSuccess (
 					success)
-	
+
 			);
-	
+
 			transaction.commit ();
-	
+
 			success = true;
 
 		}
@@ -359,34 +359,34 @@ class OxygenateRouteInSmsAction
 			RouteRec route =
 				routeHelper.findRequired (
 					smsRouteId);
-	
+
 			OxygenateRouteInRec oxygenateRouteIn =
 				oxygenateRouteInHelper.findRequired (
 					route.getId ());
-	
+
 			OxygenateConfigRec oxygenateConfig =
 				oxygenateRouteIn.getOxygenateConfig ();
-	
+
 			Optional <OxygenateNetworkRec> oxygenateNetworkOptional =
 				oxygenateNetworkHelper.findByChannel (
 					oxygenateConfig,
 					channel);
-	
+
 			if (
 				optionalIsNotPresent (
 					oxygenateNetworkOptional)
 			) {
-	
+
 				throw new RuntimeException (
 					stringFormat (
 						"Oxygen8 channel not recognised: %s",
 						channel));
-	
+
 			}
-	
+
 			OxygenateNetworkRec oxygenateNetwork =
 				oxygenateNetworkOptional.get ();
-	
+
 			smsInboxLogic.inboxInsert (
 				optionalOf (
 					reference),
@@ -404,7 +404,7 @@ class OxygenateRouteInSmsAction
 				emptyList (),
 				optionalAbsent (),
 				optionalAbsent ());
-	
+
 			transaction.commit ();
 
 		}
