@@ -1,12 +1,9 @@
 package wbs.utils.etc;
 
 import static wbs.utils.etc.LogicUtils.ifThenElse;
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -15,10 +12,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.AbstractMap;
