@@ -6,7 +6,6 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
@@ -42,12 +41,12 @@ class PlatformExceptionLogger
 	@Override
 	public
 	ExceptionLogRec logSimple (
-			final @NonNull String typeCode,
-			final @NonNull String source,
-			final @NonNull String summary,
-			final @NonNull String dump,
-			final @NonNull Optional<Long> userId,
-			final @NonNull GenericExceptionResolution resolution) {
+			@NonNull String typeCode,
+			@NonNull String source,
+			@NonNull String summary,
+			@NonNull String dump,
+			@NonNull Optional <Long> userId,
+			@NonNull GenericExceptionResolution resolution) {
 
 		return logExceptionWrapped (
 			typeCode,
@@ -76,80 +75,62 @@ class PlatformExceptionLogger
 	@Override
 	public
 	ExceptionLogRec logThrowable (
-			final @NonNull String typeCode,
-			final @NonNull String source,
-			final @NonNull Throwable throwable,
-			final @NonNull Optional<Long> userId,
-			final @NonNull GenericExceptionResolution resolution) {
+			@NonNull String typeCode,
+			@NonNull String source,
+			@NonNull Throwable throwable,
+			@NonNull Optional <Long> userId,
+			@NonNull GenericExceptionResolution resolution) {
 
 		return logExceptionWrapped (
 			typeCode,
 			source,
 			userId,
-			new Provider<ExceptionLogRec> () {
-
-			@Override
-			public
-			ExceptionLogRec get () {
-
-				return realLogException (
-					typeCode,
-					source,
-					exceptionLogic.throwableSummary (throwable),
-					exceptionLogic.throwableDump (throwable),
-					userId,
-					resolution);
-
-			}
-
-		});
+			() -> realLogException (
+				typeCode,
+				source,
+				exceptionLogic.throwableSummary (
+					throwable),
+				exceptionLogic.throwableDump (
+					throwable),
+				userId,
+				resolution));
 
 	}
 
 	@Override
 	public
 	ExceptionLogRec logThrowableWithSummary (
-			final @NonNull String typeCode,
-			final @NonNull String source,
-			final @NonNull String summary,
-			final @NonNull Throwable throwable,
-			final @NonNull Optional<Long> userId,
-			final @NonNull GenericExceptionResolution resolution) {
+			@NonNull String typeCode,
+			@NonNull String source,
+			@NonNull String summary,
+			@NonNull Throwable throwable,
+			@NonNull Optional <Long> userId,
+			@NonNull GenericExceptionResolution resolution) {
 
 		return logExceptionWrapped (
 			typeCode,
 			source,
 			userId,
-			new Provider<ExceptionLogRec> () {
-
-			@Override
-			public
-			ExceptionLogRec get () {
-
-				return realLogException (
-					typeCode,
-					source,
-					stringFormat (
-						"%s\n%s",
-						summary,
-						exceptionLogic.throwableSummary (
-							throwable)),
-					exceptionLogic.throwableDump (
-						throwable),
-					userId,
-					resolution);
-
-			}
-
-		});
+			() -> realLogException (
+				typeCode,
+				source,
+				stringFormat (
+					"%s\n%s",
+					summary,
+					exceptionLogic.throwableSummary (
+						throwable)),
+				exceptionLogic.throwableDump (
+					throwable),
+				userId,
+				resolution));
 
 	}
 
 	ExceptionLogRec logExceptionWrapped (
 			@NonNull String typeCode,
 			@NonNull String source,
-			@NonNull Optional<Long> userId,
-			@NonNull Provider<ExceptionLogRec> target) {
+			@NonNull Optional <Long> userId,
+			@NonNull Provider <ExceptionLogRec> target) {
 
 		try {
 
@@ -202,27 +183,32 @@ class PlatformExceptionLogger
 			@NonNull String source,
 			@NonNull String summary,
 			@NonNull String dump,
-			@NonNull Optional<Long> userId,
+			@NonNull Optional <Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"PlatformExceptionLogger.realLogException (...)",
-				this);
+		try (
 
-		ExceptionLogRec exceptionLog =
-			exceptionLogLogic.logException (
-				typeCode,
-				source,
-				summary,
-				dump,
-				userId,
-				resolution);
+			Transaction transaction =
+				database.beginReadWrite (
+					"PlatformExceptionLogger.realLogException (...)",
+					this);
 
-		transaction.commit ();
+		) {
 
-		return exceptionLog;
+			ExceptionLogRec exceptionLog =
+				exceptionLogLogic.logException (
+					typeCode,
+					source,
+					summary,
+					dump,
+					userId,
+					resolution);
+
+			transaction.commit ();
+
+			return exceptionLog;
+
+		}
 
 	}
 

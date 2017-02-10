@@ -117,7 +117,7 @@ class ExceptionLogLogicImplementation
 	// data
 
 	final static
-	Map<GenericExceptionResolution,ConcreteExceptionResolution> conreteMap =
+	Map <GenericExceptionResolution,ConcreteExceptionResolution> conreteMap =
 		ImmutableMap.<GenericExceptionResolution,ConcreteExceptionResolution>builder ()
 
 		.put (
