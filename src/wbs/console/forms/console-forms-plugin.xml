@@ -107,6 +107,9 @@
 		<component class="TimestampToFormFieldBuilder"/>
 		<component class="TimestampToFormFieldInterfaceMapping"/>
 		<component class="TimestampToFormFieldSpec"/>
+		<component class="TimezoneFormFieldBuilder"/>
+		<component class="TimezoneFormFieldSpec"/>
+		<component class="TimezoneFormFieldValueValidator"/>
 		<component class="UpdatableFormField"/>
 		<component class="UploadFormFieldBuilder"/>
 		<component class="UploadFormFieldRenderer"/>

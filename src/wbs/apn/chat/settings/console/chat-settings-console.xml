@@ -263,7 +263,7 @@
 		<text-field
 			name="defaultBrandName"/>
 
-		<text-field
+		<timezone-field
 			name="timezone"
 			nullable="yes"/>
 

@@ -210,7 +210,7 @@
 		<yes-no-field
 			name="approvals"/>
 
-		<text-field
+		<timezone-field
 			name="timezone"/>
 
 		<enum-field
