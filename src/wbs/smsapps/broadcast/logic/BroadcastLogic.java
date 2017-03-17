@@ -13,7 +13,7 @@ interface BroadcastLogic {
 
 	AddResult addNumbers (
 			BroadcastRec broadcast,
-			List<String> numbers,
+			List <String> numbers,
 			UserRec user);
 
 	@Accessors (fluent = true)

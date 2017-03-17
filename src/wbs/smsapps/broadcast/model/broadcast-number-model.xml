@@ -26,14 +26,17 @@
 
 		<reference-field
 			name="addedByUser"
-			type="user"/>
+			type="user"
+			nullable="yes"/>
 
 		<reference-field
 			name="removedByUser"
-			type="user"/>
+			type="user"
+			nullable="yes"/>
 
 		<reference-field
-			type="message"/>
+			type="message"
+			nullable="yes"/>
 
 	</fields>
 

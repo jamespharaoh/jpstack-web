@@ -1,5 +1,6 @@
 package wbs.framework.object;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import com.google.common.base.Optional;
@@ -28,6 +29,10 @@ interface ObjectHelperCodeMethods <
 	Optional <RecordType> findByCode (
 			GlobalId parentGlobalId,
 			String ... code);
+
+	List <Optional <RecordType>> findManyByCode (
+			GlobalId parentGlobalId,
+			List <String> code);
 
 	RecordType findByCodeRequired (
 			GlobalId parentGlobalId,

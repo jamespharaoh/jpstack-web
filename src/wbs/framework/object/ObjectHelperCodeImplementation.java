@@ -1,5 +1,8 @@
 package wbs.framework.object;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.collection.MapUtils.mapItemForKey;
+import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
 import static wbs.utils.etc.LogicUtils.allOf;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -10,6 +13,8 @@ import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import javax.inject.Provider;
@@ -164,6 +169,27 @@ class ObjectHelperCodeImplementation <RecordType extends Record <RecordType>>
 
 		throw new IllegalArgumentException (
 			"codes");
+
+	}
+
+	@Override
+	public
+	List <Optional <RecordType>> findManyByCode (
+			@NonNull GlobalId parentGlobalId,
+			@NonNull List <String> codes) {
+
+		Map <String, RecordType> recordsByCode =
+			mapWithDerivedKey (
+				objectDatabaseHelper.findManyByParentAndCode (
+					parentGlobalId,
+					codes),
+				objectModel::getCode);
+
+		return iterableMapToList (
+			code -> mapItemForKey (
+				recordsByCode,
+				code),
+			codes);
 
 	}
 

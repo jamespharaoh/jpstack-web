@@ -2,12 +2,15 @@ package wbs.platform.queue.fixture;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.platform.feature.model.FeatureObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 
@@ -17,6 +20,12 @@ class QueueFixtureProvider
 	implements FixtureProvider {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	FeatureObjectHelper featureObjectHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
@@ -29,6 +38,23 @@ class QueueFixtureProvider
 	@Override
 	public
 	void createFixtures (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFixtures");
+
+		createMenuItems (
+			taskLogger);
+
+		createFeatures (
+			taskLogger);
+
+	}
+
+	private
+	void createMenuItems (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		menuItemHelper.insert (
@@ -57,6 +83,26 @@ class QueueFixtureProvider
 
 			.setTargetFrame (
 				"main")
+
+		);
+
+	}
+
+	private
+	void createFeatures (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		featureObjectHelper.insert (
+			featureObjectHelper.createInstance ()
+
+			.setCode (
+				"queue_items_status_line")
+
+			.setName (
+				"Queue items status line")
+
+			.setDescription (
+				"Queue items status line feature")
 
 		);
 

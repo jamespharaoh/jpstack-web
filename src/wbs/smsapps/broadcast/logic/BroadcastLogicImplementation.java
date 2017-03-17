@@ -1,11 +1,18 @@
 package wbs.smsapps.broadcast.logic;
 
+import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
+
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 
 import wbs.platform.user.model.UserRec;
 
@@ -30,6 +37,9 @@ class BroadcastLogicImplementation
 	BroadcastNumberObjectHelper broadcastNumberHelper;
 
 	@SingletonDependency
+	Database database;
+
+	@SingletonDependency
 	NumberObjectHelper numberHelper;
 
 	@SingletonDependency
@@ -41,8 +51,11 @@ class BroadcastLogicImplementation
 	public
 	AddResult addNumbers (
 			@NonNull BroadcastRec broadcast,
-			@NonNull List<String> numbers,
+			@NonNull List <String> numberStrings,
 			UserRec user) {
+
+		Transaction transaction =
+			database.currentTransaction ();
 
 		AddResult result =
 			new AddResult ();
@@ -53,126 +66,148 @@ class BroadcastLogicImplementation
 		// add numbers
 
 		for (
-			String numberString
-				: numbers
+			List <String> numberStringsBatch
+				: Lists.partition (
+					numberStrings,
+					256)
 		) {
 
-			NumberRec numberRecord =
-				numberHelper.findOrCreate (
-					numberString);
+			List <NumberRec> numberRecords =
+				numberHelper.findOrCreateMany (
+					numberStringsBatch);
 
-			BroadcastNumberRec broadcastNumber =
-				broadcastNumberHelper.findOrCreate (
+			List <BroadcastNumberRec> broadcastNumbers =
+				broadcastNumberHelper.findOrCreateMany (
 					broadcast,
-					numberRecord);
+					numberRecords);
 
-			// check block list
+			for (
+				long index = 0;
+				index < collectionSize (numberStringsBatch);
+				index ++
+			) {
 
-			boolean reject =
-				broadcastConfig.getBlockNumberLookup () != null
-					? numberLookupManager.lookupNumber (
-						broadcastConfig.getBlockNumberLookup (),
-						numberRecord)
-					: false;
+				NumberRec numberRecord =
+					listItemAtIndexRequired (
+						numberRecords,
+						index);
 
-			// add number
+				BroadcastNumberRec broadcastNumber =
+					listItemAtIndexRequired (
+						broadcastNumbers,
+						index);
 
-			switch (broadcastNumber.getState ()) {
+				// check block list
 
-			case removed:
+				boolean reject =
+					broadcastConfig.getBlockNumberLookup () != null
+						? numberLookupManager.lookupNumber (
+							broadcastConfig.getBlockNumberLookup (),
+							numberRecord)
+						: false;
 
-				if (reject) {
+				// add number
 
-					broadcastNumber
+				switch (broadcastNumber.getState ()) {
 
-						.setState (
-							BroadcastNumberState.rejected)
+				case removed:
 
-						.setAddedByUser (
-							user);
+					if (reject) {
 
-					broadcast
+						broadcastNumber
 
-						.setNumRemoved (
-							broadcast.getNumRemoved () - 1)
+							.setState (
+								BroadcastNumberState.rejected)
 
-						.setNumRejected (
-							broadcast.getNumRejected () + 1);
+							.setAddedByUser (
+								user);
 
-					result.numRejected ++;
+						broadcast
 
-				} else {
+							.setNumRemoved (
+								broadcast.getNumRemoved () - 1)
 
-					broadcastNumber
+							.setNumRejected (
+								broadcast.getNumRejected () + 1);
 
-						.setState (
-							BroadcastNumberState.accepted)
+						result.numRejected ++;
 
-						.setAddedByUser (
-							user);
+					} else {
 
-					broadcast
+						broadcastNumber
 
-						.setNumRemoved (
-							broadcast.getNumRemoved () - 1)
+							.setState (
+								BroadcastNumberState.accepted)
 
-						.setNumAccepted (
-							broadcast.getNumAccepted () + 1)
+							.setAddedByUser (
+								user);
 
-						.setNumTotal (
-							broadcast.getNumTotal () + 1);
+						broadcast
 
-					result.numAdded ++;
+							.setNumRemoved (
+								broadcast.getNumRemoved () - 1)
+
+							.setNumAccepted (
+								broadcast.getNumAccepted () + 1)
+
+							.setNumTotal (
+								broadcast.getNumTotal () + 1);
+
+						result.numAdded ++;
+
+					}
+
+					break;
+
+				case accepted:
+
+					result.numAlreadyAdded ++;
+
+					break;
+
+				case rejected:
+
+					if (reject) {
+
+						result.numAlreadyRejected ++;
+
+					} else {
+
+						broadcastNumber
+
+							.setState (
+								BroadcastNumberState.accepted)
+
+							.setAddedByUser (
+								user);
+
+						broadcast
+
+							.setNumRejected (
+								broadcast.getNumRejected () - 1)
+
+							.setNumAccepted (
+								broadcast.getNumAccepted () + 1)
+
+							.setNumTotal (
+								broadcast.getNumTotal () + 1);
+
+						result.numAdded ++;
+
+					}
+
+					break;
+
+				case sent:
+
+					throw new RuntimeException (
+						"Should never happen");
 
 				}
-
-				break;
-
-			case accepted:
-
-				result.numAlreadyAdded ++;
-
-				break;
-
-			case rejected:
-
-				if (reject) {
-
-					result.numAlreadyRejected ++;
-
-				} else {
-
-					broadcastNumber
-
-						.setState (
-							BroadcastNumberState.accepted)
-
-						.setAddedByUser (
-							user);
-
-					broadcast
-
-						.setNumRejected (
-							broadcast.getNumRejected () - 1)
-
-						.setNumAccepted (
-							broadcast.getNumAccepted () + 1)
-
-						.setNumTotal (
-							broadcast.getNumTotal () + 1);
-
-					result.numAdded ++;
-
-				}
-
-				break;
-
-			case sent:
-
-				throw new RuntimeException (
-					"Should never happen");
 
 			}
+
+			transaction.flush ();
 
 		}
 

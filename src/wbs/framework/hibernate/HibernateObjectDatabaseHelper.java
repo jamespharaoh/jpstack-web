@@ -1,11 +1,14 @@
 package wbs.framework.hibernate;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.LogicUtils.notEqualSafe;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -39,6 +42,8 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.object.ObjectDatabaseHelper;
 import wbs.framework.object.ObjectModel;
 import wbs.framework.object.ObjectTypeRegistry;
+
+import wbs.utils.etc.OptionalUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("hibernateObjectDatabaseHelper")
@@ -333,6 +338,193 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				list.get (0);
 
 			return object;
+
+		}
+
+	}
+
+	@Override
+	public
+	List <RecordType> findManyByParentAndCode (
+			@NonNull GlobalId parentGlobalId,
+			@NonNull List <String> codes) {
+
+		@Cleanup
+		ActiveTask activeTask =
+			startTask (
+				"findManyByParentAndCode",
+				parentGlobalId.toString (),
+				stringFormat (
+					"%s codes",
+					integerToDecimalString (
+						collectionSize (codes))));
+
+		Session session =
+			hibernateDatabase.currentSession ();
+
+		if (
+			isNotNull (
+				objectModel.typeCodeField ())
+		) {
+
+			throw new UnsupportedOperationException (
+				stringFormat (
+					"Object type %s must be looked up by type code",
+					getClass ().getSimpleName ()));
+
+		}
+
+		if (objectModel.isRooted ()) {
+
+			if (
+				notEqualSafe (
+					parentGlobalId,
+					GlobalId.root)
+			) {
+
+				throw new IllegalArgumentException (
+					stringFormat (
+						"Invalid parent global id %s ",
+						parentGlobalId.toString (),
+						"for rooted object in %s.%s",
+						getClass ().getSimpleName (),
+						"findChildByCode"));
+
+			}
+
+			List<?> list =
+				session.createQuery (
+
+				stringFormat (
+
+					"FROM %s _%s ",
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
+
+					"WHERE _%s.%s IN :codes",
+					objectModel.objectName (),
+					objectModel.codeField ().name ()))
+
+				.setParameterList (
+					"codes",
+					codes)
+
+				.setFlushMode (
+					FlushMode.MANUAL)
+
+				.list ();
+
+			return genericCastUnchecked (
+				iterableMapToList (
+					OptionalUtils::optionalFromNullable,
+					list));
+
+		} else if (objectModel.parentTypeIsFixed ()) {
+
+			/*
+			if (parentGlobalId.getTypeId ()
+					!= parentObjectHelperProvider ().objectTypeId ()) {
+
+				throw new IllegalArgumentException (sf (
+					"Invalid parent type id %s for %s (should be %s)",
+					parentGlobalId.getTypeId (),
+					objectClass ().getSimpleName (),
+					parentObjectHelperProvider ().objectTypeId ()));
+
+			}
+			*/
+
+			if (
+				isNull (
+					objectModel.parentField ())
+			) {
+
+				throw new UnsupportedOperationException (
+					stringFormat (
+						"%sObjectHelper.findByParentAndCode (...)",
+						objectModel.objectName ()));
+
+			}
+
+			List <?> list =
+				session.createQuery (
+
+				stringFormat (
+
+					"FROM %s _%s ",
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
+
+					"WHERE _%s.%s.id = :parentId ",
+					objectModel.objectName (),
+					objectModel.parentField ().name (),
+
+					"AND _%s.%s IN :codes",
+					objectModel.objectName (),
+					objectModel.codeField ().name ()))
+
+				.setLong (
+					"parentId",
+					parentGlobalId.objectId ())
+
+				.setParameterList (
+					"codes",
+					codes)
+
+				.setFlushMode (
+					FlushMode.MANUAL)
+
+				.list ();
+
+			return genericCastUnchecked (
+				iterableMapToList (
+					OptionalUtils::optionalFromNullable,
+					list));
+
+		} else {
+
+			List <?> list =
+				session.createQuery (
+
+				stringFormat (
+
+					"FROM %s _%s ",
+					objectModel.objectClass ().getSimpleName (),
+					objectModel.objectName (),
+
+					"WHERE _%s.%s.id = :parentTypeId ",
+					objectModel.objectName (),
+					objectModel.parentTypeField ().name (),
+
+					"AND _%s.%s = :parentId ",
+					objectModel.objectName (),
+					objectModel.parentIdField ().name (),
+
+					"AND _%s.%s IN :codes",
+					objectModel.objectName (),
+					objectModel.codeField ().name ()))
+
+				.setLong (
+					"parentTypeId",
+					parentGlobalId.typeId ())
+
+				.setLong (
+					"parentId",
+					parentGlobalId.objectId ())
+
+				.setParameterList (
+					"codes",
+					codes)
+
+				.setFlushMode (
+					FlushMode.MANUAL)
+
+				.list ();
+
+			return genericCastUnchecked (
+				iterableMapToList (
+					OptionalUtils::optionalFromNullable,
+					list));
 
 		}
 

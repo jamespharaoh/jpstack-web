@@ -9,6 +9,7 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.calculateAgeInYears;
 import static wbs.utils.time.TimeUtils.earlierThan;
@@ -158,7 +159,7 @@ class ManualResponderCommand
 	MessageRec message;
 	ManualResponderNumberRec manualResponderNumber;
 	ServiceRec defaultService;
-	Optional<SmsCustomerRec> smsCustomer;
+	Optional <SmsCustomerRec> smsCustomer;
 	ManualResponderRequestRec request;
 	Instant previousRequestTime;
 
@@ -562,7 +563,7 @@ class ManualResponderCommand
 
 			smsCustomerLogic.sessionStart (
 				smsCustomer.get (),
-				Optional.of (
+				optionalOf (
 					message.getThreadId ()));
 
 		}
@@ -571,12 +572,11 @@ class ManualResponderCommand
 
 		QueueItemRec queueItem =
 			queueLogic.createQueueItem (
-				queueLogic.findQueue (
-					manualResponder,
-					"default"),
-				message.getNumber (),
+				manualResponder,
+				"default",
+				manualResponderNumber,
 				request,
-				message.getNumFrom (),
+				manualResponderNumber.getCode (),
 				message.getText ().getText ());
 
 		request
@@ -591,7 +591,7 @@ class ManualResponderCommand
 
 		return smsInboxLogic.inboxProcessed (
 			inbox,
-			Optional.of (
+			optionalOf (
 				defaultService),
 			manualResponderLogic.customerAffiliate (
 				manualResponderNumber),

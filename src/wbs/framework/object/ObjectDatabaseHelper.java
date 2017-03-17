@@ -2,6 +2,8 @@ package wbs.framework.object;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
@@ -29,6 +31,10 @@ interface ObjectDatabaseHelper <RecordType extends Record <RecordType>> {
 	RecordType findByParentAndCode (
 			GlobalId parentGlobalId,
 			String code);
+
+	List <RecordType> findManyByParentAndCode (
+			GlobalId parentGlobalId,
+			List <String> codes);
 
 	RecordType findByParentAndIndex (
 			GlobalId parentGlobalId,

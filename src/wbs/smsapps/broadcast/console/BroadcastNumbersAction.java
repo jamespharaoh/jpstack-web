@@ -120,7 +120,7 @@ class BroadcastNumbersAction
 
 			// parse numbers
 
-			List<String> numbers;
+			List <String> numbers;
 
 			try {
 
@@ -141,10 +141,15 @@ class BroadcastNumbersAction
 
 			// check permissions
 
-			if (! privChecker.canRecursive (
+			if (
+				! privChecker.canRecursive (
 					broadcastConfig,
-					"manage"))
+					"manage")
+			) {
+
 				throw new RuntimeException ();
+
+			}
 
 			// check state
 
