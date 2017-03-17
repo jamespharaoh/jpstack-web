@@ -2,6 +2,8 @@ package wbs.platform.queue.logic;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import wbs.framework.entity.record.Record;
 
 import wbs.platform.queue.model.QueueItemRec;
@@ -12,6 +14,10 @@ import wbs.platform.user.model.UserRec;
 
 public
 interface QueueLogic {
+
+	QueueRec findQueueByCodeRequired (
+			Record <?> queueParent,
+			String queueCode);
 
 	QueueItemRec createQueueItem (
 			QueueSubjectRec queueSubject,
@@ -25,6 +31,26 @@ interface QueueLogic {
 			Record <?> refObject,
 			String source,
 			String details);
+
+	default
+	QueueItemRec createQueueItem (
+			@NonNull Record <?> queueParent,
+			@NonNull String queueCode,
+			@NonNull Record <?> subjectObject,
+			@NonNull Record <?> refObject,
+			@NonNull String source,
+			@NonNull String details) {
+
+		return createQueueItem (
+			findQueueByCodeRequired (
+				queueParent,
+				queueCode),
+			subjectObject,
+			refObject,
+			source,
+			details);
+
+	}
 
 	void cancelQueueItem (
 			QueueItemRec queueItem);

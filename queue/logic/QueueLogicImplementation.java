@@ -566,4 +566,16 @@ class QueueLogicImplementation
 
 	}
 
+	@Override
+	public
+	QueueRec findQueueByCodeRequired (
+			@NonNull Record <?> queueParent,
+			@NonNull String queueCode) {
+
+		return queueHelper.findByCodeRequired (
+			queueParent,
+			queueCode);
+
+	}
+
 }
