@@ -2,12 +2,17 @@ package wbs.smsapps.manualresponder.logic;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+
 import wbs.sms.number.core.model.NumberRec;
+
 import wbs.smsapps.manualresponder.model.ManualResponderNumberObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberObjectHelperMethods;
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
+
+import wbs.utils.random.RandomLogic;
 
 public
 class ManualResponderNumberObjectHelperMethodsImplementation
@@ -17,6 +22,9 @@ class ManualResponderNumberObjectHelperMethodsImplementation
 
 	@WeakSingletonDependency
 	ManualResponderNumberObjectHelper manualResponderNumberHelper;
+
+	@SingletonDependency
+	RandomLogic randomLogic;
 
 	// implementation
 
@@ -44,6 +52,10 @@ class ManualResponderNumberObjectHelperMethodsImplementation
 
 				.setNumber (
 					number)
+
+				.setCode (
+					randomLogic.generateNumericNoZero (
+						8))
 
 			);
 

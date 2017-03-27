@@ -18,6 +18,10 @@
 
 		<!-- data -->
 
+		<string-field
+			name="code"
+			nullable="no"/>
+
 		<reference-field
 			type="smsCustomer"
 			nullable="yes"/>
