@@ -18,3 +18,6 @@ CREATE TABLE manual_responder_reply_message (
 	REFERENCES message
 
 );
+
+CREATE UNIQUE INDEX manual_responder_number_code
+ON manual_responder_number (manual_responder_id, code);

@@ -574,9 +574,9 @@ class ManualResponderCommand
 				queueLogic.findQueue (
 					manualResponder,
 					"default"),
-				message.getNumber (),
+				manualResponderNumber,
 				request,
-				message.getNumFrom (),
+				manualResponderNumber.getCode (),
 				message.getText ().getText ());
 
 		request
