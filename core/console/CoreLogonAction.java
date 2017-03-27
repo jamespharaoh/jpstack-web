@@ -1,5 +1,8 @@
 package wbs.platform.core.console;
 
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -7,6 +10,9 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringInSafe;
+import static wbs.utils.string.StringUtils.stringSplitFullStop;
+
+import java.util.List;
 
 import com.google.common.base.Optional;
 
@@ -107,6 +113,29 @@ class CoreLogonAction
 		) {
 			return null;
 		}
+
+		// extract slice from username if present
+
+		List <String> usernameParts =
+			stringSplitFullStop (
+				username);
+
+		if (
+			collectionHasTwoElements (
+				usernameParts)
+		) {
+
+			slice =
+				listFirstElementRequired (
+					usernameParts);
+
+			username =
+				listSecondElementRequired (
+					usernameParts);
+
+		}
+
+		// attempt login
 
 		Optional <Long> userIdOptional;
 
