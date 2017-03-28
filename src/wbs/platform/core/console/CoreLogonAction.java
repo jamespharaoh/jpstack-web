@@ -24,6 +24,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
@@ -61,6 +62,9 @@ class CoreLogonAction
 
 	@SingletonDependency
 	UserLogic userLogic;
+
+	@SingletonDependency
+	WbsConfig wbsConfig;
 
 	// details
 
@@ -102,6 +106,35 @@ class CoreLogonAction
 			requestContext.parameterRequired (
 				"password");
 
+		// extract slice from username if present
+
+		if (
+			optionalIsPresent (
+				requestContext.header (
+					"x-wbs-slice"))
+		) {
+
+			List <String> usernameParts =
+				stringSplitFullStop (
+					username);
+
+			if (
+				collectionHasTwoElements (
+					usernameParts)
+			) {
+
+				slice =
+					listFirstElementRequired (
+						usernameParts);
+
+				username =
+					listSecondElementRequired (
+						usernameParts);
+
+			}
+
+		}
+
 		// check we got the right params
 
 		if (
@@ -112,27 +145,6 @@ class CoreLogonAction
 				password)
 		) {
 			return null;
-		}
-
-		// extract slice from username if present
-
-		List <String> usernameParts =
-			stringSplitFullStop (
-				username);
-
-		if (
-			collectionHasTwoElements (
-				usernameParts)
-		) {
-
-			slice =
-				listFirstElementRequired (
-					usernameParts);
-
-			username =
-				listSecondElementRequired (
-					usernameParts);
-
 		}
 
 		// attempt login
