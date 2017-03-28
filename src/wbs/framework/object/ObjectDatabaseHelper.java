@@ -2,8 +2,6 @@ package wbs.framework.object;
 
 import java.util.List;
 
-import com.google.common.base.Optional;
-
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;

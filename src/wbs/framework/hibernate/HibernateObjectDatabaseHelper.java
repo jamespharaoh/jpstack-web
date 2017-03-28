@@ -392,7 +392,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 			}
 
-			List<?> list =
+			List <?> list =
 				session.createQuery (
 
 				stringFormat (
@@ -415,9 +415,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				.list ();
 
 			return genericCastUnchecked (
-				iterableMapToList (
-					OptionalUtils::optionalFromNullable,
-					list));
+				list);
 
 		} else if (objectModel.parentTypeIsFixed ()) {
 
@@ -477,9 +475,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				.list ();
 
 			return genericCastUnchecked (
-				iterableMapToList (
-					OptionalUtils::optionalFromNullable,
-					list));
+				list);
 
 		} else {
 
@@ -522,9 +518,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				.list ();
 
 			return genericCastUnchecked (
-				iterableMapToList (
-					OptionalUtils::optionalFromNullable,
-					list));
+				list);
 
 		}
 
