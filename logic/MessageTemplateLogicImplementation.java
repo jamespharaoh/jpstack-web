@@ -79,6 +79,7 @@ class MessageTemplateLogicImplementation
 
 		MessageTemplateDatabaseRec mtDatabase =
 			messageTemplateDatabaseHelper.insert (
+				taskLogger,
 				messageTemplateDatabaseHelper.createInstance ()
 
 			.setSlice (
@@ -106,6 +107,7 @@ class MessageTemplateLogicImplementation
 
 			MessageTemplateEntryTypeRec entryType =
 				messageTemplateEntryTypeHelper.insert (
+					taskLogger,
 					messageTemplateEntryTypeHelper.createInstance ()
 
 				.setMessageTemplateDatabase (
@@ -132,6 +134,7 @@ class MessageTemplateLogicImplementation
 			) {
 
 				messageTemplateFieldTypeHelper.insert (
+					taskLogger,
 					messageTemplateFieldTypeHelper.createInstance ()
 
 					.setMessageTemplateEntryType (
@@ -169,6 +172,7 @@ class MessageTemplateLogicImplementation
 			) {
 
 				messageTemplateParameterHelper.insert (
+					taskLogger,
 					messageTemplateParameterHelper.createInstance ()
 
 					.setMessageTemplateEntryType (

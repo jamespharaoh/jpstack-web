@@ -14,13 +14,18 @@ import lombok.NonNull;
 
 import org.hibernate.TransientObjectException;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHooks;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.queue.logic.QueueLogic;
+
 import wbs.utils.random.RandomLogic;
 
 public
@@ -31,6 +36,9 @@ class MessageTemplateEntryValueHooks
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@WeakSingletonDependency
 	MessageTemplateFieldTypeObjectHelper messageTemplateFieldTypeHelper;
@@ -98,9 +106,15 @@ class MessageTemplateEntryValueHooks
 	@Override
 	public
 	void setDynamic (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull MessageTemplateEntryValueRec entryValue,
 			@NonNull String name,
 			@NonNull Optional <?> valueOptional) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setDynamic");
 
 		MessageTemplateEntryTypeRec entryType =
 			entryValue.getMessageTemplateEntryType ();
@@ -250,6 +264,7 @@ class MessageTemplateEntryValueHooks
 
 			fieldValue =
 				messageTemplateFieldValueHelper.insert (
+					taskLogger,
 					messageTemplateFieldValueHelper.createInstance ()
 
 				.setMessageTemplateEntryValue (
