@@ -2,12 +2,14 @@ package wbs.services.ticket.core.fixture;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -40,6 +42,9 @@ class TicketFixtureProvider
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
@@ -87,16 +92,30 @@ class TicketFixtureProvider
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		createMenuItems ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFixtures");
 
-		createTicketManager ();
+		createMenuItems (
+			taskLogger);
+
+		createTicketManager (
+			taskLogger);
 
 	}
 
 	private
-	void createMenuItems () {
+	void createMenuItems (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMenuItems");
 
 		menuHelper.insert (
+			taskLogger,
 			menuHelper.createInstance ()
 
 			.setMenuGroup (
@@ -131,13 +150,20 @@ class TicketFixtureProvider
 	}
 
 	private
-	void createTicketManager () {
+	void createTicketManager (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createTicketManager");
 
 		Transaction transaction =
 			database.currentTransaction ();
 
 		TicketManagerRec ticketManager =
 			ticketManagerHelper.insert (
+				taskLogger,
 				ticketManagerHelper.createInstance ()
 
 			.setSlice (
@@ -160,6 +186,7 @@ class TicketFixtureProvider
 
 		TicketStateRec submittedState =
 			ticketStateHelper.insert (
+				taskLogger,
 				ticketStateHelper.createInstance ()
 
 			.setTicketManager (
@@ -191,6 +218,7 @@ class TicketFixtureProvider
 		// accepted state
 
 		ticketStateHelper.insert (
+			taskLogger,
 			ticketStateHelper.createInstance ()
 
 			.setTicketManager (
@@ -222,6 +250,7 @@ class TicketFixtureProvider
 		// pending state
 
 		ticketStateHelper.insert (
+			taskLogger,
 			ticketStateHelper.createInstance ()
 
 			.setTicketManager (
@@ -253,6 +282,7 @@ class TicketFixtureProvider
 		// solved state
 
 		ticketStateHelper.insert (
+			taskLogger,
 			ticketStateHelper.createInstance ()
 
 			.setTicketManager (
@@ -284,6 +314,7 @@ class TicketFixtureProvider
 		// closed state
 
 		ticketStateHelper.insert (
+			taskLogger,
 			ticketStateHelper.createInstance ()
 
 			.setTicketManager (
@@ -316,6 +347,7 @@ class TicketFixtureProvider
 
 		TicketRec ticket =
 			ticketHelper.insert (
+				taskLogger,
 				ticketHelper.createInstance ()
 
 			.setTicketManager (
@@ -334,6 +366,7 @@ class TicketFixtureProvider
 
 		TicketFieldTypeRec booleanType =
 			ticketFieldTypeHelper.insert (
+				taskLogger,
 				ticketFieldTypeHelper.createInstance ()
 
 			.setTicketManager (
@@ -361,6 +394,7 @@ class TicketFixtureProvider
 
 		TicketFieldTypeRec numberType =
 			ticketFieldTypeHelper.insert (
+				taskLogger,
 				ticketFieldTypeHelper.createInstance ()
 
 			.setTicketManager (
@@ -388,6 +422,7 @@ class TicketFixtureProvider
 
 		TicketFieldTypeRec stringType =
 			ticketFieldTypeHelper.insert (
+				taskLogger,
 				ticketFieldTypeHelper.createInstance ()
 
 			.setTicketManager (
@@ -415,6 +450,7 @@ class TicketFixtureProvider
 
 		TicketFieldTypeRec chatUserType =
 			ticketFieldTypeHelper.insert (
+				taskLogger,
 				ticketFieldTypeHelper.createInstance ()
 
 			.setTicketManager (
@@ -446,6 +482,7 @@ class TicketFixtureProvider
 		);
 
 		ticketFieldValueHelper.insert (
+			taskLogger,
 			ticketFieldValueHelper.createInstance ()
 
 			.setTicket (
@@ -460,6 +497,7 @@ class TicketFixtureProvider
 		);
 
 		ticketFieldValueHelper.insert (
+			taskLogger,
 			ticketFieldValueHelper.createInstance ()
 
 			.setTicket (
@@ -474,6 +512,7 @@ class TicketFixtureProvider
 		);
 
 		ticketFieldValueHelper.insert (
+			taskLogger,
 			ticketFieldValueHelper.createInstance ()
 
 			.setTicket (
@@ -488,6 +527,7 @@ class TicketFixtureProvider
 		);
 
 		ticketFieldValueHelper.insert (
+			taskLogger,
 			ticketFieldValueHelper.createInstance ()
 
 			.setTicket (
@@ -502,6 +542,7 @@ class TicketFixtureProvider
 		);
 
 		ticketNoteHelper.insert (
+			taskLogger,
 			ticketNoteHelper.createInstance ()
 
 			.setTicket (
@@ -520,6 +561,7 @@ class TicketFixtureProvider
 				ticket.getNumNotes () + 1);
 
 		ticketNoteHelper.insert (
+			taskLogger,
 			ticketNoteHelper.createInstance ()
 
 			.setTicket (
