@@ -1,13 +1,17 @@
 package wbs.platform.daemon;
 
-import com.google.common.base.Optional;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
 import org.apache.log4j.Logger;
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.random.RandomLogic;
 
 public abstract
@@ -19,6 +23,9 @@ class SleepingDaemonService
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RandomLogic randomLogic;
 
@@ -28,7 +35,8 @@ class SleepingDaemonService
 	Duration getSleepDuration ();
 
 	abstract protected
-	void runOnce ();
+	void runOnce (
+			TaskLogger parentTaskLogger);
 
 	abstract protected
 	String generalErrorSource ();
@@ -66,9 +74,14 @@ class SleepingDaemonService
 
 			// run service hook
 
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"runService ()");
+
 			try {
 
-				runOnce ();
+				runOnce (
+					taskLogger);
 
 			} catch (Exception exception) {
 
@@ -81,11 +94,12 @@ class SleepingDaemonService
 					exception);
 
 				exceptionLogger.logThrowableWithSummary (
+					taskLogger,
 					"daemon",
 					generalErrorSource (),
 					generalErrorSummary (),
 					exception,
-					Optional.absent (),
+					optionalAbsent (),
 					GenericExceptionResolution.tryAgainLater);
 
 			}

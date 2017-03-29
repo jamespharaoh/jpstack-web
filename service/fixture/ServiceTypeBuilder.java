@@ -9,13 +9,14 @@ import java.sql.SQLException;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -25,17 +26,19 @@ import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.service.metamodel.ServiceTypeSpec;
 import wbs.platform.service.model.ServiceTypeObjectHelper;
 
-@Log4j
 @PrototypeComponent ("serviceTypeBuilder")
 @ModelMetaBuilderHandler
 public
-class ServiceTypeBuilder {
+class ServiceTypeBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -44,6 +47,9 @@ class ServiceTypeBuilder {
 
 	@SingletonDependency
 	EntityHelper entityHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectTypeObjectHelper objectTypeHelper;
@@ -65,23 +71,30 @@ class ServiceTypeBuilder {
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		try {
 
-			log.info (
-				stringFormat (
-					"Create service type %s.%s",
-					camelToUnderscore (
-						ifNull (
-							spec.subject (),
-							parent.name ())),
-					simplifyToCodeRequired (
-						spec.name ())));
+			taskLogger.noticeFormat (
+				"Create service type %s.%s",
+				camelToUnderscore (
+					ifNull (
+						spec.subject (),
+						parent.name ())),
+				simplifyToCodeRequired (
+					spec.name ()));
 
-			createServiceType ();
+			createServiceType (
+				taskLogger);
 
 		} catch (Exception exception) {
 
@@ -101,8 +114,14 @@ class ServiceTypeBuilder {
 	}
 
 	private
-	void createServiceType ()
+	void createServiceType (
+			@NonNull TaskLogger parentTaskLogger)
 		throws SQLException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createServiceType");
 
 		// begin transaction
 
@@ -128,6 +147,7 @@ class ServiceTypeBuilder {
 		// create service type
 
 		serviceTypeHelper.insert (
+			taskLogger,
 			serviceTypeHelper.createInstance ()
 
 			.setParentType (

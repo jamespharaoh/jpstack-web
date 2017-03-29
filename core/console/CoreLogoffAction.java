@@ -1,19 +1,21 @@
 package wbs.platform.core.console;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.logic.UserLogic;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
+
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("coreLogoffAction")
@@ -63,22 +65,28 @@ class CoreLogoffAction
 		Long userId =
 			userConsoleLogic.userIdRequired ();
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"CoreLogoffAction.goReal ()",
-				this);
+		try (
 
-		UserRec user =
-			userHelper.findRequired (
-				userId);
+			Transaction transaction =
+				database.beginReadWrite (
+					"CoreLogoffAction.goReal ()",
+					this);
 
-		userLogic.userLogoff (
-			user);
+		) {
 
-		transaction.commit ();
+			UserRec user =
+				userHelper.findRequired (
+					userId);
 
-		return null;
+			userLogic.userLogoff (
+				taskLogger,
+				user);
+
+			transaction.commit ();
+
+			return null;
+
+		}
 
 	}
 

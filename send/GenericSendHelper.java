@@ -5,6 +5,7 @@ import java.util.List;
 import org.joda.time.Instant;
 
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 public
@@ -17,15 +18,15 @@ interface GenericSendHelper<
 	String name ();
 	String itemNamePlural ();
 
-	ObjectHelper<Job> jobHelper ();
-	ObjectHelper<Item> itemHelper ();
+	ObjectHelper <Job> jobHelper ();
+	ObjectHelper <Item> itemHelper ();
 
-	List<Job> findSendingJobs ();
+	List <Job> findSendingJobs ();
 
-	List<Job> findScheduledJobs (
+	List <Job> findScheduledJobs (
 			Instant now);
 
-	List<Item> findItemsLimit (
+	List <Item> findItemsLimit (
 			Service service,
 			Job job,
 			int maxResults);
@@ -50,10 +51,12 @@ interface GenericSendHelper<
 			Job job);
 
 	void sendStart (
+			TaskLogger parentTaskLogger,
 			Service service,
 			Job job);
 
 	boolean verifyItem (
+			TaskLogger parentTaskLogger,
 			Service service,
 			Job job,
 			Item item);
@@ -64,11 +67,13 @@ interface GenericSendHelper<
 			Item item);
 
 	void sendItem (
+			TaskLogger parentTaskLogger,
 			Service service,
 			Job job,
 			Item item);
 
 	void sendComplete (
+			TaskLogger parentTaskLogger,
 			Service service,
 			Job job);
 

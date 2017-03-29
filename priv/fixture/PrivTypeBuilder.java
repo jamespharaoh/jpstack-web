@@ -7,13 +7,14 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -23,17 +24,19 @@ import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.priv.metamodel.PrivTypeSpec;
 import wbs.platform.priv.model.PrivTypeObjectHelper;
 
-@Log4j
 @PrototypeComponent ("privTypeBuilder")
 @ModelMetaBuilderHandler
 public
-class PrivTypeBuilder {
+class PrivTypeBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -42,6 +45,9 @@ class PrivTypeBuilder {
 
 	@SingletonDependency
 	EntityHelper entityHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectTypeObjectHelper objectTypeHelper;
@@ -63,23 +69,30 @@ class PrivTypeBuilder {
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		try {
 
-			log.info (
-				stringFormat (
-					"Create priv type %s.%s",
-					camelToUnderscore (
-						ifNull (
-							spec.subject (),
-							parent.name ())),
-					simplifyToCodeRequired (
-						spec.name ())));
+			taskLogger.noticeFormat (
+				"Create priv type %s.%s",
+				camelToUnderscore (
+					ifNull (
+						spec.subject (),
+						parent.name ())),
+				simplifyToCodeRequired (
+					spec.name ()));
 
-			createPrivType ();
+			createPrivType (
+				taskLogger);
 
 		} catch (Exception exception) {
 
@@ -99,7 +112,13 @@ class PrivTypeBuilder {
 	}
 
 	private
-	void createPrivType () {
+	void createPrivType (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createPrivType");
 
 		// begin transaction
 
@@ -125,6 +144,7 @@ class PrivTypeBuilder {
 		// create priv type
 
 		privTypeHelper.insert (
+			taskLogger,
 			privTypeHelper.createInstance ()
 
 			.setParentObjectType (

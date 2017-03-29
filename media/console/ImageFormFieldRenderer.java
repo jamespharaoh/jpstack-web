@@ -23,8 +23,10 @@ import wbs.console.forms.FormFieldRenderer;
 import wbs.console.forms.FormFieldSubmission;
 import wbs.console.forms.FormType;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
@@ -42,6 +44,9 @@ class ImageFormFieldRenderer <Container>
 	implements FormFieldRenderer <Container, MediaRec> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
@@ -194,8 +199,14 @@ class ImageFormFieldRenderer <Container>
 	}
 
 	MediaRec formValue (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"formValue");
 
 		if (
 			submission.hasParameter (
@@ -221,6 +232,7 @@ class ImageFormFieldRenderer <Container>
 					fileItem.getInputStream ());
 
 			return mediaLogic.createMediaFromImageRequired (
+				taskLogger,
 				data,
 				"image/jpeg",
 				fileItem.getName ());
@@ -236,13 +248,20 @@ class ImageFormFieldRenderer <Container>
 
 	@Override
 	public
-	Either<Optional<MediaRec>,String> formToInterface (
+	Either <Optional <MediaRec>, String> formToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"formToInterface");
 
 		return successResult (
 			Optional.fromNullable (
 				formValue (
+					taskLogger,
 					submission,
 					formName)));
 

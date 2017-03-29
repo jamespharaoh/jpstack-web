@@ -227,6 +227,7 @@ class ObjectSearchPostAction <
 							searchClass)));
 
 			fieldsLogic.implicit (
+				taskLogger,
 				searchFormFieldSet,
 				search);
 
@@ -264,6 +265,7 @@ class ObjectSearchPostAction <
 
 			UpdateResultSet updateResultSet =
 				fieldsLogic.update (
+					taskLogger,
 					requestContext,
 					searchFormFieldSet,
 					search,

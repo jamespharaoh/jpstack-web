@@ -2,10 +2,12 @@ package wbs.platform.user.fixture;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.menu.model.MenuGroupObjectHelper;
@@ -24,6 +26,9 @@ class UserFixtureProvider
 	implements FixtureProvider {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
@@ -50,10 +55,20 @@ class UserFixtureProvider
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFixtures");
+
 		PrivRec rootManagePriv =
 			privHelper.findByCodeRequired (
 				GlobalId.root,
 				"manage");
+
+		PrivRec rootDebugPriv =
+			privHelper.findByCodeRequired (
+				GlobalId.root,
+				"debug");
 
 		SliceRec testSlice =
 			sliceHelper.findByCodeRequired (
@@ -68,6 +83,7 @@ class UserFixtureProvider
 
 			UserRec testUser =
 				userHelper.insert (
+					taskLogger,
 					userHelper.createInstance ()
 
 				.setUsername (
@@ -91,6 +107,7 @@ class UserFixtureProvider
 			);
 
 			userPrivHelper.insert (
+				taskLogger,
 				userPrivHelper.createInstance ()
 
 				.setUser (
@@ -104,9 +121,25 @@ class UserFixtureProvider
 
 			);
 
+			userPrivHelper.insert (
+				taskLogger,
+				userPrivHelper.createInstance ()
+
+				.setUser (
+					testUser)
+
+				.setPriv (
+					rootDebugPriv)
+
+				.setCan (
+					true)
+
+			);
+
 		}
 
 		menuItemHelper.insert (
+			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (

@@ -9,10 +9,12 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -32,19 +34,22 @@ class UserPrivsEditorAction
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
 	Database database;
 
 	@SingletonDependency
 	EventLogic eventLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	@SingletonDependency
 	PrivConsoleHelper privHelper;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	UpdateManager updateManager;
@@ -71,7 +76,12 @@ class UserPrivsEditorAction
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		try (
 
@@ -157,6 +167,7 @@ class UserPrivsEditorAction
 						}
 
 						userPrivHelper.insert (
+							taskLogger,
 							userPriv);
 
 						changed = true;
@@ -200,6 +211,7 @@ class UserPrivsEditorAction
 				if (changed) {
 
 					eventLogic.createEvent (
+						taskLogger,
 						can
 							? (grant
 								? "user_grant_grant"
@@ -218,10 +230,12 @@ class UserPrivsEditorAction
 			// signal the privs have been updated
 
 			updateManager.signalUpdate (
+				taskLogger,
 				"user_privs",
 				user.getId ());
 
 			updateManager.signalUpdate (
+				taskLogger,
 				"privs",
 				0l);
 

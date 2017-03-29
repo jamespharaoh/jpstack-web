@@ -16,16 +16,18 @@ import java.util.List;
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
@@ -43,7 +45,6 @@ import wbs.platform.scaffold.logic.SliceLogic;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserRec;
 
-@Log4j
 @SingletonComponent ("queueLogic")
 public
 class QueueLogicImplementation
@@ -53,6 +54,9 @@ class QueueLogicImplementation
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -92,10 +96,16 @@ class QueueLogicImplementation
 	@Override
 	public
 	QueueItemRec createQueueItem (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueSubjectRec queueSubject,
 			@NonNull Record<?> refObject,
 			@NonNull String source,
 			@NonNull String details) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createQueueItem");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -126,6 +136,7 @@ class QueueLogicImplementation
 
 		QueueItemRec queueItem =
 			queueItemHelper.insert (
+				taskLogger,
 				queueItemHelper.createInstance ()
 
 			.setQueueSubject (
@@ -188,11 +199,10 @@ class QueueLogicImplementation
 				optionalSlice)
 		) {
 
-			log.warn (
-				stringFormat (
-					"Unable to determine slice for queue %s",
-					integerToDecimalString (
-						queue.getId ())));
+			taskLogger.warningFormat (
+				"Unable to determine slice for queue %s",
+				integerToDecimalString (
+					queue.getId ()));
 
 		}
 
@@ -210,18 +220,26 @@ class QueueLogicImplementation
 	@Override
 	public
 	QueueItemRec createQueueItem (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueRec queue,
 			@NonNull Record<?> subjectObject,
 			@NonNull Record<?> refObject,
 			@NonNull String source,
 			@NonNull String details) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createQueueItem");
+
 		QueueSubjectRec queueSubject =
 			findOrCreateQueueSubject (
+				taskLogger,
 				queue,
 				subjectObject);
 
 		return createQueueItem (
+			taskLogger,
 			queueSubject,
 			refObject,
 			source,
@@ -232,8 +250,14 @@ class QueueLogicImplementation
 	@Override
 	public
 	QueueSubjectRec findOrCreateQueueSubject (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueRec queue,
 			@NonNull Record<?> object) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreateQueueSubject");
 
 		QueueTypeRec queueType =
 			queue.getQueueType ();
@@ -272,6 +296,7 @@ class QueueLogicImplementation
 
 		queueSubject =
 			queueSubjectHelper.insert (
+				taskLogger,
 				queueSubjectHelper.createInstance ()
 
 			.setQueue (

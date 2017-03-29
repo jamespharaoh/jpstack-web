@@ -121,6 +121,7 @@ class CoreTitledResponder
 							requestContext.pathInfo ()));
 
 				exceptionLogger.logThrowable (
+					taskLogger,
 					"console",
 					path,
 					exception,

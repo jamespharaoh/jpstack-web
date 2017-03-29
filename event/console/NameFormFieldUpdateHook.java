@@ -10,9 +10,14 @@ import lombok.NonNull;
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.forms.FormFieldUpdateHook;
 import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleLogic;
 
@@ -26,6 +31,9 @@ class NameFormFieldUpdateHook
 	@SingletonDependency
 	EventLogic eventLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
@@ -37,11 +45,17 @@ class NameFormFieldUpdateHook
 	@Override
 	public
 	void onUpdate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull UpdateResult <String, String> updateResult,
 			@NonNull Record <?> container,
 			@NonNull Record <?> linkObject,
 			@NonNull Optional <Object> objectRef,
 			@NonNull Optional <String> objectType) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"onUpdate");
 
 		// don't create event on initial creation
 
@@ -69,6 +83,7 @@ class NameFormFieldUpdateHook
 		if (objectRef.isPresent ()) {
 
 			eventLogic.createEvent (
+				taskLogger,
 				"object_name_changed_in",
 				userConsoleLogic.userRequired (),
 				objectRef.get (),
@@ -80,6 +95,7 @@ class NameFormFieldUpdateHook
 			if (codeChanged) {
 
 				eventLogic.createEvent (
+					taskLogger,
 					"object_code_changed_in",
 					userConsoleLogic.userRequired (),
 					objectRef.get (),
@@ -93,6 +109,7 @@ class NameFormFieldUpdateHook
 		} else {
 
 			eventLogic.createEvent (
+				taskLogger,
 				"object_name_changed",
 				userConsoleLogic.userRequired (),
 				linkObject,
@@ -102,6 +119,7 @@ class NameFormFieldUpdateHook
 			if (codeChanged) {
 
 				eventLogic.createEvent (
+					taskLogger,
 					"object_code_changed",
 					userConsoleLogic.userRequired (),
 					linkObject,

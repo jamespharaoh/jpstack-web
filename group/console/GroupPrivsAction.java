@@ -122,6 +122,7 @@ class GroupPrivsAction
 						priv);
 
 					eventLogic.createEvent (
+						taskLogger,
 						"group_grant",
 						userConsoleLogic.userRequired (),
 						priv,
@@ -129,11 +130,13 @@ class GroupPrivsAction
 
 					numGranted ++;
 
-				} else if (oldCan && !newCan) {
+				} else if (oldCan && ! newCan) {
 
-					group.getPrivs().remove(priv);
+					group.getPrivs ().remove (
+						priv);
 
 					eventLogic.createEvent (
+						taskLogger,
 						"group_revoke",
 						userConsoleLogic.userRequired (),
 						priv,
@@ -151,6 +154,7 @@ class GroupPrivsAction
 			) {
 
 				updateManager.signalUpdate (
+					taskLogger,
 					"user_privs",
 					user.getId ());
 

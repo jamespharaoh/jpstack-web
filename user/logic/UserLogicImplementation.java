@@ -12,12 +12,15 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
@@ -37,6 +40,9 @@ class UserLogicImplementation
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SliceObjectHelper sliceHelper;
@@ -61,10 +67,16 @@ class UserLogicImplementation
 	@Override
 	public
 	UserSessionRec userLogon (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull UserRec user,
 			@NonNull String sessionId,
 			@NonNull Optional <String> userAgent,
 			@NonNull Optional <String> consoleDeploymentCode) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userLogon");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -72,12 +84,14 @@ class UserLogicImplementation
 		// end any existing session
 
 		userLogoff (
+			taskLogger,
 			user);
 
 		// start the session log
 
 		UserSessionRec session =
 			userSessionHelper.insert (
+				taskLogger,
 				userSessionHelper.createInstance ()
 
 			.setUser (
@@ -88,6 +102,7 @@ class UserLogicImplementation
 
 			.setUserAgent (
 				textHelper.findOrCreate (
+					taskLogger,
 					userAgent.orNull ()))
 
 		);
@@ -95,6 +110,7 @@ class UserLogicImplementation
 		// go online
 
 		userOnlineHelper.insert (
+			taskLogger,
 			userOnlineHelper.createInstance ()
 
 			.setUser (
@@ -118,9 +134,10 @@ class UserLogicImplementation
 	@Override
 	public
 	void userLogoff (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull UserRec user) {
 
-		Optional<UserOnlineRec> userOnlineOptional =
+		Optional <UserOnlineRec> userOnlineOptional =
 			userOnlineHelper.find (
 				user.getId ());
 
@@ -156,12 +173,18 @@ class UserLogicImplementation
 	@Override
 	public
 	Optional <UserSessionRec> userLogonTry (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String sliceCode,
 			@NonNull String username,
 			@NonNull String password,
 			@NonNull String sessionId,
 			@NonNull Optional <String> userAgent,
 			@NonNull Optional <String> consoleDeploymentCode) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userLogonTry");
 
 		// lookup the user
 
@@ -197,6 +220,7 @@ class UserLogicImplementation
 
 		UserSessionRec userSession =
 			userLogon (
+				taskLogger,
 				user,
 				sessionId,
 				userAgent,

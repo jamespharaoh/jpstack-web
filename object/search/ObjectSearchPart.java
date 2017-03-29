@@ -225,6 +225,7 @@ class ObjectSearchPart <
 			"function resetSearchForm () {");
 
 		formFieldLogic.outputFormReset (
+			taskLogger,
 			formatWriter,
 			fields,
 			FormType.search,

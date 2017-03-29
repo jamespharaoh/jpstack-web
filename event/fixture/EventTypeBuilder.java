@@ -14,6 +14,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -22,6 +23,8 @@ import wbs.framework.entity.fixtures.ModelMetaBuilderHandler;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.metamodel.EventTypeSpec;
 import wbs.platform.event.model.EventTypeObjectHelper;
@@ -43,6 +46,9 @@ class EventTypeBuilder {
 	@SingletonDependency
 	EventTypeObjectHelper eventTypeHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// builder
 
 	@BuilderParent
@@ -59,7 +65,13 @@ class EventTypeBuilder {
 	@BuildMethod
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		try {
 
@@ -69,7 +81,8 @@ class EventTypeBuilder {
 					simplifyToCodeRequired (
 						spec.name ())));
 
-			createEventType ();
+			createEventType (
+				taskLogger);
 
 		} catch (Exception exception) {
 
@@ -85,8 +98,14 @@ class EventTypeBuilder {
 	}
 
 	private
-	void createEventType ()
+	void createEventType (
+			@NonNull TaskLogger parentTaskLogger)
 		throws SQLException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createEventType");
 
 		// begin transaction
 
@@ -99,6 +118,7 @@ class EventTypeBuilder {
 		// create event type
 
 		eventTypeHelper.insert (
+			taskLogger,
 			eventTypeHelper.createInstance ()
 
 			.setCode (

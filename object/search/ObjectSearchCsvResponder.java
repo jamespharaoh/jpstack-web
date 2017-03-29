@@ -1,5 +1,6 @@
 package wbs.platform.object.search;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
@@ -13,7 +14,6 @@ import java.util.List;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 import lombok.Getter;
@@ -27,10 +27,12 @@ import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
@@ -48,6 +50,9 @@ class ObjectSearchCsvResponder <RecordType>
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -132,6 +137,11 @@ class ObjectSearchCsvResponder <RecordType>
 	void render (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"render ()");
+
 		Transaction transaction =
 			database.currentTransaction ();
 
@@ -193,10 +203,11 @@ class ObjectSearchCsvResponder <RecordType>
 				// write object
 
 				formFieldLogic.outputCsvRow (
+					taskLogger,
 					formatWriter,
 					formFieldSets,
 					object,
-					ImmutableMap.of ());
+					emptyMap ());
 
 			}
 

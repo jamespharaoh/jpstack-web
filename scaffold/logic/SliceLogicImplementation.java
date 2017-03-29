@@ -2,6 +2,7 @@ package wbs.platform.scaffold.logic;
 
 import static wbs.utils.etc.Misc.orNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.time.TimeUtils.laterThan;
@@ -11,7 +12,6 @@ import java.util.Map;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -19,6 +19,7 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -27,8 +28,12 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.scaffold.model.SliceObjectHelper;
 import wbs.platform.scaffold.model.SliceRec;
+
 import wbs.utils.thread.ThreadManager;
 
 @Accessors (fluent = true)
@@ -46,6 +51,9 @@ class SliceLogicImplementation
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SliceObjectHelper sliceHelper;
@@ -89,21 +97,12 @@ class SliceLogicImplementation
 					1000);
 
 				if (runAutomatically) {
-					runNow ();
+					runOnce ();
 				}
 
 			} catch (InterruptedException exception) {
 
 				return;
-
-			} catch (Exception exception) {
-
-				exceptionLogger.logThrowable (
-					"unknown",
-					"sliceLogic",
-					exception,
-					Optional.absent (),
-					GenericExceptionResolution.tryAgainLater);
 
 			}
 
@@ -115,47 +114,66 @@ class SliceLogicImplementation
 
 	@Override
 	public synchronized
-	void runNow () {
+	void runOnce () {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"SliceLogicImplementation.runNow ()",
-				this);
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"runOnce ()");
 
-		// iterate slices
+		try (
 
-		for (
-			Long sliceId
-				: nextUpdateTimestampBySlice.keySet ()
+			Transaction transaction =
+				database.beginReadWrite (
+					"SliceLogicImplementation.runNow ()",
+					this);
+
 		) {
 
-			SliceRec slice =
-				sliceHelper.findRequired (
-					sliceId);
+			// iterate slices
 
-			// perform update
+			for (
+				Long sliceId
+					: nextUpdateTimestampBySlice.keySet ()
+			) {
 
-			slice
+				SliceRec slice =
+					sliceHelper.findRequired (
+						sliceId);
 
-				.setCurrentQueueInactivityTime (
-					ifNull (
-						slice.getCurrentQueueInactivityTime (),
-						orNull (
-							nextTimestampBySlice.get (
-								sliceId))))
+				// perform update
 
-				.setCurrentQueueInactivityUpdateTime (
-					optionalGetRequired (
-						nextUpdateTimestampBySlice.get (
-							sliceId)));
+				slice
+
+					.setCurrentQueueInactivityTime (
+						ifNull (
+							slice.getCurrentQueueInactivityTime (),
+							orNull (
+								nextTimestampBySlice.get (
+									sliceId))))
+
+					.setCurrentQueueInactivityUpdateTime (
+						optionalGetRequired (
+							nextUpdateTimestampBySlice.get (
+								sliceId)));
+
+			}
+
+			nextTimestampBySlice.clear ();
+			nextUpdateTimestampBySlice.clear ();
+
+			transaction.commit ();
+
+		} catch (Exception exception) {
+
+			exceptionLogger.logThrowable (
+				taskLogger,
+				"unknown",
+				"sliceLogic",
+				exception,
+				optionalAbsent (),
+				GenericExceptionResolution.tryAgainLater);
 
 		}
-
-		nextTimestampBySlice.clear ();
-		nextUpdateTimestampBySlice.clear ();
-
-		transaction.commit ();
 
 	}
 

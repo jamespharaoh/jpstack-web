@@ -12,9 +12,9 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.moreThan;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
-import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringToBytes;
 
@@ -42,11 +42,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.model.ContentObjectHelper;
 import wbs.platform.media.model.ContentRec;
@@ -55,7 +57,6 @@ import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeObjectHelper;
 import wbs.platform.media.model.MediaTypeRec;
 
-@Log4j
 @SingletonComponent ("mediaLogic")
 public
 class MediaLogicImplementation
@@ -65,6 +66,9 @@ class MediaLogicImplementation
 
 	@SingletonDependency
 	ContentObjectHelper contentHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaObjectHelper mediaHelper;
@@ -349,7 +353,13 @@ class MediaLogicImplementation
 	@Override
 	public
 	ContentRec findOrCreateContent (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreateContent");
 
 		// work out hash code
 
@@ -391,6 +401,7 @@ class MediaLogicImplementation
 
 		ContentRec content =
 			contentHelper.insert (
+				taskLogger,
 				contentHelper.createInstance ()
 
 			.setData (
@@ -412,11 +423,17 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	Optional<MediaRec> createMedia (
-			byte[] data,
+	Optional <MediaRec> createMedia (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull byte[] data,
 			@NonNull String mimeType,
 			@NonNull String filename,
 			@NonNull Optional <String> encoding) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMedia");
 
 		if (
 			contains (
@@ -425,6 +442,7 @@ class MediaLogicImplementation
 		) {
 
 			return createMediaFromImage (
+				taskLogger,
 				data,
 				mimeType,
 				filename);
@@ -446,6 +464,7 @@ class MediaLogicImplementation
 			}
 
 			return createTextualMedia (
+				taskLogger,
 				data,
 				mimeType,
 				filename,
@@ -458,6 +477,7 @@ class MediaLogicImplementation
 		) {
 
 			return createMediaFromVideo (
+				taskLogger,
 				data,
 				mimeType,
 				filename);
@@ -479,9 +499,15 @@ class MediaLogicImplementation
 	@Override
 	public
 	MediaRec createMediaFromImage (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull BufferedImage image,
 			@NonNull String mimeType,
 			@NonNull String filename) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMediaFromImage");
 
 		// encode the image
 
@@ -491,6 +517,7 @@ class MediaLogicImplementation
 				defaultMimeType);
 
 		return createMediaWithThumbnail (
+			taskLogger,
 			data,
 			image,
 			mimeType,
@@ -505,12 +532,19 @@ class MediaLogicImplementation
 	@Override
 	public
 	Optional <MediaRec> createMediaFromImage (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data,
 			@NonNull String mimeType,
 			@NonNull String filename) {
 
-		Optional<BufferedImage> imageOptional =
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMediaFromImage");
+
+		Optional <BufferedImage> imageOptional =
 			readImage (
+				taskLogger,
 				data,
 				mimeType);
 
@@ -522,8 +556,9 @@ class MediaLogicImplementation
 			BufferedImage image =
 				imageOptional.get ();
 
-			return Optional.of (
+			return optionalOf (
 				createMediaWithThumbnail (
+					taskLogger,
 					data,
 					image,
 					mimeType,
@@ -543,28 +578,19 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	MediaRec createMediaFromImageRequired (
-			@NonNull byte[] data,
-			@NonNull String mimeType,
-			@NonNull String filename) {
-
-		return optionalGetRequired (
-			createMediaFromImage (
-				data,
-				mimeType,
-				filename));
-
-	}
-
-	@Override
-	public
 	MediaRec createMediaWithThumbnail (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data,
 			@NonNull BufferedImage thumbnailImage,
 			@NonNull String mimeType,
 			@NonNull String filename,
 			@NonNull Long width,
 			@NonNull Long height) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMediaWithThumbnail");
 
 		// create the 100x100 thumbnail
 
@@ -593,6 +619,7 @@ class MediaLogicImplementation
 				defaultMimeType);
 
 		return createMediaWithThumbnail (
+			taskLogger,
 			data,
 			data100,
 			data32,
@@ -606,6 +633,7 @@ class MediaLogicImplementation
 	@Override
 	public
 	MediaRec createMediaWithThumbnail (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data,
 			@NonNull byte[] thumb100,
 			@NonNull byte[] thumb32,
@@ -614,11 +642,17 @@ class MediaLogicImplementation
 			@NonNull Long width,
 			@NonNull Long height) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMediaWithThumbnail");
+
 		MediaTypeRec mediaType =
 			findMediaTypeRequired (
 				mimeType);
 
 		return mediaHelper.insert (
+			taskLogger,
 			mediaHelper.createInstance ()
 
 			.setFilename (
@@ -626,14 +660,17 @@ class MediaLogicImplementation
 
 			.setContent (
 				findOrCreateContent (
+					taskLogger,
 					data))
 
 			.setThumb100Content (
 				findOrCreateContent (
+					taskLogger,
 					thumb100))
 
 			.setThumb32Content (
 				findOrCreateContent (
+					taskLogger,
 					thumb32))
 
 			.setMediaType (
@@ -654,13 +691,20 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	Optional<MediaRec> createMediaFromVideo (
+	Optional <MediaRec> createMediaFromVideo (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data,
 			@NonNull String mimeType,
 			@NonNull String filename) {
 
-		Optional<BufferedImage> videoFrameImageOptional =
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMediaFromVideo");
+
+		Optional <BufferedImage> videoFrameImageOptional =
 			videoFrame (
+				taskLogger,
 				data);
 
 		if (
@@ -675,6 +719,7 @@ class MediaLogicImplementation
 
 		return Optional.of (
 			createMediaWithThumbnail (
+				taskLogger,
 				data,
 				videoFrameImage,
 				mimeType,
@@ -688,31 +733,23 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	MediaRec createMediaFromVideoRequired (
-			@NonNull byte[] data,
-			@NonNull String mimeType,
-			@NonNull String filename) {
-
-		return optionalGetRequired (
-			createMediaFromVideo (
-				data,
-				mimeType,
-				filename));
-
-	}
-
-	@Override
-	public
 	MediaRec createMediaFromAudio (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data,
 			@NonNull String mimeType,
 			@NonNull String filename) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMediaFromAudio");
 
 		MediaTypeRec mediaType =
 			findMediaTypeRequired (
 				mimeType);
 
 		return mediaHelper.insert (
+			taskLogger,
 			mediaHelper.createInstance ()
 
 			.setFilename (
@@ -720,6 +757,7 @@ class MediaLogicImplementation
 
 			.setContent (
 				findOrCreateContent (
+					taskLogger,
 					data))
 
 			.setMediaType (
@@ -740,14 +778,21 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	Optional<MediaRec> createTextualMedia (
+	Optional <MediaRec> createTextualMedia (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data,
 			@NonNull String mimeType,
 			@NonNull String filename,
 			@NonNull String encoding) {
 
-		return Optional.of (
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createTextualMedia");
+
+		return optionalOf (
 			mediaHelper.insert (
+				taskLogger,
 				mediaHelper.createInstance ()
 
 			.setMediaType (
@@ -756,6 +801,7 @@ class MediaLogicImplementation
 
 			.setContent (
 				findOrCreateContent (
+					taskLogger,
 					data))
 
 			.setFilename (
@@ -771,11 +817,18 @@ class MediaLogicImplementation
 	@Override
 	public
 	MediaRec createTextMedia (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String text,
 			@NonNull String mimeType,
 			@NonNull String filename) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createTextMedia");
+
 		return mediaHelper.insert (
+			taskLogger,
 			mediaHelper.createInstance ()
 
 			.setMediaType (
@@ -784,6 +837,7 @@ class MediaLogicImplementation
 
 			.setContent (
 				findOrCreateContent (
+					taskLogger,
 					stringToBytes (
 						text,
 						"utf-8")))
@@ -883,9 +937,15 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	Optional<BufferedImage> readImage (
+	Optional <BufferedImage> readImage (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data,
 			@NonNull String mimeType) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"readImage");
 
 		for (
 			ImageReader imageReader
@@ -894,13 +954,12 @@ class MediaLogicImplementation
 						mimeType))
 		) {
 
-			log.debug (
-				stringFormat (
-					"Attempt to read image of type %s with %s bytes with %s",
-					mimeType,
-					integerToDecimalString (
-						data.length),
-					imageReader.toString ()));
+			taskLogger.debugFormat (
+				"Attempt to read image of type %s with %s bytes with %s",
+				mimeType,
+				integerToDecimalString (
+					data.length),
+				imageReader.toString ());
 
 			imageReader.setInput (
 				new ByteArrayImageInputStream (data));
@@ -912,39 +971,24 @@ class MediaLogicImplementation
 
 			} catch (IOException exception) {
 
-				log.warn (
-					stringFormat (
-						"Failed to read image of type %s with %s bytes",
-						mimeType,
-						integerToDecimalString (
-							data.length)),
-					exception);
+				taskLogger.warningFormatException (
+					exception,
+					"Failed to read image of type %s with %s bytes",
+					mimeType,
+					integerToDecimalString (
+						data.length));
 
 			}
 
 		}
 
-		log.warn (
-			stringFormat (
-				"Exhausted options to read image of type %s with %s bytes",
-				mimeType,
-				integerToDecimalString (
-					data.length)));
+		taskLogger.warningFormat (
+			"Exhausted options to read image of type %s with %s bytes",
+			mimeType,
+			integerToDecimalString (
+				data.length));
 
 		return optionalAbsent ();
-
-	}
-
-	@Override
-	public
-	BufferedImage readImageRequired (
-			@NonNull byte[] data,
-			@NonNull String mimeType) {
-
-		return optionalGetRequired (
-			readImage (
-				data,
-				mimeType));
 
 	}
 
@@ -1036,17 +1080,6 @@ class MediaLogicImplementation
 		}
 
 		throw new RuntimeException ();
-
-	}
-
-	@Override
-	public
-	Optional <BufferedImage> getImage (
-			@NonNull MediaRec media) {
-
-		return readImage (
-			media.getContent ().getData (),
-			media.getMediaType ().getMimeType ());
 
 	}
 
@@ -1399,9 +1432,15 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	Optional<byte[]> videoConvert (
+	Optional <byte[]> videoConvert (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String profileName,
 			@NonNull byte[] data) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"videoConvert");
 
 		FfmpegProfile ffmpegProfile =
 			ffmpegProfiles.get (
@@ -1411,7 +1450,7 @@ class MediaLogicImplementation
 
 			return Optional.of (
 				runFilterAdvanced (
-					log,
+					taskLogger,
 					data,
 					"",
 					"." + ffmpegProfile.fileExtension,
@@ -1427,27 +1466,20 @@ class MediaLogicImplementation
 
 	@Override
 	public
-	byte[] videoConvertRequired (
-			@NonNull String profileName,
-			@NonNull byte[] data) {
-
-		return optionalGetRequired (
-			videoConvert (
-				profileName,
-				data));
-
-	}
-
-	@Override
-	public
 	Optional <byte[]> videoFrameBytes (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"videoFrameBytes");
 
 		try {
 
 			return Optional.of (
 				runFilter (
-					log,
+					taskLogger,
 					data,
 					".mp4",
 					".mjpeg",
@@ -1475,10 +1507,17 @@ class MediaLogicImplementation
 	@Override
 	public
 	Optional <BufferedImage> videoFrame (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"videoFrame");
 
 		Optional <byte[]> videoFrameBytesOptional =
 			videoFrameBytes (
+				taskLogger,
 				data);
 
 		if (
@@ -1487,6 +1526,7 @@ class MediaLogicImplementation
 		) {
 
 			return readImage (
+				taskLogger,
 				videoFrameBytesOptional.get (),
 				"image/jpeg");
 

@@ -2,10 +2,12 @@ package wbs.platform.group.fixture;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.group.model.GroupObjectHelper;
@@ -23,6 +25,9 @@ class GroupFixtureProvider
 	@SingletonDependency
 	GroupObjectHelper groupHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
@@ -39,9 +44,15 @@ class GroupFixtureProvider
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFixtures");
+
 		// menu item
 
 		menuItemHelper.insert (
+			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
@@ -79,6 +90,7 @@ class GroupFixtureProvider
 		) {
 
 			groupHelper.insert (
+				taskLogger,
 				groupHelper.createInstance ()
 
 				.setSlice (

@@ -7,18 +7,19 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import org.apache.log4j.Logger;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
 
@@ -36,13 +37,13 @@ class GenericScheduleDaemon <
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// hooks
 
 	protected abstract
 	GenericSendHelper <Service, Job, Item> helper ();
-
-	protected abstract
-	Logger log ();
 
 	// details
 
@@ -88,112 +89,136 @@ class GenericScheduleDaemon <
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		log ().debug (
-			stringFormat (
-				"Looking for scheduled broadcasts to send"));
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce ()");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"GenericScheduleDaemon.runOnce ()",
-				this);
+		taskLogger.debugFormat (
+			"Looking for scheduled broadcasts to send");
 
-		List <Job> jobs =
-			helper ().findScheduledJobs (
-				transaction.now ());
+		try (
 
-		List <Long> jobIds =
-			new ArrayList<> ();
+			Transaction transaction =
+				database.beginReadOnly (
+					"GenericScheduleDaemon.runOnce ()",
+					this);
 
-		for (
-			Job job
-				: jobs
 		) {
 
-			jobIds.add (
-				job.getId ());
+			List <Job> jobs =
+				helper ().findScheduledJobs (
+					transaction.now ());
+
+			List <Long> jobIds =
+				new ArrayList<> ();
+
+			for (
+				Job job
+					: jobs
+			) {
+
+				jobIds.add (
+					job.getId ());
+
+			}
+
+			transaction.close ();
+
+			jobIds.forEach (
+				jobId ->
+					runJob (
+						taskLogger,
+						jobId));
 
 		}
-
-		transaction.close ();
-
-		jobIds.forEach (
-			this::runJob);
 
 	}
 
 	void runJob (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long jobId) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"GenericScheduleDaemon.runJob (jobId)",
-				this);
+		TaskLogger taskLogger =
+			logContext.nestTaskLoggerFormat (
+				parentTaskLogger,
+				"runJob (%s)",
+				integerToDecimalString (
+					jobId));
 
-		Job job =
-			helper ().jobHelper ().findRequired (
-				jobId);
+		try (
 
-		Service service =
-			helper ().getService (
-				job);
+			Transaction transaction =
+				database.beginReadWrite (
+					"GenericScheduleDaemon.runJob (jobId)",
+					this);
 
-		// check state is still "scheduled"
-
-		if (
-			! helper ().jobScheduled (
-				service,
-				job)
 		) {
 
-			log ().debug (
-				stringFormat (
+			Job job =
+				helper ().jobHelper ().findRequired (
+					jobId);
+
+			Service service =
+				helper ().getService (
+					job);
+
+			// check state is still "scheduled"
+
+			if (
+				! helper ().jobScheduled (
+					service,
+					job)
+			) {
+
+				taskLogger.debugFormat (
 					"Not sending %s because it is not scheduled",
 					integerToDecimalString (
-						jobId)));
+						jobId));
 
-			return;
+				return;
 
-		}
+			}
 
-		// check scheduled time is in the future
+			// check scheduled time is in the future
 
-		Instant scheduledTime =
-			helper ().getScheduledTime (
+			Instant scheduledTime =
+				helper ().getScheduledTime (
+					service,
+					job);
+
+			if (
+				scheduledTime.isAfter (
+					transaction.now ())
+			) {
+
+				taskLogger.warningFormat (
+					"Not sending %s because it is scheduled in the future",
+					integerToDecimalString (
+						jobId));
+
+				return;
+
+			}
+
+			// move to sending state
+
+			taskLogger.noticeFormat (
+				"Sending %s",
+				integerToDecimalString (
+					jobId));
+
+			helper ().sendStart (
+				taskLogger,
 				service,
 				job);
 
-		if (
-			scheduledTime.isAfter (
-				transaction.now ())
-		) {
-
-			log ().warn (
-				stringFormat (
-					"Not sending %s because it is scheduled in the future",
-					integerToDecimalString (
-						jobId)));
-
-			return;
+			transaction.commit ();
 
 		}
-
-		// move to sending state
-
-		log ().info (
-			stringFormat (
-				"Sending %s",
-				integerToDecimalString (
-					jobId)));
-
-		helper ().sendStart (
-			service,
-			job);
-
-		transaction.commit ();
 
 	}
 

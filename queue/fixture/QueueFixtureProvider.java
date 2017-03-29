@@ -57,7 +57,13 @@ class QueueFixtureProvider
 	void createMenuItems (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMenuItems");
+
 		menuItemHelper.insert (
+			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
@@ -92,7 +98,13 @@ class QueueFixtureProvider
 	void createFeatures (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFeatures");
+
 		featureObjectHelper.insert (
+			taskLogger,
 			featureObjectHelper.createInstance ()
 
 			.setCode (

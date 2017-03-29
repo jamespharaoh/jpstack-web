@@ -2,7 +2,6 @@ package wbs.platform.updatelog.logic;
 
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,20 +10,21 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentProvider;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.updatelog.model.UpdateLogObjectHelper;
 import wbs.platform.updatelog.model.UpdateLogRec;
 
 /**
-s * Provides an efficient signalling system which works using the database.
+ * Provides an efficient signalling system which works using the database.
  * Signals are categorised according to a name, and a reference integer (eg a
  * hash code). To cause a signal use signalUpdate (...). To receive signals
  * create a Watcher using makeWatcher (...) then call isUpdated (...) to check
@@ -42,16 +42,22 @@ s * Provides an efficient signalling system which works using the database.
  *
  * TODO is this really the best way to do this?
  */
-@Log4j
 @SingletonComponent ("updateManager")
 public
 class UpdateManager {
 
+	// singleton dependencies
+
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UpdateLogObjectHelper updateLogHelper;
+
+	// properties
 
 	@Getter @Setter
 	long intervalMs = 3000;
@@ -66,9 +72,16 @@ class UpdateManager {
 	Map<String,Map<Long,UpdateStuff>> tertiaryVersions =
 		new HashMap<> ();
 
+	private
 	long getDatabaseVersion (
-			String table,
-			long ref) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String table,
+			@NonNull Long ref) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getDatabaseVersion");
 
 		UpdateLogRec updateLog =
 			updateLogHelper.findByTableAndRef (
@@ -80,20 +93,26 @@ class UpdateManager {
 				? updateLog.getVersion ()
 				: -1l;
 
-		log.debug (
-			stringFormat (
-				"getDatabaseVersion (\"%s\", %s) = %s",
-				table,
-				integerToDecimalString (
-					ref),
-				integerToDecimalString (
-					ret)));
+		taskLogger.debugFormat (
+			"getDatabaseVersion (\"%s\", %s) = %s",
+			table,
+			integerToDecimalString (
+				ref),
+			integerToDecimalString (
+				ret));
 
 		return ret;
 
 	}
 
-	void refreshMaster () {
+	private
+	void refreshMaster (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"refreshMaster");
 
 		// check it is time
 
@@ -111,8 +130,9 @@ class UpdateManager {
 
 		long newMasterVersion =
 			getDatabaseVersion (
+				taskLogger,
 				"master",
-				0);
+				0l);
 
 		// if the version hasn't changed don't bother
 
@@ -141,8 +161,15 @@ class UpdateManager {
 
 	}
 
+	private
 	void refreshSecondary (
-			String table) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String table) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"refreshSecondary");
 
 		// if it isn't marked dirty don't bother
 
@@ -172,8 +199,9 @@ class UpdateManager {
 
 		long newSecondaryVersion =
 			getDatabaseVersion (
+				taskLogger,
 				table,
-				0);
+				0l);
 
 		// if the version hasn't changed don't bother
 
@@ -206,12 +234,18 @@ class UpdateManager {
 
 	public
 	long refreshTertiary (
-			String table,
-			long ref) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String table,
+			@NonNull Long ref) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"refreshTertiary");
 
 		// if it's not dirty don't bother
 
-		Map<Long,UpdateStuff> map =
+		Map <Long, UpdateStuff> map =
 			tertiaryVersions.get (
 				table);
 
@@ -252,6 +286,7 @@ class UpdateManager {
 
 		long newTertiaryVersion =
 			getDatabaseVersion (
+				taskLogger,
 				table,
 				ref);
 
@@ -274,8 +309,14 @@ class UpdateManager {
 
 	public
 	long getVersionDb (
-			String table,
-			long ref) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String table,
+			@NonNull Long ref) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getVersionDb");
 
 		@Cleanup
 		Transaction transaction =
@@ -283,16 +324,19 @@ class UpdateManager {
 				"UpdateManager.getVersionDb (table, ref)",
 				this);
 
-		refreshMaster ();
+		refreshMaster (
+			taskLogger);
 
 		refreshSecondary (
+			taskLogger,
 			table);
 
 		refreshTertiary (
+			taskLogger,
 			table,
 			ref);
 
-		Map<Long,UpdateStuff> map =
+		Map <Long, UpdateStuff> map =
 			tertiaryVersions.get (
 				table);
 
@@ -305,8 +349,14 @@ class UpdateManager {
 
 	public synchronized
 	long getVersion (
-			String table,
-			long ref) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String table,
+			@NonNull Long ref) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getVersion");
 
 		// check master
 
@@ -316,6 +366,7 @@ class UpdateManager {
 		if (reloadTime < now) {
 
 			return getVersionDb (
+				taskLogger,
 				table,
 				ref);
 
@@ -330,6 +381,7 @@ class UpdateManager {
 		if (stuff1 == null || stuff1.dirty) {
 
 			return getVersionDb (
+				taskLogger,
 				table,
 				ref);
 
@@ -341,10 +393,14 @@ class UpdateManager {
 			tertiaryVersions.get (
 				table);
 
-		if (map == null)
+		if (map == null) {
+
 			return getVersionDb (
+				taskLogger,
 				table,
 				ref);
+
+		}
 
 		UpdateStuff stuff2 =
 			map.get (ref);
@@ -352,6 +408,7 @@ class UpdateManager {
 		if (stuff2 == null || stuff2.dirty) {
 
 			return getVersionDb (
+				taskLogger,
 				table,
 				ref);
 
@@ -361,9 +418,16 @@ class UpdateManager {
 
 	}
 
+	private
 	void realSignalUpdate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String table,
 			@NonNull Long ref) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"realSignalUpdate");
 
 		UpdateLogRec updateLog =
 			updateLogHelper.findByTableAndRef (
@@ -374,6 +438,7 @@ class UpdateManager {
 
 			updateLog =
 				updateLogHelper.insert (
+					taskLogger,
 					updateLogHelper.createInstance ()
 
 				.setCode (
@@ -396,18 +461,27 @@ class UpdateManager {
 
 	public
 	void signalUpdate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String table,
 			@NonNull Long ref) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"signalUpdate");
+
 		realSignalUpdate (
+			taskLogger,
 			table,
 			ref);
 
 		realSignalUpdate (
+			taskLogger,
 			table,
 			0l);
 
 		realSignalUpdate (
+			taskLogger,
 			"master",
 			0l);
 
@@ -447,13 +521,23 @@ class UpdateManager {
 
 		public
 		boolean isUpdated (
-				long ref) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Long ref) {
 
-			log.debug (
-				"Watcher (\"" + table + "\").isUpdated (" + ref + ")");
+			TaskLogger taskLogger =
+				logContext.nestTaskLoggerFormat (
+					parentTaskLogger,
+					"Watcher (%s).isUpdated (%s)",
+					table,
+					integerToDecimalString (
+						ref));
+
+			taskLogger.debugFormat (
+				"Watcher (\"%s" + table + "\").isUpdated (" + ref + ")");
 
 			long newVersion =
 				getVersion (
+					taskLogger,
 					table,
 					ref);
 
@@ -540,6 +624,11 @@ class UpdateManager {
 		T provide (
 				@NonNull TaskLogger parentTaskLogger) {
 
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"UpdateGetterAdaptor.provide ()");
+
 			long now =
 				System.currentTimeMillis ();
 
@@ -562,6 +651,7 @@ class UpdateManager {
 
 			long newVersion =
 				getVersion (
+					taskLogger,
 					table,
 					ref);
 

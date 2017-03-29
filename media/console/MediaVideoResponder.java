@@ -6,26 +6,29 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.model.MediaRec;
 
 import wbs.utils.io.RuntimeIoException;
 
-@Log4j
 @PrototypeComponent ("mediaVideoResponder")
 public
 class MediaVideoResponder
 	extends ConsoleResponder {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaConsoleHelper mediaHelper;
@@ -53,6 +56,11 @@ class MediaVideoResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		MediaRec media =
 			mediaHelper.findFromContextRequired ();
 
@@ -60,7 +68,7 @@ class MediaVideoResponder
 
 			data =
 				runFilter (
-					log,
+					taskLogger,
 					media.getContent ().getData (),
 					".3gp",
 					".flv",
