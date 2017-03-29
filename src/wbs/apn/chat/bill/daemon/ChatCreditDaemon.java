@@ -6,17 +6,18 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
 
@@ -29,7 +30,6 @@ import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 
-@Log4j
 @SingletonComponent ("chatCreditDaemon")
 public
 class ChatCreditDaemon
@@ -48,6 +48,9 @@ class ChatCreditDaemon
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -91,9 +94,15 @@ class ChatCreditDaemon
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		log.debug (
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce ()");
+
+		taskLogger.debugFormat (
 			"Checking for all users with negative credit");
 
 		List <Long> chatIds;
@@ -117,88 +126,119 @@ class ChatCreditDaemon
 		}
 
 		chatIds.forEach (
-			this::doChat);
+			chatId ->
+				doChat (
+					taskLogger,
+					chatId));
 
 	}
 
 	private
 	void doChat (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatId) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				stringFormat (
-					"%s.%s (%s)",
-					"ChatCreditDaemon",
-					"doChat",
+		TaskLogger taskLogger =
+			logContext.nestTaskLoggerFormat (
+				parentTaskLogger,
+				"doChat (%s)",
+				integerToDecimalString (
+					chatId));
+
+		try (
+
+			Transaction transaction =
+				database.beginReadOnly (
 					stringFormat (
-						"chatId = %s",
-						integerToDecimalString (
-							chatId))),
-				this);
+						"%s.%s (%s)",
+						"ChatCreditDaemon",
+						"doChat",
+						stringFormat (
+							"chatId = %s",
+							integerToDecimalString (
+								chatId))),
+					this);
 
-		ChatRec chat =
-			chatHelper.findRequired (
-				chatId);
+		) {
 
-		Instant cutoffTime =
-			transaction.now ().minus (
-				Duration.standardSeconds (
-					chat.getBillTimeLimit ()));
+			ChatRec chat =
+				chatHelper.findRequired (
+					chatId);
 
-		log.debug (
-			stringFormat (
+			Instant cutoffTime =
+				transaction.now ().minus (
+					Duration.standardSeconds (
+						chat.getBillTimeLimit ()));
+
+			taskLogger.debugFormat (
 				"Chat billing after %s",
 				timeFormatter.timestampSecondStringIso (
-					cutoffTime)));
-
-		List <Long> chatUserIds =
-			iterableMapToList (
-				ChatUserRec::getId,
-				chatUserHelper.findWantingBill (
-					chat,
 					cutoffTime));
 
-		transaction.close ();
+			List <Long> chatUserIds =
+				iterableMapToList (
+					ChatUserRec::getId,
+					chatUserHelper.findWantingBill (
+						chat,
+						cutoffTime));
 
-		log.debug (
-			stringFormat (
+			transaction.close ();
+
+			taskLogger.debugFormat (
 				"Found %s users",
 				integerToDecimalString (
-					chatUserIds.size ())));
+					chatUserIds.size ()));
 
-		chatUserIds.forEach (
-			this::doUserCredit);
+			chatUserIds.forEach (
+				chatUserId ->
+					doUserCredit (
+						taskLogger,
+						chatUserId));
+
+		}
 
 	}
 
 	private
 	void doUserCredit (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				stringFormat (
-					"%s.%s (%s)",
-					"ChatCreditDaemon",
-					"doUserCredit",
+		TaskLogger taskLogger =
+			logContext.nestTaskLoggerFormat (
+				parentTaskLogger,
+				"doUserCredit (%s)",
+				integerToDecimalString (
+					chatUserId));
+
+		try (
+
+			Transaction transaction =
+				database.beginReadWrite (
 					stringFormat (
-						"chatUserId = %s",
-						integerToDecimalString (
-							chatUserId))),
-				this);
+						"%s.%s (%s)",
+						"ChatCreditDaemon",
+						"doUserCredit",
+						stringFormat (
+							"chatUserId = %s",
+							integerToDecimalString (
+								chatUserId))),
+					this);
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				chatUserId);
+		) {
 
-		chatCreditLogic.userBill (
-			chatUser,
-			new BillCheckOptions ());
+			ChatUserRec chatUser =
+				chatUserHelper.findRequired (
+					chatUserId);
 
-		transaction.commit ();
+			chatCreditLogic.userBill (
+				taskLogger,
+				chatUser,
+				new BillCheckOptions ());
+
+			transaction.commit ();
+
+		}
 
 	}
 

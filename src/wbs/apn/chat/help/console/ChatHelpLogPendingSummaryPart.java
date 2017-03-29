@@ -194,6 +194,7 @@ class ChatHelpLogPendingSummaryPart
 
 		ChatCreditCheckResult creditCheckResult =
 			chatCreditLogic.userCreditCheck (
+				taskLogger,
 				chatUser);
 
 		htmlTableDetailsRowWrite (

@@ -1,11 +1,12 @@
 package wbs.integrations.digitalselect.api;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.IOException;
 import java.util.Map;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
@@ -123,14 +124,15 @@ class DigitalSelectRouteReportFile
 		try {
 
 			reportLogic.deliveryReport (
+				taskLogger,
 				digitalSelectRouteOut.getRoute (),
 				msgidParam,
 				newMessageStatus,
-				Optional.of (
+				optionalOf (
 					statParam),
-				Optional.absent (),
-				Optional.absent (),
-				Optional.absent ());
+				optionalAbsent (),
+				optionalAbsent (),
+				optionalAbsent ());
 
 		} catch (NoSuchMessageException exception) {
 

@@ -1,19 +1,17 @@
 package wbs.apn.chat.ad.daemon;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.time.TimeUtils.laterThan;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.base.Optional;
-
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -21,6 +19,8 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -46,7 +46,6 @@ import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
 
-@Log4j
 @SingletonComponent ("chatAdDaemon")
 public
 class ChatAdDaemon
@@ -80,6 +79,9 @@ class ChatAdDaemon
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -126,9 +128,15 @@ class ChatAdDaemon
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		log.debug (
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce");
+
+		taskLogger.debugFormat (
 			"Looking for users to send an ad to");
 
 		// get a list of users who have passed their ad time
@@ -158,15 +166,17 @@ class ChatAdDaemon
 				try {
 
 					doChatUserAd (
+						taskLogger,
 						chatUser.getId ());
 
 				} catch (Exception exception) {
 
 					exceptionLogger.logThrowable (
+						taskLogger,
 						"daemon",
 						"ChatAdDaemon",
 						exception,
-						Optional.absent (),
+						optionalAbsent (),
 						GenericExceptionResolution.tryAgainLater);
 
 				}
@@ -179,13 +189,18 @@ class ChatAdDaemon
 
 	private
 	void doChatUserAd (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
 
-		log.debug (
-			stringFormat (
-				"Attempting to send ad to %s",
-				integerToDecimalString (
-					chatUserId)));
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doChatUserAd");
+
+		taskLogger.debugFormat (
+			"Attempting to send ad to %s",
+			integerToDecimalString (
+				chatUserId));
 
 		try (
 
@@ -219,32 +234,33 @@ class ChatAdDaemon
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userCreditCheck (
+					taskLogger,
 					chatUser);
 
 			if (
 				creditCheckResult.failed ()
 			) {
 
-				log.info (
-					stringFormat (
-						"Skipping ad to %s (%s)",
-						objectManager.objectPath (chatUser),
-						creditCheckResult.details ()));
+				taskLogger.noticeFormat (
+					"Skipping ad to %s (%s)",
+					objectManager.objectPath (chatUser),
+					creditCheckResult.details ());
 
 			} else if (chatUser.getFirstJoin () == null) {
 
-				log.info (
-					stringFormat (
-						"Skipping ad to %s (never fully joined)",
-						objectManager.objectPath (chatUser)));
+				taskLogger.noticeFormat (
+					"Skipping ad to %s (never fully joined)",
+					objectManager.objectPath (
+						chatUser));
 
-			} else if (! chatUser.getNumber ().getNumber ().startsWith ("447")
-					|| chatUser.getNumber ().getNumber ().length () != 12) {
+			} else if (
+				! chatUser.getNumber ().getNumber ().startsWith ("447")
+				|| chatUser.getNumber ().getNumber ().length () != 12
+			) {
 
-				log.info (
-					stringFormat (
-						"Skipping ad to %s (not a mobile number)",
-						objectManager.objectPath (chatUser)));
+				taskLogger.noticeFormat (
+					"Skipping ad to %s (not a mobile number)",
+					objectManager.objectPath (chatUser));
 
 			} else {
 
@@ -310,10 +326,10 @@ class ChatAdDaemon
 
 				if (text == null) {
 
-					log.info (
-						stringFormat (
-							"Skipping ad to %s (no suitable ads configured)",
-							objectManager.objectPath (chatUser)));
+					taskLogger.noticeFormat (
+						"Skipping ad to %s (no suitable ads configured)",
+						objectManager.objectPath (
+							chatUser));
 
 				} else {
 
@@ -329,14 +345,15 @@ class ChatAdDaemon
 
 					// send the message
 
-					log.info (
-						stringFormat (
-							"Sending ad to %s: %s",
-							objectManager.objectPath (chatUser),
-							messageString));
+					taskLogger.noticeFormat (
+						"Sending ad to %s: %s",
+						objectManager.objectPath (
+							chatUser),
+						messageString);
 
 					TextRec messageText =
 						textHelper.findOrCreate (
+							taskLogger,
 							messageString);
 
 					ServiceRec adService =
@@ -345,8 +362,9 @@ class ChatAdDaemon
 							"ad");
 
 					chatSendLogic.sendMessageMagic (
+						taskLogger,
 						chatUser,
-						Optional.<Long>absent (),
+						optionalAbsent (),
 						messageText,
 						commandHelper.findByCodeRequired (
 							chat,

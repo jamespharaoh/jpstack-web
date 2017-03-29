@@ -2,26 +2,27 @@ package wbs.services.ticket.core.daemon;
 
 import static wbs.utils.etc.LogicUtils.booleanEqual;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.notLessThanZero;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
 import java.util.List;
 
-import com.google.common.base.Optional;
-
 import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -35,7 +36,6 @@ import wbs.utils.random.RandomLogic;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
 
-@Log4j
 @SingletonComponent ("ticketStateTimeDaemon")
 public
 class TicketStateTimeDaemon
@@ -44,16 +44,19 @@ class TicketStateTimeDaemon
 	// singleton dependencies
 
 	@SingletonDependency
-	TicketObjectHelper ticketHelper;
-
-	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
 	@SingletonDependency
 	ObjectManager objectManager;
+
+	@SingletonDependency
+	QueueLogic queueLogic;
 
 	@SingletonDependency
 	RandomLogic randomLogic;
@@ -65,7 +68,7 @@ class TicketStateTimeDaemon
 	TextObjectHelper textHelper;
 
 	@SingletonDependency
-	QueueLogic queueLogic;
+	TicketObjectHelper ticketHelper;
 
 	// details
 
@@ -100,7 +103,13 @@ class TicketStateTimeDaemon
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce ()");
 
 		// TODO disabled for now
 
@@ -111,7 +120,7 @@ class TicketStateTimeDaemon
 			return;
 		}
 
-		log.debug (
+		taskLogger.debugFormat (
 			"Getting all unqueued tickets");
 
 		// get all the unqueued tickets
@@ -137,15 +146,17 @@ class TicketStateTimeDaemon
 			try {
 
 				doTicketTimeCheck (
+					taskLogger,
 					ticket.getId ());
 
 			} catch (Exception exception) {
 
 				exceptionLogger.logThrowable (
+					taskLogger,
 					"daemon",
 					"TicketStateTimeDaemon",
 					exception,
-					Optional.absent (),
+					optionalAbsent (),
 					GenericExceptionResolution.tryAgainLater);
 
 			}
@@ -156,13 +167,18 @@ class TicketStateTimeDaemon
 
 	private
 	void doTicketTimeCheck (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long ticketId) {
 
-		log.debug (
-			stringFormat (
-				"Checking timestamp for ticket",
-				String.valueOf (
-					ticketId)));
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doTicketTimeCheck");
+
+		taskLogger.debugFormat (
+			"Checking timestamp for ticket",
+			integerToDecimalString (
+				ticketId));
 
 		@Cleanup
 		Transaction transaction =
@@ -206,9 +222,9 @@ class TicketStateTimeDaemon
 
 			QueueItemRec queueItem =
 				queueLogic.createQueueItem (
-					queueLogic.findQueue (
-						ticket.getTicketState (),
-						"default"),
+					taskLogger,
+					ticket.getTicketState (),
+					"default",
 					ticket,
 					ticket,
 					ticket.getCode (),

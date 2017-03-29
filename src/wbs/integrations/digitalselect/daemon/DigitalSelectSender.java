@@ -79,12 +79,9 @@ class DigitalSelectSender
 	@Override
 	protected
 	State getMessage (
-			OutboxRec outbox)
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull OutboxRec outbox)
 		throws SendFailureException {
-
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"getMessage");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -127,11 +124,13 @@ class DigitalSelectSender
 	@Override
 	protected
 	Optional <List <String>> sendMessage (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull State state)
 		throws SendFailureException {
 
 		TaskLogger taskLogger =
-			logContext.createTaskLogger (
+			logContext.nestTaskLogger (
+				parentTaskLogger,
 				"sendMessage");
 
 		taskLogger.noticeFormat (

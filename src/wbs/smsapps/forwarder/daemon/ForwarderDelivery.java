@@ -7,16 +7,20 @@ import com.google.common.collect.ImmutableList;
 import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.sms.message.core.model.MessageStatus;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
 import wbs.sms.message.outbox.logic.SmsOutboxLogic;
+
 import wbs.smsapps.forwarder.model.ForwarderMessageOutObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutRec;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutReportObjectHelper;
@@ -41,6 +45,9 @@ class ForwarderDelivery
 	@SingletonDependency
 	ForwarderMessageOutReportObjectHelper forwarderMessageOutReportHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	SmsOutboxLogic outboxLogic;
 
@@ -61,6 +68,11 @@ class ForwarderDelivery
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long deliveryId,
 			@NonNull Long ref) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		@Cleanup
 		Transaction transaction =
@@ -93,6 +105,7 @@ class ForwarderDelivery
 			if (delivery.getNewMessageStatus ().isGoodType ()) {
 
 				outboxLogic.unholdMessage (
+					taskLogger,
 					forwarderMessageOut
 						.getNextForwarderMessageOut ()
 						.getMessage ());
@@ -114,6 +127,7 @@ class ForwarderDelivery
 				) {
 
 					outboxLogic.cancelMessage (
+						taskLogger,
 						nextForwarderMessageOut.getMessage ());
 
 				}
@@ -130,6 +144,7 @@ class ForwarderDelivery
 
 			ForwarderMessageOutReportRec forwarderMessageOutReport =
 				forwarderMessageOutReportHelper.insert (
+					taskLogger,
 					forwarderMessageOutReportHelper.createInstance ()
 
 				.setForwarderMessageOut (

@@ -7,6 +7,8 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.etc.NumberUtils;
 
 @PrototypeComponent ("javaIintegerFormFieldNativeMapping")
@@ -29,6 +31,7 @@ class JavaIntegerFormFieldNativeMapping <Container>
 	@Override
 	public
 	Optional <Integer> genericToNative (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Optional <Long> genericValue) {
 

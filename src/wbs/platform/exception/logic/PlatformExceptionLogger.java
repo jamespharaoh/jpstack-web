@@ -1,14 +1,15 @@
 package wbs.platform.exception.logic;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import javax.inject.Provider;
+import java.util.function.Function;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -16,10 +17,11 @@ import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.exception.model.ExceptionLogRec;
 
-@Log4j
 @SingletonComponent ("platformExceptionLogger")
 public
 class PlatformExceptionLogger
@@ -36,11 +38,15 @@ class PlatformExceptionLogger
 	@SingletonDependency
 	ExceptionUtils exceptionLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// implementation
 
 	@Override
 	public
 	ExceptionLogRec logSimple (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull String summary,
@@ -48,44 +54,49 @@ class PlatformExceptionLogger
 			@NonNull Optional <Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"logSimple");
+
 		return logExceptionWrapped (
+			taskLogger,
 			typeCode,
 			source,
 			userId,
-			new Provider<ExceptionLogRec> () {
-
-			@Override
-			public
-			ExceptionLogRec get () {
-
-				return realLogException (
-					typeCode,
-					source,
-					summary,
-					dump,
-					userId,
-					resolution);
-
-			}
-
-		});
+			nestedTaskLogger -> realLogException (
+				nestedTaskLogger,
+				typeCode,
+				source,
+				summary,
+				dump,
+				userId,
+				resolution));
 
 	}
 
 	@Override
 	public
 	ExceptionLogRec logThrowable (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull Throwable throwable,
 			@NonNull Optional <Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"logThrowable");
+
 		return logExceptionWrapped (
+			taskLogger,
 			typeCode,
 			source,
 			userId,
-			() -> realLogException (
+			nestedTaskLogger -> realLogException (
+				nestedTaskLogger,
 				typeCode,
 				source,
 				exceptionLogic.throwableSummary (
@@ -100,6 +111,7 @@ class PlatformExceptionLogger
 	@Override
 	public
 	ExceptionLogRec logThrowableWithSummary (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull String summary,
@@ -107,11 +119,18 @@ class PlatformExceptionLogger
 			@NonNull Optional <Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"logThrowableWithSummary");
+
 		return logExceptionWrapped (
+			taskLogger,
 			typeCode,
 			source,
 			userId,
-			() -> realLogException (
+			nestedTaskLogger -> realLogException (
+				nestedTaskLogger,
 				typeCode,
 				source,
 				stringFormat (
@@ -127,20 +146,27 @@ class PlatformExceptionLogger
 	}
 
 	ExceptionLogRec logExceptionWrapped (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull Optional <Long> userId,
-			@NonNull Provider <ExceptionLogRec> target) {
+			@NonNull Function <TaskLogger, ExceptionLogRec> target) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"logExceptionWrapped");
 
 		try {
 
-			return target.get ();
+			return target.apply (
+				taskLogger);
 
 		} catch (Exception furtherException) {
 
-			log.fatal (
-				"Error logging exception",
-				furtherException);
+			taskLogger.fatalFormatException (
+				furtherException,
+				"Error logging exception");
 
 			String furtherSummary =
 				stringFormat (
@@ -151,6 +177,7 @@ class PlatformExceptionLogger
 			try {
 
 				realLogException (
+					taskLogger,
 					typeCode,
 					"exception log",
 					stringFormat (
@@ -160,14 +187,14 @@ class PlatformExceptionLogger
 							furtherException)),
 					exceptionLogic.throwableDump (
 						furtherException),
-					Optional.absent (),
+					optionalAbsent (),
 					GenericExceptionResolution.fatalError);
 
 			} catch (Exception yetAnotherException) {
 
-				log.fatal (
-					"Error logging error logging exception",
-					yetAnotherException);
+				taskLogger.fatalFormatException (
+					yetAnotherException,
+					"Error logging error logging exception");
 
 			}
 
@@ -179,12 +206,18 @@ class PlatformExceptionLogger
 
 	private
 	ExceptionLogRec realLogException (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull String summary,
 			@NonNull String dump,
 			@NonNull Optional <Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"realLogException");
 
 		try (
 
@@ -197,6 +230,7 @@ class PlatformExceptionLogger
 
 			ExceptionLogRec exceptionLog =
 				exceptionLogLogic.logException (
+					taskLogger,
 					typeCode,
 					source,
 					summary,

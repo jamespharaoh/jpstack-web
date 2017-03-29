@@ -1,12 +1,18 @@
 package wbs.apn.chat.broadcast.logic;
 
-import com.google.common.base.Optional;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.SingletonDependency;
 
 @SingletonComponent ("chatBroadcastLogic")
 public
@@ -18,14 +24,23 @@ class ChatBroadcastLogicImplementation
 	@SingletonDependency
 	ChatCreditLogic chatCreditLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// implementation
 
 	@Override
 	public
 	boolean canSendToUser (
-			ChatUserRec chatUser,
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser,
 			boolean includeBlocked,
 			boolean includeOptedOut) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"canSendToUser");
 
 		// exclude incomplete users
 
@@ -59,9 +74,10 @@ class ChatBroadcastLogicImplementation
 
 		ChatCreditCheckResult creditCheckResult =
 			chatCreditLogic.userSpendCreditCheck (
+				taskLogger,
 				chatUser,
 				false,
-				Optional.<Long>absent ());
+				optionalAbsent ());
 
 		if (
 			creditCheckResult.failed ()

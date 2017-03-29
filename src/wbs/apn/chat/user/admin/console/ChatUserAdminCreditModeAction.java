@@ -123,6 +123,7 @@ class ChatUserAdminCreditModeAction
 				// and log event
 
 				eventLogic.createEvent (
+					taskLogger,
 					"chat_user_credit_mode",
 					userConsoleLogic.userRequired (),
 					chatUser,

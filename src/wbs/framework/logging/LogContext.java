@@ -17,10 +17,21 @@ interface LogContext {
 
 	default
 	TaskLogger createTaskLogger (
-			String dynamicContext) {
+			@NonNull String dynamicContext) {
 
 		return createTaskLogger (
 			dynamicContext,
+			optionalAbsent ());
+
+	}
+
+	default
+	TaskLogger createTaskLoggerFormat (
+			@NonNull String ... arguments) {
+
+		return createTaskLogger (
+			stringFormatArray (
+				arguments),
 			optionalAbsent ());
 
 	}

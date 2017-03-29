@@ -30,6 +30,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
 
@@ -452,11 +453,13 @@ class ObjectHelperPropertyImplementation <
 	@Override
 	public
 	void setDynamic (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object,
 			@NonNull String name,
 			@NonNull Optional <?> valueOptional) {
 
 		objectModel.hooks ().setDynamic (
+			parentTaskLogger,
 			object,
 			name,
 			valueOptional);

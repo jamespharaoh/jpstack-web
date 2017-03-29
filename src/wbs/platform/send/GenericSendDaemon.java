@@ -7,17 +7,18 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import org.apache.log4j.Logger;
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
 
@@ -35,10 +36,10 @@ class GenericSendDaemon <
 	@SingletonDependency
 	Database database;
 
-	// hooks
+	@ClassSingletonDependency
+	LogContext logContext;
 
-	protected abstract
-	Logger log ();
+	// hooks
 
 	protected abstract
 	GenericSendHelper <Service, Job, Item> helper ();
@@ -89,176 +90,198 @@ class GenericSendDaemon <
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"GenericSendDaemon.runOnce ()",
-				this);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce ()");
 
-		log ().debug (
-			stringFormat (
-				"Looking for jobs in sending state"));
+		try (
 
-		List <Job> jobs =
-			helper ().findSendingJobs ();
+			Transaction transaction =
+				database.beginReadOnly (
+					"GenericSendDaemon.runOnce ()",
+					this);
 
-		List <Long> jobIds =
-			jobs.stream ()
+		) {
 
-			.map (
-				Job::getId)
+			taskLogger.debugFormat (
+				"Looking for jobs in sending state");
 
-			.collect (
-				Collectors.toList ());
+			List <Job> jobs =
+				helper ().findSendingJobs ();
 
-		transaction.close ();
+			List <Long> jobIds =
+				jobs.stream ()
 
-		jobIds.forEach (
-			this::runJob);
+				.map (
+					Job::getId)
+
+				.collect (
+					Collectors.toList ());
+
+			transaction.close ();
+
+			jobIds.forEach (
+				jobId ->
+					runJob (
+						taskLogger,
+						jobId));
+
+		}
 
 	}
 
 	void runJob (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long jobId) {
 
-		log ().debug (
-			stringFormat (
-				"Performing send for %s",
+		TaskLogger taskLogger =
+			logContext.nestTaskLoggerFormat (
+				parentTaskLogger,
+				"runJob (%s)",
 				integerToDecimalString (
-					jobId)));
+					jobId));
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"GenericSendDaemon.runJob (jobId)",
-				this);
+		taskLogger.debugFormat (
+			"Performing send for %s",
+			integerToDecimalString (
+				jobId));
 
-		Job job =
-			helper ().jobHelper ().findRequired (
-				jobId);
+		try (
 
-		Service service =
-			helper ().getService (
-				job);
+			Transaction transaction =
+				database.beginReadWrite (
+					"GenericSendDaemon.runJob (jobId)",
+					this);
 
-		if (
-			! helper ().jobSending (
-				service,
-				job)
 		) {
 
-			log ().debug (
-				stringFormat (
-					"Not sending job %s",
-					integerToDecimalString (
-						jobId)));
+			Job job =
+				helper ().jobHelper ().findRequired (
+					jobId);
 
-			return;
+			Service service =
+				helper ().getService (
+					job);
 
-		}
-
-		if (
-			! helper ().jobConfigured (
-				service,
-				job)
-		) {
-
-			log ().warn (
-				stringFormat (
-					"Not configured job %s",
-					integerToDecimalString (
-						jobId)));
-
-			return;
-
-		}
-
-		List <Item> items =
-			helper ().findItemsLimit (
-				service,
-				job,
-				100);
-
-		if (
-			items.isEmpty ()
-		) {
-
-			// handle completion
-
-			log ().debug (
-				stringFormat (
-					"Triggering completion for job %s",
-					integerToDecimalString (
-						jobId)));
-
-			helper ().sendComplete (
-				service,
-				job);
-
-		} else {
-
-			// perform send
-
-			for (
-				Item item
-					: items
+			if (
+				! helper ().jobSending (
+					service,
+					job)
 			) {
 
-				// verify the item
+				taskLogger.debugFormat (
+					"Not sending job %s",
+					integerToDecimalString (
+						jobId));
 
-				boolean itemVerified =
-					helper ().verifyItem (
-						service,
-						job,
-						item);
+				return;
 
-				if (itemVerified) {
+			}
 
-					log ().debug (
-						stringFormat (
+			if (
+				! helper ().jobConfigured (
+					service,
+					job)
+			) {
+
+				taskLogger.warningFormat (
+					"Not configured job %s",
+					integerToDecimalString (
+						jobId));
+
+				return;
+
+			}
+
+			List <Item> items =
+				helper ().findItemsLimit (
+					service,
+					job,
+					100);
+
+			if (
+				items.isEmpty ()
+			) {
+
+				// handle completion
+
+				taskLogger.debugFormat (
+					"Triggering completion for job %s",
+					integerToDecimalString (
+						jobId));
+
+				helper ().sendComplete (
+					taskLogger,
+					service,
+					job);
+
+			} else {
+
+				// perform send
+
+				for (
+					Item item
+						: items
+				) {
+
+					// verify the item
+
+					boolean itemVerified =
+						helper ().verifyItem (
+							taskLogger,
+							service,
+							job,
+							item);
+
+					if (itemVerified) {
+
+						taskLogger.debugFormat (
 							"Sending item %s",
 							integerToDecimalString (
-								item.getId ())));
+								item.getId ()));
 
-					// send item
+						// send item
 
-					helper ().sendItem (
-						service,
-						job,
-						item);
+						helper ().sendItem (
+							taskLogger,
+							service,
+							job,
+							item);
 
-				} else {
+					} else {
 
-					log ().debug (
-						stringFormat (
+						taskLogger.debugFormat (
 							"Rejecting item %s",
 							integerToDecimalString (
-								item.getId ())));
+								item.getId ()));
 
-					// reject it
+						// reject it
 
-					helper ().rejectItem (
-						service,
-						job,
-						item);
+						helper ().rejectItem (
+							service,
+							job,
+							item);
+
+					}
 
 				}
 
 			}
 
-		}
+			// commit transaction
 
-		// commit transaction
+			transaction.commit ();
 
-		transaction.commit ();
-
-		log ().debug (
-			stringFormat (
+			taskLogger.debugFormat (
 				"Finished send for job %s",
 				integerToDecimalString (
-					jobId)));
+					jobId));
+
+		}
 
 	}
 

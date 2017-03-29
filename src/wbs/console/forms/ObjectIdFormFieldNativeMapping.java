@@ -8,8 +8,10 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.core.ConsoleHelper;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectIdFormFieldNativeMapping")
@@ -48,6 +50,7 @@ class ObjectIdFormFieldNativeMapping
 	@Override
 	public
 	Optional <Long> genericToNative (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Optional <RecordType> genericValue) {
 

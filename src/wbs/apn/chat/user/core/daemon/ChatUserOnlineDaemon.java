@@ -7,11 +7,10 @@ import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.time.TimeUtils.earlierThan;
 
 import java.util.List;
-
-import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
@@ -106,35 +105,42 @@ class ChatUserOnlineDaemon
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"runOnce");
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce ()");
 
 		taskLogger.debugFormat (
 			"Checking online users for action needed");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ChatUserOnlineDaemon.runOnce ()",
-				this);
+		try (
 
-		List<ChatUserRec> onlineUsers =
-			chatUserHelper.findOnline (
-				ChatUserType.user);
+			Transaction transaction =
+				database.beginReadOnly (
+					"ChatUserOnlineDaemon.runOnce ()",
+					this);
 
-		transaction.close ();
-
-		for (
-			ChatUserRec chatUser
-				: onlineUsers
 		) {
 
-			doUser (
-				taskLogger,
-				chatUser.getId ());
+			List <ChatUserRec> onlineUsers =
+				chatUserHelper.findOnline (
+					ChatUserType.user);
+
+			transaction.close ();
+
+			for (
+				ChatUserRec chatUser
+					: onlineUsers
+			) {
+
+				doUser (
+					taskLogger,
+					chatUser.getId ());
+
+			}
 
 		}
 
@@ -194,6 +200,7 @@ class ChatUserOnlineDaemon
 				chatUser.getCode ());
 
 			chatMiscLogic.userLogoffWithMessage (
+				taskLogger,
 				chatUser,
 				null,
 				true);
@@ -350,9 +357,10 @@ class ChatUserOnlineDaemon
 
 			long numSent =
 				chatInfoLogic.sendUserInfos (
+					taskLogger,
 					chatUser,
 					1l,
-					Optional.absent ());
+					optionalAbsent ());
 
 			if (chatUser.getSessionInfoRemain () != null) {
 
@@ -397,6 +405,7 @@ class ChatUserOnlineDaemon
 				chatUser.getCode ());
 
 			chatInfoLogic.sendNameHint (
+				taskLogger,
 				chatUser);
 
 		}
@@ -471,6 +480,7 @@ class ChatUserOnlineDaemon
 				chatUser.getCode ());
 
 			chatInfoLogic.sendPicHint (
+				taskLogger,
 				chatUser);
 
 		}
@@ -517,6 +527,7 @@ class ChatUserOnlineDaemon
 				chatUser.getCode ());
 
 			chatInfoLogic.sendPicHint2 (
+				taskLogger,
 				chatUser);
 
 		}

@@ -26,6 +26,7 @@ import wbs.console.lookup.BooleanLookup;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -33,6 +34,7 @@ import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.action.Action;
@@ -56,6 +58,9 @@ class ConsoleFile
 
 	@SingletonDependency
 	ConsoleRequestContext consoleRequestContext;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -292,10 +297,15 @@ class ConsoleFile
 	@Override
 	public
 	void doGet (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws
 			ServletException,
 			IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doGet");
 
 		if (
 

@@ -7,25 +7,33 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
+
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.send.GenericSendHelper;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
+
 import wbs.sms.message.batch.logic.BatchLogic;
 import wbs.sms.message.batch.model.BatchObjectHelper;
 import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.batch.model.BatchSubjectObjectHelper;
 import wbs.sms.message.batch.model.BatchSubjectRec;
 import wbs.sms.message.outbox.logic.SmsMessageSender;
+
 import wbs.smsapps.subscription.model.SubscriptionBillObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionListRec;
 import wbs.smsapps.subscription.model.SubscriptionNumberObjectHelper;
@@ -69,6 +77,9 @@ class SubscriptionSendHelper
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectTypeObjectHelper objectTypeHelper;
@@ -226,8 +237,14 @@ class SubscriptionSendHelper
 	@Override
 	public
 	void sendStart (
-			SubscriptionRec subscription,
-			SubscriptionSendRec subscriptionSend) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull SubscriptionRec subscription,
+			@NonNull SubscriptionSendRec subscriptionSend) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendStart");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -236,11 +253,13 @@ class SubscriptionSendHelper
 
 		BatchSubjectRec batchSubject =
 			batchLogic.batchSubject (
+				taskLogger,
 				subscription,
 				"send");
 
 		BatchRec batch =
 			batchHelper.insert (
+				taskLogger,
 				batchHelper.createInstance ()
 
 			.setParentType (
@@ -292,6 +311,7 @@ class SubscriptionSendHelper
 				continue;
 
 			subscriptionSendNumberHelper.insert (
+				taskLogger,
 				subscriptionSendNumberHelper.createInstance ()
 
 				.setSubscriptionSend (
@@ -315,9 +335,10 @@ class SubscriptionSendHelper
 	@Override
 	public
 	boolean verifyItem (
-			SubscriptionRec subscription,
-			SubscriptionSendRec subscriptionSend,
-			SubscriptionSendNumberRec subscriptionSendNumber) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull SubscriptionRec subscription,
+			@NonNull SubscriptionSendRec subscriptionSend,
+			@NonNull SubscriptionSendNumberRec subscriptionSendNumber) {
 
 		return true;
 
@@ -337,9 +358,15 @@ class SubscriptionSendHelper
 	@Override
 	public
 	void sendItem (
-			SubscriptionRec subscription,
-			SubscriptionSendRec subscriptionSend,
-			SubscriptionSendNumberRec subscriptionSendNumber) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull SubscriptionRec subscription,
+			@NonNull SubscriptionSendRec subscriptionSend,
+			@NonNull SubscriptionSendNumberRec subscriptionSendNumber) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendItem");
 
 		SubscriptionSubRec subscriptionSub =
 			subscriptionSendNumber.getSubscriptionSub ();
@@ -355,11 +382,13 @@ class SubscriptionSendHelper
 		) {
 
 			subscriptionLogic.sendNow (
+				taskLogger,
 				subscriptionSendNumber);
 
 		} else {
 
 			subscriptionLogic.sendLater (
+				taskLogger,
 				subscriptionSendNumber);
 
 		}
@@ -369,8 +398,9 @@ class SubscriptionSendHelper
 	@Override
 	public
 	void sendComplete (
-			SubscriptionRec subscription,
-			SubscriptionSendRec subscriptionSend) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull SubscriptionRec subscription,
+			@NonNull SubscriptionSendRec subscriptionSend) {
 
 		subscriptionSend
 

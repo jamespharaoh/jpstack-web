@@ -2,23 +2,26 @@ package wbs.apn.chat.broadcast.logic;
 
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
 import javax.inject.Provider;
 
-import com.google.common.base.Optional;
-
 import lombok.NonNull;
 
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -90,6 +93,9 @@ class ChatBroadcastSendHelper
 
 	@SingletonDependency
 	EventLogic eventLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MagicNumberLogic magicNumberLogic;
@@ -221,8 +227,14 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	void sendStart (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendStart");
 
 		// sanity check
 
@@ -251,6 +263,7 @@ class ChatBroadcastSendHelper
 		// create event
 
 		eventLogic.createEvent (
+			taskLogger,
 			"chat_broadcast_send_begun",
 			chatBroadcast);
 
@@ -259,14 +272,21 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	boolean verifyItem (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast,
 			@NonNull ChatBroadcastNumberRec chatBroadcastNumber) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"verifyItem");
 
 		ChatUserRec chatUser =
 			chatBroadcastNumber.getChatUser ();
 
 		return chatBroadcastLogic.canSendToUser (
+			taskLogger,
 			chatUser,
 			chatBroadcast.getIncludeBlocked (),
 			chatBroadcast.getIncludeOptedOut ());
@@ -309,9 +329,15 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	void sendItem (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast,
 			@NonNull ChatBroadcastNumberRec chatBroadcastNumber) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendItem");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -357,25 +383,27 @@ class ChatBroadcastSendHelper
 
 		MessageRec message =
 			magicNumberLogic.sendMessage (
+				taskLogger,
 				chatScheme.getMagicNumberSet (),
 				toChatUser.getNumber (),
 				commandHelper.findByCodeRequired (
 					chat,
 					"chat"),
 				fromChatUser.getId (),
-				Optional.<Long>absent (),
+				optionalAbsent (),
 				chatBroadcast.getText (),
 				chatScheme.getMagicRouter (),
 				broadcastService,
-				Optional.of (
+				optionalOf (
 					batch),
 				affiliate,
-				Optional.of (
+				optionalOf (
 					chatBroadcast.getSentUser ()));
 
 		// create chat message
 
 		chatMessageHelper.insert (
+			taskLogger,
 			chatMessageHelper.createInstance ()
 
 			.setChat (
@@ -427,8 +455,14 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	void sendComplete (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatRec chat,
 			@NonNull ChatBroadcastRec chatBroadcast) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendComplete");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -471,6 +505,7 @@ class ChatBroadcastSendHelper
 		// create event
 
 		eventLogic.createEvent (
+			taskLogger,
 			"chat_broadcast_send_completed",
 			chatBroadcast);
 

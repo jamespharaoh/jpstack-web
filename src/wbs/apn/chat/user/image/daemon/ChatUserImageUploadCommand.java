@@ -1,6 +1,7 @@
 package wbs.apn.chat.user.image.daemon;
 
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -123,6 +124,11 @@ class ChatUserImageUploadCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
+
 		Transaction transaction =
 			database.currentTransaction ();
 
@@ -136,6 +142,7 @@ class ChatUserImageUploadCommand
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
+				taskLogger,
 				chat,
 				messageIn);
 
@@ -173,8 +180,9 @@ class ChatUserImageUploadCommand
 		MessageRec messageOut =
 			optionalGetRequired (
 				chatSendLogic.sendSystemMagic (
+					taskLogger,
 					chatUser,
-					Optional.of (
+					optionalOf (
 						messageIn.getThreadId ()),
 					"image_upload_link",
 					magicCommand,
@@ -187,6 +195,7 @@ class ChatUserImageUploadCommand
 		// save token in database
 
 		chatUserImageUploadTokenHelper.insert (
+			taskLogger,
 			chatUserImageUploadTokenHelper.createInstance ()
 
 			.setChatUser (
@@ -223,9 +232,12 @@ class ChatUserImageUploadCommand
 		// process inbox
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (defaultService),
-			Optional.of (affiliate),
+			optionalOf (
+				defaultService),
+			optionalOf (
+				affiliate),
 			command);
 
 

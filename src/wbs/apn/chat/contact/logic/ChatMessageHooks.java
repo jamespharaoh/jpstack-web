@@ -7,9 +7,12 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHooks;
 
 import wbs.apn.chat.contact.model.ChatContactObjectHelper;
@@ -30,12 +33,21 @@ class ChatMessageHooks
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// implementation
 
 	@Override
 	public
 	void beforeInsert (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatMessageRec chatMessage) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"beforeInsert");
 
 		ChatUserRec fromChatUser =
 			chatMessage.getFromUser ();
@@ -69,6 +81,7 @@ class ChatMessageHooks
 
 		ChatContactRec chatContact =
 			chatContactHelper.findOrCreate (
+				taskLogger,
 				chatMessage.getFromUser (),
 				chatMessage.getToUser ());
 

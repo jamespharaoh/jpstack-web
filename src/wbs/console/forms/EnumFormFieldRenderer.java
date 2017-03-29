@@ -24,7 +24,9 @@ import lombok.experimental.Accessors;
 
 import wbs.console.helper.enums.EnumConsoleHelper;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
@@ -36,6 +38,11 @@ import fj.data.Either;
 public
 class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 	implements FormFieldRenderer <Container, Interface> {
+
+	// singleton components
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -91,12 +98,18 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderFormInput");
+
 		Optional <Interface> currentValue =
 			formValuePresent (
 					submission,
 					formName)
 				? resultValueRequired (
 					formToInterface (
+						taskLogger,
 						submission,
 						formName))
 				: interfaceValue;
@@ -231,6 +244,7 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 	@Override
 	public
 	Either <Optional <Interface>, String> formToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 

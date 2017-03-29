@@ -116,6 +116,7 @@ class ChatUserAdminOnlineAction
 							true);
 
 					eventLogic.createEvent (
+						taskLogger,
 						"chat_user_online",
 						userConsoleLogic.userRequired (),
 						chatUser);
@@ -146,12 +147,14 @@ class ChatUserAdminOnlineAction
 						transaction.now ());
 
 				chatMiscLogic.userJoin (
+					taskLogger,
 					chatUser,
 					true,
 					null,
 					chatUser.getDeliveryMethod ());
 
 				eventLogic.createEvent (
+					taskLogger,
 					"chat_user_online",
 					userConsoleLogic.userRequired (),
 					chatUser);
@@ -192,6 +195,7 @@ class ChatUserAdminOnlineAction
 				} else {
 
 					chatMiscLogic.userLogoffWithMessage (
+						taskLogger,
 						chatUser,
 						null,
 						false);
@@ -199,6 +203,7 @@ class ChatUserAdminOnlineAction
 				}
 
 				eventLogic.createEvent (
+					taskLogger,
 					"chat_user_offline",
 					userConsoleLogic.userRequired (),
 					chatUser);

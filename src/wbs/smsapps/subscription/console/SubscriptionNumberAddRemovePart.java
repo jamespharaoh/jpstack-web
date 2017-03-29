@@ -54,6 +54,11 @@ class SubscriptionNumberAddRemovePart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		addRemoveFormFieldSet =
 			subscriptionNumberConsoleModule.formFieldSet (
 				"addRemoveForm",
@@ -63,6 +68,7 @@ class SubscriptionNumberAddRemovePart
 			new SubscriptionNumberAddRemoveForm ();
 
 		formFieldLogic.update (
+			taskLogger,
 			requestContext,
 			addRemoveFormFieldSet,
 			addRemoveForm,

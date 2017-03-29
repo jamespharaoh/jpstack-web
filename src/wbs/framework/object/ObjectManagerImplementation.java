@@ -54,6 +54,7 @@ import com.google.common.collect.ImmutableList;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -61,6 +62,8 @@ import wbs.framework.database.Database;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
 
@@ -76,6 +79,9 @@ class ObjectManagerImplementation
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectTypeRegistry objectTypeRegistry;
@@ -529,14 +535,16 @@ class ObjectManagerImplementation
 	}
 
 	@Override
-	public <RecordType extends Record<?>>
+	public <RecordType extends Record <?>>
 	RecordType update (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object) {
 
-		ObjectHelper<?> objectHelper =
+		ObjectHelper <?> objectHelper =
 			objectHelperForClassRequired (object.getClass ());
 
 		return objectHelper.update (
+			parentTaskLogger,
 			object);
 
 	}

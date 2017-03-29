@@ -9,13 +9,14 @@ import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.message.core.model.MessageStatus;
@@ -36,13 +37,16 @@ class BroadcastSystemsReportFile
 	// singleton dependencies
 
 	@SingletonDependency
-	RequestContext requestContext;
-
-	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SmsDeliveryReportLogic reportLogic;
+
+	@SingletonDependency
+	RequestContext requestContext;
 
 	@SingletonDependency
 	RouteObjectHelper routeHelper;
@@ -115,30 +119,41 @@ class BroadcastSystemsReportFile
 	}
 
 	void updateDatabase (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Data data) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"BroadcastSystemsReportFile.updateDatabase (data)",
-				this);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"updateDatabase");
 
-		RouteRec route =
-			routeHelper.findRequired (
-				data.routeId);
+		try (
 
-		reportLogic.deliveryReport (
-			route,
-			data.transactionId,
-			data.status,
-			Optional.of (
-				data.statusCode),
-			Optional.absent (),
-			Optional.absent (),
-			Optional.absent ());
+			Transaction transaction =
+				database.beginReadWrite (
+					"BroadcastSystemsReportFile.updateDatabase (data)",
+					this);
 
-		transaction.commit ();
+		) {
+
+			RouteRec route =
+				routeHelper.findRequired (
+					data.routeId);
+
+			reportLogic.deliveryReport (
+				taskLogger,
+				route,
+				data.transactionId,
+				data.status,
+				Optional.of (
+					data.statusCode),
+				Optional.absent (),
+				Optional.absent (),
+				Optional.absent ());
+
+			transaction.commit ();
+
+		}
 
 	}
 

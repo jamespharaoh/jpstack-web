@@ -128,12 +128,14 @@ class BroadcastSendAction
 						broadcastConfig.getNumSending () + 1);
 
 				eventLogic.createEvent (
+					taskLogger,
 					"broadcast_scheduled",
 					userConsoleLogic.userRequired (),
 					broadcast,
 					transaction.now ());
 
 				eventLogic.createEvent (
+					taskLogger,
 					"broadcast_send_begun",
 					broadcast);
 
@@ -202,6 +204,7 @@ class BroadcastSendAction
 						broadcastConfig.getNumScheduled () + 1);
 
 				eventLogic.createEvent (
+					taskLogger,
 					"broadcast_scheduled",
 					userConsoleLogic.userRequired (),
 					broadcast,
@@ -239,12 +242,15 @@ class BroadcastSendAction
 					.setState (BroadcastState.unsent);
 
 				broadcastConfig
+
 					.setNumScheduled (
 						broadcastConfig.getNumScheduled () - 1)
+
 					.setNumUnsent (
 						broadcastConfig.getNumUnsent () + 1);
 
 				eventLogic.createEvent (
+					taskLogger,
 					"broadcast_unscheduled",
 					userConsoleLogic.userRequired (),
 					broadcast);
@@ -295,6 +301,7 @@ class BroadcastSendAction
 						BroadcastState.cancelled);
 
 					eventLogic.createEvent (
+						taskLogger,
 						"broadcast_cancelled",
 						userConsoleLogic.userRequired (),
 						broadcast);
@@ -318,6 +325,7 @@ class BroadcastSendAction
 						BroadcastState.partiallySent);
 
 					eventLogic.createEvent (
+						taskLogger,
 						"broadcast_cancelled",
 						userConsoleLogic.userRequired (),
 						broadcast);

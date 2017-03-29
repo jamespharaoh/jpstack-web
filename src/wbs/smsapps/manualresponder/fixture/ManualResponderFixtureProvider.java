@@ -2,11 +2,13 @@ package wbs.smsapps.manualresponder.fixture;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.model.CurrencyObjectHelper;
@@ -48,6 +50,9 @@ class ManualResponderFixtureProvider
 	@SingletonDependency
 	KeywordSetObjectHelper keywordSetHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ManualResponderObjectHelper manualResponderHelper;
 
@@ -82,16 +87,30 @@ class ManualResponderFixtureProvider
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		createMenuItem ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFixtures");
 
-		createManualResponder ();
+		createMenuItem (
+			taskLogger);
+
+		createManualResponder (
+			taskLogger);
 
 	}
 
 	private
-	void createMenuItem () {
+	void createMenuItem (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMenuItem");
 
 		menuItemHelper.insert (
+			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
@@ -123,10 +142,17 @@ class ManualResponderFixtureProvider
 	}
 
 	private
-	void createManualResponder () {
+	void createManualResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createManualResponder");
 
 		ManualResponderRec manualResponder =
 			manualResponderHelper.insert (
+				taskLogger,
 				manualResponderHelper.createInstance ()
 
 			.setSlice (
@@ -169,6 +195,7 @@ class ManualResponderFixtureProvider
 		database.flush ();
 
 		keywordHelper.insert (
+			taskLogger,
 			keywordHelper.createInstance ()
 
 			.setKeywordSet (
@@ -191,15 +218,23 @@ class ManualResponderFixtureProvider
 		);
 
 		createManualResponderTemplates (
+			taskLogger,
 			manualResponder);
 
 	}
 
 	private
 	void createManualResponderTemplates (
-			ManualResponderRec manualResponder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ManualResponderRec manualResponder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createManualResponderTemplates");
 
 		manualResponderTemplateHelper.insert (
+			taskLogger,
 			manualResponderTemplateHelper.createInstance ()
 
 			.setManualResponder (
@@ -240,6 +275,7 @@ class ManualResponderFixtureProvider
 		);
 
 		manualResponderTemplateHelper.insert (
+			taskLogger,
 			manualResponderTemplateHelper.createInstance ()
 
 			.setManualResponder (
@@ -295,6 +331,7 @@ class ManualResponderFixtureProvider
 		);
 
 		manualResponderTemplateHelper.insert (
+			taskLogger,
 			manualResponderTemplateHelper.createInstance ()
 
 			.setManualResponder (
@@ -350,6 +387,7 @@ class ManualResponderFixtureProvider
 		);
 
 		manualResponderTemplateHelper.insert (
+			taskLogger,
 			manualResponderTemplateHelper.createInstance ()
 
 			.setManualResponder (
@@ -405,6 +443,7 @@ class ManualResponderFixtureProvider
 		);
 
 		manualResponderTemplateHelper.insert (
+			taskLogger,
 			manualResponderTemplateHelper.createInstance ()
 
 			.setManualResponder (
@@ -446,6 +485,7 @@ class ManualResponderFixtureProvider
 
 		manualResponder.setDateOfBirthTemplate (
 			manualResponderTemplateHelper.insert (
+				taskLogger,
 				manualResponderTemplateHelper.createInstance ()
 
 			.setManualResponder (
@@ -493,6 +533,7 @@ class ManualResponderFixtureProvider
 
 		manualResponder.setDateOfBirthErrorTemplate (
 			manualResponderTemplateHelper.insert (
+				taskLogger,
 				manualResponderTemplateHelper.createInstance ()
 
 			.setManualResponder (
@@ -543,6 +584,7 @@ class ManualResponderFixtureProvider
 
 		manualResponder.setTooYoungTemplate (
 			manualResponderTemplateHelper.insert (
+				taskLogger,
 				manualResponderTemplateHelper.createInstance ()
 
 			.setManualResponder (

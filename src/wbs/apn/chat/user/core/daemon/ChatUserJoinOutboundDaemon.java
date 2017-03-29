@@ -2,24 +2,26 @@ package wbs.apn.chat.user.core.daemon;
 
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.earlierThan;
 
 import java.util.List;
-
-import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
 
@@ -56,6 +58,9 @@ class ChatUserJoinOutboundDaemon
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// details
 
 	@Override
@@ -89,45 +94,58 @@ class ChatUserJoinOutboundDaemon
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce ()");
 
 		// get a list of users who are past their outbound timestamp
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ChatUserJoinOutboundDaemon.runOnce ()",
-				this);
+		try (
 
-		List<ChatUserRec> chatUsers =
-			chatUserHelper.findWantingJoinOutbound (
-				transaction.now ());
+			Transaction transaction =
+				database.beginReadOnly (
+					"ChatUserJoinOutboundDaemon.runOnce ()",
+					this);
 
-		transaction.close ();
-
-		// then do each one
-
-		for (
-			ChatUserRec chatUser
-				: chatUsers
 		) {
 
-			try {
+			List <ChatUserRec> chatUsers =
+				chatUserHelper.findWantingJoinOutbound (
+					transaction.now ());
 
-				doChatUserJoinOutbound (
-					chatUser.getId ());
+			transaction.close ();
 
-			} catch (Exception exception) {
+			// then do each one
 
-				exceptionLogger.logThrowable (
-					"daemon",
-					stringFormat (
-						"chat user ",
-						integerToDecimalString (
-							chatUser.getId ())),
-					exception,
-					Optional.absent (),
-					GenericExceptionResolution.tryAgainLater);
+			for (
+				ChatUserRec chatUser
+					: chatUsers
+			) {
+
+				try {
+
+					doChatUserJoinOutbound (
+						taskLogger,
+						chatUser.getId ());
+
+				} catch (Exception exception) {
+
+					exceptionLogger.logThrowable (
+						taskLogger,
+						"daemon",
+						stringFormat (
+							"chat user ",
+							integerToDecimalString (
+								chatUser.getId ())),
+						exception,
+						optionalAbsent (),
+						GenericExceptionResolution.tryAgainLater);
+
+				}
 
 			}
 
@@ -136,7 +154,13 @@ class ChatUserJoinOutboundDaemon
 	}
 
 	void doChatUserJoinOutbound (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doChatUserJoinOutbound");
 
 		@Cleanup
 		Transaction transaction =
@@ -197,6 +221,7 @@ class ChatUserJoinOutboundDaemon
 
 		ChatMonitorInboxRec chatMonitorInbox =
 			chatMessageLogic.findOrCreateChatMonitorInbox (
+				taskLogger,
 				monitor,
 				user,
 				true);
@@ -209,6 +234,7 @@ class ChatUserJoinOutboundDaemon
 		// create a log
 
 		chatUserInitiationLogHelper.insert (
+			taskLogger,
 			chatUserInitiationLogHelper.createInstance ()
 
 			.setChatUser (

@@ -1,14 +1,15 @@
 package wbs.platform.object.settings;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.Getter;
@@ -147,10 +148,11 @@ class ObjectSettingsAction <
 
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
+				taskLogger,
 				requestContext,
 				formFieldSet,
 				object,
-				ImmutableMap.of (),
+				emptyMap (),
 				"settings");
 
 		if (updateResultSet.errorCount () > 0) {
@@ -182,6 +184,7 @@ class ObjectSettingsAction <
 		if (object instanceof PermanentRecord) {
 
 			formFieldLogic.runUpdateHooks (
+				taskLogger,
 				formFieldSet,
 				updateResultSet,
 				object,
@@ -203,13 +206,14 @@ class ObjectSettingsAction <
 					objectRefName);
 
 			formFieldLogic.runUpdateHooks (
+				taskLogger,
 				formFieldSet,
 				updateResultSet,
 				object,
 				linkObject,
-				Optional.of (
+				optionalOf (
 					objectRef),
-				Optional.of (
+				optionalOf (
 					objectType),
 				"settings");
 

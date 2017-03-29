@@ -17,12 +17,15 @@ import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -56,6 +59,9 @@ class ChatMonitorSwapDaemon
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -96,46 +102,58 @@ class ChatMonitorSwapDaemon
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce ()");
 
 		// get list of chats
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ChatMonitorSwapDaemon.runOnce ()",
-				this);
+		try (
 
-		List<ChatRec> chats =
-			chatHelper.findAll ();
+			Transaction transaction =
+				database.beginReadOnly (
+					"ChatMonitorSwapDaemon.runOnce ()",
+					this);
 
-		transaction.close ();
-
-		// then call doMonitorSwap for any whose time has come
-
-		for (
-			ChatRec chat
-				: chats
 		) {
 
-			if (
+			List <ChatRec> chats =
+				chatHelper.findAll ();
 
-				isNull (
-					chat.getLastMonitorSwap ())
+			transaction.close ();
 
-				|| earlierThan (
-					chat.getLastMonitorSwap ().plus (
-						chat.getTimeMonitorSwap () * 1000),
-					transaction.now ())
+			// then call doMonitorSwap for any whose time has come
 
+			for (
+				ChatRec chat
+					: chats
 			) {
 
-				doMonitorSwap (
-					chat.getId (),
-					randomLogic.sample (
-						Gender.values ()),
-					randomLogic.sample (
-						Orient.values ()));
+				if (
+
+					isNull (
+						chat.getLastMonitorSwap ())
+
+					|| earlierThan (
+						chat.getLastMonitorSwap ().plus (
+							chat.getTimeMonitorSwap () * 1000),
+						transaction.now ())
+
+				) {
+
+					doMonitorSwap (
+						taskLogger,
+						chat.getId (),
+						randomLogic.sample (
+							Gender.values ()),
+						randomLogic.sample (
+							Orient.values ()));
+
+				}
 
 			}
 
@@ -143,10 +161,17 @@ class ChatMonitorSwapDaemon
 
 	}
 
+	private
 	void doMonitorSwap (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatId,
 			@NonNull Gender gender,
 			@NonNull Orient orient) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doMonitorSwap");
 
 		try {
 
@@ -158,6 +183,7 @@ class ChatMonitorSwapDaemon
 		} catch (Exception exception) {
 
 			exceptionLogger.logThrowable (
+				taskLogger,
 				"daemon",
 				stringFormat (
 					"chat %s %s %s",

@@ -1,14 +1,18 @@
 package wbs.platform.event.logic;
 
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.model.EventRec;
 
 public
 interface EventLogic {
 
 	EventRec createEvent (
+			TaskLogger parentTaskLogger,
 			String typeCode);
 
 	EventRec createEvent (
+			TaskLogger parentTaskLogger,
 			String typeCode,
 			Object... objects);
 

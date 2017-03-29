@@ -19,9 +19,12 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -44,11 +47,9 @@ import wbs.sms.route.router.model.RouterRec;
 
 import wbs.utils.etc.NumberUtils;
 
-import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.logic.ChatHelpLogLogic;
 import wbs.apn.chat.help.logic.ChatHelpTemplateLogic;
-import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
@@ -78,6 +79,9 @@ class ChatSendLogicImplementation
 
 	@SingletonDependency
 	KeywordLogic keywordLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MagicNumberLogic magicNumberLogic;
@@ -112,10 +116,16 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	MessageRec sendMessageRbFree (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
 			@NonNull ServiceRec service,
 			@NonNull String message) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendMessageRbFree");
 
 		if (chatUser.getNumber () == null) {
 
@@ -150,6 +160,7 @@ class ChatSendLogicImplementation
 				chatUser.getNumber ())
 
 			.messageString (
+				taskLogger,
 				message)
 
 			.numFrom (
@@ -164,7 +175,8 @@ class ChatSendLogicImplementation
 			.affiliate (
 				affiliate)
 
-			.send ();
+			.send (
+				taskLogger);
 
 	}
 
@@ -185,7 +197,8 @@ class ChatSendLogicImplementation
 	 */
 	@Override
 	public
-	Optional<MessageRec> sendSystem (
+	Optional <MessageRec> sendSystem (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
 			@NonNull String templateCode,
@@ -196,6 +209,11 @@ class ChatSendLogicImplementation
 			@NonNull String serviceCode,
 			@NonNull TemplateMissing templateMissing,
 			@NonNull Map<String,String> suppliedParams) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendSystem");
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -248,11 +266,16 @@ class ChatSendLogicImplementation
 		// to be changed when the reverse bill number changes which is
 		// certainly not a good thing
 
-		if (chatHelpTemplate.getFromNumber () != null
-				&& chatHelpTemplate.getFromNumber () != "") {
+		if (
+			chatHelpTemplate.getFromNumber () != null
+			&& chatHelpTemplate.getFromNumber () != ""
+		) {
 
-			numFrom =
-				chatHelpTemplate.getFromNumber ();
+			throw new RuntimeException (
+				"Disabled because it is horrible");
+
+			//numFrom =
+			//	chatHelpTemplate.getFromNumber ();
 
 		}
 
@@ -277,6 +300,7 @@ class ChatSendLogicImplementation
 				chatUser.getNumber ())
 
 			.messageString (
+				taskLogger,
 				finalText)
 
 			.numFrom (
@@ -300,18 +324,20 @@ class ChatSendLogicImplementation
 			.tags (
 				tags)
 
-			.send ();
+			.send (
+				taskLogger);
 
 		// log it
 
 		chatHelpLogLogic.createChatHelpLogOut (
+			taskLogger,
 			chatUser,
-			Optional.<ChatHelpLogRec>absent (),
-			Optional.<UserRec>absent (),
+			optionalAbsent (),
+			optionalAbsent (),
 			message,
-			Optional.<ChatMessageRec>absent (),
+			optionalAbsent (),
 			finalText,
-			Optional.<CommandRec>absent ());
+			optionalAbsent ());
 
 		return Optional.of (
 			message);
@@ -320,12 +346,18 @@ class ChatSendLogicImplementation
 
 	@Override
 	public
-	Optional<MessageRec> sendSystemRbFree (
+	Optional <MessageRec> sendSystemRbFree (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
 			@NonNull String templateCode,
 			@NonNull TemplateMissing templateMissing,
 			@NonNull Map<String,String> suppliedParams) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendSystemRbFree");
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -372,6 +404,7 @@ class ChatSendLogicImplementation
 
 		MessageRec message =
 			sendMessageRbFree (
+				taskLogger,
 				chatUser,
 				threadId,
 				serviceHelper.findByCodeRequired (
@@ -382,6 +415,7 @@ class ChatSendLogicImplementation
 		// log it
 
 		chatHelpLogLogic.createChatHelpLogOut (
+			taskLogger,
 			chatUser,
 			optionalAbsent (),
 			optionalAbsent (),
@@ -400,11 +434,17 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	MessageRec sendMessageMmsFree (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
 			@NonNull String message,
 			@NonNull CommandRec command,
 			@NonNull ServiceRec service) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendMessageMmsFree");
 
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();
@@ -425,6 +465,7 @@ class ChatSendLogicImplementation
 				chatUser.getNumber ())
 
 			.messageString (
+				taskLogger,
 				message)
 
 			.numFrom (
@@ -439,7 +480,8 @@ class ChatSendLogicImplementation
 			.affiliate (
 				affiliate)
 
-			.send ();
+			.send (
+				taskLogger);
 
 		// set the fallback keyword on the mms thing to handle a reply with no
 		// keyword
@@ -447,6 +489,7 @@ class ChatSendLogicImplementation
 		if (chatScheme.getMmsKeywordSet () != null) {
 
 			keywordLogic.createOrUpdateKeywordSetFallback (
+				taskLogger,
 				chatScheme.getMmsKeywordSet (),
 				chatUser.getNumber (),
 				command);
@@ -461,12 +504,18 @@ class ChatSendLogicImplementation
 
 	@Override
 	public
-	Optional<MessageRec> sendSystemMmsFree (
+	Optional <MessageRec> sendSystemMmsFree (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
 			@NonNull String templateCode,
 			@NonNull CommandRec command,
 			@NonNull TemplateMissing templateMissing) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendSystemMmsFree");
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -507,6 +556,7 @@ class ChatSendLogicImplementation
 
 		MessageRec message =
 			sendMessageMmsFree (
+				taskLogger,
 				chatUser,
 				threadId,
 				chatHelpTemplate.getText (),
@@ -516,13 +566,14 @@ class ChatSendLogicImplementation
 		// log it
 
 		chatHelpLogLogic.createChatHelpLogOut (
+			taskLogger,
 			chatUser,
-			Optional.<ChatHelpLogRec>absent (),
-			Optional.<UserRec>absent (),
+			optionalAbsent (),
+			optionalAbsent (),
 			message,
-			Optional.<ChatMessageRec>absent (),
+			optionalAbsent (),
 			chatHelpTemplate.getText (),
-			Optional.<CommandRec>absent ());
+			optionalAbsent ());
 
 		// and return
 
@@ -534,12 +585,18 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	MessageRec sendMessageMagic (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
 			@NonNull TextRec message,
 			@NonNull CommandRec magicCommand,
 			@NonNull ServiceRec service,
 			@NonNull Long magicRef) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendMessageMagic");
 
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();
@@ -562,6 +619,7 @@ class ChatSendLogicImplementation
 		// send the message and return
 
 		return magicNumberLogic.sendMessage (
+			taskLogger,
 			chatScheme.getMagicNumberSet (),
 			chatUser.getNumber (),
 			magicCommand,
@@ -580,6 +638,7 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	Optional <MessageRec> sendSystemMagic (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional <Long> threadId,
 			@NonNull String templateCode,
@@ -587,6 +646,11 @@ class ChatSendLogicImplementation
 			@NonNull Long magicRef,
 			@NonNull TemplateMissing templateMissing,
 			@NonNull Map <String, String> suppliedParams) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendSystemMagic");
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -646,12 +710,14 @@ class ChatSendLogicImplementation
 
 		TextRec text =
 			textHelper.findOrCreate (
+				taskLogger,
 				finalText);
 
 		// send message
 
 		MessageRec message =
 			sendMessageMagic (
+				taskLogger,
 				chatUser,
 				threadId,
 				text,
@@ -664,6 +730,7 @@ class ChatSendLogicImplementation
 		// log it
 
 		chatHelpLogLogic.createChatHelpLogOut (
+			taskLogger,
 			chatUser,
 			optionalAbsent (),
 			optionalAbsent (),
@@ -690,6 +757,7 @@ class ChatSendLogicImplementation
 	@Override
 	public
 	Long sendMessageMagic (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional <Long> threadId,
 			@NonNull Collection <TextRec> parts,
@@ -698,10 +766,16 @@ class ChatSendLogicImplementation
 			@NonNull Long magicRef,
 			@NonNull Optional <UserRec> user) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendMessageMagic");
+
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();
 
 		return magicNumberLogic.sendMessage (
+			taskLogger,
 			chatScheme.getMagicNumberSet (),
 			chatUser.getNumber (),
 			magicCommand,
@@ -710,7 +784,7 @@ class ChatSendLogicImplementation
 			parts,
 			chatScheme.getMagicRouter (),
 			service,
-			Optional.<BatchRec>absent (),
+			optionalAbsent (),
 			chatUserLogic.getAffiliate (
 				chatUser),
 			user);

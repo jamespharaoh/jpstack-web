@@ -1,10 +1,9 @@
 package wbs.imchat.api;
 
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
 import javax.inject.Provider;
-
-import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
@@ -12,6 +11,7 @@ import lombok.NonNull;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -19,7 +19,9 @@ import wbs.framework.component.config.WbsConfig;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.imchat.logic.ImChatLogic;
 import wbs.imchat.model.ImChatCustomerObjectHelper;
 import wbs.imchat.model.ImChatCustomerRec;
@@ -52,6 +54,9 @@ class ImChatForgotPasswordAction
 	@SingletonDependency
 	ImChatObjectHelper imChatHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RequestContext requestContext;
 
@@ -69,6 +74,11 @@ class ImChatForgotPasswordAction
 	public
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		DataFromJson dataFromJson =
 			new DataFromJson ();
@@ -127,8 +137,9 @@ class ImChatForgotPasswordAction
 		// generate new password
 
 		imChatLogic.customerPasswordGenerate (
+			taskLogger,
 			imChatCustomer,
-			Optional.absent ());
+			optionalAbsent ());
 
 		// create response
 

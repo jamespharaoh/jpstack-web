@@ -11,18 +11,23 @@ import lombok.NonNull;
 
 import org.apache.commons.lang3.tuple.Pair;
 
-import wbs.apn.chat.contact.model.ChatContactObjectHelperMethods;
-import wbs.apn.chat.contact.model.ChatContactObjectHelper;
-import wbs.apn.chat.contact.model.ChatContactRec;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.LateLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.cache.AdvancedCache;
 import wbs.utils.cache.IdCacheBuilder;
+
+import wbs.apn.chat.contact.model.ChatContactObjectHelper;
+import wbs.apn.chat.contact.model.ChatContactObjectHelperMethods;
+import wbs.apn.chat.contact.model.ChatContactRec;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 
 public
 class ChatContactObjectHelperMethodsImplementation
@@ -39,6 +44,9 @@ class ChatContactObjectHelperMethodsImplementation
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// prototype dependencies
 
 	@PrototypeDependency
@@ -53,7 +61,13 @@ class ChatContactObjectHelperMethodsImplementation
 
 	@LateLifecycleSetup
 	public
-	void setup () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
 
 		// from and to user id
 
@@ -76,19 +90,13 @@ class ChatContactObjectHelperMethodsImplementation
 				ChatContactRec::getId)
 
 			.createFunction (
-				key ->
-
-				findOrCreateReal (
-					chatUserHelper.findRequired (
-						key.getLeft ()),
-					chatUserHelper.findRequired (
-						key.getRight ())))
+				this::findOrCreateReal)
 
 			.build ();
 
 	}
 
-	// implementation
+	// public implementation
 
 	@Override
 	public
@@ -106,10 +114,17 @@ class ChatContactObjectHelperMethodsImplementation
 	@Override
 	public
 	ChatContactRec findOrCreate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec fromUser,
 			@NonNull ChatUserRec toUser) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreate");
+
 		return fromAndToUserCache.findOrCreate (
+			taskLogger,
 			Pair.of (
 				fromUser.getId (),
 				toUser.getId ()));
@@ -118,8 +133,14 @@ class ChatContactObjectHelperMethodsImplementation
 
 	private
 	ChatContactRec findOrCreateReal (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec fromUser,
 			@NonNull ChatUserRec toUser) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreateReal");
 
 		// look for existing
 
@@ -148,6 +169,7 @@ class ChatContactObjectHelperMethodsImplementation
 
 		ChatContactRec chatContact =
 			chatContactHelper.insert (
+				taskLogger,
 				chatContactHelper.createInstance ()
 
 			.setFromUser (
@@ -182,6 +204,22 @@ class ChatContactObjectHelperMethodsImplementation
 		// and return
 
 		return chatContact;
+
+	}
+
+	// private implementation
+
+	private
+	ChatContactRec findOrCreateReal (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Pair <Long, Long> userIds) {
+
+		return findOrCreateReal (
+			parentTaskLogger,
+			chatUserHelper.findRequired (
+				userIds.getLeft ()),
+			chatUserHelper.findRequired (
+				userIds.getRight ()));
 
 	}
 

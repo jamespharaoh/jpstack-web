@@ -210,6 +210,7 @@ class ChatBroadcastVerifyPart
 		// always hidden
 
 		formFieldLogic.outputFormAlwaysHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			searchFields,
@@ -220,6 +221,7 @@ class ChatBroadcastVerifyPart
 			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			numbersFields,
@@ -230,6 +232,7 @@ class ChatBroadcastVerifyPart
 			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			commonFields,
@@ -240,6 +243,7 @@ class ChatBroadcastVerifyPart
 			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			messageUserFields,
@@ -250,6 +254,7 @@ class ChatBroadcastVerifyPart
 			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			messageMessageFields,
@@ -262,6 +267,7 @@ class ChatBroadcastVerifyPart
 		// temporarily hidden
 
 		formFieldLogic.outputFormTemporarilyHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			searchFields,
@@ -271,6 +277,7 @@ class ChatBroadcastVerifyPart
 			"send");
 
 		formFieldLogic.outputFormTemporarilyHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			numbersFields,
@@ -280,6 +287,7 @@ class ChatBroadcastVerifyPart
 			"send");
 
 		formFieldLogic.outputFormTemporarilyHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			commonFields,
@@ -289,6 +297,7 @@ class ChatBroadcastVerifyPart
 			"send");
 
 		formFieldLogic.outputFormTemporarilyHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			messageUserFields,

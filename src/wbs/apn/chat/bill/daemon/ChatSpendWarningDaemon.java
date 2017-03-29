@@ -1,24 +1,24 @@
 package wbs.apn.chat.bill.daemon;
 
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
-import java.util.Collections;
 import java.util.List;
 
-import com.google.common.base.Optional;
-
-import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -30,7 +30,6 @@ import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 
-@Log4j
 @SingletonComponent ("chatSpendWarningDaemon")
 public
 class ChatSpendWarningDaemon
@@ -49,6 +48,9 @@ class ChatSpendWarningDaemon
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -86,42 +88,55 @@ class ChatSpendWarningDaemon
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		log.debug (
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce ()");
+
+		taskLogger.debugFormat (
 			"Looking for users to send spend warning to");
 
 		// get a list of users who need a spend warning
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ChatSpendWarningDaemon.runOnce ()",
-				this);
+		try (
 
-		List<ChatUserRec> chatUsers =
-			chatUserHelper.findWantingWarning ();
+			Transaction transaction =
+				database.beginReadOnly (
+					"ChatSpendWarningDaemon.runOnce ()",
+					this);
 
-		transaction.close ();
-
-		for (
-			ChatUserRec chatUser
-				: chatUsers
 		) {
 
-			try {
+			List <ChatUserRec> chatUsers =
+				chatUserHelper.findWantingWarning ();
 
-				doUser (
-					chatUser.getId ());
+			transaction.close ();
 
-			} catch (Exception exception) {
+			for (
+				ChatUserRec chatUser
+					: chatUsers
+			) {
 
-				exceptionLogger.logThrowable (
-					"daemon",
-					"ChatSpendWarningDaemon",
-					exception,
-					Optional.absent (),
-					GenericExceptionResolution.tryAgainLater);
+				try {
+
+					doUser (
+						taskLogger,
+						chatUser.getId ());
+
+				} catch (Exception exception) {
+
+					exceptionLogger.logThrowable (
+						taskLogger,
+						"daemon",
+						"ChatSpendWarningDaemon",
+						exception,
+						optionalAbsent (),
+						GenericExceptionResolution.tryAgainLater);
+
+				}
 
 			}
 
@@ -129,70 +144,83 @@ class ChatSpendWarningDaemon
 
 	}
 
+	private
 	void doUser (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatSpendWarningDaemon.doUser (chatUserId)",
-				this);
+		TaskLogger taskLogger =
+			logContext.nestTaskLoggerFormat (
+				parentTaskLogger,
+				"doUser (%s)",
+				integerToDecimalString (
+					chatUserId));
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				chatUserId);
+		try (
 
-		ChatSchemeRec chatScheme =
-			chatUser.getChatScheme ();
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatSpendWarningDaemon.doUser (chatUserId)",
+					this);
 
-		ChatSchemeChargesRec chatSchemeCharges =
-			chatScheme.getCharges ();
-
-		// check warning is due
-
-		if (
-			chatUser.getValueSinceWarning ()
-				< chatSchemeCharges.getSpendWarningEvery ()
 		) {
-			return;
-		}
 
-		// log message
+			ChatUserRec chatUser =
+				chatUserHelper.findRequired (
+					chatUserId);
 
-		log.info (
-			stringFormat (
+			ChatSchemeRec chatScheme =
+				chatUser.getChatScheme ();
+
+			ChatSchemeChargesRec chatSchemeCharges =
+				chatScheme.getCharges ();
+
+			// check warning is due
+
+			if (
+				chatUser.getValueSinceWarning ()
+					< chatSchemeCharges.getSpendWarningEvery ()
+			) {
+				return;
+			}
+
+			// log message
+
+			taskLogger.noticeFormat (
 				"Sending warning to user %s",
 				objectManager.objectPathMini (
-					chatUser)));
+					chatUser));
 
-		// send message
+			// send message
 
-		chatSendLogic.sendSystemRbFree (
-			chatUser,
-			Optional.<Long>absent (),
-			chatUser.getNumSpendWarnings () == 0
-				? "spend_warning_1"
-				: "spend_warning_2",
-			TemplateMissing.error,
-			Collections.<String,String>emptyMap ());
+			chatSendLogic.sendSystemRbFree (
+				taskLogger,
+				chatUser,
+				optionalAbsent (),
+				chatUser.getNumSpendWarnings () == 0
+					? "spend_warning_1"
+					: "spend_warning_2",
+				TemplateMissing.error,
+				emptyMap ());
 
-		// update user
+			// update user
 
-		chatUser
+			chatUser
 
-			.setValueSinceWarning (
-				+ chatUser.getValueSinceWarning ()
-				- chatSchemeCharges.getSpendWarningEvery ())
+				.setValueSinceWarning (
+					+ chatUser.getValueSinceWarning ()
+					- chatSchemeCharges.getSpendWarningEvery ())
 
-			.setNumSpendWarnings (
-				+ chatUser.getNumSpendWarnings ()
-				+ 1);
+				.setNumSpendWarnings (
+					+ chatUser.getNumSpendWarnings ()
+					+ 1);
 
-		// commit and return
+			// commit and return
 
-		transaction.commit ();
+			transaction.commit ();
+
+		}
 
 	}
-
 
 }

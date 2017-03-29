@@ -27,12 +27,14 @@ import org.joda.time.Days;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -84,8 +86,8 @@ class ManualResponderCommand
 	@SingletonDependency
 	EmailLogic emailLogic;
 
-	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ManualResponderLogic manualResponderLogic;
@@ -116,6 +118,9 @@ class ManualResponderCommand
 
 	@SingletonDependency
 	SmsCustomerLogic smsCustomerLogic;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -170,6 +175,11 @@ class ManualResponderCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
+
 		transaction =
 			database.currentTransaction ();
 
@@ -203,6 +213,7 @@ class ManualResponderCommand
 
 		manualResponderNumber =
 			manualResponderNumberHelper.findOrCreate (
+				taskLogger,
 				manualResponder,
 				message.getNumber ());
 
@@ -219,6 +230,7 @@ class ManualResponderCommand
 		) {
 
 			numberListLogic.removeDueToMessage (
+				taskLogger,
 				manualResponder.getUnblockNumberList (),
 				message.getNumber (),
 				message,
@@ -236,6 +248,7 @@ class ManualResponderCommand
 			smsCustomer =
 				Optional.of (
 					smsCustomerHelper.findOrCreate (
+						taskLogger,
 						manualResponder.getSmsCustomerManager (),
 						message.getNumber ()));
 
@@ -278,6 +291,7 @@ class ManualResponderCommand
 			}
 
 			smsCustomerLogic.customerAffiliateUpdate (
+				taskLogger,
 				smsCustomer.get (),
 				manualResponderAffiliate.getSmsCustomerAffiliate (),
 				message);
@@ -288,6 +302,7 @@ class ManualResponderCommand
 
 		request =
 			manualResponderRequestHelper.insert (
+				taskLogger,
 				manualResponderRequestHelper.createInstance ()
 
 			.setManualResponderNumber (
@@ -330,11 +345,18 @@ class ManualResponderCommand
 
 		// handle message as appropriate
 
-		return handleGeneral ();
+		return handleGeneral (
+			taskLogger);
 
 	}
 
-	InboxAttemptRec handleExpectDateOfBirth () {
+	InboxAttemptRec handleExpectDateOfBirth (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleExpectDateOfBirth");
 
 		// reset if date of birth already known
 
@@ -348,7 +370,8 @@ class ManualResponderCommand
 				.setExpectDateOfBirth (
 					false);
 
-			return handleGeneral ();
+			return handleGeneral (
+				taskLogger);
 
 		}
 
@@ -406,7 +429,8 @@ class ManualResponderCommand
 					"Message rest: %s\n",
 					rest));
 
-			return handleDateOfBirthError ();
+			return handleDateOfBirthError (
+				taskLogger);
 
 		}
 
@@ -422,13 +446,21 @@ class ManualResponderCommand
 			.setExpectDateOfBirth (
 				false);
 
-		return handleGeneral ();
+		return handleGeneral (
+			taskLogger);
 
 	}
 
-	InboxAttemptRec handleNeedDateOfBirth () {
+	InboxAttemptRec handleNeedDateOfBirth (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleNeedDateOfBirth");
 
 		manualResponderLogic.sendTemplateAutomatically (
+			taskLogger,
 			request,
 			manualResponder.getDateOfBirthTemplate ());
 
@@ -438,8 +470,9 @@ class ManualResponderCommand
 				true);
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (
+			optionalOf (
 				defaultService),
 			manualResponderLogic.customerAffiliate (
 				manualResponderNumber),
@@ -447,9 +480,16 @@ class ManualResponderCommand
 
 	}
 
-	InboxAttemptRec handleDateOfBirthError () {
+	InboxAttemptRec handleDateOfBirthError (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleDateOfBirthError");
 
 		manualResponderLogic.sendTemplateAutomatically (
+			taskLogger,
 			request,
 			manualResponder.getDateOfBirthErrorTemplate ());
 
@@ -459,8 +499,9 @@ class ManualResponderCommand
 				true);
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (
+			optionalOf (
 				defaultService),
 			manualResponderLogic.customerAffiliate (
 				manualResponderNumber),
@@ -468,15 +509,23 @@ class ManualResponderCommand
 
 	}
 
-	InboxAttemptRec handleTooYoungError () {
+	InboxAttemptRec handleTooYoungError (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleTooYoungError");
 
 		manualResponderLogic.sendTemplateAutomatically (
+			taskLogger,
 			request,
 			manualResponder.getTooYoungTemplate ());
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (
+			optionalOf (
 				defaultService),
 			manualResponderLogic.customerAffiliate (
 				manualResponderNumber),
@@ -484,12 +533,21 @@ class ManualResponderCommand
 
 	}
 
-	InboxAttemptRec handleGeneral () {
+	InboxAttemptRec handleGeneral (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleGeneral");
 
 		// if expecting date of birth
 
 		if (manualResponderNumber.getExpectDateOfBirth ()) {
-			return handleExpectDateOfBirth ();
+
+			return handleExpectDateOfBirth (
+				taskLogger);
+
 		}
 
 		// check age
@@ -519,7 +577,10 @@ class ManualResponderCommand
 				)
 
 			) {
-				return handleNeedDateOfBirth ();
+
+				return handleNeedDateOfBirth (
+					taskLogger);
+
 			}
 
 			// error if too young
@@ -541,18 +602,28 @@ class ManualResponderCommand
 						age,
 						manualResponder.getRequiredAge ())
 				) {
-					return handleTooYoungError ();
+
+					return handleTooYoungError (
+						taskLogger);
+
 				}
 
 			}
 
 		}
 
-		return handleNormal ();
+		return handleNormal (
+			taskLogger);
 
 	}
 
-	InboxAttemptRec handleNormal () {
+	InboxAttemptRec handleNormal (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleNormal");
 
 		// start session
 
@@ -562,6 +633,7 @@ class ManualResponderCommand
 		) {
 
 			smsCustomerLogic.sessionStart (
+				taskLogger,
 				smsCustomer.get (),
 				optionalOf (
 					message.getThreadId ()));
@@ -572,6 +644,7 @@ class ManualResponderCommand
 
 		QueueItemRec queueItem =
 			queueLogic.createQueueItem (
+				taskLogger,
 				manualResponder,
 				"default",
 				manualResponderNumber,
@@ -590,6 +663,7 @@ class ManualResponderCommand
 		// return
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
 			optionalOf (
 				defaultService),

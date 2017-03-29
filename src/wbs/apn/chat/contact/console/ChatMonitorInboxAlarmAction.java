@@ -219,6 +219,7 @@ class ChatMonitorInboxAlarmAction
 				// and create log
 
 				chatUserInitiationLogHelper.insert (
+					taskLogger,
 					chatUserInitiationLogHelper.createInstance ()
 
 					.setChatUser (
@@ -283,6 +284,7 @@ class ChatMonitorInboxAlarmAction
 				if (insert) {
 
 					chatUserAlarmHelper.insert (
+						taskLogger,
 						chatUserAlarm);
 
 				}
@@ -290,6 +292,7 @@ class ChatMonitorInboxAlarmAction
 				// create log
 
 				chatUserInitiationLogHelper.insert (
+					taskLogger,
 					chatUserInitiationLogHelper.createInstance ()
 
 					.setChatUser (

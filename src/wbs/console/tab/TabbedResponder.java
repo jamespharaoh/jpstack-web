@@ -97,8 +97,8 @@ class TabbedResponder
 
 	Throwable pagePartThrew;
 
-	List<MyLayer> myLayers =
-		new ArrayList<MyLayer> ();
+	List <MyLayer> myLayers =
+		new ArrayList<> ();
 
 	// details
 
@@ -223,6 +223,7 @@ class TabbedResponder
 				// record the exception
 
 				exceptionLogger.logThrowable (
+					taskLogger,
 					"console",
 					path,
 					exception,

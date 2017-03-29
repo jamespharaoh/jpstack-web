@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.NonNull;
 
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
@@ -20,12 +21,14 @@ interface QueueLogic {
 			String queueCode);
 
 	QueueItemRec createQueueItem (
+			TaskLogger parentTaskLogger,
 			QueueSubjectRec queueSubject,
 			Record <?> refObject,
 			String source,
 			String details);
 
 	QueueItemRec createQueueItem (
+			TaskLogger parentTaskLogger,
 			QueueRec queue,
 			Record <?> subjectObject,
 			Record <?> refObject,
@@ -34,6 +37,7 @@ interface QueueLogic {
 
 	default
 	QueueItemRec createQueueItem (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> queueParent,
 			@NonNull String queueCode,
 			@NonNull Record <?> subjectObject,
@@ -42,6 +46,7 @@ interface QueueLogic {
 			@NonNull String details) {
 
 		return createQueueItem (
+			parentTaskLogger,
 			findQueueByCodeRequired (
 				queueParent,
 				queueCode),
@@ -64,10 +69,11 @@ interface QueueLogic {
 			String code);
 
 	QueueSubjectRec findOrCreateQueueSubject (
+			TaskLogger parentTaskLogger,
 			QueueRec queue,
-			Record<?> object);
+			Record <?> object);
 
-	List<QueueItemRec> getActiveQueueItems (
+	List <QueueItemRec> getActiveQueueItems (
 			QueueSubjectRec queueSubject);
 
 	boolean sliceHasQueueActivity (

@@ -6,8 +6,13 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.sms.number.core.model.NumberRec;
+
 import wbs.test.simulator.model.SimulatorSessionNumberObjectHelper;
 import wbs.test.simulator.model.SimulatorSessionNumberObjectHelperMethods;
 import wbs.test.simulator.model.SimulatorSessionNumberRec;
@@ -18,6 +23,9 @@ class SimulatorSessionNumberObjectHelperMethodsImplementation
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@WeakSingletonDependency
 	SimulatorSessionNumberObjectHelper simulatorSessionNumberHelper;
 
@@ -26,7 +34,13 @@ class SimulatorSessionNumberObjectHelperMethodsImplementation
 	@Override
 	public
 	SimulatorSessionNumberRec findOrCreate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull NumberRec number) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreate");
 
 		// find existing
 
@@ -45,6 +59,7 @@ class SimulatorSessionNumberObjectHelperMethodsImplementation
 
 		SimulatorSessionNumberRec newSimulatorSessionNumber =
 			simulatorSessionNumberHelper.insert (
+				taskLogger,
 				simulatorSessionNumberHelper.createInstance ()
 
 			.setNumber (

@@ -11,10 +11,12 @@ import lombok.NonNull;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleHelper;
@@ -39,6 +41,9 @@ class ImChatCustomerSettingsPasswordAction
 
 	@SingletonDependency
 	ImChatLogic imChatLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -65,8 +70,13 @@ class ImChatCustomerSettingsPasswordAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws ServletException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// begin transaction
 
@@ -87,6 +97,7 @@ class ImChatCustomerSettingsPasswordAction
 			// generate new password
 
 			imChatLogic.customerPasswordGenerate (
+				taskLogger,
 				customer,
 				Optional.of (
 					userConsoleLogic.userRequired ()));

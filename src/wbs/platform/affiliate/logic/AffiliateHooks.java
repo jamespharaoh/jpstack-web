@@ -10,13 +10,17 @@ import java.util.stream.Collectors;
 import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHooks;
+
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.affiliate.model.AffiliateTypeDao;
 import wbs.platform.affiliate.model.AffiliateTypeRec;
@@ -34,6 +38,9 @@ class AffiliateHooks
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectTypeDao objectTypeDao;
@@ -78,6 +85,7 @@ class AffiliateHooks
 	@Override
 	public
 	void createSingletons (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ObjectHelper<AffiliateRec> affiliateHelper,
 			@NonNull ObjectHelper<?> parentHelper,
 			@NonNull Record<?> parent) {
@@ -89,6 +97,11 @@ class AffiliateHooks
 		) {
 			return;
 		}
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createSingletons");
 
 		ObjectTypeRec parentType =
 			objectTypeDao.findById (
@@ -105,6 +118,7 @@ class AffiliateHooks
 					affiliateTypeId);
 
 			affiliateHelper.insert (
+				taskLogger,
 				affiliateHelper.createInstance ()
 
 				.setAffiliateType (

@@ -20,7 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import lombok.Cleanup;
+import lombok.NonNull;
 
 import org.joda.time.Instant;
 
@@ -28,6 +28,7 @@ import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -36,11 +37,13 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.logic.UserLogic;
 import wbs.platform.user.model.UserOnlineObjectHelper;
 import wbs.platform.user.model.UserOnlineRec;
 import wbs.platform.user.model.UserRec;
+
 import wbs.web.responder.Responder;
 
 @SingletonComponent ("coreAuthFilter")
@@ -91,70 +94,82 @@ class CoreAuthFilter
 		new HashMap<> ();
 
 	private synchronized
-	void reload () {
+	void reload (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"CoreAuthFilter.reload ()",
-				this);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"reload");
 
-		onlineSessionIdsByUserId =
-			new HashMap <> ();
+		try (
 
-		for (
-			UserOnlineRec online
-				: userOnlineHelper.findAll ()
+			Transaction transaction =
+				database.beginReadWrite (
+					"CoreAuthFilter.reload ()",
+					this);
+
 		) {
 
-			UserRec user =
-				online.getUser ();
+			onlineSessionIdsByUserId =
+				new HashMap <> ();
 
-			// update his timestamp if appropriate
-
-			if (
-				activeSessions.containsKey (
-					online.getSessionId ())
-			)
-
-				online
-
-					.setTimestamp (
-						activeSessions.get (
-							online.getSessionId ()));
-
-			// check if he has been disabled or timed out
-
-			if (
-
-				! user.getActive ()
-
-				|| earlierThan (
-					online.getTimestamp ().plus (
-						logoffTime),
-					transaction.now ())
-
+			for (
+				UserOnlineRec online
+					: userOnlineHelper.findAll ()
 			) {
 
-				userLogic.userLogoff (
-					user);
+				UserRec user =
+					online.getUser ();
 
-				continue;
+				// update his timestamp if appropriate
+
+				if (
+					activeSessions.containsKey (
+						online.getSessionId ())
+				)
+
+					online
+
+						.setTimestamp (
+							activeSessions.get (
+								online.getSessionId ()));
+
+				// check if he has been disabled or timed out
+
+				if (
+
+					! user.getActive ()
+
+					|| earlierThan (
+						online.getTimestamp ().plus (
+							logoffTime),
+						transaction.now ())
+
+				) {
+
+					userLogic.userLogoff (
+						taskLogger,
+						user);
+
+					continue;
+
+				}
+
+				// ok put him in the ok list
+
+				onlineSessionIdsByUserId.put (
+					user.getId (),
+					online.getSessionId ());
 
 			}
 
-			// ok put him in the ok list
+			transaction.commit ();
 
-			onlineSessionIdsByUserId.put (
-				user.getId (),
-				online.getSessionId ());
+			activeSessions =
+				new HashMap<> ();
 
 		}
-
-		transaction.commit ();
-
-		activeSessions =
-			new HashMap<String,Instant> ();
 
 	}
 
@@ -165,7 +180,13 @@ class CoreAuthFilter
 	 * automatically when the caches are updated.
 	 */
 	private synchronized
-	boolean checkUser () {
+	boolean checkUser (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"checkUser");
 
 		Instant now =
 			Instant.now ();
@@ -196,7 +217,8 @@ class CoreAuthFilter
 
 		) {
 
-			reload ();
+			reload (
+				taskLogger);
 
 			lastReload =
 				now;
@@ -218,7 +240,8 @@ class CoreAuthFilter
 			if (reloaded)
 				return false;
 
-			reload ();
+			reload (
+				taskLogger);
 
 			lastReload =
 				now;
@@ -265,7 +288,8 @@ class CoreAuthFilter
 		// check the user is ok
 
 		boolean userOk =
-			checkUser ();
+			checkUser (
+				taskLogger);
 
 		if (userOk) {
 

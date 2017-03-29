@@ -174,6 +174,7 @@ class ChatBroadcastSendPart
 			"Recipients");
 
 		formFieldLogic.outputFormAlwaysHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			searchFields,
@@ -184,6 +185,7 @@ class ChatBroadcastSendPart
 			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			numbersFields,
@@ -194,6 +196,7 @@ class ChatBroadcastSendPart
 			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			commonFields,
@@ -204,6 +207,7 @@ class ChatBroadcastSendPart
 			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			messageUserFields,
@@ -214,6 +218,7 @@ class ChatBroadcastSendPart
 			"send");
 
 		formFieldLogic.outputFormAlwaysHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			messageMessageFields,
@@ -263,6 +268,7 @@ class ChatBroadcastSendPart
 			htmlParagraphClose ();
 
 			formFieldLogic.outputFormTemporarilyHidden (
+				taskLogger,
 				requestContext,
 				formatWriter,
 				searchFields,
@@ -311,6 +317,7 @@ class ChatBroadcastSendPart
 				">");
 
 			formFieldLogic.outputFormTemporarilyHidden (
+				taskLogger,
 				requestContext,
 				formatWriter,
 				numbersFields,
@@ -351,6 +358,7 @@ class ChatBroadcastSendPart
 		htmlParagraphClose ();
 
 		formFieldLogic.outputFormTemporarilyHidden (
+			taskLogger,
 			requestContext,
 			formatWriter,
 			messageMessageFields,

@@ -3,10 +3,6 @@ package wbs.apn.chat.user.core.logic;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Instant;
-
 import com.google.common.base.Optional;
 
 import lombok.Data;
@@ -14,19 +10,28 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 
-import wbs.apn.chat.bill.model.ChatUserCreditMode;
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
-import wbs.apn.chat.user.image.model.ChatUserImageType;
-import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.scheme.model.ChatSchemeRec;
-import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import org.apache.commons.lang3.builder.CompareToBuilder;
+
+import org.joda.time.DateTimeZone;
+import org.joda.time.Instant;
+
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.user.model.UserRec;
+
 import wbs.sms.message.core.model.MessageRec;
+
+import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
+import wbs.apn.chat.bill.model.ChatUserCreditMode;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
+import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.apn.chat.user.image.model.ChatUserImageType;
 
 public
 interface ChatUserLogic {
@@ -103,6 +108,7 @@ interface ChatUserLogic {
 			ChatUserRec chatUser);
 
 	ChatUserRec createChatMonitor (
+			TaskLogger parentTaskLogger,
 			ChatRec chat);
 
 	void creditModeChange (
@@ -110,20 +116,23 @@ interface ChatUserLogic {
 			ChatUserCreditMode newMode);
 
 	ChatUserImageRec setImage (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			ChatUserImageType type,
 			MediaRec smallMedia,
 			MediaRec fullMedia,
-			Optional<MessageRec> message,
+			Optional <MessageRec> message,
 			boolean append);
 
 	ChatUserImageRec setPhoto (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			MediaRec fullMedia,
-			Optional<MessageRec> message,
+			Optional <MessageRec> message,
 			boolean append);
 
 	ChatUserImageRec setPhoto (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			byte[] data,
 			Optional <String> filename,
@@ -132,17 +141,20 @@ interface ChatUserLogic {
 			Boolean append);
 
 	Optional <ChatUserImageRec> setPhotoFromMessage (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			MessageRec message,
 			Boolean append);
 
 	void setVideo (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			MediaRec fullMedia,
 			MessageRec message,
 			Boolean append);
 
 	void setVideo (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			byte[] data,
 			Optional<String> filename,
@@ -151,30 +163,34 @@ interface ChatUserLogic {
 			Boolean append);
 
 	void setAudio (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			byte[] data,
 			MessageRec message,
 			Boolean append);
 
 	void setImage (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			ChatUserImageType type,
 			byte[] data,
 			String filename,
 			String mimeType,
-			Optional<MessageRec> message,
+			Optional <MessageRec> message,
 			Boolean append);
 
 	boolean setVideo (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			MessageRec message,
 			Boolean append);
 
 	boolean setPlace (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			String place,
-			Optional<MessageRec> message,
-			Optional<UserRec> user);
+			Optional <MessageRec> message,
+			Optional <UserRec> user);
 
 	boolean gotDob (
 			ChatUserRec chatUser);
@@ -187,6 +203,7 @@ interface ChatUserLogic {
 			ChatSchemeRec chatScheme);
 
 	void setAffiliate (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			ChatAffiliateRec chatAffiliate,
 			Optional <MessageRec> message);

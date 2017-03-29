@@ -17,11 +17,13 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -48,16 +50,13 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
-
-	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
 	Database database;
 
 	@SingletonDependency
 	EventLogic eventLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ManualResponderConsoleHelper manualResponderHelper;
@@ -67,6 +66,12 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 	@SingletonDependency
 	NumberConsoleHelper numberHelper;
+
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -156,6 +161,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 			manualResponderNumber =
 				manualResponderNumberHelper.findOrCreate (
+					taskLogger,
 					manualResponder,
 					number);
 
@@ -173,11 +179,13 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 			) {
 
 				return updateNumber (
+					taskLogger,
 					transaction);
 
 			} else {
 
 				return updateCustomer (
+					taskLogger,
 					transaction);
 
 			}
@@ -187,7 +195,13 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 	}
 
 	Responder updateNumber (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Transaction transaction) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"updateNumber");
 
 		// find old and new value
 
@@ -198,6 +212,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 			valueParam.isEmpty ()
 				? null
 				: textHelper.findOrCreate (
+					taskLogger,
 					valueParam);
 
 		if (
@@ -231,6 +246,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 		if (newValue != null) {
 
 			eventLogic.createEvent (
+				taskLogger,
 				"object_field_updated",
 				userConsoleLogic.userRequired (),
 				"notesText",
@@ -240,6 +256,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 		} else {
 
 			eventLogic.createEvent (
+				taskLogger,
 				"object_field_nulled",
 				userConsoleLogic.userRequired (),
 				"notesText",
@@ -262,7 +279,13 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 	}
 
 	Responder updateCustomer (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Transaction transaction) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"updateCustomer");
 
 		// find old and new value
 
@@ -273,6 +296,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 			valueParam.isEmpty ()
 				? null
 				: textHelper.findOrCreate (
+					taskLogger,
 					valueParam);
 
 		if (
@@ -306,6 +330,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 		if (newValue != null) {
 
 			eventLogic.createEvent (
+				taskLogger,
 				"object_field_updated",
 				userConsoleLogic.userRequired (),
 				"notesText",
@@ -315,6 +340,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 		} else {
 
 			eventLogic.createEvent (
+				taskLogger,
 				"object_field_nulled",
 				userConsoleLogic.userRequired (),
 				"notesText",

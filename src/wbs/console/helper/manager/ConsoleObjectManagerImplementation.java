@@ -512,11 +512,13 @@ class ConsoleObjectManagerImplementation
 	}
 
 	@Override
-	public <ObjectType extends Record<?>>
+	public <ObjectType extends Record <?>>
 	ObjectType update (
-			ObjectType object) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ObjectType object) {
 
 		return objectManager.update (
+			parentTaskLogger,
 			object);
 
 	}

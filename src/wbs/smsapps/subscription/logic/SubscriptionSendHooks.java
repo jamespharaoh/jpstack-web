@@ -1,6 +1,10 @@
 package wbs.smsapps.subscription.logic;
 
+import lombok.NonNull;
+
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHooks;
+
 import wbs.smsapps.subscription.model.SubscriptionRec;
 import wbs.smsapps.subscription.model.SubscriptionSendRec;
 
@@ -13,7 +17,8 @@ class SubscriptionSendHooks
 	@Override
 	public
 	void beforeInsert (
-			SubscriptionSendRec subscriptionSend) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull SubscriptionSendRec subscriptionSend) {
 
 		SubscriptionRec subscription =
 			subscriptionSend.getSubscription ();
@@ -30,7 +35,8 @@ class SubscriptionSendHooks
 	@Override
 	public
 	void afterInsert (
-			SubscriptionSendRec subscriptionSend) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull SubscriptionSendRec subscriptionSend) {
 
 		SubscriptionRec subscription =
 			subscriptionSend.getSubscription ();

@@ -123,6 +123,7 @@ class ChatUserAdminNameAction
 
 				ChatUserNameRec chatUserName =
 					chatUserNameHelper.insert (
+						taskLogger,
 						chatUserNameHelper.createInstance ()
 
 					.setChatUser (

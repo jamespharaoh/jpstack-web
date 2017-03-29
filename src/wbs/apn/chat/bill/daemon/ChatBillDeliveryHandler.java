@@ -281,6 +281,7 @@ class ChatBillDeliveryHandler
 			if (delivery.getNewMessageStatus ().isGoodType ()) {
 
 				chatCreditLogic.userBill (
+					taskLogger,
 					chatUser,
 					new BillCheckOptions ()
 						.retry (true));
@@ -292,6 +293,7 @@ class ChatBillDeliveryHandler
 			if (delivery.getNewMessageStatus ().isGoodType ()) {
 
 				chatCreditLogic.creditLimitUpdate (
+					taskLogger,
 					chatUser);
 
 			}

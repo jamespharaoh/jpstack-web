@@ -104,13 +104,15 @@ class ChatUserAdminDeleteAction
 				chatUser.setNumber (null);
 
 				eventLogic.createEvent (
+					taskLogger,
 					"chat_user_delete",
 					userConsoleLogic.userRequired (),
 					chatUser);
 
 				transaction.commit ();
 
-				requestContext.addNotice ("User deleted");
+				requestContext.addNotice (
+					"User deleted");
 
 				return null;
 			}
@@ -138,23 +140,28 @@ class ChatUserAdminDeleteAction
 
 				if (newChatUser != null) {
 
-					requestContext.addError ("Cannot undelete this user");
+					requestContext.addError (
+						"Cannot undelete this user");
 
 					return null;
 
 				}
 
 				chatUser
-					.setNumber (chatUser.getOldNumber ());
+
+					.setNumber (
+						chatUser.getOldNumber ());
 
 				eventLogic.createEvent (
+					taskLogger,
 					"chat_user_undelete",
 					userConsoleLogic.userRequired (),
 					chatUser);
 
 				transaction.commit ();
 
-				requestContext.addNotice ("User undeleted");
+				requestContext.addNotice (
+					"User undeleted");
 
 				return null;
 

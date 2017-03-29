@@ -14,6 +14,7 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
 
@@ -41,6 +42,7 @@ class SimpleFormFieldAccessor <Container, Native>
 	@Override
 	public
 	Optional <Native> read (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container) {
 
 		// get native object
@@ -85,6 +87,7 @@ class SimpleFormFieldAccessor <Container, Native>
 	@Override
 	public
 	void write (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValue) {
 

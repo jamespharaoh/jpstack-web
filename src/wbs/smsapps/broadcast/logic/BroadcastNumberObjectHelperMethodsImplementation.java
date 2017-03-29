@@ -12,7 +12,10 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.number.core.model.NumberRec;
 
@@ -31,13 +34,22 @@ class BroadcastNumberObjectHelperMethodsImplementation
 	@WeakSingletonDependency
 	BroadcastNumberObjectHelper broadcastNumberHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// implementation
 
 	@Override
 	public
 	BroadcastNumberRec findOrCreate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull BroadcastRec broadcast,
 			@NonNull NumberRec number) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreate");
 
 		// find existing
 
@@ -53,6 +65,7 @@ class BroadcastNumberObjectHelperMethodsImplementation
 
 		broadcastNumber =
 			broadcastNumberHelper.insert (
+				taskLogger,
 				broadcastNumberHelper.createInstance ()
 
 			.setBroadcast (
@@ -82,8 +95,14 @@ class BroadcastNumberObjectHelperMethodsImplementation
 	@Override
 	public
 	List <BroadcastNumberRec> findOrCreateMany (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull BroadcastRec broadcast,
 			@NonNull List <NumberRec> numbers) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreateMany");
 
 		ImmutableList.Builder <BroadcastNumberRec> broadcastNumbersBuilder =
 			ImmutableList.builder ();
@@ -126,6 +145,7 @@ class BroadcastNumberObjectHelperMethodsImplementation
 
 				broadcastNumbersBuilder.add (
 					broadcastNumberHelper.insert (
+						taskLogger,
 						broadcastNumberHelper.createInstance ()
 
 					.setBroadcast (

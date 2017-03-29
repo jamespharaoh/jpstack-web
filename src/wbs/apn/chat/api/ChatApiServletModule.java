@@ -16,6 +16,7 @@ import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
@@ -97,7 +98,6 @@ import wbs.sms.locator.logic.LocatorLogic;
 import wbs.sms.locator.model.EastNorth;
 import wbs.sms.locator.model.LongLat;
 import wbs.sms.locator.model.MercatorProjection;
-import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.model.NumberObjectHelper;
 import wbs.sms.number.core.model.NumberRec;
 
@@ -345,6 +345,7 @@ class ChatApiServletModule
 
 							data =
 								mediaLogic.videoConvertRequired (
+									taskLogger,
 									format,
 									data);
 
@@ -826,6 +827,11 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
+
 			try (
 
 				Transaction transaction =
@@ -850,7 +856,8 @@ class ChatApiServletModule
 
 				// return
 
-				return makeResponse ();
+				return makeResponse (
+					taskLogger);
 
 			}
 
@@ -889,7 +896,13 @@ class ChatApiServletModule
 		}
 
 		private
-		RpcResult makeResponse () {
+		RpcResult makeResponse (
+				@NonNull TaskLogger parentTaskLogger) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"makeResponse");
 
 			try (
 
@@ -906,6 +919,7 @@ class ChatApiServletModule
 
 					NumberRec numberRec =
 						numberHelper.findOrCreate (
+							taskLogger,
 							number);
 
 					myUser =
@@ -1732,7 +1746,7 @@ class ChatApiServletModule
 		String email;
 		String jigsawApplicationIdentifier;
 		String jigsawToken;
-		Map<String,String> profileFields;
+		Map <String, String> profileFields;
 
 		ChatUserRec chatUser;
 
@@ -1741,6 +1755,11 @@ class ChatApiServletModule
 		RpcResult handle (
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
 			try (
 
@@ -1771,6 +1790,7 @@ class ChatApiServletModule
 				// do updates
 
 				doUpdates (
+					taskLogger,
 					transaction);
 
 				// commit
@@ -1851,7 +1871,13 @@ class ChatApiServletModule
 
 		private
 		void doUpdates (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Transaction transaction) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doUpdates");
 
 			ChatRec chat =
 				chatHelper.findRequired (
@@ -1859,10 +1885,12 @@ class ChatApiServletModule
 
 			NumberRec numberRec =
 				numberHelper.findOrCreate (
+					taskLogger,
 					number);
 
 			chatUser =
 				chatUserHelper.findOrCreate (
+					taskLogger,
 					chat,
 					numberRec);
 
@@ -1891,17 +1919,22 @@ class ChatApiServletModule
 								"The affiliate specified can not be found")));
 
 				chatUserLogic.setAffiliate (
+					taskLogger,
 					chatUser,
 					affiliate,
-					Optional.<MessageRec>absent ());
+					optionalAbsent ());
 
 			}
 
-			if (name != null)
+			if (name != null) {
+
 				chatMiscLogic.chatUserSetName (
+					taskLogger,
 					chatUser,
 					name,
 					null);
+
+			}
 
 			if (gender != null)
 				chatUser.setGender (gender);
@@ -1909,11 +1942,15 @@ class ChatApiServletModule
 			if (orient != null)
 				chatUser.setOrient (orient);
 
-			if (info != null)
+			if (info != null) {
+
 				chatInfoLogic.chatUserSetInfo (
+					taskLogger,
 					chatUser,
 					info,
 					null);
+
+			}
 
 			if (dob != null) {
 
@@ -1936,15 +1973,18 @@ class ChatApiServletModule
 
 				if (
 					! chatUserLogic.setPlace (
+						taskLogger,
 						chatUser,
 						location,
-						Optional.<MessageRec>absent (),
-						Optional.<UserRec>absent ())
+						optionalAbsent (),
+						optionalAbsent ())
 				) {
 
-					errorCodes.add ("location-invalid");
+					errorCodes.add (
+						"location-invalid");
 
-					errors.add ("Invalid location");
+					errors.add (
+						"Invalid location");
 
 				}
 
@@ -1968,6 +2008,7 @@ class ChatApiServletModule
 							latitude));
 
 				eventLogic.createEvent (
+					taskLogger,
 					"chat_user_location_api",
 					chatUser,
 					longitude,
@@ -1988,6 +2029,7 @@ class ChatApiServletModule
 			}
 
 			chatDateLogic.userDateStuff (
+				taskLogger,
 				chatUser,
 				null,
 				null,
@@ -2004,11 +2046,12 @@ class ChatApiServletModule
 			if (image != null) {
 
 				chatUserLogic.setPhoto (
+					taskLogger,
 					chatUser,
 					image,
-					Optional.<String>absent (),
-					Optional.<String>absent (),
-					Optional.<MessageRec>absent (),
+					optionalAbsent (),
+					optionalAbsent (),
+					optionalAbsent (),
 					false);
 
 			}
@@ -2095,6 +2138,7 @@ class ChatApiServletModule
 
 						userField =
 							chatUserProfileFieldHelper.insert (
+								taskLogger,
 								chatUserProfileFieldHelper.createInstance ()
 
 							.setChatUser (
@@ -2502,6 +2546,7 @@ class ChatApiServletModule
 
 			NumberRec numberRec =
 				numberHelper.findOrCreate (
+					taskLogger,
 					number);
 
 			chatUser =
@@ -2625,6 +2670,11 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
+
 			try (
 
 				Transaction transaction =
@@ -2642,6 +2692,7 @@ class ChatApiServletModule
 				// get params
 
 				getParams (
+					taskLogger,
 					source);
 
 				// bail on any request-invalid classErrors
@@ -2658,7 +2709,8 @@ class ChatApiServletModule
 
 				// do it
 
-				doIt ();
+				doIt (
+					taskLogger);
 
 				// commit
 
@@ -2677,14 +2729,15 @@ class ChatApiServletModule
 		@SuppressWarnings ("unchecked")
 		private
 		void getParams (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			Map<String,Object> params =
-				(Map<String,Object>)
-				source.obtain (
-					messageSendRequestDef,
-					errors,
-					true);
+			Map <String, Object> params =
+				genericCastUnchecked (
+					source.obtain (
+						messageSendRequestDef,
+						errors,
+						true));
 
 			if (params == null)
 				return;
@@ -2705,7 +2758,13 @@ class ChatApiServletModule
 		}
 
 		private
-		void doIt () {
+		void doIt (
+				@NonNull TaskLogger parentTaskLogger) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doIt");
 
 			ChatRec chat =
 				chatHelper.findRequired (
@@ -2713,10 +2772,12 @@ class ChatApiServletModule
 
 			NumberRec numberRec =
 				numberHelper.findOrCreate (
+					taskLogger,
 					number);
 
 			ChatUserRec fromUser =
 				chatUserHelper.findOrCreate (
+					taskLogger,
 					chat,
 					numberRec);
 
@@ -2742,9 +2803,10 @@ class ChatApiServletModule
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userSpendCreditCheck (
+					taskLogger,
 					fromUser,
 					true,
-					Optional.<Long>absent ());
+					optionalAbsent ());
 
 			if (creditCheckResult.failed ()) {
 
@@ -2826,6 +2888,7 @@ class ChatApiServletModule
 
 					MediaRec media =
 						mediaLogic.createMediaFromImageRequired (
+							taskLogger,
 							attachment.data,
 							attachment.type,
 							attachment.filename);
@@ -2838,14 +2901,18 @@ class ChatApiServletModule
 			}
 
 			// send the message
+
 			chatMessageLogic.chatMessageSendFromUser (
+				taskLogger,
 				fromUser,
 				toUser,
 				message,
 				null,
 				source,
 				medias);
+
 		}
+
 	}
 
 	// =============================================== message poll rpc handler
@@ -2915,6 +2982,11 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
+
 			try (
 
 				Transaction transaction =
@@ -2949,6 +3021,7 @@ class ChatApiServletModule
 				// do it
 
 				doIt (
+					taskLogger,
 					transaction.now ());
 
 				// commit
@@ -2967,7 +3040,9 @@ class ChatApiServletModule
 		}
 
 		@SuppressWarnings ("unchecked")
-		private void getParams (RpcSource source) {
+		private
+		void getParams (
+				RpcSource source) {
 
 			Map<String,Object> params = (Map<String,Object>)
 				source.obtain (messagePollRequestDef, errors, true);
@@ -2986,7 +3061,13 @@ class ChatApiServletModule
 
 		private
 		void doIt (
+				@NonNull TaskLogger parentTaskLogger,
 				Instant now) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doIt");
 
 			ChatRec chat =
 				chatHelper.findRequired (
@@ -2994,10 +3075,12 @@ class ChatApiServletModule
 
 			NumberRec numberRec =
 				numberHelper.findOrCreate (
+					taskLogger,
 					number);
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
+					taskLogger,
 					chat,
 					numberRec);
 
@@ -3020,9 +3103,10 @@ class ChatApiServletModule
 
 				ChatCreditCheckResult creditCheckResult =
 					chatCreditLogic.userSpendCreditCheck (
+						taskLogger,
 						chatUser,
 						true,
-						Optional.<Long>absent ());
+						optionalAbsent ());
 
 				if (creditCheckResult.failed ()) {
 
@@ -3067,6 +3151,7 @@ class ChatApiServletModule
 			if (login) {
 
 				chatMiscLogic.userJoin (
+					taskLogger,
 					chatUser,
 					false,
 					null,
@@ -3371,6 +3456,11 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
+
 			try (
 
 				Transaction transaction =
@@ -3403,7 +3493,9 @@ class ChatApiServletModule
 
 				// do it
 
-				doIt (transaction);
+				doIt (
+					taskLogger,
+					transaction);
 
 				// commit
 
@@ -3503,8 +3595,15 @@ class ChatApiServletModule
 
 		}
 
-		private void doIt (
-				Transaction transaction) {
+		private
+		void doIt (
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Transaction transaction) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doIt");
 
 			ChatRec chat =
 				chatHelper.findRequired (
@@ -3512,14 +3611,16 @@ class ChatApiServletModule
 
 			NumberRec numberRec =
 				numberHelper.findOrCreate (
+					taskLogger,
 					number);
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
+					taskLogger,
 					chat,
 					numberRec);
 
-			List<ChatUserImageRec> images =
+			List <ChatUserImageRec> images =
 				chatUserLogic.getChatUserImageListByType (
 					chatUser,
 					type);
@@ -3712,6 +3813,7 @@ class ChatApiServletModule
 				for (ImageUpdateAdd imageUpdateAdd : add) {
 
 					chatUserLogic.setImage (
+						taskLogger,
 						chatUser,
 						type,
 						imageUpdateAdd.imageData,
@@ -4021,6 +4123,11 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
+
 			try (
 
 				Transaction transaction =
@@ -4049,7 +4156,9 @@ class ChatApiServletModule
 
 				// do it
 
-				doIt (transaction);
+				doIt (
+					taskLogger,
+					transaction);
 
 				// commit
 
@@ -4095,7 +4204,13 @@ class ChatApiServletModule
 
 		private
 		void doIt (
-				Transaction transaction) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Transaction transaction) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doIt");
 
 			ChatRec chat =
 				chatHelper.findRequired (
@@ -4103,10 +4218,12 @@ class ChatApiServletModule
 
 			NumberRec numberRec =
 				numberHelper.findOrCreate (
+					taskLogger,
 					number);
 
 			ChatUserRec chatUser =
 				chatUserHelper.findOrCreate (
+					taskLogger,
 					chat,
 					numberRec);
 
@@ -4161,10 +4278,14 @@ class ChatApiServletModule
 
 			if (sendCount != null) {
 
-				for (int i = 0; i < sendCount; i++)
+				for (int i = 0; i < sendCount; i++) {
+
 					chatCreditLogic.userBillReal (
+						taskLogger,
 						chatUser,
 						true);
+
+				}
 
 			}
 
@@ -4173,6 +4294,7 @@ class ChatApiServletModule
 			if (creditAmount != null || billAmount != null) {
 
 				chatUserCreditHelper.insert (
+					taskLogger,
 					chatUserCreditHelper.createInstance ()
 
 					.setChatUser (

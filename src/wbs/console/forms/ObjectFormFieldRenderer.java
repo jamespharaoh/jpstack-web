@@ -169,6 +169,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 					formName)
 				? resultValueRequired (
 					formToInterface (
+						taskLogger,
 						submission,
 						formName))
 				: interfaceValue;
@@ -402,6 +403,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	@Override
 	public
 	Either <Optional <Interface>, String> formToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 

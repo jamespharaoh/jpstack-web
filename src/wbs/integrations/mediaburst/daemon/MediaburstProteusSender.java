@@ -22,6 +22,7 @@ import lombok.extern.log4j.Log4j;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.integrations.mediaburst.model.MediaburstNetworkObjectHelper;
@@ -93,7 +94,8 @@ class MediaburstProteusSender
 	@Override
 	protected
 	State getMessage (
-			OutboxRec outbox) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull OutboxRec outbox) {
 
 		State proteusOutbox =
 			new State ();
@@ -205,7 +207,8 @@ class MediaburstProteusSender
 
 	@Override
 	protected
-	Optional<List<String>> sendMessage (
+	Optional <List <String>> sendMessage (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull State proteusOutbox) {
 
 		log.info (

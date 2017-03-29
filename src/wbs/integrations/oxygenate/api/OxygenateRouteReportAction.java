@@ -12,11 +12,13 @@ import lombok.NonNull;
 
 import wbs.api.mvc.ApiLoggingAction;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.oxygenate.model.OxygenateInboundLogObjectHelper;
@@ -46,6 +48,9 @@ class OxygenateRouteReportAction
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	OxygenateInboundLogObjectHelper oxygenateInboundLogHelper;
@@ -143,6 +148,7 @@ class OxygenateRouteReportAction
 					smsRouteId);
 
 			reportLogic.deliveryReport (
+				taskLogger,
 				route,
 				reference,
 				reportCode.getMessageStatus (),
@@ -197,8 +203,13 @@ class OxygenateRouteReportAction
 	@Override
 	protected
 	void storeLog (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String debugLog) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"storeLog");
 
 		@Cleanup
 		Transaction transaction =
@@ -210,6 +221,7 @@ class OxygenateRouteReportAction
 				this);
 
 		oxygenateInboundLogHelper.insert (
+			taskLogger,
 			oxygenateInboundLogHelper.createInstance ()
 
 			.setRoute (

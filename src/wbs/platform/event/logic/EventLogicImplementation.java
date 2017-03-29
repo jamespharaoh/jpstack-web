@@ -10,12 +10,15 @@ import lombok.NonNull;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.PermanentRecord;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.event.model.EventLinkObjectHelper;
@@ -45,6 +48,9 @@ class EventLogicImplementation
 	@SingletonDependency
 	EventTypeObjectHelper eventTypeHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ObjectManager objectManager;
 
@@ -56,7 +62,13 @@ class EventLogicImplementation
 	@Override
 	public
 	EventRec createEvent (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createEvent");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -72,6 +84,7 @@ class EventLogicImplementation
 
 		EventRec event =
 			eventHelper.insert (
+				taskLogger,
 				eventHelper.createInstance ()
 
 			.setEventType (
@@ -91,13 +104,20 @@ class EventLogicImplementation
 	@Override
 	public
 	EventRec createEvent (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode,
 			@NonNull Object... linkObjects) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createEvent");
 
 		// create event
 
 		EventRec event =
 			createEvent (
+				taskLogger,
 				typeCode);
 
 		// create event links
@@ -111,12 +131,14 @@ class EventLogicImplementation
 
 			EventLinkRec eventLink =
 				createEventLink (
+					taskLogger,
 					event,
 					linkObject,
 					fromJavaInteger (
 						index));
 
 			eventLinkHelper.insert (
+				taskLogger,
 				eventLink);
 
 			event.getEventLinks ().add (
@@ -132,13 +154,21 @@ class EventLogicImplementation
 
 	}
 
+	private
 	EventLinkRec createEventLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull EventRec event,
 			@NonNull Object originalLinkObject,
 			@NonNull Long index) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createEventLink");
+
 		Object linkObject =
 			normaliseLinkObject (
+				taskLogger,
 				originalLinkObject,
 				index);
 
@@ -248,8 +278,14 @@ class EventLogicImplementation
 	}
 
 	Object normaliseLinkObject (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object originalLinkObject,
 			@NonNull Long index) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"normaliseLinkObject");
 
 		Object currentLinkObject =
 			originalLinkObject;
@@ -284,6 +320,7 @@ class EventLogicImplementation
 		if (currentLinkObject instanceof String) {
 
 			return textHelper.findOrCreate (
+				taskLogger,
 				(String)
 				currentLinkObject);
 

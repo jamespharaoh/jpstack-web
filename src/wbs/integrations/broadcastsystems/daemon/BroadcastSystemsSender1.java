@@ -1,6 +1,7 @@
 package wbs.integrations.broadcastsystems.daemon;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
@@ -15,15 +16,17 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.IOUtils;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.integrations.broadcastsystems.model.BroadcastSystemsRouteOutObjectHelper;
@@ -36,7 +39,6 @@ import wbs.sms.route.core.model.RouteRec;
 
 import wbs.web.utils.HtmlUtils;
 
-@Log4j
 @SingletonComponent ("broadcastSystemsSender1")
 public
 class BroadcastSystemsSender1
@@ -49,6 +51,9 @@ class BroadcastSystemsSender1
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -75,7 +80,13 @@ class BroadcastSystemsSender1
 	@Override
 	protected
 	State getMessage (
-			OutboxRec outbox) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull OutboxRec outbox) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getMessage");
 
 		State state =
 			new State ();
@@ -130,14 +141,19 @@ class BroadcastSystemsSender1
 
 	@Override
 	protected
-	Optional<List<String>> sendMessage (
-			State state) {
+	Optional <List <String>> sendMessage (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull State state) {
 
-		log.info (
-			stringFormat (
-				"Sending message %s",
-				integerToDecimalString (
-					state.messageId)));
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendMessage");
+
+		taskLogger.noticeFormat (
+			"Sending message %s",
+			integerToDecimalString (
+				state.messageId));
 
 		try {
 
@@ -145,6 +161,7 @@ class BroadcastSystemsSender1
 				state);
 
 			return readResponse (
+				taskLogger,
 				state);
 
 		} catch (IOException exception) {
@@ -215,22 +232,27 @@ class BroadcastSystemsSender1
 			"^error=(.+)$");
 
 	public
-	Optional<List<String>> readResponse (
+	Optional <List <String>> readResponse (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull State state)
 		throws
 			IOException,
 			SendFailureException {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"readResponse");
+
 		String responseString =
 			IOUtils.toString (
 				state.urlConn.getInputStream ());
 
-		log.debug (
-			stringFormat (
-				"Message %s response: %s",
-				integerToDecimalString (
-					state.messageId),
-				responseString));
+		taskLogger.debugFormat (
+			"Message %s response: %s",
+			integerToDecimalString (
+				state.messageId),
+			responseString);
 
 		if (state.urlConn.getResponseCode () == 200) {
 
@@ -240,12 +262,12 @@ class BroadcastSystemsSender1
 
 			if (! matcher.matches ()) {
 
-				log.warn (
-					stringFormat (
-						"Success response did not match: [%s]",
-						responseString));
+				taskLogger.warningFormat (
+					"Success response did not match: [%s]",
+					responseString);
 
 				exceptionLogger.logSimple (
+					taskLogger,
 					"unknown",
 					stringFormat (
 						"message %s",
@@ -253,7 +275,7 @@ class BroadcastSystemsSender1
 							state.messageId)),
 					"Success response did not match",
 					responseString,
-					Optional.absent (),
+					optionalAbsent (),
 					GenericExceptionResolution.ignoreWithLoggedWarning);
 
 				return null;
@@ -272,12 +294,12 @@ class BroadcastSystemsSender1
 
 			if (! matcher.matches ()) {
 
-				log.warn (
-					stringFormat (
-						"Failure response did not match: [%s]",
-						responseString));
+				taskLogger.warningFormat (
+					"Failure response did not match: [%s]",
+					responseString);
 
 				exceptionLogger.logSimple (
+					taskLogger,
 					"unknown",
 					stringFormat (
 						"message %s",
@@ -285,7 +307,7 @@ class BroadcastSystemsSender1
 							state.messageId)),
 					"Failure response did not match",
 					responseString,
-					Optional.absent (),
+					optionalAbsent (),
 					GenericExceptionResolution.ignoreWithLoggedWarning);
 
 				throw tempFailure (

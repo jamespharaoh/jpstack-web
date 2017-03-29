@@ -9,6 +9,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.logging.TaskLogger;
+
 @Accessors (fluent = true)
 public
 class DummyCache <Key, Value>
@@ -30,6 +32,7 @@ class DummyCache <Key, Value>
 	@Override
 	public
 	Value create (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Key key) {
 
 		throw new UnsupportedOperationException ();
@@ -39,6 +42,7 @@ class DummyCache <Key, Value>
 	@Override
 	public
 	Value findOrCreate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Key key) {
 
 		throw new UnsupportedOperationException ();

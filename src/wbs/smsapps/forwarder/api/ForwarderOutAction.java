@@ -306,6 +306,7 @@ class ForwarderOutAction
 
 				forwarderMessageOut =
 					forwarderLogic.sendMessage (
+						taskLogger,
 						forwarder,
 						forwarderMessageInOptional.orNull (),
 						message,

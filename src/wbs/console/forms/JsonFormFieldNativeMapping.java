@@ -1,15 +1,16 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import org.json.simple.JSONValue;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-
-import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-
-import com.google.common.base.Optional;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("jsonFormFieldNativeMapping")
@@ -38,9 +39,10 @@ class JsonFormFieldNativeMapping<Container>
 
 	@Override
 	public
-	Optional<String> genericToNative (
+	Optional <String> genericToNative (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Optional<Object> genericValue) {
+			@NonNull Optional <Object> genericValue) {
 
 		if (
 			optionalIsNotPresent (

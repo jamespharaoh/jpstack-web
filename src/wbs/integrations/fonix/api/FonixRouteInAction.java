@@ -11,13 +11,13 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 
 import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiLoggingAction;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -25,6 +25,7 @@ import wbs.framework.data.tools.DataFromGeneric;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.fonix.logic.FonixLogic;
@@ -55,6 +56,12 @@ class FonixRouteInAction
 	// singleton dependencies
 
 	@SingletonDependency
+	Database database;
+
+	@SingletonDependency
+	ExceptionLogger exceptionLogger;
+
+	@SingletonDependency
 	FonixInboundLogObjectHelper fonixInboundLogHelper;
 
 	@SingletonDependency
@@ -63,11 +70,8 @@ class FonixRouteInAction
 	@SingletonDependency
 	FonixRouteInObjectHelper fonixRouteInHelper;
 
-	@SingletonDependency
-	Database database;
-
-	@SingletonDependency
-	ExceptionLogger exceptionLogger;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RequestContext requestContext;
@@ -214,11 +218,14 @@ class FonixRouteInAction
 			// insert message
 
 			smsInboxLogic.inboxInsert (
+				taskLogger,
 				optionalOf (
 					request.guid ()),
 				textHelper.findOrCreate (
+					taskLogger,
 					request.body ()),
 				smsNumberHelper.findOrCreate (
+					taskLogger,
 					request.moNumber ()),
 				request.destination (),
 				smsRoute,
@@ -226,7 +233,7 @@ class FonixRouteInAction
 				optionalOf (
 					fonixLogic.stringToInstant (
 						request.receiveTime ())),
-				ImmutableList.of (),
+				emptyList (),
 				optionalAbsent (),
 				optionalAbsent ());
 
@@ -256,8 +263,13 @@ class FonixRouteInAction
 	@Override
 	protected
 	void storeLog (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String debugLog) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"storeLog");
 
 		@Cleanup
 		Transaction transaction =
@@ -266,6 +278,7 @@ class FonixRouteInAction
 				this);
 
 		fonixInboundLogHelper.insert (
+			taskLogger,
 			fonixInboundLogHelper.createInstance ()
 
 			.setRoute (

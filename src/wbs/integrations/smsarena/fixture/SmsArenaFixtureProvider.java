@@ -6,10 +6,12 @@ import java.util.Properties;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.smsarena.model.SmsArenaConfigObjectHelper;
@@ -33,6 +35,9 @@ class SmsArenaFixtureProvider
 	implements FixtureProvider {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
@@ -68,7 +73,13 @@ class SmsArenaFixtureProvider
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFixtures");
+
 		menuItemHelper.insert (
+			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
@@ -99,6 +110,7 @@ class SmsArenaFixtureProvider
 
 		RouteRec smsArenaRoute =
 			routeHelper.insert (
+				taskLogger,
 				routeHelper.createInstance ()
 
 			.setSlice (
@@ -154,6 +166,7 @@ class SmsArenaFixtureProvider
 
 		SmsArenaConfigRec smsArenaConfig =
 			smsArenaConfigHelper.insert (
+				taskLogger,
 				smsArenaConfigHelper.createInstance ()
 
 			.setCode (
@@ -173,6 +186,7 @@ class SmsArenaFixtureProvider
 		);
 
 		smsArenaRouteOutHelper.insert (
+			taskLogger,
 			smsArenaRouteOutHelper.createInstance ()
 
 			.setSmsArenaConfig (
@@ -192,6 +206,7 @@ class SmsArenaFixtureProvider
 		);
 
 		smsArenaRouteInHelper.insert (
+			taskLogger,
 			smsArenaRouteInHelper.createInstance ()
 
 			.setSmsArenaConfig (
@@ -202,6 +217,7 @@ class SmsArenaFixtureProvider
 		);
 
 		smsArenaReportCodeHelper.insert (
+			taskLogger,
 			smsArenaReportCodeHelper.createInstance ()
 
 			.setSmsArenaConfig (
@@ -222,6 +238,7 @@ class SmsArenaFixtureProvider
 		);
 
 		smsArenaReportCodeHelper.insert (
+			taskLogger,
 			smsArenaReportCodeHelper.createInstance ()
 
 			.setSmsArenaConfig (
@@ -242,6 +259,7 @@ class SmsArenaFixtureProvider
 		);
 
 		smsArenaReportCodeHelper.insert (
+			taskLogger,
 			smsArenaReportCodeHelper.createInstance ()
 
 			.setSmsArenaConfig (

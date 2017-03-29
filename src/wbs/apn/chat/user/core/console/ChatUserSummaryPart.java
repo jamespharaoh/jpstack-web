@@ -106,11 +106,17 @@ class ChatUserSummaryPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		chatUser =
 			chatUserHelper.findFromContextRequired ();
 
 		creditCheckResult =
 			chatCreditLogic.userCreditCheck (
+				taskLogger,
 				chatUser);
 
 		internalChatUserCharges =

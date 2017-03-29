@@ -13,10 +13,12 @@ import com.google.common.collect.ImmutableMap;
 import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.exception.logic.ExceptionLogLogic;
@@ -45,6 +47,9 @@ class UnwiredPlazaApiServletModule
 
 	@SingletonDependency
 	ExceptionLogLogic exceptionLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SmsDeliveryReportLogic reportLogic;
@@ -125,6 +130,11 @@ class UnwiredPlazaApiServletModule
 		void doGet (
 				@NonNull TaskLogger parentTaskLogger) {
 
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"reportFile.doGet");
+
 			// process request
 
 			Long routeId =
@@ -190,6 +200,7 @@ class UnwiredPlazaApiServletModule
 			// process delivery report
 
 			reportLogic.deliveryReport (
+				taskLogger,
 				route,
 				id.toString (),
 				result,

@@ -3,6 +3,8 @@ package wbs.imchat.api;
 import java.util.List;
 import java.util.Map;
 
+import wbs.framework.logging.TaskLogger;
+
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerRec;
 import wbs.imchat.model.ImChatMessageRec;
@@ -23,10 +25,10 @@ interface ImChatApiLogic {
 	ImChatCustomerData customerData (
 			ImChatCustomerRec customer);
 
-	List<ImChatCustomerDetailData> customerDetailData (
+	List <ImChatCustomerDetailData> customerDetailData (
 			ImChatCustomerRec customer);
 
-	List<ImChatCustomerDetailData> createDetailData (
+	List <ImChatCustomerDetailData> createDetailData (
 			ImChatRec imChat);
 
 	ImChatConversationData conversationData (
@@ -41,8 +43,9 @@ interface ImChatApiLogic {
 	ImChatPurchaseHistoryData purchaseHistoryData (
 			ImChatPurchaseRec purchase);
 
-	Map<String,String> updateCustomerDetails (
+	Map <String, String> updateCustomerDetails (
+			TaskLogger parentTaskLogger,
 			ImChatCustomerRec customer,
-			Map<String,String> newDetails);
+			Map <String, String> newDetails);
 
 }

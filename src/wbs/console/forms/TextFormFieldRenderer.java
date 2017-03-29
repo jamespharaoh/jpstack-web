@@ -268,6 +268,7 @@ class TextFormFieldRenderer <Container>
 	@Override
 	public
 	Either <Optional <String>, String> formToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 

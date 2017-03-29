@@ -26,11 +26,14 @@ import lombok.NonNull;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.event.logic.EventLogic;
@@ -70,6 +73,9 @@ class ImChatApiLogicImplementation
 
 	@SingletonDependency
 	ImChatCustomerDetailValueObjectHelper imChatCustomerDetailValueHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	TimeFormatter timeFormatter;
@@ -504,9 +510,15 @@ class ImChatApiLogicImplementation
 
 	@Override
 	public
-	Map<String,String> updateCustomerDetails (
+	Map <String, String> updateCustomerDetails (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ImChatCustomerRec customer,
-			@NonNull Map<String,String> newDetails) {
+			@NonNull Map <String, String> newDetails) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"updateCustomerDetails");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -640,6 +652,7 @@ class ImChatApiLogicImplementation
 
 			ImChatCustomerDetailValueRec detailValue =
 				imChatCustomerDetailValueHelper.insert (
+					taskLogger,
 					imChatCustomerDetailValueHelper.createInstance ()
 
 				.setImChatCustomer (
@@ -658,6 +671,7 @@ class ImChatApiLogicImplementation
 				detailValue);
 
 			eventLogic.createEvent (
+				taskLogger,
 				"im_chat_customer_detail_updated",
 				customer,
 				detailType,

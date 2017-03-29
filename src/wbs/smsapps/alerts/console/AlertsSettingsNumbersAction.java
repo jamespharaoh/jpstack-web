@@ -157,6 +157,7 @@ class AlertsSettingsNumbersAction
 					alertsNumberIterator.remove ();
 
 					eventLogic.createEvent (
+						taskLogger,
 						"alerts_number_deleted",
 						userConsoleLogic.userRequired (),
 						alertsNumber.getId (),
@@ -196,6 +197,7 @@ class AlertsSettingsNumbersAction
 					updatedNames ++;
 
 					eventLogic.createEvent (
+						taskLogger,
 						"alerts_number_updated",
 						userConsoleLogic.userRequired (),
 						"name",
@@ -235,6 +237,7 @@ class AlertsSettingsNumbersAction
 
 					NumberRec numberRec =
 						numberHelper.findOrCreate (
+							taskLogger,
 							newNumber);
 
 					alertsNumber
@@ -245,6 +248,7 @@ class AlertsSettingsNumbersAction
 					updatedNumbers ++;
 
 					eventLogic.createEvent (
+						taskLogger,
 						"alerts_number_updated",
 						userConsoleLogic.userRequired (),
 						"number",
@@ -287,6 +291,7 @@ class AlertsSettingsNumbersAction
 					}
 
 					eventLogic.createEvent (
+						taskLogger,
 						"alerts_number_updated",
 						userConsoleLogic.userRequired (),
 						"enabled",
@@ -370,6 +375,7 @@ class AlertsSettingsNumbersAction
 
 				NumberRec numberRec =
 					numberHelper.findOrCreate (
+						taskLogger,
 						newNumber);
 
 				AlertsNumberRec alertsNumber =
@@ -396,15 +402,18 @@ class AlertsSettingsNumbersAction
 						newEnabled);
 
 				alertsNumberHelper.insert (
+					taskLogger,
 					alertsNumber);
 
 				eventLogic.createEvent (
+					taskLogger,
 					"alerts_number_created",
 					userConsoleLogic.userRequired (),
 					alertsNumber.getId (),
 					alertsSettings);
 
 				eventLogic.createEvent (
+					taskLogger,
 					"alerts_number_updated",
 					userConsoleLogic.userRequired (),
 					"name",
@@ -413,6 +422,7 @@ class AlertsSettingsNumbersAction
 					alertsNumber.getName ());
 
 				eventLogic.createEvent (
+					taskLogger,
 					"alerts_number_updated",
 					userConsoleLogic.userRequired (),
 					"number",
@@ -421,6 +431,7 @@ class AlertsSettingsNumbersAction
 					numberRec);
 
 				eventLogic.createEvent (
+					taskLogger,
 					"alerts_number_updated",
 					userConsoleLogic.userRequired (),
 					"enabled",

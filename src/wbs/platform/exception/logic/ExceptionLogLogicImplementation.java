@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -16,6 +17,9 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionUtilsImplementation;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.exception.model.ConcreteExceptionResolution;
 import wbs.platform.exception.model.ExceptionLogObjectHelper;
 import wbs.platform.exception.model.ExceptionLogRec;
@@ -40,6 +44,9 @@ class ExceptionLogLogicImplementation
 	@SingletonDependency
 	ExceptionLogTypeObjectHelper exceptionLogTypeHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
@@ -48,12 +55,18 @@ class ExceptionLogLogicImplementation
 	@Override
 	public
 	ExceptionLogRec logException (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull String summary,
 			@NonNull String dump,
 			@NonNull Optional<Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"logException");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -77,6 +90,7 @@ class ExceptionLogLogicImplementation
 
 		ExceptionLogRec exceptionLog =
 			exceptionLogHelper.insert (
+				taskLogger,
 				exceptionLogHelper.createInstance ()
 
 			.setTimestamp (

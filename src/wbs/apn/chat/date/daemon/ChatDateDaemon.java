@@ -13,6 +13,7 @@ import static wbs.utils.etc.NumberUtils.roundToIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -168,10 +169,11 @@ class ChatDateDaemon
 			} catch (RuntimeException exception) {
 
 				exceptionLogger.logThrowable (
+					taskLogger,
 					"daemon",
 					"Chat daemon dating",
 					exception,
-					Optional.absent (),
+					optionalAbsent (),
 					GenericExceptionResolution.tryAgainLater);
 
 			}
@@ -218,11 +220,19 @@ class ChatDateDaemon
 	}
 
 	void doChat (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatId) {
 
-		Optional<ChatData> chatDataOptional =
+		TaskLogger taskLogger =
+			logContext.nestTaskLoggerFormat (
+				parentTaskLogger,
+				"doChat (%s)",
+				integerToDecimalString (
+					chatId));
+
+		Optional <ChatData> chatDataOptional =
 			getChatData (
+				taskLogger,
 				chatId);
 
 		if (
@@ -287,10 +297,11 @@ class ChatDateDaemon
 			} catch (Exception exception) {
 
 				exceptionLogger.logThrowable (
+					taskLogger,
 					"daemon",
 					"Chat daemon dating",
 					exception,
-					Optional.absent (),
+					optionalAbsent (),
 					GenericExceptionResolution.tryAgainLater);
 
 			}
@@ -303,345 +314,360 @@ class ChatDateDaemon
 	}
 
 	private
-	Optional<ChatData> getChatData (
+	Optional <ChatData> getChatData (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLoggerFormat (
+				parentTaskLogger,
+				"getChatData (%s)",
+				integerToDecimalString (
+					chatId));
 
 		ChatData chatData =
 			new ChatData ();
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				stringFormat (
-					"%s.%s (%s)",
-					classNameSimple (
-						getClass ()),
-					"getChatData",
-					integerToDecimalString (
-						chatId)),
-				this);
-
-		ChatRec chat;
-
-		int hour;
-		LocalDate today;
-
 		try (
 
-			ActiveTask activeStep =
-				activityManager.start (
-					"step",
-					"find chat",
+			Transaction transaction =
+				database.beginReadOnly (
+					stringFormat (
+						"%s.%s (%s)",
+						classNameSimple (
+							getClass ()),
+						"getChatData",
+						integerToDecimalString (
+							chatId)),
 					this);
 
 		) {
 
-			chat =
-				chatHelper.findRequired (
-					chatId);
+			ChatRec chat;
 
-			log.info (
-				stringFormat (
-					"Start dating for chat %s.%s",
-					chat.getSlice ().getCode (),
-					chat.getCode ()));
+			int hour;
+			LocalDate today;
 
-			if (! chat.getDatingEnabled ()) {
+			try (
 
-				log.warn (
-					"Dating disabled for " + chat.getCode ());
+				ActiveTask activeStep =
+					activityManager.start (
+						"step",
+						"find chat",
+						this);
 
-				return Optional.absent ();
-
-			}
-
-			log.info (
-				"Begin dating for " + chat.getCode ());
-
-			hour =
-				transaction.now ()
-
-				.toDateTime (
-					chatMiscLogic.timezone (
-						chat))
-
-				.getHourOfDay ();
-
-			today =
-				LocalDate.now ();
-
-		}
-
-		// first cache some database info to make this a little quicker
-
-		Collection <ChatUserRec> datingUsers;
-
-		try (
-
-			ActiveTask activeStep =
-				activityManager.start (
-					"step",
-					"find dating users",
-					this);
-
-		) {
-
-			datingUsers =
-				chatUserHelper.findDating (
-					chat);
-
-		}
-
-		// put all valid dating users into otherUserInfos
-
-		try (
-
-			ActiveTask activeStep =
-				activityManager.start (
-					"step",
-					"verify dating users",
-					this);
-
-		) {
-
-			for (
-				ChatUserRec chatUser
-					: datingUsers
 			) {
 
-				try (
+				chat =
+					chatHelper.findRequired (
+						chatId);
 
-					ActiveTask activeIteration =
-						activityManager.start (
-							"iteration",
-							stringFormat (
-								"chat user %s",
-								objectManager.objectPathMini (
-									chatUser)),
-							this);
+				log.info (
+					stringFormat (
+						"Start dating for chat %s.%s",
+						chat.getSlice ().getCode (),
+						chat.getCode ()));
 
-				) {
+				if (! chat.getDatingEnabled ()) {
 
-					if (chatUser.getNumber () == null)
-						continue;
+					log.warn (
+						"Dating disabled for " + chat.getCode ());
 
-					if (chatUser.getNumber ().getNetwork ().getId () == 0)
-						continue;
-
-					ChatCreditCheckResult creditCheckResult =
-						chatCreditLogic.userSpendCreditCheck (
-							chatUser,
-							false,
-							Optional.<Long>absent ());
-
-					if (creditCheckResult.failed ())
-						continue;
-
-					chatData.otherUserInfos.add (
-						new DatingUserInfo (
-							chatUser));
+					return Optional.absent ();
 
 				}
 
-			}
+				log.info (
+					"Begin dating for " + chat.getCode ());
 
-		}
+				hour =
+					transaction.now ()
 
-		// then add all the monitors too
+					.toDateTime (
+						chatMiscLogic.timezone (
+							chat))
 
-		try (
+					.getHourOfDay ();
 
-			ActiveTask activeStep =
-				activityManager.start (
-					"step",
-					"find dating monitors",
-					this);
-
-		) {
-
-			Collection <Long> monitorIds =
-				chatUserHelper.searchIds (
-					new ChatUserSearch ()
-
-				.chatId (
-					chatId)
-
-				.type (
-					ChatUserType.monitor)
-
-			);
-
-			for (
-				Long chatUserId
-					: monitorIds
-			) {
-
-				try (
-
-					ActiveTask activeIteration =
-						activityManager.start (
-							"iteration",
-							stringFormat (
-								"chat user %s",
-								integerToDecimalString (
-									chatUserId)),
-							this);
-
-				) {
-
-					ChatUserRec chatUser =
-						chatUserHelper.findRequired (
-							chatUserId);
-
-					chatData.otherUserInfos.add (
-						new DatingUserInfo (
-							chatUser));
-
-				}
+				today =
+					LocalDate.now ();
 
 			}
 
-		}
+			// first cache some database info to make this a little quicker
 
-		// put all active dating users who may still need a message into
-		// datingUserIds
+			Collection <ChatUserRec> datingUsers;
 
-		try (
+			try (
 
-			ActiveTask activeStep =
-				activityManager.start (
-					"step",
-					"select users for dating",
-					this);
+				ActiveTask activeStep =
+					activityManager.start (
+						"step",
+						"find dating users",
+						this);
 
-		) {
-
-			for (
-				ChatUserRec chatUser
-					: datingUsers
 			) {
 
-				try (
+				datingUsers =
+					chatUserHelper.findDating (
+						chat);
 
-					ActiveTask activeIteration =
-						activityManager.start (
-							"iteration",
-							stringFormat (
-								"chat user %s",
-								objectManager.objectPathMini (
-									chatUser)),
-							this);
+			}
 
+			// put all valid dating users into otherUserInfos
+
+			try (
+
+				ActiveTask activeStep =
+					activityManager.start (
+						"step",
+						"verify dating users",
+						this);
+
+			) {
+
+				for (
+					ChatUserRec chatUser
+						: datingUsers
 				) {
 
-					if (chatUser.getType () != ChatUserType.user) {
+					try (
 
-						log.debug (
-							stringFormat (
-								"Ignoring %s ",
-								integerToDecimalString (
-									chatUser.getId ()),
-								"(user type)"));
+						ActiveTask activeIteration =
+							activityManager.start (
+								"iteration",
+								stringFormat (
+									"chat user %s",
+									objectManager.objectPathMini (
+										chatUser)),
+								this);
 
-						continue;
-
-					}
-
-					chatData.numUsers ++;
-
-					ChatCreditCheckResult creditCheckResult =
-						chatCreditLogic.userSpendCreditCheck (
-							chatUser,
-							false,
-							Optional.<Long>absent ());
-
-					if (creditCheckResult.failed ()) {
-
-						chatData.numCredit ++;
-
-						log.info (
-							stringFormat (
-								"Ignoring %s ",
-								integerToDecimalString (
-									chatUser.getId ()),
-								"(%s)",
-								creditCheckResult.details ()));
-
-						continue;
-
-					}
-
-					if (
-						! checkHours (
-							hour,
-							chatUser.getDateStartHour (),
-							chatUser.getDateEndHour ())
 					) {
 
-						chatData.numHours ++;
+						if (chatUser.getNumber () == null)
+							continue;
 
-						log.debug (
-							stringFormat (
-								"Ignoring %s ",
-								integerToDecimalString (
-									chatUser.getId ()),
-								"(time)"));
+						if (chatUser.getNumber ().getNetwork ().getId () == 0)
+							continue;
 
-						continue;
+						ChatCreditCheckResult creditCheckResult =
+							chatCreditLogic.userSpendCreditCheck (
+								taskLogger,
+								chatUser,
+								false,
+								optionalAbsent ());
 
-					}
+						if (creditCheckResult.failed ())
+							continue;
 
-					if (chatUser.getOnline ()) {
-
-						chatData.numOnline ++;
-
-						log.info (
-							stringFormat (
-								"Ignoring %s (online)",
-								integerToDecimalString (
-									chatUser.getId ())));
-
-						continue;
+						chatData.otherUserInfos.add (
+							new DatingUserInfo (
+								chatUser));
 
 					}
-
-					if (allOf (
-
-						() -> isNotNull (
-							chatUser.getDateDailyDate ()),
-
-						() -> equalSafe (
-							chatUser.getDateDailyDate (),
-							today),
-
-						() -> lessThanOne (
-							chatUser.getDateDailyCount ())
-
-					)) {
-
-						chatData.numSent ++;
-
-						log.debug (
-							"Ignoring " + chatUser.getId () + " (daily limit)");
-
-						continue;
-
-					}
-
-					log.debug (
-						"Including " + chatUser.getId ());
-
-					chatData.datingUserIds.add (
-						chatUser.getId ());
 
 				}
 
 			}
 
-		}
+			// then add all the monitors too
 
-		return Optional.of (
-			chatData);
+			try (
+
+				ActiveTask activeStep =
+					activityManager.start (
+						"step",
+						"find dating monitors",
+						this);
+
+			) {
+
+				Collection <Long> monitorIds =
+					chatUserHelper.searchIds (
+						new ChatUserSearch ()
+
+					.chatId (
+						chatId)
+
+					.type (
+						ChatUserType.monitor)
+
+				);
+
+				for (
+					Long chatUserId
+						: monitorIds
+				) {
+
+					try (
+
+						ActiveTask activeIteration =
+							activityManager.start (
+								"iteration",
+								stringFormat (
+									"chat user %s",
+									integerToDecimalString (
+										chatUserId)),
+								this);
+
+					) {
+
+						ChatUserRec chatUser =
+							chatUserHelper.findRequired (
+								chatUserId);
+
+						chatData.otherUserInfos.add (
+							new DatingUserInfo (
+								chatUser));
+
+					}
+
+				}
+
+			}
+
+			// put all active dating users who may still need a message into
+			// datingUserIds
+
+			try (
+
+				ActiveTask activeStep =
+					activityManager.start (
+						"step",
+						"select users for dating",
+						this);
+
+			) {
+
+				for (
+					ChatUserRec chatUser
+						: datingUsers
+				) {
+
+					try (
+
+						ActiveTask activeIteration =
+							activityManager.start (
+								"iteration",
+								stringFormat (
+									"chat user %s",
+									objectManager.objectPathMini (
+										chatUser)),
+								this);
+
+					) {
+
+						if (chatUser.getType () != ChatUserType.user) {
+
+							log.debug (
+								stringFormat (
+									"Ignoring %s ",
+									integerToDecimalString (
+										chatUser.getId ()),
+									"(user type)"));
+
+							continue;
+
+						}
+
+						chatData.numUsers ++;
+
+						ChatCreditCheckResult creditCheckResult =
+							chatCreditLogic.userSpendCreditCheck (
+								taskLogger,
+								chatUser,
+								false,
+								optionalAbsent ());
+
+						if (creditCheckResult.failed ()) {
+
+							chatData.numCredit ++;
+
+							log.info (
+								stringFormat (
+									"Ignoring %s ",
+									integerToDecimalString (
+										chatUser.getId ()),
+									"(%s)",
+									creditCheckResult.details ()));
+
+							continue;
+
+						}
+
+						if (
+							! checkHours (
+								hour,
+								chatUser.getDateStartHour (),
+								chatUser.getDateEndHour ())
+						) {
+
+							chatData.numHours ++;
+
+							log.debug (
+								stringFormat (
+									"Ignoring %s ",
+									integerToDecimalString (
+										chatUser.getId ()),
+									"(time)"));
+
+							continue;
+
+						}
+
+						if (chatUser.getOnline ()) {
+
+							chatData.numOnline ++;
+
+							log.info (
+								stringFormat (
+									"Ignoring %s (online)",
+									integerToDecimalString (
+										chatUser.getId ())));
+
+							continue;
+
+						}
+
+						if (allOf (
+
+							() -> isNotNull (
+								chatUser.getDateDailyDate ()),
+
+							() -> equalSafe (
+								chatUser.getDateDailyDate (),
+								today),
+
+							() -> lessThanOne (
+								chatUser.getDateDailyCount ())
+
+						)) {
+
+							chatData.numSent ++;
+
+							log.debug (
+								"Ignoring " + chatUser.getId () + " (daily limit)");
+
+							continue;
+
+						}
+
+						log.debug (
+							"Including " + chatUser.getId ());
+
+						chatData.datingUserIds.add (
+							chatUser.getId ());
+
+					}
+
+				}
+
+			}
+
+			return optionalOf (
+				chatData);
+
+		}
 
 	}
 
@@ -752,6 +778,7 @@ class ChatDateDaemon
 
 		ChatCreditCheckResult creditCheckResult =
 			chatCreditLogic.userSpendCreditCheck (
+				taskLogger,
 				thisUser,
 				false,
 				optionalAbsent ());
@@ -946,6 +973,7 @@ class ChatDateDaemon
 		if (sendPhoto) {
 
 			chatInfoLogic.sendUserPics (
+				taskLogger,
 				thisUser,
 				otherUsers,
 				null,
@@ -953,9 +981,13 @@ class ChatDateDaemon
 
 		} else {
 
-			for (ChatUserRec otherUser : otherUsers)
+			for (
+				ChatUserRec otherUser
+					: otherUsers
+			)
 
 				chatInfoLogic.sendUserInfo (
+					taskLogger,
 					thisUser,
 					otherUser,
 					null,

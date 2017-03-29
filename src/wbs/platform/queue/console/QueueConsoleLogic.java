@@ -248,6 +248,7 @@ class QueueConsoleLogic {
 
 		QueueItemClaimRec queueItemClaim =
 			queueItemClaimHelper.insert (
+				taskLogger,
 				queueItemClaimHelper.createInstance ()
 
 			.setQueueItem (
@@ -353,9 +354,15 @@ class QueueConsoleLogic {
 
 	public
 	void reclaimQueueItem (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueItemRec queueItem,
 			@NonNull UserRec oldUser,
 			@NonNull UserRec newUser) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"reclaimQueueItem");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -403,6 +410,7 @@ class QueueConsoleLogic {
 
 		QueueItemClaimRec queueItemClaim =
 			queueItemClaimHelper.insert (
+				taskLogger,
 				queueItemClaimHelper.createInstance ()
 
 			.setQueueItem (

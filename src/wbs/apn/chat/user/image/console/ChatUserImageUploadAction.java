@@ -24,10 +24,12 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
@@ -70,6 +72,9 @@ class ChatUserImageUploadAction
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MediaLogic mediaLogic;
 
@@ -103,7 +108,12 @@ class ChatUserImageUploadAction
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		fields =
 			chatUserImageConsoleModule.formFieldSet (
@@ -121,6 +131,7 @@ class ChatUserImageUploadAction
 			new ChatUserImageUploadForm ();
 
 		formFieldLogic.update (
+			taskLogger,
 			requestContext,
 			fields,
 			uploadForm,
@@ -140,6 +151,7 @@ class ChatUserImageUploadAction
 
 			resampledData =
 				mediaLogic.videoConvertRequired (
+					taskLogger,
 					"3gpp",
 					uploadForm.upload ().data ());
 
@@ -157,8 +169,9 @@ class ChatUserImageUploadAction
 
 			// read the image
 
-			Optional<BufferedImage> imageOptional =
+			Optional <BufferedImage> imageOptional =
 				mediaLogic.readImage (
+					taskLogger,
 					uploadForm.upload ().data (),
 					"image/jpeg");
 
@@ -226,6 +239,7 @@ class ChatUserImageUploadAction
 
 			MediaRec media =
 				mediaLogic.createMediaRequired (
+					taskLogger,
 					resampledData,
 					resultType,
 					chatUser.getCode () + "." + extension,
@@ -240,6 +254,7 @@ class ChatUserImageUploadAction
 
 			ChatUserImageRec chatUserImage =
 				chatUserImageHelper.insert (
+					taskLogger,
 					chatUserImageHelper.createInstance ()
 
 				.setChatUser (

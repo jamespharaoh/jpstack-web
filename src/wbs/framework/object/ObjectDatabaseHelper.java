@@ -5,6 +5,7 @@ import java.util.List;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 public
 interface ObjectDatabaseHelper <RecordType extends Record <RecordType>> {
@@ -58,9 +59,11 @@ interface ObjectDatabaseHelper <RecordType extends Record <RecordType>> {
 			String typeCode);
 
 	RecordType insert (
+			TaskLogger taskLogger,
 			RecordType object);
 
 	RecordType insertSpecial (
+			TaskLogger taskLogger,
 			RecordType object);
 
 	RecordType update (

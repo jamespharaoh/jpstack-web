@@ -1,7 +1,6 @@
 package wbs.apn.chat.core.fixture;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,12 +9,14 @@ import lombok.NonNull;
 
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -89,6 +90,9 @@ class ChatCoreFixtureProvider
 	@SingletonDependency
 	GazetteerObjectHelper gazetteerHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
@@ -132,18 +136,33 @@ class ChatCoreFixtureProvider
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		createMenuItems ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFixtures");
 
-		createRoutes ();
+		createMenuItems (
+			taskLogger);
 
-		createChatServices ();
+		createRoutes (
+			taskLogger);
+
+		createChatServices (
+			taskLogger);
 
 	}
 
 	private
-	void createMenuItems () {
+	void createMenuItems (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMenuItems");
 
 		menuItemHelper.insert (
+			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
@@ -175,11 +194,18 @@ class ChatCoreFixtureProvider
 	}
 
 	private
-	void createRoutes () {
+	void createRoutes (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createRoutes");
 
 		// routes
 
 		routeHelper.insert (
+			taskLogger,
 			routeHelper.createInstance ()
 
 			.setSlice (
@@ -219,6 +245,7 @@ class ChatCoreFixtureProvider
 		);
 
 		routeHelper.insert (
+			taskLogger,
 			routeHelper.createInstance ()
 
 			.setSlice (
@@ -253,7 +280,13 @@ class ChatCoreFixtureProvider
 	}
 
 	private
-	void createChatServices () {
+	void createChatServices (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createChatServices");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -275,6 +308,7 @@ class ChatCoreFixtureProvider
 				"magic_number");
 
 		routeHelper.insert (
+			taskLogger,
 			routeHelper.createInstance ()
 
 			.setSlice (
@@ -301,6 +335,7 @@ class ChatCoreFixtureProvider
 
 		ChatRec chat =
 			chatHelper.insert (
+				taskLogger,
 				chatHelper.createInstance ()
 
 			.setSlice (
@@ -340,6 +375,7 @@ class ChatCoreFixtureProvider
 		// templates
 
 		chatHelpTemplateHelper.insert (
+			taskLogger,
 			chatHelpTemplateHelper.createInstance ()
 
 			.setChat (
@@ -360,6 +396,7 @@ class ChatCoreFixtureProvider
 		);
 
 		chatHelpTemplateHelper.insert (
+			taskLogger,
 			chatHelpTemplateHelper.createInstance ()
 
 			.setChat (
@@ -383,6 +420,7 @@ class ChatCoreFixtureProvider
 
 		ChatSchemeRec leftChatScheme =
 			chatSchemeHelper.insert (
+				taskLogger,
 				chatSchemeHelper.createInstance ()
 
 			.setChat (
@@ -430,6 +468,7 @@ class ChatCoreFixtureProvider
 		);
 
 		chatSchemeHelper.insert (
+			taskLogger,
 			chatSchemeHelper.createInstance ()
 
 			.setChat (
@@ -499,6 +538,7 @@ class ChatCoreFixtureProvider
 
 			NumberRec number =
 				numberHelper.insert (
+					taskLogger,
 					numberHelper.createInstance ()
 
 				.setNumber (
@@ -512,6 +552,7 @@ class ChatCoreFixtureProvider
 
 			ChatUserRec chatUser =
 				chatUserHelper.insert (
+					taskLogger,
 					chatUserHelper.createInstance ()
 
 				.setChat (
@@ -560,6 +601,7 @@ class ChatCoreFixtureProvider
 
 			ChatUserRec chatUser =
 				chatUserHelper.insert (
+					taskLogger,
 					chatUserHelper.createInstance ()
 
 				.setChat (
@@ -595,13 +637,14 @@ class ChatCoreFixtureProvider
 		) {
 
 			TextRec messageText =
-				textHelper.findOrCreate (
-					stringFormat (
-						"Chat message user to user %s",
-						integerToDecimalString (
-							index)));
+				textHelper.findOrCreateFormat (
+					taskLogger,
+					"Chat message user to user %s",
+					integerToDecimalString (
+						index));
 
 			chatMessageHelper.insert (
+				taskLogger,
 				chatMessageHelper.createInstance ()
 
 				.setChat (
@@ -652,13 +695,14 @@ class ChatCoreFixtureProvider
 		) {
 
 			TextRec messageText =
-				textHelper.findOrCreate (
-					stringFormat (
-						"Chat message to monitor %s",
-						integerToDecimalString (
-							index)));
+				textHelper.findOrCreateFormat (
+					taskLogger,
+					"Chat message to monitor %s",
+					integerToDecimalString (
+						index));
 
 			chatMessageHelper.insert (
+				taskLogger,
 				chatMessageHelper.createInstance ()
 
 				.setChat (
@@ -706,13 +750,14 @@ class ChatCoreFixtureProvider
 		) {
 
 			TextRec messageText =
-				textHelper.findOrCreate (
-					stringFormat (
-						"Chat message from monitor %s",
-						integerToDecimalString (
-							index)));
+				textHelper.findOrCreateFormat (
+					taskLogger,
+					"Chat message from monitor %s",
+					integerToDecimalString (
+						index));
 
 			chatMessageHelper.insert (
+				taskLogger,
 				chatMessageHelper.createInstance ()
 
 				.setChat (

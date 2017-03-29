@@ -1,17 +1,16 @@
 package wbs.framework.exception;
 
-import static wbs.utils.string.StringUtils.stringFormat;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @PrototypeComponent ("simpleExceptionLogger")
 public
 class SimpleExceptionLogger
@@ -22,11 +21,15 @@ class SimpleExceptionLogger
 	@SingletonDependency
 	ExceptionUtils exceptionLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// implementation
 
 	@Override
 	public
-	Record<?> logSimple (
+	Record <?> logSimple (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull String summary,
@@ -34,11 +37,10 @@ class SimpleExceptionLogger
 			@NonNull Optional<Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
-		log.error (
-			stringFormat (
-				"%s: %s",
-				source,
-				summary));
+		parentTaskLogger.errorFormat (
+			"%s: %s",
+			source,
+			summary);
 
 		return null;
 
@@ -47,19 +49,19 @@ class SimpleExceptionLogger
 	@Override
 	public
 	Record<?> logThrowable (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull Throwable throwable,
 			@NonNull Optional<Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
-		log.error (
-			stringFormat (
-				"%s: %s",
-				source,
-				exceptionLogic.throwableSummary (
-					throwable)),
-			throwable);
+		parentTaskLogger.errorFormatException (
+			throwable,
+			"%s: %s",
+			source,
+			exceptionLogic.throwableSummary (
+				throwable));
 
 		return null;
 
@@ -67,7 +69,8 @@ class SimpleExceptionLogger
 
 	@Override
 	public
-	Record<?> logThrowableWithSummary (
+	Record <?> logThrowableWithSummary (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String typeCode,
 			@NonNull String source,
 			@NonNull String summary,
@@ -75,13 +78,12 @@ class SimpleExceptionLogger
 			@NonNull Optional<Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
-		log.error (
-			stringFormat (
-				"%s: %s",
-				source,
-				exceptionLogic.throwableSummary (
-					throwable)),
-			throwable);
+		parentTaskLogger.errorFormatException (
+			throwable,
+			"%s: %s",
+			source,
+			exceptionLogic.throwableSummary (
+				throwable));
 
 		return null;
 

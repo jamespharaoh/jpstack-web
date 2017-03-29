@@ -12,9 +12,12 @@ import lombok.experimental.Accessors;
 import wbs.console.formaction.AbstractConsoleFormActionHelper;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
@@ -37,6 +40,9 @@ class ChatUserAdminLocationFormActionHelper
 
 	@SingletonDependency
 	ChatUserLogic chatUserLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -85,8 +91,14 @@ class ChatUserAdminLocationFormActionHelper
 	@Override
 	public
 	Optional <Responder> processFormSubmission (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Transaction transaction,
 			@NonNull ChatUserAdminLocationForm formState) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"processFormSubmission");
 
 		// check form is filled in ok
 
@@ -106,6 +118,7 @@ class ChatUserAdminLocationFormActionHelper
 
 		boolean success =
 			chatUserLogic.setPlace (
+				taskLogger,
 				chatUser,
 				formState.newLocationName (),
 				optionalAbsent (),

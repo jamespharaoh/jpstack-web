@@ -1,5 +1,6 @@
 package wbs.imchat.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.OptionalUtils.ifNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 
@@ -7,7 +8,6 @@ import javax.inject.Named;
 import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.NonNull;
@@ -19,10 +19,12 @@ import wbs.console.forms.FormFieldSet;
 import wbs.console.module.ConsoleModule;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleHelper;
@@ -53,6 +55,9 @@ class ImChatCustomerCreditAction
 	@SingletonDependency
 	ImChatCustomerConsoleHelper imChatCustomerHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
@@ -78,8 +83,13 @@ class ImChatCustomerCreditAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws ServletException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// begin transaction
 
@@ -114,10 +124,11 @@ class ImChatCustomerCreditAction
 
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
+				taskLogger,
 				requestContext,
 				formFields,
 				request,
-				ImmutableMap.of (),
+				emptyMap (),
 				"credit");
 
 		if (updateResultSet.errorCount () > 0) {
@@ -138,6 +149,7 @@ class ImChatCustomerCreditAction
 		// create credit log
 
 		imChatCustomerCreditHelper.insert (
+			taskLogger,
 			imChatCustomerCreditHelper.createInstance ()
 
 			.setImChatCustomer (

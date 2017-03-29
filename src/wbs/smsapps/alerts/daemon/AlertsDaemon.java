@@ -5,8 +5,9 @@ import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.time.TimeUtils.earlierThan;
+import static wbs.utils.time.TimeUtils.shorterThan;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,15 +16,12 @@ import java.util.stream.Collectors;
 
 import javax.inject.Provider;
 
-import com.google.common.base.Optional;
-
-import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -33,6 +31,8 @@ import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -58,8 +58,8 @@ import wbs.smsapps.alerts.model.AlertsStatusCheckObjectHelper;
 import wbs.smsapps.alerts.model.AlertsSubjectRec;
 
 import wbs.utils.string.StringSubstituter;
+import wbs.utils.time.TimeFormatter;
 
-@Log4j
 @SingletonComponent ("alertsDaemon")
 public
 class AlertsDaemon
@@ -82,6 +82,9 @@ class AlertsDaemon
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ObjectManager objectManager;
 
@@ -99,6 +102,9 @@ class AlertsDaemon
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
+
+	@SingletonDependency
+	TimeFormatter timeFormatter;
 
 	// prototype dependencies
 
@@ -138,84 +144,96 @@ class AlertsDaemon
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"AlertsDaemon.runOnce ()",
-				this);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce ()");
 
-		// work out current minute
+		try (
 
-		Instant currentMinute =
-			transaction.now ()
-				.toDateTime ()
-				.withSecondOfMinute (0)
-				.withMillisOfSecond (0)
-				.toInstant ();
+			Transaction transaction =
+				database.beginReadOnly (
+					"AlertsDaemon.runOnce ()",
+					this);
 
-		// find alerts settings pending
-
-		List<Long> alertsSettingsIds =
-			alertsSettingsHelper.findAll ().stream ()
-
-			.filter (
-				alertsSettings ->
-					! alertsSettings.getDeleted ())
-
-			.filter (
-				alertsSettings ->
-					alertsSettings.getEnabled ())
-
-			.filter (
-				alertsSettings ->
-
-				isNull (
-					alertsSettings.getLastStatusCheck ())
-
-				|| earlierThan (
-					alertsSettings.getLastStatusCheck (),
-					currentMinute)
-
-			)
-
-			.map (
-				alertsSettings ->
-					alertsSettings.getId ())
-
-			.collect (
-				Collectors.toList ());
-
-		transaction.close ();
-
-		// process alerts settings
-
-		for (
-			Long alertsSettingsId
-				: alertsSettingsIds
 		) {
 
-			try {
+			// work out current minute
 
-				runOnce (
-					alertsSettingsId);
+			Instant currentMinute =
+				transaction.now ()
+					.toDateTime ()
+					.withSecondOfMinute (0)
+					.withMillisOfSecond (0)
+					.toInstant ();
 
-			} catch (Exception exception) {
+			// find alerts settings pending
 
-				log.error (
-					stringFormat (
+			List <Long> alertsSettingsIds =
+				alertsSettingsHelper.findAll ().stream ()
+
+				.filter (
+					alertsSettings ->
+						! alertsSettings.getDeleted ())
+
+				.filter (
+					alertsSettings ->
+						alertsSettings.getEnabled ())
+
+				.filter (
+					alertsSettings ->
+
+					isNull (
+						alertsSettings.getLastStatusCheck ())
+
+					|| earlierThan (
+						alertsSettings.getLastStatusCheck (),
+						currentMinute)
+
+				)
+
+				.map (
+					alertsSettings ->
+						alertsSettings.getId ())
+
+				.collect (
+					Collectors.toList ());
+
+			transaction.close ();
+
+			// process alerts settings
+
+			for (
+				Long alertsSettingsId
+					: alertsSettingsIds
+			) {
+
+				try {
+
+					runOnce (
+						taskLogger,
+						alertsSettingsId);
+
+				} catch (Exception exception) {
+
+					taskLogger.errorFormatException (
+						exception,
 						"Error checking alerts for %s",
 						integerToDecimalString (
-							alertsSettingsId)),
-					exception);
+							alertsSettingsId));
 
-				exceptionLogger.logThrowable (
-					"daemon",
-					"alerts daemon " + alertsSettingsId,
-					exception,
-					Optional.absent (),
-					GenericExceptionResolution.ignoreWithNoWarning);
+					exceptionLogger.logThrowable (
+						taskLogger,
+						"daemon",
+						"alerts daemon " + alertsSettingsId,
+						exception,
+						optionalAbsent (),
+						GenericExceptionResolution.ignoreWithNoWarning);
+
+				}
 
 			}
 
@@ -225,237 +243,292 @@ class AlertsDaemon
 
 	protected
 	void runOnce (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long alertsSettingsId) {
 
-		log.debug (
-			stringFormat (
-				"checking if we should send an alert for %s",
+		TaskLogger taskLogger =
+			logContext.nestTaskLoggerFormat (
+				parentTaskLogger,
+				"runOnce (%s)",
 				integerToDecimalString (
-					alertsSettingsId)));
+					alertsSettingsId));
+
+		taskLogger.debugFormat (
+			"checking if we should send an alert for %s",
+			integerToDecimalString (
+				alertsSettingsId));
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"AlertsDaemon.runOnce ()",
-				this);
+		try (
 
-		AlertsSettingsRec alertsSettings =
-			alertsSettingsHelper.findRequired (
-				alertsSettingsId);
+			Transaction transaction =
+				database.beginReadWrite (
+					"AlertsDaemon.runOnce ()",
+					this);
 
-		// check it's still pending
-
-		if (! alertsSettings.getEnabled ())
-			return;
-
-		Instant currentMinute =
-			transaction.now ()
-				.toDateTime ()
-				.withSecondOfMinute (0)
-				.withMillisOfSecond (0)
-				.toInstant ();
-
-		if (alertsSettings.getLastStatusCheck () != null
-				&& alertsSettings.getLastStatusCheck ().isAfter (
-					currentMinute))
-			return;
-
-		// durations
-
-		Duration maxDurationAllowedInQueue =
-			new Duration (
-				alertsSettings.getMaxDurationInQueue ()
-				* 1000L);
-
-		// look up subjects
-
-		Map<Record<?>,AlertsSubjectRec> subjects =
-			new HashMap<Record<?>,AlertsSubjectRec> ();
-
-		for (AlertsSubjectRec alertsSubject
-				: alertsSettings.getAlertsSubjects ()) {
-
-			Record<?> subject =
-				objectManager.findObject (
-					new GlobalId (
-						alertsSubject.getObjectType ().getId (),
-						alertsSubject.getObjectId ()));
-
-			subjects.put (
-				subject,
-				alertsSubject);
-
-		}
-
-		// get queue info
-
-		long numUnclaimed = 0;
-
-		Instant now = Instant.now ();
-		Instant oldest = now;
-
-		for (
-			QueueSubjectRec queueSubject
-				: queueSubjectHelper.findActive ()
 		) {
 
-			if (
-				! isSubject (
-					subjects,
-					queueSubject.getQueue ())
-			) {
+			AlertsSettingsRec alertsSettings =
+				alertsSettingsHelper.findRequired (
+					alertsSettingsId);
 
-				continue;
+			// check it's still pending
+
+			if (! alertsSettings.getEnabled ())
+				return;
+
+			Instant currentMinute =
+				transaction.now ()
+					.toDateTime ()
+					.withSecondOfMinute (0)
+					.withMillisOfSecond (0)
+					.toInstant ();
+
+			if (alertsSettings.getLastStatusCheck () != null
+					&& alertsSettings.getLastStatusCheck ().isAfter (
+						currentMinute))
+				return;
+
+			// durations
+
+			Duration maxDurationAllowedInQueue =
+				new Duration (
+					alertsSettings.getMaxDurationInQueue ()
+					* 1000L);
+
+			// look up subjects
+
+			Map<Record<?>,AlertsSubjectRec> subjects =
+				new HashMap<Record<?>,AlertsSubjectRec> ();
+
+			for (AlertsSubjectRec alertsSubject
+					: alertsSettings.getAlertsSubjects ()) {
+
+				Record<?> subject =
+					objectManager.findObject (
+						new GlobalId (
+							alertsSubject.getObjectType ().getId (),
+							alertsSubject.getObjectId ()));
+
+				subjects.put (
+					subject,
+					alertsSubject);
 
 			}
 
+			// get queue info
+
+			long numUnclaimed = 0;
+
+			Instant now = Instant.now ();
+			Instant oldest = now;
+
 			for (
-				QueueItemRec queueItem
-					: queueLogic.getActiveQueueItems (
-						queueSubject)
+				QueueSubjectRec queueSubject
+					: queueSubjectHelper.findActive ()
 			) {
 
 				if (
-					enumNotInSafe (
-						queueItem.getState (),
-						QueueItemState.pending,
-						QueueItemState.waiting)
+					! isSubject (
+						subjects,
+						queueSubject.getQueue ())
 				) {
 
 					continue;
 
 				}
 
-				Instant createdTime =
-					queueItem.getCreatedTime ();
+				for (
+					QueueItemRec queueItem
+						: queueLogic.getActiveQueueItems (
+							queueSubject)
+				) {
 
-				if (createdTime.isBefore (oldest))
-					oldest = createdTime;
+					if (
+						enumNotInSafe (
+							queueItem.getState (),
+							QueueItemState.pending,
+							QueueItemState.waiting)
+					) {
 
-				numUnclaimed ++;
+						continue;
+
+					}
+
+					Instant createdTime =
+						queueItem.getCreatedTime ();
+
+					if (createdTime.isBefore (oldest))
+						oldest = createdTime;
+
+					numUnclaimed ++;
+
+				}
 
 			}
 
-		}
+			Duration maxDurationFoundInQueue =
+				new Duration (
+					oldest,
+					now);
 
-		Duration maxDurationFoundInQueue =
-			new Duration (
-				oldest,
-				now);
+			Long maxDurationSeconds =
+				fromJavaInteger (
+					maxDurationFoundInQueue
+						.toStandardSeconds ()
+						.getSeconds ());
 
-		Long maxDurationSeconds =
-			fromJavaInteger (
-				maxDurationFoundInQueue
-					.toStandardSeconds ()
-					.getSeconds ());
-
-		log.debug (
-			stringFormat (
+			taskLogger.debugFormat (
 				"now is %s",
-				now.toString ()));
+				timeFormatter.timestampSecondStringIso (
+					now));
 
-		log.debug (
-			stringFormat (
+			taskLogger.debugFormat (
 				"oldest is %s",
-				oldest.toString ()));
+				timeFormatter.timestampSecondStringIso (
+					oldest));
 
-		log.debug (
-			stringFormat (
+			taskLogger.debugFormat (
 				"oldest duration is %s",
-				maxDurationFoundInQueue.toString ()));
+				timeFormatter.prettyDuration (
+					maxDurationFoundInQueue));
 
-		log.debug (
-			stringFormat (
+			taskLogger.debugFormat (
 				"unclaimed count is %s",
 				integerToDecimalString (
-					numUnclaimed)));
+					numUnclaimed));
 
-		// check if alert is due
+			// check if alert is due
 
-		boolean maxDurationExceeded =
-			maxDurationFoundInQueue.isLongerThan (
-				maxDurationAllowedInQueue);
+			boolean maxDurationExceeded =
+				maxDurationFoundInQueue.isLongerThan (
+					maxDurationAllowedInQueue);
 
-		boolean maxItemsExceeded =
-			numUnclaimed > alertsSettings.getMaxItemsInQueue ();
+			boolean maxItemsExceeded =
+				numUnclaimed > alertsSettings.getMaxItemsInQueue ();
 
-		boolean alertDue;
+			boolean alertDue;
 
-		if (! maxDurationExceeded
-				&& ! maxItemsExceeded) {
+			if (! maxDurationExceeded
+					&& ! maxItemsExceeded) {
 
-			log.debug (
-				stringFormat (
-					"everything within limits"));
+				taskLogger.debugFormat (
+					"everything within limits");
 
-			alertDue = false;
+				alertDue = false;
 
-		} else if (maxDurationExceeded) {
+			} else if (maxDurationExceeded) {
 
-			log.debug (
-				stringFormat (
+				taskLogger.debugFormat (
 					"maximum duration of %s exceeded",
-					maxDurationAllowedInQueue.toString ()));
+					maxDurationAllowedInQueue.toString ());
 
-			alertDue = true;
+				alertDue = true;
 
-		} else if (maxItemsExceeded) {
+			} else if (maxItemsExceeded) {
 
-			log.debug (
-				stringFormat (
+				taskLogger.debugFormat (
 					"maximum unclaimed count of %s exceeded",
 					integerToDecimalString (
-						alertsSettings.getMaxItemsInQueue ())));
+						alertsSettings.getMaxItemsInQueue ()));
 
-			alertDue = true;
+				alertDue = true;
 
-		} else {
+			} else {
 
-			throw new RuntimeException ();
+				throw new RuntimeException ();
 
-		}
+			}
 
-		// construct message
+			// construct message
 
-		TextRec messageText =
-			constructMessage (
-				alertsSettings,
-				numUnclaimed,
-				maxDurationFoundInQueue);
-
-		// limit send frequency
-
-		boolean sentRecently =
-			checkSentRecently (transaction, alertsSettings);
-
-		boolean active =
-			checkActive (transaction, alertsSettings);
-
-		boolean performSend =
-			alertDue && ! sentRecently && active;
-
-		if (performSend) {
-
-			long numSent =
-				sendAlerts (
+			TextRec messageText =
+				constructMessage (
+					taskLogger,
 					alertsSettings,
-					messageText);
+					numUnclaimed,
+					maxDurationFoundInQueue);
 
-			// create alert
+			// limit send frequency
 
-			alertsAlertHelper.insert (
-				alertsAlertHelper.createInstance ()
+			boolean sentRecently =
+				checkSentRecently (
+					taskLogger,
+					transaction,
+					alertsSettings);
+
+			boolean active =
+				checkActive (
+					transaction,
+					alertsSettings);
+
+			boolean performSend =
+				alertDue && ! sentRecently && active;
+
+			if (performSend) {
+
+				long numSent =
+					sendAlerts (
+						taskLogger,
+						alertsSettings,
+						messageText);
+
+				// create alert
+
+				alertsAlertHelper.insert (
+					taskLogger,
+					alertsAlertHelper.createInstance ()
+
+					.setAlertsSettings (
+						alertsSettings)
+
+					.setIndex (
+						alertsSettings.getNumAlerts ())
+
+					.setTimestamp (
+						now)
+
+					.setUnclaimedItems (
+						numUnclaimed)
+
+					.setMaximumDuration (
+						maxDurationSeconds)
+
+					.setText (
+						messageText)
+
+					.setRecipients (
+						numSent)
+
+				);
+
+				// update alerts settings
+
+				alertsSettings
+
+					.setLastAlert (
+						transaction.now ())
+
+					.setNumAlerts (
+						alertsSettings.getNumAlerts () + 1);
+
+			}
+
+			// create status check log
+
+			alertsStatusCheckHelper.insert (
+				taskLogger,
+				alertsStatusCheckHelper.createInstance ()
 
 				.setAlertsSettings (
 					alertsSettings)
 
 				.setIndex (
-					alertsSettings.getNumAlerts ())
+					alertsSettings.getNumStatusChecks ())
 
 				.setTimestamp (
-					now)
+					transaction.now ())
 
 				.setUnclaimedItems (
 					numUnclaimed)
@@ -463,11 +536,17 @@ class AlertsDaemon
 				.setMaximumDuration (
 					maxDurationSeconds)
 
-				.setText (
-					messageText)
+				.setResult (
+					alertDue)
 
-				.setRecipients (
-					numSent)
+				.setActive (
+					active)
+
+				.setSentRecently (
+					sentRecently)
+
+				.setAlertSent (
+					performSend)
 
 			);
 
@@ -475,68 +554,31 @@ class AlertsDaemon
 
 			alertsSettings
 
-				.setLastAlert (
+				.setLastStatusCheck (
 					transaction.now ())
 
-				.setNumAlerts (
-					alertsSettings.getNumAlerts () + 1);
+				.setNumStatusChecks (
+					alertsSettings.getNumStatusChecks () + 1);
+
+			// and we're done
+
+			transaction.commit ();
 
 		}
 
-		// create status check log
-
-		alertsStatusCheckHelper.insert (
-			alertsStatusCheckHelper.createInstance ()
-
-			.setAlertsSettings (
-				alertsSettings)
-
-			.setIndex (
-				alertsSettings.getNumStatusChecks ())
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setUnclaimedItems (
-				numUnclaimed)
-
-			.setMaximumDuration (
-				maxDurationSeconds)
-
-			.setResult (
-				alertDue)
-
-			.setActive (
-				active)
-
-			.setSentRecently (
-				sentRecently)
-
-			.setAlertSent (
-				performSend)
-
-		);
-
-		// update alerts settings
-
-		alertsSettings
-
-			.setLastStatusCheck (
-				transaction.now ())
-
-			.setNumStatusChecks (
-				alertsSettings.getNumStatusChecks () + 1);
-
-		// and we're done
-
-		transaction.commit ();
-
 	}
 
+	private
 	TextRec constructMessage (
-			AlertsSettingsRec alertsSettings,
-			Long numUnclaimed,
-			Duration maximumDuration) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull AlertsSettingsRec alertsSettings,
+			@NonNull Long numUnclaimed,
+			@NonNull Duration maximumDuration) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"constructMessage");
 
 		Integer maxDurationMinutes =
 			maximumDuration
@@ -559,10 +601,13 @@ class AlertsDaemon
 			.substitute (
 				alertsSettings.getTemplate ());
 
-		log.warn (message);
+		taskLogger.warningFormat (
+			"%s",
+			message);
 
 		TextRec messageText =
 			textHelper.findOrCreate (
+				taskLogger,
 				message);
 
 		return messageText;
@@ -570,8 +615,14 @@ class AlertsDaemon
 	}
 
 	boolean checkSentRecently (
-			Transaction transaction,
-			AlertsSettingsRec alertsSettings) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction,
+			@NonNull AlertsSettingsRec alertsSettings) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"checkSentRecently");
 
 		Duration minAlertFrequency =
 			new Duration (
@@ -581,36 +632,40 @@ class AlertsDaemon
 		if (alertsSettings.getLastAlert () == null)
 			return false;
 
-		log.debug (
-			stringFormat (
-				"last alert was at %s",
-				alertsSettings.getLastAlert ().toString ()));
+		taskLogger.debugFormat (
+			"last alert was at %s",
+			timeFormatter.timestampSecondStringIso (
+				alertsSettings.getLastAlert ()));
 
 		Duration durationSinceLastSend =
 			new Duration (
 				alertsSettings.getLastAlert (),
 				transaction.now ());
 
-		log.debug (
-			stringFormat (
-				"duration since last alert is %s",
-				durationSinceLastSend.toString ()));
+		taskLogger.debugFormat (
+			"duration since last alert is %s",
+			timeFormatter.prettyDuration (
+				durationSinceLastSend));
 
-		if (durationSinceLastSend.isShorterThan (minAlertFrequency)) {
+		if (
+			shorterThan (
+				durationSinceLastSend,
+				minAlertFrequency)
+		) {
 
-			log.debug (
-				stringFormat (
-					"mininum alert frequency of %s not exceeded",
-					minAlertFrequency.toString ()));
+			taskLogger.debugFormat (
+				"mininum alert frequency of %s not exceeded",
+				timeFormatter.prettyDuration (
+					minAlertFrequency));
 
 			return true;
 
 		} else {
 
-			log.debug (
-				stringFormat (
-					"minimum alert frequency of %s exceeded",
-					minAlertFrequency.toString ()));
+			taskLogger.debugFormat (
+				"minimum alert frequency of %s exceeded",
+				timeFormatter.prettyDuration (
+					minAlertFrequency));
 
 			return false;
 
@@ -683,23 +738,30 @@ class AlertsDaemon
 	}
 
 	int sendAlerts (
-			AlertsSettingsRec alertsSettings,
-			TextRec messageText) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull AlertsSettingsRec alertsSettings,
+			@NonNull TextRec messageText) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendAlerts");
 
 		// send alerts
 
 		int numSent = 0;
 
-		for (AlertsNumberRec alertsNumber
-				: alertsSettings.getAlertsNumbers ()) {
+		for (
+			AlertsNumberRec alertsNumber
+				: alertsSettings.getAlertsNumbers ()
+		) {
 
 			if (! alertsNumber.getEnabled ())
 				continue;
 
-			log.info (
-				stringFormat (
-					"sending alert to %s",
-					alertsNumber.getNumber ().getNumber ()));
+			taskLogger.noticeFormat (
+				"sending alert to %s",
+				alertsNumber.getNumber ().getNumber ());
 
 			ServiceRec alertsService =
 				serviceHelper.findByCodeRequired (
@@ -727,7 +789,8 @@ class AlertsDaemon
 				.service (
 					alertsService)
 
-				.send ();
+				.send (
+					taskLogger);
 
 			numSent ++;
 

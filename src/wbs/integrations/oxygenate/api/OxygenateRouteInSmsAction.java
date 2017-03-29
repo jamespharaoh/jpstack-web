@@ -22,12 +22,14 @@ import lombok.NonNull;
 
 import wbs.api.mvc.ApiAction;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionUtils;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -63,8 +65,8 @@ class OxygenateRouteInSmsAction
 	@SingletonDependency
 	ExceptionUtils exceptionLogic;
 
-	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -83,6 +85,9 @@ class OxygenateRouteInSmsAction
 
 	@SingletonDependency
 	RouteObjectHelper routeHelper;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
 
 	@SingletonDependency
 	NumberObjectHelper smsNumberHelper;
@@ -122,13 +127,19 @@ class OxygenateRouteInSmsAction
 	Responder goApi (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goApi");
+
 		try {
 
 			logRequest ();
 
 			processRequest ();
 
-			updateDatabase ();
+			updateDatabase (
+				taskLogger);
 
 			return createResponse ();
 
@@ -141,7 +152,8 @@ class OxygenateRouteInSmsAction
 
 		} finally {
 
-			storeLog ();
+			storeLog (
+				taskLogger);
 
 		}
 
@@ -227,7 +239,13 @@ class OxygenateRouteInSmsAction
 
 	}
 
-	void storeLog () {
+	void storeLog (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"storeLog");
 
 		try (
 
@@ -239,6 +257,7 @@ class OxygenateRouteInSmsAction
 		) {
 
 			oxygenateInboundLogHelper.insert (
+				taskLogger,
 				oxygenateInboundLogHelper.createInstance ()
 
 				.setRoute (
@@ -345,7 +364,13 @@ class OxygenateRouteInSmsAction
 
 	}
 
-	void updateDatabase () {
+	void updateDatabase (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"updateDatabase");
 
 		try (
 
@@ -388,11 +413,14 @@ class OxygenateRouteInSmsAction
 				oxygenateNetworkOptional.get ();
 
 			smsInboxLogic.inboxInsert (
+				taskLogger,
 				optionalOf (
 					reference),
 				textHelper.findOrCreate (
+					taskLogger,
 					textContent),
 				smsNumberHelper.findOrCreate (
+					taskLogger,
 					msisdn),
 				shortcode,
 				route,

@@ -104,9 +104,12 @@ class ChatUserNotesAction
 			// create note
 
 			TextRec noteText =
-				textHelper.findOrCreate (noteString);
+				textHelper.findOrCreate (
+					taskLogger,
+					noteString);
 
 			chatUserNoteHelper.insert (
+				taskLogger,
 				chatUserNoteHelper.createInstance ()
 
 				.setChatUser (

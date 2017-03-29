@@ -209,10 +209,12 @@ class ChatUserImageListAction
 
 					BufferedImage smallImage =
 						mediaLogic.getImageRequired (
+							taskLogger,
 							chatUserImage.getMedia ());
 
 					BufferedImage fullImage =
 						mediaLogic.getImageRequired (
+							taskLogger,
 							chatUserImage.getFullMedia ());
 
 					if (
@@ -222,10 +224,12 @@ class ChatUserImageListAction
 					) {
 
 						smallImage =
-							mediaLogic.rotateImage270 (smallImage);
+							mediaLogic.rotateImage270 (
+								smallImage);
 
 						fullImage =
-							mediaLogic.rotateImage270 (fullImage);
+							mediaLogic.rotateImage270 (
+								fullImage);
 
 					}
 
@@ -248,12 +252,14 @@ class ChatUserImageListAction
 
 					chatUserImage.setMedia (
 						mediaLogic.createMediaFromImage (
+							taskLogger,
 							smallImage,
 							"image/jpeg",
 							filename));
 
 					chatUserImage.setFullMedia (
 						mediaLogic.createMediaFromImage (
+							taskLogger,
 							fullImage,
 							"image/jpeg",
 							filename));

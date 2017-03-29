@@ -4,17 +4,23 @@ import java.util.List;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHooks;
+
 import wbs.platform.object.core.model.ObjectTypeDao;
 import wbs.platform.object.core.model.ObjectTypeRec;
+
 import wbs.sms.message.batch.logic.BatchLogic;
 import wbs.sms.message.batch.model.BatchObjectHelper;
 import wbs.sms.message.batch.model.BatchSubjectRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
+
 import wbs.smsapps.broadcast.model.BroadcastConfigRec;
 import wbs.smsapps.broadcast.model.BroadcastRec;
 
@@ -36,6 +42,9 @@ class BroadcastHooks
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@WeakSingletonDependency
 	NumberFormatLogic numberFormatLogicProvider;
 
@@ -47,6 +56,7 @@ class BroadcastHooks
 	@Override
 	public
 	void beforeInsert (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull BroadcastRec broadcast) {
 
 		BroadcastConfigRec broadcastConfig =
@@ -62,7 +72,13 @@ class BroadcastHooks
 	@Override
 	public
 	void afterInsert (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull BroadcastRec broadcast) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"afterInsert");
 
 		BroadcastConfigRec broadcastConfig =
 			broadcast.getBroadcastConfig ();
@@ -79,6 +95,7 @@ class BroadcastHooks
 
 		BatchSubjectRec batchSubject =
 			batchLogic.batchSubject (
+				taskLogger,
 				broadcastConfig,
 				"broadcast");
 
@@ -90,6 +107,7 @@ class BroadcastHooks
 			throw new NullPointerException ();
 
 		batchHelper.insert (
+			taskLogger,
 			batchHelper.createInstance ()
 
 			.setParentType (
@@ -110,7 +128,7 @@ class BroadcastHooks
 
 		if (broadcastConfig.getDefaultNumbers () != null) {
 
-			List<String> numbers;
+			List <String> numbers;
 
 			try {
 
@@ -128,6 +146,7 @@ class BroadcastHooks
 			}
 
 			broadcastLogicProvider.addNumbers (
+				taskLogger,
 				broadcast,
 				numbers,
 				null);

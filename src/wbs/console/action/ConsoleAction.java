@@ -191,6 +191,7 @@ class ConsoleAction
 		} catch (Exception exceptionFromBackupResponder) {
 
 			exceptionLogger.logThrowable (
+				taskLogger,
 				"console",
 				requestContext.requestPath (),
 				exceptionFromBackupResponder,
@@ -221,6 +222,7 @@ class ConsoleAction
 			requestContext.requestPath ());
 
 		exceptionLogger.logThrowable (
+			taskLogger,
 			"console",
 			requestContext.requestPath (),
 			throwable,

@@ -1,5 +1,6 @@
 package wbs.apn.chat.core.daemon;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
@@ -191,6 +192,7 @@ class ChatMainCommand
 
 		fromChatUser =
 			chatUserHelper.findOrCreate (
+				taskLogger,
 				chat,
 				smsMessage);
 
@@ -280,6 +282,7 @@ class ChatMainCommand
 					"no keyword found, new user, sending error");
 
 				chatHelpLogLogic.createChatHelpLogIn (
+					taskLogger,
 					fromChatUser,
 					smsMessage,
 					rest,
@@ -287,20 +290,22 @@ class ChatMainCommand
 					false);
 
 				chatSendLogic.sendSystemRbFree (
+					taskLogger,
 					fromChatUser,
-					Optional.of (
+					optionalOf (
 						smsMessage.getThreadId ()),
 					"keyword_error",
 					TemplateMissing.error,
-					Collections.<String,String>emptyMap ());
+					emptyMap ());
 
 				return smsInboxLogic.inboxProcessed (
+					taskLogger,
 					inbox,
-					Optional.of (
+					optionalOf (
 						serviceHelper.findByCodeRequired (
 							chat,
 							"default")),
-					Optional.of (
+					optionalOf (
 						chatUserLogic.getAffiliate (
 							fromChatUser)),
 					command);
@@ -345,6 +350,7 @@ class ChatMainCommand
 				"no keyword found, existing user, sent to help");
 
 			chatHelpLogLogic.createChatHelpLogIn (
+				taskLogger,
 				fromChatUser,
 				smsMessage,
 				rest,
@@ -352,12 +358,13 @@ class ChatMainCommand
 				true);
 
 			return smsInboxLogic.inboxProcessed (
+				taskLogger,
 				inbox,
-				Optional.of (
+				optionalOf (
 					serviceHelper.findByCodeRequired (
 						chat,
 						"default")),
-				Optional.of (
+				optionalOf (
 					chatUserLogic.getAffiliate (
 						fromChatUser)),
 				command);
@@ -369,11 +376,16 @@ class ChatMainCommand
 	// private implementation
 
 	InboxAttemptRec doCode (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String code,
 			@NonNull String rest) {
 
-		Optional<ChatUserRec> toUserOptional =
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doCode");
+
+		Optional <ChatUserRec> toUserOptional =
 			chatUserHelper.findByCode (
 				chat,
 				code);
@@ -393,6 +405,7 @@ class ChatMainCommand
 				code);
 
 			return smsInboxLogic.inboxProcessed (
+				taskLogger,
 				inbox,
 				Optional.of (
 					serviceHelper.findByCodeRequired (
@@ -416,6 +429,7 @@ class ChatMainCommand
 				toUser.getId ()));
 
 		chatMessageLogic.chatMessageSendFromUser (
+			taskLogger,
 			fromChatUser,
 			toUser,
 			rest,
@@ -429,19 +443,21 @@ class ChatMainCommand
 		if (fromChatUser.getFirstJoin () == null) {
 
 			chatSendLogic.sendSystem (
+				taskLogger,
 				fromChatUser,
-				Optional.of (
+				optionalOf (
 					smsMessage.getThreadId ()),
 				"message_signup",
 				userChatScheme.getRbFreeRouter (),
 				userChatScheme.getRbNumber (),
 				Collections.<String>emptySet (),
-				Optional.<String>absent (),
+				optionalAbsent (),
 				"system",
 				TemplateMissing.error,
 				Collections.<String,String>emptyMap ());
 
 			chatSendLogic.sendSystemMagic (
+				taskLogger,
 				fromChatUser,
 				Optional.of (
 					smsMessage.getThreadId ()),
@@ -459,12 +475,13 @@ class ChatMainCommand
 		}
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (
+			optionalOf (
 				serviceHelper.findByCodeRequired (
 					chat,
 					"default")),
-			Optional.of (
+			optionalOf (
 				chatUserLogic.getAffiliate (
 					fromChatUser)),
 			command);
@@ -834,7 +851,12 @@ class ChatMainCommand
 	}
 
 	Optional <InboxAttemptRec> performCreditCheck (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"performCreditCheck");
 
 		taskLogger.debugFormat (
 			"message %s: performing credit check",
@@ -848,8 +870,9 @@ class ChatMainCommand
 				integerToDecimalString (
 					inbox.getId ()));
 
-			return Optional.of (
+			return optionalOf (
 				smsInboxLogic.inboxNotProcessed (
+					taskLogger,
 					inbox,
 					Optional.of (
 						serviceHelper.findByCodeRequired (
@@ -867,9 +890,10 @@ class ChatMainCommand
 
 		ChatCreditCheckResult creditCheckResult =
 			chatCreditLogic.userSpendCreditCheck (
+				taskLogger,
 				fromChatUser,
 				true,
-				Optional.of (
+				optionalOf (
 					smsMessage.getThreadId ()));
 
 		if (creditCheckResult.failed ()) {
@@ -881,20 +905,22 @@ class ChatMainCommand
 				"credit check failed, sending to help");
 
 			chatHelpLogLogic.createChatHelpLogIn (
+				taskLogger,
 				fromChatUser,
 				smsMessage,
 				rest,
 				null,
 				true);
 
-			return Optional.of (
+			return optionalOf (
 				smsInboxLogic.inboxProcessed (
+					taskLogger,
 					inbox,
-					Optional.of (
+					optionalOf (
 						serviceHelper.findByCodeRequired (
 							chat,
 							"default")),
-					Optional.of (
+					optionalOf (
 						chatUserLogic.getAffiliate (
 							fromChatUser)),
 					command));

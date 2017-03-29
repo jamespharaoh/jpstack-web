@@ -37,6 +37,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.dialogue.model.DialogueMmsRouteObjectHelper;
 import wbs.integrations.dialogue.model.DialogueMmsRouteRec;
@@ -80,7 +81,8 @@ class DialogueMmsSender
 	@Override
 	protected
 	DialogueMmsOutbox getMessage (
-			OutboxRec outbox)
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull OutboxRec outbox)
 		throws SendFailureException {
 
 		DialogueMmsOutbox dialogueMmsOutbox =
@@ -121,7 +123,8 @@ class DialogueMmsSender
 
 	@Override
 	protected
-	Optional<List<String>> sendMessage (
+	Optional <List <String>> sendMessage (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull DialogueMmsOutbox dialogueMmsOutbox)
 		throws SendFailureException {
 

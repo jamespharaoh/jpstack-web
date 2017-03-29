@@ -155,6 +155,7 @@ class ChatNoteNamesAction
 				) {
 
 					chatNoteNameHelper.insert (
+						taskLogger,
 						chatNoteNameHelper.createInstance ()
 
 						.setChat (

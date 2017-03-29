@@ -1,5 +1,8 @@
 package wbs.smsapps.forwarder.daemon;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -7,14 +10,17 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-import wbs.platform.affiliate.model.AffiliateRec;
+
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
+
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
@@ -25,6 +31,7 @@ import wbs.sms.message.inbox.model.InboxAttemptRec;
 import wbs.sms.message.inbox.model.InboxRec;
 import wbs.sms.messageset.logic.MessageSetLogic;
 import wbs.sms.messageset.model.MessageSetObjectHelper;
+
 import wbs.smsapps.forwarder.model.ForwarderMessageInObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderRec;
@@ -49,8 +56,8 @@ class ForwarderCommand
 	@SingletonDependency
 	ForwarderObjectHelper forwarderHelper;
 
-	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MessageObjectHelper messageHelper;
@@ -63,6 +70,9 @@ class ForwarderCommand
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
 
 	// properties
 
@@ -97,6 +107,11 @@ class ForwarderCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
+
 		Transaction transaction =
 			database.currentTransaction ();
 
@@ -113,6 +128,7 @@ class ForwarderCommand
 				"default");
 
 		forwarderMessageInHelper.insert (
+			taskLogger,
 			forwarderMessageInHelper.createInstance ()
 
 			.setForwarder (
@@ -133,6 +149,7 @@ class ForwarderCommand
 		);
 
 		messageSetLogic.sendMessageSet (
+			taskLogger,
 			messageSetHelper.findByCodeRequired (
 				forwarder,
 				"forwarder"),
@@ -143,9 +160,11 @@ class ForwarderCommand
 		// process inbox
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (defaultService),
-			Optional.<AffiliateRec>absent (),
+			optionalOf (
+				defaultService),
+			optionalAbsent (),
 			command);
 
 	}

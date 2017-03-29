@@ -2,8 +2,12 @@ package wbs.platform.media.console;
 
 import java.awt.image.BufferedImage;
 
+import lombok.NonNull;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaRec;
@@ -24,7 +28,13 @@ class MediaImageScaleResponder
 	@Override
 	protected
 	byte[] getData (
-			MediaRec media) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull MediaRec media) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getData");
 
 		Long maxWidth =
 			requestContext.parameterIntegerRequired (
@@ -42,6 +52,7 @@ class MediaImageScaleResponder
 
 		BufferedImage fullImage =
 			mediaLogic.readImageRequired (
+				taskLogger,
 				content.getData (),
 				mediaType.getMimeType ());
 

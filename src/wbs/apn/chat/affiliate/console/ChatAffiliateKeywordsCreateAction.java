@@ -167,6 +167,7 @@ class ChatAffiliateKeywordsCreateAction
 			}
 
 			chatSchemeKeywordHelper.insert (
+				taskLogger,
 				chatSchemeKeywordHelper.createInstance ()
 
 				.setChatScheme (

@@ -153,10 +153,13 @@ class G8waveInFile
 		// insert the message
 
 		smsInboxLogic.inboxInsert (
+			taskLogger,
 			optionalAbsent (),
 			textHelper.findOrCreate (
+				taskLogger,
 				messageParam),
 			smsNumberHelper.findOrCreate (
+				taskLogger,
 				numFromParam),
 			numToParam,
 			route,

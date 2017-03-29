@@ -10,16 +10,21 @@ import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
-import wbs.apn.chat.user.core.model.ChatUserType;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.core.model.ChatStatsObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.daemon.AbstractDaemonService;
+
+import wbs.apn.chat.core.model.ChatObjectHelper;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.core.model.ChatStatsObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserType;
 
 @Log4j
 @SingletonComponent ("chatStatsDaemon")
@@ -40,6 +45,9 @@ class ChatStatsDaemon
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// details
 
@@ -119,7 +127,11 @@ class ChatStatsDaemon
 	}
 
 	void doStats (
-			Instant timestamp) {
+			@NonNull Instant timestamp) {
+
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"doStats");
 
 		// get list of chats
 
@@ -140,6 +152,7 @@ class ChatStatsDaemon
 		) {
 
 			doStats (
+				taskLogger,
 				timestamp,
 				chat.getId ());
 
@@ -148,8 +161,14 @@ class ChatStatsDaemon
 	}
 
 	void doStats (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Instant timestamp,
 			@NonNull Long chatId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doStats");
 
 		@Cleanup
 		Transaction transaction =
@@ -174,6 +193,7 @@ class ChatStatsDaemon
 		// insert stats
 
 		chatStatsHelper.insert (
+			taskLogger,
 			chatStatsHelper.createInstance ()
 
 			.setChat (

@@ -10,8 +10,6 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import java.io.FileOutputStream;
 import java.util.List;
 
-import com.google.common.base.Optional;
-
 import lombok.Cleanup;
 import lombok.NonNull;
 
@@ -191,6 +189,7 @@ class ChatUserImageUploadPostAction
 			}
 
 			chatUserLogic.setImage (
+				taskLogger,
 				imageUploadToken.getChatUser (),
 				ChatUserImageType.image,
 				fileItem.get (),
@@ -228,10 +227,11 @@ class ChatUserImageUploadPostAction
 			// log exception
 
 			exceptionLogger.logThrowable (
+				taskLogger,
 				"webapi",
 				requestContext.requestPath (),
 				exception,
-				Optional.absent (),
+				optionalAbsent (),
 				GenericExceptionResolution.ignoreWithUserWarning);
 
 			// start new transaction

@@ -123,6 +123,7 @@ class ChatUserAdminCreditAction
 
 			ChatUserCreditRec chatUserCredit =
 				chatUserCreditHelper.insert (
+					taskLogger,
 					chatUserCreditHelper.createInstance ()
 
 				.setChatUser (

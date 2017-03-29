@@ -148,6 +148,7 @@ class MediaburstProteusApiServletModule
 						"routeId"));
 
 			reportLogic.deliveryReport (
+				taskLogger,
 				route,
 				reportRequestResult.otherId,
 				reportRequestResult.status,

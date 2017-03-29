@@ -211,13 +211,16 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 			TextRec newText =
 				newValue.length () > 0
-					? textHelper.findOrCreate (newValue)
+					? textHelper.findOrCreate (
+						taskLogger,
+						newValue)
 					: null;
 
 			if (namedNote == null) {
 
 				namedNote =
 					chatNamedNoteHelper.insert (
+						taskLogger,
 						chatNamedNoteHelper.createInstance ()
 
 					.setChatNoteName (
@@ -256,6 +259,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 			}
 
 			chatNamedNoteLogHelper.insert (
+				taskLogger,
 				chatNamedNoteLogHelper.createInstance ()
 
 				.setChatNamedNote (

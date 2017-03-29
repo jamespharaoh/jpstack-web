@@ -105,6 +105,7 @@ class ConsoleExceptionHandler
 		try {
 
 			exceptionLogger.logThrowable (
+				taskLogger,
 				"console",
 				stringFormat (
 					"%s %s",

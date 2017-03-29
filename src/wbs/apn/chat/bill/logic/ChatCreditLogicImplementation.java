@@ -1,5 +1,6 @@
 package wbs.apn.chat.bill.logic;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.LogicUtils.booleanToYesNo;
@@ -26,17 +27,19 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateRec;
@@ -71,7 +74,6 @@ import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
 
-@Log4j
 @SingletonComponent ("chatCreditLogic")
 public
 class ChatCreditLogicImplementation
@@ -106,6 +108,9 @@ class ChatCreditLogicImplementation
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ObjectManager objectManager;
 
@@ -128,8 +133,14 @@ class ChatCreditLogicImplementation
 	@Override
 	public
 	void userReceiveSpend (
-			ChatUserRec toChatUser,
-			int receivedMessageCount) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec toChatUser,
+			@NonNull Long receivedMessageCount) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userReceiveSpend");
 
 		if (toChatUser.getType () == ChatUserType.monitor)
 			return;
@@ -155,6 +166,7 @@ class ChatCreditLogicImplementation
 
 		ChatUserSpendRec toChatUserSpend =
 			findOrCreateChatUserSpend (
+				taskLogger,
 				toChatUser,
 				today);
 
@@ -212,12 +224,18 @@ class ChatCreditLogicImplementation
 	@Override
 	public
 	void userSpend (
-			ChatUserRec chatUser,
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser,
 			int userMessageCount,
 			int monitorMessageCount,
 			int textProfileCount,
 			int imageProfileCount,
 			int videoProfileCount) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userSpend");
 
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();
@@ -242,6 +260,7 @@ class ChatCreditLogicImplementation
 
 		ChatUserSpendRec chatUserSpend =
 			findOrCreateChatUserSpend (
+				taskLogger,
 				chatUser,
 				today);
 
@@ -423,8 +442,14 @@ class ChatCreditLogicImplementation
 	@Override
 	public
 	ChatUserSpendRec findOrCreateChatUserSpend (
-			ChatUserRec chatUser,
-			LocalDate date) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser,
+			@NonNull LocalDate date) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreateChatUserSpend");
 
 		ChatUserSpendRec chatUserSpend =
 			chatUserSpendHelper.findByDate (
@@ -435,6 +460,7 @@ class ChatCreditLogicImplementation
 
 			chatUserSpend =
 				chatUserSpendHelper.insert (
+					taskLogger,
 					chatUserSpendHelper.createInstance ()
 
 				.setChatUser (
@@ -453,20 +479,25 @@ class ChatCreditLogicImplementation
 	@Override
 	public
 	ChatCreditCheckResult userSpendCreditCheck (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Boolean userActed,
 			@NonNull Optional <Long> threadId) {
 
-		log.debug (
-			stringFormat (
-				"userSpendCheck (%s, %s, %s)",
-				integerToDecimalString (
-					chatUser.getId ()),
-				booleanToYesNo (
-					userActed),
-				threadId.isPresent ()
-					? threadId.get ().toString ()
-					: "null"));
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userSpendCreditCheck");
+
+		taskLogger.debugFormat (
+			"userSpendCheck (%s, %s, %s)",
+			integerToDecimalString (
+				chatUser.getId ()),
+			booleanToYesNo (
+				userActed),
+			threadId.isPresent ()
+				? threadId.get ().toString ()
+				: "null");
 
 		// if user acted then clear block and send pending bill
 
@@ -478,6 +509,7 @@ class ChatCreditLogicImplementation
 					false);
 
 			userBill (
+				taskLogger,
 				chatUser,
 				new BillCheckOptions ()
 					.retry (true));
@@ -488,6 +520,7 @@ class ChatCreditLogicImplementation
 
 		ChatCreditCheckResult creditCheckResult =
 			userCreditCheck (
+				taskLogger,
 				chatUser);
 
 		// if credit ok, clear credit hint
@@ -510,6 +543,7 @@ class ChatCreditLogicImplementation
 		) {
 
 			userCreditHint (
+				taskLogger,
 				chatUser,
 				threadId);
 
@@ -539,13 +573,18 @@ class ChatCreditLogicImplementation
 	@Override
 	public
 	ChatCreditCheckResult userCreditCheck (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser) {
 
-		log.debug (
-			stringFormat (
-				"userCreditOk (%s)",
-				integerToDecimalString (
-					chatUser.getId ())));
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userCreditCheck");
+
+		taskLogger.debugFormat (
+			"userCreditOk (%s)",
+			integerToDecimalString (
+				chatUser.getId ()));
 
 		// monitors always pass
 
@@ -867,8 +906,14 @@ class ChatCreditLogicImplementation
 	@Override
 	public
 	void userBill (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull BillCheckOptions options) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userBill");
 
 		Optional <String> reasonOptional =
 			userBillCheck (
@@ -880,12 +925,14 @@ class ChatCreditLogicImplementation
 				reasonOptional)
 		) {
 
-			log.debug (
+			taskLogger.debugFormat (
+				"%s",
 				reasonOptional.get ());
 
 		} else {
 
 			userBillReal (
+				taskLogger,
 				chatUser,
 				true);
 
@@ -896,8 +943,14 @@ class ChatCreditLogicImplementation
 	@Override
 	public
 	void userBillReal (
-			ChatUserRec chatUser,
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser,
 			boolean updateRevoked) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userBillReal");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -911,11 +964,10 @@ class ChatCreditLogicImplementation
 		RouteRec route =
 			chatScheme.getRbBillRoute ();
 
-		log.debug (
-			stringFormat (
-				"Doing credit for user %s",
-				integerToDecimalString (
-					chatUser.getId ())));
+		taskLogger.debugFormat (
+			"Doing credit for user %s",
+			integerToDecimalString (
+				chatUser.getId ()));
 
 		// sanity check on the route
 
@@ -1054,6 +1106,7 @@ class ChatCreditLogicImplementation
 
 		TextRec text =
 			textHelper.findOrCreate (
+				taskLogger,
 				finalText);
 
 		// and send it
@@ -1093,7 +1146,8 @@ class ChatCreditLogicImplementation
 			.ref (
 				chatUser.getId ())
 
-			.send ();
+			.send (
+				taskLogger);
 
 		// Bill message has been sent, now tidy up for 30 pound limit
 
@@ -1108,13 +1162,12 @@ class ChatCreditLogicImplementation
 			.setLastBillSent (
 				transaction.now ());
 
-		log.info (
-			stringFormat (
-				"Billed message sent to chat user %s %s",
-				integerToDecimalString (
-					chatUser.getId ()),
-				userCreditDebug (
-					chatUser)));
+		taskLogger.noticeFormat (
+			"Billed message sent to chat user %s %s",
+			integerToDecimalString (
+				chatUser.getId ()),
+			userCreditDebug (
+				chatUser));
 
 	}
 
@@ -1228,8 +1281,14 @@ class ChatCreditLogicImplementation
 	@Override
 	public
 	void userCreditHint (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userCreditHint");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -1260,12 +1319,11 @@ class ChatCreditLogicImplementation
 
 			if (! chatNetworkOptional.isPresent ()) {
 
-				log.debug (
-					stringFormat (
-						"Not sending credit hint to %s ",
-						integerToDecimalString (
-							chatUser.getId ()),
-						"because no network settings found"));
+				taskLogger.debugFormat (
+					"Not sending credit hint to %s ",
+					integerToDecimalString (
+						chatUser.getId ()),
+					"because no network settings found");
 
 				return;
 
@@ -1283,20 +1341,22 @@ class ChatCreditLogicImplementation
 				if (! chatNetwork.getAllowPrePay ()) {
 
 					chatSendLogic.sendSystemRbFree (
+						taskLogger,
 						chatUser,
 						threadId,
 						"credit_hint_network",
 						TemplateMissing.error,
-						Collections.<String,String>emptyMap ());
+						emptyMap ());
 
 				} else {
 
 					chatSendLogic.sendSystemRbFree (
+						taskLogger,
 						chatUser,
 						threadId,
 						"credit_hint_prepay",
 						TemplateMissing.error,
-						Collections.<String,String>emptyMap ());
+						emptyMap ());
 
 				}
 
@@ -1309,11 +1369,12 @@ class ChatCreditLogicImplementation
 				if (! chatNetwork.getAllowReverseBill ()) {
 
 					chatSendLogic.sendSystemRbFree (
+						taskLogger,
 						chatUser,
 						threadId,
 						"credit_hint_network",
 						TemplateMissing.error,
-						Collections.<String,String>emptyMap ());
+						emptyMap ());
 
 				} else if (
 					userBillLimitApplies (
@@ -1321,11 +1382,12 @@ class ChatCreditLogicImplementation
 				) {
 
 					chatSendLogic.sendSystemRbFree (
+						taskLogger,
 						chatUser,
 						threadId,
 						"credit_hint_daily",
 						TemplateMissing.error,
-						ImmutableMap.<String,String>builder ()
+						ImmutableMap.<String, String> builder ()
 
 							.put (
 								"limit",
@@ -1337,11 +1399,12 @@ class ChatCreditLogicImplementation
 				} else {
 
 					chatSendLogic.sendSystemRbFree (
+						taskLogger,
 						chatUser,
 						threadId,
 						"credit_hint",
 						TemplateMissing.error,
-						Collections.<String,String>emptyMap ());
+						emptyMap ());
 
 				}
 
@@ -1378,7 +1441,13 @@ class ChatCreditLogicImplementation
 	@Override
 	public
 	void creditLimitUpdate (
-			ChatUserRec chatUser) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"creditLimitUpdate");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -1398,6 +1467,7 @@ class ChatCreditLogicImplementation
 		// log it
 
 		chatUserCreditLimitLogHelper.insert (
+			taskLogger,
 			chatUserCreditLimitLogHelper.createInstance ()
 
 			.setChatUser (

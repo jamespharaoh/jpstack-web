@@ -132,6 +132,7 @@ class ChatHelpLogPendingFormAction
 			if (! ignore) {
 
 				chatHelpLogic.sendHelpMessage (
+					taskLogger,
 					userConsoleLogic.userRequired (),
 					chatUser,
 					text,

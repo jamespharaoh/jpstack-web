@@ -1,20 +1,24 @@
 package wbs.platform.text.logic;
 
-import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 
 import javax.inject.Provider;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.LateLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextObjectHelperMethods;
 import wbs.platform.text.model.TextRec;
+
 import wbs.utils.cache.AdvancedCache;
 import wbs.utils.cache.IdCacheBuilder;
 
@@ -29,6 +33,9 @@ class TextObjectHelperMethodsImplementation
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@WeakSingletonDependency
 	TextObjectHelper textHelper;
@@ -77,35 +84,32 @@ class TextObjectHelperMethodsImplementation
 	@Override
 	public
 	TextRec findOrCreate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String stringValue) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreate");
+
 		return textCache.findOrCreate (
-			stringValue);
-
-	}
-
-	@Override
-	public
-	TextRec findOrCreateMapNull (
-			String stringValue) {
-
-		if (
-			isNull (
-				stringValue)
-		) {
-			return null;
-		}
-
-		return findOrCreate (
+			taskLogger,
 			stringValue);
 
 	}
 
 	private
 	TextRec createReal (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String stringValue) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createReal");
+
 		return textHelper.insert (
+			taskLogger,
 			textHelper.createInstance ()
 
 			.setText (

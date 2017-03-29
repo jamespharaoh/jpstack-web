@@ -1,12 +1,13 @@
 package wbs.services.ticket.create;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -187,10 +188,10 @@ class ObjectTicketCreateAction <
 			// determine ticket
 
 			ticketManager =
-				(TicketManagerRec)
-				objectManager.dereferenceObsolete (
-					contextObject,
-					ticketManagerPath);
+				genericCastUnchecked (
+					objectManager.dereferenceObsolete (
+						contextObject,
+						ticketManagerPath));
 
 			if (ticketManager == null)
 				return null;
@@ -333,10 +334,11 @@ class ObjectTicketCreateAction <
 
 			UpdateResultSet updateResultSet =
 				formFieldLogic.update (
+					taskLogger,
 					requestContext,
 					fields,
 					ticket,
-					ImmutableMap.of (),
+					emptyMap (),
 					"create");
 
 			if (updateResultSet.errorCount () > 0) {
@@ -375,6 +377,7 @@ class ObjectTicketCreateAction <
 			// insert
 
 			ticketHelper.insert (
+				taskLogger,
 				ticket);
 
 			// create event
@@ -387,6 +390,7 @@ class ObjectTicketCreateAction <
 			if (consoleHelper.ephemeral ()) {
 
 				eventLogic.createEvent (
+					taskLogger,
 					"object_created_in",
 					userConsoleLogic.userRequired (),
 					objectRef,
@@ -396,6 +400,7 @@ class ObjectTicketCreateAction <
 			} else {
 
 				eventLogic.createEvent (
+					taskLogger,
 					"object_created",
 					userConsoleLogic.userRequired (),
 					ticket,
@@ -408,24 +413,26 @@ class ObjectTicketCreateAction <
 			if (ticket instanceof PermanentRecord) {
 
 				formFieldLogic.runUpdateHooks (
+					taskLogger,
 					fields,
 					updateResultSet,
 					ticket,
-					(PermanentRecord<?>) ticket,
-					Optional.<Object>absent (),
-					Optional.<String>absent (),
+					(PermanentRecord <?>) ticket,
+					optionalAbsent (),
+					optionalAbsent (),
 					"create");
 
 			} else {
 
 				formFieldLogic.runUpdateHooks (
+					taskLogger,
 					fields,
 					updateResultSet,
 					ticket,
-					(PermanentRecord<?>) ticketManager,
-					Optional.of (
+					(PermanentRecord <?>) ticketManager,
+					optionalOf (
 						objectRef),
-					Optional.of (
+					optionalOf (
 						consoleHelper.shortName ()),
 					"create");
 

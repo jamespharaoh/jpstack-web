@@ -332,11 +332,14 @@ class MediaburstApiServletModule
 				// insert the message
 
 				TextRec messageText =
-					textHelper.findOrCreate (messageParam);
+					textHelper.findOrCreate (
+						taskLogger,
+						messageParam);
 
 				if (concatenatedInformationElement != null) {
 
 					inboxMultipartLogic.insertInboxMultipart (
+						taskLogger,
 						route,
 						concatenatedInformationElement.getRef (),
 						concatenatedInformationElement.getSeqMax (),
@@ -351,10 +354,12 @@ class MediaburstApiServletModule
 				} else {
 
 					smsInboxLogic.inboxInsert (
+						taskLogger,
 						optionalOf (
 							msgIdParam),
 						messageText,
 						smsNumberHelper.findOrCreate (
+							taskLogger,
 							numFromParam),
 						numToParam,
 						route,
@@ -414,6 +419,11 @@ class MediaburstApiServletModule
 				ServletException,
 				IOException {
 
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"reportFile.doGet");
+
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
@@ -454,6 +464,7 @@ class MediaburstApiServletModule
 				) {
 
 					reportLogic.deliveryReport (
+						taskLogger,
 						route,
 						requestContext.parameterRequired (
 							"msg_id"),

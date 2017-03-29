@@ -1,14 +1,15 @@
 package wbs.console.forms;
 
-import lombok.NonNull;
-
-import wbs.framework.component.annotations.PrototypeComponent;
-
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 import static wbs.utils.string.StringUtils.utf8ToString;
 
 import com.google.common.base.Optional;
+
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("utf8StringFormFieldNativeMapping")
 public
@@ -36,9 +37,10 @@ class Utf8StringFormFieldNativeMapping<Container>
 
 	@Override
 	public
-	Optional<byte[]> genericToNative (
+	Optional <byte[]> genericToNative (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Optional<String> genericValue) {
+			@NonNull Optional <String> genericValue) {
 
 		if (
 			optionalIsNotPresent (

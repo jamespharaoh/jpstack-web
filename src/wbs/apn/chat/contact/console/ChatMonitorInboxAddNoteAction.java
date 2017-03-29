@@ -1,9 +1,6 @@
 package wbs.apn.chat.contact.console;
 
-import static wbs.utils.string.StringUtils.stringFormat;
-
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
@@ -22,7 +19,6 @@ import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.web.responder.Responder;
 
-@Log4j
 @PrototypeComponent ("chatMonitorInboxAddNoteAction")
 public
 class ChatMonitorInboxAddNoteAction
@@ -91,12 +87,12 @@ class ChatMonitorInboxAddNoteAction
 
 			if (newNote != null) {
 
-				log.info (
-					stringFormat (
-						"Adding note to %s",
-						chatMonitorInbox.getMonitorChatUser ().getName ()));
+				taskLogger.noticeFormat (
+					"Adding note to %s",
+					chatMonitorInbox.getMonitorChatUser ().getName ());
 
 				chatContactNoteHelper.insert (
+					taskLogger,
 					chatContactNoteHelper.createInstance ()
 
 					.setChat (

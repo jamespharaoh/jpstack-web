@@ -8,8 +8,13 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.forms.FormFieldNativeMapping;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 
@@ -21,6 +26,9 @@ class TextFormFieldNativeMapping <Container>
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	TextObjectHelper textHelper;
 
@@ -29,8 +37,14 @@ class TextFormFieldNativeMapping <Container>
 	@Override
 	public
 	Optional <TextRec> genericToNative (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Optional <String> genericValue) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"genericToNative");
 
 		if (! genericValue.isPresent ()) {
 			return optionalAbsent ();
@@ -38,6 +52,7 @@ class TextFormFieldNativeMapping <Container>
 
 		return Optional.of (
 			textHelper.findOrCreate (
+				taskLogger,
 				genericValue.get ()));
 
 	}

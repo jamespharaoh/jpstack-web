@@ -155,12 +155,14 @@ class ChatUserAdminBillAction
 			// bill the user
 
 			chatCreditLogic.userBillReal (
+				taskLogger,
 				chatUser,
 				true);
 
 			// log it
 
 			chatUserBillLogHelper.insert (
+				taskLogger,
 				chatUserBillLogHelper.createInstance ()
 
 				.setChatUser (

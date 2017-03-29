@@ -1,15 +1,19 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 
 import org.apache.commons.lang3.tuple.Pair;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-
-import com.google.common.base.Optional;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("timestampTimezonePairFormFieldNativeMapping")
 public
@@ -39,12 +43,13 @@ class TimestampTimezonePairFormFieldNativeMapping<Container>
 
 	@Override
 	public
-	Optional<Pair<Instant,String>> genericToNative (
+	Optional <Pair <Instant, String>> genericToNative (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Optional<DateTime> genericValue) {
+			@NonNull Optional <DateTime> genericValue) {
 
 		if (! genericValue.isPresent ()) {
-			return Optional.<Pair<Instant,String>>absent ();
+			return optionalAbsent ();
 		}
 
 		return Optional.of (

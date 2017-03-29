@@ -12,12 +12,14 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.fonix.model.FonixConfigObjectHelper;
@@ -44,6 +46,9 @@ class FonixFixtureProvider
 	// singleton dependencies
 
 	@SingletonDependency
+	Database database;
+
+	@SingletonDependency
 	FonixConfigObjectHelper fonixConfigHelper;
 
 	@SingletonDependency
@@ -58,8 +63,8 @@ class FonixFixtureProvider
 	@SingletonDependency
 	FonixRouteOutObjectHelper fonixRouteOutHelper;
 
-	@SingletonDependency
-	Database database;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
@@ -89,21 +94,39 @@ class FonixFixtureProvider
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		createMenus ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFixtures");
 
-		createConfig ();
+		createMenus (
+			taskLogger);
 
-		createDefaultDeliveryStatuses ();
-		createDefaultNetworks ();
+		createConfig (
+			taskLogger);
 
-		createRoutes ();
+		createDefaultDeliveryStatuses (
+			taskLogger);
+
+		createDefaultNetworks (
+			taskLogger);
+
+		createRoutes (
+			taskLogger);
 
 	}
 
 	private
-	void createMenus () {
+	void createMenus (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMenus");
 
 		menuItemHelper.insert (
+			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
@@ -137,9 +160,16 @@ class FonixFixtureProvider
 	}
 
 	private
-	void createConfig () {
+	void createConfig (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createConfig");
 
 		fonixConfigHelper.insert (
+			taskLogger,
 			fonixConfigHelper.createInstance ()
 
 			.setCode (
@@ -158,11 +188,18 @@ class FonixFixtureProvider
 	}
 
 	private
-	void createDefaultDeliveryStatuses () {
+	void createDefaultDeliveryStatuses (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createDefaultDeliveryStatuses");
 
 		defaultDeliveryStatuses.forEach (
 			defaultDeliveryStatus ->
 				fonixDeliveryStatusHelper.insert (
+					taskLogger,
 					fonixDeliveryStatusHelper.createInstance ()
 
 			.setFonixConfig (
@@ -189,11 +226,18 @@ class FonixFixtureProvider
 	}
 
 	private
-	void createDefaultNetworks () {
+	void createDefaultNetworks (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createDefaultNetworks");
 
 		defaultNetworks.forEach (
 			defaultNetwork ->
 				fonixNetworkHelper.insert (
+					taskLogger,
 					fonixNetworkHelper.createInstance ()
 
 			.setFonixConfig (
@@ -216,11 +260,20 @@ class FonixFixtureProvider
 	}
 
 	private
-	void createRoutes () {
+	void createRoutes (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createRoutes");
 
 		testAccounts.forEach (
 			"fonix-route",
-			this::createRoute);
+			testAccount ->
+				createRoute (
+					taskLogger,
+					testAccount));
 
 		database.flush ();
 
@@ -228,7 +281,13 @@ class FonixFixtureProvider
 
 	private
 	void createRoute (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Map <String, String> params) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createRoute");
 
 		switch (
 			params.get (
@@ -238,6 +297,7 @@ class FonixFixtureProvider
 		case "in":
 
 			createInboundRoute (
+				taskLogger,
 				params);
 
 			break;
@@ -245,6 +305,7 @@ class FonixFixtureProvider
 		case "out":
 
 			createOutboundRoute (
+				taskLogger,
 				params);
 
 			break;
@@ -262,10 +323,17 @@ class FonixFixtureProvider
 
 	private
 	void createInboundRoute (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Map <String, String> params) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createInboundRoute");
 
 		RouteRec smsRoute =
 			smsRouteHelper.insert (
+				taskLogger,
 				smsRouteHelper.createInstance ()
 
 			.setSlice (
@@ -289,6 +357,7 @@ class FonixFixtureProvider
 		);
 
 		fonixRouteInHelper.insert (
+			taskLogger,
 			fonixRouteInHelper.createInstance ()
 
 			.setRoute (
@@ -305,10 +374,17 @@ class FonixFixtureProvider
 
 	private
 	void createOutboundRoute (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Map <String, String> params) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createOutboundRoute");
 
 		RouteRec smsRoute =
 			smsRouteHelper.insert (
+				taskLogger,
 				smsRouteHelper.createInstance ()
 
 			.setSlice (
@@ -340,6 +416,7 @@ class FonixFixtureProvider
 		);
 
 		fonixRouteOutHelper.insert (
+			taskLogger,
 			fonixRouteOutHelper.createInstance ()
 
 			.setRoute (

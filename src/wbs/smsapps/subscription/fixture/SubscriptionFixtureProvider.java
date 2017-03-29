@@ -8,11 +8,13 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.menu.model.MenuGroupObjectHelper;
@@ -54,6 +56,9 @@ class SubscriptionFixtureProvider
 	@SingletonDependency
 	KeywordSetObjectHelper keywordSetHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
 
@@ -91,7 +96,13 @@ class SubscriptionFixtureProvider
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFixtures");
+
 		menuItemHelper.insert (
+			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
@@ -122,6 +133,7 @@ class SubscriptionFixtureProvider
 
 		SubscriptionRec subscription =
 			subscriptionHelper.insert (
+				taskLogger,
 				subscriptionHelper.createInstance ()
 
 			.setSlice (
@@ -149,6 +161,7 @@ class SubscriptionFixtureProvider
 
 			.setBilledMessage (
 				textHelper.findOrCreate (
+					taskLogger,
 					"Billed message"))
 
 			.setFreeRouter (
@@ -170,10 +183,12 @@ class SubscriptionFixtureProvider
 
 			.setSubscribeMessageText (
 				textHelper.findOrCreate (
+					taskLogger,
 					"Subsription confirmed"))
 
 			.setUnsubscribeMessageText (
 				textHelper.findOrCreate (
+					taskLogger,
 					"Subscription cancelled"))
 
 		);
@@ -187,6 +202,7 @@ class SubscriptionFixtureProvider
 				"inbound");
 
 		keywordHelper.insert (
+			taskLogger,
 			keywordHelper.createInstance ()
 
 			.setKeywordSet (
@@ -206,6 +222,7 @@ class SubscriptionFixtureProvider
 		);
 
 		keywordHelper.insert (
+			taskLogger,
 			keywordHelper.createInstance ()
 
 			.setKeywordSet (
@@ -231,6 +248,7 @@ class SubscriptionFixtureProvider
 
 			SubscriptionListRec list =
 				subscriptionListHelper.insert (
+					taskLogger,
 					subscriptionListHelper.createInstance ()
 
 				.setSubscription (
@@ -249,6 +267,7 @@ class SubscriptionFixtureProvider
 			);
 
 			subscriptionKeywordHelper.insert (
+				taskLogger,
 				subscriptionKeywordHelper.createInstance ()
 
 				.setSubscription (
@@ -274,6 +293,7 @@ class SubscriptionFixtureProvider
 
 			SubscriptionAffiliateRec affiliate =
 				subscriptionAffiliateHelper.insert (
+					taskLogger,
 					subscriptionAffiliateHelper.createInstance ()
 
 				.setSubscription (
@@ -294,6 +314,7 @@ class SubscriptionFixtureProvider
 			database.flush ();
 
 			keywordHelper.insert (
+				taskLogger,
 				keywordHelper.createInstance ()
 
 				.setKeywordSet (

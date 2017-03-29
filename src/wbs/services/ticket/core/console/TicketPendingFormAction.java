@@ -165,6 +165,7 @@ class TicketPendingFormAction
 			if (! noteText.isEmpty ()) {
 
 				ticketNoteHelper.insert (
+					taskLogger,
 					ticketNoteHelper.createInstance ()
 
 					.setTicket (

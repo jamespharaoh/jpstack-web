@@ -5,6 +5,7 @@ import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalNotEqualOrNotPresentWithClass;
@@ -23,12 +24,13 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
-import org.joda.time.Instant;
-
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.service.model.ServiceObjectHelper;
@@ -76,6 +78,9 @@ class ForwarderLogicImplementation
 
 	@SingletonDependency
 	ForwarderRouteObjectHelper forwarderRouteHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	NetworkObjectHelper networkHelper;
@@ -231,7 +236,13 @@ class ForwarderLogicImplementation
 	@Override
 	public
 	boolean sendTemplateCheck (
-			SendTemplate template) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull SendTemplate template) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendTemplateCheck");
 
 		SendTemplateCheckWork work =
 			new SendTemplateCheckWork ();
@@ -264,7 +275,9 @@ class ForwarderLogicImplementation
 
 		// check parts
 
-		sendTemplateCheckParts (work);
+		sendTemplateCheckParts (
+			taskLogger,
+			work);
 
 		// match against existing message
 
@@ -374,7 +387,13 @@ class ForwarderLogicImplementation
 
 	private
 	void sendTemplateCheckParts (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull SendTemplateCheckWork work) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendTemplateCheckParts");
 
 		for (
 			SendPart part
@@ -473,6 +492,7 @@ class ForwarderLogicImplementation
 
 				part.service =
 					serviceHelper.findOrCreate (
+						taskLogger,
 						work.template.forwarder,
 						"default",
 						part.serviceCode);
@@ -546,13 +566,15 @@ class ForwarderLogicImplementation
 
 				part.numToNumber =
 					numberHelper.findOrCreate (
+						taskLogger,
 						part.numTo);
 
 				if (
 					! smsTrackerManager.canSend (
+						taskLogger,
 						work.template.forwarder.getSmsTracker (),
 						part.numToNumber,
-						Optional.<Instant>absent ())
+						optionalAbsent ())
 				) {
 
 					sendTemplateCheckError (
@@ -704,7 +726,13 @@ class ForwarderLogicImplementation
 	@Override
 	public
 	void sendTemplateSend (
-			SendTemplate sendTemplate) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull SendTemplate sendTemplate) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendTemplateSend");
 
 		ForwarderMessageOutRec lastForwarderMessageOut = null;
 
@@ -729,6 +757,7 @@ class ForwarderLogicImplementation
 
 			sendPart.forwarderMessageOut =
 				createMessage (
+					taskLogger,
 					sendTemplate.forwarder,
 					sendTemplate.fmIn,
 					sendPart.message,
@@ -781,6 +810,7 @@ class ForwarderLogicImplementation
 	@Override
 	public
 	ForwarderMessageOutRec sendMessage (
+			@NonNull TaskLogger parentTaskLogger,
 			ForwarderRec forwarder,
 			ForwarderMessageInRec fmIn,
 			String message,
@@ -790,7 +820,12 @@ class ForwarderLogicImplementation
 			String routeCode,
 			String myId,
 			Long pri,
-			Collection<MediaRec> medias) {
+			Collection <MediaRec> medias) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendMessage");
 
 		SendTemplate sendTemplate =
 			new SendTemplate ();
@@ -814,7 +849,11 @@ class ForwarderLogicImplementation
 		sendPart.pri = pri;
 		sendPart.medias = medias;
 
-		if (! sendTemplateCheck (sendTemplate)) {
+		if (
+			! sendTemplateCheck (
+				taskLogger,
+				sendTemplate)
+		) {
 
 			if (
 				enumEqualSafe (
@@ -839,6 +878,7 @@ class ForwarderLogicImplementation
 		}
 
 		sendTemplateSend (
+			taskLogger,
 			sendTemplate);
 
 		return sendTemplate.parts.get (0).forwarderMessageOut;
@@ -965,6 +1005,7 @@ class ForwarderLogicImplementation
 
 	private
 	ForwarderMessageOutRec createMessage (
+			@NonNull TaskLogger parentTaskLogger,
 			ForwarderRec forwarder,
 			ForwarderMessageInRec fmIn,
 			String message,
@@ -977,24 +1018,35 @@ class ForwarderLogicImplementation
 			String myId,
 			Long pri,
 			boolean sendNow,
-			Set<String> tags,
+			Set <String> tags,
 			NetworkRec network,
 			String subject,
-			Collection<MediaRec> medias) {
+			Collection <MediaRec> medias) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMessage");
 
 		// lookup some stuff
 
 		NumberRec number =
 			numberHelper.findOrCreate (
+				taskLogger,
 				numto);
 
-		if (threadId == null && fmIn != null)
-			threadId = fmIn.getMessage().getThreadId();
+		if (threadId == null && fmIn != null) {
+
+			threadId =
+				fmIn.getMessage ().getThreadId ();
+
+		}
 
 		// create the out record
 
 		ForwarderMessageOutRec forwarderMessageOut =
 			forwarderMessageOutHelper.insert (
+				taskLogger,
 				forwarderMessageOutHelper.createInstance ()
 
 			.setForwarder (
@@ -1033,6 +1085,7 @@ class ForwarderLogicImplementation
 					number)
 
 				.messageString (
+					taskLogger,
 					message)
 
 				.numFrom (
@@ -1051,6 +1104,7 @@ class ForwarderLogicImplementation
 					forwarderMessageOut.getId ())
 
 				.subjectString (
+					taskLogger,
 					optionalFromNullable (
 						subject))
 
@@ -1066,17 +1120,23 @@ class ForwarderLogicImplementation
 				.network (
 					network)
 
-				.send ();
+				.send (
+					taskLogger);
 
 		} else {
 
 			messageOut =
 				wapPushLogic.wapPushSend (
+					taskLogger,
 					threadId,
 					number,
 					numfrom,
-					textHelper.findOrCreate (message),
-					textHelper.findOrCreate (url),
+					textHelper.findOrCreate (
+						taskLogger,
+						message),
+					textHelper.findOrCreate (
+						taskLogger,
+						url),
 					forwarderRoute.getRouter (),
 					service,
 					null,

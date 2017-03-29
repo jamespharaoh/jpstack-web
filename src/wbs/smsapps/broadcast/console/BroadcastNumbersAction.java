@@ -176,6 +176,7 @@ class BroadcastNumbersAction
 
 				addResult =
 					broadcastLogic.addNumbers (
+						taskLogger,
 						broadcast,
 						numbers,
 						userConsoleLogic.userRequired ());
@@ -205,6 +206,7 @@ class BroadcastNumbersAction
 
 					NumberRec numberRecord =
 						numberHelper.findOrCreate (
+							taskLogger,
 							numberString);
 
 					BroadcastNumberRec broadcastNumber =
@@ -290,6 +292,7 @@ class BroadcastNumbersAction
 			if (addResult.numAdded () > 0) {
 
 				eventLogic.createEvent (
+					taskLogger,
 					"broadcast_numbers_added",
 					userConsoleLogic.userRequired (),
 					addResult.numAdded (),
@@ -300,6 +303,7 @@ class BroadcastNumbersAction
 			if (numRemoved > 0) {
 
 				eventLogic.createEvent (
+					taskLogger,
 					"broadcast_numbers_removed",
 					userConsoleLogic.userRequired (),
 					numRemoved,

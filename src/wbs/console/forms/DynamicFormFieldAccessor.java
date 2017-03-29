@@ -14,9 +14,12 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.helper.manager.ConsoleObjectManager;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("dynamicFormFieldAccessor")
@@ -32,6 +35,9 @@ class DynamicFormFieldAccessor <
 	@SingletonDependency
 	ConsoleObjectManager consoleObjectManager;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// properties
 
 	@Getter @Setter
@@ -45,6 +51,7 @@ class DynamicFormFieldAccessor <
 	@Override
 	public
 	Optional <Native> read (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container) {
 
 		// get native object
@@ -92,8 +99,14 @@ class DynamicFormFieldAccessor <
 	@Override
 	public
 	void write (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValueOptional) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"write");
 
 		// sanity check native type
 
@@ -123,6 +136,7 @@ class DynamicFormFieldAccessor <
 				container);
 
 		consoleHelper.setDynamic (
+			taskLogger,
 			genericCastUnchecked (
 				container),
 			name,

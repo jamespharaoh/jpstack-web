@@ -1,25 +1,25 @@
 package wbs.apn.chat.user.core.daemon;
 
 import static wbs.utils.etc.Misc.isNull;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.time.TimeUtils.earlierThan;
 
 import java.util.List;
 
-import com.google.common.base.Optional;
-
 import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -33,7 +33,6 @@ import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 
-@Log4j
 @SingletonComponent ("chatUserQuietDaemon")
 public
 class ChatUserQuietDaemon
@@ -58,6 +57,9 @@ class ChatUserQuietDaemon
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -93,44 +95,58 @@ class ChatUserQuietDaemon
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		log.debug ("Looking for quiet users");
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce ()");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ChatUserQuietDaemon.runOnce ()",
-				this);
+		taskLogger.debugFormat (
+			"Looking for quiet users");
 
-		// get a list of users who are past their outbound timestamp
+		try (
 
-		List<ChatUserRec> chatUsers =
-			chatUserHelper.findWantingQuietOutbound (
-				transaction.now ());
+			Transaction transaction =
+				database.beginReadOnly (
+					"ChatUserQuietDaemon.runOnce ()",
+					this);
 
-		transaction.close ();
-
-		// then do each one
-
-		for (
-			ChatUserRec chatUser
-				: chatUsers
 		) {
 
-			try {
+			// get a list of users who are past their outbound timestamp
 
-				doUser (
-					chatUser.getId ());
+			List <ChatUserRec> chatUsers =
+				chatUserHelper.findWantingQuietOutbound (
+					transaction.now ());
 
-			} catch (Exception exception) {
+			transaction.close ();
 
-				exceptionLogger.logThrowable (
-					"daemon",
-					"Chat daemon",
-					exception,
-					Optional.absent (),
-					GenericExceptionResolution.tryAgainLater);
+			// then do each one
+
+			for (
+				ChatUserRec chatUser
+					: chatUsers
+			) {
+
+				try {
+
+					doUser (
+						taskLogger,
+						chatUser.getId ());
+
+				} catch (Exception exception) {
+
+					exceptionLogger.logThrowable (
+						taskLogger,
+						"daemon",
+						"Chat daemon",
+						exception,
+						optionalAbsent (),
+						GenericExceptionResolution.tryAgainLater);
+
+				}
 
 			}
 
@@ -140,7 +156,13 @@ class ChatUserQuietDaemon
 
 	private
 	void doUser (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doUser");
 
 		@Cleanup
 		Transaction transaction =
@@ -182,10 +204,9 @@ class ChatUserQuietDaemon
 
 		if (user.getBarred ()) {
 
-			log.info (
-				stringFormat (
-					"Skipping quiet alarm for %s: barred",
-					userPath));
+			taskLogger.noticeFormat (
+				"Skipping quiet alarm for %s: barred",
+				userPath);
 
 			transaction.commit ();
 
@@ -194,10 +215,9 @@ class ChatUserQuietDaemon
 
 		if (user.getCreditMode () == ChatUserCreditMode.barred) {
 
-			log.info (
-				stringFormat (
-					"Skipping quiet alarm for %s: barred",
-					userPath));
+			taskLogger.noticeFormat (
+				"Skipping quiet alarm for %s: barred",
+				userPath);
 
 			transaction.commit ();
 
@@ -209,10 +229,9 @@ class ChatUserQuietDaemon
 
 		if (user.getCreditSuccess () < 300) {
 
-			log.info (
-				stringFormat (
-					"Skipping quiet alarm for %s: low credit success",
-					userPath));
+			taskLogger.noticeFormat (
+				"Skipping quiet alarm for %s: low credit success",
+				userPath);
 
 			transaction.commit ();
 
@@ -227,10 +246,9 @@ class ChatUserQuietDaemon
 
 		if (monitor == null) {
 
-			log.info (
-				stringFormat (
-					"Skipping quiet alarm for %s: no available monitor",
-					userPath));
+			taskLogger.noticeFormat (
+				"Skipping quiet alarm for %s: no available monitor",
+				userPath);
 
 			transaction.commit ();
 
@@ -245,6 +263,7 @@ class ChatUserQuietDaemon
 
 		ChatMonitorInboxRec chatMonitorInbox =
 			chatMessageLogic.findOrCreateChatMonitorInbox (
+				taskLogger,
 				monitor,
 				user,
 				true);
@@ -257,6 +276,7 @@ class ChatUserQuietDaemon
 		// create a log
 
 		chatUserInitiationLogHelper.insert (
+			taskLogger,
 			chatUserInitiationLogHelper.createInstance ()
 
 			.setChatUser (
@@ -275,11 +295,10 @@ class ChatUserQuietDaemon
 
 		// and return
 
-		log.info (
-			stringFormat (
-				"Setting quiet alarm for %s with %s",
-				userPath,
-				monitorPath));
+		taskLogger.noticeFormat (
+			"Setting quiet alarm for %s with %s",
+			userPath,
+			monitorPath);
 
 		transaction.commit ();
 

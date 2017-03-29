@@ -454,64 +454,78 @@ class ForwarderApiModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"ForwarderApiModule.SendRpcHandler.handle (source)",
-					this);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
 
-			// authenticate
+			try (
 
-			forwarder =
-				forwarderApiLogic.rpcAuth (source);
+				Transaction transaction =
+					database.beginReadWrite (
+						"ForwarderApiModule.SendRpcHandler.handle (source)",
+						this);
 
-			// get params
+			) {
 
-			getParams (source);
+				// authenticate
 
-			// bail on any request-invalid classErrors
+				forwarder =
+					forwarderApiLogic.rpcAuth (source);
 
-			if (errors.iterator ().hasNext ()) {
+				// get params
 
-				return Rpc.rpcError (
-					"forwarder-send-response",
-					Rpc.stRequestInvalid,
-					"request-invalid",
-					errors);
+				getParams (source);
 
-			}
+				// bail on any request-invalid classErrors
 
-			// create template
+				if (errors.iterator ().hasNext ()) {
 
-			createTemplate ();
+					return Rpc.rpcError (
+						"forwarder-send-response",
+						Rpc.stRequestInvalid,
+						"request-invalid",
+						errors);
 
-			// check template
+				}
 
-			if (checkTemplate ()) {
+				// create template
 
-				// and send
+				createTemplate ();
 
-				sendTemplate ();
+				// check template
 
-				// return success
+				if (
+					checkTemplate (
+						taskLogger)
+				) {
 
-				transaction.commit ();
+					// and send
 
-				return Rpc.rpcSuccess (
-					"Message queued for sending",
-					"forwarer-send-response",
-					Rpc.rpcElem (
-						"server-id",
-						sendTemplate.parts.get (0)
-							.forwarderMessageOut
-							.getId ()));
+					sendTemplate (
+						taskLogger);
 
-			} else {
+					// return success
 
-				// return failure
+					transaction.commit ();
 
-				throw new RuntimeException (
-					"Need to elaborate on error here...");
+					return Rpc.rpcSuccess (
+						"Message queued for sending",
+						"forwarer-send-response",
+						Rpc.rpcElem (
+							"server-id",
+							sendTemplate.parts.get (0)
+								.forwarderMessageOut
+								.getId ()));
+
+				} else {
+
+					// return failure
+
+					throw new RuntimeException (
+						"Need to elaborate on error here...");
+
+				}
 
 			}
 
@@ -576,17 +590,31 @@ class ForwarderApiModule
 		}
 
 		private
-		boolean checkTemplate () {
+		boolean checkTemplate (
+				@NonNull TaskLogger parentTaskLogger) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"checkTemplate");
 
 			return forwarderLogic.sendTemplateCheck (
+				taskLogger,
 				sendTemplate);
 
 		}
 
 		private
-		void sendTemplate () {
+		void sendTemplate (
+				@NonNull TaskLogger parentTaskLogger) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendTemplate");
 
 			forwarderLogic.sendTemplateSend (
+				taskLogger,
 				sendTemplate);
 
 		}
@@ -830,6 +858,11 @@ class ForwarderApiModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
+
 			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
@@ -843,7 +876,9 @@ class ForwarderApiModule
 
 			// get params
 
-			getParams (source);
+			getParams (
+				taskLogger,
+				source);
 
 			// bail on any request-invalid classErrors
 
@@ -863,12 +898,17 @@ class ForwarderApiModule
 
 			// check the template is ok
 
-			checkTemplate ();
+			checkTemplate (
+				taskLogger);
 
 			// send the message (if appropriate)
 
-			if (! cancel)
-				sendTemplate ();
+			if (! cancel) {
+
+				sendTemplate (
+					taskLogger);
+
+			}
 
 			// return
 
@@ -881,17 +921,25 @@ class ForwarderApiModule
 		}
 
 		private
-		Collection<MediaRec> getMedias (
-				List<Map<String, Object>> mpList)
+		Collection <MediaRec> getMedias (
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull List <Map <String, Object>> mpList)
 			throws ReportableException {
 
-			Collection<MediaRec> medias =
-				new ArrayList<MediaRec> ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getMedias");
+
+			Collection <MediaRec> medias =
+				new ArrayList<> ();
 
 			try {
 
-				for (Map<String,Object> mp
-						: mpList) {
+				for (
+					Map <String, Object> mp
+						: mpList
+				) {
 
 					String url = (String) mp.get("url");
 
@@ -908,6 +956,7 @@ class ForwarderApiModule
 
 					medias.add (
 						mediaLogic.createMediaFromImageRequired (
+							taskLogger,
 							getImageContent (url),
 							"image/jpeg",
 							filename));
@@ -936,6 +985,7 @@ class ForwarderApiModule
 
 						medias.add (
 							mediaLogic.createTextMedia (
+								taskLogger,
 								message,
 								"text/plain",
 								txtFilename));
@@ -994,9 +1044,15 @@ class ForwarderApiModule
 		 */
 		private
 		void getParams (
-				RpcSource source) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull RpcSource source) {
 
-			Map<String,Object> params =
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"getParams");
+
+			Map <String, Object> params =
 				forwarderApiLogic.unsafeMapStringObject (
 					source.obtain (
 						sendExRequestDef,
@@ -1119,6 +1175,7 @@ class ForwarderApiModule
 
 									sendExMessage.medias =
 										getMedias (
+											taskLogger,
 											mediaList);
 
 									sendExMessage.subject =
@@ -1231,7 +1288,13 @@ class ForwarderApiModule
 		 * failures and successes etc...
 		 */
 		private
-		void checkTemplate () {
+		void checkTemplate (
+				@NonNull TaskLogger parentTaskLogger) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"checkTemplate");
 
 			for (
 				int index = 0;
@@ -1244,8 +1307,11 @@ class ForwarderApiModule
 
 				// call sendTemplateCheck
 
-				if (forwarderLogic.sendTemplateCheck (
-						sendExMessageChain.sendTemplate)) {
+				if (
+					forwarderLogic.sendTemplateCheck (
+						taskLogger,
+						sendExMessageChain.sendTemplate)
+				) {
 
 					someSuccess = true;
 
@@ -1272,15 +1338,24 @@ class ForwarderApiModule
 		}
 
 		private
-		void sendTemplate () {
+		void sendTemplate (
+				@NonNull TaskLogger parentTaskLogger) {
 
-			for (SendExMessageChain sendExMessasgeChain
-					: messageChains) {
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"sendTemplate");
+
+			for (
+				SendExMessageChain sendExMessasgeChain
+					: messageChains
+			) {
 
 				if (! sendExMessasgeChain.ok)
 					continue;
 
 				forwarderLogic.sendTemplateSend (
+					taskLogger,
 					sendExMessasgeChain.sendTemplate);
 
 			}

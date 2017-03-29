@@ -4,6 +4,7 @@ import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.ResultUtils.successResult;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -400,12 +401,13 @@ class TextAreaFormFieldRenderer <Container, Parent>
 
 	@Override
 	public
-	Either<Optional<String>,String> formToInterface (
+	Either <Optional <String>, String> formToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 
 		return successResult (
-			Optional.fromNullable (
+			optionalFromNullable (
 				submission.parameter (
 					stringFormat (
 						"%s.%s",

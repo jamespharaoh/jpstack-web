@@ -4,6 +4,7 @@ import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalFromJava;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -16,12 +17,14 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -74,25 +77,28 @@ class SubscriptionCommand
 	EventLogic eventLogic;
 
 	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
-
-	@SingletonDependency
 	KeywordFinder keywordFinder;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
 	@SingletonDependency
-	ObjectManager objectManager;
+	ServiceObjectHelper serviceHelper;
 
 	@SingletonDependency
-	ServiceObjectHelper serviceHelper;
+	SmsInboxLogic smsInboxLogic;
+
+	@SingletonDependency
+	SubscriptionObjectHelper subscriptionHelper;
 
 	@SingletonDependency
 	SubscriptionKeywordObjectHelper subscriptionKeywordHelper;
 
 	@SingletonDependency
-	SubscriptionObjectHelper subscriptionHelper;
+	SubscriptionLogic subscriptionLogic;
 
 	@SingletonDependency
 	SubscriptionNumberObjectHelper subscriptionNumberHelper;
@@ -101,7 +107,7 @@ class SubscriptionCommand
 	SubscriptionSubObjectHelper subscriptionSubHelper;
 
 	@SingletonDependency
-	SubscriptionLogic subscriptionLogic;
+	ObjectManager objectManager;
 
 	// prototype dependencies
 
@@ -163,6 +169,11 @@ class SubscriptionCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
+
 		transaction =
 			database.currentTransaction ();
 
@@ -176,6 +187,7 @@ class SubscriptionCommand
 
 		subscriptionNumber =
 			subscriptionNumberHelper.findOrCreate (
+				taskLogger,
 				subscription,
 				number);
 
@@ -185,7 +197,8 @@ class SubscriptionCommand
 				"subscribe")
 		) {
 
-			return doSubscribe ();
+			return doSubscribe (
+				taskLogger);
 
 		} else if (
 			stringEqualSafe (
@@ -253,7 +266,13 @@ class SubscriptionCommand
 
 	}
 
-	InboxAttemptRec doSubscribe () {
+	InboxAttemptRec doSubscribe (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doSubscribe");
 
 		matchKeyword ();
 
@@ -270,6 +289,7 @@ class SubscriptionCommand
 					subscriptionAffiliate);
 
 			eventLogic.createEvent (
+				taskLogger,
 				"subscription_number_affiliate",
 				subscriptionNumber,
 				subscriptionAffiliate,
@@ -337,6 +357,7 @@ class SubscriptionCommand
 
 			SubscriptionSubRec newSubscriptionSub =
 				subscriptionSubHelper.insert (
+					taskLogger,
 					subscriptionSubHelper.createInstance ()
 
 				.setSubscriptionNumber (
@@ -406,6 +427,7 @@ class SubscriptionCommand
 			// create event
 
 			eventLogic.createEvent (
+				taskLogger,
 				"subscription_number_subscribe",
 				subscriptionNumber,
 				subscriptionList,
@@ -443,15 +465,17 @@ class SubscriptionCommand
 					subscriptionAffiliate,
 					"default"))
 
-			.send ();
+			.send (
+				taskLogger);
 
 		// process message
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (
+			optionalOf (
 				response.getService ()),
-			Optional.of (
+			optionalOf (
 				response.getAffiliate ()),
 			command);
 

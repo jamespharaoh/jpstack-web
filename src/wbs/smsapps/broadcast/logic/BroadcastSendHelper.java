@@ -4,23 +4,31 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.send.GenericSendHelper;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
+
 import wbs.sms.message.batch.model.BatchObjectHelper;
 import wbs.sms.message.batch.model.BatchRec;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.number.lookup.logic.NumberLookupManager;
+
 import wbs.smsapps.broadcast.model.BroadcastConfigRec;
 import wbs.smsapps.broadcast.model.BroadcastNumberObjectHelper;
 import wbs.smsapps.broadcast.model.BroadcastNumberRec;
@@ -55,6 +63,9 @@ class BroadcastSendHelper
 
 	@SingletonDependency
 	EventLogic eventLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	NumberLookupManager numberLookupManager;
@@ -182,8 +193,14 @@ class BroadcastSendHelper
 	@Override
 	public
 	void sendStart (
-			BroadcastConfigRec broadcastConfig,
-			BroadcastRec broadcast) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull BroadcastConfigRec broadcastConfig,
+			@NonNull BroadcastRec broadcast) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendStart");
 
 		// sanity check
 
@@ -212,6 +229,7 @@ class BroadcastSendHelper
 		// create event
 
 		eventLogic.createEvent (
+			taskLogger,
 			"broadcast_send_begun",
 			broadcast);
 
@@ -220,9 +238,10 @@ class BroadcastSendHelper
 	@Override
 	public
 	boolean verifyItem (
-			BroadcastConfigRec broadcastConfig,
-			BroadcastRec broadcast,
-			BroadcastNumberRec broadcastNumber) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull BroadcastConfigRec broadcastConfig,
+			@NonNull BroadcastRec broadcast,
+			@NonNull BroadcastNumberRec broadcastNumber) {
 
 		// check if block list configured
 
@@ -284,9 +303,15 @@ class BroadcastSendHelper
 	@Override
 	public
 	void sendItem (
-			BroadcastConfigRec broadcastConfig,
-			BroadcastRec broadcast,
-			BroadcastNumberRec broadcastNumber) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull BroadcastConfigRec broadcastConfig,
+			@NonNull BroadcastRec broadcast,
+			@NonNull BroadcastNumberRec broadcastNumber) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendItem");
 
 		// sanity check
 
@@ -316,6 +341,7 @@ class BroadcastSendHelper
 				broadcastBatch)
 
 			.messageString (
+				taskLogger,
 				broadcast.getMessageText ())
 
 			.number (
@@ -333,7 +359,8 @@ class BroadcastSendHelper
 			.user (
 				broadcast.getSentUser ())
 
-			.send ();
+			.send (
+				taskLogger);
 
 		// mark the number as sent
 
@@ -358,8 +385,14 @@ class BroadcastSendHelper
 	@Override
 	public
 	void sendComplete (
-			BroadcastConfigRec broadcastConfig,
-			BroadcastRec broadcast) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull BroadcastConfigRec broadcastConfig,
+			@NonNull BroadcastRec broadcast) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendComplete");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -391,6 +424,7 @@ class BroadcastSendHelper
 		// create event
 
 		eventLogic.createEvent (
+			taskLogger,
 			"broadcast_send_completed",
 			broadcast);
 

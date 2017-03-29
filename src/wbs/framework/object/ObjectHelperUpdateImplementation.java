@@ -1,6 +1,7 @@
 package wbs.framework.object;
 
 import static wbs.utils.etc.TypeUtils.dynamicCast;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -12,11 +13,14 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.entity.record.UnsavedRecordDetector;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperUpdateImplementation")
@@ -29,6 +33,9 @@ class ObjectHelperUpdateImplementation <
 		ObjectHelperUpdateMethods <RecordType> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@WeakSingletonDependency
 	ObjectManager objectManager;
@@ -47,9 +54,15 @@ class ObjectHelperUpdateImplementation <
 	// public implementation
 
 	@Override
-	public <RecordTypeAgain extends Record<?>>
+	public <RecordTypeAgain extends Record <?>>
 	RecordTypeAgain insert (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordTypeAgain objectUncast) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"insert");
 
 		if (
 			! objectModel.objectClass ().isInstance (
@@ -70,6 +83,7 @@ class ObjectHelperUpdateImplementation <
 			objectUncast;
 
 		objectDatabaseHelper.insert (
+			taskLogger,
 			object);
 
 		UnsavedRecordDetector.instance.removeRecord (
@@ -81,6 +95,7 @@ class ObjectHelperUpdateImplementation <
 		) {
 
 			childObjectHelper.createSingletons (
+				taskLogger,
 				objectHelper,
 				object);
 
@@ -93,7 +108,13 @@ class ObjectHelperUpdateImplementation <
 	@Override
 	public <RecordTypeAgain extends Record<?>>
 	RecordTypeAgain insertSpecial (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordTypeAgain objectUncast) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"insertSpecial");
 
 		if (
 			! objectModel.objectClass ().isInstance (
@@ -108,12 +129,12 @@ class ObjectHelperUpdateImplementation <
 
 		}
 
-		@SuppressWarnings ("unchecked")
 		RecordType object =
-			(RecordType)
-			objectUncast;
+			genericCastUnchecked (
+				objectUncast);
 
 		objectDatabaseHelper.insertSpecial (
+			taskLogger,
 			object);
 
 		UnsavedRecordDetector.instance.removeRecord (
@@ -125,6 +146,7 @@ class ObjectHelperUpdateImplementation <
 		) {
 
 			childObjectHelper.createSingletons (
+				taskLogger,
 				objectHelper,
 				object);
 
@@ -137,7 +159,13 @@ class ObjectHelperUpdateImplementation <
 	@Override
 	public <RecordTypeAgain extends Record<?>>
 	RecordTypeAgain update (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordTypeAgain objectUncast) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"update");
 
 		if (
 			! objectModel.objectClass ().isInstance (
@@ -152,10 +180,9 @@ class ObjectHelperUpdateImplementation <
 
 		}
 
-		@SuppressWarnings ("unchecked")
 		RecordType object =
-			(RecordType)
-			objectUncast;
+			genericCastUnchecked (
+				objectUncast);
 
 		objectDatabaseHelper.update (
 			object);
@@ -166,6 +193,7 @@ class ObjectHelperUpdateImplementation <
 		) {
 
 			childObjectHelper.createSingletons (
+				taskLogger,
 				objectHelper,
 				object);
 
@@ -178,10 +206,12 @@ class ObjectHelperUpdateImplementation <
 	@Override
 	public
 	void createSingletons (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ObjectHelper<?> parentHelper,
 			@NonNull Record<?> parentObject) {
 
 		objectModel.hooks ().createSingletons (
+			parentTaskLogger,
 			objectHelper,
 			parentHelper,
 			parentObject);

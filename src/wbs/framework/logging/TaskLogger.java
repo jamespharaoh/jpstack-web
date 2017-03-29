@@ -48,12 +48,14 @@ class TaskLogger
 	Boolean debugEnabled;
 
 	LogSeverity severity =
-		LogSeverity.notice;
+		LogSeverity.trace;
 
 	long errorCount;
 	long warningCount;
 	long noticeCount;
 	long debugCount;
+
+	boolean addedToParent;
 
 	String firstError;
 	String lastError = "Aborting";
@@ -104,31 +106,16 @@ class TaskLogger
 
 		} else {
 
-			this.debugEnabled = (
-
-				logTarget.debugEnabled ()
-
-				&& optionalMapRequiredOrDefault (
+			this.debugEnabled =
+				optionalMapRequiredOrDefault (
 					TaskLogger::debugEnabled,
 					parentOptional,
-					true)
-
-			);
+					true);
 
 		}
 
-		if (
-
-			this.debugEnabled
-
-			&& optionalIsPresent (
-				parentOptional)
-
-		) {
-
-			parentOptional.get ().events.add (
-				this);
-
+		if (this.debugEnabled) {
+			addToParent ();
 		}
 
 	}
@@ -191,6 +178,15 @@ class TaskLogger
 
 	}
 
+	public
+	void addChild (
+			@NonNull TaskLogger child) {
+
+		events.add (
+			child);
+
+	}
+
 	// implementation
 
 	public
@@ -224,6 +220,13 @@ class TaskLogger
 		case notice:
 
 			noticeFormat (
+				arguments);
+
+			break;
+
+		case trace:
+
+			debugFormat (
 				arguments);
 
 			break;
@@ -558,7 +561,12 @@ class TaskLogger
 
 	public
 	boolean debugEnabled () {
-		return debugEnabled;
+
+		return (
+			logTarget.debugEnabled ()
+			|| debugEnabled
+		);
+
 	}
 
 	// private implementation
@@ -589,19 +597,7 @@ class TaskLogger
 
 			// add to parent if we didn't already
 
-			if (
-
-				optionalIsPresent (
-					parentOptional)
-
-				&& ! debugEnabled
-
-			) {
-
-				parentOptional.get ().events.add (
-					this);
-
-			}
+			addToParent ();
 
 			// write first error
 
@@ -660,6 +656,26 @@ class TaskLogger
 		optionalDo (
 			parentOptional,
 			TaskLogger::increaseDebugCount);
+
+	}
+
+	private
+	void addToParent () {
+
+		if (addedToParent) {
+			return;
+		}
+
+		if (
+			optionalIsPresent (
+				parentOptional)
+		) {
+
+			parentOptional.get ().addChild (
+				this);
+		}
+
+		addedToParent = true;
 
 	}
 

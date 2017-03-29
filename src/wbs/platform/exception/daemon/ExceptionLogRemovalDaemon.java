@@ -2,27 +2,27 @@ package wbs.platform.exception.daemon;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import lombok.Cleanup;
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
 import wbs.platform.exception.model.ExceptionLogObjectHelper;
 import wbs.platform.exception.model.ExceptionLogRec;
 
-@Log4j
 @SingletonComponent ("exceptionLogRemovalDaemon")
 public
 class ExceptionLogRemovalDaemon
@@ -38,6 +38,9 @@ class ExceptionLogRemovalDaemon
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// details
 
@@ -72,17 +75,24 @@ class ExceptionLogRemovalDaemon
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		for (;;) {
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce ()");
 
-			// get a list of old exception logs
+		try (
 
-			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
 					"ExceptionLogRemovalDaemon.runOnce ()",
 					this);
+
+		) {
+
+			// get a list of old exception logs
 
 			Instant cutoffTime =
 				transaction.now ()
@@ -90,7 +100,7 @@ class ExceptionLogRemovalDaemon
 					.minusWeeks (1)
 					.toInstant ();
 
-			List<ExceptionLogRec> oldExceptionLogs =
+			List <ExceptionLogRec> oldExceptionLogs =
 				exceptionLogHelper.findOldLimit (
 					cutoffTime,
 					1000l);
@@ -116,11 +126,10 @@ class ExceptionLogRemovalDaemon
 
 			transaction.commit ();
 
-			log.info (
-				stringFormat (
-					"Removed %s old exception logs",
-					integerToDecimalString (
-						oldExceptionLogs.size ())));
+			taskLogger.noticeFormat (
+				"Removed %s old exception logs",
+				integerToDecimalString (
+					oldExceptionLogs.size ()));
 
 		}
 

@@ -3,6 +3,7 @@ package wbs.platform.postgresql.daemon;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.notLessThan;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.utils.time.TimeUtils.localTime;
@@ -22,26 +23,25 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import com.google.common.base.Optional;
-
 import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.AbstractDaemonService;
 
 import wbs.utils.thread.ThreadManager;
 
-@Log4j
 @SingletonComponent ("pgMaint")
 public
 class PostgresqlMaintenanceDaemon
@@ -54,6 +54,9 @@ class PostgresqlMaintenanceDaemon
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ThreadManager threadManager;
@@ -107,15 +110,20 @@ class PostgresqlMaintenanceDaemon
 
 	private
 	void doTasks (
-			String frequency) {
+			@NonNull String frequency) {
+
+		TaskLogger taskLogger =
+			logContext.createTaskLoggerFormat (
+				"doTasks (%s)",
+				frequency);
 
 		String frequencyName =
-			frequencyName (frequency);
+			frequencyName (
+				frequency);
 
-		log.info (
-			stringFormat (
-				"%s maintenance starting",
-				frequencyName));
+		taskLogger.noticeFormat (
+			"%s maintenance starting",
+			frequencyName);
 
 		try {
 
@@ -155,15 +163,16 @@ class PostgresqlMaintenanceDaemon
 
 			// for each command...
 
-			for (Command command
-					: commands) {
+			for (
+				Command command
+					: commands
+			) {
 
 				// output a pretty message
 
-				log.debug (
-					stringFormat (
-						"executing \"%s\"",
-						command.command));
+				taskLogger.debugFormat (
+					"executing \"%s\"",
+					command.command);
 
 				try {
 
@@ -229,10 +238,11 @@ class PostgresqlMaintenanceDaemon
 				} catch (Exception exception) {
 
 					exceptionLogger.logThrowable (
+						taskLogger,
 						"daemon",
 						getClass ().getSimpleName (),
 						exception,
-						Optional.absent (),
+						optionalAbsent (),
 						GenericExceptionResolution.tryAgainLater);
 
 				}
@@ -242,63 +252,73 @@ class PostgresqlMaintenanceDaemon
 		} catch (Exception exception) {
 
 			exceptionLogger.logThrowable (
+				taskLogger,
 				"daemon",
 				getClass ().getSimpleName (),
 				exception,
-				Optional.absent (),
+				optionalAbsent (),
 				GenericExceptionResolution.tryAgainLater);
 
 		}
 
-		log.info (
-			stringFormat (
-				"%s maintenance complete",
-				frequencyName));
+		taskLogger.noticeFormat (
+			"%s maintenance complete",
+			frequencyName);
 
 	}
 
 	List <Command> fetchCommands (
-			Connection connection,
-			String frequency)
+			@NonNull Connection connection,
+			@NonNull String frequency)
 		throws SQLException {
 
 		List <Command> commands =
 			new ArrayList<> ();
 
-		@Cleanup
-		PreparedStatement preparedStatement =
-			connection.prepareStatement (
-				stringFormat (
-					"SELECT id, command ",
-					"FROM postgresql_maintenance ",
-					"WHERE frequency = ? ",
-					"ORDER BY sequence, command"));
+		try (
 
-		preparedStatement.setString (
-			1,
-			frequency);
+			PreparedStatement preparedStatement =
+				connection.prepareStatement (
+					stringFormat (
+						"SELECT id, command ",
+						"FROM postgresql_maintenance ",
+						"WHERE frequency = ? ",
+						"ORDER BY sequence, command"));
 
-		@Cleanup
-		ResultSet resultSet =
-			preparedStatement.executeQuery ();
+		) {
 
-		while (resultSet.next ()) {
+			preparedStatement.setString (
+				1,
+				frequency);
 
-			Command command =
-				new Command ();
+			try (
 
-			command.id =
-				resultSet.getInt (1);
+				ResultSet resultSet =
+					preparedStatement.executeQuery ();
 
-			command.command =
-				resultSet.getString (2);
+			) {
 
-			commands.add (
-				command);
+				while (resultSet.next ()) {
+
+					Command command =
+						new Command ();
+
+					command.id =
+						resultSet.getInt (1);
+
+					command.command =
+						resultSet.getString (2);
+
+					commands.add (
+						command);
+
+				}
+
+				return commands;
+
+			}
 
 		}
-
-		return commands;
 
 	}
 

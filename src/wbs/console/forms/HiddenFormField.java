@@ -27,11 +27,14 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
@@ -45,6 +48,9 @@ class HiddenFormField <Container, Generic, Native>
 	implements FormField <Container, Generic, Native, String> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -158,6 +164,7 @@ class HiddenFormField <Container, Generic, Native>
 	@Override
 	public
 	void renderFormAlwaysHidden (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
@@ -165,9 +172,15 @@ class HiddenFormField <Container, Generic, Native>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderFormAlwaysHidden");
+
 		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
+					taskLogger,
 					container));
 
 		Optional <Generic> genericValue =
@@ -213,7 +226,13 @@ class HiddenFormField <Container, Generic, Native>
 	@Override
 	public
 	void implicit (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"implicit");
 
 		if (
 			optionalIsNotPresent (
@@ -225,10 +244,12 @@ class HiddenFormField <Container, Generic, Native>
 		Optional <Native> nativeValue =
 			requiredValue (
 				nativeMapping.genericToNative (
+					taskLogger,
 					container,
 					implicitValue.get ()));
 
 		accessor.write (
+			taskLogger,
 			container,
 			nativeValue);
 
@@ -236,11 +257,17 @@ class HiddenFormField <Container, Generic, Native>
 
 	@Override
 	public
-	UpdateResult<Generic,Native> update (
+	UpdateResult <Generic, Native> update (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull String formName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"update");
 
 		// do nothing if no value present in form
 
@@ -292,14 +319,15 @@ class HiddenFormField <Container, Generic, Native>
 
 		}
 
-		Optional<Generic> newGenericValue =
+		Optional <Generic> newGenericValue =
 			interfaceToGenericResult.left ().value ();
 
 		// convert to native
 
-		Optional<Native> newNativeValue =
+		Optional <Native> newNativeValue =
 			requiredValue (
 				nativeMapping.genericToNative (
+					taskLogger,
 					container,
 					newGenericValue));
 
@@ -308,6 +336,7 @@ class HiddenFormField <Container, Generic, Native>
 		Optional <Native> oldNativeValue =
 			requiredValue (
 				accessor.read (
+					taskLogger,
 					container));
 
 		Optional <Generic> oldGenericValue =
@@ -335,6 +364,7 @@ class HiddenFormField <Container, Generic, Native>
 		// set the new value
 
 		accessor.write (
+			taskLogger,
 			container,
 			newNativeValue);
 

@@ -299,12 +299,14 @@ class OxygenateRouteInMmsNewAction
 
 			TextRec messageBodyText =
 				textHelper.findOrCreate (
+					taskLogger,
 					stringBuilder.toString ());
 
 			// lookup number, discarding extra info
 
 			NumberRec number =
 				smsNumberHelper.findOrCreate (
+					taskLogger,
 					listFirstElementRequired (
 						stringSplitSlash (
 							request.source ())));
@@ -312,6 +314,7 @@ class OxygenateRouteInMmsNewAction
 			// insert message
 
 			smsInboxLogic.inboxInsert (
+				taskLogger,
 				optionalOf (
 					request.oxygenateReference ()),
 				messageBodyText,
@@ -359,8 +362,13 @@ class OxygenateRouteInMmsNewAction
 	@Override
 	protected
 	void storeLog (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String debugLog) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"storeLog");
 
 		@Cleanup
 		Transaction transaction =
@@ -369,6 +377,7 @@ class OxygenateRouteInMmsNewAction
 				this);
 
 		oxygenateInboundLogHelper.insert (
+			taskLogger,
 			oxygenateInboundLogHelper.createInstance ()
 
 			.setRoute (
@@ -402,6 +411,11 @@ class OxygenateRouteInMmsNewAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull OxygenateRouteInMmsNewRequest.Attachment attachment) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"processAttachment");
+
 		if (
 			stringEqualSafe (
 				attachment.encoding (),
@@ -409,6 +423,7 @@ class OxygenateRouteInMmsNewAction
 		) {
 
 			return mediaLogic.createTextMedia (
+				taskLogger,
 				attachment.content (),
 				attachment.contentType (),
 				attachment.fileName ());
@@ -424,6 +439,7 @@ class OxygenateRouteInMmsNewAction
 					attachment.content ());
 
 			return mediaLogic.createMediaRequired (
+				taskLogger,
 				attachmentContent,
 				attachment.contentType (),
 				attachment.fileName (),

@@ -4,22 +4,25 @@ import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.List;
 
-import lombok.Cleanup;
+import lombok.NonNull;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
-import wbs.apn.chat.contact.model.ChatMessageStatus;
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageRec;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.daemon.SleepingDaemonService;
+
+import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
+import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.contact.model.ChatMessageStatus;
+import wbs.apn.chat.core.model.ChatObjectHelper;
+import wbs.apn.chat.core.model.ChatRec;
 
 @SingletonComponent ("chatJoinTimeoutDaemon")
 public
@@ -76,46 +79,52 @@ class ChatJoinTimeoutDaemon
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatJoinTimeoutDaemon.runOnce ()",
-				this);
+		try (
 
-		for (
-			ChatRec chat
-				: chatHelper.findAll ()
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatJoinTimeoutDaemon.runOnce ()",
+					this);
+
 		) {
 
-			Instant createdTime =
-				DateTime.now ()
-
-				.minusSeconds (
-					toJavaIntegerRequired (
-						chat.getTimeSignupTimeout ()))
-
-				.toInstant ();
-
-			List<ChatMessageRec> messages =
-				chatMessageHelper.findSignupTimeout (
-					chat,
-					createdTime);
-
 			for (
-				ChatMessageRec message
-					: messages
+				ChatRec chat
+					: chatHelper.findAll ()
 			) {
 
-				message.setStatus (
-					ChatMessageStatus.signupTimeout);
+				Instant createdTime =
+					DateTime.now ()
+
+					.minusSeconds (
+						toJavaIntegerRequired (
+							chat.getTimeSignupTimeout ()))
+
+					.toInstant ();
+
+				List<ChatMessageRec> messages =
+					chatMessageHelper.findSignupTimeout (
+						chat,
+						createdTime);
+
+				for (
+					ChatMessageRec message
+						: messages
+				) {
+
+					message.setStatus (
+						ChatMessageStatus.signupTimeout);
+
+				}
 
 			}
 
-		}
+			transaction.commit ();
 
-		transaction.commit ();
+		}
 
 	}
 

@@ -1,9 +1,8 @@
 package wbs.apn.chat.infosite.api;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 
 import lombok.Cleanup;
 import lombok.NonNull;
@@ -93,13 +92,14 @@ class ChatInfoSiteRespondAction
 					"otherUserId"));
 
 		chatMessageLogic.chatMessageSendFromUser (
+			taskLogger,
 			infoSite.getChatUser (),
 			otherUser,
 			requestContext.parameterRequired (
 				"text"),
-			Optional.absent (),
+			optionalAbsent (),
 			ChatMessageMethod.infoSite,
-			ImmutableList.of ());
+			emptyList ());
 
 		transaction.commit ();
 

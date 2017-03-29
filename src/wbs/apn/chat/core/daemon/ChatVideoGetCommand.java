@@ -1,10 +1,11 @@
 package wbs.apn.chat.core.daemon;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Provider;
@@ -16,10 +17,12 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -90,6 +93,9 @@ class ChatVideoGetCommand
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
 
@@ -140,6 +146,11 @@ class ChatVideoGetCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
+
 		MessageRec message =
 			inbox.getMessage ();
 
@@ -155,6 +166,7 @@ class ChatVideoGetCommand
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
+				taskLogger,
 				chat,
 				message);
 
@@ -169,14 +181,16 @@ class ChatVideoGetCommand
 
 		ChatCreditCheckResult creditCheckResult =
 			chatCreditLogic.userSpendCreditCheck (
+				taskLogger,
 				chatUser,
 				true,
-				Optional.of (
+				optionalOf (
 					message.getThreadId ()));
 
 		if (creditCheckResult.failed ()) {
 
 			chatHelpLogLogic.createChatHelpLogIn (
+				taskLogger,
 				chatUser,
 				message,
 				rest,
@@ -184,9 +198,12 @@ class ChatVideoGetCommand
 				true);
 
 			return smsInboxLogic.inboxProcessed (
+				taskLogger,
 				inbox,
-				Optional.of (defaultService),
-				Optional.of (affiliate),
+				optionalOf (
+					defaultService),
+				optionalOf (
+					affiliate),
 				command);
 
 		}
@@ -194,6 +211,7 @@ class ChatVideoGetCommand
 		// log request
 
 		chatHelpLogLogic.createChatHelpLogIn (
+			taskLogger,
 			chatUser,
 			message,
 			rest,
@@ -209,9 +227,10 @@ class ChatVideoGetCommand
 
 			long numSent =
 				chatInfoLogic.sendUserVideos (
+					taskLogger,
 					chatUser,
 					3l,
-					Optional.of (
+					optionalOf (
 						message.getThreadId ()));
 
 			// send a message if no videos were found
@@ -219,11 +238,13 @@ class ChatVideoGetCommand
 			if (numSent == 0) {
 
 				chatSendLogic.sendSystemRbFree (
+					taskLogger,
 					chatUser,
-					Optional.of (message.getThreadId ()),
+					optionalOf (
+						message.getThreadId ()),
 					"no_videos_error",
 					TemplateMissing.error,
-					Collections.<String,String>emptyMap ());
+					emptyMap ());
 
 			}
 
@@ -246,16 +267,21 @@ class ChatVideoGetCommand
 			) {
 
 				chatSendLogic.sendSystemRbFree (
+					taskLogger,
 					chatUser,
-					Optional.of (message.getThreadId ()),
+					optionalOf (
+						message.getThreadId ()),
 					"video_not_found",
 					TemplateMissing.error,
-					Collections.<String,String>emptyMap ());
+					emptyMap ());
 
 				return smsInboxLogic.inboxProcessed (
+					taskLogger,
 					inbox,
-					Optional.of (defaultService),
-					Optional.of (affiliate),
+					optionalOf (
+						defaultService),
+					optionalOf (
+						affiliate),
 					command);
 
 			}
@@ -273,6 +299,7 @@ class ChatVideoGetCommand
 
 			medias.add (
 				chatInfoLogic.chatUserBlurbMedia (
+					taskLogger,
 					chatUser,
 					otherUser));
 
@@ -285,6 +312,7 @@ class ChatVideoGetCommand
 					chatUser.getNumber ())
 
 				.messageString (
+					taskLogger,
 					"")
 
 				.numFrom (
@@ -300,16 +328,19 @@ class ChatVideoGetCommand
 					affiliate)
 
 				.subjectString (
+					taskLogger,
 					"User video")
 
 				.medias (
 					medias)
 
-				.send ();
+				.send (
+					taskLogger);
 
 			// charge for one video
 
 			chatCreditLogic.userSpend (
+				taskLogger,
 				chatUser,
 				0,
 				0,
@@ -322,9 +353,12 @@ class ChatVideoGetCommand
 		// process inbox
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (defaultService),
-			Optional.of (affiliate),
+			optionalOf (
+				defaultService),
+			optionalOf (
+				affiliate),
 			command);
 
 	}

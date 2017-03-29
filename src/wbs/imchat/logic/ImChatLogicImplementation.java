@@ -10,11 +10,14 @@ import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.platform.event.logic.EventLogic;
@@ -49,6 +52,9 @@ class ImChatLogicImplementation
 
 	@SingletonDependency
 	EventLogic eventLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RandomLogic randomLogic;
@@ -192,8 +198,14 @@ class ImChatLogicImplementation
 	@Override
 	public
 	void customerPasswordGenerate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ImChatCustomerRec customer,
-			@NonNull Optional<UserRec> consoleUser) {
+			@NonNull Optional <UserRec> consoleUser) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"customerPasswordGenerate");
 
 		ImChatRec imChat =
 			customer.getImChat ();
@@ -233,6 +245,7 @@ class ImChatLogicImplementation
 		) {
 
 			eventLogic.createEvent (
+				taskLogger,
 				"im_chat_customer_generated_password_from_console",
 				consoleUser.get (),
 				customer);
@@ -240,6 +253,7 @@ class ImChatLogicImplementation
 		} else {
 
 			eventLogic.createEvent (
+				taskLogger,
 				"im_chat_customer_forgotten_password",
 				customer);
 

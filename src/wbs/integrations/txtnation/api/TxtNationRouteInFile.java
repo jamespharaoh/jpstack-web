@@ -203,11 +203,14 @@ class TxtNationRouteInFile
 		// store message
 
 		smsInboxLogic.inboxInsert (
+			taskLogger,
 			optionalOf (
 				idParam),
 			textHelper.findOrCreate (
+				taskLogger,
 				messageParam),
 			smsNumberHelper.findOrCreate (
+				taskLogger,
 				numberFrom),
 			numberTo,
 			txtNationRouteIn.getRoute (),

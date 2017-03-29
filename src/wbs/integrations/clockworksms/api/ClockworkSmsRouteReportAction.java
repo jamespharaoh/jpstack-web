@@ -170,7 +170,6 @@ class ClockworkSmsRouteReportAction
 	void updateDatabase (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		@SuppressWarnings ("unused")
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
@@ -260,6 +259,7 @@ class ClockworkSmsRouteReportAction
 
 			response.items.add (
 				handleDeliveryReport (
+					taskLogger,
 					clockworkSmsRouteOut,
 					item));
 
@@ -275,8 +275,14 @@ class ClockworkSmsRouteReportAction
 
 	private
 	ClockworkSmsRouteReportResponse.Item handleDeliveryReport (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ClockworkSmsRouteOutRec clockworkSmsRouteOut,
 			@NonNull ClockworkSmsRouteReportRequest.Item item) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleDeliveryReport");
 
 		// lookup the delivery status
 
@@ -362,6 +368,7 @@ class ClockworkSmsRouteReportAction
 		try {
 
 			smsDeliveryReportLogic.deliveryReport (
+				taskLogger,
 				smsMessage,
 				deliveryStatus.getMessageStatus (),
 				Optional.of (
@@ -396,10 +403,11 @@ class ClockworkSmsRouteReportAction
 		} catch (Exception exception) {
 
 			exceptionLogger.logThrowable (
+				taskLogger,
 				"webapi",
 				requestContext.requestUri (),
 				exception,
-				Optional.absent (),
+				optionalAbsent (),
 				GenericExceptionResolution.ignoreWithThirdPartyWarning);
 
 			return new ClockworkSmsRouteReportResponse.Item ()
@@ -458,6 +466,11 @@ class ClockworkSmsRouteReportAction
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String debugLog) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"storeLog");
+
 		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
@@ -465,6 +478,7 @@ class ClockworkSmsRouteReportAction
 				this);
 
 		clockworkSmsInboundLogHelper.insert (
+			taskLogger,
 			clockworkSmsInboundLogHelper.createInstance ()
 
 			.setRoute (

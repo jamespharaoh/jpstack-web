@@ -1,6 +1,7 @@
 package wbs.apn.chat.contact.logic;
 
 import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
@@ -8,6 +9,8 @@ import static wbs.utils.etc.LogicUtils.allOf;
 import static wbs.utils.etc.LogicUtils.not;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.earlierThan;
@@ -26,11 +29,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -39,6 +42,8 @@ import wbs.framework.entity.record.IdObject;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.integrations.jigsaw.api.JigsawApi;
@@ -86,7 +91,6 @@ import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.apn.chat.user.core.model.Gender;
 
-@Log4j
 @SingletonComponent ("chatMessageLogic")
 public
 class ChatMessageLogicImplementation
@@ -142,6 +146,9 @@ class ChatMessageLogicImplementation
 	@SingletonDependency
 	ExceptionUtils exceptionLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ObjectManager objectManager;
 
@@ -196,6 +203,7 @@ class ChatMessageLogicImplementation
 	@Override
 	public
 	String chatMessageSendFromUser (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec fromUser,
 			@NonNull ChatUserRec toUser,
 			@NonNull String text,
@@ -203,26 +211,30 @@ class ChatMessageLogicImplementation
 			@NonNull ChatMessageMethod source,
 			@NonNull List <MediaRec> medias) {
 
-		log.debug (
-			stringFormat (
-				"chatMessageSendFromUser (%s)",
-				joinWithCommaAndSpace (
-					objectManager.objectPathMini (
-						fromUser),
-					objectManager.objectPathMini (
-						toUser),
-					stringFormat (
-						"\"%s\"",
-						text.length () > 20
-							? text.substring (0, 20)
-							: text),
-					threadId.isPresent ()
-						? threadId.get ().toString ()
-						: "null",
-					source.toString (),
-					integerToDecimalString (
-						collectionSize (
-							medias)))));
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatMessageSendFromUser");
+
+		taskLogger.debugFormat (
+			"chatMessageSendFromUser (%s)",
+			joinWithCommaAndSpace (
+				objectManager.objectPathMini (
+					fromUser),
+				objectManager.objectPathMini (
+					toUser),
+				stringFormat (
+					"\"%s\"",
+					text.length () > 20
+						? text.substring (0, 20)
+						: text),
+				threadId.isPresent ()
+					? threadId.get ().toString ()
+					: "null",
+				source.toString (),
+				integerToDecimalString (
+					collectionSize (
+						medias))));
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -234,6 +246,7 @@ class ChatMessageLogicImplementation
 
 		ChatCreditCheckResult fromCreditCheckResult =
 			chatCreditLogic.userSpendCreditCheck (
+				taskLogger,
 				fromUser,
 				true,
 				threadId);
@@ -246,7 +259,8 @@ class ChatMessageLogicImplementation
 					fromUser.getCode (),
 					fromCreditCheckResult.details ());
 
-			log.info (
+			taskLogger.noticeFormat (
+				"%s",
 				errorMessage);
 
 			return errorMessage;
@@ -254,7 +268,9 @@ class ChatMessageLogicImplementation
 		}
 
 		TextRec originalText =
-			textHelper.findOrCreate (text);
+			textHelper.findOrCreate (
+				taskLogger,
+				text);
 
 		// ignored duplicated messages
 
@@ -280,7 +296,8 @@ class ChatMessageLogicImplementation
 						? threadId.get ().toString ()
 						: "null");
 
-			log.info (
+			taskLogger.noticeFormat (
+				"%s",
 				errorMessage);
 
 			return errorMessage;
@@ -294,7 +311,8 @@ class ChatMessageLogicImplementation
 				toUser.getCode (),
 				text);
 
-		log.info (
+		taskLogger.noticeFormat (
+			"%s",
 			logMessage);
 
 		// check if the message should be blocked
@@ -306,6 +324,7 @@ class ChatMessageLogicImplementation
 
 		ChatCreditCheckResult toCreditCheckResult =
 			chatCreditLogic.userCreditCheck (
+				taskLogger,
 				toUser);
 
 		boolean blocked =
@@ -351,6 +370,7 @@ class ChatMessageLogicImplementation
 				alarm);
 
 			chatUserInitiationLogHelper.insert (
+				taskLogger,
 				chatUserInitiationLogHelper.createInstance ()
 
 				.setChatUser (
@@ -394,14 +414,15 @@ class ChatMessageLogicImplementation
 
 			if (oldMessage != null) {
 
-				log.info (
-					stringFormat (
-						"Cancelling previously queued message %s",
-						integerToDecimalString (
-							oldMessage.getId ())));
+				taskLogger.noticeFormat (
+					"Cancelling previously queued message %s",
+					integerToDecimalString (
+						oldMessage.getId ()));
 
 				oldMessage
-					.setStatus (ChatMessageStatus.signupReplaced);
+
+					.setStatus (
+						ChatMessageStatus.signupReplaced);
 
 			}
 
@@ -411,6 +432,7 @@ class ChatMessageLogicImplementation
 
 		ChatMessageRec chatMessage =
 			chatMessageHelper.insert (
+				taskLogger,
 				chatMessageHelper.createInstance ()
 
 			.setChat (
@@ -451,6 +473,7 @@ class ChatMessageLogicImplementation
 		if (chatMessage.getStatus () == ChatMessageStatus.sent) {
 
 			chatMessageSendFromUserPartTwo (
+				taskLogger,
 				chatMessage);
 
 		}
@@ -480,6 +503,7 @@ class ChatMessageLogicImplementation
 		) {
 
 			chatSendLogic.sendSystemMagic (
+				taskLogger,
 				fromUser,
 				threadId,
 				"logon_hint",
@@ -491,7 +515,7 @@ class ChatMessageLogicImplementation
 						chat,
 						"help")),
 				TemplateMissing.error,
-				Collections.emptyMap ());
+				emptyMap ());
 
 			fromUser
 
@@ -507,7 +531,13 @@ class ChatMessageLogicImplementation
 	@Override
 	public
 	void chatMessageSendFromUserPartTwo (
-			ChatMessageRec chatMessage) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatMessageRec chatMessage) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatMessageSendFromUserPartTwo");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -523,6 +553,7 @@ class ChatMessageLogicImplementation
 
 		ChatContactRec chatUserContact =
 			chatContactHelper.findOrCreate (
+				taskLogger,
 				fromUser,
 				toUser);
 
@@ -531,6 +562,7 @@ class ChatMessageLogicImplementation
 		if (toUser.getType () == ChatUserType.user) {
 
 			chatCreditLogic.userSpend (
+				taskLogger,
 				fromUser,
 				1,
 				0,
@@ -541,6 +573,7 @@ class ChatMessageLogicImplementation
 		} else {
 
 			chatCreditLogic.userSpend (
+				taskLogger,
 				fromUser,
 				0,
 				1,
@@ -558,8 +591,9 @@ class ChatMessageLogicImplementation
 		// subtract credit etc
 
 		chatCreditLogic.userReceiveSpend (
+			taskLogger,
 			toUser,
-			1);
+			1l);
 
 		// work out adult state of users
 
@@ -596,6 +630,7 @@ class ChatMessageLogicImplementation
 				chatMessage.getOriginalText ());
 
 			chatMessageDeliver (
+				taskLogger,
 				chatMessage);
 
 			chatUserContact
@@ -616,6 +651,7 @@ class ChatMessageLogicImplementation
 
 			chatMessage.setEditedText (
 				textHelper.findOrCreate (
+					taskLogger,
 					approvalResult.message));
 
 			switch (approvalResult.status) {
@@ -629,6 +665,7 @@ class ChatMessageLogicImplementation
 						ChatMessageStatus.sent);
 
 				chatMessageDeliver (
+					taskLogger,
 					chatMessage);
 
 				chatUserContact
@@ -647,6 +684,7 @@ class ChatMessageLogicImplementation
 						ChatMessageStatus.autoEdited);
 
 				chatMessageDeliver (
+					taskLogger,
 					chatMessage);
 
 				chatUserContact
@@ -655,10 +693,12 @@ class ChatMessageLogicImplementation
 						transaction.now ());
 
 				chatUserRejectionCountInc (
+					taskLogger,
 					fromUser,
 					chatMessage.getThreadId ());
 
 				chatUserRejectionCountInc (
+					taskLogger,
 					toUser,
 					chatMessage.getThreadId ());
 
@@ -675,7 +715,9 @@ class ChatMessageLogicImplementation
 
 				QueueItemRec queueItem =
 					queueLogic.createQueueItem (
-						queueLogic.findQueue (chat, "message"),
+						taskLogger,
+						chat,
+						"message",
 						chatUserContact,
 						chatMessage,
 						chatUserLogic.getPrettyName (
@@ -702,13 +744,21 @@ class ChatMessageLogicImplementation
 	@Override
 	public
 	void chatMessageDeliver (
-			ChatMessageRec chatMessage) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatMessageRec chatMessage) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatMessageDeliver");
 
 		switch (chatMessage.getToUser ().getType ()) {
 
 		case user:
 
-			chatMessageDeliverToUser (chatMessage);
+			chatMessageDeliverToUser (
+				taskLogger,
+				chatMessage);
 
 			break;
 
@@ -716,6 +766,7 @@ class ChatMessageLogicImplementation
 
 			ChatMonitorInboxRec inbox =
 				findOrCreateChatMonitorInbox (
+					taskLogger,
 					chatMessage.getToUser (),
 					chatMessage.getFromUser (),
 					false);
@@ -848,7 +899,13 @@ class ChatMessageLogicImplementation
 	@Override
 	public
 	boolean chatMessageDeliverToUser (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatMessageRec chatMessage) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatMessageDeliverToUser");
 
 		ChatUserRec toUser =
 			chatMessage.getToUser ();
@@ -884,6 +941,7 @@ class ChatMessageLogicImplementation
 		case sms:
 
 			return chatMessageDeliverViaSms (
+				taskLogger,
 				chatMessage,
 				text);
 
@@ -892,6 +950,7 @@ class ChatMessageLogicImplementation
 			if (toUser.getJigsawToken () != null) {
 
 				return chatMessageDeliverViaJigsaw (
+					taskLogger,
 					chatMessage,
 					text);
 
@@ -917,8 +976,14 @@ class ChatMessageLogicImplementation
 	@Override
 	public
 	boolean chatMessageDeliverViaJigsaw (
-			ChatMessageRec chatMessage,
-			String text) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatMessageRec chatMessage,
+			@NonNull String text) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatMessageDeliverViaJigsaw");
 
 		ChatUserRec fromUser =
 			chatMessage.getFromUser ();
@@ -931,7 +996,7 @@ class ChatMessageLogicImplementation
 
 		// count pending allMessages
 
-		List<ChatMessageRec> messages =
+		List <ChatMessageRec> messages =
 			chatMessageHelper.search (
 				new ChatMessageSearch ()
 
@@ -1003,6 +1068,7 @@ class ChatMessageLogicImplementation
 		} catch (Exception exception) {
 
 			exceptionLogger.logSimple (
+				taskLogger,
 				"unknown",
 				"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
 
@@ -1012,7 +1078,7 @@ class ChatMessageLogicImplementation
 				exceptionLogic.throwableDump (
 					exception),
 
-				Optional.absent (),
+				optionalAbsent (),
 				GenericExceptionResolution.ignoreWithNoWarning);
 
 			success = false;
@@ -1022,8 +1088,10 @@ class ChatMessageLogicImplementation
 		long jigsawEnd =
 			System.nanoTime ();
 
-		log.info (
-			"Call to jigsaw took " + (jigsawEnd - jigsawStart) + "ns");
+		taskLogger.noticeFormat (
+			"Call to jigsaw took %sns",
+			integerToDecimalString (
+				jigsawEnd - jigsawStart));
 
 		UrbanAirshipApi.PushRequest urbanApiRequest =
 			new UrbanAirshipApi.PushRequest ();
@@ -1067,6 +1135,7 @@ class ChatMessageLogicImplementation
 		} catch (Exception exception) {
 
 			exceptionLogger.logSimple (
+				taskLogger,
 				"unknown",
 				"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
 
@@ -1076,7 +1145,7 @@ class ChatMessageLogicImplementation
 				exceptionLogic.throwableDump (
 					exception),
 
-				Optional.absent (),
+				optionalAbsent (),
 				GenericExceptionResolution.ignoreWithNoWarning);
 
 			success = false;
@@ -1086,11 +1155,10 @@ class ChatMessageLogicImplementation
 		long urbanEnd =
 			System.nanoTime ();
 
-		log.info (
-			stringFormat (
-				"Call to urban airship (prod) took %sns",
-				integerToDecimalString (
-					urbanEnd - urbanStart)));
+		taskLogger.noticeFormat (
+			"Call to urban airship (prod) took %sns",
+			integerToDecimalString (
+				urbanEnd - urbanStart));
 
 		urbanStart = System.nanoTime ();
 		try {
@@ -1106,6 +1174,7 @@ class ChatMessageLogicImplementation
 		} catch (Exception exception) {
 
 			exceptionLogger.logSimple (
+				taskLogger,
 				"unknown",
 				"ChatLogicImpl.chatMessageDeliverViaJigsaw (...)",
 
@@ -1115,7 +1184,7 @@ class ChatMessageLogicImplementation
 				exceptionLogic.throwableDump (
 					exception),
 
-				Optional.absent (),
+				optionalAbsent (),
 				GenericExceptionResolution.ignoreWithNoWarning);
 
 			success = false;
@@ -1125,11 +1194,10 @@ class ChatMessageLogicImplementation
 		urbanEnd =
 			System.nanoTime ();
 
-		log.info (
-			stringFormat (
-				"Call to urban airship (dev) took %sns",
-				integerToDecimalString (
-					urbanEnd - urbanStart)));
+		taskLogger.noticeFormat (
+			"Call to urban airship (dev) took %sns",
+			integerToDecimalString (
+				urbanEnd - urbanStart));
 
 		return success;
 
@@ -1138,9 +1206,15 @@ class ChatMessageLogicImplementation
 	@Override
 	public
 	ChatMonitorInboxRec findOrCreateChatMonitorInbox (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec monitorChatUser,
 			@NonNull ChatUserRec userChatUser,
 			boolean alarm) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreateChatMonitorInbox");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -1162,6 +1236,7 @@ class ChatMessageLogicImplementation
 
 		chatMonitorInbox =
 			chatMonitorInboxHelper.insert (
+				taskLogger,
 				chatMonitorInboxHelper.createInstance ()
 
 			.setMonitorChatUser (
@@ -1179,6 +1254,7 @@ class ChatMessageLogicImplementation
 
 		ChatContactRec chatUserContact =
 			chatContactHelper.findOrCreate (
+				taskLogger,
 				userChatUser,
 				monitorChatUser);
 
@@ -1234,6 +1310,7 @@ class ChatMessageLogicImplementation
 
 		QueueItemRec queueItem =
 			queueLogic.createQueueItem (
+				taskLogger,
 				queue,
 				chatUserContact,
 				chatMonitorInbox,
@@ -1254,8 +1331,14 @@ class ChatMessageLogicImplementation
 	@Override
 	public
 	boolean chatMessageDeliverViaSms (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatMessageRec chatMessage,
 			@NonNull String text) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatMessageDeliverViaSms");
 
 		ChatUserRec fromUser =
 			chatMessage.getFromUser ();
@@ -1266,7 +1349,7 @@ class ChatMessageLogicImplementation
 		ChatRec chat =
 			toUser.getChat ();
 
-		List<String> stringParts;
+		List <String> stringParts;
 
 		try {
 
@@ -1278,11 +1361,12 @@ class ChatMessageLogicImplementation
 
 		} catch (IllegalArgumentException exception) {
 
-			log.error (
-				"MessageSplitter.split threw exception",
-				exception);
+			taskLogger.errorFormatException (
+				exception,
+				"MessageSplitter.split threw exception");
 
 			exceptionLogger.logSimple (
+				taskLogger,
 				"unknown",
 				"ChatReceivedHandler.sendUserMessage (...)",
 				"MessageSplitter.split (...) threw IllegalArgumentException",
@@ -1333,14 +1417,16 @@ class ChatMessageLogicImplementation
 
 			textParts.add (
 				textHelper.findOrCreate (
+					taskLogger,
 					part));
 
 		}
 
 		Long threadId =
 			chatSendLogic.sendMessageMagic (
+				taskLogger,
 				toUser,
-				Optional.fromNullable (
+				optionalFromNullable (
 					chatMessage.getThreadId ()),
 				textParts,
 				commandHelper.findByCodeRequired (
@@ -1350,7 +1436,7 @@ class ChatMessageLogicImplementation
 					chat,
 					serviceCode),
 				fromUser.getId (),
-				Optional.fromNullable (
+				optionalFromNullable (
 					chatMessage.getSender ()));
 
 		chatMessage
@@ -1427,8 +1513,14 @@ class ChatMessageLogicImplementation
 	@Override
 	public
 	void chatUserRejectionCountInc (
-			ChatUserRec chatUser,
-			Long threadId) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser,
+			@NonNull Long threadId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatUserRejectionCountInc");
 
 		ChatSchemeRec chatScheme =
 			chatUser.getChatScheme ();
@@ -1461,17 +1553,18 @@ class ChatMessageLogicImplementation
 		// send the hint explaining how to adult verify
 
 		chatSendLogic.sendSystem (
+			taskLogger,
 			chatUser,
-			Optional.fromNullable (
+			optionalFromNullable (
 				threadId),
 			"adult_hint_in",
 			chatScheme.getRbFreeRouter (),
 			"89505",
 			Collections.<String>emptySet (),
-			Optional.<String>absent (),
+			optionalAbsent (),
 			"system",
 			TemplateMissing.error,
-			Collections.<String,String>emptyMap ());
+			emptyMap ());
 
 	}
 

@@ -16,14 +16,19 @@ import lombok.NonNull;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
+
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.customer.logic.SmsCustomerLogic;
@@ -33,6 +38,7 @@ import wbs.sms.keyword.logic.KeywordLogic;
 import wbs.sms.message.outbox.logic.SmsMessageSender;
 import wbs.sms.route.core.model.RouteRec;
 import wbs.sms.route.router.logic.RouterLogic;
+
 import wbs.smsapps.manualresponder.model.ManualResponderNumberRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyObjectHelper;
@@ -52,6 +58,9 @@ class ManualResponderLogicImplementation
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	KeywordLogic keywordLogic;
@@ -184,8 +193,14 @@ class ManualResponderLogicImplementation
 	@Override
 	public
 	void sendTemplateAutomatically (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestRec request,
 			@NonNull ManualResponderTemplateRec template) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendTemplateAutomatically");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -223,6 +238,7 @@ class ManualResponderLogicImplementation
 
 		TextRec messageText =
 			textHelper.findOrCreate (
+				taskLogger,
 				template.getDefaultText ());
 
 		// resolve route
@@ -235,6 +251,7 @@ class ManualResponderLogicImplementation
 
 		ManualResponderReplyRec reply =
 			manualResponderReplyHelper.insert (
+				taskLogger,
 				manualResponderReplyHelper.createInstance ()
 
 			.setManualResponderRequest (
@@ -277,6 +294,7 @@ class ManualResponderLogicImplementation
 					request.getNumber ())
 
 				.messageString (
+					taskLogger,
 					messagePart)
 
 				.numFrom (
@@ -304,7 +322,8 @@ class ManualResponderLogicImplementation
 					first
 					|| ! template.getSequenceParts ())
 
-				.send ()
+				.send (
+					taskLogger)
 
 			);
 
@@ -325,6 +344,7 @@ class ManualResponderLogicImplementation
 					"default");
 
 			keywordLogic.createOrUpdateKeywordSetFallback (
+				taskLogger,
 				template.getReplyKeywordSet (),
 				request.getNumber (),
 				command);

@@ -11,7 +11,10 @@ import static wbs.utils.etc.Misc.stringTrim;
 import static wbs.utils.etc.NumberUtils.equalToZero;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.moreThan;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 
@@ -25,10 +28,12 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.logic.QueueLogic;
@@ -53,7 +58,6 @@ import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.contact.model.ChatMessageStatus;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.logic.ChatHelpLogLogic;
-import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.logic.ChatUserLogic.PendingMode;
@@ -102,6 +106,9 @@ class ChatUserPendingFormAction
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	QueueLogic queueLogic;
 
@@ -147,7 +154,12 @@ class ChatUserPendingFormAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// delegate appropriately
 
@@ -172,7 +184,10 @@ class ChatUserPendingFormAction
 				requestContext.parameter (
 					"chatUserInfoApprove"))
 		) {
-			return goApproveInfo ();
+
+			return goApproveInfo (
+				taskLogger);
+
 		}
 
 		if (
@@ -213,7 +228,10 @@ class ChatUserPendingFormAction
 				requestContext.parameter (
 					"chatUserNameReject"))
 		) {
-			return goRejectName ();
+
+			return goRejectName (
+				taskLogger);
+
 		}
 
 		if (
@@ -221,7 +239,10 @@ class ChatUserPendingFormAction
 				requestContext.parameter (
 					"chatUserInfoReject"))
 		) {
-			return goRejectInfo ();
+
+			return goRejectInfo (
+				taskLogger);
+
 		}
 
 		if (
@@ -231,6 +252,7 @@ class ChatUserPendingFormAction
 		) {
 
 			return goRejectImage (
+				taskLogger,
 				PendingMode.image);
 
 		}
@@ -242,6 +264,7 @@ class ChatUserPendingFormAction
 		) {
 
 			return goRejectImage (
+				taskLogger,
 				PendingMode.video);
 
 		}
@@ -253,6 +276,7 @@ class ChatUserPendingFormAction
 		) {
 
 			return goRejectImage (
+				taskLogger,
 				PendingMode.audio);
 
 		}
@@ -388,7 +412,13 @@ class ChatUserPendingFormAction
 	}
 
 	private
-	Responder goApproveInfo () {
+	Responder goApproveInfo (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goApproveInfo");
 
 		try (
 
@@ -440,6 +470,7 @@ class ChatUserPendingFormAction
 
 			TextRec editedText =
 				textHelper.findOrCreate (
+					taskLogger,
 					editedInfo);
 
 			chatUserInfo
@@ -624,7 +655,13 @@ class ChatUserPendingFormAction
 	}
 
 	private
-	Responder goRejectName () {
+	Responder goRejectName (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goRejectName");
 
 		// get params
 
@@ -703,9 +740,10 @@ class ChatUserPendingFormAction
 			// send rejection
 
 			sendRejection (
+				taskLogger,
 				userConsoleLogic.userRequired (),
 				chatUser,
-				Optional.fromNullable (
+				optionalFromNullable (
 					chatUserName.getThreadId ()),
 				messageParam);
 
@@ -726,7 +764,13 @@ class ChatUserPendingFormAction
 	}
 
 	private
-	Responder goRejectInfo () {
+	Responder goRejectInfo (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goRejectInfo");
 
 		// get params
 
@@ -818,9 +862,10 @@ class ChatUserPendingFormAction
 			// send rejection
 
 			sendRejection (
+				taskLogger,
 				userConsoleLogic.userRequired (),
 				chatUser,
-				Optional.fromNullable (
+				optionalFromNullable (
 					chatUserInfo.getThreadId ()),
 				messageParam);
 
@@ -842,10 +887,16 @@ class ChatUserPendingFormAction
 
 	private
 	void sendRejection (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull UserRec myUser,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<Long> threadId,
 			@NonNull String messageParam) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendRejection");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -871,11 +922,13 @@ class ChatUserPendingFormAction
 
 			TextRec messageText =
 				textHelper.findOrCreate (
+					taskLogger,
 					messageParam);
 
 			chatMessage =
 				Optional.of (
 					chatMessageHelper.insert (
+						taskLogger,
 						chatMessageHelper.createInstance ()
 
 				.setFromUser (
@@ -908,16 +961,19 @@ class ChatUserPendingFormAction
 			));
 
 			chatMessageLogic.chatMessageDeliverToUser (
+				taskLogger,
 				chatMessage.get ());
 
 		} else {
 
 			TextRec messageText =
 				textHelper.findOrCreate (
+					taskLogger,
 					messageParam);
 
 			message =
 				chatSendLogic.sendMessageMagic (
+					taskLogger,
 					chatUser,
 					threadId,
 					messageText,
@@ -935,14 +991,15 @@ class ChatUserPendingFormAction
 		}
 
 		chatHelpLogLogic.createChatHelpLogOut (
+			taskLogger,
 			chatUser,
-			Optional.<ChatHelpLogRec>absent (),
-			Optional.of (
+			optionalAbsent (),
+			optionalOf (
 				myUser),
 			message,
 			chatMessage,
 			messageParam,
-			Optional.of (
+			optionalOf (
 				commandHelper.findByCodeRequired (
 					chat,
 					"join_info")));
@@ -951,7 +1008,13 @@ class ChatUserPendingFormAction
 
 	private
 	Responder goRejectImage (
-			PendingMode mode) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull PendingMode mode) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goRejectImage");
 
 		// check params
 
@@ -1061,10 +1124,13 @@ class ChatUserPendingFormAction
 				// iphone/web
 
 				TextRec messageText =
-					textHelper.findOrCreate (messageParam);
+					textHelper.findOrCreate (
+						taskLogger,
+						messageParam);
 
 				chatMessage =
 					chatMessageHelper.insert (
+						taskLogger,
 						chatMessageHelper.createInstance ()
 
 					.setFromUser (
@@ -1097,6 +1163,7 @@ class ChatUserPendingFormAction
 				);
 
 				chatMessageLogic.chatMessageDeliverToUser (
+					taskLogger,
 					chatMessage);
 
 			} else {
@@ -1105,8 +1172,9 @@ class ChatUserPendingFormAction
 
 				message =
 					chatSendLogic.sendMessageMmsFree (
+						taskLogger,
 						chatUser,
-						Optional.<Long>absent (),
+						optionalAbsent (),
 						messageParam,
 						commandHelper.findByCodeRequired (
 							chat,
@@ -1120,15 +1188,16 @@ class ChatUserPendingFormAction
 			// log message sent
 
 			chatHelpLogLogic.createChatHelpLogOut (
+				taskLogger,
 				chatUser,
-				Optional.<ChatHelpLogRec>absent (),
-				Optional.of (
+				optionalAbsent (),
+				optionalOf (
 					userConsoleLogic.userRequired ()),
 				message,
-				Optional.fromNullable (
+				optionalFromNullable (
 					chatMessage),
 				messageParam,
-				Optional.of (
+				optionalOf (
 					commandHelper.findByCodeRequired (
 						chat,
 						mode.commandCode ())));

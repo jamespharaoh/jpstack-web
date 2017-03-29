@@ -138,7 +138,9 @@ class ChatUserAdminInfoAction
 
 			TextRec newInfoText =
 				newInfo != null
-					? textHelper.findOrCreate (newInfo)
+					? textHelper.findOrCreate (
+						taskLogger,
+						newInfo)
 					: null;
 
 			TextRec oldInfoText =
@@ -148,6 +150,7 @@ class ChatUserAdminInfoAction
 
 				ChatUserInfoRec chatUserInfo =
 					chatUserInfoHelper.insert (
+						taskLogger,
 						chatUserInfoHelper.createInstance ()
 
 					.setChatUser (
@@ -186,13 +189,15 @@ class ChatUserAdminInfoAction
 					// TODO use a template
 
 					TextRec messageText =
-						textHelper.findOrCreate (
-							"Please reply with a message we can send out " +
-							"to people to introduce you. Say where you " +
-							"are, describe yourself and say what you are " +
-							"looking for.");
+						textHelper.findOrCreateFormat (
+							taskLogger,
+							"Please reply with a message we can send out to ",
+							"people to introduce you. Say where you are, ",
+							"describe yourself and say what you are looking ",
+							"for.");
 
 					chatSendLogic.sendMessageMagic (
+						taskLogger,
 						chatUser,
 						null,
 						messageText,

@@ -99,6 +99,7 @@ class ConsoleFormActionsAction
 
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
+				taskLogger,
 				requestContext,
 				formAction.formFields (),
 				formState,
@@ -111,6 +112,7 @@ class ConsoleFormActionsAction
 
 		Optional <Responder> responder =
 			formAction.helper ().processFormSubmission (
+				taskLogger,
 				transaction,
 				genericCastUnchecked (
 					formState));

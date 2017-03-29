@@ -37,7 +37,7 @@ import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 
-import org.apache.log4j.Logger;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.io.RuntimeIoException;
 
@@ -309,15 +309,14 @@ class Misc {
 
 	public static
 	int runCommand (
-			Logger logger,
+			TaskLogger taskLogger,
 			List <String> command)
 		throws InterruptedException {
 
-		logger.info (
-			stringFormat (
-				"Executing %s",
-				joinWithSpace (
-					command)));
+		taskLogger.noticeFormat (
+			"Executing %s",
+			joinWithSpace (
+				command));
 
 		try {
 
@@ -339,7 +338,8 @@ class Misc {
 
 			while ((line = bufferedReader.readLine ()) != null) {
 
-				logger.debug (
+				taskLogger.debugFormat (
+					"%s",
 					line);
 
 			}
@@ -369,7 +369,7 @@ class Misc {
 
 	public static
 	byte[] runFilter (
-			Logger logger,
+			TaskLogger taskLogger,
 			byte[] data,
 			String inExt,
 			String outExt,
@@ -377,7 +377,7 @@ class Misc {
 		throws InterruptedException {
 
 		return runFilterAdvanced (
-			logger,
+			taskLogger,
 			data,
 			inExt,
 			outExt,
@@ -389,7 +389,7 @@ class Misc {
 
 	public static
 	byte[] runFilterAdvanced (
-			Logger logger,
+			TaskLogger taskLogger,
 			byte[] data,
 			String inExtension,
 			String outExtension,
@@ -444,7 +444,7 @@ class Misc {
 
 			int status =
 				runCommand (
-					logger,
+					taskLogger,
 					newCommand);
 
 			if (status != 0)

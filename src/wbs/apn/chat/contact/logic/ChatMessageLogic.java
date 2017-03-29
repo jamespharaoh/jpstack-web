@@ -4,29 +4,36 @@ import java.util.List;
 
 import com.google.common.base.Optional;
 
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.media.model.MediaRec;
+import wbs.platform.text.model.TextRec;
+
 import wbs.apn.chat.contact.model.ChatMessageMethod;
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.platform.media.model.MediaRec;
-import wbs.platform.text.model.TextRec;
 
 public
 interface ChatMessageLogic {
 
 	boolean chatMessageDeliverViaSms (
+			TaskLogger parentTaskLogger,
 			ChatMessageRec chatMessage,
 			String text);
 
 	boolean chatMessageDeliverToUser (
+			TaskLogger parentTaskLogger,
 			ChatMessageRec chatMessage);
 
 	boolean chatMessageDeliverViaJigsaw (
+			TaskLogger parentTaskLogger,
 			ChatMessageRec chatMessage,
 			String text);
 
 	void chatMessageDeliver (
+			TaskLogger parentTaskLogger,
 			ChatMessageRec chatMessage);
 
 	boolean chatMessageIsRecentDupe (
@@ -38,14 +45,16 @@ interface ChatMessageLogic {
 			ChatMessageRec chatMessage);
 
 	String chatMessageSendFromUser (
+			TaskLogger parentTaskLogger,
 			ChatUserRec fromUser,
 			ChatUserRec toUser,
 			String text,
-			Optional<Long> threadId,
+			Optional <Long> threadId,
 			ChatMessageMethod source,
 			List<MediaRec> medias);
 
 	void chatMessageSendFromUserPartTwo (
+			TaskLogger parentTaskLogger,
 			ChatMessageRec chatMessage);
 
 	ApprovalResult checkForApproval (
@@ -53,6 +62,7 @@ interface ChatMessageLogic {
 			String message);
 
 	ChatMonitorInboxRec findOrCreateChatMonitorInbox (
+			TaskLogger parentTaskLogger,
 			ChatUserRec monitor,
 			ChatUserRec user,
 			boolean alarm);
@@ -73,6 +83,7 @@ interface ChatMessageLogic {
 	 *     Thread id of existing message thread to associate messages with
 	 */
 	void chatUserRejectionCountInc (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			Long threadId);
 

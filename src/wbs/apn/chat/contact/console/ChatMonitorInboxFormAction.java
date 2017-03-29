@@ -247,10 +247,12 @@ class ChatMonitorInboxFormAction
 
 			TextRec textRec =
 				textHelper.findOrCreate (
+					taskLogger,
 					text);
 
 			ChatMessageRec chatMessage =
 				chatMessageHelper.insert (
+					taskLogger,
 					chatMessageHelper.createInstance ()
 
 				.setChat (
@@ -287,6 +289,7 @@ class ChatMonitorInboxFormAction
 
 			ChatContactRec chatContact =
 				chatContactHelper.findOrCreate (
+					taskLogger,
 					monitorChatUser,
 					userChatUser);
 
@@ -323,6 +326,7 @@ class ChatMonitorInboxFormAction
 			if (! (blocked || deleted)) {
 
 				chatMessageLogic.chatMessageDeliverToUser (
+					taskLogger,
 					chatMessage);
 
 			}
@@ -332,8 +336,9 @@ class ChatMonitorInboxFormAction
 			if (! (blocked || deleted)) {
 
 				chatCreditLogic.userReceiveSpend (
+					taskLogger,
 					userChatUser,
-					1);
+					1l);
 
 			}
 
@@ -349,6 +354,7 @@ class ChatMonitorInboxFormAction
 			if (note) {
 
 				chatContactNoteHelper.insert (
+					taskLogger,
 					chatContactNoteHelper.createInstance ()
 
 					.setUser (

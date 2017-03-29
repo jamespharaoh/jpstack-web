@@ -2,9 +2,11 @@ package wbs.services.messagetemplate.fixture;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -34,6 +36,9 @@ class MessageTemplateFixtureProvider
 	implements FixtureProvider {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
@@ -81,7 +86,13 @@ class MessageTemplateFixtureProvider
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFixtures");
+
 		menuItemHelper.insert (
+			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
@@ -112,6 +123,7 @@ class MessageTemplateFixtureProvider
 
 		MessageTemplateDatabaseRec messageTemplateDatabase =
 			messageTemplateDatabaseHelper.insert (
+				taskLogger,
 				messageTemplateDatabaseHelper.createInstance ()
 
 			.setSlice (
@@ -132,6 +144,7 @@ class MessageTemplateFixtureProvider
 
 		MessageTemplateEntryTypeRec entryType1 =
 			messageTemplateEntryTypeHelper.insert (
+				taskLogger,
 				messageTemplateEntryTypeHelper.createInstance ()
 
 			.setMessageTemplateDatabase (
@@ -150,6 +163,7 @@ class MessageTemplateFixtureProvider
 
 		MessageTemplateFieldTypeRec fieldType1a =
 			messageTemplateFieldTypeHelper.insert (
+				taskLogger,
 				messageTemplateFieldTypeHelper.createInstance ()
 
 			.setMessageTemplateEntryType (
@@ -182,6 +196,7 @@ class MessageTemplateFixtureProvider
 		);
 
 		messageTemplateParameterHelper.insert (
+			taskLogger,
 			messageTemplateParameterHelper.createInstance ()
 
 			.setCode (
@@ -203,6 +218,7 @@ class MessageTemplateFixtureProvider
 
 		MessageTemplateEntryTypeRec entryType2 =
 			messageTemplateEntryTypeHelper.insert (
+				taskLogger,
 				messageTemplateEntryTypeHelper.createInstance ()
 
 			.setMessageTemplateDatabase (
@@ -220,6 +236,7 @@ class MessageTemplateFixtureProvider
 		);
 
 		messageTemplateFieldTypeHelper.insert (
+			taskLogger,
 			messageTemplateFieldTypeHelper.createInstance ()
 
 			.setMessageTemplateEntryType (
@@ -252,6 +269,7 @@ class MessageTemplateFixtureProvider
 		);
 
 		messageTemplateParameterHelper.insert (
+			taskLogger,
 			messageTemplateParameterHelper.createInstance ()
 
 			.setMessageTemplateEntryType (
@@ -275,6 +293,7 @@ class MessageTemplateFixtureProvider
 		);
 
 		messageTemplateParameterHelper.insert (
+			taskLogger,
 			messageTemplateParameterHelper.createInstance ()
 
 			.setMessageTemplateEntryType (
@@ -299,6 +318,7 @@ class MessageTemplateFixtureProvider
 
 		MessageTemplateSetRec messageTemplateSet =
 			messageTemplateSetHelper.insert (
+				taskLogger,
 				messageTemplateSetHelper.createInstance ()
 
 			.setMessageTemplateDatabase (
@@ -317,6 +337,7 @@ class MessageTemplateFixtureProvider
 
 		MessageTemplateEntryValueRec entryValue1 =
 			messageTemplateEntryValueHelper.insert (
+				taskLogger,
 				messageTemplateEntryValueHelper.createInstance ()
 
 			.setMessageTemplateSet (
@@ -328,6 +349,7 @@ class MessageTemplateFixtureProvider
 		);
 
 		messageTemplateFieldValueHelper.insert (
+			taskLogger,
 			messageTemplateFieldValueHelper.createInstance ()
 
 			.setMessageTemplateEntryValue (

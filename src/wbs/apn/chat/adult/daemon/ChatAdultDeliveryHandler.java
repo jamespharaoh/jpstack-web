@@ -1,13 +1,13 @@
 package wbs.apn.chat.adult.daemon;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 
 import java.util.Collection;
-import java.util.Collections;
 
 import javax.inject.Provider;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
@@ -169,11 +169,13 @@ class ChatAdultDeliveryHandler
 			if (! join) {
 
 				chatSendLogic.sendSystemRbFree (
+					taskLogger,
 					chatUser,
-					Optional.of (delivery.getMessage ().getThreadId ()),
+					optionalOf (
+						delivery.getMessage ().getThreadId ()),
 					"adult_confirm",
 					TemplateMissing.error,
-					Collections.<String,String>emptyMap ());
+					emptyMap ());
 
 				deliveryHelper.remove (
 					delivery);

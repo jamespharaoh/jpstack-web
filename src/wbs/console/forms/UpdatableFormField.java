@@ -249,6 +249,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
+					taskLogger,
 					container));
 
 		Optional <Generic> genericValue =
@@ -292,6 +293,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
+					taskLogger,
 					container));
 
 		Optional <Generic> genericValue =
@@ -322,25 +324,32 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderFormTemporarilyHidden (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		Optional<Native> nativeValue =
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderFormTemporarilyHidden");
+
+		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
+					taskLogger,
 					container));
 
-		Optional<Generic> genericValue =
+		Optional <Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
 					nativeValue));
 
-		Optional<Interface> interfaceValue =
+		Optional <Interface> interfaceValue =
 			requiredValue (
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
@@ -379,6 +388,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
+					taskLogger,
 					container));
 
 		Optional <Generic> genericValue =
@@ -444,15 +454,22 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderFormReset (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderFormReset");
+
 		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
+					taskLogger,
 					container));
 
 		Optional <Generic> genericValue =
@@ -481,16 +498,23 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void renderCsvRow (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter out,
 			@NonNull Container container,
-			@NonNull Map <String,Object> hints) {
+			@NonNull Map <String, Object> hints) {
 
-		Optional<Native> nativeValue =
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderCsvRow");
+
+		Optional <Native> nativeValue =
 			requiredValue (
 				accessor.read (
+					taskLogger,
 					container));
 
-		Optional<Generic> genericValue =
+		Optional <Generic> genericValue =
 			requiredValue (
 				nativeMapping.nativeToGeneric (
 					container,
@@ -514,10 +538,16 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	UpdateResult <Generic, Native> update (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,
 			@NonNull Map <String,Object> hints,
 			@NonNull String formName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"update");
 
 		// do nothing if no value present in form
 
@@ -542,6 +572,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 		Either <Optional <Interface>, String> newInterfaceValue =
 			requiredValue (
 				renderer.formToInterface (
+					taskLogger,
 					submission,
 					formName));
 
@@ -621,15 +652,16 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 		// convert to native
 
-		Optional<Native> newNativeValue =
+		Optional <Native> newNativeValue =
 			requiredValue (
 				nativeMapping.genericToNative (
+					taskLogger,
 					container,
 					newGenericValue));
 
 		// check new value
 
-		Optional<String> constraintError =
+		Optional <String> constraintError =
 			constraintValidator.validate (
 				container,
 				newNativeValue);
@@ -654,6 +686,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 		Optional <Native> oldNativeValue =
 			requiredValue (
 				accessor.read (
+					taskLogger,
 					container));
 
 		Optional <Generic> oldGenericValue =
@@ -682,6 +715,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 		// set the new value
 
 		accessor.write (
+			taskLogger,
 			container,
 			newNativeValue);
 
@@ -710,13 +744,15 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	void runUpdateHook (
-			@NonNull UpdateResult<Generic,Native> updateResult,
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull UpdateResult <Generic, Native> updateResult,
 			@NonNull Container container,
-			@NonNull PermanentRecord<?> linkObject,
-			@NonNull Optional<Object> objectRef,
-			@NonNull Optional<String> objectType) {
+			@NonNull PermanentRecord <?> linkObject,
+			@NonNull Optional <Object> objectRef,
+			@NonNull Optional <String> objectType) {
 
 		updateHook.onUpdate (
+			parentTaskLogger,
 			updateResult,
 			container,
 			linkObject,

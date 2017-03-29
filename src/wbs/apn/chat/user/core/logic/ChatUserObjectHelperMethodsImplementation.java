@@ -5,10 +5,13 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.number.core.logic.NumberLogic;
@@ -44,6 +47,9 @@ class ChatUserObjectHelperMethodsImplementation
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@WeakSingletonDependency
 	NumberLogic numberLogic;
 
@@ -55,8 +61,14 @@ class ChatUserObjectHelperMethodsImplementation
 	@Override
 	public
 	ChatUserRec findOrCreate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatRec chat,
 			@NonNull MessageRec message) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreate");
 
 		// resolve stuff
 
@@ -87,9 +99,11 @@ class ChatUserObjectHelperMethodsImplementation
 
 				NumberRec newNumber =
 					numberLogic.archiveNumberFromMessage (
+						taskLogger,
 						message);
 
 				return create (
+					taskLogger,
 					chat,
 					newNumber);
 
@@ -100,6 +114,7 @@ class ChatUserObjectHelperMethodsImplementation
 		}
 
 		return create (
+			taskLogger,
 			chat,
 			number);
 
@@ -108,8 +123,14 @@ class ChatUserObjectHelperMethodsImplementation
 	@Override
 	public
 	ChatUserRec findOrCreate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatRec chat,
 			@NonNull NumberRec number) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreate");
 
 		// check for an existing ChatUser
 
@@ -122,6 +143,7 @@ class ChatUserObjectHelperMethodsImplementation
 			return chatUser;
 
 		return create (
+			taskLogger,
 			chat,
 			number);
 
@@ -130,8 +152,14 @@ class ChatUserObjectHelperMethodsImplementation
 	@Override
 	public
 	ChatUserRec create (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatRec chat,
 			@NonNull NumberRec number) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"create");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -184,6 +212,7 @@ class ChatUserObjectHelperMethodsImplementation
 		}
 
 		chatUserHelper.insert (
+			taskLogger,
 			chatUser);
 
 		return chatUser;

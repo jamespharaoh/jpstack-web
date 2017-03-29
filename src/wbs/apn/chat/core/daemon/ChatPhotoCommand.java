@@ -1,10 +1,10 @@
 package wbs.apn.chat.core.daemon;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-
-import java.util.Collections;
 
 import com.google.common.base.Optional;
 
@@ -12,6 +12,28 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.entity.record.IdObject;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.framework.object.ObjectManager;
+
+import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
+
+import wbs.sms.command.model.CommandObjectHelper;
+import wbs.sms.command.model.CommandRec;
+import wbs.sms.message.core.model.MessageObjectHelper;
+import wbs.sms.message.core.model.MessageRec;
+import wbs.sms.message.inbox.daemon.CommandHandler;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
 import wbs.apn.chat.bill.logic.ChatCreditCheckResult;
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
@@ -23,23 +45,6 @@ import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.info.logic.ChatInfoLogic;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.entity.record.IdObject;
-import wbs.framework.logging.TaskLogger;
-import wbs.framework.object.ObjectManager;
-import wbs.platform.affiliate.model.AffiliateRec;
-import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.platform.service.model.ServiceRec;
-import wbs.sms.command.model.CommandObjectHelper;
-import wbs.sms.command.model.CommandRec;
-import wbs.sms.message.core.model.MessageObjectHelper;
-import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.logic.SmsInboxLogic;
-import wbs.sms.message.inbox.model.InboxAttemptRec;
-import wbs.sms.message.inbox.model.InboxRec;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatPhotoCommand")
@@ -73,8 +78,8 @@ class ChatPhotoCommand
 	@SingletonDependency
 	Database database;
 
-	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MessageObjectHelper messageHelper;
@@ -84,6 +89,9 @@ class ChatPhotoCommand
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
 
 	// properties
 
@@ -116,7 +124,12 @@ class ChatPhotoCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		ChatRec chat =
 			genericCastUnchecked (
@@ -133,6 +146,7 @@ class ChatPhotoCommand
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
+				taskLogger,
 				chat,
 				message);
 
@@ -144,14 +158,16 @@ class ChatPhotoCommand
 
 		ChatCreditCheckResult creditCheckResult =
 			chatCreditLogic.userSpendCreditCheck (
+				taskLogger,
 				chatUser,
 				true,
-				Optional.of (
+				optionalOf (
 					message.getThreadId ()));
 
 		if (creditCheckResult.failed ()) {
 
 			chatHelpLogLogic.createChatHelpLogIn (
+				taskLogger,
 				chatUser,
 				message,
 				rest,
@@ -163,7 +179,7 @@ class ChatPhotoCommand
 			String text =
 				rest.trim ();
 
-			Optional<ChatUserRec> photoUserOptional =
+			Optional <ChatUserRec> photoUserOptional =
 				chatUserHelper.findByCode (
 					chat,
 					text);
@@ -173,9 +189,10 @@ class ChatPhotoCommand
 				// just send any three users
 
 				chatInfoLogic.sendUserPics (
+					taskLogger,
 					chatUser,
 					3l,
-					Optional.of (
+					optionalOf (
 						message.getThreadId ()));
 
 			} else if (
@@ -191,8 +208,9 @@ class ChatPhotoCommand
 				// send no such user error
 
 				chatSendLogic.sendSystemMagic (
+					taskLogger,
 					chatUser,
-					Optional.of (
+					optionalOf (
 						message.getThreadId ()),
 					"request_photo_error",
 					commandHelper.findByCodeRequired (
@@ -203,7 +221,7 @@ class ChatPhotoCommand
 							chat,
 							"help")),
 					TemplateMissing.error,
-					Collections.emptyMap ());
+					emptyMap ());
 
 			} else if (
 				isNull (
@@ -213,8 +231,9 @@ class ChatPhotoCommand
 				// send no such photo error
 
 				chatSendLogic.sendSystemMagic (
+					taskLogger,
 					chatUser,
-					Optional.of (
+					optionalOf (
 						message.getThreadId ()),
 					"no_photo_error",
 					commandHelper.findByCodeRequired (
@@ -225,17 +244,18 @@ class ChatPhotoCommand
 							chat,
 							"help")),
 					TemplateMissing.error,
-					Collections.emptyMap ());
+					emptyMap ());
 
 			} else {
 
 				// send pics
 
 				chatInfoLogic.sendRequestedUserPicandOtherUserPics (
+					taskLogger,
 					chatUser,
 					photoUserOptional.get (),
 					2l,
-					Optional.of (
+					optionalOf (
 						message.getThreadId ()));
 
 			}
@@ -245,10 +265,11 @@ class ChatPhotoCommand
 		// process inbox
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (
+			optionalOf (
 				defaultService),
-			Optional.of (
+			optionalOf (
 				affiliate),
 			command);
 

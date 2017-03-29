@@ -2,7 +2,6 @@ package wbs.framework.hibernate;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
-import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.LogicUtils.notEqualSafe;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
@@ -34,16 +33,17 @@ import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectDatabaseHelper;
 import wbs.framework.object.ObjectModel;
 import wbs.framework.object.ObjectTypeRegistry;
-
-import wbs.utils.etc.OptionalUtils;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("hibernateObjectDatabaseHelper")
@@ -58,6 +58,9 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	@SingletonDependency
 	HibernateDatabase hibernateDatabase;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectTypeRegistry objectTypeRegistry;
@@ -1255,7 +1258,13 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType insert (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"insert");
 
 		@Cleanup
 		ActiveTask activeTask =
@@ -1264,6 +1273,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				"...");
 
 		objectModel.hooks ().beforeInsert (
+			taskLogger,
 			object);
 
 		Session session =
@@ -1273,6 +1283,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			object);
 
 		objectModel.hooks ().afterInsert (
+			taskLogger,
 			object);
 
 		return object;
@@ -1282,7 +1293,13 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	@Override
 	public
 	RecordType insertSpecial (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"insertSpecial");
 
 		@Cleanup
 		ActiveTask activeTask =
@@ -1294,6 +1311,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 						object.getId ())));
 
 		objectModel.hooks ().beforeInsert (
+			taskLogger,
 			object);
 
 		Session session =
@@ -1304,6 +1322,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			ReplicationMode.EXCEPTION);
 
 		objectModel.hooks ().afterInsert (
+			taskLogger,
 			object);
 
 		return object;

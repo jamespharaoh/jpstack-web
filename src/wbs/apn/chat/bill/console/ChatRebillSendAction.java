@@ -138,6 +138,7 @@ class ChatRebillSendAction
 
 			formUpdates =
 				formFieldLogic.update (
+					taskLogger,
 					requestContext,
 					formFields,
 					formValues,
@@ -249,6 +250,7 @@ class ChatRebillSendAction
 			) {
 
 				chatRebillLogHelper.insert (
+					taskLogger,
 					chatRebillLogHelper.createInstance ()
 
 					.setChat (
@@ -285,6 +287,7 @@ class ChatRebillSendAction
 				billChatUsers.forEach (
 					chatUser ->
 						chatCreditLogic.userBillReal (
+							taskLogger,
 							chatUser,
 							true));
 

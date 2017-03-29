@@ -119,18 +119,8 @@ class TabContextResponder
 			PagePart pagePart) {
 
 		pagePartFactory =
-			new PagePartFactory () {
-
-			@Override
-			public
-			PagePart buildPagePart (
-					@NonNull TaskLogger parentTaskLogger) {
-
-				return pagePart;
-
-			}
-
-		};
+			nextedTaskLogger ->
+				pagePart;
 
 	}
 

@@ -173,6 +173,7 @@ class ChatUserAdminBarringAction
 			// create an event
 
 			eventLogic.createEvent (
+				taskLogger,
 				eventType,
 				userConsoleLogic.userRequired (),
 				chatUser,

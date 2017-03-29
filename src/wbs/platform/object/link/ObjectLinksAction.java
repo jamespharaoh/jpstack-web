@@ -215,6 +215,7 @@ class ObjectLinksAction
 					if (eventOrder == EventOrder.contextThenTarget) {
 
 						eventLogic.createEvent (
+							taskLogger,
 							addEventName,
 							userConsoleLogic.userRequired (),
 							contextObject,
@@ -225,6 +226,7 @@ class ObjectLinksAction
 					if (eventOrder == EventOrder.targetThenContext) {
 
 						eventLogic.createEvent (
+							taskLogger,
 							addEventName,
 							userConsoleLogic.userRequired (),
 							targetObject,
@@ -253,6 +255,7 @@ class ObjectLinksAction
 					if (eventOrder == EventOrder.contextThenTarget) {
 
 						eventLogic.createEvent (
+							taskLogger,
 							removeEventName,
 							userConsoleLogic.userRequired (),
 							contextObject,
@@ -263,6 +266,7 @@ class ObjectLinksAction
 					if (eventOrder == EventOrder.targetThenContext) {
 
 						eventLogic.createEvent (
+							taskLogger,
 							removeEventName,
 							userConsoleLogic.userRequired (),
 							targetObject,
@@ -288,6 +292,7 @@ class ObjectLinksAction
 				) {
 
 					updateManager.signalUpdate (
+						taskLogger,
 						contextUpdateSignalName,
 						contextObject.getId ());
 
@@ -304,6 +309,7 @@ class ObjectLinksAction
 					) {
 
 						updateManager.signalUpdate (
+							taskLogger,
 							targetUpdateSignalName,
 							targetObject.getId ());
 

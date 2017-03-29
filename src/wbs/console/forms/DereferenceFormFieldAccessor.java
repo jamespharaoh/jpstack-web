@@ -1,6 +1,8 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringInSafe;
 
@@ -15,6 +17,7 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
 
@@ -42,16 +45,16 @@ class DereferenceFormFieldAccessor <Container, Native>
 	@Override
 	public
 	Optional <Native> read (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container) {
 
-		@SuppressWarnings ("unchecked")
 		Native nativeValue =
-			(Native)
-			objectManager.dereferenceObsolete (
-				container,
-				path);
+			genericCastUnchecked (
+				objectManager.dereferenceObsolete (
+					container,
+					path));
 
-		return Optional.fromNullable (
+		return optionalFromNullable (
 			nativeValue);
 
 	}
@@ -59,6 +62,7 @@ class DereferenceFormFieldAccessor <Container, Native>
 	@Override
 	public
 	void write (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValue) {
 

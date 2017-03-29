@@ -1,6 +1,8 @@
 package wbs.smsapps.autoresponder.daemon;
 
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import javax.inject.Provider;
 
@@ -12,16 +14,19 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
-import wbs.platform.affiliate.model.AffiliateRec;
+
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
+
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
 import wbs.sms.message.core.model.MessageObjectHelper;
@@ -35,10 +40,12 @@ import wbs.sms.messageset.model.MessageSetMessageRec;
 import wbs.sms.messageset.model.MessageSetObjectHelper;
 import wbs.sms.messageset.model.MessageSetRec;
 import wbs.sms.number.list.logic.NumberListLogic;
+
 import wbs.smsapps.autoresponder.model.AutoResponderObjectHelper;
 import wbs.smsapps.autoresponder.model.AutoResponderRec;
 import wbs.smsapps.autoresponder.model.AutoResponderRequestObjectHelper;
 import wbs.smsapps.autoresponder.model.AutoResponderRequestRec;
+
 import wbs.utils.email.EmailLogic;
 
 @Accessors (fluent = true)
@@ -63,6 +70,9 @@ class AutoResponderCommand
 
 	@SingletonDependency
 	EmailLogic emailLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SmsInboxLogic smsInboxLogic;
@@ -116,7 +126,12 @@ class AutoResponderCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -137,6 +152,7 @@ class AutoResponderCommand
 
 		AutoResponderRequestRec request =
 			autoResponderRequestHelper.insert (
+				taskLogger,
 				autoResponderRequestHelper.createInstance ()
 
 			.setAutoResponder (
@@ -175,6 +191,7 @@ class AutoResponderCommand
 					receivedMessage.getNumber ())
 
 				.messageString (
+					taskLogger,
 					messageSetMessage.getMessage ())
 
 				.numFrom (
@@ -196,7 +213,8 @@ class AutoResponderCommand
 				.ref (
 					request.getId ())
 
-				.send ();
+				.send (
+					taskLogger);
 
 			request.getSentMessages ().add (
 				sentMessage);
@@ -226,6 +244,7 @@ class AutoResponderCommand
 		) {
 
 			numberListLogic.addDueToMessage (
+				taskLogger,
 				autoResponder.getAddToNumberList (),
 				receivedMessage.getNumber (),
 				receivedMessage,
@@ -236,9 +255,11 @@ class AutoResponderCommand
 		// process inbox
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (defaultService),
-			Optional.<AffiliateRec>absent (),
+			optionalOf (
+				defaultService),
+			optionalAbsent (),
 			command);
 
 	}

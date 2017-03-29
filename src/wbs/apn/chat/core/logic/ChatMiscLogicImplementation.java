@@ -1,7 +1,12 @@
 package wbs.apn.chat.core.logic;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.earlierThan;
 
@@ -17,17 +22,19 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.event.logic.EventLogic;
@@ -71,7 +78,6 @@ import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 import wbs.apn.chat.user.info.model.ChatUserNameObjectHelper;
 import wbs.apn.chat.user.info.model.ChatUserNameRec;
 
-@Log4j
 @SingletonComponent ("chatMiscLogic")
 public
 class ChatMiscLogicImplementation
@@ -126,6 +132,9 @@ class ChatMiscLogicImplementation
 
 	@SingletonDependency
 	LocatorManager locatorManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MagicNumberLogic magicNumberLogic;
@@ -256,14 +265,21 @@ class ChatMiscLogicImplementation
 	@Override
 	public
 	void blockAll (
-			ChatUserRec chatUser,
-			MessageRec message) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser,
+			@NonNull Optional <MessageRec> message) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"blockAll");
 
 		// log them off
 
 		chatUserLogic.logoff (
 			chatUser,
-			message == null);
+			optionalIsNotPresent (
+				message));
 
 		// block all allMessages and ads
 
@@ -278,6 +294,7 @@ class ChatMiscLogicImplementation
 		// turn off dating
 
 		chatDateLogic.userDateStuff (
+			taskLogger,
 			chatUser,
 			null,
 			message,
@@ -289,11 +306,12 @@ class ChatMiscLogicImplementation
 		if (chatUser.getChatScheme () != null) {
 
 			chatSendLogic.sendSystemRbFree (
+				taskLogger,
 				chatUser,
-				Optional.<Long>absent (),
+				optionalAbsent (),
 				"block_all_confirm",
 				TemplateMissing.error,
-				Collections.<String,String>emptyMap ());
+				emptyMap ());
 
 		}
 
@@ -302,9 +320,15 @@ class ChatMiscLogicImplementation
 	@Override
 	public
 	void userAutoJoin (
-			ChatUserRec chatUser,
-			MessageRec message,
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser,
+			@NonNull MessageRec message,
 			boolean sendMessage) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userAutoJoin");
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -317,6 +341,7 @@ class ChatMiscLogicImplementation
 		) {
 
 			userJoin (
+				taskLogger,
 				chatUser,
 				sendMessage,
 				message.getThreadId (),
@@ -334,9 +359,11 @@ class ChatMiscLogicImplementation
 		) {
 
 			chatDateLogic.userDateStuff (
+				taskLogger,
 				chatUser,
 				null,
-				message,
+				optionalOf (
+					message),
 				chatUser.getMainChatUserImage () != null
 					? ChatUserDateMode.photo
 					: ChatUserDateMode.text,
@@ -349,10 +376,16 @@ class ChatMiscLogicImplementation
 	@Override
 	public
 	void userJoin (
+			@NonNull TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			boolean sendMessage,
 			Long threadId,
 			ChatMessageMethod deliveryMethod) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userJoin");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -409,6 +442,7 @@ class ChatMiscLogicImplementation
 		if (! wasOnline) {
 
 			chatUserSessionHelper.insert (
+				taskLogger,
 				chatUserSessionHelper.createInstance ()
 
 				.setChatUser (
@@ -426,8 +460,9 @@ class ChatMiscLogicImplementation
 		if (sendMessage) {
 
 			chatSendLogic.sendSystemMagic (
+				taskLogger,
 				chatUser,
-				Optional.fromNullable (
+				optionalFromNullable (
 					threadId),
 				"logon",
 				commandHelper.findByCodeRequired (
@@ -438,7 +473,7 @@ class ChatMiscLogicImplementation
 						chat,
 						"help")),
 				TemplateMissing.error,
-				Collections.emptyMap ());
+				emptyMap ());
 
 		}
 
@@ -461,13 +496,14 @@ class ChatMiscLogicImplementation
 
 		) {
 
-			final Long chatUserId =
+			Long chatUserId =
 				chatUser.getId ();
 
-			final Long locatorId =
+			Long locatorId =
 				chat.getLocator ().getId ();
 
 			locatorManager.locate (
+				taskLogger,
 				chat.getLocator ().getId (),
 				chatUser.getNumber ().getId (),
 				serviceHelper.findByCodeRequired (
@@ -533,6 +569,7 @@ class ChatMiscLogicImplementation
 							locatorId);
 
 					eventLogic.createEvent (
+						taskLogger,
 						"chat_user_location_locator",
 						chatUser,
 						longLat.longitude (),
@@ -541,11 +578,10 @@ class ChatMiscLogicImplementation
 
 					transaction.commit ();
 
-					log.info (
-						stringFormat (
-							"Got location for %s: %s",
-							chatUser.getCode (),
-							longLat.toString ()));
+					taskLogger.noticeFormat (
+						"Got location for %s: %s",
+						chatUser.getCode (),
+						longLat.toString ());
 
 				}
 
@@ -558,9 +594,15 @@ class ChatMiscLogicImplementation
 	@Override
 	public
 	void userLogoffWithMessage (
+			@NonNull TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			Long threadId,
 			boolean automatic) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userLogoffWithMessage");
 
 		ChatRec chat = chatUser.getChat ();
 
@@ -571,8 +613,9 @@ class ChatMiscLogicImplementation
 			if (chatUser.getDateMode () != ChatUserDateMode.none) {
 
 				chatSendLogic.sendSystemMagic (
+					taskLogger,
 					chatUser,
-					Optional.fromNullable (
+					optionalFromNullable (
 						threadId),
 					"date_stop_hint",
 					commandHelper.findByCodeRequired (
@@ -580,7 +623,7 @@ class ChatMiscLogicImplementation
 						"help"),
 					0l,
 					TemplateMissing.error,
-					Collections.<String,String>emptyMap ());
+					emptyMap ());
 
 			}
 
@@ -599,11 +642,13 @@ class ChatMiscLogicImplementation
 		if (chatUser.getNumber () != null) {
 
 			chatSendLogic.sendSystemRbFree (
+				taskLogger,
 				chatUser,
-				Optional.fromNullable (threadId),
+				optionalFromNullable (
+					threadId),
 				"logoff_confirm",
 				TemplateMissing.error,
-				Collections.<String,String>emptyMap ());
+				emptyMap ());
 
 		}
 
@@ -675,9 +720,15 @@ class ChatMiscLogicImplementation
 	@Override
 	public
 	void chatUserSetName (
-			ChatUserRec chatUser,
-			String name,
-			Long threadId) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser,
+			@NonNull String name,
+			@NonNull Long threadId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatUserSetName");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -690,6 +741,7 @@ class ChatMiscLogicImplementation
 
 		ChatUserNameRec chatUserName =
 			chatUserNameHelper.insert (
+				taskLogger,
 				chatUserNameHelper.createInstance ()
 
 			.setChatUser (
@@ -726,7 +778,9 @@ class ChatMiscLogicImplementation
 
 			QueueItemRec qi =
 				queueLogic.createQueueItem (
-					queueLogic.findQueue (chat, "user"),
+					taskLogger,
+					chat,
+					"user",
 					chatUser,
 					chatUser,
 					chatUserLogic.getPrettyName (
@@ -742,8 +796,9 @@ class ChatMiscLogicImplementation
 		if (threadId != null)
 
 			chatSendLogic.sendSystemMagic (
+				taskLogger,
 				chatUser,
-				Optional.of (
+				optionalOf (
 					threadId),
 				"name_confirm",
 				commandHelper.findByCodeRequired (
@@ -754,7 +809,7 @@ class ChatMiscLogicImplementation
 						chat,
 						"name")),
 				TemplateMissing.error,
-				ImmutableMap.<String,String>builder ()
+				ImmutableMap.<String, String> builder ()
 					.put ("newName", name)
 					.build ());
 

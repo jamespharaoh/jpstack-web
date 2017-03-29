@@ -1,11 +1,11 @@
 package wbs.apn.chat.contact.console;
 
 import static wbs.utils.etc.Misc.stringTrim;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
-
-import com.google.common.base.Optional;
 
 import lombok.Cleanup;
 import lombok.NonNull;
@@ -13,10 +13,12 @@ import lombok.NonNull;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.exception.logic.ExceptionLogLogic;
@@ -35,7 +37,6 @@ import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.logic.ChatHelpLogic;
-import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("chatMessagePendingFormAction")
@@ -69,6 +70,9 @@ class ChatMessagePendingFormAction
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	QueueLogic queueLogic;
 
@@ -92,7 +96,12 @@ class ChatMessagePendingFormAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// get the message id
 
@@ -116,7 +125,10 @@ class ChatMessagePendingFormAction
 				requestContext.parameter (
 					"sendWithoutApproval"))
 		) {
-			return goSend ();
+
+			return goSend (
+				taskLogger);
+
 		}
 
 		if (
@@ -124,7 +136,10 @@ class ChatMessagePendingFormAction
 				requestContext.parameter (
 					"reject"))
 		) {
-			return goReject ();
+
+			return goReject (
+				taskLogger);
+
 		}
 
 		throw new RuntimeException (
@@ -133,7 +148,13 @@ class ChatMessagePendingFormAction
 	}
 
 	private
-	Responder goSend () {
+	Responder goSend (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goSend");
 
 		// get params
 
@@ -246,10 +267,12 @@ class ChatMessagePendingFormAction
 						ChatMessageStatus.moderatorAutoEdited);
 
 				chatMessageLogic.chatUserRejectionCountInc (
+					taskLogger,
 					chatMessage.getFromUser (),
 					chatMessage.getThreadId ());
 
 				chatMessageLogic.chatUserRejectionCountInc (
+					taskLogger,
 					chatMessage.getToUser (),
 					chatMessage.getThreadId ());
 
@@ -260,13 +283,17 @@ class ChatMessagePendingFormAction
 				chatMessage
 					.setStatus (ChatMessageStatus.moderatorEdited)
 					.setEditedText (
-						textHelper.findOrCreate (messageParam));
+						textHelper.findOrCreate (
+							taskLogger,
+							messageParam));
 
 				chatMessageLogic.chatUserRejectionCountInc (
+					taskLogger,
 					chatMessage.getFromUser (),
 					chatMessage.getThreadId ());
 
 				chatMessageLogic.chatUserRejectionCountInc (
+					taskLogger,
 					chatMessage.getToUser (),
 					chatMessage.getThreadId ());
 
@@ -276,6 +303,7 @@ class ChatMessagePendingFormAction
 
 			ChatContactRec chatContact =
 				chatContactHelper.findOrCreate (
+					taskLogger,
 					chatMessage.getFromUser (),
 					chatMessage.getToUser ());
 
@@ -291,6 +319,7 @@ class ChatMessagePendingFormAction
 			case user:
 
 				chatMessageLogic.chatMessageDeliverToUser (
+					taskLogger,
 					chatMessage);
 
 				break;
@@ -299,6 +328,7 @@ class ChatMessagePendingFormAction
 
 				ChatMonitorInboxRec chatMonitorInbox =
 					chatMessageLogic.findOrCreateChatMonitorInbox (
+						taskLogger,
 						chatMessage.getToUser (),
 						chatMessage.getFromUser (),
 						false);
@@ -328,7 +358,13 @@ class ChatMessagePendingFormAction
 	}
 
 	private
-	Responder goReject () {
+	Responder goReject (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReject");
 
 		// get params
 
@@ -399,16 +435,18 @@ class ChatMessagePendingFormAction
 		// and send help message
 
 		chatHelpLogic.sendHelpMessage (
+			taskLogger,
 			userConsoleLogic.userRequired (),
 			chatMessage.getFromUser (),
 			messageParam,
-			Optional.of (
+			optionalOf (
 				chatMessage.getThreadId ()),
-			Optional.<ChatHelpLogRec>absent ());
+			optionalAbsent ());
 
 		// inc rejection count
 
 		chatMessageLogic.chatUserRejectionCountInc (
+			taskLogger,
 			chatMessage.getFromUser (),
 			chatMessage.getThreadId ());
 

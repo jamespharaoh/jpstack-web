@@ -1,6 +1,8 @@
 package wbs.apn.chat.help.logic;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import java.util.List;
 
@@ -8,23 +10,28 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
+import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.user.model.UserRec;
+
+import wbs.sms.command.model.CommandObjectHelper;
+import wbs.sms.command.model.CommandRec;
+import wbs.sms.gsm.MessageSplitter;
+import wbs.sms.message.core.model.MessageRec;
+
 import wbs.apn.chat.contact.logic.ChatSendLogic;
-import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.platform.service.model.ServiceRec;
-import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.user.model.UserRec;
-import wbs.sms.command.model.CommandObjectHelper;
-import wbs.sms.command.model.CommandRec;
-import wbs.sms.gsm.MessageSplitter;
-import wbs.sms.message.core.model.MessageRec;
 
 @SingletonComponent ("chatHelpLogic")
 public
@@ -45,6 +52,9 @@ class ChatHelpLogicImplementation
 	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
@@ -56,11 +66,17 @@ class ChatHelpLogicImplementation
 	@Override
 	public
 	void sendHelpMessage (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull UserRec user,
 			@NonNull ChatUserRec chatUser,
 			@NonNull String text,
-			@NonNull Optional<Long> threadId,
-			@NonNull Optional<ChatHelpLogRec> replyTo) {
+			@NonNull Optional <Long> threadId,
+			@NonNull Optional <ChatHelpLogRec> replyTo) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendHelpMessage");
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -103,7 +119,7 @@ class ChatHelpLogicImplementation
 				multipleTemplate.getText (),
 				multipleTemplate.getText ());
 
-		List<String> splitTexts =
+		List <String> splitTexts =
 			MessageSplitter.split (
 				text,
 				messageSplitterTemplates);
@@ -117,9 +133,11 @@ class ChatHelpLogicImplementation
 
 			MessageRec message =
 				chatSendLogic.sendMessageMagic (
+					taskLogger,
 					chatUser,
 					threadId,
 					textHelper.findOrCreate (
+						taskLogger,
 						splitText),
 					magicCommand,
 					helpService,
@@ -139,14 +157,15 @@ class ChatHelpLogicImplementation
 			// save reply
 
 			chatHelpLogLogic.createChatHelpLogOut (
+				taskLogger,
 				chatUser,
 				replyTo,
-				Optional.of (
+				optionalOf (
 					user),
 				message,
-				Optional.<ChatMessageRec>absent (),
+				optionalAbsent (),
 				splitText,
-				Optional.of (
+				optionalOf (
 					helpCommand));
 
 		}

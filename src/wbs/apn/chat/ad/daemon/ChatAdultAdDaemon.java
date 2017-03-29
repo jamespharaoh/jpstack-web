@@ -1,7 +1,6 @@
 package wbs.apn.chat.ad.daemon;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.laterThan;
 
 import java.util.List;
@@ -11,10 +10,10 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -22,6 +21,8 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.daemon.SleepingDaemonService;
@@ -43,7 +44,6 @@ import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
 
-@Log4j
 @SingletonComponent ("chatAdultAdDaemon")
 public
 class ChatAdultAdDaemon
@@ -71,6 +71,9 @@ class ChatAdultAdDaemon
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
@@ -116,9 +119,15 @@ class ChatAdultAdDaemon
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		log.debug (
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce");
+
+		taskLogger.debugFormat (
 			"Looking for users to send an adult ad to");
 
 		// get a list of users who have passed their ad time
@@ -148,11 +157,13 @@ class ChatAdultAdDaemon
 				try {
 
 					doAdultAd (
+						taskLogger,
 						chatUser.getId ());
 
 				} catch (Exception exception) {
 
 					exceptionLogger.logThrowable (
+						taskLogger,
 						"daemon",
 						"ChatAdDaemon",
 						exception,
@@ -169,13 +180,18 @@ class ChatAdultAdDaemon
 
 	private
 	void doAdultAd (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long chatUserId) {
 
-		log.debug (
-			stringFormat (
-				"Attempting to send adult ad to %s",
-				integerToDecimalString (
-					chatUserId)));
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doAdultAd");
+
+		taskLogger.debugFormat (
+			"Attempting to send adult ad to %s",
+			integerToDecimalString (
+				chatUserId));
 
 		try (
 
@@ -207,11 +223,10 @@ class ChatAdultAdDaemon
 
 			if (chat.getAdultAdsChat () == null) {
 
-				log.info (
-					stringFormat (
-						"Skipping adult ad to %s (no adult ads on this service)",
-						objectManager.objectPath (
-							chatUser)));
+				taskLogger.noticeFormat (
+					"Skipping adult ad to %s (no adult ads on this service)",
+					objectManager.objectPath (
+						chatUser));
 
 				chatUser
 
@@ -229,32 +244,36 @@ class ChatAdultAdDaemon
 					chat.getAdultAdsChat (),
 					chatUser.getNumber ());
 
-			if (userOnAdultService != null
-					&& userOnAdultService.getFirstJoin () != null) {
+			if (
+				userOnAdultService != null
+				&& userOnAdultService.getFirstJoin () != null
+			) {
 
-				log.info (
-					stringFormat (
-						"Skipping adult ad to %s (already on adult service)",
-						objectManager.objectPath (chatUser)));
+				taskLogger.noticeFormat (
+					"Skipping adult ad to %s (already on adult service)",
+					objectManager.objectPath (
+						chatUser));
 
 				chatUser.setNextAdultAd (null);
+
 				transaction.commit ();
+
 				return;
 
 			}
 
 			ChatCreditCheckResult creditCheckResult =
 				chatCreditLogic.userCreditCheck (
+					taskLogger,
 					chatUser);
 
 			if (creditCheckResult.failed ()) {
 
-				log.info (
-					stringFormat (
-						"Skipping adult ad to %s (%s)",
-						objectManager.objectPath (
-							chatUser),
-						creditCheckResult.details ()));
+				taskLogger.noticeFormat (
+					"Skipping adult ad to %s (%s)",
+					objectManager.objectPath (
+						chatUser),
+					creditCheckResult.details ());
 
 				chatUser
 
@@ -269,10 +288,10 @@ class ChatAdultAdDaemon
 
 			if (chatUser.getFirstJoin () == null) {
 
-				log.info (
-					stringFormat (
-						"Skipping adult ad to %s (never fully joined)",
-						objectManager.objectPath (chatUser)));
+				taskLogger.noticeFormat (
+					"Skipping adult ad to %s (never fully joined)",
+					objectManager.objectPath (
+						chatUser));
 
 				chatUser.setNextAdultAd (null);
 				transaction.commit ();
@@ -280,16 +299,20 @@ class ChatAdultAdDaemon
 
 			}
 
-			if (! chatUser.getNumber ().getNumber ().startsWith ("447")
-					|| chatUser.getNumber ().getNumber ().length () != 12) {
+			if (
+				! chatUser.getNumber ().getNumber ().startsWith ("447")
+				|| chatUser.getNumber ().getNumber ().length () != 12
+			) {
 
-				log.info (
-					stringFormat (
-						"Skipping adult ad to %s (not a mobile number)",
-						objectManager.objectPath (chatUser)));
+				taskLogger.noticeFormat (
+					"Skipping adult ad to %s (not a mobile number)",
+					objectManager.objectPath (
+						chatUser));
 
 				chatUser.setNextAdultAd (null);
+
 				transaction.commit ();
+
 				return;
 
 			}
@@ -329,11 +352,11 @@ class ChatAdultAdDaemon
 					"system",
 					templateCode);
 
-			log.info (
-				stringFormat (
-					"Sending adult ad to %s: %s",
-					objectManager.objectPath (chatUser),
-					template.getText ()));
+			taskLogger.noticeFormat (
+				"Sending adult ad to %s: %s",
+				objectManager.objectPath (
+					chatUser),
+				template.getText ());
 
 			ChatSchemeRec adultScheme =
 				chat.getAdultAdsChat ().getChatSchemes ().iterator ().next ();
@@ -349,6 +372,7 @@ class ChatAdultAdDaemon
 					chatUser.getNumber ())
 
 				.messageString (
+					taskLogger,
 					template.getText ())
 
 				.numFrom (
@@ -360,7 +384,8 @@ class ChatAdultAdDaemon
 				.service (
 					systemService)
 
-				.send ();
+				.send (
+					taskLogger);
 
 			// clear his next ad time
 

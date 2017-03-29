@@ -6,15 +6,18 @@ import static wbs.utils.collection.CollectionUtils.listItemAtIndexRequired;
 import java.util.Arrays;
 import java.util.Collection;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.service.model.ServiceObjectHelper;
+
 import wbs.sms.message.core.logic.SmsMessageLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
@@ -22,6 +25,7 @@ import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
 import wbs.sms.message.outbox.logic.SmsOutboxLogic;
+
 import wbs.smsapps.manualresponder.model.ManualResponderReplyObjectHelper;
 import wbs.smsapps.manualresponder.model.ManualResponderReplyRec;
 
@@ -37,6 +41,9 @@ class ManualResponderDelivery
 
 	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ManualResponderReplyObjectHelper manualResponderReplyHelper;
@@ -70,92 +77,104 @@ class ManualResponderDelivery
 			@NonNull Long deliveryId,
 			@NonNull Long ref) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ManualResopnderDelivery.handle (deliveryId, ref)",
-				this);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
-		DeliveryRec delivery =
-			deliveryHelper.findRequired (
-				deliveryId);
+		try (
 
-		if (delivery.getNewMessageStatus ().isGoodType ()) {
+			Transaction transaction =
+				database.beginReadWrite (
+					"ManualResopnderDelivery.handle (deliveryId, ref)",
+					this);
 
-			MessageRec deliveryMessage =
-				delivery.getMessage ();
+		) {
 
-			ManualResponderReplyRec reply =
-				manualResponderReplyHelper.findRequired (
-					deliveryMessage.getRef ());
+			DeliveryRec delivery =
+				deliveryHelper.findRequired (
+					deliveryId);
 
-			Long deliveryMessageIndex =
-				listIndexOfRequired (
-					reply.getMessages (),
-					deliveryMessage);
+			if (delivery.getNewMessageStatus ().isGoodType ()) {
 
-			if (
-				reply.getMessages ().size ()
-					> deliveryMessageIndex + 1
-			) {
+				MessageRec deliveryMessage =
+					delivery.getMessage ();
 
-				MessageRec nextMessage =
-					listItemAtIndexRequired (
+				ManualResponderReplyRec reply =
+					manualResponderReplyHelper.findRequired (
+						deliveryMessage.getRef ());
+
+				Long deliveryMessageIndex =
+					listIndexOfRequired (
 						reply.getMessages (),
-						deliveryMessageIndex + 1);
+						deliveryMessage);
 
-				if (nextMessage.getStatus () == MessageStatus.held) {
+				if (
+					reply.getMessages ().size ()
+						> deliveryMessageIndex + 1
+				) {
 
-					outboxLogic.unholdMessage (
-						nextMessage);
+					MessageRec nextMessage =
+						listItemAtIndexRequired (
+							reply.getMessages (),
+							deliveryMessageIndex + 1);
+
+					if (nextMessage.getStatus () == MessageStatus.held) {
+
+						outboxLogic.unholdMessage (
+							taskLogger,
+							nextMessage);
+
+					}
 
 				}
 
 			}
 
-		}
+			if (delivery.getNewMessageStatus ().isBadType ()) {
 
-		if (delivery.getNewMessageStatus ().isBadType ()) {
+				MessageRec deliveryMessage =
+					delivery.getMessage ();
 
-			MessageRec deliveryMessage =
-				delivery.getMessage ();
+				ManualResponderReplyRec reply =
+					manualResponderReplyHelper.findRequired (
+						deliveryMessage.getRef ());
 
-			ManualResponderReplyRec reply =
-				manualResponderReplyHelper.findRequired (
-					deliveryMessage.getRef ());
-
-			Long deliveryMessageIndex =
-				listIndexOfRequired (
-					reply.getMessages (),
-					deliveryMessage);
-
-			for (
-				long messageIndex = deliveryMessageIndex + 1;
-				messageIndex < reply.getMessages ().size ();
-				messageIndex ++
-			) {
-
-				MessageRec heldMessage =
-					listItemAtIndexRequired (
+				Long deliveryMessageIndex =
+					listIndexOfRequired (
 						reply.getMessages (),
-						messageIndex);
+						deliveryMessage);
 
-				if (heldMessage.getStatus () == MessageStatus.held) {
+				for (
+					long messageIndex = deliveryMessageIndex + 1;
+					messageIndex < reply.getMessages ().size ();
+					messageIndex ++
+				) {
 
-					messageLogic.messageStatus (
-						heldMessage,
-						MessageStatus.cancelled);
+					MessageRec heldMessage =
+						listItemAtIndexRequired (
+							reply.getMessages (),
+							messageIndex);
+
+					if (heldMessage.getStatus () == MessageStatus.held) {
+
+						messageLogic.messageStatus (
+							taskLogger,
+							heldMessage,
+							MessageStatus.cancelled);
+
+					}
 
 				}
 
 			}
 
+			deliveryHelper.remove (
+				delivery);
+
+			transaction.commit ();
+
 		}
-
-		deliveryHelper.remove (
-			delivery);
-
-		transaction.commit ();
 
 	}
 

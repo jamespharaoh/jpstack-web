@@ -10,10 +10,12 @@ import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.model.QueueItemRec;
@@ -32,6 +34,9 @@ class QueueItemActionsAction
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	QueueConsoleLogic queueConsoleLogic;
@@ -119,6 +124,7 @@ class QueueItemActionsAction
 			) {
 
 				return reclaimQueueItem (
+					taskLogger,
 					transaction);
 
 			} else {
@@ -165,7 +171,13 @@ class QueueItemActionsAction
 
 	private
 	Responder reclaimQueueItem (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Transaction transaction) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"reclaimQueueItem");
 
 		if (
 
@@ -199,6 +211,7 @@ class QueueItemActionsAction
 		}
 
 		queueConsoleLogic.reclaimQueueItem (
+			taskLogger,
 			queueItem,
 			queueItem.getQueueItemClaim ().getUser (),
 			user);

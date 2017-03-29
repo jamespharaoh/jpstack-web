@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 @Accessors (fluent = true)
@@ -31,6 +32,7 @@ class ParentFormFieldAccessor <
 	@Override
 	public
 	Optional <Parent> read (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container) {
 
 		return genericCastUnchecked (
@@ -42,6 +44,7 @@ class ParentFormFieldAccessor <
 	@Override
 	public
 	void write (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Optional <Parent> nativeValue) {
 

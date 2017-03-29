@@ -2,6 +2,8 @@ package wbs.apn.chat.user.admin.console;
 
 import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import lombok.NonNull;
 
@@ -135,9 +137,11 @@ class ChatUserAdminDateAction
 				chatUserHelper.findFromContextRequired ();
 
 			chatDateLogic.userDateStuff (
+				taskLogger,
 				chatUser,
-				userConsoleLogic.userRequired (),
-				null,
+				optionalOf (
+					userConsoleLogic.userRequired ()),
+				optionalAbsent (),
 				dateMode,
 				radius,
 				startHour,

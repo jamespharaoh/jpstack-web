@@ -1,5 +1,6 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.string.CodeUtils.simplifyToCodeRelaxed;
 
 import com.google.common.base.Optional;
@@ -12,6 +13,7 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.core.ConsoleHelper;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
 
@@ -31,9 +33,10 @@ class NameFormFieldAccessor <Container>
 	@Override
 	public
 	Optional <String> read (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container) {
 
-		return Optional.fromNullable (
+		return optionalFromNullable (
 			(String)
 			PropertyUtils.propertyGetAuto (
 				container,
@@ -44,6 +47,7 @@ class NameFormFieldAccessor <Container>
 	@Override
 	public
 	void write (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Optional <String> nativeValue) {
 

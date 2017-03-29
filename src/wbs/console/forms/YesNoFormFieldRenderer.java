@@ -237,6 +237,7 @@ class YesNoFormFieldRenderer <Container>
 	@Override
 	public
 	Either <Optional <Boolean>, String> formToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 

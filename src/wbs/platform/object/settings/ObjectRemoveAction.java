@@ -19,11 +19,13 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleManager;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -53,6 +55,9 @@ class ObjectRemoveAction
 
 	@SingletonDependency
 	EventLogic eventLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -90,7 +95,12 @@ class ObjectRemoveAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		try (
 
@@ -114,6 +124,7 @@ class ObjectRemoveAction
 						ephemeralObject));
 
 			eventLogic.createEvent (
+				taskLogger,
 				"object_removed_in",
 				userConsoleLogic.userRequired (),
 				objectHelper.getCode (

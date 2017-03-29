@@ -1,23 +1,25 @@
 package wbs.utils.thread;
 
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
+import static wbs.utils.etc.EnumUtils.enumNameHyphens;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
-
-import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
-@Log4j
 @PrototypeComponent ("threadManagerImplementation")
 public
 class ThreadManagerImplementation
@@ -27,6 +29,9 @@ class ThreadManagerImplementation
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -71,25 +76,31 @@ class ThreadManagerImplementation
 				@NonNull Throwable throwable,
 				@NonNull GenericExceptionResolution resolution) {
 
+			TaskLogger taskLogger =
+				logContext.createTaskLoggerFormat (
+					"logThrowable (%s, %s)",
+					classNameSimple (
+						throwable.getClass ()),
+					enumNameHyphens (
+						resolution));
+
 			if (
 				enumEqualSafe (
 					resolution,
 					GenericExceptionResolution.fatalError)
 			) {
 
-				log.fatal (
-					stringFormat (
-						"Unhandled fatal exception in thread %s",
-						getName ()),
-					throwable);
+				taskLogger.fatalFormatException (
+					throwable,
+					"Unhandled fatal exception in thread %s",
+					getName ());
 
 			} else {
 
-				log.error (
-					stringFormat (
-						"Unhandled exception in thread %s",
-						getName ()),
-					throwable);
+				taskLogger.errorFormatException (
+					throwable,
+					"Unhandled exception in thread %s",
+					getName ());
 
 			}
 
@@ -98,21 +109,21 @@ class ThreadManagerImplementation
 			try {
 
 				exceptionLogger.logThrowable (
+					taskLogger,
 					exceptionTypeCode,
 					stringFormat (
 						"Thread %s",
 						getName ()),
 					throwable,
-					Optional.absent (),
+					optionalAbsent (),
 					resolution);
 
 			} catch (Throwable exception) {
 
-				log.fatal (
-					stringFormat (
-						"Error logging exception in %s",
-						getName ()),
-					exception);
+				taskLogger.fatalFormatException (
+					exception,
+					"Error logging exception in %s",
+					getName ());
 
 			}
 

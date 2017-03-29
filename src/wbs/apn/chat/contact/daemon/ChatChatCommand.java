@@ -1,17 +1,16 @@
 package wbs.apn.chat.contact.daemon;
 
 import static wbs.sms.gsm.GsmUtils.gsmStringSimplifyAllowNonGsm;
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -191,6 +190,7 @@ class ChatChatCommand
 
 		fromChatUser =
 			chatUserHelper.findOrCreate (
+				taskLogger,
 				chat,
 				message);
 
@@ -240,7 +240,13 @@ class ChatChatCommand
 
 	}
 
-	InboxAttemptRec doBlock () {
+	InboxAttemptRec doBlock (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doBlock");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -260,6 +266,7 @@ class ChatChatCommand
 		if (chatBlock == null) {
 
 			chatBlockHelper.insert (
+				taskLogger,
 				chatBlockHelper.createInstance ()
 
 				.setChatUser (
@@ -278,10 +285,10 @@ class ChatChatCommand
 		// send message through magic number
 
 		TextRec text =
-			textHelper.findOrCreate (
-				stringFormat (
-					"User %s has now been blocked",
-					toChatUser.getCode ()));
+			textHelper.findOrCreateFormat (
+				taskLogger,
+				"User %s has now been blocked",
+				toChatUser.getCode ());
 
 		CommandRec magicCommand =
 			commandHelper.findByCodeRequired (
@@ -299,8 +306,9 @@ class ChatChatCommand
 				"system");
 
 		chatSendLogic.sendMessageMagic (
+			taskLogger,
 			fromChatUser,
-			Optional.of (
+			optionalOf (
 				message.getThreadId ()),
 			text,
 			magicCommand,
@@ -310,10 +318,11 @@ class ChatChatCommand
 		// process inbox
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (
+			optionalOf (
 				defaultService),
-			Optional.of (
+			optionalOf (
 				affiliate),
 			command);
 
@@ -352,10 +361,11 @@ class ChatChatCommand
 				"does not exist");
 
 			return smsInboxLogic.inboxProcessed (
+				taskLogger,
 				inbox,
-				Optional.of (
+				optionalOf (
 					defaultService),
-				Optional.of (
+				optionalOf (
 					affiliate),
 				command);
 
@@ -365,17 +375,19 @@ class ChatChatCommand
 
 		String rejectedReason =
 			chatMessageLogic.chatMessageSendFromUser (
+				taskLogger,
 				fromChatUser,
 				toChatUser,
 				rest,
 				optionalOf (
 					message.getThreadId ()),
 				ChatMessageMethod.sms,
-				ImmutableList.of ());
+				emptyList ());
 
 		if (rejectedReason != null) {
 
 			failedMessageHelper.insert (
+				taskLogger,
 				failedMessageHelper.createInstance ()
 
 				.setMessage (
@@ -391,6 +403,7 @@ class ChatChatCommand
 		if (chat.getAutoJoinOnSend ()) {
 
 			chatMiscLogic.userAutoJoin (
+				taskLogger,
 				fromChatUser,
 				message,
 				true);
@@ -400,10 +413,11 @@ class ChatChatCommand
 		// process inbox
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (
+			optionalOf (
 				defaultService),
-			Optional.of (
+			optionalOf (
 				affiliate),
 			command);
 
@@ -438,7 +452,8 @@ class ChatChatCommand
 		if (chatKeyword.getChatBlock ()) {
 
 			return optionalOf (
-				doBlock ());
+				doBlock (
+					taskLogger));
 
 		}
 

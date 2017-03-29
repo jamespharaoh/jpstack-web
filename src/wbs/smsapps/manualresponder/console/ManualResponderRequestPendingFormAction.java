@@ -17,7 +17,6 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,11 +25,13 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -82,6 +83,9 @@ class ManualResponderRequestPendingFormAction
 
 	@SingletonDependency
 	KeywordLogic keywordLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ManualResponderLogic manualResponderLogic;
@@ -137,7 +141,12 @@ class ManualResponderRequestPendingFormAction
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		Long manualResponderRequestId =
 			requestContext.stuffIntegerRequired (
@@ -160,6 +169,7 @@ class ManualResponderRequestPendingFormAction
 		} else {
 
 			return goSend (
+				taskLogger,
 				manualResponderRequestId,
 				templateIdStr);
 
@@ -220,8 +230,14 @@ class ManualResponderRequestPendingFormAction
 	}
 
 	Responder goSend (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long manualResponderRequestId,
 			@NonNull String templateIdString) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goSend");
 
 		boolean sendAgain =
 			false;
@@ -313,6 +329,7 @@ class ManualResponderRequestPendingFormAction
 
 			TextRec messageText =
 				textHelper.findOrCreate (
+					taskLogger,
 					messageString);
 
 			boolean shortMessageParts =
@@ -406,6 +423,7 @@ class ManualResponderRequestPendingFormAction
 
 				Optional <Long> spendAvailable =
 					smsSpendLimitLogic.spendCheck (
+						taskLogger,
 						manualResponder.getSmsSpendLimiter (),
 						manualResponderNumber.getNumber ());
 
@@ -456,6 +474,7 @@ class ManualResponderRequestPendingFormAction
 
 			ManualResponderReplyRec reply =
 				manualResponderReplyHelper.insert (
+					taskLogger,
 					manualResponderReplyHelper.createInstance ()
 
 				.setManualResponderRequest (
@@ -501,6 +520,7 @@ class ManualResponderRequestPendingFormAction
 						request.getNumber ())
 
 					.messageString (
+						taskLogger,
 						messagePart)
 
 					.numFrom (
@@ -531,7 +551,8 @@ class ManualResponderRequestPendingFormAction
 						first
 						|| ! template.getSequenceParts ())
 
-					.send ()
+					.send (
+						taskLogger)
 
 				);
 
@@ -563,6 +584,7 @@ class ManualResponderRequestPendingFormAction
 			) {
 
 				smsSpendLimitLogic.spend (
+					taskLogger,
 					manualResponder.getSmsSpendLimiter (),
 					manualResponderNumber.getNumber (),
 					reply.getMessages (),
@@ -613,6 +635,7 @@ class ManualResponderRequestPendingFormAction
 						"default");
 
 				keywordLogic.createOrUpdateKeywordSetFallback (
+					taskLogger,
 					template.getReplyKeywordSet (),
 					request.getNumber (),
 					command);

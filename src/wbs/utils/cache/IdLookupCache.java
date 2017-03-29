@@ -8,6 +8,7 @@ import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import com.google.common.base.Optional;
@@ -21,10 +22,19 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.Duration;
 
+import wbs.framework.logging.DefaultLogContext;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 @Accessors (fluent = true)
 public
 class IdLookupCache <Key, Id, Value>
 	implements AdvancedCache <Key, Value> {
+
+	private final static
+	LogContext logContext =
+		DefaultLogContext.forClass (
+			IdLookupCache.class);
 
 	// constants
 
@@ -55,7 +65,7 @@ class IdLookupCache <Key, Id, Value>
 	Function <Value, Id> getIdFunction;
 
 	@Getter @Setter
-	Function <Key, Value> createFunction;
+	BiFunction <TaskLogger, Key, Value> createFunction;
 
 	// state
 
@@ -152,10 +162,17 @@ class IdLookupCache <Key, Id, Value>
 	@Override
 	public
 	Value create (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Key key) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"create");
 
 		Value value =
 			createFunction.apply (
+				taskLogger,
 				key);
 
 		Id id =
@@ -174,7 +191,13 @@ class IdLookupCache <Key, Id, Value>
 	@Override
 	public
 	Value findOrCreate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Key key) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreate");
 
 		Optional <Value> valueOptional =
 			find (
@@ -191,6 +214,7 @@ class IdLookupCache <Key, Id, Value>
 		} else {
 
 			return create (
+				taskLogger,
 				key);
 
 		}

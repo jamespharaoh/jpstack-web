@@ -1,24 +1,43 @@
 package wbs.apn.chat.scheme.logic;
 
-import wbs.apn.chat.scheme.model.ChatSchemeChargesRec;
-import wbs.apn.chat.scheme.model.ChatSchemeRec;
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHooks;
+
+import wbs.apn.chat.scheme.model.ChatSchemeChargesRec;
+import wbs.apn.chat.scheme.model.ChatSchemeRec;
 
 public
 class ChatSchemeChargesHooks
 	implements ObjectHooks<ChatSchemeChargesRec> {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// public implementation
+
 	@Override
 	public
 	void createSingletons (
-			ObjectHelper<ChatSchemeChargesRec> chatSchemeChargesHelper,
-			ObjectHelper<?> chatSchemeHelper,
-			Record<?> parent) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ObjectHelper <ChatSchemeChargesRec> chatSchemeChargesHelper,
+			@NonNull ObjectHelper <?> chatSchemeHelper,
+			@NonNull Record <?> parent) {
 
 		if (! (parent instanceof ChatSchemeRec))
 			return;
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createSingletons");
 
 		ChatSchemeRec chatScheme =
 			(ChatSchemeRec)
@@ -26,6 +45,7 @@ class ChatSchemeChargesHooks
 
 		ChatSchemeChargesRec chatSchemeCharges =
 			chatSchemeChargesHelper.insert (
+				taskLogger,
 				chatSchemeChargesHelper.createInstance ()
 
 			.setChatScheme (

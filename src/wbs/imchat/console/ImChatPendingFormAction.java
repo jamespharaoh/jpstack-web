@@ -261,6 +261,7 @@ class ImChatPendingFormAction
 
 				ImChatMessageRec operatorMessage =
 					imChatMessageHelper.insert (
+						taskLogger,
 						imChatMessageHelper.createInstance ()
 
 					.setImChatConversation (

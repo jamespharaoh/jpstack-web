@@ -165,7 +165,8 @@ class UploadFormFieldRenderer <Container>
 
 	@Override
 	public
-	Either<Optional<FileUpload>,String> formToInterface (
+	Either <Optional <FileUpload>, String> formToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull String formName) {
 

@@ -1,5 +1,10 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -7,30 +12,42 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-
-import com.google.common.base.Optional;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("pairFormFieldAccessor")
 public
-class PairFormFieldAccessor<Container,Left,Right>
-	implements FormFieldAccessor<Container,Pair<Left,Right>> {
+class PairFormFieldAccessor <Container, Left, Right>
+	implements FormFieldAccessor <Container, Pair <Left, Right>> {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
 	@Getter @Setter
-	FormFieldAccessor<Container,Left> leftAccessor;
+	FormFieldAccessor <Container, Left> leftAccessor;
 
 	@Getter @Setter
-	FormFieldAccessor<Container,Right> rightAccessor;
+	FormFieldAccessor <Container, Right> rightAccessor;
 
 	// implementation
 
 	@Override
 	public
-	Optional<Pair<Left,Right>> read (
+	Optional <Pair <Left, Right>> read (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"read");
 
 		// special case for null container
 
@@ -42,12 +59,14 @@ class PairFormFieldAccessor<Container,Left,Right>
 
 		// get native values
 
-		Optional<Left> leftValue =
+		Optional <Left> leftValue =
 			leftAccessor.read (
+				taskLogger,
 				container);
 
 		Optional<Right> rightValue =
 			rightAccessor.read (
+				taskLogger,
 				container);
 
 		// return as pair
@@ -69,16 +88,22 @@ class PairFormFieldAccessor<Container,Left,Right>
 	@Override
 	public
 	void write (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Optional<Pair<Left,Right>> nativeValue) {
+			@NonNull Optional <Pair <Left, Right>> nativeValue) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"write");
 
 		// special case for null
 
 		if (! nativeValue.isPresent ()) {
 
 			nativeValue =
-				Optional.of (
-					Pair.<Left,Right>of (
+				optionalOf (
+					Pair.<Left, Right> of (
 						null,
 						null));
 
@@ -87,13 +112,15 @@ class PairFormFieldAccessor<Container,Left,Right>
 		// write values
 
 		leftAccessor.write (
+			taskLogger,
 			container,
-			Optional.fromNullable (
+			optionalFromNullable (
 				nativeValue.get ().getLeft ()));
 
 		rightAccessor.write (
+			taskLogger,
 			container,
-			Optional.fromNullable (
+			optionalFromNullable (
 				nativeValue.get ().getRight ()));
 
 	}

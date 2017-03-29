@@ -1,6 +1,11 @@
 package wbs.apn.chat.date.logic;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.prettyHour;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.util.Collections;
 
@@ -9,21 +14,27 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
-import wbs.apn.chat.contact.logic.ChatSendLogic;
-import wbs.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
-import wbs.apn.chat.user.core.model.ChatUserDateMode;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.model.ChatUserDateLogObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
-import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.IdObject;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.model.UserRec;
+
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.message.core.model.MessageRec;
+
+import wbs.apn.chat.contact.logic.ChatSendLogic;
+import wbs.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.model.ChatUserDateLogObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserDateMode;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 
 @SingletonComponent ("chatDateLogic")
 public
@@ -47,12 +58,21 @@ class ChatDateLogicImplementation
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// implementation
 
 	@Override
 	public
 	void chatUserDateJoinHint (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatUserDateJoinHint");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -63,15 +83,16 @@ class ChatDateLogicImplementation
 		// send the message
 
 		chatSendLogic.sendSystemMagic (
+			taskLogger,
 			chatUser,
-			Optional.<Long>absent (),
+			optionalAbsent (),
 			"date_hint_photo",
 			commandHelper.findByCodeRequired (
 				chat,
 				"date_join_photo"),
 			0l,
 			TemplateMissing.error,
-			Collections.<String,String>emptyMap ());
+			emptyMap ());
 
 		// and update the chat user
 
@@ -85,7 +106,13 @@ class ChatDateLogicImplementation
 	@Override
 	public
 	void chatUserDateUpgradeHint (
-			ChatUserRec chatUser) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatUserDateUpgradeHint");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -96,6 +123,7 @@ class ChatDateLogicImplementation
 		// send the message
 
 		chatSendLogic.sendSystemMagic (
+			taskLogger,
 			chatUser,
 			Optional.absent (),
 			"date_hint_upgrade",
@@ -121,9 +149,10 @@ class ChatDateLogicImplementation
 	@Override
 	public
 	void userDateStuff (
-			ChatUserRec chatUser,
-			UserRec user,
-			MessageRec message,
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser,
+			@NonNull Optional <UserRec> user,
+			@NonNull Optional <MessageRec> message,
 			ChatUserDateMode dateMode,
 			Long radius,
 			Long startHour,
@@ -131,11 +160,13 @@ class ChatDateLogicImplementation
 			Long dailyMax,
 			boolean sendMessage) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userDateStuff");
+
 		Transaction transaction =
 			database.currentTransaction ();
-
-		if (chatUser == null)
-			throw new NullPointerException ();
 
 		ChatRec chat =
 			chatUser.getChat ();
@@ -155,8 +186,13 @@ class ChatDateLogicImplementation
 		}
 
 		if (
-			(user != null)
-			&& (message != null)
+
+			optionalIsPresent (
+				user)
+
+			&& optionalIsPresent (
+				message)
+
 		) {
 
 			throw new IllegalArgumentException (
@@ -184,35 +220,64 @@ class ChatDateLogicImplementation
 		chatUserHelper.lock (
 			chatUser);
 
-		if (dateMode != null)
-			chatUser.setDateMode (dateMode);
+		if (dateMode != null) {
 
-		if (radius != null)
-			chatUser.setDateRadius (radius);
+			chatUser.setDateMode (
+				dateMode);
 
-		if (startHour != null)
-			chatUser.setDateStartHour (startHour);
+		}
 
-		if (endHour != null)
-			chatUser.setDateEndHour (endHour);
+		if (radius != null) {
 
-		if (dailyMax != null)
-			chatUser.setDateDailyMax (dailyMax);
+			chatUser.setDateRadius (
+				radius);
 
-		if (dateMode != null && dateMode != ChatUserDateMode.none)
+		}
+
+		if (startHour != null) {
+
+			chatUser.setDateStartHour (
+				startHour);
+
+		}
+
+		if (endHour != null) {
+
+			chatUser.setDateEndHour (
+				endHour);
+
+		}
+
+		if (dailyMax != null) {
+
+			chatUser.setDateDailyMax (
+				dailyMax);
+
+		}
+
+		if (
+			dateMode != null
+			&& dateMode != ChatUserDateMode.none
+		) {
+
 			chatUser.setBlockAll (false);
 
+		}
+
 		chatUserDateLogHelper.insert (
+			taskLogger,
 			chatUserDateLogHelper.createInstance ()
 
 			.setChatUser (
 				chatUser)
 
 			.setUser (
-				user)
+				optionalOrNull (
+					user))
 
 			.setMessage (
-				message)
+				optionalOrNull (
+					message))
 
 			.setDateMode (
 				dateMode)
@@ -241,26 +306,34 @@ class ChatDateLogicImplementation
 			switch (chatUser.getDateMode ()) {
 
 			case none:
+
 				code = "date_confirm_stop";
+
 				break;
 
 			case photo:
+
 				code = "date_confirm_photo";
+
 				break;
 
 			case text:
+
 				code = "date_confirm_text";
+
 				break;
 
 			default:
+
 				throw new RuntimeException ();
 
 			}
 
 			chatSendLogic.sendSystemMagic (
+				taskLogger,
 				chatUser,
-				Optional.of (
-					message.getThreadId ()),
+				optionalOf (
+					message.get ().getThreadId ()),
 				code,
 				commandHelper.findByCodeRequired (
 					chat,
@@ -270,7 +343,7 @@ class ChatDateLogicImplementation
 						chat,
 						"help")),
 				TemplateMissing.ignore,
-				ImmutableMap.<String,String>builder ()
+				ImmutableMap.<String, String> builder ()
 
 					.put (
 						"miles",
@@ -303,28 +376,6 @@ class ChatDateLogicImplementation
 					transaction.now ());
 
 		}
-
-	}
-
-	@Override
-	public
-	void userDateStuff (
-			ChatUserRec chatUser,
-			UserRec user,
-			MessageRec message,
-			ChatUserDateMode dateMode,
-			boolean sendMessage) {
-
-		userDateStuff (
-			chatUser,
-			user,
-			message,
-			dateMode,
-			chatUser.getDateRadius (),
-			chatUser.getDateStartHour (),
-			chatUser.getDateEndHour (),
-			chatUser.getDateDailyMax (),
-			sendMessage);
 
 	}
 

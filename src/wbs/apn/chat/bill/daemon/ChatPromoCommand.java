@@ -4,6 +4,8 @@ import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.LogicUtils.allOf;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.utils.time.TimeUtils.laterThan;
@@ -31,7 +33,6 @@ import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.service.model.ServiceRec;
 import wbs.platform.text.model.TextObjectHelper;
-import wbs.platform.user.model.UserRec;
 
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.command.model.CommandRec;
@@ -48,7 +49,6 @@ import wbs.apn.chat.bill.model.ChatPromoUserObjectHelper;
 import wbs.apn.chat.bill.model.ChatPromoUserRec;
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.date.logic.ChatDateLogic;
@@ -173,6 +173,7 @@ class ChatPromoCommand
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
+				taskLogger,
 				chat,
 				inboundMessage);
 
@@ -199,14 +200,16 @@ class ChatPromoCommand
 
 		ChatCreditCheckResult creditCheckResult =
 			chatCreditLogic.userSpendCreditCheck (
+				taskLogger,
 				chatUser,
 				true,
-				Optional.of (
+				optionalOf (
 					inboundMessage.getThreadId ()));
 
 		if (creditCheckResult.failed ()) {
 
 			chatHelpLogLogic.createChatHelpLogIn (
+				taskLogger,
 				chatUser,
 				inboundMessage,
 				inboundMessage.getText ().getText (),
@@ -214,10 +217,11 @@ class ChatPromoCommand
 				true);
 
 			return smsInboxLogic.inboxProcessed (
+				taskLogger,
 				inbox,
-				Optional.of (
+				optionalOf (
 					promoService),
-				Optional.of (
+				optionalOf (
 					affiliate),
 				command);
 
@@ -227,6 +231,7 @@ class ChatPromoCommand
 
 		ChatHelpLogRec inboundHelpLog =
 			chatHelpLogLogic.createChatHelpLogIn (
+				taskLogger,
 				chatUser,
 				inboundMessage,
 				inboundMessage.getText ().getText (),
@@ -243,8 +248,9 @@ class ChatPromoCommand
 
 			MessageRec outboundMessage =
 				chatSendLogic.sendMessageMagic (
+					taskLogger,
 					chatUser,
-					Optional.of (
+					optionalOf (
 						inboundMessage.getThreadId ()),
 					chatPromo.getPromoNotStartedText (),
 					magicCommand,
@@ -252,21 +258,23 @@ class ChatPromoCommand
 					helpCommand.getId ());
 
 			chatHelpLogLogic.createChatHelpLogOut (
+				taskLogger,
 				chatUser,
-				Optional.of (
+				optionalOf (
 					inboundHelpLog),
-				Optional.<UserRec>absent (),
+				optionalAbsent (),
 				outboundMessage,
-				Optional.<ChatMessageRec>absent (),
+				optionalAbsent (),
 				outboundMessage.getText ().getText (),
-				Optional.of (
+				optionalOf (
 					helpCommand));
 
 			return smsInboxLogic.inboxProcessed (
+				taskLogger,
 				inbox,
-				Optional.of (
+				optionalOf (
 					promoService),
-				Optional.of (
+				optionalOf (
 					affiliate),
 				command);
 
@@ -282,8 +290,9 @@ class ChatPromoCommand
 
 			MessageRec outboundMessage =
 				chatSendLogic.sendMessageMagic (
+					taskLogger,
 					chatUser,
-					Optional.of (
+					optionalOf (
 						inboundMessage.getThreadId ()),
 					chatPromo.getPromoEndedText (),
 					magicCommand,
@@ -291,21 +300,23 @@ class ChatPromoCommand
 					helpCommand.getId ());
 
 			chatHelpLogLogic.createChatHelpLogOut (
+				taskLogger,
 				chatUser,
-				Optional.of (
+				optionalOf (
 					inboundHelpLog),
-				Optional.<UserRec>absent (),
+				optionalAbsent (),
 				outboundMessage,
-				Optional.<ChatMessageRec>absent (),
+				optionalAbsent (),
 				outboundMessage.getText ().getText (),
-				Optional.of (
+				optionalOf (
 					helpCommand));
 
 			return smsInboxLogic.inboxProcessed (
+				taskLogger,
 				inbox,
-				Optional.of (
+				optionalOf (
 					promoService),
-				Optional.of (
+				optionalOf (
 					affiliate),
 				command);
 
@@ -324,8 +335,9 @@ class ChatPromoCommand
 
 			MessageRec outboundMessage =
 				chatSendLogic.sendMessageMagic (
+					taskLogger,
 					chatUser,
-					Optional.of (
+					optionalOf (
 						inboundMessage.getThreadId ()),
 					chatPromo.getAlreadyClaimedText (),
 					magicCommand,
@@ -333,21 +345,23 @@ class ChatPromoCommand
 					helpCommand.getId ());
 
 			chatHelpLogLogic.createChatHelpLogOut (
+				taskLogger,
 				chatUser,
-				Optional.of (
+				optionalOf (
 					inboundHelpLog),
-				Optional.<UserRec>absent (),
+				optionalAbsent (),
 				outboundMessage,
-				Optional.<ChatMessageRec>absent (),
+				optionalAbsent (),
 				outboundMessage.getText ().getText (),
-				Optional.of (
+				optionalOf (
 					helpCommand));
 
 			return smsInboxLogic.inboxProcessed (
+				taskLogger,
 				inbox,
-				Optional.of (
+				optionalOf (
 					promoService),
-				Optional.of (
+				optionalOf (
 					affiliate),
 				command);
 
@@ -356,6 +370,7 @@ class ChatPromoCommand
 		// claim promo
 
 		chatPromoUserHelper.insert (
+			taskLogger,
 			chatPromoUserHelper.createInstance ()
 
 			.setChatPromo (
@@ -390,8 +405,9 @@ class ChatPromoCommand
 
 		MessageRec outboundMessage =
 			chatSendLogic.sendMessageMagic (
+				taskLogger,
 				chatUser,
-				Optional.of (
+				optionalOf (
 					inboundMessage.getThreadId ()),
 				chatPromo.getSuccessText (),
 				magicCommand,
@@ -399,14 +415,15 @@ class ChatPromoCommand
 				helpCommand.getId ());
 
 		chatHelpLogLogic.createChatHelpLogOut (
+			taskLogger,
 			chatUser,
-			Optional.of (
+			optionalOf (
 				inboundHelpLog),
-			Optional.<UserRec>absent (),
+			optionalAbsent (),
 			outboundMessage,
-			Optional.<ChatMessageRec>absent (),
+			optionalAbsent (),
 			outboundMessage.getText ().getText (),
-			Optional.of (
+			optionalOf (
 				helpCommand));
 
 		// new users jump to join process
@@ -451,6 +468,7 @@ class ChatPromoCommand
 		) {
 
 			chatMiscLogic.userJoin (
+				taskLogger,
 				chatUser,
 				sendMessage,
 				inboundMessage.getThreadId (),
@@ -471,9 +489,11 @@ class ChatPromoCommand
 		)) {
 
 			chatDateLogic.userDateStuff (
+				taskLogger,
 				chatUser,
-				null,
-				inboundMessage,
+				optionalAbsent (),
+				optionalOf (
+					inboundMessage),
 				chatUser.getMainChatUserImage () != null
 					? ChatUserDateMode.photo
 					: ChatUserDateMode.text,
@@ -486,10 +506,11 @@ class ChatPromoCommand
 		// process inbox
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (
+			optionalOf (
 				promoService),
-			Optional.of (
+			optionalOf (
 				affiliate),
 			command);
 

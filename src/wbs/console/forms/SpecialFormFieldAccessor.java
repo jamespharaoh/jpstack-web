@@ -16,6 +16,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.model.ModelField;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
 
@@ -43,6 +44,7 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 	@Override
 	public
 	Optional <Native> read (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container) {
 
 		// get field name
@@ -104,6 +106,7 @@ class SpecialFormFieldAccessor <Container extends Record <?>, Native>
 	@Override
 	public
 	void write (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Optional<Native> nativeValue) {
 

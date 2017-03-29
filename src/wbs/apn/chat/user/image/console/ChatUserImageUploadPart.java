@@ -63,6 +63,11 @@ class ChatUserImageUploadPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		formFieldSet =
 			chatUserImageConsoleModule.formFieldSet (
 				"uploadForm",
@@ -80,6 +85,7 @@ class ChatUserImageUploadPart
 		if (requestContext.post ()) {
 
 			formFieldLogic.update (
+				taskLogger,
 				requestContext,
 				formFieldSet,
 				uploadForm,

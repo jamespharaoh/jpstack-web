@@ -7,6 +7,8 @@ import lombok.experimental.Accessors;
 
 import org.joda.time.LocalDate;
 
+import wbs.framework.logging.TaskLogger;
+
 import wbs.apn.chat.bill.model.ChatUserSpendRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 
@@ -14,16 +16,12 @@ public
 interface ChatCreditLogic {
 
 	void userReceiveSpend (
+			TaskLogger parentTaskLogger,
 			ChatUserRec toUser,
-			int receivedMessageCount);
+			Long receivedMessageCount);
 
-	/**
-	 * Bills a user the specified amount. This increases their valueSinceXxx
-	 * counters and reduces their credit. If they have free usage it increases
-	 * their creditAdded by the same amount and the overall credit is
-	 * unaffected.
-	 */
 	void userSpend (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			int userMessageCount,
 			int monitorMessageCount,
@@ -35,23 +33,19 @@ interface ChatCreditLogic {
 		ChatUserRec chatUser,
 		int amount);
 
-	/**
-	 * @param chatUser
-	 *            the chat user to associate with
-	 * @param date
-	 *            the date to associate with
-	 * @return the new/existing chat user spend record
-	 */
 	ChatUserSpendRec findOrCreateChatUserSpend (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			LocalDate date);
 
 	ChatCreditCheckResult userSpendCreditCheck (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			Boolean userActed,
-			Optional<Long> threadId);
+			Optional <Long> threadId);
 
 	ChatCreditCheckResult userCreditCheck (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser);
 
 	ChatCreditCheckResult userCreditCheckStrict (
@@ -62,10 +56,12 @@ interface ChatCreditLogic {
 			BillCheckOptions options);
 
 	void userBill (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			BillCheckOptions options);
 
 	void userBillReal (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			boolean updateRevoked);
 
@@ -75,31 +71,15 @@ interface ChatCreditLogic {
 	boolean userBillLimitApplies (
 			ChatUserRec chatUser);
 
-	/**
-	 * Sends a credit hint to a chat user, unless they are barred or blocked or
-	 * have had one very recently.
-	 *
-	 * @param chatUser
-	 *            the chat user to send the hint to
-	 * @param threadId
-	 *            the threadId to associate the message with, or null
-	 */
 	void userCreditHint (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
-			Optional<Long> threadId);
+			Optional <Long> threadId);
 
 	void doRebill ();
 
-	/**
-	 * Checks if a user has a credit limit less than their successful delivered
-	 * count rounded down to the nearest thousand (ten pounds) plus one thousand
-	 * (ten pounds), if so it raises their credit limit to that amount and logs
-	 * the event.
-	 *
-	 * @param chatUser
-	 *            The user to check
-	 */
 	void creditLimitUpdate (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser);
 
 	String userCreditDebug (

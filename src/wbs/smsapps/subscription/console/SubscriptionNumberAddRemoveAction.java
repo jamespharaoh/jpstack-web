@@ -122,6 +122,7 @@ class SubscriptionNumberAddRemoveAction
 				new SubscriptionNumberAddRemoveForm ();
 
 			formFieldLogic.update (
+				taskLogger,
 				requestContext,
 				addRemoveFormFieldSet,
 				addRemoveForm,
@@ -160,6 +161,7 @@ class SubscriptionNumberAddRemoveAction
 
 				NumberRec number =
 					numberHelper.findOrCreate (
+						taskLogger,
 						numberString);
 
 				numbers.add (
@@ -185,6 +187,7 @@ class SubscriptionNumberAddRemoveAction
 
 					SubscriptionNumberRec subscriptionNumber =
 						subscriptionNumberHelper.findOrCreate (
+							taskLogger,
 							subscription,
 							number);
 
@@ -209,6 +212,7 @@ class SubscriptionNumberAddRemoveAction
 
 					SubscriptionSubRec subscriptionSub =
 						subscriptionSubHelper.insert (
+							taskLogger,
 							subscriptionSubHelper.createInstance ()
 
 						.setSubscriptionNumber (
@@ -322,6 +326,7 @@ class SubscriptionNumberAddRemoveAction
 
 					SubscriptionNumberRec subscriptionNumber =
 						subscriptionNumberHelper.findOrCreate (
+							taskLogger,
 							subscription,
 							number);
 

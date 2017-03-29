@@ -348,6 +348,7 @@ class DialogueApiServletModule
 				// insert a part message
 
 				inboxMultipartLogic.insertInboxMultipart (
+					taskLogger,
 					route,
 					concat.getRef (),
 					concat.getSeqMax (),
@@ -364,11 +365,14 @@ class DialogueApiServletModule
 				// insert a message
 
 				smsInboxLogic.inboxInsert (
+					taskLogger,
 					optionalOf (
 						idParam),
 					textHelper.findOrCreate (
+						taskLogger,
 						message),
 					smsNumberHelper.findOrCreate (
+						taskLogger,
 						numFromParam),
 					numToParam,
 					route,
@@ -528,25 +532,31 @@ class DialogueApiServletModule
 
 			}
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"DialogueApiServletModule.reportAction.handle ()",
-					this);
+			try (
 
-			reportLogic.deliveryReport (
-				messageId,
-				newMessageStatus,
-				Optional.of (
-					deliveryReportParam),
-				Optional.absent (),
-				Optional.absent (),
-				Optional.absent ());
+				Transaction transaction =
+					database.beginReadWrite (
+						"DialogueApiServletModule.reportAction.handle ()",
+						this);
 
-			transaction.commit ();
+			) {
 
-			return dialogueResponderProvider
-				.get ();
+				reportLogic.deliveryReport (
+					taskLogger,
+					messageId,
+					newMessageStatus,
+					Optional.of (
+						deliveryReportParam),
+					Optional.absent (),
+					Optional.absent (),
+					Optional.absent ());
+
+				transaction.commit ();
+
+				return dialogueResponderProvider
+					.get ();
+
+			}
 
 		}
 

@@ -110,6 +110,7 @@ class SubscriptionSendControlAction
 				}
 
 				subscriptionLogic.scheduleSend (
+					taskLogger,
 					subscriptionSend,
 					transaction.now (),
 					userConsoleLogic.userRequired ());
@@ -162,6 +163,7 @@ class SubscriptionSendControlAction
 				}
 
 				subscriptionLogic.scheduleSend (
+					taskLogger,
 					subscriptionSend,
 					scheduledTime,
 					userConsoleLogic.userRequired ());
@@ -210,6 +212,7 @@ class SubscriptionSendControlAction
 						SubscriptionSendState.notSent);
 
 				eventLogic.createEvent (
+					taskLogger,
 					"subscription_send_unscheduled",
 					userConsoleLogic.userRequired (),
 					subscriptionSend);
@@ -266,6 +269,7 @@ class SubscriptionSendControlAction
 							SubscriptionSendState.cancelled);
 
 					eventLogic.createEvent (
+						taskLogger,
 						"subscription_send_cancelled",
 						userConsoleLogic.userRequired (),
 						subscriptionSend);
@@ -291,6 +295,7 @@ class SubscriptionSendControlAction
 							SubscriptionSendState.partiallySent);
 
 					eventLogic.createEvent (
+						taskLogger,
 						"subscription_send_cancelled",
 						userConsoleLogic.userRequired (),
 						subscriptionSend);

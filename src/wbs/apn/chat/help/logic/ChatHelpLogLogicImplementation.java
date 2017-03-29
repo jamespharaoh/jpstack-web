@@ -4,21 +4,27 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.queue.logic.QueueLogic;
+import wbs.platform.queue.model.QueueItemRec;
+import wbs.platform.user.model.UserRec;
+
+import wbs.sms.command.model.CommandRec;
+import wbs.sms.message.core.model.MessageDirection;
+import wbs.sms.message.core.model.MessageRec;
+
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.model.ChatHelpLogObjectHelper;
 import wbs.apn.chat.help.model.ChatHelpLogRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.component.annotations.SingletonComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
-import wbs.platform.queue.logic.QueueLogic;
-import wbs.platform.queue.model.QueueItemRec;
-import wbs.platform.user.model.UserRec;
-import wbs.sms.command.model.CommandRec;
-import wbs.sms.message.core.model.MessageDirection;
-import wbs.sms.message.core.model.MessageRec;
 
 @SingletonComponent ("chatHelpLogLogic")
 public
@@ -33,6 +39,9 @@ class ChatHelpLogLogicImplementation
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	QueueLogic queueLogic;
 
@@ -41,11 +50,17 @@ class ChatHelpLogLogicImplementation
 	@Override
 	public
 	ChatHelpLogRec createChatHelpLogIn (
-			ChatUserRec chatUser,
-			MessageRec message,
-			String text,
-			CommandRec command,
-			boolean queue) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser,
+			@NonNull MessageRec message,
+			@NonNull String text,
+			@NonNull CommandRec command,
+			@NonNull Boolean queue) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createChatHelpLogIn");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -57,6 +72,7 @@ class ChatHelpLogLogicImplementation
 
 		ChatHelpLogRec chatHelpLog =
 			chatHelpLogHelper.insert (
+				taskLogger,
 				chatHelpLogHelper.createInstance ()
 
 			.setChatUser (
@@ -88,7 +104,9 @@ class ChatHelpLogLogicImplementation
 
 			QueueItemRec queueItem =
 				queueLogic.createQueueItem (
-					queueLogic.findQueue (chat, "help"),
+					taskLogger,
+					chat,
+					"help",
 					chatUser,
 					chatHelpLog,
 					chatUser.getCode (),
@@ -107,6 +125,7 @@ class ChatHelpLogLogicImplementation
 	@Override
 	public
 	ChatHelpLogRec createChatHelpLogOut (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional<ChatHelpLogRec> replyTo,
 			@NonNull Optional<UserRec> user,
@@ -115,10 +134,16 @@ class ChatHelpLogLogicImplementation
 			@NonNull String text,
 			@NonNull Optional<CommandRec> command) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createChatHelpLogOut");
+
 		Transaction transaction =
 			database.currentTransaction ();
 
 		return chatHelpLogHelper.insert (
+			taskLogger,
 			chatHelpLogHelper.createInstance ()
 
 			.setChatUser (

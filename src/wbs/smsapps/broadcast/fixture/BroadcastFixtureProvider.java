@@ -83,7 +83,13 @@ class BroadcastFixtureProvider
 	void createMenuItems (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMenuItems");
+
 		menuItemHelper.insert (
+			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
@@ -118,7 +124,13 @@ class BroadcastFixtureProvider
 	void createBroadcastConfigs (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createBroadcastConfigs");
+
 		broadcastConfigHelper.insert (
+			taskLogger,
 			broadcastConfigHelper.createInstance ()
 
 			.setSlice (

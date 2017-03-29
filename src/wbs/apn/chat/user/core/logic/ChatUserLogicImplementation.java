@@ -10,10 +10,12 @@ import static wbs.utils.etc.NumberUtils.integerNotEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.notLessThan;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromJava;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringInSafe;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
@@ -40,6 +42,7 @@ import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
@@ -48,6 +51,8 @@ import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
@@ -133,6 +138,9 @@ class ChatUserLogicImplementation
 
 	@SingletonDependency
 	LocatorLogic locatorLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaLogic mediaLogic;
@@ -629,12 +637,19 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	ChatUserRec createChatMonitor (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatRec chat) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createChatMonitor");
 
 		Transaction transaction =
 			database.currentTransaction ();
 
 		return chatUserHelper.insert (
+			taskLogger,
 			chatUserHelper.createInstance ()
 
 			.setChat (
@@ -692,12 +707,18 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	ChatUserImageRec setImage (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatUserImageType type,
 			@NonNull MediaRec smallMedia,
 			@NonNull MediaRec fullMedia,
 			@NonNull Optional<MessageRec> message,
 			boolean append) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setImage");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -709,6 +730,7 @@ class ChatUserLogicImplementation
 
 		ChatUserImageRec chatUserImage =
 			chatUserImageHelper.insert (
+				taskLogger,
 				chatUserImageHelper.createInstance ()
 
 			.setChatUser (
@@ -741,7 +763,9 @@ class ChatUserLogicImplementation
 
 			QueueItemRec queueItem =
 				queueLogic.createQueueItem (
-					queueLogic.findQueue (chat, "user"),
+					taskLogger,
+					chat,
+					"user",
 					chatUser,
 					chatUser,
 					chatUser.getNumber ().getNumber (),
@@ -762,10 +786,16 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	ChatUserImageRec setPhoto (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull MediaRec fullMedia,
 			@NonNull Optional<MessageRec> message,
 			boolean append) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setPhoto");
 
 		// load
 
@@ -777,6 +807,7 @@ class ChatUserLogicImplementation
 
 		BufferedImage fullImage =
 			mediaLogic.readImageRequired (
+				taskLogger,
 				fullData,
 				fullMimeType);
 
@@ -797,6 +828,7 @@ class ChatUserLogicImplementation
 
 		MediaRec smallMedia =
 			mediaLogic.createMediaFromImageRequired (
+				taskLogger,
 				smallData,
 				"image/jpeg",
 				chatUser.getCode () + ".jpg");
@@ -804,6 +836,7 @@ class ChatUserLogicImplementation
 		// and delegate
 
 		return setImage (
+			taskLogger,
 			chatUser,
 			ChatUserImageType.image,
 			smallMedia,
@@ -816,12 +849,18 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	ChatUserImageRec setPhoto (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull byte[] data,
 			@NonNull Optional <String> filenameOptional,
 			@NonNull Optional <String> mimeType,
 			@NonNull Optional <MessageRec> message,
 			@NonNull Boolean append) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setPhoto");
 
 		// create media
 
@@ -831,6 +870,7 @@ class ChatUserLogicImplementation
 
 		MediaRec fullMedia =
 			mediaLogic.createMediaFromImageRequired (
+				taskLogger,
 				data,
 				mimeType.or (
 					"image/jpeg"),
@@ -839,6 +879,7 @@ class ChatUserLogicImplementation
 		// and delegate
 
 		return setPhoto (
+			taskLogger,
 			chatUser,
 			fullMedia,
 			message,
@@ -849,9 +890,15 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	Optional <ChatUserImageRec> setPhotoFromMessage (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull MessageRec message,
 			@NonNull Boolean append) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setPhotoFromMessage");
 
 		return optionalMapRequired (
 
@@ -860,9 +907,10 @@ class ChatUserLogicImplementation
 
 			media ->
 				setPhoto (
+					taskLogger,
 					chatUser,
 					media,
-					Optional.of (
+					optionalOf (
 						message),
 					append)
 
@@ -894,16 +942,24 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void setVideo (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull MediaRec fullMedia,
 			@NonNull MessageRec message,
 			@NonNull Boolean append) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setVideo");
+
 		// resample
 
 		MediaRec newMedia =
 			mediaLogic.createMediaFromVideoRequired (
+				taskLogger,
 				mediaLogic.videoConvertRequired (
+					taskLogger,
 					"3gpp",
 					fullMedia.getContent ().getData ()),
 				"video/3gpp",
@@ -912,11 +968,12 @@ class ChatUserLogicImplementation
 		// and delegate
 
 		setImage (
+			taskLogger,
 			chatUser,
 			ChatUserImageType.video,
 			newMedia,
 			fullMedia,
-			Optional.of (
+			optionalOf (
 				message),
 			append);
 
@@ -925,12 +982,18 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void setVideo (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull byte[] data,
 			@NonNull Optional <String> filenameOptional,
 			@NonNull Optional <String> mimeTypeOptional,
 			@NonNull MessageRec message,
 			@NonNull Boolean append) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setVideo");
 
 		// default mime type
 
@@ -966,6 +1029,7 @@ class ChatUserLogicImplementation
 
 		MediaRec fullMedia =
 			mediaLogic.createMediaFromVideoRequired (
+				taskLogger,
 				data,
 				mimeType,
 				filename);
@@ -974,18 +1038,23 @@ class ChatUserLogicImplementation
 
 		MediaRec newMedia =
 			mediaLogic.createMediaFromVideoRequired (
-				mediaLogic.videoConvertRequired ("3gpp", data),
+				taskLogger,
+				mediaLogic.videoConvertRequired (
+					taskLogger,
+					"3gpp",
+					data),
 				"video/3gpp",
 				chatUser.getCode () + ".3gp");
 
 		// and delegate
 
 		setImage (
+			taskLogger,
 			chatUser,
 			ChatUserImageType.video,
 			newMedia,
 			fullMedia,
-			Optional.of (
+			optionalOf (
 				message),
 			append);
 
@@ -994,22 +1063,33 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void setAudio (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull byte[] data,
 			@NonNull MessageRec message,
 			@NonNull Boolean append) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setAudio");
+
 		// resample
 
 		MediaRec newMedia =
 			mediaLogic.createMediaFromAudio (
-				mediaLogic.videoConvertRequired ("mp3", data),
+				taskLogger,
+				mediaLogic.videoConvertRequired (
+					taskLogger,
+					"mp3",
+					data),
 				"audio/mpeg",
 				chatUser.getCode () + ".mp3");
 
 		// and delegate
 
 		setImage (
+			taskLogger,
 			chatUser,
 			ChatUserImageType.audio,
 			newMedia,
@@ -1023,6 +1103,7 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void setImage (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatUserImageType type,
 			@NonNull byte[] data,
@@ -1031,16 +1112,22 @@ class ChatUserLogicImplementation
 			@NonNull Optional<MessageRec> message,
 			@NonNull Boolean append) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setImage");
+
 		switch (type) {
 
 		case image:
 
 			setPhoto (
+				taskLogger,
 				chatUser,
 				data,
-				Optional.of (
+				optionalOf (
 					filename),
-				Optional.of (
+				optionalOf (
 					mimeType),
 				message,
 				append);
@@ -1050,10 +1137,13 @@ class ChatUserLogicImplementation
 		case video:
 
 			setVideo (
+				taskLogger,
 				chatUser,
 				data,
-				Optional.of (filename),
-				Optional.of (mimeType),
+				optionalOf (
+					filename),
+				optionalOf (
+					mimeType),
 				null,
 				append);
 
@@ -1062,6 +1152,7 @@ class ChatUserLogicImplementation
 		case audio:
 
 			setAudio (
+				taskLogger,
 				chatUser,
 				data,
 				null,
@@ -1085,12 +1176,20 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	boolean setVideo (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull MessageRec message,
 			@NonNull Boolean append) {
 
-		for (MediaRec media
-				: message.getMedias ()) {
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setVideo");
+
+		for (
+			MediaRec media
+				: message.getMedias ()
+		) {
 
 			if (
 				! mediaLogic.isVideo (
@@ -1100,6 +1199,7 @@ class ChatUserLogicImplementation
 			}
 
 			setVideo (
+				taskLogger,
 				chatUser,
 				media,
 				message,
@@ -1116,10 +1216,16 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	boolean setPlace (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull String place,
-			@NonNull Optional<MessageRec> message,
-			@NonNull Optional<UserRec> user) {
+			@NonNull Optional <MessageRec> message,
+			@NonNull Optional <UserRec> user) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setPlace");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -1136,7 +1242,7 @@ class ChatUserLogicImplementation
 
 		// try and find the place
 
-		Optional<GazetteerEntryRec> gazetteerEntryOptional =
+		Optional <GazetteerEntryRec> gazetteerEntryOptional =
 			Optional.absent ();
 
 		for (
@@ -1216,10 +1322,11 @@ class ChatUserLogicImplementation
 				} catch (Exception exception) {
 
 					exceptionLogger.logThrowable (
+						taskLogger,
 						"logic",
 						"ChatUserLogic.setPlace",
 						exception,
-						Optional.absent (),
+						optionalAbsent (),
 						GenericExceptionResolution.ignoreWithLoggedWarning);
 
 				}
@@ -1278,6 +1385,7 @@ class ChatUserLogicImplementation
 		if (message.isPresent ()) {
 
 			eventLogic.createEvent (
+				taskLogger,
 				"chat_user_place_message",
 				chatUser,
 				gazetteerEntry,
@@ -1288,6 +1396,7 @@ class ChatUserLogicImplementation
 		} else if (user.isPresent ()) {
 
 			eventLogic.createEvent (
+				taskLogger,
 				"chat_user_place_user",
 				chatUser,
 				gazetteerEntry,
@@ -1298,6 +1407,7 @@ class ChatUserLogicImplementation
 		} else {
 
 			eventLogic.createEvent (
+				taskLogger,
 				"chat_user_place_api",
 				chatUser,
 				gazetteerEntry,
@@ -1469,9 +1579,15 @@ class ChatUserLogicImplementation
 	@Override
 	public
 	void setAffiliate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull ChatAffiliateRec chatAffiliate,
 			@NonNull Optional<MessageRec> message) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setAffiliate");
 
 		ChatSchemeRec chatScheme =
 			chatAffiliate.getChatScheme ();
@@ -1508,6 +1624,7 @@ class ChatUserLogicImplementation
 			) {
 
 				eventLogic.createEvent (
+					taskLogger,
 					"chat_user_category_message",
 					chatUser,
 					chatUser.getCategory (),
@@ -1516,6 +1633,7 @@ class ChatUserLogicImplementation
 			} else {
 
 				eventLogic.createEvent (
+					taskLogger,
 					"chat_user_category_api",
 					chatUser,
 					chatUser.getCategory ());

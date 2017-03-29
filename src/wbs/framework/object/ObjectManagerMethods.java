@@ -22,6 +22,7 @@ import lombok.NonNull;
 import wbs.framework.entity.record.EphemeralRecord;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 import fj.data.Either;
 
@@ -115,9 +116,10 @@ interface ObjectManagerMethods {
 
 	<ObjectType extends Record <?>>
 	ObjectType update (
+			TaskLogger parentTaskLogger,
 			ObjectType object);
 
-	<ObjectType extends EphemeralRecord<?>>
+	<ObjectType extends EphemeralRecord <?>>
 	ObjectType remove (
 			ObjectType object);
 

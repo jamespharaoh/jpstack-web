@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.Cleanup;
@@ -196,10 +195,11 @@ class DialogueMmsApiServletModule
 
 					medias.add (
 						mediaLogic.createMediaRequired (
+							taskLogger,
 							item.get (),
 							type,
 							item.getName (),
-							Optional.of (
+							optionalOf (
 								charset)));
 
 					if (
@@ -264,11 +264,14 @@ class DialogueMmsApiServletModule
 				// insert into inbox
 
 				smsInboxLogic.inboxInsert (
+					taskLogger,
 					optionalOf (
 						mmsMessageId),
 					textHelper.findOrCreate (
+						taskLogger,
 						text),
 					smsNumberHelper.findOrCreate (
+						taskLogger,
 						mmsSenderAddress),
 					mmsRecipientAddress,
 					route,
@@ -410,13 +413,14 @@ class DialogueMmsApiServletModule
 			}
 
 			reportLogic.deliveryReport (
+				taskLogger,
 				message,
 				newMessageStatus,
-				Optional.of (
+				optionalOf (
 					deliveryReportParam),
-				Optional.absent (),
-				Optional.absent (),
-				Optional.absent ());
+				optionalAbsent (),
+				optionalAbsent (),
+				optionalAbsent ());
 
 			transaction.commit ();
 

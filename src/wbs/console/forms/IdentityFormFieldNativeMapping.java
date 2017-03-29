@@ -1,21 +1,22 @@
 package wbs.console.forms;
 
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-
-import com.google.common.base.Optional;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("identityFormFieldNativeMapping")
 public
-class IdentityFormFieldNativeMapping<Container,Type>
-	implements FormFieldNativeMapping<Container,Type,Type> {
+class IdentityFormFieldNativeMapping <Container, Type>
+	implements FormFieldNativeMapping <Container, Type, Type> {
 
 	@Override
 	public
-	Optional<Type> nativeToGeneric (
+	Optional <Type> nativeToGeneric (
 			@NonNull Container container,
-			@NonNull Optional<Type> nativeValue) {
+			@NonNull Optional <Type> nativeValue) {
 
 		return nativeValue;
 
@@ -23,9 +24,10 @@ class IdentityFormFieldNativeMapping<Container,Type>
 
 	@Override
 	public
-	Optional<Type> genericToNative (
+	Optional <Type> genericToNative (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Optional<Type> genericValue) {
+			@NonNull Optional <Type> genericValue) {
 
 		return genericValue;
 

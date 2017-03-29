@@ -42,7 +42,6 @@ import com.google.common.collect.Maps;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.tuple.Pair;
@@ -62,7 +61,6 @@ import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
 
-@Log4j
 @SingletonComponent ("fieldsLogic")
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 public
@@ -80,8 +78,14 @@ class FormFieldLogic {
 
 	public <Container>
 	void implicit (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull Container container) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"implicit");
 
 		for (
 			FormField <Container, ?, ?, ?> formField
@@ -89,6 +93,7 @@ class FormFieldLogic {
 		) {
 
 			formField.implicit (
+				taskLogger,
 				container);
 
 		}
@@ -97,6 +102,7 @@ class FormFieldLogic {
 
 	public
 	UpdateResultSet update (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object container,
@@ -107,6 +113,7 @@ class FormFieldLogic {
 			new UpdateResultSet ();
 
 		update (
+			parentTaskLogger,
 			requestContext,
 			formFieldSet,
 			updateResultSet,
@@ -120,6 +127,7 @@ class FormFieldLogic {
 
 	public
 	void update (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull UpdateResultSet updateResults,
@@ -128,6 +136,7 @@ class FormFieldLogic {
 			@NonNull String formName) {
 
 		update (
+			parentTaskLogger,
 			requestContextToSubmission (
 				requestContext),
 			formFieldSet,
@@ -140,12 +149,18 @@ class FormFieldLogic {
 
 	public <Container>
 	void update (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull UpdateResultSet updateResults,
 			@NonNull Container container,
 			@NonNull Map <String,Object> hints,
 			@NonNull String formName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"update");
 
 		for (
 			FormField <Container, ?, ?, ?> formField
@@ -158,6 +173,7 @@ class FormFieldLogic {
 
 				updateResult =
 					formField.update (
+						taskLogger,
 						submission,
 						container,
 						hints,
@@ -295,6 +311,7 @@ class FormFieldLogic {
 
 	public
 	void runUpdateHooks (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull UpdateResultSet updateResultSet,
 			@NonNull Object container,
@@ -302,6 +319,11 @@ class FormFieldLogic {
 			@NonNull Optional <Object> objectRef,
 			@NonNull Optional <String> objectType,
 			@NonNull String formName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runUpdateHooks");
 
 		for (
 			Map.Entry <Pair <String, String>, UpdateResult <?, ?>>
@@ -329,6 +351,7 @@ class FormFieldLogic {
 				continue;
 
 			formField.runUpdateHook (
+				taskLogger,
 				updateResult,
 				container,
 				linkObject,
@@ -449,6 +472,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputFormAlwaysHidden (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
@@ -459,6 +483,7 @@ class FormFieldLogic {
 			@NonNull String formName) {
 
 		outputFormAlwaysHidden (
+			parentTaskLogger,
 			requestContextToSubmission (
 				requestContext),
 			htmlWriter,
@@ -473,6 +498,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputFormAlwaysHidden (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
@@ -481,6 +507,11 @@ class FormFieldLogic {
 			@NonNull Map <String, Object> hints,
 			@NonNull FormType formType,
 			@NonNull String formName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"outputFormAlwaysHidden");
 
 		for (
 			FormField <Container, ?, ?, ?> formField
@@ -509,6 +540,7 @@ class FormFieldLogic {
 			}
 
 			formField.renderFormAlwaysHidden (
+				taskLogger,
 				submission,
 				htmlWriter,
 				object,
@@ -522,6 +554,7 @@ class FormFieldLogic {
 
 	public
 	void outputFormTemporarilyHidden (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleRequestContext requestContext,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
@@ -531,6 +564,7 @@ class FormFieldLogic {
 			@NonNull String formName) {
 
 		outputFormTemporarilyHidden (
+			parentTaskLogger,
 			requestContextToSubmission (
 				requestContext),
 			htmlWriter,
@@ -544,6 +578,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputFormTemporarilyHidden (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
@@ -566,6 +601,7 @@ class FormFieldLogic {
 			}
 
 			formField.renderFormTemporarilyHidden (
+				parentTaskLogger,
 				submission,
 				htmlWriter,
 				object,
@@ -626,11 +662,10 @@ class FormFieldLogic {
 						updateResultOptional)
 				) {
 
-					log.error (
-						stringFormat (
-							"Unable to find update result for %s-%s",
-							formName,
-							formField.name ()));
+					taskLogger.errorFormat (
+						"Unable to find update result for %s-%s",
+						formName,
+						formField.name ());
 
 					error =
 						optionalAbsent ();
@@ -679,6 +714,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputFormReset (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull FormType formType,
@@ -692,6 +728,7 @@ class FormFieldLogic {
 		) {
 
 			formField.renderFormReset (
+				parentTaskLogger,
 				javascriptWriter,
 				object,
 				hints,
@@ -931,6 +968,7 @@ class FormFieldLogic {
 
 	public <Container>
 	void outputCsvRow (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter csvWriter,
 			@NonNull List <FormFieldSet <Container>> formFieldSets,
 			@NonNull Container object,
@@ -956,6 +994,7 @@ class FormFieldLogic {
 				}
 
 				formField.renderCsvRow (
+					parentTaskLogger,
 					csvWriter,
 					object,
 					hints);

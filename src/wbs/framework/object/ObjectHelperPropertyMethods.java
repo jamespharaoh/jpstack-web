@@ -14,6 +14,7 @@ import lombok.NonNull;
 import wbs.framework.codegen.DoNotDelegate;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 import fj.data.Either;
 
@@ -127,6 +128,7 @@ interface ObjectHelperPropertyMethods <
 
 
 	void setDynamic (
+			TaskLogger parentTaskLogger,
 			RecordType object,
 			String name,
 			Optional <?> value);

@@ -30,7 +30,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
@@ -132,10 +131,11 @@ class QueueDebugPart
 				userConsoleLogic.userIdRequired ());
 
 		formFieldLogic.update (
+			taskLogger,
 			requestContext,
 			formFields,
 			form,
-			ImmutableMap.of (),
+			emptyMap (),
 			"search");
 
 		SortedQueueSubjects sortedQueueSubjects =

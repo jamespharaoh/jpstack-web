@@ -12,13 +12,19 @@ import lombok.NonNull;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.queue.logic.QueueLogic;
+import wbs.platform.queue.model.QueueItemRec;
+
 import wbs.imchat.model.ImChatConversationObjectHelper;
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerRec;
@@ -28,8 +34,6 @@ import wbs.imchat.model.ImChatObjectHelper;
 import wbs.imchat.model.ImChatRec;
 import wbs.imchat.model.ImChatSessionObjectHelper;
 import wbs.imchat.model.ImChatSessionRec;
-import wbs.platform.queue.logic.QueueLogic;
-import wbs.platform.queue.model.QueueItemRec;
 import wbs.web.action.Action;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.JsonResponder;
@@ -60,6 +64,9 @@ class ImChatMessageSendAction
 	@SingletonDependency
 	ImChatSessionObjectHelper imChatSessionHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	QueueLogic queueLogic;
 
@@ -77,6 +84,11 @@ class ImChatMessageSendAction
 	public
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		DataFromJson dataFromJson =
 			new DataFromJson ();
@@ -220,6 +232,7 @@ class ImChatMessageSendAction
 
 		ImChatMessageRec message =
 			imChatMessageHelper.insert (
+				taskLogger,
 				imChatMessageHelper.createInstance ()
 
 			.setImChatConversation (
@@ -251,9 +264,9 @@ class ImChatMessageSendAction
 
 		QueueItemRec queueItem =
 			queueLogic.createQueueItem (
-				queueLogic.findQueue (
-					imChat,
-					"reply"),
+				taskLogger,
+				imChat,
+				"reply",
 				conversation,
 				message,
 				customer.getCode (),

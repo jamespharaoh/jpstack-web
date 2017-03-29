@@ -257,6 +257,7 @@ class ChatBroadcastSendAction
 				new UpdateResultSet ();
 
 			formFieldLogic.update (
+				taskLogger,
 				requestContext,
 				searchFields,
 				verify
@@ -267,6 +268,7 @@ class ChatBroadcastSendAction
 				"send");
 
 			formFieldLogic.update (
+				taskLogger,
 				requestContext,
 				numbersFields,
 				verify
@@ -277,6 +279,7 @@ class ChatBroadcastSendAction
 				"send");
 
 			formFieldLogic.update (
+				taskLogger,
 				requestContext,
 				commonFields,
 				verify
@@ -287,6 +290,7 @@ class ChatBroadcastSendAction
 				"send");
 
 			formFieldLogic.update (
+				taskLogger,
 				requestContext,
 				messageUserFields,
 				verify
@@ -297,6 +301,7 @@ class ChatBroadcastSendAction
 				"send");
 
 			formFieldLogic.update (
+				taskLogger,
 				requestContext,
 				messageMessageFields,
 				send
@@ -601,6 +606,7 @@ class ChatBroadcastSendAction
 
 					if (
 						! chatBroadcastLogic.canSendToUser (
+							taskLogger,
 							chatUser,
 							includeBlocked,
 							includeOptedOut)
@@ -691,6 +697,7 @@ class ChatBroadcastSendAction
 
 				TextRec text =
 					textHelper.findOrCreate (
+						taskLogger,
 						messageString);
 
 				ChatBroadcastRec chatBroadcast =
@@ -770,16 +777,19 @@ class ChatBroadcastSendAction
 						includeOptedOut);
 
 				chatBroadcastHelper.insert (
+					taskLogger,
 					chatBroadcast);
 
 				// create batch
 
 				BatchSubjectRec batchSubject =
 					batchLogic.batchSubject (
+						taskLogger,
 						chat,
 						"broadcast");
 
 				batchHelper.insert (
+					taskLogger,
 					batchHelper.createInstance ()
 
 					.setSubject (
@@ -814,6 +824,7 @@ class ChatBroadcastSendAction
 					// record this number in the broadcast
 
 					chatBroadcastNumberHelper.insert (
+						taskLogger,
 						chatBroadcastNumberHelper.createInstance ()
 
 						.setChatBroadcast (

@@ -2,9 +2,12 @@ package wbs.imchat.logic;
 
 import com.google.common.base.Optional;
 
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.user.model.UserRec;
+
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerRec;
-import wbs.platform.user.model.UserRec;
 
 public
 interface ImChatLogic {
@@ -16,7 +19,8 @@ interface ImChatLogic {
 			ImChatConversationRec conversation);
 
 	void customerPasswordGenerate (
+			TaskLogger parentTaskLogger,
 			ImChatCustomerRec customer,
-			Optional<UserRec> consoleUser);
+			Optional <UserRec> consoleUser);
 
 }

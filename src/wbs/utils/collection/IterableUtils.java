@@ -8,6 +8,7 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -16,6 +17,7 @@ import java.util.stream.StreamSupport;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
@@ -75,6 +77,21 @@ class IterableUtils {
 			@NonNull Iterable <InputType> input) {
 
 		return ImmutableList.copyOf (
+			iterableMap (
+				mapFunction,
+				input));
+
+	}
+
+	public static <InputType, OutputType>
+	Set <OutputType> iterableMapToSet (
+			@NonNull Function <
+				? super InputType,
+				? extends OutputType
+			> mapFunction,
+			@NonNull Iterable <InputType> input) {
+
+		return ImmutableSet.copyOf (
 			iterableMap (
 				mapFunction,
 				input));

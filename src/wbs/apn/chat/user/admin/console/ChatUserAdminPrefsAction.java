@@ -143,6 +143,7 @@ class ChatUserAdminPrefsAction
 						newOrient);
 
 				eventLogic.createEvent (
+					taskLogger,
 					"chat_user_prefs",
 					userConsoleLogic.userRequired (),
 					chatUser,

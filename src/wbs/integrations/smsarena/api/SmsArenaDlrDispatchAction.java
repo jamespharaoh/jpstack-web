@@ -12,12 +12,14 @@ import com.google.common.base.Optional;
 import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionUtils;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.smsarena.model.SmsArenaDlrReportLogObjectHelper;
@@ -50,6 +52,9 @@ class SmsArenaDlrDispatchAction
 
 	@SingletonDependency
 	ExceptionUtils exceptionLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SmsDeliveryReportLogic reportLogic;
@@ -95,9 +100,15 @@ class SmsArenaDlrDispatchAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
+
 		try {
 
-			return handleDispatch ();
+			return handleDispatch (
+				taskLogger);
 
 		} catch (RuntimeException exception) {
 
@@ -116,14 +127,21 @@ class SmsArenaDlrDispatchAction
 
 		} finally {
 
-			writeLog ();
+			writeLog (
+				taskLogger);
 
 		}
 
 	}
 
 	private
-	Responder handleDispatch () {
+	Responder handleDispatch (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleDispatch");
 
 		// output
 
@@ -223,6 +241,7 @@ class SmsArenaDlrDispatchAction
 				dlr);
 
 		reportLogic.deliveryReport (
+			taskLogger,
 			route,
 			id,
 			reportCode.getMessageStatus (),
@@ -240,7 +259,13 @@ class SmsArenaDlrDispatchAction
 	}
 
 	private
-	void writeLog () {
+	void writeLog (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeLog");
 
 		// create the log for the delivery report
 
@@ -256,6 +281,7 @@ class SmsArenaDlrDispatchAction
 					"routeId"));
 
 		smsArenaDlrReportLogHelper.insert (
+			taskLogger,
 			smsArenaDlrReportLogHelper.createInstance ()
 
 			.setRoute (

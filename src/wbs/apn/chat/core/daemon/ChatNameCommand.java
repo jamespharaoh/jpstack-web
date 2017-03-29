@@ -1,9 +1,9 @@
 package wbs.apn.chat.core.daemon;
 
 import static wbs.framework.entity.record.IdObject.objectId;
+import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-
-import java.util.Collections;
 
 import com.google.common.base.Optional;
 
@@ -12,8 +12,10 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -70,8 +72,8 @@ class ChatNameCommand
 	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
-	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MessageObjectHelper messageHelper;
@@ -81,6 +83,9 @@ class ChatNameCommand
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
 
 	// properties
 
@@ -113,7 +118,12 @@ class ChatNameCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		String newName =
 			rest.replaceAll ("\\s*$", "");
@@ -133,6 +143,7 @@ class ChatNameCommand
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
+				taskLogger,
 				chat,
 				message);
 
@@ -153,14 +164,16 @@ class ChatNameCommand
 
 		ChatCreditCheckResult creditCheckResult =
 			chatCreditLogic.userSpendCreditCheck (
+				taskLogger,
 				chatUser,
 				true,
-				Optional.of (
+				optionalOf (
 					message.getThreadId ()));
 
 		if (creditCheckResult.failed ()) {
 
 			chatHelpLogLogic.createChatHelpLogIn (
+				taskLogger,
 				chatUser,
 				message,
 				rest,
@@ -172,6 +185,7 @@ class ChatNameCommand
 			// set name
 
 			chatMiscLogic.chatUserSetName (
+				taskLogger,
 				chatUser,
 				newName,
 				message.getThreadId ());
@@ -181,8 +195,9 @@ class ChatNameCommand
 			// send reply
 
 			chatSendLogic.sendSystemMagic (
+				taskLogger,
 				chatUser,
-				Optional.of (
+				optionalOf (
 					message.getThreadId ()),
 				"name_error",
 				commandHelper.findByCodeRequired (
@@ -193,16 +208,19 @@ class ChatNameCommand
 						chat,
 						"name")),
 				TemplateMissing.error,
-				Collections.<String,String>emptyMap ());
+				emptyMap ());
 
 		}
 
 		// process inbox
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (defaultService),
-			Optional.of (affiliate),
+			optionalOf (
+				defaultService),
+			optionalOf (
+				affiliate),
 			command);
 
 	}

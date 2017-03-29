@@ -61,6 +61,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderFormAlwaysHidden (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
@@ -74,6 +75,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderFormTemporarilyHidden (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
@@ -102,6 +104,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderFormReset (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -114,6 +117,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void renderCsvRow (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
@@ -124,6 +128,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void implicit (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container) {
 
 		doNothing ();
@@ -132,6 +137,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	UpdateResult <Generic, Native> update (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
@@ -143,6 +149,7 @@ interface FormField <Container, Generic, Native, Interface>
 
 	default
 	void runUpdateHook (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull UpdateResult <Generic, Native> updateResult,
 			@NonNull Container container,
 			@NonNull PermanentRecord <?> linkObject,

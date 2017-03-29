@@ -11,6 +11,8 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.media.model.MediaTypeRec;
@@ -19,9 +21,11 @@ public
 interface MediaLogic {
 
 	ContentRec findOrCreateContent (
+			TaskLogger parentTaskLogger,
 			byte[] data);
 
 	Optional <MediaRec> createMedia (
+			TaskLogger parentTaskLogger,
 			byte[] data,
 			String mimeType,
 			String filename,
@@ -29,6 +33,7 @@ interface MediaLogic {
 
 	default
 	MediaRec createMediaRequired (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull byte[] data,
 			@NonNull String mimeType,
 			@NonNull String filename,
@@ -36,6 +41,7 @@ interface MediaLogic {
 
 		return optionalOrThrow (
 			createMedia (
+				parentTaskLogger,
 				data,
 				mimeType,
 				filename,
@@ -49,21 +55,36 @@ interface MediaLogic {
 	}
 
 	MediaRec createMediaFromImage (
+			TaskLogger parentTaskLogger,
 			BufferedImage image,
 			String mimeType,
 			String filename);
 
-	Optional<MediaRec> createMediaFromImage (
+	Optional <MediaRec> createMediaFromImage (
+			TaskLogger parentTaskLogger,
 			byte[] data,
 			String mimeType,
 			String filename);
 
+	default
 	MediaRec createMediaFromImageRequired (
-			byte[] data,
-			String mimeType,
-			String filename);
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull byte[] data,
+			@NonNull String mimeType,
+			@NonNull String filename) {
+
+		return optionalGetRequired (
+			createMediaFromImage (
+				parentTaskLogger,
+				data,
+				mimeType,
+				filename));
+
+	}
+
 
 	MediaRec createMediaWithThumbnail (
+			TaskLogger parentTaskLogger,
 			byte[] data,
 			BufferedImage thumbnailImage,
 			String mimeType,
@@ -72,6 +93,7 @@ interface MediaLogic {
 			Long height);
 
 	MediaRec createMediaWithThumbnail (
+			TaskLogger parentTaskLogger,
 			byte[] data,
 			byte[] thumb100,
 			byte[] thumb32,
@@ -80,17 +102,30 @@ interface MediaLogic {
 			Long width,
 			Long height);
 
-	Optional<MediaRec> createMediaFromVideo (
+	Optional <MediaRec> createMediaFromVideo (
+			TaskLogger parentTaskLogger,
 			byte[] data,
 			String mimeType,
 			String filename);
 
+	default
 	MediaRec createMediaFromVideoRequired (
-			byte[] data,
-			String mimeType,
-			String filename);
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull byte[] data,
+			@NonNull String mimeType,
+			@NonNull String filename) {
+
+		return optionalGetRequired (
+			createMediaFromVideo (
+				parentTaskLogger,
+				data,
+				mimeType,
+				filename));
+
+	}
 
 	MediaRec createMediaFromAudio (
+			TaskLogger parentTaskLogger,
 			byte[] data,
 			String mimeType,
 			String filename);
@@ -98,24 +133,38 @@ interface MediaLogic {
 	MediaTypeRec findMediaTypeRequired (
 			String mimeType);
 
-	Optional<MediaRec> createTextualMedia (
+	Optional <MediaRec> createTextualMedia (
+			TaskLogger parentTaskLogger,
 			byte[] data,
 			String mimeType,
 			String filename,
 			String encoding);
 
 	MediaRec createTextMedia (
+			TaskLogger parentTaskLogger,
 			String text,
 			String mimeType,
 			String filename);
 
-	Optional<BufferedImage> readImage (
+	Optional <BufferedImage> readImage (
+			TaskLogger parentTaskLogger,
 			byte[] data,
 			String mimeType);
 
+	default
 	BufferedImage readImageRequired (
-			byte[] data,
-			String mimeType);
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull byte[] data,
+			@NonNull String mimeType) {
+
+		return optionalGetRequired (
+			readImage (
+				parentTaskLogger,
+				data,
+				mimeType));
+
+	}
+
 
 	byte[] writeImage (
 			BufferedImage image,
@@ -125,15 +174,27 @@ interface MediaLogic {
 			BufferedImage image,
 			float jpegQuality);
 
+	default
 	Optional <BufferedImage> getImage (
-			MediaRec media);
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull MediaRec media) {
+
+		return readImage (
+			parentTaskLogger,
+			media.getContent ().getData (),
+			media.getMediaType ().getMimeType ());
+
+	}
+
 
 	default
 	BufferedImage getImageRequired (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull MediaRec media) {
 
 		return optionalGetRequired (
 			getImage (
+				parentTaskLogger,
 				media));
 
 	}
@@ -157,18 +218,31 @@ interface MediaLogic {
 	BufferedImage rotateImage270 (
 			BufferedImage image);
 
-	Optional<byte[]> videoConvert (
+	Optional <byte[]> videoConvert (
+			TaskLogger parentTaskLogger,
 			String profileName,
 			byte[] data);
 
+	default
 	byte[] videoConvertRequired (
-			String profileName,
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String profileName,
+			@NonNull byte[] data) {
+
+		return optionalGetRequired (
+			videoConvert (
+				parentTaskLogger,
+				profileName,
+				data));
+
+	}
+
+	Optional <byte[]> videoFrameBytes (
+			TaskLogger parentTaskLogger,
 			byte[] data);
 
-	Optional<byte[]> videoFrameBytes (
-			byte[] data);
-
-	Optional<BufferedImage> videoFrame (
+	Optional <BufferedImage> videoFrame (
+			TaskLogger parentTaskLogger,
 			byte[] data);
 
 	boolean isApplication (

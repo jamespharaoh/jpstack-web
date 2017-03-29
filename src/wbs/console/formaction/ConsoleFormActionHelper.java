@@ -97,6 +97,7 @@ interface ConsoleFormActionHelper <FormState> {
 	}
 
 	Optional <Responder> processFormSubmission (
+			TaskLogger parentTaskLogger,
 			Transaction transaction,
 			FormState formState);
 

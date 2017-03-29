@@ -10,6 +10,8 @@ import lombok.experimental.Accessors;
 import wbs.console.forms.FormField.UpdateResult;
 import wbs.console.forms.FormFieldUpdateHook;
 import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.CommonRecord;
@@ -19,6 +21,9 @@ import wbs.framework.entity.record.MajorRecord;
 import wbs.framework.entity.record.MinorRecord;
 import wbs.framework.entity.record.Record;
 import wbs.framework.entity.record.RootRecord;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.user.console.UserConsoleLogic;
 
@@ -32,6 +37,9 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 
 	@SingletonDependency
 	EventLogic eventLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -49,11 +57,17 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 	@Override
 	public
 	void onUpdate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull UpdateResult <Generic, Native> updateResult,
 			@NonNull Container container,
 			@NonNull Record <?> linkObject,
 			@NonNull Optional <Object> objectRef,
 			@NonNull Optional <String> objectType) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"onUpdate");
 
 		// determine if it's an admin event
 
@@ -90,6 +104,7 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 			if (updateResult.newNativeValue ().isPresent ()) {
 
 				eventLogic.createEvent (
+					taskLogger,
 					adminPrefix + "object_field_updated_in",
 					userConsoleLogic.userRequired (),
 					fieldName,
@@ -101,6 +116,7 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 			} else {
 
 				eventLogic.createEvent (
+					taskLogger,
 					adminPrefix + "object_field_nulled_in",
 					userConsoleLogic.userRequired (),
 					fieldName,
@@ -115,6 +131,7 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 			if (updateResult.newNativeValue ().isPresent ()) {
 
 				eventLogic.createEvent (
+					taskLogger,
 					adminPrefix + "object_field_updated",
 					userConsoleLogic.userRequired (),
 					fieldName,
@@ -124,6 +141,7 @@ class SimpleFormFieldUpdateHook <Container extends Record <?>, Generic, Native>
 			} else {
 
 				eventLogic.createEvent (
+					taskLogger,
 					adminPrefix + "object_field_nulled",
 					userConsoleLogic.userRequired (),
 					fieldName,

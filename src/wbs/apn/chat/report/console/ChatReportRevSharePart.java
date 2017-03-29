@@ -169,6 +169,11 @@ class ChatReportRevSharePart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		searchFields =
 			chatReportConsoleModule.formFieldSet (
 				"monthReportSearch",
@@ -192,6 +197,7 @@ class ChatReportRevSharePart
 					"YYYY-MM"));
 
 		formFieldLogic.update (
+			taskLogger,
 			requestContext,
 			searchFields,
 			form,

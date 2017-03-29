@@ -15,10 +15,12 @@ import lombok.experimental.Accessors;
 
 import org.json.simple.JSONValue;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.message.core.model.MessageObjectHelper;
@@ -44,6 +46,9 @@ class SimulatorSenderHelper
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MessageObjectHelper messageHelper;
@@ -93,6 +98,11 @@ class SimulatorSenderHelper
 	PerformSendResult performSend (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull State state) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"performSend");
 
 		@Cleanup
 		Transaction transaction =
@@ -169,6 +179,7 @@ class SimulatorSenderHelper
 
 		SimulatorEventRec event =
 			simulatorEventHelper.insert (
+				taskLogger,
 				simulatorEventHelper.createInstance ()
 
 			.setSimulatorSession (

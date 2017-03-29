@@ -276,6 +276,7 @@ class ChatAffiliateCreateOldAction
 
 			ChatAffiliateRec chatAffiliate =
 				chatAffiliateHelper.insert (
+					taskLogger,
 					chatAffiliateHelper.createInstance ()
 
 				.setChatScheme (
@@ -312,6 +313,7 @@ class ChatAffiliateCreateOldAction
 				}
 
 				chatSchemeKeywordHelper.insert (
+					taskLogger,
 					chatSchemeKeywordHelper.createInstance ()
 
 					.setChatScheme (

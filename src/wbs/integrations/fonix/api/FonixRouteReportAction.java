@@ -19,6 +19,7 @@ import lombok.NonNull;
 
 import wbs.api.mvc.ApiLoggingAction;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -26,6 +27,7 @@ import wbs.framework.data.tools.DataFromGeneric;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.fonix.logic.FonixLogic;
@@ -59,22 +61,25 @@ class FonixRouteReportAction
 	// singleton dependencies
 
 	@SingletonDependency
-	FonixDeliveryStatusObjectHelper fonixDeliveryStatusHelper;
-
-	@SingletonDependency
-	FonixInboundLogObjectHelper fonixInboundLogHelper;
-
-	@SingletonDependency
-	FonixRouteOutObjectHelper fonixRouteOutHelper;
-
-	@SingletonDependency
 	Database database;
 
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
 	@SingletonDependency
+	FonixDeliveryStatusObjectHelper fonixDeliveryStatusHelper;
+
+	@SingletonDependency
+	FonixInboundLogObjectHelper fonixInboundLogHelper;
+
+	@SingletonDependency
 	FonixLogic fonixLogic;
+
+	@SingletonDependency
+	FonixRouteOutObjectHelper fonixRouteOutHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RequestContext requestContext;
@@ -218,6 +223,7 @@ class FonixRouteReportAction
 		// process delivery report
 
 		handleDeliveryReport (
+			taskLogger,
 			fonixRouteOut);
 
 		// commit and return
@@ -230,7 +236,13 @@ class FonixRouteReportAction
 
 	private
 	void handleDeliveryReport (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FonixRouteOutRec fonixRouteOut) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleDeliveryReport");
 
 		// lookup the delivery status
 
@@ -281,6 +293,7 @@ class FonixRouteReportAction
 		// store the delivery report
 
 		smsDeliveryReportLogic.deliveryReport (
+			taskLogger,
 			smsMessage,
 			deliveryStatus.getMessageStatus (),
 			optionalOf (
@@ -330,8 +343,13 @@ class FonixRouteReportAction
 	@Override
 	protected
 	void storeLog (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String debugLog) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"storeLog");
 
 		@Cleanup
 		Transaction transaction =
@@ -343,6 +361,7 @@ class FonixRouteReportAction
 				this);
 
 		fonixInboundLogHelper.insert (
+			taskLogger,
 			fonixInboundLogHelper.createInstance ()
 
 			.setRoute (

@@ -405,6 +405,7 @@ class ManualResponderRequestPendingSummaryPart
 
 			spendAvailable =
 				smsSpendLimitLogic.spendCheck (
+					taskLogger,
 					manualResponder.getSmsSpendLimiter (),
 					manualResponderRequest.getNumber ());
 

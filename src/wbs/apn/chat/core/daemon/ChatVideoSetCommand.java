@@ -1,8 +1,8 @@
 package wbs.apn.chat.core.daemon;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-
-import java.util.Collections;
 
 import com.google.common.base.Optional;
 
@@ -11,9 +11,11 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -68,8 +70,8 @@ class ChatVideoSetCommand
 	@SingletonDependency
 	Database database;
 
-	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MessageObjectHelper messageHelper;
@@ -79,6 +81,9 @@ class ChatVideoSetCommand
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
 
 	// properties
 
@@ -113,6 +118,11 @@ class ChatVideoSetCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
+
 		ChatRec chat =
 			genericCastUnchecked (
 				objectManager.getParentRequired (
@@ -128,6 +138,7 @@ class ChatVideoSetCommand
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
+				taskLogger,
 				chat,
 				message);
 
@@ -138,6 +149,7 @@ class ChatVideoSetCommand
 		// log request
 
 		chatHelpLogLogic.createChatHelpLogIn (
+			taskLogger,
 			chatUser,
 			message,
 			rest,
@@ -146,6 +158,7 @@ class ChatVideoSetCommand
 
 		if (
 			chatUserLogic.setVideo (
+				taskLogger,
 				chatUser,
 				message,
 				false)
@@ -154,15 +167,18 @@ class ChatVideoSetCommand
 			// send a message
 
 			chatSendLogic.sendSystemRbFree (
+				taskLogger,
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				optionalOf (
+					message.getThreadId ()),
 				"video_set_pending",
 				TemplateMissing.error,
-				Collections.<String,String>emptyMap ());
+				emptyMap ());
 
 			// auto join
 
 			chatMiscLogic.userAutoJoin (
+				taskLogger,
 				chatUser,
 				message,
 				true);
@@ -172,21 +188,24 @@ class ChatVideoSetCommand
 			// no video found
 
 			chatSendLogic.sendSystemRbFree (
+				taskLogger,
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				optionalOf (
+					message.getThreadId ()),
 				"video_set_error",
 				TemplateMissing.error,
-				Collections.<String,String>emptyMap ());
+				emptyMap ());
 
 		}
 
 		// process inbox
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (
+			optionalOf (
 				defaultService),
-			Optional.of (
+			optionalOf (
 				affiliate),
 			command);
 

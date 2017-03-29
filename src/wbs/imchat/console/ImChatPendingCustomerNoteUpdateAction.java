@@ -113,6 +113,7 @@ class ImChatPendingCustomerNoteUpdateAction
 				valueParam.isEmpty ()
 					? null
 					: textHelper.findOrCreate (
+						taskLogger,
 						valueParam);
 
 			if (
@@ -146,6 +147,7 @@ class ImChatPendingCustomerNoteUpdateAction
 			if (newValue != null) {
 
 				eventLogic.createEvent (
+					taskLogger,
 					"object_field_updated",
 					userConsoleLogic.userRequired (),
 					"notesText",
@@ -155,6 +157,7 @@ class ImChatPendingCustomerNoteUpdateAction
 			} else {
 
 				eventLogic.createEvent (
+					taskLogger,
 					"object_field_nulled",
 					userConsoleLogic.userRequired (),
 					"notesText",

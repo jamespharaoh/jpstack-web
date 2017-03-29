@@ -161,6 +161,7 @@ class UserPasswordAction
 			// create an event
 
 			eventLogic.createEvent (
+				taskLogger,
 				"user_password_reset",
 				userConsoleLogic.userRequired (),
 				user);

@@ -7,15 +7,18 @@ import java.util.Collection;
 
 import com.google.common.collect.ImmutableList;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.service.model.ServiceObjectHelper;
+
 import wbs.sms.message.core.logic.SmsMessageLogic;
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
@@ -23,6 +26,7 @@ import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
 import wbs.sms.message.outbox.logic.SmsOutboxLogic;
+
 import wbs.smsapps.autoresponder.model.AutoResponderRequestObjectHelper;
 import wbs.smsapps.autoresponder.model.AutoResponderRequestRec;
 
@@ -34,13 +38,16 @@ class AutoResponderDelivery
 	// singleton dependencies
 
 	@SingletonDependency
+	AutoResponderRequestObjectHelper autoResponderRequestHelper;
+
+	@SingletonDependency
 	Database database;
 
 	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
-	@SingletonDependency
-	AutoResponderRequestObjectHelper autoResponderRequestHelper;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	SmsMessageLogic messageLogic;
@@ -71,92 +78,104 @@ class AutoResponderDelivery
 			@NonNull Long deliveryId,
 			@NonNull Long ref) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"AutoResponderDelivery.handle (deliveryId, ref)",
-				this);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
-		DeliveryRec delivery =
-			deliveryHelper.findRequired (
-				deliveryId);
+		try (
 
-		if (delivery.getNewMessageStatus ().isGoodType ()) {
+			Transaction transaction =
+				database.beginReadWrite (
+					"AutoResponderDelivery.handle (deliveryId, ref)",
+					this);
 
-			MessageRec deliveryMessage =
-				delivery.getMessage ();
+		) {
 
-			AutoResponderRequestRec request =
-				autoResponderRequestHelper.findRequired (
-					deliveryMessage.getRef ());
+			DeliveryRec delivery =
+				deliveryHelper.findRequired (
+					deliveryId);
 
-			long deliveryMessageIndex =
-				listIndexOfRequired (
-					request.getSentMessages (),
-					deliveryMessage);
+			if (delivery.getNewMessageStatus ().isGoodType ()) {
 
-			if (
-				request.getSentMessages ().size ()
-					> deliveryMessageIndex + 1
-			) {
+				MessageRec deliveryMessage =
+					delivery.getMessage ();
 
-				MessageRec nextMessage =
-					listItemAtIndexRequired (
+				AutoResponderRequestRec request =
+					autoResponderRequestHelper.findRequired (
+						deliveryMessage.getRef ());
+
+				long deliveryMessageIndex =
+					listIndexOfRequired (
 						request.getSentMessages (),
-						deliveryMessageIndex + 1);
+						deliveryMessage);
 
-				if (nextMessage.getStatus () == MessageStatus.held) {
+				if (
+					request.getSentMessages ().size ()
+						> deliveryMessageIndex + 1
+				) {
 
-					outboxLogic.unholdMessage (
-						nextMessage);
+					MessageRec nextMessage =
+						listItemAtIndexRequired (
+							request.getSentMessages (),
+							deliveryMessageIndex + 1);
+
+					if (nextMessage.getStatus () == MessageStatus.held) {
+
+						outboxLogic.unholdMessage (
+							taskLogger,
+							nextMessage);
+
+					}
 
 				}
 
 			}
 
-		}
+			if (delivery.getNewMessageStatus ().isBadType ()) {
 
-		if (delivery.getNewMessageStatus ().isBadType ()) {
+				MessageRec deliveryMessage =
+					delivery.getMessage ();
 
-			MessageRec deliveryMessage =
-				delivery.getMessage ();
+				AutoResponderRequestRec request =
+					autoResponderRequestHelper.findRequired (
+						deliveryMessage.getRef ());
 
-			AutoResponderRequestRec request =
-				autoResponderRequestHelper.findRequired (
-					deliveryMessage.getRef ());
-
-			Long deliveryMessageIndex =
-				listIndexOfRequired (
-					request.getSentMessages (),
-					deliveryMessage);
-
-			for (
-				long messageIndex = deliveryMessageIndex + 1;
-				messageIndex < request.getSentMessages ().size ();
-				messageIndex ++
-			) {
-
-				MessageRec heldMessage =
-					listItemAtIndexRequired (
+				Long deliveryMessageIndex =
+					listIndexOfRequired (
 						request.getSentMessages (),
-						messageIndex);
+						deliveryMessage);
 
-				if (heldMessage.getStatus () == MessageStatus.held) {
+				for (
+					long messageIndex = deliveryMessageIndex + 1;
+					messageIndex < request.getSentMessages ().size ();
+					messageIndex ++
+				) {
 
-					messageLogic.messageStatus (
-						heldMessage,
-						MessageStatus.cancelled);
+					MessageRec heldMessage =
+						listItemAtIndexRequired (
+							request.getSentMessages (),
+							messageIndex);
+
+					if (heldMessage.getStatus () == MessageStatus.held) {
+
+						messageLogic.messageStatus (
+							taskLogger,
+							heldMessage,
+							MessageStatus.cancelled);
+
+					}
 
 				}
 
 			}
 
+			deliveryHelper.remove (
+				delivery);
+
+			transaction.commit ();
+
 		}
-
-		deliveryHelper.remove (
-			delivery);
-
-		transaction.commit ();
 
 	}
 

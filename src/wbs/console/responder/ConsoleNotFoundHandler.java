@@ -108,6 +108,7 @@ class ConsoleNotFoundHandler
 						requestContext.pathInfo ()));
 
 			exceptionLogger.logSimple (
+				taskLogger,
 				"console",
 				path,
 				"Not found",

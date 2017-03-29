@@ -3,26 +3,32 @@ package wbs.smsapps.subscription.daemon;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import javax.inject.Provider;
 
+import com.google.common.collect.ImmutableList;
+
 import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.service.model.ServiceObjectHelper;
+
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.delivery.daemon.DeliveryHandler;
 import wbs.sms.message.delivery.model.DeliveryObjectHelper;
 import wbs.sms.message.delivery.model.DeliveryRec;
 import wbs.sms.message.outbox.logic.SmsMessageSender;
+
 import wbs.smsapps.subscription.logic.SubscriptionLogic;
 import wbs.smsapps.subscription.model.SubscriptionBillObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionBillRec;
@@ -43,6 +49,9 @@ class SubscriptionDeliveryNoticeHandler
 	@SingletonDependency
 	DeliveryObjectHelper deliveryHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
@@ -61,9 +70,9 @@ class SubscriptionDeliveryNoticeHandler
 
 	@Override
 	public
-	Collection<String> getDeliveryTypeCodes () {
+	Collection <String> getDeliveryTypeCodes () {
 
-		return Arrays.<String>asList (
+		return ImmutableList.of (
 			"subscription");
 
 	}
@@ -76,6 +85,11 @@ class SubscriptionDeliveryNoticeHandler
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long deliveryId,
 			@NonNull Long ref) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		@Cleanup
 		Transaction transaction =
@@ -174,6 +188,7 @@ class SubscriptionDeliveryNoticeHandler
 			) {
 
 				subscriptionLogic.sendNow (
+					taskLogger,
 					subscriptionNumber.getPendingSubscriptionSendNumber ());
 
 			}

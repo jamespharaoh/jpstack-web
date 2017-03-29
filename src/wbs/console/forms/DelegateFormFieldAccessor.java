@@ -1,5 +1,8 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+
 import com.google.common.base.Optional;
 
 import lombok.Getter;
@@ -8,8 +11,12 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("delegateFormFieldacessor")
@@ -18,6 +25,9 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 	implements FormFieldAccessor <PrincipalContainer, Native> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -35,22 +45,28 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 	@Override
 	public
 	Optional <Native> read (
-			PrincipalContainer principalContainer) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull PrincipalContainer principalContainer) {
 
-		@SuppressWarnings ("unchecked")
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"read");
+
 		DelegateContainer delegateContainer =
-			(DelegateContainer)
-			objectManager.dereferenceObsolete (
-				principalContainer,
-				path);
+			genericCastUnchecked (
+				objectManager.dereferenceObsolete (
+					principalContainer,
+					path));
 
 		if (delegateContainer == null) {
 
-			return Optional.<Native>absent ();
+			return optionalAbsent ();
 
 		}
 
 		return delegateFormFieldAccessor.read (
+			taskLogger,
 			delegateContainer);
 
 	}
@@ -58,21 +74,27 @@ class DelegateFormFieldAccessor <PrincipalContainer, DelegateContainer, Native>
 	@Override
 	public
 	void write (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PrincipalContainer principalContainer,
-			@NonNull Optional<Native> nativeValue) {
+			@NonNull Optional <Native> nativeValue) {
 
-		@SuppressWarnings ("unchecked")
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"write");
+
 		DelegateContainer delegateContainer =
-			(DelegateContainer)
-			objectManager.dereferenceObsolete (
-				principalContainer,
-				path);
+			genericCastUnchecked (
+				objectManager.dereferenceObsolete (
+					principalContainer,
+					path));
 
 		if (delegateContainer == null) {
 			throw new RuntimeException ();
 		}
 
 		delegateFormFieldAccessor.write (
+			taskLogger,
 			delegateContainer,
 			nativeValue);
 

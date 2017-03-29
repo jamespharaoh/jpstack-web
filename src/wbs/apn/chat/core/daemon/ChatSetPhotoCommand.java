@@ -1,8 +1,9 @@
 package wbs.apn.chat.core.daemon;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-
-import java.util.Collections;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import com.google.common.base.Optional;
 
@@ -10,6 +11,29 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.entity.record.IdObject;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+import wbs.framework.object.ObjectManager;
+
+import wbs.platform.affiliate.model.AffiliateRec;
+import wbs.platform.service.model.ServiceObjectHelper;
+import wbs.platform.service.model.ServiceRec;
+
+import wbs.sms.command.logic.CommandLogic;
+import wbs.sms.command.model.CommandObjectHelper;
+import wbs.sms.command.model.CommandRec;
+import wbs.sms.message.core.model.MessageObjectHelper;
+import wbs.sms.message.core.model.MessageRec;
+import wbs.sms.message.inbox.daemon.CommandHandler;
+import wbs.sms.message.inbox.logic.SmsInboxLogic;
+import wbs.sms.message.inbox.model.InboxAttemptRec;
+import wbs.sms.message.inbox.model.InboxRec;
 
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.contact.logic.ChatSendLogic.TemplateMissing;
@@ -20,26 +44,6 @@ import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageRec;
-import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
-import wbs.framework.entity.record.IdObject;
-import wbs.framework.logging.LogContext;
-import wbs.framework.logging.TaskLogger;
-import wbs.framework.object.ObjectManager;
-import wbs.platform.affiliate.model.AffiliateRec;
-import wbs.platform.service.model.ServiceObjectHelper;
-import wbs.platform.service.model.ServiceRec;
-import wbs.sms.command.logic.CommandLogic;
-import wbs.sms.command.model.CommandObjectHelper;
-import wbs.sms.command.model.CommandRec;
-import wbs.sms.message.core.model.MessageObjectHelper;
-import wbs.sms.message.core.model.MessageRec;
-import wbs.sms.message.inbox.daemon.CommandHandler;
-import wbs.sms.message.inbox.logic.SmsInboxLogic;
-import wbs.sms.message.inbox.model.InboxAttemptRec;
-import wbs.sms.message.inbox.model.InboxRec;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chatSetPhotoCommand")
@@ -119,6 +123,11 @@ class ChatSetPhotoCommand
 	InboxAttemptRec handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
+
 		ChatRec chat;
 		ChatSchemeRec chatScheme;
 
@@ -152,6 +161,7 @@ class ChatSetPhotoCommand
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
+				taskLogger,
 				chat,
 				message);
 
@@ -173,6 +183,7 @@ class ChatSetPhotoCommand
 
 		Optional <ChatUserImageRec> chatUserImageOptional =
 			chatUserLogic.setPhotoFromMessage (
+				taskLogger,
 				chatUser,
 				message,
 				false);
@@ -185,8 +196,9 @@ class ChatSetPhotoCommand
 			// send confirmation
 
 			chatSendLogic.sendSystemMagic (
+				taskLogger,
 				chatUser,
-				Optional.absent (),
+				optionalAbsent (),
 				"photo_confirm",
 				commandHelper.findByCodeRequired (
 					chat,
@@ -196,11 +208,12 @@ class ChatSetPhotoCommand
 						chat,
 						"help")),
 				TemplateMissing.error,
-				Collections.emptyMap ());
+				emptyMap ());
 
 			// auto join
 
 			chatMiscLogic.userAutoJoin (
+				taskLogger,
 				chatUser,
 				message,
 				true);
@@ -209,6 +222,7 @@ class ChatSetPhotoCommand
 
 		} else if (
 			chatUserLogic.setVideo (
+				taskLogger,
 				chatUser,
 				message,
 				false)
@@ -217,15 +231,18 @@ class ChatSetPhotoCommand
 			// send confirmation
 
 			chatSendLogic.sendSystemRbFree (
+				taskLogger,
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				optionalOf (
+					message.getThreadId ()),
 				"video_set_pending",
 				TemplateMissing.error,
-				Collections.<String,String>emptyMap ());
+				emptyMap ());
 
 			// auto join
 
 			chatMiscLogic.userAutoJoin (
+				taskLogger,
 				chatUser,
 				message,
 				true);
@@ -235,8 +252,10 @@ class ChatSetPhotoCommand
 			// send error
 
 			chatSendLogic.sendSystemMmsFree (
+				taskLogger,
 				chatUser,
-				Optional.of (message.getThreadId ()),
+				optionalOf (
+					message.getThreadId ()),
 				"photo_error",
 				commandHelper.findByCodeRequired (
 					chat,
@@ -248,9 +267,12 @@ class ChatSetPhotoCommand
 		// process inbox
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
-			Optional.of (defaultService),
-			Optional.of (affiliate),
+			optionalOf (
+				defaultService),
+			optionalOf (
+				affiliate),
 			command);
 
 	}

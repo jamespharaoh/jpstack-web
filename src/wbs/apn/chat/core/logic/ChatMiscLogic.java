@@ -2,55 +2,43 @@ package wbs.apn.chat.core.logic;
 
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import org.joda.time.DateTimeZone;
 
+import wbs.framework.logging.TaskLogger;
+
+import wbs.sms.message.core.model.MessageRec;
+
 import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.apn.chat.user.core.model.Gender;
-import wbs.apn.chat.user.core.model.Orient;
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.sms.message.core.model.MessageRec;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
 
 public
 interface ChatMiscLogic {
 
-	/**
-	 * Gets all online monitors who are candidates for a random outbound message
-	 * (either in response to a "join" outbound or a "quiet" outbound).
-	 *
-	 * Monitors considered must have a picture, not be blocked, be compatible
-	 * and never previously sent a message to this user.
-	 *
-	 * @param thisUser
-	 *            User message is to be sent to
-	 * @return All online monitors who qualify.
-	 */
-	List<ChatUserRec> getOnlineMonitorsForOutbound (
+	List <ChatUserRec> getOnlineMonitorsForOutbound (
 			ChatUserRec thisUser);
 
-	/**
-	 * Get the closest online monitor suitable to use for an outbound message.
-	 *
-	 * @see getOnlineMoniorsForOutbound for detailed criteria.
-	 *
-	 * @param thisUser
-	 *            User message is to be sent to
-	 * @return Monitor to send
-	 */
 	ChatUserRec getOnlineMonitorForOutbound (
 			ChatUserRec thisUser);
 
 	void blockAll (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
-			MessageRec message);
+			Optional <MessageRec> message);
 
 	void userJoin (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			boolean sendMessage,
 			Long threadId,
 			ChatMessageMethod deliveryMethod);
 
 	void userLogoffWithMessage (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			Long threadId,
 			boolean automatic);
@@ -62,11 +50,13 @@ interface ChatMiscLogic {
 			long target);
 
 	void userAutoJoin (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			MessageRec message,
 			boolean sendMessage);
 
 	void chatUserSetName (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			String name,
 			Long threadId);

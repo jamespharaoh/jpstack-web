@@ -5,26 +5,28 @@ import static wbs.utils.time.TimeUtils.instantToDateNullSafe;
 
 import java.util.Date;
 
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-
-import com.google.common.base.Optional;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("dateFormFieldNativeMapping")
 public
-class DateFormFieldNativeMapping<Container>
-	implements FormFieldNativeMapping<Container,Instant,Date> {
+class DateFormFieldNativeMapping <Container>
+	implements FormFieldNativeMapping <Container, Instant, Date> {
 
 	// implementation
 
 	@Override
 	public
 	Optional<Date> genericToNative (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Optional<Instant> genericValue) {
 

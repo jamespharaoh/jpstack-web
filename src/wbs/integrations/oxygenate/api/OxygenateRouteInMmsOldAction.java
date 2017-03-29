@@ -149,7 +149,8 @@ class OxygenateRouteInMmsOldAction
 			processRequestBody (
 				taskLogger);
 
-			updateDatabase ();
+			updateDatabase (
+				taskLogger);
 
 			transaction.commit ();
 
@@ -313,10 +314,11 @@ class OxygenateRouteInMmsOldAction
 
 			medias.add (
 				mediaLogic.createMediaRequired (
+					taskLogger,
 					fileItem.get (),
 					type,
 					fileItem.getName (),
-					Optional.of (
+					optionalOf (
 						charset)));
 
 			if (
@@ -347,7 +349,13 @@ class OxygenateRouteInMmsOldAction
 
 	}
 
-	void updateDatabase () {
+	void updateDatabase (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"updateDatabase");
 
 		// lookup route
 
@@ -401,13 +409,16 @@ class OxygenateRouteInMmsOldAction
 
 		TextRec messageText =
 			textHelper.findOrCreate (
+				taskLogger,
 				messageString);
 
 		smsInboxLogic.inboxInsert (
+			taskLogger,
 			optionalOf (
 				mmsMessageId),
 			messageText,
 			smsNumberHelper.findOrCreate (
+				taskLogger,
 				mmsSenderAddress),
 			mmsRecipientAddress,
 			route,

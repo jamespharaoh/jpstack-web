@@ -10,13 +10,17 @@ import java.util.stream.Collectors;
 import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHooks;
+
 import wbs.platform.object.core.model.ObjectTypeDao;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.priv.model.PrivRec;
@@ -31,6 +35,9 @@ class PrivHooks
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectTypeDao objectTypeDao;
@@ -84,6 +91,7 @@ class PrivHooks
 	@Override
 	public
 	void createSingletons (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ObjectHelper<PrivRec> privHelper,
 			@NonNull ObjectHelper<?> parentHelper,
 			@NonNull Record<?> parent) {
@@ -95,6 +103,11 @@ class PrivHooks
 		) {
 			return;
 		}
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createSingletons");
 
 		ObjectTypeRec parentType =
 			objectTypeDao.findById (
@@ -111,6 +124,7 @@ class PrivHooks
 					privTypeId);
 
 			privHelper.insert (
+				taskLogger,
 				privHelper.createInstance ()
 
 				.setPrivType (

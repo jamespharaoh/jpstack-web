@@ -22,6 +22,7 @@ import org.json.simple.JSONValue;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -29,6 +30,7 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -71,8 +73,8 @@ class SimulatorSessionCreateEventAction
 	@SingletonDependency
 	ExceptionLogger exceptionLogger;
 
-	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	NetworkConsoleHelper networkHelper;
@@ -102,6 +104,9 @@ class SimulatorSessionCreateEventAction
 	SliceConsoleHelper sliceHelper;
 
 	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
+
+	@SingletonDependency
 	NumberConsoleHelper smsNumberHelper;
 
 	@SingletonDependency
@@ -126,7 +131,12 @@ class SimulatorSessionCreateEventAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		try {
 
@@ -139,7 +149,10 @@ class SimulatorSessionCreateEventAction
 					type,
 					"sendMessage")
 			) {
-				return sendMessage ();
+
+				return sendMessage (
+					taskLogger);
+
 			}
 
 			if (
@@ -147,7 +160,10 @@ class SimulatorSessionCreateEventAction
 					type,
 					"deliveryReport")
 			) {
-				return deliveryReport ();
+
+				return deliveryReport (
+					taskLogger);
+
 			}
 
 			throw new AjaxException (
@@ -177,10 +193,11 @@ class SimulatorSessionCreateEventAction
 		} catch (RuntimeException exception) {
 
 			exceptionLogger.logThrowable (
+				taskLogger,
 				"console",
 				requestContext.requestPath (),
 				exception,
-				Optional.of (
+				optionalOf (
 					userConsoleLogic.userIdRequired ()),
 				GenericExceptionResolution.ignoreWithUserWarning);
 
@@ -205,7 +222,13 @@ class SimulatorSessionCreateEventAction
 
 	}
 
-	Responder sendMessage () {
+	Responder sendMessage (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendMessage");
 
 		try (
 
@@ -279,10 +302,13 @@ class SimulatorSessionCreateEventAction
 
 			MessageRec message =
 				smsInboxLogic.inboxInsert (
+					taskLogger,
 					optionalAbsent (),
 					textHelper.findOrCreate (
+						taskLogger,
 						messageText),
 					smsNumberHelper.findOrCreate (
+						taskLogger,
 						numFrom),
 					numTo,
 					route,
@@ -316,6 +342,7 @@ class SimulatorSessionCreateEventAction
 			// create event
 
 			simulatorEventHelper.insert (
+				taskLogger,
 				simulatorEventHelper.createInstance ()
 
 				.setSimulatorSession (
@@ -338,10 +365,12 @@ class SimulatorSessionCreateEventAction
 
 			NumberRec number =
 				smsNumberHelper.findOrCreate (
+					taskLogger,
 					numFrom);
 
 			SimulatorSessionNumberRec simulatorSessionNumber =
 				simulatorSessionNumberHelper.findOrCreate (
+					taskLogger,
 					number);
 
 			simulatorSessionNumber
@@ -363,7 +392,13 @@ class SimulatorSessionCreateEventAction
 
 	}
 
-	Responder deliveryReport () {
+	Responder deliveryReport (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"deliveryReport");
 
 		try (
 
@@ -390,6 +425,7 @@ class SimulatorSessionCreateEventAction
 			// submit delivery report
 
 			reportLogic.deliveryReport (
+				taskLogger,
 				messageId,
 				ifThenElse (
 					success,
@@ -426,6 +462,7 @@ class SimulatorSessionCreateEventAction
 			// create event
 
 			simulatorEventHelper.insert (
+				taskLogger,
 				simulatorEventHelper.createInstance ()
 
 				.setSimulatorSession (

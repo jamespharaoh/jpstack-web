@@ -99,7 +99,6 @@ class AutoResponderVotesPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		@SuppressWarnings ("unused")
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
@@ -125,6 +124,7 @@ class AutoResponderVotesPart
 
 		formUpdate =
 			formFieldLogic.update (
+				taskLogger,
 				requestContext,
 				formFields,
 				formValue,

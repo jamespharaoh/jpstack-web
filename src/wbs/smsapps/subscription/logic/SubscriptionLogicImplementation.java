@@ -6,19 +6,27 @@ import static wbs.utils.etc.NullUtils.ifNull;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.affiliate.model.AffiliateObjectHelper;
 import wbs.platform.event.logic.EventLogic;
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.user.model.UserRec;
+
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.logic.SmsMessageSender;
+
 import wbs.smsapps.subscription.model.SubscriptionAffiliateRec;
 import wbs.smsapps.subscription.model.SubscriptionBillObjectHelper;
 import wbs.smsapps.subscription.model.SubscriptionBillRec;
@@ -51,6 +59,9 @@ class SubscriptionLogicImplementation
 	@SingletonDependency
 	EventLogic eventLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
 
@@ -73,7 +84,13 @@ class SubscriptionLogicImplementation
 	@Override
 	public
 	void sendNow (
-			SubscriptionSendNumberRec subscriptionSendNumber) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull SubscriptionSendNumberRec subscriptionSendNumber) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendNow");
 
 		SubscriptionSendRec subscriptionSend =
 			subscriptionSendNumber.getSubscriptionSend ();
@@ -148,7 +165,8 @@ class SubscriptionLogicImplementation
 					subscriptionAffiliate,
 					"default"))
 
-			.send ();
+			.send (
+				taskLogger);
 
 		// update state
 
@@ -170,7 +188,13 @@ class SubscriptionLogicImplementation
 	@Override
 	public
 	void sendLater (
-			SubscriptionSendNumberRec subscriptionSendNumber) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull SubscriptionSendNumberRec subscriptionSendNumber) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendLater");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -250,6 +274,7 @@ class SubscriptionLogicImplementation
 
 			SubscriptionBillRec subscriptionBill =
 				subscriptionBillHelper.insert (
+					taskLogger,
 					subscriptionBillHelper.createInstance ()
 
 				.setSubscriptionNumber (
@@ -301,7 +326,8 @@ class SubscriptionLogicImplementation
 				.ref (
 					subscriptionBill.getId ())
 
-				.send ();
+				.send (
+					taskLogger);
 
 			subscriptionBill
 
@@ -325,9 +351,15 @@ class SubscriptionLogicImplementation
 	@Override
 	public
 	void scheduleSend (
-			SubscriptionSendRec subscriptionSend,
-			Instant scheduleForTime,
-			UserRec user) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull SubscriptionSendRec subscriptionSend,
+			@NonNull Instant scheduleForTime,
+			@NonNull UserRec user) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"scheduleSend");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -367,6 +399,7 @@ class SubscriptionLogicImplementation
 		// create event
 
 		eventLogic.createEvent (
+			taskLogger,
 			"subscription_send_scheduled",
 			user,
 			subscriptionSend,

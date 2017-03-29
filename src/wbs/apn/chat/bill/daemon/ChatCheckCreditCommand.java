@@ -1,6 +1,7 @@
 package wbs.apn.chat.bill.daemon;
 
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -10,8 +11,10 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -68,8 +71,8 @@ class ChatCheckCreditCommand
 	@SingletonDependency
 	CurrencyLogic currencyLogic;
 
-	@SingletonDependency
-	SmsInboxLogic smsInboxLogic;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MessageObjectHelper messageHelper;
@@ -79,6 +82,9 @@ class ChatCheckCreditCommand
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
+
+	@SingletonDependency
+	SmsInboxLogic smsInboxLogic;
 
 	// properties
 
@@ -111,12 +117,17 @@ class ChatCheckCreditCommand
 	@Override
 	public
 	InboxAttemptRec handle (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		ChatRec chat =
-			(ChatRec)
-			objectManager.getParentRequired (
-				command);
+			genericCastUnchecked (
+				objectManager.getParentRequired (
+					command));
 
 		ServiceRec defaultService =
 			serviceHelper.findByCodeRequired (
@@ -128,6 +139,7 @@ class ChatCheckCreditCommand
 
 		ChatUserRec chatUser =
 			chatUserHelper.findOrCreate (
+				taskLogger,
 				chat,
 				message);
 
@@ -139,6 +151,7 @@ class ChatCheckCreditCommand
 
 		ChatCreditCheckResult creditCheckResult =
 			chatCreditLogic.userSpendCreditCheck (
+				taskLogger,
 				chatUser,
 				true,
 				optionalOf (
@@ -147,6 +160,7 @@ class ChatCheckCreditCommand
 		if (creditCheckResult.failed ()) {
 
 			chatHelpLogLogic.createChatHelpLogIn (
+				taskLogger,
 				chatUser,
 				message,
 				rest,
@@ -154,6 +168,7 @@ class ChatCheckCreditCommand
 				true);
 
 			return smsInboxLogic.inboxProcessed (
+				taskLogger,
 				inbox,
 				optionalOf (
 					defaultService),
@@ -171,6 +186,7 @@ class ChatCheckCreditCommand
 				chatUser.getCredit ());
 
 		chatSendLogic.sendSystemRbFree (
+			taskLogger,
 			chatUser,
 			optionalOf (
 				message.getThreadId ()),
@@ -183,6 +199,7 @@ class ChatCheckCreditCommand
 		// process inbox
 
 		return smsInboxLogic.inboxProcessed (
+			taskLogger,
 			inbox,
 			optionalOf (
 				defaultService),

@@ -9,7 +9,9 @@ import lombok.NonNull;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
@@ -24,14 +26,17 @@ class AbstractMediaImageResponder
 
 	// singleton dependencies
 
-	@SingletonDependency
-	ConsoleRequestContext requestContext;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaObjectHelper mediaHelper;
 
 	@SingletonDependency
 	MediaLogic mediaLogic;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// state
 
@@ -43,6 +48,7 @@ class AbstractMediaImageResponder
 
 	protected abstract
 	byte[] getData (
+			TaskLogger parentTaskLogger,
 			MediaRec media);
 
 	protected abstract
@@ -56,17 +62,29 @@ class AbstractMediaImageResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare ()");
+
 		media =
 			mediaHelper.findRequired (
 				requestContext.stuffIntegerRequired (
 					"mediaId"));
 
-		transform ();
+		transform (
+			taskLogger);
 
 	}
 
 	protected
-	void transform () {
+	void transform (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"transform ()");
 
 		String rotate =
 			requestContext.parameterOrEmptyString (
@@ -82,8 +100,12 @@ class AbstractMediaImageResponder
 				mediaLogic.writeImage (
 					mediaLogic.rotateImage90 (
 						mediaLogic.readImageRequired (
-							getData (media),
-							getMimeType (media))),
+							taskLogger,
+							getData (
+								taskLogger,
+								media),
+							getMimeType (
+								media))),
 					getMimeType (media));
 
 		} else if (
@@ -96,9 +118,14 @@ class AbstractMediaImageResponder
 				mediaLogic.writeImage (
 					mediaLogic.rotateImage180 (
 						mediaLogic.readImageRequired (
-							getData (media),
-							getMimeType (media))),
-					getMimeType (media));
+							taskLogger,
+							getData (
+								taskLogger,
+								media),
+							getMimeType (
+								media))),
+					getMimeType (
+						media));
 
 		} else if (
 			stringEqualSafe (
@@ -110,14 +137,21 @@ class AbstractMediaImageResponder
 				mediaLogic.writeImage (
 					mediaLogic.rotateImage270 (
 						mediaLogic.readImageRequired (
-							getData (media),
-							getMimeType (media))),
-					getMimeType (media));
+							taskLogger,
+							getData (
+								taskLogger,
+								media),
+							getMimeType (
+								media))),
+					getMimeType (
+						media));
 
 		} else {
 
 			data =
-				getData (media);
+				getData (
+					taskLogger,
+					media);
 
 		}
 

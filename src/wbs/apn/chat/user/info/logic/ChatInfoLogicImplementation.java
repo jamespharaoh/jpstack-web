@@ -1,15 +1,16 @@
 package wbs.apn.chat.user.info.logic;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.roundToIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.laterThan;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Provider;
@@ -19,11 +20,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -33,6 +34,8 @@ import wbs.framework.entity.record.IdObject;
 import wbs.framework.exception.ExceptionLogger;
 import wbs.framework.exception.ExceptionUtils;
 import wbs.framework.exception.GenericExceptionResolution;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.affiliate.model.AffiliateRec;
 import wbs.platform.media.logic.MediaLogic;
@@ -73,7 +76,6 @@ import wbs.apn.chat.user.info.model.ChatUserInfoObjectHelper;
 import wbs.apn.chat.user.info.model.ChatUserInfoRec;
 import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 
-@Log4j
 @SingletonComponent ("chatInfoLogic")
 public
 class ChatInfoLogicImplementation
@@ -123,6 +125,9 @@ class ChatInfoLogicImplementation
 	@SingletonDependency
 	LocatorLogic locatorLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MagicNumberLogic magicNumberLogic;
 
@@ -151,10 +156,16 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	void sendUserInfo (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec thisUser,
 			@NonNull ChatUserRec otherUser,
 			@NonNull Optional <Long> threadIdOptional,
 			@NonNull Boolean asDating) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendUserInfo");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -165,6 +176,7 @@ class ChatInfoLogicImplementation
 		// update chat user with last info stats and charge
 
 		chatCreditLogic.userSpend (
+			taskLogger,
 			thisUser,
 			0,
 			0,
@@ -181,6 +193,7 @@ class ChatInfoLogicImplementation
 
 		ChatContactRec contact =
 			chatContactHelper.findOrCreate (
+				taskLogger,
 				otherUser,
 				thisUser);
 
@@ -236,11 +249,12 @@ class ChatInfoLogicImplementation
 
 		} catch (IllegalArgumentException exception) {
 
-			log.error (
-				"Error splitting message",
-				exception);
+			taskLogger.errorFormatException (
+				exception,
+				"Error splitting message");
 
 			exceptionLogger.logSimple (
+				taskLogger,
 				"unknown",
 				"chatLogic.sendUserInfo (...)",
 				"MessageSplitter.split (...) threw IllegalArgumentException",
@@ -280,11 +294,13 @@ class ChatInfoLogicImplementation
 
 			textParts.add (
 				textHelper.findOrCreate (
+					taskLogger,
 					part));
 
 		}
 
 		chatSendLogic.sendMessageMagic (
+			taskLogger,
 			thisUser,
 			threadIdOptional,
 			textParts,
@@ -295,16 +311,22 @@ class ChatInfoLogicImplementation
 				chat,
 				serviceCode),
 			otherUser.getId (),
-			Optional.absent ());
+			optionalAbsent ());
 
 	}
 
 	@Override
 	public
 	long sendUserInfos (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec thisUser,
 			@NonNull Long numToSend,
 			@NonNull Optional <Long> threadIdOptional) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendUserInfos");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -332,6 +354,7 @@ class ChatInfoLogicImplementation
 		) {
 
 			sendUserInfo (
+				taskLogger,
 				thisUser,
 				otherUser,
 				threadIdOptional,
@@ -346,8 +369,14 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	String chatUserBlurb (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec thisUser,
 			@NonNull ChatUserRec otherUser) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatUserBlurb");
 
 		ChatRec chat =
 			thisUser.getChat ();
@@ -359,6 +388,7 @@ class ChatInfoLogicImplementation
 
 		MagicNumberRec magicNumber =
 			magicNumberLogic.allocateMagicNumber (
+				taskLogger,
 				chatScheme.getMagicNumberSet (),
 				thisUser.getNumber (),
 				commandHelper.findByCodeRequired (
@@ -401,15 +431,23 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	MediaRec chatUserBlurbMedia (
-			ChatUserRec thisUser,
-			ChatUserRec otherUser) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec thisUser,
+			@NonNull ChatUserRec otherUser) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatUserBlurbMedia");
 
 		String message =
 			chatUserBlurb (
+				taskLogger,
 				thisUser,
 				otherUser);
 
 		return mediaLogic.createTextMedia (
+			taskLogger,
 			message,
 			"text/plain",
 			otherUser.getCode () + ".txt");
@@ -418,10 +456,16 @@ class ChatInfoLogicImplementation
 
 	public
 	void sendUserPicsViaLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec thisUser,
 			@NonNull Collection <ChatUserRec> otherUsers,
 			@NonNull Optional <Long> threadIdOptional,
 			@NonNull Boolean asDating) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendUserPicsViaLink");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -436,6 +480,7 @@ class ChatInfoLogicImplementation
 
 		ChatInfoSiteRec chatInfoSite =
 			chatInfoSiteHelper.insert (
+				taskLogger,
 				chatInfoSiteHelper.createInstance ()
 
 			.setChatUser (
@@ -466,6 +511,7 @@ class ChatInfoLogicImplementation
 		// update user charge and stats
 
 		chatCreditLogic.userSpend (
+			taskLogger,
 			thisUser,
 			0,
 			0,
@@ -544,6 +590,7 @@ class ChatInfoLogicImplementation
 				thisUser.getNumber ())
 
 			.messageString (
+				taskLogger,
 				messageText)
 
 			.numFrom (
@@ -558,16 +605,23 @@ class ChatInfoLogicImplementation
 			.affiliate (
 				affiliate)
 
-			.send ();
+			.send (
+				taskLogger);
 
 	}
 
 	public
 	void sendUserPicsViaMms (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec thisUser,
 			@NonNull Collection <ChatUserRec> otherUsers,
 			@NonNull Optional <Long> threadIdOptional,
 			@NonNull Boolean asDating) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendUserPicsViaMms");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -601,16 +655,18 @@ class ChatInfoLogicImplementation
 
 			medias.add (
 				chatUserBlurbMedia (
+					taskLogger,
 					thisUser,
 					otherUser));
 
-			i++;
+			i ++;
 
 		}
 
 		// update chat user with last pic stats and charge
 
 		chatCreditLogic.userSpend (
+			taskLogger,
 			thisUser,
 			0,
 			0,
@@ -633,6 +689,7 @@ class ChatInfoLogicImplementation
 
 		MediaRec helpTextMedia =
 			mediaLogic.createTextMedia (
+				taskLogger,
 				chatHelpTemplate.getText (),
 				"text/plain",
 				"help.text");
@@ -664,6 +721,7 @@ class ChatInfoLogicImplementation
 				thisUser.getNumber ())
 
 			.messageString (
+				taskLogger,
 				"")
 
 			.numFrom (
@@ -679,22 +737,30 @@ class ChatInfoLogicImplementation
 				affiliate)
 
 			.subjectString (
+				taskLogger,
 				"User profiles")
 
 			.medias (
 				medias)
 
-			.send ();
+			.send (
+				taskLogger);
 
 	}
 
 	@Override
 	public
 	void sendUserPics (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec thisUser,
 			@NonNull Collection <ChatUserRec> otherUsers,
 			@NonNull Optional <Long> threadIdOptional,
 			@NonNull Boolean asDating) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendUserPics");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -704,6 +770,7 @@ class ChatInfoLogicImplementation
 		case link:
 
 			sendUserPicsViaLink (
+				taskLogger,
 				thisUser,
 				otherUsers,
 				threadIdOptional,
@@ -714,6 +781,7 @@ class ChatInfoLogicImplementation
 		case mms:
 
 			sendUserPicsViaMms (
+				taskLogger,
 				thisUser,
 				otherUsers,
 				threadIdOptional,
@@ -736,6 +804,7 @@ class ChatInfoLogicImplementation
 
 			ChatContactRec contact =
 				chatContactHelper.findOrCreate (
+					taskLogger,
 					otherUser,
 					thisUser);
 
@@ -751,10 +820,16 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	void sendUserVideos (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec thisUser,
 			@NonNull Collection <ChatUserRec> otherUsers,
 			@NonNull Optional <Long> threadIdOptional,
 			@NonNull Boolean asDating) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendUserVideos");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -765,7 +840,7 @@ class ChatInfoLogicImplementation
 		List <MediaRec> medias =
 			new ArrayList<> ();
 
-		int i = 0;
+		int index = 0;
 
 		for (
 			ChatUserRec otherUser
@@ -785,6 +860,7 @@ class ChatInfoLogicImplementation
 
 			medias.add (
 				chatUserBlurbMedia (
+					taskLogger,
 					thisUser,
 					otherUser));
 
@@ -792,6 +868,7 @@ class ChatInfoLogicImplementation
 
 			ChatContactRec contact =
 				chatContactHelper.findOrCreate (
+					taskLogger,
 					otherUser,
 					thisUser);
 
@@ -800,19 +877,20 @@ class ChatInfoLogicImplementation
 				.setLastVideoTime (
 					transaction.now ());
 
-			i ++;
+			index ++;
 
 		}
 
 		// update chat user with last video stats and charge
 
 		chatCreditLogic.userSpend (
+			taskLogger,
 			thisUser,
 			0,
 			0,
 			0,
 			0,
-			i);
+			index);
 
 		thisUser
 
@@ -829,6 +907,7 @@ class ChatInfoLogicImplementation
 
 		MediaRec helpTextMedia =
 			mediaLogic.createTextMedia (
+				taskLogger,
 				template.getText (),
 				"text/plain",
 				"help.text");
@@ -861,6 +940,7 @@ class ChatInfoLogicImplementation
 				thisUser.getNumber ())
 
 			.messageString (
+				taskLogger,
 				"")
 
 			.numFrom (
@@ -876,22 +956,30 @@ class ChatInfoLogicImplementation
 				affiliate)
 
 			.subjectString (
+				taskLogger,
 				"User videos")
 
 			.medias (
 				medias)
 
-			.send ();
+			.send (
+				taskLogger);
 
 	}
 
 	@Override
 	public
 	long sendRequestedUserPicandOtherUserPics (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec thisUser,
 			@NonNull ChatUserRec requestedUser,
 			@NonNull Long numToSend,
 			@NonNull Optional <Long> threadIdOptional) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendRequestedUserPicandOtherUserPics");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -902,20 +990,22 @@ class ChatInfoLogicImplementation
 				.minusDays (1)
 				.toInstant ();
 
-		Collection<ChatUserRec> otherUsers =
+		Collection <ChatUserRec> otherUsers =
 			getNearbyOnlineUsersForPic (
 				thisUser,
 				cutoffTime,
 				numToSend);
 
-		ArrayList<ChatUserRec> list =
-			new ArrayList<ChatUserRec> (otherUsers);
+		ArrayList <ChatUserRec> list =
+			new ArrayList<> (
+				otherUsers);
 
 		list.add (0, requestedUser);
 
 		otherUsers = list;
 
 		sendUserPics (
+			taskLogger,
 			thisUser,
 			otherUsers,
 			threadIdOptional,
@@ -928,9 +1018,15 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	long sendUserPics (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec thisUser,
 			@NonNull Long numToSend,
 			@NonNull Optional <Long> threadIdOptional) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendUserPics");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -951,6 +1047,7 @@ class ChatInfoLogicImplementation
 			return 0;
 
 		sendUserPics (
+			taskLogger,
 			thisUser,
 			otherUsers,
 			threadIdOptional,
@@ -963,9 +1060,15 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	long sendUserVideos (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec thisUser,
 			@NonNull Long numToSend,
 			@NonNull Optional <Long> threadId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendUserVideos");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -986,6 +1089,7 @@ class ChatInfoLogicImplementation
 			return 0;
 
 		sendUserVideos (
+			taskLogger,
 			thisUser,
 			otherUsers,
 			threadId,
@@ -1416,9 +1520,15 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	void chatUserSetInfo (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull String info,
 			@NonNull Optional <Long> threadId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatUserSetInfo");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -1428,12 +1538,14 @@ class ChatInfoLogicImplementation
 
 		TextRec newInfoText =
 			textHelper.findOrCreate (
+				taskLogger,
 				info);
 
 		// create the chat user info
 
 		ChatUserInfoRec chatUserInfoRec =
 			chatUserInfoHelper.insert (
+				taskLogger,
 				chatUserInfoHelper.createInstance ()
 
 			.setChatUser (
@@ -1465,7 +1577,9 @@ class ChatInfoLogicImplementation
 
 			QueueItemRec queueItem =
 				queueLogic.createQueueItem (
-					queueLogic.findQueue (chat, "user"),
+					taskLogger,
+					chat,
+					"user",
 					chatUser,
 					chatUser,
 					chatUserLogic.getPrettyName (
@@ -1484,7 +1598,13 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	void sendNameHint (
-			ChatUserRec chatUser) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendNameHint");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -1495,8 +1615,9 @@ class ChatInfoLogicImplementation
 		// send the message
 
 		chatSendLogic.sendSystemMagic (
+			taskLogger,
 			chatUser,
-			Optional.absent (),
+			optionalAbsent (),
 			"name_hint",
 			commandHelper.findByCodeRequired (
 				chat,
@@ -1506,7 +1627,7 @@ class ChatInfoLogicImplementation
 					chat,
 					"name")),
 			TemplateMissing.error,
-			Collections.emptyMap ());
+			emptyMap ());
 
 		// and update the chat user
 
@@ -1520,7 +1641,13 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	void sendPicHint (
-			ChatUserRec chatUser) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendPicHint");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -1531,8 +1658,9 @@ class ChatInfoLogicImplementation
 		// send the message
 
 		chatSendLogic.sendSystemMmsFree (
+			taskLogger,
 			chatUser,
-			Optional.<Long>absent (),
+			optionalAbsent (),
 			"photo_hint",
 			commandHelper.findByCodeRequired (
 				chat,
@@ -1551,7 +1679,13 @@ class ChatInfoLogicImplementation
 	@Override
 	public
 	void sendPicHint2 (
-			ChatUserRec chatUser) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec chatUser) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendPicHint2");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -1562,8 +1696,9 @@ class ChatInfoLogicImplementation
 		// send the message
 
 		chatSendLogic.sendSystemMmsFree (
+			taskLogger,
 			chatUser,
-			Optional.<Long>absent (),
+			optionalAbsent (),
 			"photo_hint_2",
 			commandHelper.findByCodeRequired (
 				chat,

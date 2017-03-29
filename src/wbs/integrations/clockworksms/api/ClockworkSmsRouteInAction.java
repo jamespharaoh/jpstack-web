@@ -108,12 +108,12 @@ class ClockworkSmsRouteInAction
 	@Override
 	protected
 	void processRequest (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
-		taskLogger =
+		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
-				taskLogger,
+				parentTaskLogger,
 				"processRequest");
 
 		// convert request to string
@@ -298,11 +298,14 @@ class ClockworkSmsRouteInAction
 		// insert message
 
 		smsInboxLogic.inboxInsert (
+			taskLogger,
 			optionalOf (
 				request.id ()),
 			textHelper.findOrCreate (
+				taskLogger,
 				request.content ()),
 			smsNumberHelper.findOrCreate (
+				taskLogger,
 				request.from ()),
 			request.to (),
 			smsRoute,
@@ -336,8 +339,13 @@ class ClockworkSmsRouteInAction
 	@Override
 	protected
 	void storeLog (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String debugLog) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"storeLog");
 
 		@Cleanup
 		Transaction transaction =
@@ -346,6 +354,7 @@ class ClockworkSmsRouteInAction
 				this);
 
 		clockworkSmsInboundLogHelper.insert (
+			taskLogger,
 			clockworkSmsInboundLogHelper.createInstance ()
 
 			.setRoute (

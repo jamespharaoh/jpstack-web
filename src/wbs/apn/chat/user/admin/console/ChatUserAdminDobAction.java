@@ -119,6 +119,7 @@ class ChatUserAdminDobAction
 			// create event
 
 			eventLogic.createEvent (
+				taskLogger,
 				"chat_user_dob",
 				userConsoleLogic.userRequired (),
 				chatUser,

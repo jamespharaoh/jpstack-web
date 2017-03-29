@@ -12,15 +12,19 @@ import com.google.common.base.Optional;
 import lombok.Cleanup;
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHooks;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.object.core.model.ObjectTypeDao;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.scaffold.model.SliceRec;
@@ -36,6 +40,9 @@ class ServiceHooks
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@WeakSingletonDependency
 	ObjectManager objectManager;
@@ -92,6 +99,7 @@ class ServiceHooks
 	@Override
 	public
 	void createSingletons (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ObjectHelper <ServiceRec> serviceHelper,
 			@NonNull ObjectHelper <?> parentHelper,
 			@NonNull Record <?> parent) {
@@ -103,6 +111,11 @@ class ServiceHooks
 		) {
 			return;
 		}
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createSingletons");
 
 		Optional <SliceRec> slice =
 			objectManager.getAncestor (
@@ -124,6 +137,7 @@ class ServiceHooks
 					serviceTypeId);
 
 			serviceHelper.insert (
+				taskLogger,
 				serviceHelper.createInstance ()
 
 				.setServiceType (

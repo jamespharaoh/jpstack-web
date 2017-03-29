@@ -2,6 +2,7 @@ package wbs.imchat.api;
 
 import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.util.Map;
@@ -16,12 +17,14 @@ import lombok.NonNull;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.text.model.TextObjectHelper;
@@ -61,6 +64,9 @@ class ImChatCustomerCreateAction
 	@SingletonDependency
 	ImChatSessionObjectHelper imChatSessionHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RandomLogic randomLogic;
 
@@ -81,6 +87,11 @@ class ImChatCustomerCreateAction
 	public
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		DataFromJson dataFromJson =
 			new DataFromJson ();
@@ -178,6 +189,7 @@ class ImChatCustomerCreateAction
 
 		ImChatCustomerRec newCustomer =
 			imChatCustomerHelper.insert (
+				taskLogger,
 				imChatCustomerHelper.createInstance ()
 
 			.setImChat (
@@ -202,8 +214,9 @@ class ImChatCustomerCreateAction
 
 		// update details
 
-		Map<String,String> detailErrors =
+		Map <String, String> detailErrors =
 			imChatApiLogic.updateCustomerDetails (
+				taskLogger,
 				newCustomer,
 				createRequest.details ());
 
@@ -235,6 +248,7 @@ class ImChatCustomerCreateAction
 
 		ImChatSessionRec session =
 			imChatSessionHelper.insert (
+				taskLogger,
 				imChatSessionHelper.createInstance ()
 
 			.setImChatCustomer (
@@ -253,8 +267,11 @@ class ImChatCustomerCreateAction
 				transaction.now ())
 
 			.setUserAgentText (
-				textHelper.findOrCreateMapNull (
-					createRequest.userAgent ()))
+				optionalOrNull (
+					textHelper.findOrCreate (
+						taskLogger,
+						optionalFromNullable (
+							createRequest.userAgent ()))))
 
 			.setIpAddress (
 				optionalOrNull (

@@ -16,6 +16,7 @@ import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
 import wbs.framework.builder.annotations.BuilderTarget;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
@@ -25,6 +26,8 @@ import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.meta.model.ModelMetaSpec;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.affiliate.metamodel.AffiliateTypeSpec;
 import wbs.platform.affiliate.model.AffiliateTypeObjectHelper;
@@ -48,6 +51,9 @@ class AffiliateTypeBuilder {
 	@SingletonDependency
 	EntityHelper entityHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ObjectTypeObjectHelper objectTypeHelper;
 
@@ -67,7 +73,13 @@ class AffiliateTypeBuilder {
 	@BuildMethod
 	public
 	void build (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
 
 		try {
 
@@ -81,7 +93,8 @@ class AffiliateTypeBuilder {
 					simplifyToCodeRequired (
 						spec.name ())));
 
-			createAffiliateType ();
+			createAffiliateType (
+				taskLogger);
 
 		} catch (Exception exception) {
 
@@ -101,8 +114,14 @@ class AffiliateTypeBuilder {
 	}
 
 	private
-	void createAffiliateType ()
+	void createAffiliateType (
+			@NonNull TaskLogger parentTaskLogger)
 		throws SQLException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createAffiliateType");
 
 		// begin transaction
 
@@ -128,6 +147,7 @@ class AffiliateTypeBuilder {
 		// create affiliate type
 
 		affiliateTypeHelper.insert (
+			taskLogger,
 			affiliateTypeHelper.createInstance ()
 
 			.setParentType (

@@ -6,6 +6,6 @@ interface BackgroundProcess {
 	BackgroundProcess runAutomatically (
 			Boolean runAutomatically);
 
-	void runNow ();
+	void runOnce ();
 
 }

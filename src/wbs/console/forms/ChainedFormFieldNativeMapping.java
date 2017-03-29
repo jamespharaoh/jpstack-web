@@ -1,19 +1,27 @@
 package wbs.console.forms;
 
+import com.google.common.base.Optional;
+
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
-
-import com.google.common.base.Optional;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("chainedFormFieldNativeMapping")
 public
 class ChainedFormFieldNativeMapping<Container,Generic,Temporary,Native>
 	implements FormFieldNativeMapping<Container,Generic,Native> {
+
+	// singleton components
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -47,17 +55,25 @@ class ChainedFormFieldNativeMapping<Container,Generic,Temporary,Native>
 
 	@Override
 	public
-	Optional<Native> genericToNative (
+	Optional <Native> genericToNative (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Optional<Generic> genericValue) {
+			@NonNull Optional <Generic> genericValue) {
 
-		Optional<Temporary> temporaryValue =
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"genericToNative");
+
+		Optional <Temporary> temporaryValue =
 			previousMapping.genericToNative (
+				taskLogger,
 				container,
 				genericValue);
 
-		Optional<Native> nativeValue =
+		Optional <Native> nativeValue =
 			nextMapping.genericToNative (
+				taskLogger,
 				container,
 				temporaryValue);
 

@@ -6,6 +6,7 @@ import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
@@ -270,6 +271,7 @@ class ObjectCreateAction <
 
 		UpdateResultSet updateResultSet =
 			formFieldLogic.update (
+				taskLogger,
 				requestContext,
 				formFieldSet,
 				object,
@@ -342,6 +344,7 @@ class ObjectCreateAction <
 		// insert
 
 		consoleHelper.insert (
+			taskLogger,
 			object);
 
 		// after create hook
@@ -359,6 +362,7 @@ class ObjectCreateAction <
 		if (consoleHelper.ephemeral ()) {
 
 			eventLogic.createEvent (
+				taskLogger,
 				"object_created_in",
 				userConsoleLogic.userRequired (),
 				objectRef,
@@ -368,6 +372,7 @@ class ObjectCreateAction <
 		} else {
 
 			eventLogic.createEvent (
+				taskLogger,
 				"object_created",
 				userConsoleLogic.userRequired (),
 				object,
@@ -380,24 +385,26 @@ class ObjectCreateAction <
 		if (object instanceof PermanentRecord) {
 
 			formFieldLogic.runUpdateHooks (
+				taskLogger,
 				formFieldSet,
 				updateResultSet,
 				object,
-				(PermanentRecord<?>) object,
-				Optional.<Object>absent (),
-				Optional.<String>absent (),
+				(PermanentRecord <?>) object,
+				optionalAbsent (),
+				optionalAbsent (),
 				"create");
 
 		} else {
 
 			formFieldLogic.runUpdateHooks (
+				taskLogger,
 				formFieldSet,
 				updateResultSet,
 				object,
 				(PermanentRecord<?>) parent,
-				Optional.of (
+				optionalOf (
 					objectRef),
-				Optional.of (
+				optionalOf (
 					consoleHelper.shortName ()),
 				"create");
 

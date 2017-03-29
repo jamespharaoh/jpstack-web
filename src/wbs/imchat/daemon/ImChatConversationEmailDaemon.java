@@ -6,16 +6,17 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
 
@@ -23,7 +24,6 @@ import wbs.imchat.logic.ImChatLogic;
 import wbs.imchat.model.ImChatConversationObjectHelper;
 import wbs.imchat.model.ImChatConversationRec;
 
-@Log4j
 @SingletonComponent ("imChatConversationEmailDaemon")
 public
 class ImChatConversationEmailDaemon
@@ -39,6 +39,9 @@ class ImChatConversationEmailDaemon
 
 	@SingletonDependency
 	ImChatLogic imChatLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// details
 
@@ -79,30 +82,41 @@ class ImChatConversationEmailDaemon
 
 	@Override
 	protected
-	void runOnce () {
+	void runOnce (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		log.debug (
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"runOnce ()");
+
+		taskLogger.debugFormat (
 			"Checking for conversations to send an email");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ImChatConversationEmailDaemon.runOnce ()",
-				this);
+		try (
 
-		List<ImChatConversationRec> conversations =
-			imChatConversationHelper.findPendingEmailLimit (
-				1000);
+			Transaction transaction =
+				database.beginReadOnly (
+					"ImChatConversationEmailDaemon.runOnce ()",
+					this);
 
-		transaction.close ();
-
-		for (
-			ImChatConversationRec conversation
-				: conversations
 		) {
 
-			doConversation (
-				conversation.getId ());
+			List <ImChatConversationRec> conversations =
+				imChatConversationHelper.findPendingEmailLimit (
+					1000);
+
+			transaction.close ();
+
+			for (
+				ImChatConversationRec conversation
+					: conversations
+			) {
+
+				doConversation (
+					conversation.getId ());
+
+			}
 
 		}
 
@@ -111,56 +125,66 @@ class ImChatConversationEmailDaemon
 	void doConversation (
 			@NonNull Long conversationId) {
 
-		@Cleanup
-		Transaction updateTransaction =
-			database.beginReadWrite (
-				stringFormat (
-					"%s.%s (%s) begin",
-					"ImChatConcersationEmailDaemon",
-					"doConversation",
+		try (
+
+			Transaction updateTransaction =
+				database.beginReadWrite (
 					stringFormat (
-						"conversationId = %s",
-						integerToDecimalString (
-							conversationId))),
-				this);
+						"%s.%s (%s) begin",
+						"ImChatConcersationEmailDaemon",
+						"doConversation",
+						stringFormat (
+							"conversationId = %s",
+							integerToDecimalString (
+								conversationId))),
+					this);
 
-		ImChatConversationRec conversation =
-			imChatConversationHelper.findRequired (
-				conversationId);
-
-		if (
-			isNotNull (
-				conversation.getEmailTime ())
 		) {
-			return;
+
+			ImChatConversationRec conversation =
+				imChatConversationHelper.findRequired (
+					conversationId);
+
+			if (
+				isNotNull (
+					conversation.getEmailTime ())
+			) {
+				return;
+			}
+
+			conversation
+
+				.setEmailTime (
+					updateTransaction.now ());
+
+			updateTransaction.commit ();
+
+			try (
+
+				Transaction emailTransaction =
+					database.beginReadOnly (
+						stringFormat (
+							"%s.%s (%s) end",
+							"ImChatConversationEmailDaemon",
+							"doConversation",
+							stringFormat (
+								"conversationId = %s",
+								integerToDecimalString (
+									conversationId))),
+						this);
+
+			) {
+
+				conversation =
+					imChatConversationHelper.findRequired (
+						conversationId);
+
+				imChatLogic.conversationEmailSend (
+					conversation);
+
+			}
+
 		}
-
-		conversation
-
-			.setEmailTime (
-				updateTransaction.now ());
-
-		updateTransaction.commit ();
-
-		@Cleanup
-		Transaction emailTransaction =
-			database.beginReadOnly (
-				stringFormat (
-					"%s.%s (%s) end",
-					"ImChatConversationEmailDaemon",
-					"doConversation",
-					stringFormat (
-						"conversationId = %s",
-						integerToDecimalString (
-							conversationId))),
-				this);
-
-		conversation =
-			imChatConversationHelper.findRequired (
-				conversationId);
-
-		imChatLogic.conversationEmailSend (
-			conversation);
 
 	}
 

@@ -6,9 +6,13 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.scaffold.model.SliceRec;
@@ -24,8 +28,14 @@ class ServiceObjectHelperMethodsImplementation
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@WeakSingletonDependency
 	ObjectManager objectManager;
+
+	@WeakSingletonDependency
+	ObjectTypeObjectHelper objectTypeHelper;
 
 	@WeakSingletonDependency
 	ServiceObjectHelper serviceHelper;
@@ -33,21 +43,24 @@ class ServiceObjectHelperMethodsImplementation
 	@WeakSingletonDependency
 	ServiceTypeObjectHelper serviceTypeHelper;
 
-	@WeakSingletonDependency
-	ObjectTypeObjectHelper objectTypeHelper;
-
 	// implementation
 
 	@Override
 	public
 	ServiceRec findOrCreate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record<?> parent,
 			@NonNull String typeCode,
 			@NonNull String code) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrCreate");
+
 		// lookup existing service
 
-		Optional<ServiceRec> existingService =
+		Optional <ServiceRec> existingService =
 			serviceHelper.findByCode (
 				parent,
 				code);
@@ -71,13 +84,14 @@ class ServiceObjectHelperMethodsImplementation
 				parentType,
 				typeCode);
 
-		Optional<SliceRec> parentSlice =
+		Optional <SliceRec> parentSlice =
 			objectManager.getAncestor (
 				SliceRec.class,
 				parent);
 
 		ServiceRec newService =
 			serviceHelper.insert (
+				taskLogger,
 				serviceHelper.createInstance ()
 
 			.setCode (

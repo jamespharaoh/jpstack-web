@@ -1,6 +1,10 @@
 package wbs.platform.media.console;
 
+import lombok.NonNull;
+
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.media.model.MediaRec;
 
 @PrototypeComponent ("mediaThumb100Responder")
@@ -11,7 +15,8 @@ class MediaThumb100Responder
 	@Override
 	protected
 	byte[] getData (
-			MediaRec media) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull MediaRec media) {
 
 		return media.getThumb100Content ().getData ();
 
@@ -20,7 +25,7 @@ class MediaThumb100Responder
 	@Override
 	protected
 	String getMimeType (
-			MediaRec media) {
+			@NonNull MediaRec media) {
 
 		return media.getThumbMediaType ().getMimeType ();
 

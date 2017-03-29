@@ -7,11 +7,13 @@ import java.util.Map;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.paypal.model.PaypalAccountObjectHelper;
@@ -26,6 +28,9 @@ class PaypalFixtureProvider
 	implements FixtureProvider {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
@@ -49,7 +54,13 @@ class PaypalFixtureProvider
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFixtures");
+
 		menuItemHelper.insert (
+			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
@@ -80,14 +91,24 @@ class PaypalFixtureProvider
 
 		testAccounts.forEach (
 			"paypal",
-			this::createTestAccount);
+			testAccount ->
+				createTestAccount (
+					taskLogger,
+					testAccount));
 
 	}
 
 	void createTestAccount (
-			@NonNull Map<String,String> params) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Map <String, String> params) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createTestAccount");
 
 		paypalAccountHelper.insert (
+			taskLogger,
 			paypalAccountHelper.createInstance ()
 
 			.setSlice (

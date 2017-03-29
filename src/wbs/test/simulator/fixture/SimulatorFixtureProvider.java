@@ -2,12 +2,14 @@ package wbs.test.simulator.fixture;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.menu.model.MenuGroupObjectHelper;
@@ -33,6 +35,9 @@ class SimulatorFixtureProvider
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
@@ -68,16 +73,30 @@ class SimulatorFixtureProvider
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		createMenuItem ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createFixtures");
 
-		createSimulator ();
+		createMenuItem (
+			taskLogger);
+
+		createSimulator (
+			taskLogger);
 
 	}
 
 	private
-	void createMenuItem () {
+	void createMenuItem (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMenuItem");
 
 		menuItemHelper.insert (
+			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
@@ -109,13 +128,20 @@ class SimulatorFixtureProvider
 	}
 
 	private
-	void createSimulator () {
+	void createSimulator (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createSimulator");
 
 		Transaction transaction =
 			database.currentTransaction ();
 
 		SimulatorRec simulator =
 			simulatorHelper.insert (
+				taskLogger,
 				simulatorHelper.createInstance ()
 
 			.setSlice (
@@ -200,6 +226,7 @@ class SimulatorFixtureProvider
 				"inbound");
 
 		simulatorRouteHelper.insert (
+			taskLogger,
 			simulatorRouteHelper.createInstance ()
 
 			.setSimulator (
@@ -219,6 +246,7 @@ class SimulatorFixtureProvider
 		// session
 
 		simulatorSessionHelper.insert (
+			taskLogger,
 			simulatorSessionHelper.createInstance ()
 
 			.setSimulator (

@@ -98,6 +98,7 @@ class ChatUserHelpFormAction
 			// send message
 
 			chatHelpLogic.sendHelpMessage (
+				taskLogger,
 				userConsoleLogic.userRequired (),
 				chatUser,
 				text,

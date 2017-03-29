@@ -4,13 +4,14 @@ import java.io.IOException;
 
 import com.google.common.collect.ImmutableMap;
 
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
 import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.PrintResponder;
 

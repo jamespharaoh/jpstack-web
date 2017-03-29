@@ -8,23 +8,29 @@ import lombok.NonNull;
 
 import org.hibernate.TransientObjectException;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 import wbs.framework.object.ObjectHooks;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.object.core.model.ObjectTypeRec;
 import wbs.platform.queue.logic.QueueLogic;
 import wbs.platform.queue.model.QueueItemRec;
+
+import wbs.utils.random.RandomLogic;
+
 import wbs.services.ticket.core.model.TicketFieldTypeObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldTypeRec;
 import wbs.services.ticket.core.model.TicketFieldValueObjectHelper;
 import wbs.services.ticket.core.model.TicketFieldValueRec;
 import wbs.services.ticket.core.model.TicketObjectHelper;
 import wbs.services.ticket.core.model.TicketRec;
-import wbs.utils.random.RandomLogic;
 
 public
 class TicketHooks
@@ -34,6 +40,9 @@ class TicketHooks
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@WeakSingletonDependency
 	ObjectManager objectManager;
@@ -58,7 +67,13 @@ class TicketHooks
 	@Override
 	public
 	void afterInsert (
-			TicketRec ticket) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull TicketRec ticket) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"afterInsert");
 
 		// TODO does not belong here
 
@@ -68,9 +83,9 @@ class TicketHooks
 
 			QueueItemRec queueItem =
 				queueLogic.createQueueItem (
-					queueLogic.findQueue (
-						ticket.getTicketState (),
-						"default"),
+					taskLogger,
+					ticket.getTicketState (),
+					"default",
 					ticket,
 					ticket,
 					ticket.getCode (),
@@ -163,6 +178,7 @@ class TicketHooks
 	@Override
 	public
 	void setDynamic (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull TicketRec ticket,
 			@NonNull String name,
 			@NonNull Optional <?> valueOptional) {

@@ -146,6 +146,7 @@ class ImChatCoreFixtureProvider
 		// menu
 
 		menuItemHelper.insert (
+			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
@@ -187,6 +188,7 @@ class ImChatCoreFixtureProvider
 					"im-chat-message-template-database.xml"));
 
 		messageTemplateSetHelper.insert (
+			taskLogger,
 			messageTemplateSetHelper.createInstance ()
 
 			.setMessageTemplateDatabase (
@@ -214,6 +216,7 @@ class ImChatCoreFixtureProvider
 					"im-chat-embedded-message-template-database.xml"));
 
 		messageTemplateSetHelper.insert (
+			taskLogger,
 			messageTemplateSetHelper.createInstance ()
 
 			.setMessageTemplateDatabase (
@@ -234,6 +237,7 @@ class ImChatCoreFixtureProvider
 
 		ImChatRec imChat =
 			imChatHelper.insert (
+				taskLogger,
 				imChatHelper.createInstance ()
 
 			.setSlice (
@@ -325,6 +329,7 @@ class ImChatCoreFixtureProvider
 
 		ImChatPricePointRec basicPricePoint =
 			imChatPricePointHelper.insert (
+				taskLogger,
 				imChatPricePointHelper.createInstance ()
 
 			.setImChat (
@@ -357,6 +362,7 @@ class ImChatCoreFixtureProvider
 		);
 
 		imChatPricePointHelper.insert (
+			taskLogger,
 			imChatPricePointHelper.createInstance ()
 
 			.setImChat (
@@ -389,6 +395,7 @@ class ImChatCoreFixtureProvider
 		);
 
 		imChatPricePointHelper.insert (
+			taskLogger,
 			imChatPricePointHelper.createInstance ()
 
 			.setImChat (
@@ -429,6 +436,7 @@ class ImChatCoreFixtureProvider
 		) {
 
 			imChatTemplateHelper.insert (
+				taskLogger,
 				imChatTemplateHelper.createInstance ()
 
 				.setImChat (
@@ -465,6 +473,7 @@ class ImChatCoreFixtureProvider
 		// customer detail types
 
 		imChatCustomerDetailTypeHelper.insert (
+			taskLogger,
 			imChatCustomerDetailTypeHelper.createInstance ()
 
 			.setImChat (
@@ -506,6 +515,7 @@ class ImChatCoreFixtureProvider
 		);
 
 		imChatCustomerDetailTypeHelper.insert (
+			taskLogger,
 			imChatCustomerDetailTypeHelper.createInstance ()
 
 			.setImChat (
@@ -550,6 +560,7 @@ class ImChatCoreFixtureProvider
 		);
 
 		imChatCustomerDetailTypeHelper.insert (
+			taskLogger,
 			imChatCustomerDetailTypeHelper.createInstance ()
 
 			.setImChat (
@@ -591,6 +602,7 @@ class ImChatCoreFixtureProvider
 		);
 
 		imChatCustomerDetailTypeHelper.insert (
+			taskLogger,
 			imChatCustomerDetailTypeHelper.createInstance ()
 
 			.setImChat (
@@ -635,6 +647,7 @@ class ImChatCoreFixtureProvider
 
 		MediaRec dougalMedia =
 			mediaLogic.createMediaFromImageRequired (
+				taskLogger,
 				fileReadBytes (
 					"binaries/test/dougal.jpg"),
 				"image/jpeg",
@@ -642,6 +655,7 @@ class ImChatCoreFixtureProvider
 
 		MediaRec ermintrudeMedia =
 			mediaLogic.createMediaFromImageRequired (
+				taskLogger,
 				fileReadBytes (
 					"binaries/test/dougal.jpg"),
 				"image/jpeg",
@@ -658,6 +672,7 @@ class ImChatCoreFixtureProvider
 
 			profiles.add (
 				imChatProfileHelper.insert (
+					taskLogger,
 					imChatProfileHelper.createInstance ()
 
 				.setImChat (
@@ -715,6 +730,7 @@ class ImChatCoreFixtureProvider
 
 		ImChatCustomerRec imChatCustomer =
 			imChatCustomerHelper.insert (
+				taskLogger,
 				imChatCustomerHelper.createInstance ()
 
 			.setImChat (
@@ -741,6 +757,7 @@ class ImChatCoreFixtureProvider
 
 		ImChatConversationRec imChatConversation =
 			imChatConversationHelper.insert (
+				taskLogger,
 				imChatConversationHelper.createInstance ()
 
 			.setImChatCustomer (
@@ -769,6 +786,7 @@ class ImChatCoreFixtureProvider
 
 		ImChatSessionRec imChatSession =
 			imChatSessionHelper.insert (
+				taskLogger,
 				imChatSessionHelper.createInstance ()
 
 			.setImChatCustomer (
@@ -791,6 +809,7 @@ class ImChatCoreFixtureProvider
 
 			.setUserAgentText (
 				textHelper.findOrCreate (
+					taskLogger,
 					"User agent"))
 
 			.setIpAddress (
@@ -801,6 +820,7 @@ class ImChatCoreFixtureProvider
 		// im chat purchase
 
 		imChatPurchaseHelper.insert (
+			taskLogger,
 			imChatPurchaseHelper.createInstance ()
 
 			.setImChatCustomer (
@@ -840,6 +860,7 @@ class ImChatCoreFixtureProvider
 		// im chat message
 
 		imChatMessageHelper.insert (
+			taskLogger,
 			imChatMessageHelper.createInstance ()
 
 			.setImChatConversation (
