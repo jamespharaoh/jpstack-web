@@ -73,11 +73,6 @@ class WbsServlet
 			ServletException,
 			IOException {
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"doGet");
-
 		TaskLogger taskLogger =
 			logContext.createTaskLogger (
 				"doGet",
@@ -86,6 +81,11 @@ class WbsServlet
 						requestContext.cookie (
 							"wbs-debug"),
 						"no")));
+
+		@Cleanup
+		ActiveTask activeTask =
+			startTask (
+				"doGet");
 
 		try {
 
