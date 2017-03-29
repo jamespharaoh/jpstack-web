@@ -1,5 +1,6 @@
 package wbs.utils.cache;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import com.google.common.base.Optional;
@@ -10,6 +11,7 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsSpecialConfig;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @Data
@@ -30,7 +32,7 @@ class IdCacheBuilder <Key, Id, Value> {
 	Function <Key, Optional <Value>> lookupByKeyFunction;
 	Function <Id, Optional <Value>> lookupByIdFunction;
 	Function <Value, Id> getIdFunction;
-	Function <Key, Value> createFunction;
+	BiFunction <TaskLogger, Key, Value> createFunction;
 
 	// implementation
 
