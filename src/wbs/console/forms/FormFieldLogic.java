@@ -13,6 +13,7 @@ import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.utils.string.StringUtils.stringReplaceAllSimple;
@@ -1029,13 +1030,27 @@ class FormFieldLogic {
 				: formFieldSet.formFields ()
 		) {
 
-			formField.renderTableCellList (
-				taskLogger,
-				htmlWriter,
-				object,
-				hints,
-				links,
-				1l);
+			try {
+
+				formField.renderTableCellList (
+					taskLogger,
+					htmlWriter,
+					object,
+					hints,
+					links,
+					1l);
+
+			} catch (Exception exception) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Error rendering field %s for %s",
+						formField.name (),
+						objectToString (
+							object)),
+					exception);
+
+			}
 
 		}
 

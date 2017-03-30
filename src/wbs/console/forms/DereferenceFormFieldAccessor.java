@@ -1,7 +1,6 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringInSafe;
@@ -48,14 +47,10 @@ class DereferenceFormFieldAccessor <Container, Native>
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container) {
 
-		Native nativeValue =
-			genericCastUnchecked (
-				objectManager.dereferenceObsolete (
-					container,
-					path));
-
-		return optionalFromNullable (
-			nativeValue);
+		return genericCastUnchecked (
+			objectManager.dereference (
+				container,
+				path));
 
 	}
 
