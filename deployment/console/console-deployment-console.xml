@@ -37,6 +37,14 @@
 			<object-settings-page
 				fields="settings"/>
 
+			<context-tab-form-actions-page
+				name="actions">
+
+				<form-action
+					name="restart"/>
+
+			</context-tab-form-actions-page>
+
 			<object-events-page/>
 
 		</object>

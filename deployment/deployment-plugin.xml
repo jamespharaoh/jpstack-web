@@ -21,6 +21,10 @@
 		<component class="daemon.DeploymentAgent"/>
 	</layer>
 
+	<layer name="console">
+		<component class="console.ConsoleDeploymentRestartFormActionHelper"/>
+	</layer>
+
 	<console-modules>
 		<console-module name="deployment"/>
 		<console-module name="console-deployment"/>

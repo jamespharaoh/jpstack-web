@@ -48,4 +48,32 @@
 
 	</fields>
 
+	<event-types>
+
+		<event-type
+			name="Console deployment restarted"
+			text="%0 restarted %1"
+			admin="no"/>
+
+	</event-types>
+
+	<priv-types>
+
+		<priv-type
+			name="Manage"
+			description="Full control of a console deployment"
+			template="yes"/>
+
+		<priv-type
+			name="Restart"
+			description="Restart a console deployment"
+			template="yes"/>
+
+		<priv-type
+			name="View"
+			description="View a console deployment"
+			template="yes"/>
+
+	</priv-types>
+
 </model-meta>

@@ -285,6 +285,10 @@ class DeploymentAgent
 
 				return DeploymentState.stopping;
 
+			case "failed":
+
+				return DeploymentState.error;
+
 			default:
 
 				taskLogger.warningFormat (
