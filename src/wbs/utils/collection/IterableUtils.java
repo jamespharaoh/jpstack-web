@@ -103,15 +103,22 @@ class IterableUtils {
 			@NonNull Predicate <? super ItemType> predicate,
 			@NonNull Iterable <ItemType> input) {
 
-		// TODO should be more efficient
-
-		return ImmutableList.copyOf (
-				input)
-
-			.stream ()
+		return () ->
+			iterableStream (input)
 
 			.filter (
 				predicate)
+
+			.iterator ();				
+
+	}
+
+	public static <ItemType>
+	List <ItemType> iterableFilterToList (
+			@NonNull Predicate <? super ItemType> predicate,
+			@NonNull Iterable <ItemType> input) {
+
+		return iterableStream (input)
 
 			.collect (
 				Collectors.toList ());

@@ -245,7 +245,7 @@ class ChatBroadcastSendAction
 					false);
 
 			Map <String, Object> formHints =
-				ImmutableMap.<String,Object>builder ()
+				ImmutableMap.<String, Object> builder ()
 
 				.put (
 					"chat",
@@ -382,7 +382,7 @@ class ChatBroadcastSendAction
 				profileLogger.lap (
 					"lookup user");
 
-				Optional<ChatUserRec> fromChatUserOptional =
+				Optional <ChatUserRec> fromChatUserOptional =
 					chatUserHelper.findByCode (
 						chat,
 						form.fromUser ());
@@ -429,7 +429,7 @@ class ChatBroadcastSendAction
 
 				// perform search
 
-				List<Long> allChatUserIds =
+				List <Long> allChatUserIds =
 					new ArrayList<> ();
 
 				if (form.search ()) {
@@ -447,9 +447,6 @@ class ChatBroadcastSendAction
 
 						.deleted (
 							false)
-
-						.numberLike (
-							"447_________")
 
 						.deliveryMethodIn (
 							ImmutableList.of (
@@ -511,7 +508,7 @@ class ChatBroadcastSendAction
 
 					try {
 
-						List<String> allNumbers =
+						List <String> allNumbers =
 							numberFormatLogic.parseLines (
 								chat.getNumberFormat (),
 								form.numbers ());
@@ -523,7 +520,7 @@ class ChatBroadcastSendAction
 								: allNumbers
 						) {
 
-							Optional<NumberRec> numberOptional =
+							Optional <NumberRec> numberOptional =
 								numberHelper.findByCode (
 									GlobalId.root,
 									number);
@@ -572,7 +569,7 @@ class ChatBroadcastSendAction
 
 				int removedNumbers = 0;
 
-				List<Long> remainingChatUserIds =
+				List <Long> remainingChatUserIds =
 					new ArrayList<> ();
 
 				int loop1 = 0;
