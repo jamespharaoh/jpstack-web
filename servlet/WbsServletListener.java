@@ -24,6 +24,7 @@ import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
+import info.faljse.SDNotify.SDNotify;
 import wbs.web.context.RequestContextImplementation;
 
 public
@@ -120,6 +121,8 @@ class WbsServletListener
 		servletContext.setAttribute (
 			"wbs-application-context",
 			componentManager);
+
+		SDNotify.sendNotify ();
 
 	}
 

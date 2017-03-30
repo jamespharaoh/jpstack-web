@@ -7,6 +7,8 @@ import lombok.extern.log4j.Log4j;
 
 import wbs.framework.logging.TaskLogger;
 
+import info.faljse.SDNotify.SDNotify;
+
 @Log4j
 public
 class DaemonRunner {
@@ -18,6 +20,8 @@ class DaemonRunner {
 		throws InterruptedException {
 
 		log.info ("Daemon started");
+
+		SDNotify.sendNotify ();
 
 		try {
 
