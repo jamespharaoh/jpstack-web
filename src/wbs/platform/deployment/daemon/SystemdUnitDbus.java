@@ -1,6 +1,5 @@
 package wbs.platform.deployment.daemon;
 
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
 import lombok.NonNull;
@@ -17,6 +16,7 @@ class SystemdUnitDbus {
 
 	// state
 
+	@SuppressWarnings ("unused")
 	private final
 	DBusConnection dbusConnection;
 
@@ -49,10 +49,6 @@ class SystemdUnitDbus {
 	SystemdUnitDbus get (
 			@NonNull DBusConnection dbusConnection,
 			@NonNull String path) {
-
-		debugFormat (
-			"Get unit path: %s",
-			path);
 
 		try {
 
@@ -105,15 +101,39 @@ class SystemdUnitDbus {
 		return (String) getProperty ("SubState");
 	}
 
+	// dbus methods
+
+	public
+	void restart (
+			@NonNull String mode) {
+
+		dbusUnitInterface.restart (
+			mode);
+
+	}
+
+	public
+	void start (
+			@NonNull String mode) {
+
+		dbusUnitInterface.start (
+			mode);
+
+	}
+
 	// dbus interface
 
-	@DBusInterfaceName (dbusInterfaceName)  
+	@DBusInterfaceName (dbusInterfaceName)
 	public static
 	interface SystemdUnitDbusInterface
 		extends DBusInterface {
 
 		@DBusMemberName ("Start")
 		Object start (
+				String mode);
+
+		@DBusMemberName ("Restart")
+		Object restart (
 				String mode);
 
 	}

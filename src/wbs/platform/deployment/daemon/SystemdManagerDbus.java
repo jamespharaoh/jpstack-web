@@ -79,7 +79,7 @@ class SystemdManagerDbus {
 		@DBusMemberName ("GetUnit")
 		Path getUnit (
 				String name);
-	
+
 	}
 
 }

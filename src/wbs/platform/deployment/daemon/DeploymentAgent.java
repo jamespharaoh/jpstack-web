@@ -1,6 +1,5 @@
 package wbs.platform.deployment.daemon;
 
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.NetworkUtils.runHostname;
 import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -132,9 +131,7 @@ class DeploymentAgent
 				objectToString (
 					consoleDeployment));
 
-		debugFormat (
-			"Console deployment: %s",
-			consoleDeployment.getName ());
+		// update state
 
 		try {
 
@@ -156,6 +153,54 @@ class DeploymentAgent
 
 				.setStateTimestamp (
 					transaction.now ());
+
+		}
+
+		// perform restart
+
+		if (consoleDeployment.getRestart ()) {
+
+			taskLogger.noticeFormat (
+				"Restarting console deployment %s",
+				consoleDeployment.getServiceName ());
+
+			restartService (
+				consoleDeployment.getServiceName ());
+
+			consoleDeployment
+
+				.setRestart (
+					false);
+
+		}
+
+	}
+
+	private
+	void restartService (
+			@NonNull String serviceName) {
+
+		try {
+
+			DBusConnection dbus =
+				DBusConnection.getConnection (
+					DBusConnection.SYSTEM);
+
+			SystemdManagerDbus systemd =
+				SystemdManagerDbus.get (
+					dbus);
+
+			SystemdUnitDbus systemdUnit =
+				systemd.getUnit (
+					serviceName);
+
+			systemdUnit.restart (
+				"replace");
+
+		} catch (DBusException dbusException) {
+
+			throw new RuntimeException (
+				dbusException);
 
 		}
 
