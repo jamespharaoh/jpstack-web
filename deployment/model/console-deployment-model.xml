@@ -20,6 +20,32 @@
 
 		<deleted-field/>
 
+		<!-- settings -->
+
+		<string-field
+			name="host"
+			nullable="yes"/>
+
+		<string-field
+			name="serviceName"
+			nullable="yes"/>
+
+		<!-- state -->
+
+		<enum-field
+			name="state"
+			type="deploymentState"
+			nullable="yes"/>
+
+		<timestamp-field
+			name="stateTimestamp"
+			column-type="sql"
+			nullable="yes"/>
+
+		<yes-no-field
+			name="restart"
+			default="no"/>
+
 	</fields>
 
 </model-meta>

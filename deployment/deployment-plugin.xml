@@ -9,11 +9,17 @@
 	<models>
 		<model name="consoleDeployment"/>
 		<model name="deploymentVersion"/>
+		<enum-type name="deploymentState"/>
 	</models>
 
 	<fixtures>
 		<fixture name="deployment"/>
 	</fixtures>
+
+	<layer name="agent">
+		<component class="daemon.AgentMiscComponents"/>
+		<component class="daemon.DeploymentAgent"/>
+	</layer>
 
 	<console-modules>
 		<console-module name="deployment"/>

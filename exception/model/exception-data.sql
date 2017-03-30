@@ -8,6 +8,10 @@ VALUES (
 	'Unknown');
 
 SELECT exception_type_insert (
+	'agent',
+	'Agent');
+
+SELECT exception_type_insert (
 	'daemon',
 	'Daemon');
 
