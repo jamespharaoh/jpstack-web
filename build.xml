@@ -20,6 +20,7 @@
   <target name="fixtures" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-db-drop, just-db-create, just-schema-create, just-sql-schema, just-sql-data, just-fixtures"/>
   <target name="tomcat-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-api-deploy, just-console-deploy, just-daemon-deploy, just-tomcat-test"/>
   <target name="daemon-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-daemon-deploy, just-daemon-test"/>
+  <target name="agent-test" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers, just-build-rest, just-daemon-deploy, just-agent-test"/>
   <target name="generate-records" depends="just-build-framework, just-build-meta, just-generate-records"/>
   <target name="generate-helpers" depends="just-build-framework, just-build-meta, just-generate-records, just-build-entity, just-generate-object-helpers, just-generate-console-helpers"/>
   <target name="just-clean">
@@ -280,7 +281,7 @@
       <fileset dir="src/wbs/integrations/digitalselect/api/files"/>
       <fileset dir="src/wbs/integrations/fonix/api/files"/>
       <fileset dir="src/wbs/integrations/mediaburst/api/files"/>
-      <fileset dir="src/wbs/integrations/oxygen8/api/files"/>
+      <fileset dir="src/wbs/integrations/oxygenate/api/files"/>
       <fileset dir="src/wbs/integrations/paypal/api/files"/>
       <fileset dir="src/wbs/integrations/smsarena/api/files"/>
       <fileset dir="src/wbs/integrations/txtnation/api/files"/>
@@ -458,7 +459,7 @@
       <fileset dir="src/wbs/integrations/digitalselect/console/files"/>
       <fileset dir="src/wbs/integrations/fonix/console/files"/>
       <fileset dir="src/wbs/integrations/mediaburst/console/files"/>
-      <fileset dir="src/wbs/integrations/oxygen8/console/files"/>
+      <fileset dir="src/wbs/integrations/oxygenate/console/files"/>
       <fileset dir="src/wbs/integrations/paypal/console/files"/>
       <fileset dir="src/wbs/integrations/smsarena/console/files"/>
       <fileset dir="src/wbs/integrations/txtnation/console/files"/>
@@ -517,6 +518,16 @@
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
       <arg value="utils,config,data,entity,schema,sql,model,hibernate,object,logic,daemon,model-meta"/>
+      <arg value=""/>
+      <arg value="wbs.platform.daemon.DaemonRunner"/>
+      <arg value="runDaemon"/>
+    </java>
+  </target>
+  <target name="just-agent-test">
+    <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
+      <arg value="wbs-test"/>
+      <arg value="wbs.test"/>
+      <arg value="agent,config,data,entity,hibernate,logic,model,model-meta,object,schema,sql,utils"/>
       <arg value=""/>
       <arg value="wbs.platform.daemon.DaemonRunner"/>
       <arg value="runDaemon"/>

@@ -1,9 +1,12 @@
 package wbs.framework.logging;
 
-import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
+import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
+import static wbs.utils.etc.EnumUtils.enumName;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -26,6 +29,10 @@ class Log4jLogTarget
 		ImmutableMap.<LogSeverity, Level> builder ()
 
 		.put (
+			LogSeverity.fatal,
+			Level.FATAL)
+
+		.put (
 			LogSeverity.error,
 			Level.ERROR)
 
@@ -36,6 +43,10 @@ class Log4jLogTarget
 		.put (
 			LogSeverity.notice,
 			Level.INFO)
+
+		.put (
+			LogSeverity.trace,
+			Level.DEBUG)
 
 		.put (
 			LogSeverity.debug,
@@ -60,9 +71,14 @@ class Log4jLogTarget
 			@NonNull Optional <Throwable> exception) {
 
 		logger.log (
-			mapItemForKeyRequired (
+			mapItemForKeyOrThrow (
 				severityToLog4jLevel,
-				severity),
+				severity,
+				() -> new NoSuchElementException (
+					stringFormat (
+						"Unknown log severity: %s",
+						enumName (
+							severity)))),
 			message,
 			optionalOrNull (
 				exception));

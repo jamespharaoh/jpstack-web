@@ -26,6 +26,7 @@
   <classpathentry kind="lib" path="binaries/libraries/commons-io-jar-2.4.jar" sourcepath="/root/wbs-hades/binaries/libraries/commons-io-source-2.4.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/commons-lang3-jar-3.4.jar" sourcepath="/root/wbs-hades/binaries/libraries/commons-lang3-source-3.4.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/commons-logging-jar-1.2.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/dbus-java-jar-2.7.2.jar" sourcepath="/root/wbs-hades/binaries/libraries/dbus-java-source-2.7.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/disruptor-jar-3.3.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/dom4j-jar-1.6.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/error_prone_annotations-jar-2.0.2.jar"/>
@@ -50,6 +51,7 @@
   <classpathentry kind="lib" path="binaries/libraries/jackson-module-jaxb-annotations-bundle-2.6.3.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/jandex-bundle-2.0.0.Final.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/jansi-jar-1.11.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/java-utils-jar-1.0.0.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/javassist-bundle-3.20.0-GA.jar" sourcepath="/root/wbs-hades/binaries/libraries/javassist-source-3.20.0-GA.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/javax.el-api-jar-2.2.4.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/javax.el-jar-2.2.4.jar"/>
@@ -78,6 +80,7 @@
   <classpathentry kind="lib" path="binaries/libraries/jta-jar-1.1.jar" sourcepath="/root/wbs-hades/binaries/libraries/jta-source-1.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/junit-jar-4.10.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/kafka-clients-jar-0.9.0.0.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/libmatthew-jar-0.8.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/log4j-api-jar-2.0.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/log4j-bundle-1.2.17.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/log4j-core-jar-2.5.jar" sourcepath="/root/wbs-hades/binaries/libraries/log4j-core-source-2.5.jar"/>
@@ -93,7 +96,7 @@
   <classpathentry kind="lib" path="binaries/libraries/portlet-api-jar-1.0.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/postgresql-bundle-9.4.1207.jre7.jar" sourcepath="/root/wbs-hades/binaries/libraries/postgresql-source-9.4.1207.jre7.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/serializer-jar-2.7.1.jar"/>
-  <classpathentry kind="lib" path="binaries/libraries/slf4j-api-jar-1.7.12.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/slf4j-api-jar-1.7.21.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/snakeyaml-bundle-1.15.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/snappy-java-bundle-1.1.1.7.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/stax-api-jar-1.0-2.jar"/>

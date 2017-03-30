@@ -37,6 +37,13 @@
 			name="commons-lang3"
 			rev="3.4"/>
 
+		<!-- dbus -->
+
+		<dependency
+			org="com.github.hypfvieh"
+			name="dbus-java"
+			rev="2.7.2"/>
+
 		<!-- functional java -->
 
 		<dependency
