@@ -50,6 +50,15 @@
 		<name-field/>
 		<description-field/>
 
+		<text-field
+			name="host"/>
+
+		<enum-field
+			name="state"/>
+
+		<timestamp-field
+			name="stateTimestamp"/>
+
 	</field-set>
 
 	<field-set
@@ -58,6 +67,14 @@
 
 		<name-field/>
 		<description-field/>
+
+		<text-field
+			name="host"
+			nullable="yes"/>
+
+		<text-field
+			name="serviceName"
+			nullable="yes"/>
 
 	</field-set>
 
@@ -71,6 +88,18 @@
 		<description-field/>
 		<deleted-field/>
 
+		<text-field
+			name="host"/>
+
+		<text-field
+			name="serviceName"/>
+
+		<enum-field
+			name="state"/>
+
+		<timestamp-field
+			name="stateTimestamp"/>
+
 	</field-set>
 
 	<field-set
@@ -82,6 +111,14 @@
 		<name-field/>
 		<description-field/>
 		<deleted-field/>
+
+		<text-field
+			name="host"
+			nullable="yes"/>
+
+		<text-field
+			name="serviceName"
+			nullable="yes"/>
 
 	</field-set>
 
