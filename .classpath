@@ -8,6 +8,7 @@
   </classpathentry>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
   <classpathentry kind="lib" path="binaries/libraries/FastInfoset-jar-1.2.13.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/SDNotify-jar-1.1.jar" sourcepath="/root/wbs-hades/binaries/libraries/SDNotify-source-1.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/activation-jar-1.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/animal-sniffer-annotations-jar-1.14.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/ant-jar-1.9.6.jar" sourcepath="/root/wbs-hades/binaries/libraries/ant-source-1.9.6.jar"/>
@@ -72,6 +73,7 @@
   <classpathentry kind="lib" path="binaries/libraries/jdeparser-jar-1.0.0.Final.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/jdom-jar-2.0.2.jar" sourcepath="/root/wbs-hades/binaries/libraries/jdom-source-2.0.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/jeromq-jar-0.3.5.jar"/>
+  <classpathentry kind="lib" path="binaries/libraries/jna-jar-4.2.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/joda-convert-jar-1.2.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/joda-time-jar-2.9.1.jar" sourcepath="/root/wbs-hades/binaries/libraries/joda-time-source-2.9.1.jar"/>
   <classpathentry kind="lib" path="binaries/libraries/json-simple-bundle-1.1.1.jar" sourcepath="/root/wbs-hades/binaries/libraries/json-simple-source-1.1.1.jar"/>

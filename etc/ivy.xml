@@ -202,6 +202,13 @@
 			name="postgresql"
 			rev="9.4.1207.jre7"/>
 
+		<!-- sd notify -->
+
+		<dependency
+			org="info.faljse"
+			name="SDNotify"
+			rev="1.1"/>
+
 		<!-- tomcat -->
 
 		<dependency
