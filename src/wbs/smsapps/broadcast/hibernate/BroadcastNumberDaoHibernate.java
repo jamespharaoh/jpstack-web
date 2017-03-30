@@ -1,5 +1,7 @@
 package wbs.smsapps.broadcast.hibernate;
 
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapWithDerivedKey;
@@ -60,6 +62,13 @@ class BroadcastNumberDaoHibernate
 	List <Optional <BroadcastNumberRec>> findMany (
 			@NonNull BroadcastRec broadcast,
 			@NonNull List <NumberRec> numbers) {
+
+		if (
+			collectionIsEmpty (
+				numbers)
+		) {
+			return emptyList ();
+		}
 
 		List <BroadcastNumberRec> broadcastNumbers =
 			findMany (
