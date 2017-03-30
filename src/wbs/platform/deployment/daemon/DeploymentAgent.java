@@ -139,6 +139,7 @@ class DeploymentAgent
 
 				.setState (
 					getServiceState (
+						taskLogger,
 						consoleDeployment.getServiceName ()))
 
 				.setStateTimestamp (
@@ -208,7 +209,14 @@ class DeploymentAgent
 
 	private
 	DeploymentState getServiceState (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String serviceName) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLoggerFormat (
+				parentTaskLogger,
+				"getServiceState (%s)",
+				serviceName);
 
 		try {
 
@@ -254,7 +262,15 @@ class DeploymentAgent
 				) {
 					return DeploymentState.running;
 				} else {
+
+					taskLogger.warningFormat (
+						"Service %s ",
+						serviceName,
+						"state is active but sub-state is %s",
+						unitSubState);
+
 					return DeploymentState.error;
+
 				}
 
 			case "inactive":
@@ -270,6 +286,12 @@ class DeploymentAgent
 				return DeploymentState.stopping;
 
 			default:
+
+				taskLogger.warningFormat (
+					"Service %s ",
+					serviceName,
+					"is in unknown state %s",
+					unitActiveState);
 
 				return DeploymentState.error;
 
