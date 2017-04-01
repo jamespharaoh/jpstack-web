@@ -22,8 +22,12 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.daemon.SleepingDaemonService;
+import wbs.platform.deployment.model.ApiDeploymentObjectHelper;
+import wbs.platform.deployment.model.ApiDeploymentRec;
 import wbs.platform.deployment.model.ConsoleDeploymentObjectHelper;
 import wbs.platform.deployment.model.ConsoleDeploymentRec;
+import wbs.platform.deployment.model.DaemonDeploymentObjectHelper;
+import wbs.platform.deployment.model.DaemonDeploymentRec;
 import wbs.platform.deployment.model.DeploymentState;
 
 @SingletonComponent ("deploymentDaemon")
@@ -34,13 +38,19 @@ class DeploymentAgent
 	// singleton components
 
 	@SingletonDependency
+	ApiDeploymentObjectHelper apiDeploymentHelper;
+
+	@SingletonDependency
+	ConsoleDeploymentObjectHelper consoleDeploymentHelper;
+
+	@SingletonDependency
+	DaemonDeploymentObjectHelper daemonDeploymentHelper;
+
+	@SingletonDependency
 	Database database;
 
 	@ClassSingletonDependency
 	LogContext logContext;
-
-	@SingletonDependency
-	ConsoleDeploymentObjectHelper consoleDeploymentHelper;
 
 	// details
 
@@ -95,6 +105,19 @@ class DeploymentAgent
 
 		) {
 
+			// find local api deployments
+
+			List <ApiDeploymentRec> apiDeployments =
+				apiDeploymentHelper.findByHostNotDeleted (
+					hostname);
+
+			apiDeployments.forEach (
+				apiDeployment ->
+					runApiDeployment (
+						taskLogger,
+						transaction,
+						apiDeployment));
+
 			// find local console deployments
 
 			List <ConsoleDeploymentRec> consoleDeployments =
@@ -108,6 +131,19 @@ class DeploymentAgent
 						transaction,
 						consoleDeployment));
 
+			// find local daemon deployments
+
+			List <DaemonDeploymentRec> daemonDeployments =
+				daemonDeploymentHelper.findByHostNotDeleted (
+					hostname);
+
+			daemonDeployments.forEach (
+				daemonDeployment ->
+					runDaemonDeployment (
+						taskLogger,
+						transaction,
+						daemonDeployment));
+
 			// commit transaction
 
 			transaction.commit ();
@@ -117,6 +153,65 @@ class DeploymentAgent
 	}
 
 	// private implementation
+
+	private
+	void runApiDeployment (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction,
+			@NonNull ApiDeploymentRec apiDeployment) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLoggerFormat (
+				parentTaskLogger,
+				"runApiDeployment (%s)",
+				objectToString (
+					apiDeployment));
+
+		// update state
+
+		try {
+
+			apiDeployment
+
+				.setState (
+					getServiceState (
+						taskLogger,
+						apiDeployment.getServiceName ()))
+
+				.setStateTimestamp (
+					transaction.now ());
+
+		} catch (Exception exception) {
+
+			apiDeployment
+
+				.setState (
+					DeploymentState.unknown)
+
+				.setStateTimestamp (
+					transaction.now ());
+
+		}
+
+		// perform restart
+
+		if (apiDeployment.getRestart ()) {
+
+			taskLogger.noticeFormat (
+				"Restarting API deployment %s",
+				apiDeployment.getServiceName ());
+
+			restartService (
+				apiDeployment.getServiceName ());
+
+			apiDeployment
+
+				.setRestart (
+					false);
+
+		}
+
+	}
 
 	private
 	void runConsoleDeployment (
@@ -169,6 +264,65 @@ class DeploymentAgent
 				consoleDeployment.getServiceName ());
 
 			consoleDeployment
+
+				.setRestart (
+					false);
+
+		}
+
+	}
+
+	private
+	void runDaemonDeployment (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction,
+			@NonNull DaemonDeploymentRec daemonDeployment) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLoggerFormat (
+				parentTaskLogger,
+				"runDaemonDeployment (%s)",
+				objectToString (
+					daemonDeployment));
+
+		// update state
+
+		try {
+
+			daemonDeployment
+
+				.setState (
+					getServiceState (
+						taskLogger,
+						daemonDeployment.getServiceName ()))
+
+				.setStateTimestamp (
+					transaction.now ());
+
+		} catch (Exception exception) {
+
+			daemonDeployment
+
+				.setState (
+					DeploymentState.unknown)
+
+				.setStateTimestamp (
+					transaction.now ());
+
+		}
+
+		// perform restart
+
+		if (daemonDeployment.getRestart ()) {
+
+			taskLogger.noticeFormat (
+				"Restarting daemon deployment %s",
+				daemonDeployment.getServiceName ());
+
+			restartService (
+				daemonDeployment.getServiceName ());
+
+			daemonDeployment
 
 				.setRestart (
 					false);
