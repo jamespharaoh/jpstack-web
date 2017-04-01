@@ -3,6 +3,7 @@ package wbs.web.context;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOrElse;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
@@ -77,7 +78,8 @@ interface RequestContextRequestAttributesMethods
 				valueOptional)
 		) {
 
-			return valueOptional;
+			return optionalGetRequired (
+				valueOptional);
 
 		} else {
 
