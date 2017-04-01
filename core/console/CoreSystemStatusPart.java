@@ -18,7 +18,7 @@ class CoreSystemStatusPart
 
 	@Override
 	public
-	void prepare (
+	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlParagraphWrite (
