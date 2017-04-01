@@ -3,6 +3,7 @@ package wbs.platform.core.console;
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
 import static wbs.utils.etc.EnumUtils.enumNameSpaces;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
@@ -192,8 +193,10 @@ class CoreSystemRestartPart
 				apiDeployment.getDescription ());
 
 			htmlTableCellWrite (
-				enumNameSpaces (
-					apiDeployment.getState ()));
+				ifNotNullThenElseEmDash (
+					apiDeployment.getState (),
+					() -> enumNameSpaces (
+						apiDeployment.getState ())));
 
 			htmlTableCellWriteHtml (
 				() -> formatWriter.writeLineFormat (
@@ -246,8 +249,10 @@ class CoreSystemRestartPart
 				consoleDeployment.getDescription ());
 
 			htmlTableCellWrite (
-				enumNameSpaces (
-					consoleDeployment.getState ()));
+				ifNotNullThenElseEmDash (
+					consoleDeployment.getState (),
+					() -> enumNameSpaces (
+						consoleDeployment.getState ())));
 
 			htmlTableCellWriteHtml (
 				() -> formatWriter.writeLineFormat (
@@ -300,8 +305,10 @@ class CoreSystemRestartPart
 				daemonDeployment.getDescription ());
 
 			htmlTableCellWrite (
-				enumNameSpaces (
-					daemonDeployment.getState ()));
+				ifNotNullThenElseEmDash (
+					daemonDeployment.getState (),
+					() -> enumNameSpaces (
+						daemonDeployment.getState ())));
 
 			htmlTableCellWriteHtml (
 				() -> formatWriter.writeLineFormat (

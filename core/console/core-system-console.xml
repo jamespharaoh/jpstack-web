@@ -5,9 +5,12 @@
 		name="coreSystem">
 
 		<context-tab-page
-			name="switch"/>
+			name="status"/>
 
 		<context-tab-page
+			name="switch"/>
+
+		<context-tab-action-page
 			name="restart"/>
 
 	</simple-context>
