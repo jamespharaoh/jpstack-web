@@ -34,7 +34,7 @@ interface ChatDateLogic {
 			@NonNull ChatUserRec chatUser,
 			@NonNull Optional <UserRec> user,
 			@NonNull Optional <MessageRec> message,
-			@NonNull ChatUserDateMode dateMode,
+			ChatUserDateMode dateMode,
 			boolean sendMessage) {
 
 		userDateStuff (
