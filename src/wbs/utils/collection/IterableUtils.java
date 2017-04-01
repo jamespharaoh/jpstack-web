@@ -120,6 +120,9 @@ class IterableUtils {
 
 		return iterableStream (input)
 
+			.filter (
+				predicate)
+
 			.collect (
 				Collectors.toList ());
 
