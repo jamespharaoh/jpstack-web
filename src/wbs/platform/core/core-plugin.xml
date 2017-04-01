@@ -12,7 +12,9 @@
 		<component class="console.CoreLogonResponder"/>
 		<component class="console.CoreRedirectResponder"/>
 		<component class="console.CoreSidebarMenuResponder"/>
+		<component class="console.CoreSystemRestartAction"/>
 		<component class="console.CoreSystemRestartPart"/>
+		<component class="console.CoreSystemStatusPart"/>
 		<component class="console.CoreSystemSwitchPart"/>
 		<component class="console.CoreTitledResponder"/>
 	</layer>
