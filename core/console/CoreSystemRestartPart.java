@@ -1,0 +1,321 @@
+package wbs.platform.core.console;
+
+import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
+import static wbs.utils.collection.IterableUtils.iterableFilterToList;
+import static wbs.utils.etc.EnumUtils.enumNameSpaces;
+import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
+import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPost;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableCellWriteHtml;
+import static wbs.web.utils.HtmlTableUtils.htmlTableClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableHeaderRowWrite;
+import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
+import static wbs.web.utils.HtmlTableUtils.htmlTableRowSeparatorWrite;
+
+import java.util.Collections;
+import java.util.List;
+
+import lombok.NonNull;
+
+import wbs.console.part.AbstractPagePart;
+import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.deployment.console.ApiDeploymentConsoleHelper;
+import wbs.platform.deployment.console.ConsoleDeploymentConsoleHelper;
+import wbs.platform.deployment.console.DaemonDeploymentConsoleHelper;
+import wbs.platform.deployment.model.ApiDeploymentRec;
+import wbs.platform.deployment.model.ConsoleDeploymentRec;
+import wbs.platform.deployment.model.DaemonDeploymentRec;
+
+@PrototypeComponent ("coreSystemRestartPart")
+public
+class CoreSystemRestartPart
+	extends AbstractPagePart {
+
+	// singleton dependencies
+
+	@SingletonDependency
+	ApiDeploymentConsoleHelper apiDeploymentHelper;
+
+	@SingletonDependency
+	ConsoleDeploymentConsoleHelper consoleDeploymentHelper;
+
+	@SingletonDependency
+	DaemonDeploymentConsoleHelper daemonDeploymentHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
+	UserPrivChecker userPrivChecker;
+
+	// state
+
+	List <ApiDeploymentRec> apiDeployments;
+	List <ConsoleDeploymentRec> consoleDeployments;
+	List <DaemonDeploymentRec> daemonDeployments;
+
+	// implementation
+
+	@Override
+	public
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		apiDeployments =
+			iterableFilterToList (
+				apiDeployment ->
+					userPrivChecker.canRecursive (
+						apiDeployment,
+						"restart"),
+				apiDeploymentHelper.findAllNotDeletedEntities ());
+
+		Collections.sort (
+			apiDeployments);
+
+		consoleDeployments =
+			iterableFilterToList (
+				consoleDeployment ->
+					userPrivChecker.canRecursive (
+						consoleDeployment,
+						"restart"),
+				consoleDeploymentHelper.findAllNotDeletedEntities ());
+
+		Collections.sort (
+			consoleDeployments);
+
+		daemonDeployments =
+			iterableFilterToList (
+				daemonDeployment ->
+					userPrivChecker.canRecursive (
+						daemonDeployment,
+						"restart"),
+				daemonDeploymentHelper.findAllNotDeletedEntities ());
+
+		Collections.sort (
+			daemonDeployments);
+
+	}
+
+	@Override
+	public
+	void renderHtmlBodyContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
+		htmlHeadingTwoWrite (
+			"Restart server components");
+
+		htmlParagraphWriteFormat (
+			"Use these controls to restart server compoments. This may be ",
+			"necessary from time to time if they encounter certain types of ",
+			"problem.");
+
+		htmlFormOpenPost ();
+
+		htmlTableOpenDetails ();
+
+		htmlTableHeaderRowWrite (
+			"Name",
+			"Description",
+			"Status",
+			"Restart");
+
+		htmlTableRowSeparatorWrite ();
+
+		renderApiDeployments (
+			taskLogger);
+
+		htmlTableRowSeparatorWrite ();
+
+		renderDaemonDeployments (
+			taskLogger);
+
+		htmlTableRowSeparatorWrite ();
+
+		renderConsoleDeployments (
+			taskLogger);
+
+		htmlTableClose ();
+
+		htmlFormClose ();
+
+	}
+
+	private
+	void renderApiDeployments (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		if (
+			collectionIsEmpty (
+				apiDeployments)
+		) {
+
+			htmlTableRowOpen ();
+
+			htmlTableCellWrite (
+				"(you do not have permission to restart any API deployments)",
+				htmlColumnSpanAttribute (
+					4l));
+
+			htmlTableRowClose ();
+
+		}
+
+		for (
+			ApiDeploymentRec apiDeployment
+				: apiDeployments
+		) {
+
+			htmlTableRowOpen ();
+
+			htmlTableCellWrite (
+				apiDeployment.getName ());
+
+			htmlTableCellWrite (
+				apiDeployment.getDescription ());
+
+			htmlTableCellWrite (
+				enumNameSpaces (
+					apiDeployment.getState ()));
+
+			htmlTableCellWriteHtml (
+				() -> formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"api/%h\"",
+					apiDeployment.getCode (),
+					" value=\"restart\"",
+					">"));
+
+			htmlTableRowClose ();
+
+		}
+
+	}
+
+	private
+	void renderConsoleDeployments (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		if (
+			collectionIsEmpty (
+				consoleDeployments)
+		) {
+
+			htmlTableRowOpen ();
+
+			htmlTableCellWrite (
+				stringFormat (
+					"(you do not have permission to restart any console ",
+					"deployments)"),
+				htmlColumnSpanAttribute (
+					4l));
+
+			htmlTableRowClose ();
+
+		}
+
+		for (
+			ConsoleDeploymentRec consoleDeployment
+				: consoleDeployments
+		) {
+
+			htmlTableRowOpen ();
+
+			htmlTableCellWrite (
+				consoleDeployment.getName ());
+
+			htmlTableCellWrite (
+				consoleDeployment.getDescription ());
+
+			htmlTableCellWrite (
+				enumNameSpaces (
+					consoleDeployment.getState ()));
+
+			htmlTableCellWriteHtml (
+				() -> formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"console/%h\"",
+					consoleDeployment.getCode (),
+					" value=\"restart\"",
+					">"));
+
+			htmlTableRowClose ();
+
+		}
+
+	}
+
+	private
+	void renderDaemonDeployments (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		if (
+			collectionIsEmpty (
+				daemonDeployments)
+		) {
+
+			htmlTableRowOpen ();
+
+			htmlTableCellWrite (
+				stringFormat (
+					"(you do not have permission to restart any daemon ",
+					"deployments)"),
+				htmlColumnSpanAttribute (
+					4l));
+
+			htmlTableRowClose ();
+
+		}
+
+		for (
+			DaemonDeploymentRec daemonDeployment
+				: daemonDeployments
+		) {
+
+			htmlTableRowOpen ();
+
+			htmlTableCellWrite (
+				daemonDeployment.getName ());
+
+			htmlTableCellWrite (
+				daemonDeployment.getDescription ());
+
+			htmlTableCellWrite (
+				enumNameSpaces (
+					daemonDeployment.getState ()));
+
+			htmlTableCellWriteHtml (
+				() -> formatWriter.writeLineFormat (
+					"<input",
+					" type=\"submit\"",
+					" name=\"daemon/%h\"",
+					daemonDeployment.getCode (),
+					" value=\"restart\"",
+					">"));
+
+			htmlTableRowClose ();
+
+		}
+
+	}
+
+}

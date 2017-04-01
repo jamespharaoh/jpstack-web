@@ -97,3 +97,17 @@ function updateNotice (notice) {
 	}
 
 }
+
+$(function () {
+
+	$("#timeRow").hover (
+		function () { $(this).addClass ("hover") },
+		function () { $(this).removeClass ("hover") });
+
+	$("#timeRow").click (function () {
+		window.parent.frames.main.location = "/coreSystem";
+	});
+
+});
+
+// ex: noet ts=4 filetype=javascript
