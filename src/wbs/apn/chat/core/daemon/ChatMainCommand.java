@@ -354,7 +354,7 @@ class ChatMainCommand
 				fromChatUser,
 				smsMessage,
 				rest,
-				null,
+				optionalAbsent (),
 				true);
 
 			return smsInboxLogic.inboxProcessed (
