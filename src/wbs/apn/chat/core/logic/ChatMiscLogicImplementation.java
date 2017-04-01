@@ -296,7 +296,7 @@ class ChatMiscLogicImplementation
 		chatDateLogic.userDateStuff (
 			taskLogger,
 			chatUser,
-			null,
+			optionalAbsent (),
 			message,
 			null,
 			false);

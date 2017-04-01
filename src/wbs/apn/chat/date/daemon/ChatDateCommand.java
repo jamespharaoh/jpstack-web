@@ -174,7 +174,8 @@ class ChatDateCommand
 				chatUser,
 				message,
 				rest,
-				command,
+				optionalOf (
+					command),
 				false);
 
 			// set date mode
@@ -216,7 +217,8 @@ class ChatDateCommand
 				chatUser,
 				message,
 				rest,
-				command,
+				optionalOf (
+					command),
 				false);
 
 			// update user
@@ -248,7 +250,8 @@ class ChatDateCommand
 			chatUser,
 			message,
 			rest,
-			command,
+			optionalOf (
+				command),
 			true);
 
 		// process inbox

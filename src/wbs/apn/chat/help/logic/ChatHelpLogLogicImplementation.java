@@ -1,5 +1,7 @@
 package wbs.apn.chat.help.logic;
 
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -54,7 +56,7 @@ class ChatHelpLogLogicImplementation
 			@NonNull ChatUserRec chatUser,
 			@NonNull MessageRec message,
 			@NonNull String text,
-			@NonNull CommandRec command,
+			@NonNull Optional <CommandRec> command,
 			@NonNull Boolean queue) {
 
 		TaskLogger taskLogger =
@@ -88,7 +90,8 @@ class ChatHelpLogLogicImplementation
 				text)
 
 			.setCommand (
-				command)
+				optionalOrNull (
+					command))
 
 			.setOurNumber (
 				message.getNumTo ())
@@ -132,7 +135,7 @@ class ChatHelpLogLogicImplementation
 			@NonNull MessageRec message,
 			@NonNull Optional<ChatMessageRec> chatMessage,
 			@NonNull String text,
-			@NonNull Optional<CommandRec> command) {
+			@NonNull Optional <CommandRec> command) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (

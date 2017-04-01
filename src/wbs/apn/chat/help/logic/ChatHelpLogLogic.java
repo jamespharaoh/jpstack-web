@@ -21,7 +21,7 @@ interface ChatHelpLogLogic {
 			ChatUserRec chatUser,
 			MessageRec message,
 			String text,
-			CommandRec command,
+			Optional <CommandRec> command,
 			Boolean queue);
 
 	ChatHelpLogRec createChatHelpLogOut (

@@ -215,7 +215,8 @@ class ChatVideoGetCommand
 			chatUser,
 			message,
 			rest,
-			command,
+			optionalOf (
+				command),
 			false);
 
 		String text =

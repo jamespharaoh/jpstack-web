@@ -208,9 +208,10 @@ class ChatHelpCommand
 				chatUser,
 				message,
 				rest,
-				commandHelper.findByCodeRequired (
-					chat,
-					"help"),
+				optionalOf (
+					commandHelper.findByCodeRequired (
+						chat,
+						"help")),
 				true);
 
 		}

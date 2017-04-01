@@ -109,7 +109,7 @@ class IterableUtils {
 			.filter (
 				predicate)
 
-			.iterator ();				
+			.iterator ();
 
 	}
 

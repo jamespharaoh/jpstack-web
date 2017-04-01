@@ -6,11 +6,6 @@ import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
 import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
 import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
 import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockClose;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockOpen;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleClose;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntryWrite;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleOpen;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
@@ -31,11 +26,13 @@ import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.HtmlResponder;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -90,6 +87,19 @@ class StatusResponder
 				.iterator ())
 
 			.build ();
+
+	}
+
+	@Override
+	protected
+	Set <HtmlLink> myHtmlLinks () {
+
+		return ImmutableSet.<HtmlLink> of (
+
+			HtmlLink.applicationCssStyle (
+				"/style/status.css")
+
+		);
 
 	}
 
@@ -148,48 +158,12 @@ class StatusResponder
 		super.renderHtmlHeadContents (
 			parentTaskLogger);
 
-		renderStyleBlock ();
 		renderScriptBlock ();
 
 		pageParts.forEach (
 			pagePart ->
 				pagePart.renderHtmlHeadContent (
 					parentTaskLogger));
-
-	}
-
-	private
-	void renderStyleBlock () {
-
-		// style open
-
-		htmlStyleBlockOpen ();
-
-		// time row
-
-		htmlStyleRuleOpen (
-			"#timeRow");
-
-		htmlStyleRuleEntryWrite (
-			"display",
-			"none");
-
-		htmlStyleRuleClose ();
-
-		// notice row
-
-		htmlStyleRuleOpen (
-			"#noticeRow");
-
-		htmlStyleRuleEntryWrite (
-			"display",
-			"none");
-
-		htmlStyleRuleClose ();
-
-		// style close
-
-		htmlStyleBlockClose ();
 
 	}
 

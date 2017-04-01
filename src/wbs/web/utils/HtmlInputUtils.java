@@ -677,4 +677,57 @@ class HtmlInputUtils {
 
 	}
 
+	// radio input elements
+
+	public static
+	void htmlRadio (
+			@NonNull String name,
+			@NonNull String value,
+			@NonNull Boolean selected,
+			@NonNull ToHtmlAttribute ... attributes) {
+
+		htmlRadio (
+			currentFormatWriter (),
+			name,
+			value,
+			selected,
+			attributes);
+
+	}
+
+	public static
+	void htmlRadio (
+			@NonNull FormatWriter formatWriter,
+			@NonNull String name,
+			@NonNull String value,
+			@NonNull Boolean selected,
+			@NonNull ToHtmlAttribute ... attributes) {
+
+		formatWriter.writeIndent ();
+
+		formatWriter.writeFormat (
+			"<input",
+			" type=\"radio\"",
+			" name=\"%h\"",
+			name,
+			" value=\"%s\"",
+			value);
+
+		if (selected) {
+
+			formatWriter.writeFormat (
+				" selected");
+
+		}
+
+		htmlAttributesWrite (
+			formatWriter,
+			attributes);
+
+		formatWriter.writeFormat (
+			">");
+
+		formatWriter.writeNewline ();
+
+	}
 }

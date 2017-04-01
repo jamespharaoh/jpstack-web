@@ -182,7 +182,8 @@ class ChatDateStopCommand
 			chatUser,
 			message,
 			rest,
-			command,
+			optionalOf (
+				command),
 			false);
 
 		// process inbox

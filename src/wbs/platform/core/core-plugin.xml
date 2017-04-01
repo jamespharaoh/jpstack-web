@@ -12,11 +12,14 @@
 		<component class="console.CoreLogonResponder"/>
 		<component class="console.CoreRedirectResponder"/>
 		<component class="console.CoreSidebarMenuResponder"/>
+		<component class="console.CoreSystemRestartPart"/>
+		<component class="console.CoreSystemSwitchPart"/>
 		<component class="console.CoreTitledResponder"/>
 	</layer>
 
 	<console-modules>
 		<console-module name="core"/>
+		<console-module name="core-system"/>
 	</console-modules>
 
 </plugin>

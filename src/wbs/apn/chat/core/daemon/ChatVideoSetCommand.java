@@ -153,7 +153,8 @@ class ChatVideoSetCommand
 			chatUser,
 			message,
 			rest,
-			command,
+			optionalOf (
+				command),
 			false);
 
 		if (

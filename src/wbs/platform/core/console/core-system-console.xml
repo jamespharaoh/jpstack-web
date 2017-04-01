@@ -1,0 +1,15 @@
+<console-module
+	name="core-system">
+
+	<simple-context
+		name="coreSystem">
+
+		<context-tab-page
+			name="switch"/>
+
+		<context-tab-page
+			name="restart"/>
+
+	</simple-context>
+
+</console-module>

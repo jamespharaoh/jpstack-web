@@ -102,11 +102,11 @@ class BroadcastLogicImplementation
 					isNotNull (
 						broadcastConfig.getBlockNumberLookup ()),
 					() -> numberLookupManager.splitNumbersPresent (
-							broadcastConfig.getBlockNumberLookup (),
-							batchNumbers),
+						broadcastConfig.getBlockNumberLookup (),
+						batchNumbers),
 					() -> Pair.of (
-						batchNumbers,
-						new ArrayList <NumberRec> ()));
+						new ArrayList <NumberRec> (),
+						batchNumbers));
 
 			// process rejected numbers
 

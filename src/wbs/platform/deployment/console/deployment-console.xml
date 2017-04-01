@@ -15,9 +15,21 @@
 			priv-key="deployment.manage"/>
 
 		<context-link
+			name="api"
+			link="apiDeployment"
+			label="API"
+			priv-key="deployment.manage"/>
+
+		<context-link
 			name="console"
 			link="consoleDeployment"
 			label="Console"
+			priv-key="deployment.manage"/>
+
+		<context-link
+			name="daemon"
+			link="daemonDeployment"
+			label="Daemon"
 			priv-key="deployment.manage"/>
 
 	</simple-context>

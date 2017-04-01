@@ -213,7 +213,8 @@ class ChatPromoCommand
 				chatUser,
 				inboundMessage,
 				inboundMessage.getText ().getText (),
-				command,
+				optionalOf (
+					command),
 				true);
 
 			return smsInboxLogic.inboxProcessed (
@@ -235,7 +236,8 @@ class ChatPromoCommand
 				chatUser,
 				inboundMessage,
 				inboundMessage.getText ().getText (),
-				command,
+				optionalOf (
+					command),
 				false);
 
 		// check promo has started
