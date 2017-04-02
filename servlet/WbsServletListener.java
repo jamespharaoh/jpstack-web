@@ -1,5 +1,6 @@
 package wbs.platform.servlet;
 
+import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitComma;
@@ -33,33 +34,22 @@ class WbsServletListener
 		ServletContextListener,
 		ServletRequestListener {
 
+	// logging
+
 	private final static
 	LogContext logContext =
 		DefaultLogContext.forClass (
 			WbsServletListener.class);
 
+	// state
+
 	ServletContext servletContext;
 
 	ComponentManager componentManager;
 
-	@Override
-	public
-	void contextDestroyed (
-			@NonNull ServletContextEvent event) {
+	Thread watchdogThread;
 
-		TaskLogger taskLogger =
-			logContext.createTaskLogger (
-				"contextDestroyed");
-
-		if (componentManager == null)
-			return;
-
-		taskLogger.noticeFormat (
-			"Destroying application context");
-
-		componentManager.close ();
-
-	}
+	// public implementation
 
 	@Override
 	public
@@ -70,8 +60,13 @@ class WbsServletListener
 			logContext.createTaskLogger (
 				"contextInitialized");
 
+		// setup components
+
 		taskLogger.noticeFormat (
-			"Initialising application context");
+			"Initialising components");
+
+		SDNotify.sendStatus (
+			"Initialising components");
 
 		servletContext =
 			event.getServletContext ();
@@ -122,7 +117,73 @@ class WbsServletListener
 			"wbs-application-context",
 			componentManager);
 
+		// systemd integration
+
 		SDNotify.sendNotify ();
+
+		watchdogThread =
+			new Thread (
+				this::watchdogThread);
+
+		watchdogThread.start ();
+
+		SDNotify.sendStatus (
+			"Running");
+
+	}
+
+	@Override
+	public
+	void contextDestroyed (
+			@NonNull ServletContextEvent event) {
+
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"contextDestroyed");
+
+		// update systemd status
+
+		SDNotify.sendStatus (
+			"Shutting down");
+
+		// clean up components
+
+		if (
+			isNotNull (
+				componentManager)
+		) {
+
+			taskLogger.noticeFormat (
+				"Destroying application context");
+	
+			componentManager.close ();
+
+		}
+
+		// systemd integration
+
+		if (
+			isNotNull (
+				watchdogThread)
+		) {
+
+			taskLogger.noticeFormat (
+				"Stopping systemd watchdog");
+
+			watchdogThread.interrupt ();
+	
+			try {
+	
+				watchdogThread.wait ();
+	
+			} catch (InterruptedException interruptedException) {
+	
+				throw new RuntimeException (
+					interruptedException);
+	
+			}
+
+		}
 
 	}
 
@@ -257,6 +318,29 @@ class WbsServletListener
 				}
 
 			}
+
+		}
+
+	}
+
+	// private implementation
+
+	private
+	void watchdogThread () {
+
+		for (;;) {
+
+			try {
+
+				Thread.sleep (5000);
+
+			} catch (InterruptedException exception) {
+
+				return;
+
+			}
+
+			SDNotify.sendWatchdog ();
 
 		}
 
