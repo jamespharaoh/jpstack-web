@@ -140,6 +140,14 @@
 		<yes-no-field
 			name="approvals"/>
 
+		<object-field
+			name="adultAdsScheme"
+			object-type="chatScheme"/>
+
+		<seconds-field
+			name="adultExpirySeconds"
+			label="Adult expiry time"/>
+
 	</field-set>
 
 	<field-set
@@ -216,6 +224,16 @@
 		<enum-field
 			name="operatorLabel"/>
 
+		<object-field
+			name="adultAdsScheme"
+			object-type="chatScheme"
+			nullable="yes"/>
+
+		<seconds-field
+			name="adultExpirySeconds"
+			label="Adult expiry time"
+			nullable="yes"/>
+
 	</field-set>
 
 	<field-set
@@ -280,11 +298,6 @@
 			currency="chatScheme.chat.currency"
 			nullable="yes"
 			minimum="1"/>
-
-		<object-field
-			name="adultAdsScheme"
-			object-type="chatScheme"
-			nullable="yes"/>
 
 	</field-set>
 

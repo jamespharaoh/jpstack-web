@@ -98,6 +98,10 @@
 			type="chatScheme"
 			nullable="yes"/>
 
+		<integer-field
+			name="adultExpirySeconds"
+			nullable="yes"/>
+
 		<!-- slaves -->
 
 		<slave-field
