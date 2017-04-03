@@ -2,6 +2,7 @@ package wbs.apn.chat.core.daemon;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -171,7 +172,7 @@ class ChatPhotoCommand
 				chatUser,
 				message,
 				rest,
-				null,
+				optionalAbsent (),
 				true);
 
 		} else {
