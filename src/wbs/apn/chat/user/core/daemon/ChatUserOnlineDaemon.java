@@ -12,7 +12,6 @@ import static wbs.utils.time.TimeUtils.earlierThan;
 
 import java.util.List;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.joda.time.Duration;
@@ -155,384 +154,391 @@ class ChatUserOnlineDaemon
 				parentTaskLogger,
 				"doUser");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserOnlineDaemon.doUser (chatUserId)",
-				this);
+		try (
 
-		ChatUserRec chatUser =
-			chatUserHelper.findRequired (
-				chatUserId);
-
-		ChatRec chat =
-			chatUser.getChat ();
-
-		// only process online users
-
-		if (! chatUser.getOnline ())
-			return;
-
-		// see if they need logging off after the logoff time
-
-		if (
-
-			enumEqualSafe (
-				chatUser.getDeliveryMethod (),
-				ChatMessageMethod.sms)
-
-			&& (
-
-				isNull (
-					chatUser.getLastAction ())
-
-				|| earlierThan (
-					chatUser.getLastAction ().plus (
-						chat.getTimeLogoff () * 1000),
-					transaction.now ())
-
-			)
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserOnlineDaemon.doUser (chatUserId)",
+					this);
 
 		) {
 
-			taskLogger.noticeFormat (
-				"Automatically logging off user %s",
-				chatUser.getCode ());
+			ChatUserRec chatUser =
+				chatUserHelper.findRequired (
+					chatUserId);
 
-			chatMiscLogic.userLogoffWithMessage (
-				taskLogger,
-				chatUser,
-				null,
-				true);
+			ChatRec chat =
+				chatUser.getChat ();
 
-			transaction.commit ();
+			// only process online users
 
-			return;
+			if (! chatUser.getOnline ())
+				return;
 
-		}
+			// see if they need logging off after the logoff time
 
-		// see if they need logging off after the web logoff time
+			if (
 
-		Instant webLogoffTime =
-			transaction.now ().minus (
-				Duration.standardSeconds (
-					chat.getTimeWebLogoff ()));
+				enumEqualSafe (
+					chatUser.getDeliveryMethod (),
+					ChatMessageMethod.sms)
 
-		if (
+				&& (
 
-			chatUser.getDeliveryMethod ()
-				!= ChatMessageMethod.sms
+					chat.getDeleted ()
 
-			&& earlierThan (
-				chatUser.getLastMessagePoll (),
-				webLogoffTime)
+					|| isNull (
+						chatUser.getLastAction ())
 
-		) {
+					|| earlierThan (
+						chatUser.getLastAction ().plus (
+							chat.getTimeLogoff () * 1000),
+						transaction.now ())
 
-			taskLogger.noticeFormat (
-				"Automatically logging off %s user %s",
-				enumName (
-					chatUser.getDeliveryMethod ()),
-				chatUser.getCode ());
+				)
 
-			chatUserLogic.logoff (
-				chatUser,
-				true);
+			) {
 
-			transaction.commit ();
+				taskLogger.noticeFormat (
+					"Automatically logging off user %s",
+					chatUser.getCode ());
 
-			return;
-
-		}
-
-		// see if they need logging off due to the session limit
-
-		if (
-			chatUser.getSessionInfoRemain () != null
-			&& chatUser.getSessionInfoRemain () <= 0
-		) {
-
-			taskLogger.noticeFormat (
-				"Logging off %s user %s due to session info limit",
-				enumName (
-					chatUser.getDeliveryMethod ()),
-				chatUser.getCode ());
-
-			chatUserLogic.logoff (
-				chatUser,
-				true);
-
-			transaction.commit ();
-
-			return;
-
-		}
-
-		// below here is just for sms users
-
-		if (chatUser.getDeliveryMethod () != ChatMessageMethod.sms)
-			return;
-
-		// ignore deleted users
-
-		if (chatUser.getNumber () == null) {
-
-			taskLogger.warningFormat (
-				"Logging off %s: no number",
-				objectManager.objectPath (
-					chatUser));
-
-			chatUser
-
-				.setOnline (
-					false);
-
-			return;
-		}
-
-		// then see if they need a message from someone
-
-		if (
-
-			(
-
-				isNull (
-					chatUser.getLastSend ())
-
-				|| earlierThan (
-					chatUser.getLastSend ().plus (
-						chat.getTimeSend () * 1000),
-					transaction.now ())
-
-			)
-
-			&& (
-
-				isNull (
-					chatUser.getLastReceive ())
-
-				|| earlierThan (
-					chatUser.getLastReceive ().plus (
-						chat.getTimeReceive () * 1000),
-					transaction.now ())
-
-			)
-
-			&& (
-
-				isNull (
-					chatUser.getLastInfo ())
-
-				|| earlierThan (
-					chatUser.getLastInfo ().plus (
-						chat.getTimeInfo () * 1000),
-					transaction.now ()))
-
-			&& (
-
-				isNull (
-					chatUser.getLastPic ())
-
-				|| earlierThan (
-					chatUser.getLastPic ().plus (
-						chat.getTimeInfo () * 1000),
-					transaction.now ()))
-
-			&& (
-
-				isNull (
-					chatUser.getSessionInfoRemain ())
-
-				|| moreThanZero (
-					chatUser.getSessionInfoRemain ())
-
-			)
-
-		) {
-
-			taskLogger.noticeFormat (
-				"Sending info to user %s",
-				objectManager.objectPathMini (
-					chatUser));
-
-			long numSent =
-				chatInfoLogic.sendUserInfos (
+				chatMiscLogic.userLogoffWithMessage (
 					taskLogger,
 					chatUser,
-					1l,
-					optionalAbsent ());
+					null,
+					true);
 
-			if (chatUser.getSessionInfoRemain () != null) {
+				transaction.commit ();
 
-				chatUser
-
-					.setSessionInfoRemain (
-						chatUser.getSessionInfoRemain () - numSent);
+				return;
 
 			}
 
-		}
+			// see if they need logging off after the web logoff time
 
-		// then see if they need asking what their name is
+			Instant webLogoffTime =
+				transaction.now ().minus (
+					Duration.standardSeconds (
+						chat.getTimeWebLogoff ()));
 
-		if (
+			if (
 
-			isNull (
-				chatUser.getName ())
+				chatUser.getDeliveryMethod ()
+					!= ChatMessageMethod.sms
 
-			&& (
+				&& earlierThan (
+					chatUser.getLastMessagePoll (),
+					webLogoffTime)
+
+			) {
+
+				taskLogger.noticeFormat (
+					"Automatically logging off %s user %s",
+					enumName (
+						chatUser.getDeliveryMethod ()),
+					chatUser.getCode ());
+
+				chatUserLogic.logoff (
+					chatUser,
+					true);
+
+				transaction.commit ();
+
+				return;
+
+			}
+
+			// see if they need logging off due to the session limit
+
+			if (
+				chatUser.getSessionInfoRemain () != null
+				&& chatUser.getSessionInfoRemain () <= 0
+			) {
+
+				taskLogger.noticeFormat (
+					"Logging off %s user %s due to session info limit",
+					enumName (
+						chatUser.getDeliveryMethod ()),
+					chatUser.getCode ());
+
+				chatUserLogic.logoff (
+					chatUser,
+					true);
+
+				transaction.commit ();
+
+				return;
+
+			}
+
+			// below here is just for sms users
+
+			if (chatUser.getDeliveryMethod () != ChatMessageMethod.sms)
+				return;
+
+			// ignore deleted users
+
+			if (chatUser.getNumber () == null) {
+
+				taskLogger.warningFormat (
+					"Logging off %s: no number",
+					objectManager.objectPath (
+						chatUser));
+
+				chatUser
+
+					.setOnline (
+						false);
+
+				return;
+			}
+
+			// then see if they need a message from someone
+
+			if (
+
+				(
+
+					isNull (
+						chatUser.getLastSend ())
+
+					|| earlierThan (
+						chatUser.getLastSend ().plus (
+							chat.getTimeSend () * 1000),
+						transaction.now ())
+
+				)
+
+				&& (
+
+					isNull (
+						chatUser.getLastReceive ())
+
+					|| earlierThan (
+						chatUser.getLastReceive ().plus (
+							chat.getTimeReceive () * 1000),
+						transaction.now ())
+
+				)
+
+				&& (
+
+					isNull (
+						chatUser.getLastInfo ())
+
+					|| earlierThan (
+						chatUser.getLastInfo ().plus (
+							chat.getTimeInfo () * 1000),
+						transaction.now ()))
+
+				&& (
+
+					isNull (
+						chatUser.getLastPic ())
+
+					|| earlierThan (
+						chatUser.getLastPic ().plus (
+							chat.getTimeInfo () * 1000),
+						transaction.now ()))
+
+				&& (
+
+					isNull (
+						chatUser.getSessionInfoRemain ())
+
+					|| moreThanZero (
+						chatUser.getSessionInfoRemain ())
+
+				)
+
+			) {
+
+				taskLogger.noticeFormat (
+					"Sending info to user %s",
+					objectManager.objectPathMini (
+						chatUser));
+
+				long numSent =
+					chatInfoLogic.sendUserInfos (
+						taskLogger,
+						chatUser,
+						1l,
+						optionalAbsent ());
+
+				if (chatUser.getSessionInfoRemain () != null) {
+
+					chatUser
+
+						.setSessionInfoRemain (
+							chatUser.getSessionInfoRemain () - numSent);
+
+				}
+
+			}
+
+			// then see if they need asking what their name is
+
+			if (
 
 				isNull (
-					chatUser.getLastNameHint ())
+					chatUser.getName ())
 
-				|| earlierThan (
-					chatUser.getLastNameHint ().plus (
-						chat.getTimeName () * 1000),
-					transaction.now ()))
+				&& (
 
-			&& isNotNull (
-				chatUser.getLastJoin ())
+					isNull (
+						chatUser.getLastNameHint ())
 
-			&& earlierThan (
-				chatUser.getLastJoin ().plus (
-					chat.getTimeNameJoin () * 1000),
-				transaction.now ())
+					|| earlierThan (
+						chatUser.getLastNameHint ().plus (
+							chat.getTimeName () * 1000),
+						transaction.now ()))
 
-		) {
+				&& isNotNull (
+					chatUser.getLastJoin ())
 
-			taskLogger.noticeFormat (
-				"Sending name hint to user %s",
-				chatUser.getCode ());
+				&& earlierThan (
+					chatUser.getLastJoin ().plus (
+						chat.getTimeNameJoin () * 1000),
+					transaction.now ())
 
-			chatInfoLogic.sendNameHint (
-				taskLogger,
-				chatUser);
+			) {
+
+				taskLogger.noticeFormat (
+					"Sending name hint to user %s",
+					chatUser.getCode ());
+
+				chatInfoLogic.sendNameHint (
+					taskLogger,
+					chatUser);
+
+			}
+
+			// or a dating hint
+			/*
+			if (
+
+				(
+
+					chatUser.getDateMode () == null
+
+					|| chatUser.getDateMode () == ChatUserDateMode.none
+
+				)
+
+				&& (
+
+					chatUser.getLastDateHint() == null
+
+					|| (
+						chatUser.getLastDateHint ().getTime ()
+						+ 7 * 24 * 60 * 60 * 1000
+					) < timestamp.getTime ()
+
+				)
+
+				&& chatUser.getLastJoin () != null
+
+				&& chatUser.getLastJoin ().getTime () + 5 * 60 * 1000
+					< timestamp.getTime ()
+
+			) {
+
+				logger.info ("Sending date join hint to user "
+						+ chatUser.getCode());
+
+				chatDateLogic.chatUserDateJoinHint (chatUser);
+
+			}
+			*/
+
+			// see if they need a picture hint
+
+			if (
+
+				collectionIsEmpty (
+					chatUser.getChatUserImageList ())
+
+				&& (
+
+					isNull (
+						chatUser.getLastPicHint ())
+
+					|| earlierThan (
+						chatUser.getLastPicHint ().plus (
+							chat.getTimePicHint () * 1000),
+						transaction.now ()))
+
+				&& isNotNull (
+					chatUser.getLastJoin ())
+
+				&& earlierThan (
+					chatUser.getLastJoin ().plus (
+						15 * 60 * 1000),
+					transaction.now ())
+
+			) {
+
+				taskLogger.noticeFormat (
+					"Sending pic hint to user %s",
+					chatUser.getCode ());
+
+				chatInfoLogic.sendPicHint (
+					taskLogger,
+					chatUser);
+
+			}
+
+			// or another pic hint
+
+			if (
+
+				collectionIsNotEmpty (
+					chatUser.getChatUserImageList ())
+
+				&& (
+
+					isNull (
+						chatUser.getLastPicHint ())
+
+					|| earlierThan (
+						chatUser.getLastPicHint ().plus (
+							chat.getTimePicHint () * 1000),
+						transaction.now ()))
+
+				&& (
+
+					isNull (
+						chatUser.getLastPic ())
+
+					|| earlierThan (
+						chatUser.getLastPic ().plus (
+							chat.getTimePicHint () * 1000),
+						transaction.now ()))
+
+				&& isNotNull (
+					chatUser.getLastJoin ())
+
+				&& earlierThan (
+					chatUser.getLastJoin ().plus (
+						15 * 60 * 1000),
+					transaction.now ())
+
+			) {
+
+				taskLogger.noticeFormat (
+					"Sending pic hint 2 to user %s",
+					chatUser.getCode ());
+
+				chatInfoLogic.sendPicHint2 (
+					taskLogger,
+					chatUser);
+
+			}
+
+			transaction.commit ();
 
 		}
-
-		// or a dating hint
-		/*
-		if (
-
-			(
-
-				chatUser.getDateMode () == null
-
-				|| chatUser.getDateMode () == ChatUserDateMode.none
-
-			)
-
-			&& (
-
-				chatUser.getLastDateHint() == null
-
-				|| (
-					chatUser.getLastDateHint ().getTime ()
-					+ 7 * 24 * 60 * 60 * 1000
-				) < timestamp.getTime ()
-
-			)
-
-			&& chatUser.getLastJoin () != null
-
-			&& chatUser.getLastJoin ().getTime () + 5 * 60 * 1000
-				< timestamp.getTime ()
-
-		) {
-
-			logger.info ("Sending date join hint to user "
-					+ chatUser.getCode());
-
-			chatDateLogic.chatUserDateJoinHint (chatUser);
-
-		}
-		*/
-
-		// see if they need a picture hint
-
-		if (
-
-			collectionIsEmpty (
-				chatUser.getChatUserImageList ())
-
-			&& (
-
-				isNull (
-					chatUser.getLastPicHint ())
-
-				|| earlierThan (
-					chatUser.getLastPicHint ().plus (
-						chat.getTimePicHint () * 1000),
-					transaction.now ()))
-
-			&& isNotNull (
-				chatUser.getLastJoin ())
-
-			&& earlierThan (
-				chatUser.getLastJoin ().plus (
-					15 * 60 * 1000),
-				transaction.now ())
-
-		) {
-
-			taskLogger.noticeFormat (
-				"Sending pic hint to user %s",
-				chatUser.getCode ());
-
-			chatInfoLogic.sendPicHint (
-				taskLogger,
-				chatUser);
-
-		}
-
-		// or another pic hint
-
-		if (
-
-			collectionIsNotEmpty (
-				chatUser.getChatUserImageList ())
-
-			&& (
-
-				isNull (
-					chatUser.getLastPicHint ())
-
-				|| earlierThan (
-					chatUser.getLastPicHint ().plus (
-						chat.getTimePicHint () * 1000),
-					transaction.now ()))
-
-			&& (
-
-				isNull (
-					chatUser.getLastPic ())
-
-				|| earlierThan (
-					chatUser.getLastPic ().plus (
-						chat.getTimePicHint () * 1000),
-					transaction.now ()))
-
-			&& isNotNull (
-				chatUser.getLastJoin ())
-
-			&& earlierThan (
-				chatUser.getLastJoin ().plus (
-					15 * 60 * 1000),
-				transaction.now ())
-
-		) {
-
-			taskLogger.noticeFormat (
-				"Sending pic hint 2 to user %s",
-				chatUser.getCode ());
-
-			chatInfoLogic.sendPicHint2 (
-				taskLogger,
-				chatUser);
-
-		}
-
-		transaction.commit ();
 
 	}
 

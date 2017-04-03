@@ -1,5 +1,6 @@
 package wbs.apn.chat.date.daemon;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.LogicUtils.allOf;
 import static wbs.utils.etc.LogicUtils.equalSafe;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.google.common.base.Optional;
 
@@ -29,7 +29,6 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
@@ -71,7 +70,6 @@ import wbs.apn.chat.user.core.model.Gender;
 import wbs.apn.chat.user.core.model.Orient;
 import wbs.apn.chat.user.info.logic.ChatInfoLogic;
 
-@Log4j
 @SingletonComponent ("chatDateDaemon")
 public
 class ChatDateDaemon
@@ -191,31 +189,32 @@ class ChatDateDaemon
 		taskLogger.debugFormat (
 			"Retrieving list of chats");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ChatDateDaemon.doRun ()",
-				this);
+		try (
 
-		List <Long> chatIds =
-			chatHelper.findAll ().stream ()
+			Transaction transaction =
+				database.beginReadOnly (
+					"ChatDateDaemon.doRun ()",
+					this);
 
-			.map (
-				ChatRec::getId)
+		) {
 
-			.collect (
-				Collectors.toList ());
+			List <Long> chatIds =
+				iterableMapToList (
+					ChatRec::getId,
+					chatHelper.findNotDeleted ());
 
-		transaction.close ();
+			transaction.close ();
 
-		chatIds.forEach (
-			chatId ->
-				doChat (
-					taskLogger,
-					chatId));
+			chatIds.forEach (
+				chatId ->
+					doChat (
+						taskLogger,
+						chatId));
 
-		taskLogger.noticeFormat (
-			"Dating batch complete!");
+			taskLogger.noticeFormat (
+				"Dating batch complete!");
+
+		}
 
 	}
 
@@ -308,8 +307,10 @@ class ChatDateDaemon
 
 		}
 
-		log.info (
-			"Dating done " + count);
+		taskLogger.noticeFormat (
+			"Dating done %s",
+			integerToDecimalString (
+				count));
 
 	}
 
@@ -362,23 +363,26 @@ class ChatDateDaemon
 					chatHelper.findRequired (
 						chatId);
 
-				log.info (
-					stringFormat (
-						"Start dating for chat %s.%s",
-						chat.getSlice ().getCode (),
-						chat.getCode ()));
+				taskLogger.noticeFormat (
+					"Start dating for chat %s.%s",
+					chat.getSlice ().getCode (),
+					chat.getCode ());
 
 				if (! chat.getDatingEnabled ()) {
 
-					log.warn (
-						"Dating disabled for " + chat.getCode ());
+					taskLogger.warningFormat (
+						"Dating disabled for %s",
+						objectManager.objectPathMini (
+							chat));
 
-					return Optional.absent ();
+					return optionalAbsent ();
 
 				}
 
-				log.info (
-					"Begin dating for " + chat.getCode ());
+				taskLogger.noticeFormat (
+					"Begin dating for %s",
+					objectManager.objectPathMini (
+						chat));
 
 				hour =
 					transaction.now ()
@@ -559,12 +563,11 @@ class ChatDateDaemon
 
 						if (chatUser.getType () != ChatUserType.user) {
 
-							log.debug (
-								stringFormat (
-									"Ignoring %s ",
-									integerToDecimalString (
-										chatUser.getId ()),
-									"(user type)"));
+							taskLogger.debugFormat (
+								"Ignoring %s ",
+								integerToDecimalString (
+									chatUser.getId ()),
+								"(user type)");
 
 							continue;
 
@@ -583,13 +586,12 @@ class ChatDateDaemon
 
 							chatData.numCredit ++;
 
-							log.info (
-								stringFormat (
-									"Ignoring %s ",
-									integerToDecimalString (
-										chatUser.getId ()),
-									"(%s)",
-									creditCheckResult.details ()));
+							taskLogger.noticeFormat (
+								"Ignoring %s ",
+								integerToDecimalString (
+									chatUser.getId ()),
+								"(%s)",
+								creditCheckResult.details ());
 
 							continue;
 
@@ -604,12 +606,11 @@ class ChatDateDaemon
 
 							chatData.numHours ++;
 
-							log.debug (
-								stringFormat (
-									"Ignoring %s ",
-									integerToDecimalString (
-										chatUser.getId ()),
-									"(time)"));
+							taskLogger.debugFormat (
+								"Ignoring %s ",
+								integerToDecimalString (
+									chatUser.getId ()),
+								"(time)");
 
 							continue;
 
@@ -619,11 +620,10 @@ class ChatDateDaemon
 
 							chatData.numOnline ++;
 
-							log.info (
-								stringFormat (
-									"Ignoring %s (online)",
-									integerToDecimalString (
-										chatUser.getId ())));
+							taskLogger.noticeFormat (
+								"Ignoring %s (online)",
+								integerToDecimalString (
+									chatUser.getId ()));
 
 							continue;
 
@@ -645,15 +645,19 @@ class ChatDateDaemon
 
 							chatData.numSent ++;
 
-							log.debug (
-								"Ignoring " + chatUser.getId () + " (daily limit)");
+							taskLogger.debugFormat (
+								"Ignoring %s (daily limit)",
+								objectManager.objectPathMini (
+									chatUser));
 
 							continue;
 
 						}
 
-						log.debug (
-							"Including " + chatUser.getId ());
+						taskLogger.debugFormat (
+							"Including %s",
+							objectManager.objectPathMini (
+								chatUser));
 
 						chatData.datingUserIds.add (
 							chatUser.getId ());
@@ -769,8 +773,10 @@ class ChatDateDaemon
 
 		if (thisUser.getDateDailyCount () < 1) {
 
-			log.debug (
-				"Ignoring " + thisUserId + " (daily check failed)");
+			taskLogger.debugFormat (
+				"Ignoring %s (daily check failed)",
+				objectManager.objectPathMini (
+					thisUser));
 
 			return false;
 
@@ -803,7 +809,10 @@ class ChatDateDaemon
 				thisUser.getDateEndHour ())
 		) {
 
-			log.debug ("Ignoring " + thisUserId + " (time check failed)");
+			taskLogger.debugFormat (
+				"Ignoring %s (time check failed)",
+				objectManager.objectPathMini (
+					thisUser));
 
 			return false;
 
@@ -811,7 +820,10 @@ class ChatDateDaemon
 
 		if (thisUser.getOnline ()) {
 
-			log.debug ("Ignoring " + thisUserId + " (online check failed)");
+			taskLogger.debugFormat (
+				"Ignoring %s (online check failed)",
+				objectManager.objectPathMini (
+					thisUser));
 
 			return false;
 

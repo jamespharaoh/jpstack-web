@@ -2,6 +2,7 @@ package wbs.framework.hibernate;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.notEqualSafe;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
@@ -935,7 +936,7 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 	@Override
 	public
-	List<RecordType> findAll () {
+	List <RecordType> findAll () {
 
 		Session session =
 			hibernateDatabase.currentSession ();
@@ -951,6 +952,49 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			stringFormat (
 				"FROM %s",
 				objectModel.objectClass ().getSimpleName ()))
+
+			.setFlushMode (
+				FlushMode.MANUAL)
+
+			.list ();
+
+		@SuppressWarnings ("unchecked")
+		List<RecordType> objects =
+			(List<RecordType>)
+			objectsUncast;
+
+		return objects;
+
+	}
+
+	@Override
+	public
+	List <RecordType> findNotDeleted () {
+
+		Session session =
+			hibernateDatabase.currentSession ();
+
+		@Cleanup
+		ActiveTask activeTask =
+			startTask (
+				"findAll");
+
+		List <?> objectsUncast =
+			session.createCriteria (
+				objectModel.objectClass (),
+				"_subject")
+
+			.add (
+				ifNotNullThenElse (
+					objectModel.deletedField (),
+					() -> Restrictions.eq (
+						stringFormat (
+							"_subject.%s",
+							objectModel.deletedField ().columnName ()),
+						false),
+					() -> Restrictions.sqlRestriction (
+						"true")))
+
 
 			.setFlushMode (
 				FlushMode.MANUAL)

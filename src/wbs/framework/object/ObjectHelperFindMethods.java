@@ -12,6 +12,8 @@ interface ObjectHelperFindMethods <
 
 	List <RecordType> findAll ();
 
+	List <RecordType> findNotDeleted ();
+
 	List <RecordType> findByParent (
 			Record <?> parent);
 

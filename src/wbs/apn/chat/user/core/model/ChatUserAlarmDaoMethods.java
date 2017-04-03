@@ -10,7 +10,7 @@ import wbs.apn.chat.user.core.model.ChatUserRec;
 public
 interface ChatUserAlarmDaoMethods {
 
-	List<ChatUserAlarmRec> findPending (
+	List <ChatUserAlarmRec> findPending (
 			Instant now);
 
 	ChatUserAlarmRec find (

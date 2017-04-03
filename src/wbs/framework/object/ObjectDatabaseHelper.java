@@ -46,6 +46,8 @@ interface ObjectDatabaseHelper <RecordType extends Record <RecordType>> {
 
 	List <RecordType> findAll ();
 
+	List <RecordType> findNotDeleted ();
+
 	List <RecordType> findAllByParent (
 			GlobalId parentGlobalId);
 

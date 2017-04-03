@@ -1,5 +1,7 @@
 package wbs.apn.chat.core.daemon;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
+
 import java.util.List;
 
 import lombok.Cleanup;
@@ -135,26 +137,35 @@ class ChatStatsDaemon
 
 		// get list of chats
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ChatStatsDaemon.doStats (timestamp)",
-				this);
+		List <Long> chatIds;
 
-		List<ChatRec> chats =
-			chatHelper.findAll ();
+		try (
 
-		transaction.close ();
+			Transaction transaction =
+				database.beginReadOnly (
+					"ChatStatsDaemon.doStats (timestamp)",
+					this);
+
+		) {
+
+			chatIds =
+				iterableMapToList (
+					ChatRec::getId,
+					chatHelper.findAll ());
+
+			transaction.close ();
+
+		}
 
 		for (
-			ChatRec chat
-				: chats
+			Long chatId
+				: chatIds
 		) {
 
 			doStats (
 				taskLogger,
 				timestamp,
-				chat.getId ());
+				chatId);
 
 		}
 

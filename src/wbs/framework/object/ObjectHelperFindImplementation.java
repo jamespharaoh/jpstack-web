@@ -57,6 +57,14 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 
 	@Override
 	public
+	List <RecordType> findNotDeleted () {
+
+		return objectDatabaseHelper.findNotDeleted ();
+
+	}
+
+	@Override
+	public
 	List <RecordType> findByParent (
 			@NonNull GlobalId parentGlobalId) {
 

@@ -174,12 +174,21 @@ class ChatUserDaoHibernate
 				"_chatUser")
 
 			.createAlias (
+				"_chatUser.chat",
+				"_chat")
+
+			.createAlias (
 				"_chatUser.chatScheme",
 				"_chatScheme")
 
 			.createAlias (
 				"_chatScheme.charges",
 				"_chatSchemeCharges")
+
+			.add (
+				Restrictions.eq (
+					"_chat.deleted",
+					false))
 
 			.add (
 				Restrictions.isNotNull (
@@ -210,11 +219,21 @@ class ChatUserDaoHibernate
 			ChatUserRec.class,
 
 			createCriteria (
-				ChatUserRec.class)
+				ChatUserRec.class,
+				"_chatUser")
+
+			.createAlias (
+				"_chatUser.chat",
+				"_chat")
+
+			.add (
+				Restrictions.eq (
+					"_chat.deleted",
+					false))
 
 			.add (
 				Restrictions.lt (
-					"adultExpiry",
+					"_chatUser.adultExpiry",
 					now))
 
 			.setMaxResults (
@@ -343,11 +362,21 @@ class ChatUserDaoHibernate
 			ChatUserRec.class,
 
 			createCriteria (
-				ChatUserRec.class)
+				ChatUserRec.class,
+				"_chatUser")
+
+			.createAlias (
+				"_chatUser.chat",
+				"_chat")
+
+			.add (
+				Restrictions.eq (
+					"_chat.deleted",
+					false))
 
 			.add (
 				Restrictions.le (
-					"nextJoinOutbound",
+					"_chatUser.nextJoinOutbound",
 					now))
 
 		);
@@ -365,6 +394,15 @@ class ChatUserDaoHibernate
 
 			createCriteria (
 				ChatUserRec.class)
+
+			.createAlias (
+				"_chatUser.chat",
+				"_chat")
+
+			.add (
+				Restrictions.eq (
+					"_chat.deleted",
+					false))
 
 			.add (
 				Restrictions.lt (
@@ -1652,11 +1690,21 @@ class ChatUserDaoHibernate
 			ChatUserRec.class,
 
 			createCriteria (
-				ChatUserRec.class)
+				ChatUserRec.class,
+				"_chatUser")
+
+			.createAlias (
+				"_chatUser.chat",
+				"_chat")
+
+			.add (
+				Restrictions.eq (
+					"_chat.deleted",
+					false))
 
 			.add (
 				Restrictions.lt (
-					"nextAd",
+					"_chatUser.nextAd",
 					now))
 
 		);
@@ -1674,6 +1722,15 @@ class ChatUserDaoHibernate
 
 			createCriteria (
 				ChatUserRec.class)
+
+			.createAlias (
+				"_chatUser.chat",
+				"_chat")
+
+			.add (
+				Restrictions.eq (
+					"_chat.deleted",
+					false))
 
 			.add (
 				Restrictions.le (

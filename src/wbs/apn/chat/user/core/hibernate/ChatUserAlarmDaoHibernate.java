@@ -7,10 +7,11 @@ import lombok.NonNull;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Instant;
 
+import wbs.framework.hibernate.HibernateDao;
+
 import wbs.apn.chat.user.core.model.ChatUserAlarmDao;
 import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.hibernate.HibernateDao;
 
 public
 class ChatUserAlarmDaoHibernate
@@ -29,6 +30,19 @@ class ChatUserAlarmDaoHibernate
 			createCriteria (
 				ChatUserAlarmRec.class,
 				"_chatUserAlarm")
+
+			.createAlias (
+				"_chatUserAlarm.chatUser",
+				"_chatUser")
+
+			.createAlias (
+				"_chatUser.chat",
+				"_chat")
+
+			.add (
+				Restrictions.eq (
+					"_chat.deleted",
+					false))
 
 			.add (
 				Restrictions.le (

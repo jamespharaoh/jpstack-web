@@ -93,7 +93,7 @@ class ChatJoinTimeoutDaemon
 
 			for (
 				ChatRec chat
-					: chatHelper.findAll ()
+					: chatHelper.findNotDeleted ()
 			) {
 
 				Instant createdTime =

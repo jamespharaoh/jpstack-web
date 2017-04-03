@@ -119,7 +119,7 @@ class ChatCreditDaemon
 			chatIds =
 				iterableMapToList (
 					ChatRec::getId,
-					chatHelper.findAll ());
+					chatHelper.findNotDeleted ());
 
 			transaction.close ();
 
