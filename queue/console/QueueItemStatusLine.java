@@ -13,6 +13,7 @@ import javax.inject.Provider;
 
 import lombok.Cleanup;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import org.joda.time.Duration;
@@ -125,8 +126,11 @@ class QueueItemStatusLine
 
 	@Override
 	public
-	PagePart get () {
+	PagePart get (
+			@NonNull TaskLogger parentTaskLogger) {
+
 		return queueItemsStatusLinePart.get ();
+
 	}
 
 	// life cycle
@@ -146,50 +150,56 @@ class QueueItemStatusLine
 
 	@Override
 	public
-	Future<String> getUpdateScript () {
+	Future <String> getUpdateScript (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		@Cleanup
-		HeldLock heldLock =
-			lock.read ();
+		try (
 
-		Long userId =
-			userConsoleLogic.userIdRequired ();
+			HeldLock heldLock =
+				lock.read ();
 
-		UserData userData =
-			userDatas.computeIfAbsent (
-				userId,
-				_userId -> {
+		) {
 
-			forceUpdate =
-				true;
+			Long userId =
+				userConsoleLogic.userIdRequired ();
 
-			return new UserData ()
+			UserData userData =
+				userDatas.computeIfAbsent (
+					userId,
+					_userId -> {
 
-				.userId (
-					userId)
+				forceUpdate =
+					true;
 
-				.totalAvailableItems (
-					0l)
+				return new UserData ()
 
-				.userClaimedItems (
-					0l);
+					.userId (
+						userId)
 
-		});
+					.totalAvailableItems (
+						0l)
 
-		synchronized (userData) {
+					.userClaimedItems (
+						0l);
 
-			userData
+			});
 
-				.lastContact (
-					Instant.now ());
+			synchronized (userData) {
 
-			return futureValue (
-				stringFormat (
-					"updateQueueItems (%s, %s);\n",
-					integerToDecimalString (
-						userData.totalAvailableItems ()),
-					integerToDecimalString (
-						userData.userClaimedItems ())));
+				userData
+
+					.lastContact (
+						Instant.now ());
+
+				return futureValue (
+					stringFormat (
+						"updateQueueItems (%s, %s);\n",
+						integerToDecimalString (
+							userData.totalAvailableItems ()),
+						integerToDecimalString (
+							userData.userClaimedItems ())));
+
+			}
 
 		}
 

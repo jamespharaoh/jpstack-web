@@ -1,13 +1,12 @@
 package wbs.platform.core.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.OptionalUtils.optionalOrEmptyString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingOneWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteHtml;
 
-import java.io.IOException;
-import java.util.Collections;
 import java.util.Set;
 
 import lombok.Getter;
@@ -71,7 +70,7 @@ class CoreTitledResponder
 
 	@Override
 	protected
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 		return pagePart.scriptRefs ();
 	}
 
@@ -79,13 +78,19 @@ class CoreTitledResponder
 
 	@Override
 	protected
-	void setup ()
-		throws IOException {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.setup ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
+
+		super.setup (
+			taskLogger);
 
 		pagePart.setup (
-			Collections.<String,Object>emptyMap ());
+			emptyMap ());
 
 	}
 

@@ -96,7 +96,7 @@ class CoreSystemRestartPart
 				"/style/core-system-restart.css")
 
 		);
-	
+
 	}
 
 	// implementation

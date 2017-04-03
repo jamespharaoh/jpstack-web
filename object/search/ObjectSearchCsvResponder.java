@@ -82,7 +82,8 @@ class ObjectSearchCsvResponder <RecordType>
 
 	@Override
 	protected
-	void setup () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		formatWriter =
 			requestContext.formatWriter ();

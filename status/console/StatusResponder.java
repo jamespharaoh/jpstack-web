@@ -15,7 +15,6 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenList;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -107,10 +106,16 @@ class StatusResponder
 
 	@Override
 	protected
-	void setup ()
-			throws IOException {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.setup ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
+
+		super.setup (
+			taskLogger);
 
 		for (
 			StatusLine statusLine
@@ -118,7 +123,8 @@ class StatusResponder
 		) {
 
 			PagePart pagePart =
-				statusLine.get ();
+				statusLine.get (
+					taskLogger);
 
 			pagePart.setup (
 				Collections.emptyMap ());
