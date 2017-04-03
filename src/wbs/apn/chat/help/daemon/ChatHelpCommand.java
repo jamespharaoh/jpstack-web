@@ -1,6 +1,7 @@
 package wbs.apn.chat.help.daemon;
 
 import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 
@@ -165,7 +166,7 @@ class ChatHelpCommand
 				chatUser,
 				message,
 				rest,
-				null,
+				optionalAbsent (),
 				true);
 
 			return smsInboxLogic.inboxProcessed (
