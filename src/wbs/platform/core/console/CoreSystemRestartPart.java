@@ -26,8 +26,10 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowSeparatorWrite;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
 
@@ -36,6 +38,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.console.html.HtmlLink;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 
@@ -80,6 +83,21 @@ class CoreSystemRestartPart
 	List <ApiDeploymentRec> apiDeployments;
 	List <ConsoleDeploymentRec> consoleDeployments;
 	List <DaemonDeploymentRec> daemonDeployments;
+
+	// details
+
+	@Override
+	public
+	Set <HtmlLink> links () {
+
+		return ImmutableSet.<HtmlLink> of (
+
+			HtmlLink.applicationCssStyle (
+				"/style/core-system-restart.css")
+
+		);
+	
+	}
 
 	// implementation
 
