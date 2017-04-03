@@ -13,6 +13,7 @@ import java.util.concurrent.Future;
 import javax.inject.Provider;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -28,6 +29,7 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.misc.CachedGetter;
 import wbs.platform.status.console.StatusLine;
@@ -88,7 +90,8 @@ class ManualResponderStatusLine
 
 	@Override
 	public
-	PagePart get () {
+	PagePart get (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return manualResponderStatusLinePartProvider.get ();
 
@@ -96,7 +99,8 @@ class ManualResponderStatusLine
 
 	@Override
 	public
-	Future <String> getUpdateScript () {
+	Future <String> getUpdateScript (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		if (
 			! featureChecker.checkFeatureAccess (

@@ -35,13 +35,18 @@ class ConsoleResponder
 	// implementation
 
 	protected
-	void setup ()
-		throws IOException {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		doNothing ();
+
 	}
 
 	protected
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		doNothing ();
 
 	}
 
@@ -84,7 +89,8 @@ class ConsoleResponder
 			this.transaction =
 				transaction;
 
-			setup ();
+			setup (
+				taskLogger);
 
 			prepare (
 				taskLogger);

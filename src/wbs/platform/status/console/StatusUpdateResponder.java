@@ -1,5 +1,6 @@
 package wbs.platform.status.console;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.thread.ConcurrentUtils.futureGet;
@@ -9,7 +10,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
 
 import lombok.NonNull;
 
@@ -22,9 +22,11 @@ import org.joda.time.Instant;
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.scaffold.console.RootConsoleHelper;
@@ -42,6 +44,9 @@ class StatusUpdateResponder
 	extends ConsoleResponder {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -76,6 +81,11 @@ class StatusUpdateResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		// redirect to login page if not logged in
 
 		if (userConsoleLogic.notLoggedIn ()) {
@@ -98,15 +108,12 @@ class StatusUpdateResponder
 
 		// get status lines
 
-		List<Future<String>> futures =
-			statusLineManager.getStatusLines ().stream ()
-
-			.map (
+		List <Future <String>> futures =
+			iterableMapToList (
 				statusLine ->
-					statusLine.getUpdateScript ())
-
-			.collect (
-				Collectors.toList ());
+					statusLine.getUpdateScript (
+						taskLogger),
+				statusLineManager.getStatusLines ());
 
 		// create the html
 

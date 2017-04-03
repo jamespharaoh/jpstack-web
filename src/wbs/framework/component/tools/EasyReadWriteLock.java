@@ -1,5 +1,6 @@
 package wbs.framework.component.tools;
 
+import java.io.Closeable;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -39,7 +40,8 @@ class EasyReadWriteLock {
 	}
 
 	public static
-	class HeldLock {
+	class HeldLock
+		implements Closeable {
 
 		private
 		Lock lock;
@@ -58,6 +60,7 @@ class EasyReadWriteLock {
 
 		}
 
+		@Override
 		public
 		void close () {
 

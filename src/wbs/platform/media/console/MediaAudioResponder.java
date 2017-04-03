@@ -34,8 +34,8 @@ class MediaAudioResponder
 
 	@Override
 	public
-	void setup ()
-		throws IOException {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		out =
 			requestContext.outputStream ();

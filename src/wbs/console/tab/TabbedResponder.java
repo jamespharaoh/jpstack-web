@@ -24,7 +24,6 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -138,10 +137,16 @@ class TabbedResponder
 
 	@Override
 	protected
-	void setup ()
-		throws IOException {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		super.setup ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
+
+		super.setup (
+			taskLogger);
 
 		if (pagePart != null) {
 

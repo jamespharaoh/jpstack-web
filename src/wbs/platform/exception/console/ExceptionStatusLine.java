@@ -8,6 +8,8 @@ import java.util.concurrent.Future;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.part.PagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
@@ -16,6 +18,7 @@ import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.status.console.StatusLine;
 
@@ -55,7 +58,8 @@ class ExceptionStatusLine
 
 	@Override
 	public
-	PagePart get () {
+	PagePart get (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return exceptionStatusLinePart.get ();
 
@@ -63,7 +67,8 @@ class ExceptionStatusLine
 
 	@Override
 	public
-	Future<String> getUpdateScript () {
+	Future <String> getUpdateScript (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		Long numExceptions = 0l;
 		Long numExceptionsFatal = 0l;
