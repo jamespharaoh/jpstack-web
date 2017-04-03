@@ -1721,7 +1721,8 @@ class ChatUserDaoHibernate
 			ChatUserRec.class,
 
 			createCriteria (
-				ChatUserRec.class)
+				ChatUserRec.class,
+				"_chatUser")
 
 			.createAlias (
 				"_chatUser.chat",
@@ -1734,7 +1735,7 @@ class ChatUserDaoHibernate
 
 			.add (
 				Restrictions.le (
-					"nextQuietOutbound",
+					"_chatUser.nextQuietOutbound",
 					now))
 
 		);
