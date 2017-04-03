@@ -286,7 +286,7 @@ class ChatMainCommand
 					fromChatUser,
 					smsMessage,
 					rest,
-					null,
+					optionalAbsent (),
 					false);
 
 				chatSendLogic.sendSystemRbFree (
