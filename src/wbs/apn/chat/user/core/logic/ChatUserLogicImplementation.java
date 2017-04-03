@@ -3,6 +3,7 @@ package wbs.apn.chat.user.core.logic;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
@@ -545,17 +546,19 @@ class ChatUserLogicImplementation
 	 */
 	@Override
 	public
-	List<UserDistance> getUserDistances (
+	List <UserDistance> getUserDistances (
 			@NonNull ChatUserRec thisUser,
-			@NonNull Collection<ChatUserRec> otherUsers) {
+			@NonNull Collection <ChatUserRec> otherUsers) {
 
 		// process the list
 
-		List<UserDistance> userDistances =
-			new ArrayList<UserDistance> ();
+		List <UserDistance> userDistances =
+			new ArrayList<> ();
 
-		for (ChatUserRec thatUser
-				: otherUsers) {
+		for (
+			ChatUserRec thatUser
+				: otherUsers
+		) {
 
 			if (thisUser.getLocationLongLat () == null)
 				break;
@@ -606,18 +609,23 @@ class ChatUserLogicImplementation
 		ChatRec chat =
 			chatUser.getChat ();
 
+		ChatSchemeRec chatScheme =
+			chatUser.getChatScheme ();
+
 		// work out times
 
 		Instant nextAdultAdTime =
-			transaction
-				.now ()
-				.plus (Duration.standardSeconds (
+			transaction.now ().plus (
+				Duration.standardSeconds (
 					chat.getAdultAdsTime ()));
 
 		Instant adultExpiryTime =
-			transaction
-				.now ()
-				.plus (Duration.standardDays (90));
+			ifNotNullThenElse (
+				chatScheme.getAdultExpirySeconds (),
+				() -> transaction.now ().plus (
+					Duration.standardSeconds (
+						chatScheme.getAdultExpirySeconds ())),
+				() -> null);
 
 		// update chat user
 

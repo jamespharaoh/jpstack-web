@@ -1,5 +1,6 @@
 package wbs.apn.chat.ad.daemon;
 
+import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.time.TimeUtils.laterThan;
 
@@ -294,22 +295,6 @@ class ChatAdultAdDaemon
 						chatUser));
 
 				chatUser.setNextAdultAd (null);
-				transaction.commit ();
-				return;
-
-			}
-
-			if (
-				! chatUser.getNumber ().getNumber ().startsWith ("447")
-				|| chatUser.getNumber ().getNumber ().length () != 12
-			) {
-
-				taskLogger.noticeFormat (
-					"Skipping adult ad to %s (not a mobile number)",
-					objectManager.objectPath (
-						chatUser));
-
-				chatUser.setNextAdultAd (null);
 
 				transaction.commit ();
 
@@ -321,7 +306,11 @@ class ChatAdultAdDaemon
 
 			String templateCode = null;
 
-			if (chatUser.getOrient () == Orient.bi) {
+			if (
+				enumEqualSafe (
+					chatUser.getOrient (),
+					Orient.bi)
+			) {
 
 				templateCode =
 					"adult_ad_both";
