@@ -2,9 +2,14 @@ package wbs.platform.core.console;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.IterableUtils.iterableFilterToList;
-import static wbs.utils.etc.EnumUtils.enumNameSpaces;
-import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
+import static wbs.utils.etc.EnumUtils.enumName;
+import static wbs.utils.etc.EnumUtils.enumNameHyphens;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.time.TimeUtils.earlierThan;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
@@ -22,7 +27,14 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableRowSeparatorWrite;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
+
+import org.apache.commons.lang3.tuple.Pair;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
@@ -39,6 +51,7 @@ import wbs.platform.deployment.console.DaemonDeploymentConsoleHelper;
 import wbs.platform.deployment.model.ApiDeploymentRec;
 import wbs.platform.deployment.model.ConsoleDeploymentRec;
 import wbs.platform.deployment.model.DaemonDeploymentRec;
+import wbs.platform.deployment.model.DeploymentState;
 
 @PrototypeComponent ("coreSystemRestartPart")
 public
@@ -192,11 +205,11 @@ class CoreSystemRestartPart
 			htmlTableCellWrite (
 				apiDeployment.getDescription ());
 
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					apiDeployment.getState (),
-					() -> enumNameSpaces (
-						apiDeployment.getState ())));
+			writeDeploymentState (
+				optionalFromNullable (
+					apiDeployment.getState ()),
+				optionalFromNullable (
+					apiDeployment.getStateTimestamp ()));
 
 			htmlTableCellWriteHtml (
 				() -> formatWriter.writeLineFormat (
@@ -248,11 +261,11 @@ class CoreSystemRestartPart
 			htmlTableCellWrite (
 				consoleDeployment.getDescription ());
 
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					consoleDeployment.getState (),
-					() -> enumNameSpaces (
-						consoleDeployment.getState ())));
+			writeDeploymentState (
+				optionalFromNullable (
+					consoleDeployment.getState ()),
+				optionalFromNullable (
+					consoleDeployment.getStateTimestamp ()));
 
 			htmlTableCellWriteHtml (
 				() -> formatWriter.writeLineFormat (
@@ -304,11 +317,11 @@ class CoreSystemRestartPart
 			htmlTableCellWrite (
 				daemonDeployment.getDescription ());
 
-			htmlTableCellWrite (
-				ifNotNullThenElseEmDash (
-					daemonDeployment.getState (),
-					() -> enumNameSpaces (
-						daemonDeployment.getState ())));
+			writeDeploymentState (
+				optionalFromNullable (
+					daemonDeployment.getState ()),
+				optionalFromNullable (
+					daemonDeployment.getStateTimestamp ()));
 
 			htmlTableCellWriteHtml (
 				() -> formatWriter.writeLineFormat (
@@ -322,6 +335,64 @@ class CoreSystemRestartPart
 			htmlTableRowClose ();
 
 		}
+
+	}
+
+	private
+	void writeDeploymentState (
+			@NonNull Optional <DeploymentState> deploymentState,
+			@NonNull Optional <Instant> deploymentStateTimestamp) {
+
+		Pair <String, String> deploymentStatePair =
+			deploymentStateClassAndLabel (
+				deploymentState,
+				deploymentStateTimestamp);
+
+		htmlTableCellWrite (
+			deploymentStatePair.getLeft (),
+			htmlClassAttribute (
+				deploymentStatePair.getRight ()));
+
+	}
+
+	private
+	Pair <String, String> deploymentStateClassAndLabel (
+			@NonNull Optional <DeploymentState> deploymentState,
+			@NonNull Optional <Instant> deploymentStateTimestamp) {
+
+		if (
+
+			optionalIsNotPresent (
+				deploymentState)
+
+			|| optionalIsNotPresent (
+				deploymentStateTimestamp)
+
+			|| earlierThan (
+				optionalGetRequired (
+					deploymentStateTimestamp),
+				Instant.now ().minus (
+					Duration.standardSeconds (
+						5l)))
+
+		) {
+
+			return Pair.of (
+				"—",
+				"core-system-restart-state-unknown");
+
+		}
+
+		return Pair.of (
+			enumName (
+				optionalGetRequired (
+					deploymentState)),
+			stringFormat (
+				"core-system-restart-state-%s",
+				enumNameHyphens (
+					optionalGetRequired (
+						deploymentState))));
+
 
 	}
 

@@ -155,7 +155,7 @@ class WbsServletListener
 
 			taskLogger.noticeFormat (
 				"Destroying application context");
-	
+
 			componentManager.close ();
 
 		}
@@ -171,16 +171,16 @@ class WbsServletListener
 				"Stopping systemd watchdog");
 
 			watchdogThread.interrupt ();
-	
+
 			try {
-	
+
 				watchdogThread.wait ();
-	
+
 			} catch (InterruptedException interruptedException) {
-	
+
 				throw new RuntimeException (
 					interruptedException);
-	
+
 			}
 
 		}
