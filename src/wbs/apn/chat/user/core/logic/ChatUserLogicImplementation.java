@@ -1489,16 +1489,6 @@ class ChatUserLogicImplementation
 
 	}
 
-	/**
-	 * Sets a chat user's scheme. This does nothing if they are already on
-	 * another scheme, and will automatically give them any free credit they are
-	 * due.
-	 *
-	 * @param chatUser
-	 *            chat user to set the scheme of
-	 * @param chatScheme
-	 *            chat scheme to set
-	 */
 	@Override
 	public
 	void setScheme (
@@ -1507,8 +1497,12 @@ class ChatUserLogicImplementation
 
 		// do nothing if already set
 
-		if (chatUser.getChatScheme () != null)
+		if (
+			isNotNull (
+				chatUser.getChatScheme ())
+		) {
 			return;
+		}
 
 		// check for mappings
 
@@ -1566,16 +1560,7 @@ class ChatUserLogicImplementation
 
 	}
 
-	/**
-	 * Sets a chat user's affiliate (and scheme). This will automatically give
-	 * them any free credit they are due and will not do anything if they are
-	 * already set to a different affiliate or scheme.
-	 *
-	 * @param chatUser
-	 *            the chat user to update
-	 * @param chatAffiliate
-	 *            the chat affiliate to set to
-	 */
+
 	@Override
 	public
 	void setAffiliate (

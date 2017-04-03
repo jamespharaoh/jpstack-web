@@ -260,25 +260,6 @@ class ChatSendLogicImplementation
 				originalText,
 				allParams);
 
-		// Override default originator number if set in the database
-
-		// TODO wtf is this and why is it here? this requires a hidden field
-		// to be changed when the reverse bill number changes which is
-		// certainly not a good thing
-
-		if (
-			chatHelpTemplate.getFromNumber () != null
-			&& chatHelpTemplate.getFromNumber () != ""
-		) {
-
-			throw new RuntimeException (
-				"Disabled because it is horrible");
-
-			//numFrom =
-			//	chatHelpTemplate.getFromNumber ();
-
-		}
-
 		ServiceRec service =
 			serviceHelper.findByCodeRequired (
 				chat,

@@ -281,6 +281,11 @@
 			nullable="yes"
 			minimum="1"/>
 
+		<object-field
+			name="adultAdsScheme"
+			object-type="chatScheme"
+			nullable="yes"/>
+
 	</field-set>
 
 </console-module>

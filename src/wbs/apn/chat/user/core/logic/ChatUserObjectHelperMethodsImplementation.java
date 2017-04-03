@@ -1,9 +1,6 @@
 package wbs.apn.chat.user.core.logic;
 
-import static wbs.utils.string.StringUtils.stringFormat;
-
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -28,7 +25,6 @@ import wbs.apn.chat.user.core.model.ChatUserObjectHelperMethods;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
 
-@Log4j
 public
 class ChatUserObjectHelperMethodsImplementation
 	implements ChatUserObjectHelperMethods {
@@ -91,11 +87,10 @@ class ChatUserObjectHelperMethodsImplementation
 				&& number.getArchiveDate () == null
 			) {
 
-				log.debug (
-					stringFormat (
-						"Number archiving %s code %s",
-						number.getNumber (),
-						chatUser.getCode ()));
+				taskLogger.debugFormat (
+					"Number archiving %s code %s",
+					number.getNumber (),
+					chatUser.getCode ());
 
 				NumberRec newNumber =
 					numberLogic.archiveNumberFromMessage (

@@ -26,11 +26,6 @@
 		<string-field
 			name="text"/>
 
-		<!-- TODO this should /not/ be here -->
-		<string-field
-			name="fromNumber"
-			nullable="yes"/>
-
 	</fields>
 
 </model-meta>

@@ -11,6 +11,7 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.earlierThan;
@@ -59,6 +60,8 @@ import wbs.platform.text.model.TextRec;
 
 import wbs.sms.command.model.CommandObjectHelper;
 import wbs.sms.gsm.MessageSplitter;
+import wbs.sms.message.core.model.MessageObjectHelper;
+import wbs.sms.message.core.model.MessageRec;
 
 import wbs.apn.chat.approval.model.ChatApprovalRegexpObjectHelper;
 import wbs.apn.chat.approval.model.ChatApprovalRegexpRec;
@@ -86,6 +89,7 @@ import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserAlarmObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
+import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserOperatorLabel;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
@@ -129,6 +133,9 @@ class ChatMessageLogicImplementation
 	ChatUserAlarmObjectHelper chatUserAlarmHelper;
 
 	@SingletonDependency
+	ChatUserObjectHelper chatUserHelper;
+
+	@SingletonDependency
 	ChatUserInitiationLogObjectHelper chatUserInitiationLogHelper;
 
 	@SingletonDependency
@@ -157,6 +164,9 @@ class ChatMessageLogicImplementation
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
+
+	@SingletonDependency
+	MessageObjectHelper smsMessageHelper;
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
@@ -695,12 +705,14 @@ class ChatMessageLogicImplementation
 				chatUserRejectionCountInc (
 					taskLogger,
 					fromUser,
-					chatMessage.getThreadId ());
+					smsMessageHelper.findRequired (
+						chatMessage.getThreadId ()));
 
 				chatUserRejectionCountInc (
 					taskLogger,
 					toUser,
-					chatMessage.getThreadId ());
+					smsMessageHelper.findRequired (
+						chatMessage.getThreadId ()));
 
 				break;
 
@@ -1496,26 +1508,12 @@ class ChatMessageLogicImplementation
 
 		.build ();
 
-	/**
-	 * Increments a chat users rejection count and, when appropriate, triggers
-	 * the adult verification as appropriate depending on their network.
-	 *
-	 * This may be called for already verified users, and monitors (as both
-	 * users in a user-to-user message must be verified and this method is still
-	 * called for both of them). As such we check for them and skip the
-	 * verification process.
-	 *
-	 * @param chatUser
-	 *            ChatUserRec of chat user to inc count of
-	 * @param threadId
-	 *            threadId of existing message thread to associate messages with
-	 */
 	@Override
 	public
 	void chatUserRejectionCountInc (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
-			@NonNull Long threadId) {
+			@NonNull MessageRec message) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -1555,12 +1553,12 @@ class ChatMessageLogicImplementation
 		chatSendLogic.sendSystem (
 			taskLogger,
 			chatUser,
-			optionalFromNullable (
-				threadId),
+			optionalOf (
+				message.getThreadId ()),
 			"adult_hint_in",
 			chatScheme.getRbFreeRouter (),
-			"89505",
-			Collections.<String>emptySet (),
+			chatScheme.getAdultAdsScheme ().getRbNumber (),
+			Collections.emptySet (),
 			optionalAbsent (),
 			"system",
 			TemplateMissing.error,

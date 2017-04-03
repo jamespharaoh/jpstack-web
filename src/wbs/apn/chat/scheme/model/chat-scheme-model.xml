@@ -93,6 +93,11 @@
 			type="chatUserOperatorLabel"
 			default="operator"/>
 
+		<reference-field
+			name="adultAdsScheme"
+			type="chatScheme"
+			nullable="yes"/>
+
 		<!-- slaves -->
 
 		<slave-field

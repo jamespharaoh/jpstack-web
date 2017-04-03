@@ -9,6 +9,8 @@ import wbs.framework.logging.TaskLogger;
 import wbs.platform.media.model.MediaRec;
 import wbs.platform.text.model.TextRec;
 
+import wbs.sms.message.core.model.MessageRec;
+
 import wbs.apn.chat.contact.model.ChatMessageMethod;
 import wbs.apn.chat.contact.model.ChatMessageRec;
 import wbs.apn.chat.contact.model.ChatMonitorInboxRec;
@@ -67,25 +69,10 @@ interface ChatMessageLogic {
 			ChatUserRec user,
 			boolean alarm);
 
-	/**
-	 * Increments a chat users rejection count and, when appropriate, triggers
-	 * the adult verification as appropriate depending on their network.
-	 *
-	 * This may be called for already verified users, and monitors (as both
-	 * users in a user-to-user message must be verified and this method is still
-	 * called for both of them). As such we check for them and skip the
-	 * verification process.
-	 *
-	 * @param chatUser
-	 *     ChatUserRec of chat user to inc count of
-	 *
-	 * @param threadId
-	 *     Thread id of existing message thread to associate messages with
-	 */
 	void chatUserRejectionCountInc (
 			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
-			Long threadId);
+			MessageRec message);
 
 	static
 	class ApprovalResult {

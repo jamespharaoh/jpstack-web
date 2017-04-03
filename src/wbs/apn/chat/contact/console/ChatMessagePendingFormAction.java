@@ -28,6 +28,7 @@ import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.sms.gsm.GsmUtils;
+import wbs.sms.message.core.console.MessageConsoleHelper;
 
 import wbs.apn.chat.contact.logic.ChatMessageLogic;
 import wbs.apn.chat.contact.model.ChatContactRec;
@@ -75,6 +76,9 @@ class ChatMessagePendingFormAction
 
 	@SingletonDependency
 	QueueLogic queueLogic;
+
+	@SingletonDependency
+	MessageConsoleHelper smsMessageHelper;
 
 	@SingletonDependency
 	TextConsoleHelper textHelper;
@@ -269,12 +273,14 @@ class ChatMessagePendingFormAction
 				chatMessageLogic.chatUserRejectionCountInc (
 					taskLogger,
 					chatMessage.getFromUser (),
-					chatMessage.getThreadId ());
+					smsMessageHelper.findRequired (
+						chatMessage.getThreadId ()));
 
 				chatMessageLogic.chatUserRejectionCountInc (
 					taskLogger,
 					chatMessage.getToUser (),
-					chatMessage.getThreadId ());
+					smsMessageHelper.findRequired (
+						chatMessage.getThreadId ()));
 
 			} else {
 
@@ -290,12 +296,14 @@ class ChatMessagePendingFormAction
 				chatMessageLogic.chatUserRejectionCountInc (
 					taskLogger,
 					chatMessage.getFromUser (),
-					chatMessage.getThreadId ());
+					smsMessageHelper.findRequired (
+						chatMessage.getThreadId ()));
 
 				chatMessageLogic.chatUserRejectionCountInc (
 					taskLogger,
 					chatMessage.getToUser (),
-					chatMessage.getThreadId ());
+					smsMessageHelper.findRequired (
+						chatMessage.getThreadId ()));
 
 			}
 
@@ -448,7 +456,8 @@ class ChatMessagePendingFormAction
 		chatMessageLogic.chatUserRejectionCountInc (
 			taskLogger,
 			chatMessage.getFromUser (),
-			chatMessage.getThreadId ());
+			smsMessageHelper.findRequired (
+				chatMessage.getThreadId ()));
 
 		transaction.commit ();
 
