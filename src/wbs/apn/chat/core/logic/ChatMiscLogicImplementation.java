@@ -361,7 +361,7 @@ class ChatMiscLogicImplementation
 			chatDateLogic.userDateStuff (
 				taskLogger,
 				chatUser,
-				null,
+				optionalAbsent (),
 				optionalOf (
 					message),
 				chatUser.getMainChatUserImage () != null
