@@ -145,6 +145,39 @@ class MapUtils {
 	}
 
 	public static <KeyType, ValueType>
+	ValueType mapItemForKeyOrElseSet (
+			@NonNull Map <KeyType, ValueType> map,
+			@NonNull KeyType key,
+			@NonNull Supplier <ValueType> defaultValueSupplier) {
+
+		ValueType value =
+			map.get (
+				key);
+
+		if (value != null) {
+
+			return value;
+
+		} else if (map.containsKey (key)) {
+
+			throw new NullPointerException ();
+
+		} else {
+
+			value =
+				defaultValueSupplier.get ();
+
+			map.put (
+				key,
+				value);
+
+			return value;
+
+		}
+
+	}
+
+	public static <KeyType, ValueType>
 	ValueType mapItemForKeyRequired (
 			@NonNull Map <KeyType, ValueType> map,
 			@NonNull KeyType key) {
