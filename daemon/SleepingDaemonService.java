@@ -337,7 +337,7 @@ class SleepingDaemonService
 				backgroundProcess.getRunning ()
 
 				&& earlierThan (
-					backgroundProcess.getLastRunTime (),
+					backgroundProcess.getRunningStartTime (),
 					transaction.now ().minus (
 						Duration.standardMinutes (10)))
 
