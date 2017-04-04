@@ -7,7 +7,6 @@ import java.util.List;
 
 import lombok.NonNull;
 
-import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -46,29 +45,8 @@ class ExceptionLogRemovalDaemon
 
 	@Override
 	protected
-	String getThreadName () {
-		return "ExceptionLogRemoval";
-	}
-
-	@Override
-	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			60);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-		return "exception log removal daemon";
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-		return "error checking for old exception logs to remove";
+	String backgroundProcessName () {
+		return "exception-log.removal";
 	}
 
 	// implementation

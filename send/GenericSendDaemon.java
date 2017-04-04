@@ -1,7 +1,6 @@
 package wbs.platform.send;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -9,8 +8,6 @@ import java.util.stream.Collectors;
 
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-
-import org.joda.time.Duration;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -48,41 +45,11 @@ class GenericSendDaemon <
 
 	@Override
 	protected
-	String getThreadName () {
+	String backgroundProcessName () {
 
 		return stringFormat (
-			"%sSend",
-			capitalise (
-				helper ().name ()));
-
-	}
-
-	@Override
-	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			5);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-
-		return stringFormat (
-			"%s send daemon",
-			helper ().name ());
-
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-
-		return stringFormat (
-			"error sending %s in background",
-			helper ().itemNamePlural ());
+			"%s.send",
+			helper ().parentTypeName ());
 
 	}
 

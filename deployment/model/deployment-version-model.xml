@@ -26,4 +26,16 @@
 
 	</fields>
 
+	<!-- TODO does not belong here -->
+
+	<background-processes>
+
+		<background-process
+			object-type="root"
+			name="Deployment agent ${hostname}"
+			description="Monitor and restart deployments on ${hostname}"
+			frequency="1 second"/>
+
+	</background-processes>
+
 </model-meta>

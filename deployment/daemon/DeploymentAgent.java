@@ -3,6 +3,7 @@ package wbs.platform.deployment.daemon;
 import static wbs.utils.etc.NetworkUtils.runHostname;
 import static wbs.utils.string.StringUtils.objectToString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import java.util.List;
@@ -11,7 +12,6 @@ import lombok.NonNull;
 
 import org.freedesktop.dbus.DBusConnection;
 import org.freedesktop.dbus.exceptions.DBusException;
-import org.joda.time.Duration;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -56,26 +56,12 @@ class DeploymentAgent
 
 	@Override
 	protected
-	Duration getSleepDuration () {
-		return Duration.standardSeconds (1);
-	}
+	String backgroundProcessName () {
 
-	@Override
-	protected
-	String getThreadName () {
-		return "DeploymentAgent";
-	}
+		return stringFormat (
+			"root.deployment-agent-%s",
+			hostname);
 
-	@Override
-	protected
-	String generalErrorSource () {
-		return "deployment agent";
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-		return "Error checking deployment state";
 	}
 
 	// state
