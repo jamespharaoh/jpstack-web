@@ -98,6 +98,22 @@
 
 	</collections>
 
+	<background-processes>
+
+		<background-process
+			object-type="subscription-send"
+			name="Schedule"
+			description="Begin subscription sends"
+			frequency="10 seconds"/>
+
+		<background-process
+			object-type="subscription-send"
+			name="Send"
+			description="Process subscription sends in batches"
+			frequency="10 seconds"/>
+
+	</background-processes>
+
 	<event-types>
 
 		<event-type

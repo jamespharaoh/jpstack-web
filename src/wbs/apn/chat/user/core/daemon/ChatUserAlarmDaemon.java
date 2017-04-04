@@ -64,7 +64,7 @@ class ChatUserAlarmDaemon
 	@Override
 	protected
 	String backgroundProcessName () {
-		return "chat.user-alarm";
+		return "chat-user.alarms";
 	}
 
 	// implementation

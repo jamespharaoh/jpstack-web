@@ -58,7 +58,7 @@ class ChatSpendWarningDaemon
 	@Override
 	protected
 	String backgroundProcessName () {
-		return "chat.spend-warning";
+		return "chat-user.spend-warning";
 	}
 
 	// implementation

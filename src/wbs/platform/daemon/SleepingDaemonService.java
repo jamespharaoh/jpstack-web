@@ -36,6 +36,7 @@ import wbs.framework.exception.GenericExceptionResolution;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogEvent;
 import wbs.framework.logging.TaskLogger;
+import wbs.framework.object.ObjectManager;
 
 import wbs.platform.background.model.BackgroundProcessObjectHelper;
 import wbs.platform.background.model.BackgroundProcessRec;
@@ -63,6 +64,9 @@ class SleepingDaemonService
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	ObjectManager objectManager;
 
 	@SingletonDependency
 	ObjectTypeObjectHelper objectTypeHelper;

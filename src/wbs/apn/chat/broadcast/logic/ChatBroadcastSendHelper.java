@@ -127,7 +127,7 @@ class ChatBroadcastSendHelper
 
 	@Override
 	public
-	ObjectHelper<ChatBroadcastRec> jobHelper () {
+	ObjectHelper <ChatBroadcastRec> jobHelper () {
 		return chatBroadcastHelper;
 	}
 
@@ -140,7 +140,7 @@ class ChatBroadcastSendHelper
 	@Override
 	public
 	String parentTypeName () {
-		return "chatBroadcast";
+		return "chat-broadcast";
 	}
 
 	// implementation

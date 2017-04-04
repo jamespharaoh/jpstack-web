@@ -60,7 +60,7 @@ class ChatCreditDaemon
 	@Override
 	protected
 	String backgroundProcessName () {
-		return "chat.credit";
+		return "chat-user.billed-messages";
 	}
 
 	// implementation

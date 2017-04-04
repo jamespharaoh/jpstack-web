@@ -44,7 +44,7 @@ class ChatJoinTimeoutDaemon
 	@Override
 	protected
 	String backgroundProcessName () {
-		return "chat.join-timeout";
+		return "chat-user.join-timeout";
 	}
 
 	// implementation

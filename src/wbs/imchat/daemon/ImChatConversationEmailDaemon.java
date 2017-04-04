@@ -46,7 +46,7 @@ class ImChatConversationEmailDaemon
 	@Override
 	protected
 	String backgroundProcessName () {
-		return "im-chat.conversation-email";
+		return "im-chat-conversation.email";
 	}
 
 	// implementation

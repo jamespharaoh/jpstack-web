@@ -337,6 +337,16 @@
 
 	</service-types>
 
+	<background-processes>
+
+		<background-process
+			object-type="chat"
+			name="Monitor swap"
+			description="Swap online monitor users"
+			frequency="10 seconds"/>
+
+	</background-processes>
+
 	<batch-types>
 
 		<batch-type

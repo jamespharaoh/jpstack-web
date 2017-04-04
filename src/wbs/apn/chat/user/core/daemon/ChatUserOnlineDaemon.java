@@ -70,7 +70,7 @@ class ChatUserOnlineDaemon
 	@Override
 	protected
 	String backgroundProcessName () {
-		return "chat.user-online";
+		return "chat-user.online";
 	}
 
 	// implementation

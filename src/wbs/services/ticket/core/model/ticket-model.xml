@@ -56,4 +56,14 @@
 
 	</collections>
 
+	<background-processes>
+
+		<background-process
+			object-type="ticket"
+			name="State time"
+			description="Automatically change ticket state after a period of time"
+			frequency="10 seconds"/>
+
+	</background-processes>
+
 </model-meta>

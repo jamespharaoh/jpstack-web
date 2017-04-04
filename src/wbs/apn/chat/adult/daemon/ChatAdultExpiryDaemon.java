@@ -53,7 +53,7 @@ class ChatAdultExpiryDaemon
 	@Override
 	protected
 	String backgroundProcessName () {
-		return "chat.adult-expiry";
+		return "chat-user.adult-expiry";
 	}
 
 	// implementation

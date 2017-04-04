@@ -100,6 +100,22 @@
 
 	</fields>
 
+	<background-processes>
+
+		<background-process
+			object-type="broadcast"
+			name="Schedule"
+			description="Begin broadcast sends"
+			frequency="10 seconds"/>
+
+		<background-process
+			object-type="broadcast"
+			name="Send"
+			description="Process broadcast sends in batches"
+			frequency="10 seconds"/>
+
+	</background-processes>
+
 	<event-types>
 
 		<event-type

@@ -116,7 +116,7 @@ class AlertsDaemon
 	@Override
 	protected
 	String backgroundProcessName () {
-		return "alerts-config.alert-sender";
+		return "alerts-settings.alert-sender";
 	}
 
 	// implementation

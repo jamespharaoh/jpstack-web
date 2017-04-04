@@ -95,4 +95,14 @@
 
 	</collections>
 
+	<background-processes>
+
+		<background-process
+			object-type="alerts-settings"
+			name="Alert sender"
+			description="Check status and send alerts when appropriate"
+			frequency="10 seconds"/>
+
+	</background-processes>
+
 </model-meta>

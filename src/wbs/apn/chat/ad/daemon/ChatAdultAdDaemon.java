@@ -90,7 +90,7 @@ class ChatAdultAdDaemon
 	@Override
 	protected
 	String backgroundProcessName () {
-		return "chat.adult-ad-sender";
+		return "chat-user.adult-ads";
 	}
 
 	// implementation

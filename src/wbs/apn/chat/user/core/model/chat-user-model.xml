@@ -562,6 +562,70 @@
 
 	</collections>
 
+	<background-processes>
+
+		<background-process
+			object-type="chat-user"
+			name="Adult ads"
+			description="Send ads for adult services to chat users"
+			frequency="10 seconds"/>
+
+		<background-process
+			object-type="chat-user"
+			name="Adult expiry"
+			description="Handle expiry of chat user adult verification"
+			frequency="10 seconds"/>
+
+		<background-process
+			object-type="chat-user"
+			name="Ads"
+			description="Send ads to chat users"
+			frequency="10 seconds"/>
+
+		<background-process
+			object-type="chat-user"
+			name="Alarms"
+			description="Create queue items for chat user conversation alarms"
+			frequency="10 seconds"/>
+
+		<background-process
+			object-type="chat-user"
+			name="Billed messages"
+			description="Send billed messages to chat users"
+			frequency="10 seconds"/>
+
+		<background-process
+			object-type="chat-user"
+			name="Join outbound"
+			description="Send monitor messages to users after they join"
+			frequency="10 seconds"/>
+
+		<background-process
+			object-type="chat-user"
+			name="Join timeout"
+			description="Cancel chat user joins after a period of inactivity"
+			frequency="10 seconds"/>
+
+		<background-process
+			object-type="chat-user"
+			name="Online"
+			description="Perform various regular tasks for online users"
+			frequency="10 seconds"/>
+
+		<background-process
+			object-type="chat-user"
+			name="Quiet outbound"
+			description="Send monitor messages to users who are not chatting"
+			frequency="10 seconds"/>
+
+		<background-process
+			object-type="chat-user"
+			name="Spend warning"
+			description="Send spend warnings to chat users"
+			frequency="10 seconds"/>
+
+	</background-processes>
+
 	<event-types>
 
 		<event-type

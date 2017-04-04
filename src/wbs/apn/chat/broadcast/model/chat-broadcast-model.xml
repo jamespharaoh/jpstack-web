@@ -134,6 +134,22 @@
 
 	</fields>
 
+	<background-processes>
+
+		<background-process
+			object-type="chat-broadcast"
+			name="Schedule"
+			description="Begin chat broadcast sends"
+			frequency="10 seconds"/>
+
+		<background-process
+			object-type="chat-broadcast"
+			name="Send"
+			description="Process chat broadcast sends in batches"
+			frequency="10 seconds"/>
+
+	</background-processes>
+
 	<event-types>
 
 		<event-type

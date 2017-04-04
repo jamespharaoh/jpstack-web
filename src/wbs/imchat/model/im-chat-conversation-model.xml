@@ -70,4 +70,14 @@
 
 	</collections>
 
+	<background-processes>
+
+		<background-process
+			object-type="im-chat-conversation"
+			name="Email"
+			description="Send email after conversation has ended"
+			frequency="10 seconds"/>
+
+	</background-processes>
+
 </model-meta>

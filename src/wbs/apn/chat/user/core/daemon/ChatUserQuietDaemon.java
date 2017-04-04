@@ -67,7 +67,7 @@ class ChatUserQuietDaemon
 	@Override
 	protected
 	String backgroundProcessName () {
-		return "chat.user-quiet";
+		return "chat-user.quiet-outbound";
 	}
 
 	// implementation

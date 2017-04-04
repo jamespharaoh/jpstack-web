@@ -64,7 +64,7 @@ class ChatUserJoinOutboundDaemon
 	@Override
 	protected
 	String backgroundProcessName () {
-		return "chat.user-join-outbound";
+		return "chat-user.join-outbound";
 	}
 
 	// implementation
