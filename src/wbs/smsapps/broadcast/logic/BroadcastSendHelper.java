@@ -82,8 +82,8 @@ class BroadcastSendHelper
 
 	@Override
 	public
-	String name () {
-		return "broadcast";
+	ObjectHelper <BroadcastNumberRec> itemHelper () {
+		return broadcastNumberHelper;
 	}
 
 	@Override
@@ -94,27 +94,33 @@ class BroadcastSendHelper
 
 	@Override
 	public
-	ObjectHelper<BroadcastRec> jobHelper () {
+	ObjectHelper <BroadcastRec> jobHelper () {
 		return broadcastHelper;
 	}
 
 	@Override
 	public
-	ObjectHelper<BroadcastNumberRec> itemHelper () {
-		return broadcastNumberHelper;
+	String name () {
+		return "broadcast";
+	}
+
+	@Override
+	public
+	String parentTypeName () {
+		return "broadcast";
 	}
 
 	// implementation
 
 	@Override
 	public
-	List<BroadcastRec> findSendingJobs () {
+	List <BroadcastRec> findSendingJobs () {
 		return broadcastHelper.findSending ();
 	}
 
 	@Override
 	public
-	List<BroadcastRec> findScheduledJobs (
+	List <BroadcastRec> findScheduledJobs (
 			Instant now) {
 
 		return broadcastHelper.findScheduled (
@@ -124,7 +130,7 @@ class BroadcastSendHelper
 
 	@Override
 	public
-	List<BroadcastNumberRec> findItemsLimit (
+	List <BroadcastNumberRec> findItemsLimit (
 			BroadcastConfigRec broadcastConfig,
 			BroadcastRec broadcast,
 			int maxResults) {

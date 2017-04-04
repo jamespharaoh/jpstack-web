@@ -9,8 +9,6 @@ import java.util.List;
 import lombok.Cleanup;
 import lombok.NonNull;
 
-import org.joda.time.Duration;
-
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -68,30 +66,11 @@ class ChatUserQuietDaemon
 
 	@Override
 	protected
-	String getThreadName () {
-		return "ChatUserQuiet";
+	String backgroundProcessName () {
+		return "chat.user-quiet";
 	}
 
-	@Override
-	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			30);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-		return "chat user quiet daemon";
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-		return "error checking for quiet chat users to send a message to";
-	}
+	// implementation
 
 	@Override
 	protected

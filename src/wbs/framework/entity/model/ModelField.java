@@ -51,26 +51,26 @@ class ModelField {
 	boolean identity;
 
 	@DataChildren
-	List<String> columnNames =
-		new ArrayList<String> ();
+	List <String> columnNames =
+		new ArrayList<> ();
 
 	@DataAttribute
-	Class<?> valueType;
+	Class <?> valueType;
 
 	@DataAttribute
 	ParameterizedType parameterizedType;
 
 	@DataAttribute
-	Class<?> collectionKeyType;
+	Class <?> collectionKeyType;
 
 	@DataAttribute
-	Class<?> collectionValueType;
+	Class <?> collectionValueType;
 
 	@DataAttribute
 	String sqlType;
 
 	@DataAttribute
-	Class<?> hibernateTypeHelper;
+	Class <?> hibernateTypeHelper;
 
 	@DataAttribute
 	Boolean nullable;

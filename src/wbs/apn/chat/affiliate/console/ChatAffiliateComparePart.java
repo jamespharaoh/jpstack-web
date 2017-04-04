@@ -2,7 +2,8 @@ package wbs.apn.chat.affiliate.console;
 
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
@@ -20,10 +21,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.console.part.AbstractPagePart;
@@ -33,7 +37,7 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
 
-import wbs.utils.time.IntervalFormatter;
+import wbs.utils.time.DurationFormatter;
 import wbs.utils.time.TextualInterval;
 
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
@@ -57,7 +61,7 @@ class ChatAffiliateComparePart
 	ChatUserConsoleHelper chatUserHelper;
 
 	@SingletonDependency
-	IntervalFormatter intervalFormatter;
+	DurationFormatter durationFormatter;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
@@ -81,11 +85,14 @@ class ChatAffiliateComparePart
 				"timePeriod",
 				"7 days");
 
-		Long timePeriodSeconds =
-			intervalFormatter.parseIntervalStringSecondsRequired (
+		Optional <Duration> timePeriodDurationOptional =
+			durationFormatter.stringToDuration (
 				timePeriodString);
 
-		if (timePeriodSeconds == null) {
+		if (
+			optionalIsNotPresent (
+				timePeriodDurationOptional)
+		) {
 
 			requestContext.addError (
 				"Invalid time period");
@@ -93,6 +100,10 @@ class ChatAffiliateComparePart
 			return;
 
 		}
+
+		Duration timePeriodDuration =
+			optionalGetRequired (
+				timePeriodDurationOptional);
 
 		// get objects
 
@@ -109,9 +120,8 @@ class ChatAffiliateComparePart
 			DateTime.now (
 				timeZone)
 
-			.minusSeconds (
-				toJavaIntegerRequired (
-					timePeriodSeconds))
+			.minus (
+				timePeriodDuration)
 
 			.toInstant ();
 

@@ -15,8 +15,6 @@ import java.util.List;
 
 import lombok.NonNull;
 
-import org.joda.time.Duration;
-
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -72,29 +70,8 @@ class ChatMonitorSwapDaemon
 
 	@Override
 	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			10);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-		return "chat monitor swap daemon";
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-		return "error swapping monitors";
-	}
-
-	@Override
-	protected
-	String getThreadName () {
-		return "ChatMonitorSwap";
+	String backgroundProcessName () {
+		return "chat.monitor-swap";
 	}
 
 	// implementation

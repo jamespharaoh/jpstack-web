@@ -59,35 +59,8 @@ class ChatCreditDaemon
 
 	@Override
 	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			30);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-
-		return "chat credit daemon";
-
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-
-		return "error finding users with negative credit";
-
-	}
-
-	@Override
-	protected
-	String getThreadName () {
-
-		return "ChatCredit";
-
+	String backgroundProcessName () {
+		return "chat.credit";
 	}
 
 	// implementation

@@ -8,8 +8,6 @@ import java.util.List;
 
 import lombok.NonNull;
 
-import org.joda.time.Duration;
-
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -59,29 +57,8 @@ class ChatSpendWarningDaemon
 
 	@Override
 	protected
-	String getThreadName () {
-		return "ChatSpendWarn";
-	}
-
-	@Override
-	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			60);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-		return "chat spend warning daemon";
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-		return "error sending chat spend warnings in background";
+	String backgroundProcessName () {
+		return "chat.spend-warning";
 	}
 
 	// implementation

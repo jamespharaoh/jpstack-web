@@ -46,7 +46,7 @@ import wbs.sms.message.core.model.MessageSearch;
 
 import wbs.smsapps.autoresponder.model.AutoResponderRec;
 
-import wbs.utils.time.IntervalFormatter;
+import wbs.utils.time.DurationFormatter;
 import wbs.utils.time.TextualInterval;
 
 @PrototypeComponent ("autoResponderVotesPart")
@@ -70,7 +70,7 @@ class AutoResponderVotesPart
 	FormFieldLogic formFieldLogic;
 
 	@SingletonDependency
-	IntervalFormatter intervalFormatter;
+	DurationFormatter intervalFormatter;
 
 	@ClassSingletonDependency
 	LogContext logContext;

@@ -15,6 +15,7 @@ import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -556,6 +557,17 @@ class TaskLogger
 		makeException ();
 
 		return returnValue;
+
+	}
+
+	public
+	void wrap (
+			@NonNull Consumer <TaskLogger> function) {
+
+		function.accept (
+			this);
+
+		makeException ();
 
 	}
 

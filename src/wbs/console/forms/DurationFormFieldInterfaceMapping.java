@@ -1,10 +1,10 @@
 package wbs.console.forms;
 
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.ResultUtils.errorResultFormat;
-import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.ResultUtils.successResultAbsent;
+import static wbs.utils.etc.ResultUtils.successResultPresent;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 import java.util.Map;
@@ -16,23 +16,25 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import org.joda.time.Duration;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 
-import wbs.utils.time.IntervalFormatter;
+import wbs.utils.time.DurationFormatter;
 
 import fj.data.Either;
 
 @Accessors (fluent = true)
-@PrototypeComponent ("secondsFormFieldInterfaceMapping")
+@PrototypeComponent ("durationFormFieldInterfaceMapping")
 public
-class SecondsFormFieldInterfaceMapping <Container>
-	implements FormFieldInterfaceMapping <Container, Long, String> {
+class DurationFormFieldInterfaceMapping <Container>
+	implements FormFieldInterfaceMapping <Container, Duration, String> {
 
 	// singleton dependencies
 
 	@SingletonDependency
-	IntervalFormatter intervalFormatter;
+	DurationFormatter durationFormatter;
 
 	// properties
 
@@ -40,13 +42,13 @@ class SecondsFormFieldInterfaceMapping <Container>
 	String label;
 
 	@Getter @Setter
-	SecondsFormFieldSpec.Format format;
+	Format format;
 
 	// implementation
 
 	@Override
 	public
-	Either <Optional <Long>, String> interfaceToGeneric (
+	Either <Optional <Duration>, String> interfaceToGeneric (
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <String> interfaceValue) {
@@ -62,14 +64,14 @@ class SecondsFormFieldInterfaceMapping <Container>
 
 		) {
 
-			return successResult (
-				optionalAbsent ());
+			return successResultAbsent ();
 
 		} else {
 
-			Optional <Long> genericValue =
-				intervalFormatter.parseIntervalStringSeconds (
-					interfaceValue.get ());
+			Optional <Duration> genericValue =
+				durationFormatter.stringToDuration (
+					optionalGetRequired (
+						interfaceValue));
 
 			if (
 				optionalIsNotPresent (
@@ -82,9 +84,8 @@ class SecondsFormFieldInterfaceMapping <Container>
 
 			}
 
-			return successResult (
-				Optional.of (
-					genericValue.get ()));
+			return successResultPresent (
+				genericValue.get ());
 
 		}
 
@@ -95,15 +96,14 @@ class SecondsFormFieldInterfaceMapping <Container>
 	Either <Optional <String>, String> genericToInterface (
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
-			@NonNull Optional <Long> genericValue) {
+			@NonNull Optional <Duration> genericValue) {
 
 		if (
 			optionalIsNotPresent (
 				genericValue)
 		) {
 
-			return successResult (
-				Optional.<String>absent ());
+			return successResultAbsent ();
 
 		} else {
 
@@ -111,17 +111,17 @@ class SecondsFormFieldInterfaceMapping <Container>
 
 			case textual:
 
-				return successResult (
-					Optional.of (
-						intervalFormatter.createTextualIntervalStringSeconds (
-							genericValue.get ())));
+				return successResultPresent (
+					durationFormatter.durationToStringTextual (
+						optionalGetRequired (
+							genericValue)));
 
 			case numeric:
 
-				return successResult (
-					Optional.of (
-						intervalFormatter.createNumericIntervalStringSeconds (
-							genericValue.get ())));
+				return successResultPresent (
+					durationFormatter.durationToStringNumeric (
+						optionalGetRequired (
+							genericValue)));
 
 			default:
 
@@ -131,6 +131,12 @@ class SecondsFormFieldInterfaceMapping <Container>
 
 		}
 
+	}
+
+	public static
+	enum Format {
+		textual,
+		numeric;
 	}
 
 }

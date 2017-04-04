@@ -1,7 +1,6 @@
 package wbs.platform.send;
 
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import java.util.List;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
-import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -49,43 +47,15 @@ class GenericScheduleDaemon <
 
 	@Override
 	protected
-	String getThreadName () {
+	String backgroundProcessName () {
 
 		return stringFormat (
-			"%sSchedule",
-			capitalise (
-				helper ().name ()));
+			"%s.schedule",
+			helper ().parentTypeName ());
 
 	}
 
-	@Override
-	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			5);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-
-		return stringFormat (
-			"%s schedule daemon",
-			helper ().name ());
-
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-
-		return stringFormat (
-			"error checking for schedule %s to begin sending",
-			helper ().itemNamePlural ());
-
-	}
+	// implementation
 
 	@Override
 	protected

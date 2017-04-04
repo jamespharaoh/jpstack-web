@@ -123,6 +123,12 @@ class SubscriptionSendHelper
 
 	@Override
 	public
+	String parentTypeName () {
+		return "subscription-send";
+	}
+
+	@Override
+	public
 	String name () {
 		return "subscription";
 	}

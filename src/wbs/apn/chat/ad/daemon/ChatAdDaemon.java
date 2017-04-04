@@ -9,8 +9,6 @@ import java.util.List;
 
 import lombok.NonNull;
 
-import org.joda.time.Duration;
-
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -99,29 +97,8 @@ class ChatAdDaemon
 
 	@Override
 	protected
-	String getThreadName () {
-		return "ChatAd";
-	}
-
-	@Override
-	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			600);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-		return "chat ad daemon";
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-		return "error sending chat ads in background";
+	String backgroundProcessName () {
+		return "chat.ad-sender";
 	}
 
 	// implementation

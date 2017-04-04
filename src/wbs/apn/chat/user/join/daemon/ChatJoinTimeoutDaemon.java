@@ -7,7 +7,6 @@ import java.util.List;
 import lombok.NonNull;
 
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.SingletonComponent;
@@ -44,35 +43,8 @@ class ChatJoinTimeoutDaemon
 
 	@Override
 	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			60);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-
-		return "chat join timeout daemon";
-
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-
-		return "error finding join messages to time out";
-
-	}
-
-	@Override
-	protected
-	String getThreadName () {
-
-		return "ChatJoinTimeout";
-
+	String backgroundProcessName () {
+		return "chat.join-timeout";
 	}
 
 	// implementation

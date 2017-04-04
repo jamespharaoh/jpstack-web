@@ -115,8 +115,8 @@ class ChatBroadcastSendHelper
 
 	@Override
 	public
-	String name () {
-		return "chat broadcast";
+	ObjectHelper<ChatBroadcastNumberRec> itemHelper () {
+		return chatBroadcastNumberHelper;
 	}
 
 	@Override
@@ -133,8 +133,14 @@ class ChatBroadcastSendHelper
 
 	@Override
 	public
-	ObjectHelper<ChatBroadcastNumberRec> itemHelper () {
-		return chatBroadcastNumberHelper;
+	String name () {
+		return "chat broadcast";
+	}
+
+	@Override
+	public
+	String parentTypeName () {
+		return "chatBroadcast";
 	}
 
 	// implementation

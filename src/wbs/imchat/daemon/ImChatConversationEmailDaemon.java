@@ -8,8 +8,6 @@ import java.util.List;
 
 import lombok.NonNull;
 
-import org.joda.time.Duration;
-
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -47,35 +45,8 @@ class ImChatConversationEmailDaemon
 
 	@Override
 	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			5);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-
-		return "im chat conversation email daemon";
-
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-
-		return "error finding conversations for email";
-
-	}
-
-	@Override
-	protected
-	String getThreadName () {
-
-		return "ImChatConversationEmail";
-
+	String backgroundProcessName () {
+		return "im-chat.conversation-email";
 	}
 
 	// implementation

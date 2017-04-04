@@ -11,8 +11,6 @@ import java.util.List;
 import lombok.Cleanup;
 import lombok.NonNull;
 
-import org.joda.time.Duration;
-
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -65,29 +63,8 @@ class ChatUserJoinOutboundDaemon
 
 	@Override
 	protected
-	String getThreadName () {
-		return "ChatUserJoinOut";
-	}
-
-	@Override
-	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			10);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-		return "chat user join outbound daemon";
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-		return "error checking for chat user join outbounds";
+	String backgroundProcessName () {
+		return "chat.user-join-outbound";
 	}
 
 	// implementation

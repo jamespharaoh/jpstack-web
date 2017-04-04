@@ -18,6 +18,9 @@
 		<component class="DereferenceFormFieldAccessor"/>
 		<component class="DescriptionFormFieldBuilder"/>
 		<component class="DescriptionFormFieldSpec"/>
+		<component class="DurationFormFieldBuilder"/>
+		<component class="DurationFormFieldInterfaceMapping"/>
+		<component class="DurationFormFieldSpec"/>
 		<component class="DynamicFormFieldAccessor"/>
 		<component class="EnumCsvFormFieldInterfaceMapping"/>
 		<component class="EnumFormFieldBuilder"/>
@@ -79,8 +82,9 @@
 		<component class="ScriptRefFormFieldBuilder"/>
 		<component class="ScriptRefFormFieldSpec"/>
 		<component class="SecondsFormFieldBuilder"/>
-		<component class="SecondsFormFieldInterfaceMapping"/>
+		<component class="SecondsFormFieldNativeMapping"/>
 		<component class="SecondsFormFieldSpec"/>
+		<component class="SecondsFormFieldValueValidator"/>
 		<component class="SimpleFormFieldAccessor"/>
 		<component class="SpecialFormFieldAccessor"/>
 		<component class="TextAreaFormFieldBuilder"/>

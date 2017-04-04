@@ -1712,7 +1712,8 @@ class HibernateSessionFactoryBuilder {
 						columnSql);
 
 				String customType =
-					customTypes.get (compositeIdModelField.valueType ());
+					customTypes.get (
+						compositeIdModelField.valueType ());
 
 				if (customType != null) {
 
@@ -1774,14 +1775,14 @@ class HibernateSessionFactoryBuilder {
 
 	}
 
-	Map<Class<?>,String> basicTypes =
-		ImmutableMap.<Class<?>,String>builder ()
+	Map <Class <?>, String> basicTypes =
+		ImmutableMap.<Class <?>, String> builder ()
 			.put (String.class, "string")
 			.put (Long.class, "long")
 			.build ();
 
-	Set<Class<?>> builtinFieldTypes =
-		ImmutableSet.<Class<?>>builder ()
+	Set <Class <?>> builtinFieldTypes =
+		ImmutableSet.<Class <?>> builder ()
 			.add (Boolean.class)
 			.add (Character.class)
 			.add (Date.class)
@@ -1791,6 +1792,6 @@ class HibernateSessionFactoryBuilder {
 			.add (new byte [] {}.getClass ())
 			.build ();
 
-	Set<Class<?>> valueFieldTypes;
+	Set <Class <?>> valueFieldTypes;
 
 }

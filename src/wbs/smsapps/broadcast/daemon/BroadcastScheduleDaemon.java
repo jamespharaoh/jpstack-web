@@ -1,5 +1,7 @@
 package wbs.smsapps.broadcast.daemon;
 
+import static wbs.utils.string.StringUtils.stringFormat;
+
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 
@@ -25,6 +27,18 @@ class BroadcastScheduleDaemon
 
 	@SingletonDependency
 	BroadcastSendHelper broadcastSendHelper;
+
+	// details
+
+	@Override
+	protected
+	String backgroundProcessName () {
+
+		return stringFormat (
+			"%s.schedule",
+			broadcastSendHelper.parentTypeName ());
+
+	}
 
 	// implementation
 

@@ -5,7 +5,7 @@ import com.google.common.base.Optional;
 import wbs.framework.logging.TaskLogger;
 
 public
-interface FormFieldNativeMapping<Container,Generic,Native> {
+interface FormFieldNativeMapping <Container, Generic, Native> {
 
 	Optional <Generic> nativeToGeneric (
 			Container container,

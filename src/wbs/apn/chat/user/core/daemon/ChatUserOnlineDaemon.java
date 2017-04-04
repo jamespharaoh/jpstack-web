@@ -69,35 +69,8 @@ class ChatUserOnlineDaemon
 
 	@Override
 	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			30);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-
-		return "chat user online daemon";
-
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-
-		return "error checking for online users";
-
-	}
-
-	@Override
-	protected
-	String getThreadName () {
-
-		return "ChatUserOnline";
-
+	String backgroundProcessName () {
+		return "chat.user-online";
 	}
 
 	// implementation

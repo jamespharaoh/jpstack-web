@@ -9,8 +9,6 @@ import java.util.List;
 
 import lombok.NonNull;
 
-import org.joda.time.Duration;
-
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -54,35 +52,8 @@ class ChatAdultExpiryDaemon
 
 	@Override
 	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			30);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-
-		return "chat adult expiry daemon";
-
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-
-		return "error finding users for adult expiry";
-
-	}
-
-	@Override
-	protected
-	String getThreadName () {
-
-		return "ChatAdultExpiry";
-
+	String backgroundProcessName () {
+		return "chat.adult-expiry";
 	}
 
 	// implementation

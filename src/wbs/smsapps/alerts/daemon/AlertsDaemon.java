@@ -115,29 +115,8 @@ class AlertsDaemon
 
 	@Override
 	protected
-	String getThreadName () {
-		return "Alerts";
-	}
-
-	@Override
-	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			20);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-		return "alerts daemon";
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-		return "error running alerts background process";
+	String backgroundProcessName () {
+		return "alerts-config.alert-sender";
 	}
 
 	// implementation

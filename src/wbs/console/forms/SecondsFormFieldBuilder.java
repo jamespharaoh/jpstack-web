@@ -10,6 +10,7 @@ import java.util.List;
 import javax.inject.Provider;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -18,6 +19,7 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.utils.etc.PropertyUtils;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
@@ -34,8 +36,8 @@ class SecondsFormFieldBuilder {
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <IdentityFormFieldNativeMapping>
-	identityFormFieldNativeMappingProvider;
+	Provider <DurationFormFieldInterfaceMapping>
+	durationFormFieldInterfaceMappingProvider;
 
 	@PrototypeDependency
 	Provider <NullFormFieldConstraintValidator>
@@ -50,8 +52,12 @@ class SecondsFormFieldBuilder {
 	requiredFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
-	Provider <SecondsFormFieldInterfaceMapping>
-	secondsFormFieldInterfaceMapping;
+	Provider <SecondsFormFieldNativeMapping>
+	secondsFormFieldNativeMappingProvider;
+
+	@PrototypeDependency
+	Provider <SecondsFormFieldValueValidator>
+	secondsFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
 	Provider <SimpleFormFieldAccessor>
@@ -103,10 +109,10 @@ class SecondsFormFieldBuilder {
 				spec.readOnly (),
 				false);
 
-		SecondsFormFieldSpec.Format format =
+		DurationFormFieldInterfaceMapping.Format format =
 			ifNull (
 				spec.format (),
-				SecondsFormFieldSpec.Format.textual);
+				DurationFormFieldInterfaceMapping.Format.textual);
 
 		Class<?> propertyClass =
 			PropertyUtils.propertyClassForClass (
@@ -127,7 +133,7 @@ class SecondsFormFieldBuilder {
 		// native mapping
 
 		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+			secondsFormFieldNativeMappingProvider.get ();
 
 		// value validators
 
@@ -141,6 +147,9 @@ class SecondsFormFieldBuilder {
 
 		}
 
+		valueValidators.add (
+			secondsFormFieldValueValidatorProvider.get ());
+
 		// constraint validator
 
 		FormFieldConstraintValidator constraintValidator =
@@ -149,7 +158,7 @@ class SecondsFormFieldBuilder {
 		// interface mapping
 
 		FormFieldInterfaceMapping interfaceMapping =
-			secondsFormFieldInterfaceMapping.get ()
+			durationFormFieldInterfaceMappingProvider.get ()
 
 			.label (
 				label)

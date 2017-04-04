@@ -126,7 +126,7 @@ class TimestampModelFieldBuilder {
 	}
 
 	public final static
-	Map<ColumnType,Optional<Class<?>>> hibernateTypeHelperByColumnType =
+	Map <ColumnType, Optional <Class <?>>> hibernateTypeHelperByColumnType =
 		ImmutableMap.<ColumnType,Optional<Class<?>>>builder ()
 
 		.put (

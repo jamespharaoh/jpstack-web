@@ -12,8 +12,6 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import org.joda.time.Duration;
-
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -91,29 +89,8 @@ class ChatAdultAdDaemon
 
 	@Override
 	protected
-	String getThreadName () {
-		return "ChatAdultAd";
-	}
-
-	@Override
-	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			60);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-		return "chat adult ad daemon";
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-		return "error sending adult chat ads in background";
+	String backgroundProcessName () {
+		return "chat.adult-ad-sender";
 	}
 
 	// implementation

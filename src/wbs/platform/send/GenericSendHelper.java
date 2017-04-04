@@ -9,11 +9,13 @@ import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
 public
-interface GenericSendHelper<
-	Service extends Record<Service>,
-	Job extends Record<Job>,
-	Item extends Record<Item>
+interface GenericSendHelper <
+	Service extends Record <Service>,
+	Job extends Record <Job>,
+	Item extends Record <Item>
 > {
+
+	String parentTypeName ();
 
 	String name ();
 	String itemNamePlural ();

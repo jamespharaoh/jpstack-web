@@ -150,6 +150,10 @@
 			package="wbs.platform.affiliate"/>
 
 		<plugin
+			name="background"
+			package="wbs.platform.background"/>
+
+		<plugin
 			name="core"
 			package="wbs.platform.core"/>
 

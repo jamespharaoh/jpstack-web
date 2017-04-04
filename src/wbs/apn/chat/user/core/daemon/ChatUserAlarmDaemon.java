@@ -9,8 +9,6 @@ import java.util.List;
 import lombok.Cleanup;
 import lombok.NonNull;
 
-import org.joda.time.Duration;
-
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -65,29 +63,8 @@ class ChatUserAlarmDaemon
 
 	@Override
 	protected
-	String getThreadName () {
-		return "ChatUserAlarm";
-	}
-
-	@Override
-	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			10);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-		return "chat user alarm daemon";
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-		return "error checking for alarms to trigger";
+	String backgroundProcessName () {
+		return "chat.user-alarm";
 	}
 
 	// implementation

@@ -15,6 +15,7 @@
 		<component class="meta.fields.DateFieldSpec"/>
 		<component class="meta.fields.DeletedFieldSpec"/>
 		<component class="meta.fields.DescriptionFieldSpec"/>
+		<component class="meta.fields.DurationFieldSpec"/>
 		<component class="meta.fields.EnumFieldSpec"/>
 		<component class="meta.fields.FloatingPointFieldSpec"/>
 		<component class="meta.fields.IntegerFieldSpec"/>
@@ -73,6 +74,7 @@
 		<component class="generate.fields.DateFieldWriter"/>
 		<component class="generate.fields.DeletedFieldWriter"/>
 		<component class="generate.fields.DescriptionFieldWriter"/>
+		<component class="generate.fields.DurationFieldWriter"/>
 		<component class="generate.fields.EnumFieldWriter"/>
 		<component class="generate.fields.FloatingPointFieldWriter"/>
 		<component class="generate.fields.ForeignIdFieldWriter"/>
@@ -116,6 +118,7 @@
 		<component class="build.DateModelFieldBuilder"/>
 		<component class="build.DeletedModelFieldBuilder"/>
 		<component class="build.DescriptionModelFieldBuilder"/>
+		<component class="build.DurationModelFieldBuilder"/>
 		<component class="build.EnumModelFieldBuilder"/>
 		<component class="build.FloatingPointModelFieldBuilder"/>
 		<component class="build.ForeignIdModelFieldBuilder"/>
