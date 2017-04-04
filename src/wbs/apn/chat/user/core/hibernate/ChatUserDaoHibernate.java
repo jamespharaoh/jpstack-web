@@ -393,7 +393,8 @@ class ChatUserDaoHibernate
 			ChatUserRec.class,
 
 			createCriteria (
-				ChatUserRec.class)
+				ChatUserRec.class,
+				"_chatUser")
 
 			.createAlias (
 				"_chatUser.chat",
@@ -406,7 +407,7 @@ class ChatUserDaoHibernate
 
 			.add (
 				Restrictions.lt (
-					"nextAdultAd",
+					"_chatUser.nextAdultAd",
 					now))
 
 		);
