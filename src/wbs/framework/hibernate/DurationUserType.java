@@ -1,6 +1,8 @@
 package wbs.framework.hibernate;
 
+import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.sum;
+import static wbs.utils.etc.NumberUtils.moreThan;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentSafe;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
@@ -89,6 +91,10 @@ class DurationUserType
 			hoursMinutesSecondsMillisecondsRegex.matcher (
 				stringValue);
 
+		Matcher hoursMinutesSecondsMicrosecondsMatcher =
+			hoursMinutesSecondsMillisecondsRegex.matcher (
+				stringValue);
+
 		if (hoursMinutesSecondsMatcher.matches ()) {
 
 			return millisecondsToDuration (
@@ -138,6 +144,26 @@ class DurationUserType
 						hoursMinutesSecondsMillisecondsMatcher.group (3)),
 					parseIntegerRequired (
 						hoursMinutesSecondsMillisecondsMatcher.group (4))));
+
+		} else if (hoursMinutesSecondsMicrosecondsMatcher.matches ()) {
+
+			return millisecondsToDuration (
+				sum (
+					3600000l * parseIntegerRequired (
+						hoursMinutesSecondsMicrosecondsMatcher.group (1)),
+					60000l * parseIntegerRequired (
+						hoursMinutesSecondsMicrosecondsMatcher.group (2)),
+					1000l * parseIntegerRequired (
+						hoursMinutesSecondsMicrosecondsMatcher.group (3)),
+					parseIntegerRequired (
+						hoursMinutesSecondsMicrosecondsMatcher.group (4)),
+					ifThenElse (
+						moreThan (
+							parseIntegerRequired (
+								hoursMinutesSecondsMicrosecondsMatcher.group (5)),
+							499l),
+						() -> 1l,
+						() -> 0l)));
 
 		} else {
 
@@ -269,5 +295,10 @@ class DurationUserType
 	Pattern hoursMinutesSecondsMillisecondsRegex =
 		Pattern.compile (
 			"^(\\d{2}):(\\d{2}):(\\d{2})\\.(\\d{3})$");
+
+	private final static
+	Pattern hoursMinutesSecondsMicrosecondsRegex =
+		Pattern.compile (
+			"^(\\d{2}):(\\d{2}):(\\d{2})\\.(\\d{3})(\\d{3})$");
 
 }
