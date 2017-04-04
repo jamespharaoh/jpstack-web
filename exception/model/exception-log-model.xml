@@ -48,4 +48,14 @@
 
 	</fields>
 
+	<background-processes>
+
+		<background-process
+			object-type="exception-log"
+			name="Removal"
+			description="Remove old exception logs"
+			frequency="1 minute"/>
+
+	</background-processes>
+
 </model-meta>
