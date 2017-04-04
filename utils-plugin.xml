@@ -10,8 +10,8 @@
 
 		<component class="thread.ThreadManagerImplementation"/>
 
+		<component class="time.DurationFormatterImplementation"/>
 		<component class="time.TimeFormatterImplementation"/>
-		<component class="time.IntervalFormatterImplementation"/>
 
 	</layer>
 

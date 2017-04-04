@@ -3,6 +3,7 @@ package wbs.utils.etc;
 import static wbs.utils.etc.TypeUtils.dynamicCast;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringFormatArray;
 
 import java.util.AbstractMap;
 import java.util.Arrays;
@@ -936,6 +937,16 @@ class OptionalUtils {
 
 		return Optional.of (
 			value);
+
+	}
+
+	public static
+	Optional <String> optionalOfFormat (
+			@NonNull String ... arguments) {
+
+		return Optional.of (
+			stringFormatArray (
+				arguments));
 
 	}
 

@@ -197,6 +197,39 @@ class TimeUtils {
 
 	}
 
+	public static
+	Duration secondsToDuration (
+			@NonNull Long seconds) {
+
+		return Duration.standardSeconds (
+			seconds);
+
+	}
+
+	public static
+	Duration toDuration (
+			@NonNull ReadableDuration readableDuration) {
+
+		return readableDuration.toDuration ();
+
+	}
+
+	public static
+	Duration toDurationNullSafe (
+			ReadableDuration readableDuration) {
+
+		if (readableDuration != null) {
+
+			return readableDuration.toDuration ();
+
+		} else {
+
+			return null;
+
+		}
+
+	}
+
 	// ---------- duration comparison
 
 	public static

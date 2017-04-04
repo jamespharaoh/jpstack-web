@@ -27,6 +27,24 @@ class ResultUtils {
 	}
 
 	public static <LeftType, RightType>
+	Either <Optional <LeftType>, RightType> successResultAbsent () {
+
+		return Either.<Optional <LeftType>, RightType> left (
+			Optional.absent ());
+
+	}
+
+	public static <LeftType, RightType>
+	Either <Optional <LeftType>, RightType> successResultPresent (
+			@NonNull LeftType left) {
+
+		return Either.<Optional <LeftType>, RightType> left (
+			Optional.of (
+				left));
+
+	}
+
+	public static <LeftType, RightType>
 	Either <LeftType, RightType> errorResult (
 			@NonNull RightType right) {
 
