@@ -11,7 +11,6 @@ import java.util.List;
 import lombok.Cleanup;
 import lombok.NonNull;
 
-import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -74,29 +73,8 @@ class TicketStateTimeDaemon
 
 	@Override
 	protected
-	String getThreadName () {
-		return "ticketStateTime";
-	}
-
-	@Override
-	protected
-	Duration getSleepDuration () {
-
-		return Duration.standardSeconds (
-			5);
-
-	}
-
-	@Override
-	protected
-	String generalErrorSource () {
-		return "time ticket check daemon";
-	}
-
-	@Override
-	protected
-	String generalErrorSummary () {
-		return "error sending the ticket to it's state queue";
+	String backgroundProcessName () {
+		return "ticket.state-time";
 	}
 
 	// implementation
