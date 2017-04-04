@@ -421,7 +421,7 @@ class SleepingDaemonService
 					backgroundProcess.getRunningStartTime ())
 
 				.setLastRunSuccess (
-					! taskLogger.errors ())
+					! taskLogger.findRoot ().errors ())
 
 				.setLastRunDuration (
 					new Duration (
