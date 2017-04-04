@@ -10,6 +10,7 @@ import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.lessThan;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.hyphenToCamel;
 import static wbs.utils.string.StringUtils.hyphenToUnderscore;
 import static wbs.utils.string.StringUtils.joinWithoutSeparator;
@@ -102,8 +103,9 @@ class SleepingDaemonService
 		return joinWithoutSeparator (
 			hyphenToCamel (
 				parentTypeCode),
-			hyphenToCamel (
-				backgroundProcessCode));
+			capitalise (
+				hyphenToCamel (
+					backgroundProcessCode)));
 
 	}
 
@@ -337,9 +339,9 @@ class SleepingDaemonService
 				backgroundProcess.getRunning ()
 
 				&& earlierThan (
-					backgroundProcess.getRunningWatchdogTime (),
 					transaction.now ().minus (
-						Duration.standardMinutes (10)))
+						Duration.standardMinutes (10)),
+					backgroundProcess.getRunningWatchdogTime ())
 
 			) {
 				return false;
