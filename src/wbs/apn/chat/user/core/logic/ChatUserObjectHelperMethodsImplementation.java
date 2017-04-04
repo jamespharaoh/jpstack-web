@@ -196,16 +196,6 @@ class ChatUserObjectHelperMethodsImplementation
 					? ChatUserCreditMode.free
 					: ChatUserCreditMode.billedMessages);
 
-		// set adult verify on some services
-		// TODO this should probably not be here
-
-		if (chat.getAutoAdultVerify ()) {
-
-			chatUserLogic.adultVerify (
-				chatUser);
-
-		}
-
 		chatUserHelper.insert (
 			taskLogger,
 			chatUser);

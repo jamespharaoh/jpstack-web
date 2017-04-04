@@ -214,7 +214,10 @@ class ChatMainCommand
 			fromChatUser,
 			commandChatScheme);
 
-		if (smsMessage.getRoute ().getInboundImpliesAdult ()) {
+		if (
+			smsMessage.getRoute ().getInboundImpliesAdult ()
+			|| chat.getAutoAdultVerify ()
+		) {
 
 			chatUserLogic.adultVerify (
 				fromChatUser);
