@@ -17,10 +17,10 @@ class StringFormatWriter
 	// properties
 
 	@Getter @Setter
-	String indentString;
+	String indentString = "";
 
 	@Getter @Setter
-	long indentSize;
+	long indentSize = 0;
 
 	// state
 
