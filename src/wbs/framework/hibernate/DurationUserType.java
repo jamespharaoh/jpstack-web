@@ -79,20 +79,20 @@ class DurationUserType
 			hoursMinutesSecondsRegex.matcher (
 				stringValue);
 
-		Matcher hoursMinutesSecondsDecisecondsMatcher =
+		Matcher hmsDecisecondsMatcher =
 			hoursMinutesSecondsDecisecondsRegex.matcher (
 				stringValue);
 
-		Matcher hoursMinutesSecondsCentisecondsMatcher =
+		Matcher hmsCentisecondsMatcher =
 			hoursMinutesSecondsCentisecondsRegex.matcher (
 				stringValue);
 
-		Matcher hoursMinutesSecondsMillisecondsMatcher =
+		Matcher hmsMillisecondsMatcher =
 			hoursMinutesSecondsMillisecondsRegex.matcher (
 				stringValue);
 
-		Matcher hoursMinutesSecondsMicrosecondsMatcher =
-			hoursMinutesSecondsMillisecondsRegex.matcher (
+		Matcher hmsMicrosecondsMatcher =
+			hoursMinutesSecondsMicrosecondsRegex.matcher (
 				stringValue);
 
 		if (hoursMinutesSecondsMatcher.matches ()) {
@@ -106,61 +106,61 @@ class DurationUserType
 					1000l * parseIntegerRequired (
 						hoursMinutesSecondsMatcher.group (3))));
 
-		} else if (hoursMinutesSecondsDecisecondsMatcher.matches ()) {
+		} else if (hmsDecisecondsMatcher.matches ()) {
 
 			return millisecondsToDuration (
 				sum (
 					3600000l * parseIntegerRequired (
-						hoursMinutesSecondsDecisecondsMatcher.group (1)),
+						hmsDecisecondsMatcher.group (1)),
 					60000l * parseIntegerRequired (
-						hoursMinutesSecondsDecisecondsMatcher.group (2)),
+						hmsDecisecondsMatcher.group (2)),
 					1000l * parseIntegerRequired (
-						hoursMinutesSecondsDecisecondsMatcher.group (3)),
+						hmsDecisecondsMatcher.group (3)),
 					100l * parseIntegerRequired (
-						hoursMinutesSecondsDecisecondsMatcher.group (4))));
+						hmsDecisecondsMatcher.group (4))));
 
-		} else if (hoursMinutesSecondsCentisecondsMatcher.matches ()) {
+		} else if (hmsCentisecondsMatcher.matches ()) {
 
 			return millisecondsToDuration (
 				sum (
 					3600000l * parseIntegerRequired (
-						hoursMinutesSecondsCentisecondsMatcher.group (1)),
+						hmsCentisecondsMatcher.group (1)),
 					60000l * parseIntegerRequired (
-						hoursMinutesSecondsCentisecondsMatcher.group (2)),
+						hmsCentisecondsMatcher.group (2)),
 					1000l * parseIntegerRequired (
-						hoursMinutesSecondsCentisecondsMatcher.group (3)),
+						hmsCentisecondsMatcher.group (3)),
 					10l * parseIntegerRequired (
-						hoursMinutesSecondsCentisecondsMatcher.group (4))));
+						hmsCentisecondsMatcher.group (4))));
 
-		} else if (hoursMinutesSecondsMillisecondsMatcher.matches ()) {
-
-			return millisecondsToDuration (
-				sum (
-					3600000l * parseIntegerRequired (
-						hoursMinutesSecondsMillisecondsMatcher.group (1)),
-					60000l * parseIntegerRequired (
-						hoursMinutesSecondsMillisecondsMatcher.group (2)),
-					1000l * parseIntegerRequired (
-						hoursMinutesSecondsMillisecondsMatcher.group (3)),
-					parseIntegerRequired (
-						hoursMinutesSecondsMillisecondsMatcher.group (4))));
-
-		} else if (hoursMinutesSecondsMicrosecondsMatcher.matches ()) {
+		} else if (hmsMillisecondsMatcher.matches ()) {
 
 			return millisecondsToDuration (
 				sum (
 					3600000l * parseIntegerRequired (
-						hoursMinutesSecondsMicrosecondsMatcher.group (1)),
+						hmsMillisecondsMatcher.group (1)),
 					60000l * parseIntegerRequired (
-						hoursMinutesSecondsMicrosecondsMatcher.group (2)),
+						hmsMillisecondsMatcher.group (2)),
 					1000l * parseIntegerRequired (
-						hoursMinutesSecondsMicrosecondsMatcher.group (3)),
+						hmsMillisecondsMatcher.group (3)),
 					parseIntegerRequired (
-						hoursMinutesSecondsMicrosecondsMatcher.group (4)),
+						hmsMillisecondsMatcher.group (4))));
+
+		} else if (hmsMicrosecondsMatcher.matches ()) {
+
+			return millisecondsToDuration (
+				sum (
+					3600000l * parseIntegerRequired (
+						hmsMicrosecondsMatcher.group (1)),
+					60000l * parseIntegerRequired (
+						hmsMicrosecondsMatcher.group (2)),
+					1000l * parseIntegerRequired (
+						hmsMicrosecondsMatcher.group (3)),
+					parseIntegerRequired (
+						hmsMicrosecondsMatcher.group (4)),
 					ifThenElse (
 						moreThan (
 							parseIntegerRequired (
-								hoursMinutesSecondsMicrosecondsMatcher.group (5)),
+								hmsMicrosecondsMatcher.group (5)),
 							499l),
 						() -> 1l,
 						() -> 0l)));
