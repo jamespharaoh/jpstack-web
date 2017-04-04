@@ -49,23 +49,20 @@ class CachedGetter<Type>
 	public synchronized
 	Type get () {
 
-		Instant now =
-			Instant.now ();
-
 		// call refresh if necessary
 
 		if (
 			earlierThan (
 				lastReload.plus (
 					reloadTimeMs),
-				now)
+				Instant.now ())
 		) {
 
 			value =
 				refresh ();
 
 			lastReload =
-				now;
+				Instant.now ();
 
 		}
 
