@@ -55,11 +55,13 @@ class AbstractDaemonService {
 	}
 
 	protected
-	void init () {
+	void setupService (
+			@NonNull TaskLogger parentTaskLogger) {
 	}
 
 	protected
-	void deinit () {
+	void serviceTeardown (
+			@NonNull TaskLogger parentTaskLogger) {
 	}
 
 	protected
@@ -160,14 +162,22 @@ class AbstractDaemonService {
 
 		// call init
 
-		init ();
+		setupService (
+			taskLogger);
 
-		// ok start threads
+		// start threads
 
 		threads =
 			new ArrayList<> ();
 
 		createThreads ();
+
+		// done
+
+		taskLogger.noticeFormat (
+			"Started %s",
+			classNameSimple (
+				getClass ()));
 
 	}
 
@@ -212,8 +222,9 @@ class AbstractDaemonService {
 
 				for (Thread thread : threads) {
 
-					if (thread.isAlive ())
+					if (thread.isAlive ()) {
 						thread.join ();
+					}
 
 				}
 
@@ -227,9 +238,14 @@ class AbstractDaemonService {
 
 		// call deinit
 
-		deinit ();
+		serviceTeardown (
+			taskLogger);
 
 		// we're done
+
+		taskLogger.noticeFormat (
+			"Stopped %s",
+			getClass ().getSimpleName ());
 
 		threads = null;
 

@@ -154,7 +154,7 @@ class WbsServletListener
 		) {
 
 			taskLogger.noticeFormat (
-				"Destroying application context");
+				"Closing component manager");
 
 			componentManager.close ();
 
