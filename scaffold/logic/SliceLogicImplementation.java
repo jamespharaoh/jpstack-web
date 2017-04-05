@@ -1,10 +1,12 @@
 package wbs.platform.scaffold.logic;
 
+import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.orNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.ThreadUtils.threadInterruptAndJoinIgnoreInterrupt;
 import static wbs.utils.time.TimeUtils.laterThan;
 
 import java.util.HashMap;
@@ -21,6 +23,7 @@ import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.NormalLifecycleTeardown;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.tools.BackgroundProcess;
@@ -74,17 +77,39 @@ class SliceLogicImplementation
 	Map <Long, Optional <Instant>> nextUpdateTimestampBySlice =
 		new HashMap<> ();
 
+	Thread backgroundThread;
+
 	// lifecycle
 
 	@NormalLifecycleSetup
 	public
 	void setup () {
 
-		threadManager.startThread (
-			this::mainLoop,
-			"SliceLogic");
+		backgroundThread =
+			threadManager.startThread (
+				this::mainLoop,
+				"SliceLogic");
 
 	}
+
+	@NormalLifecycleTeardown
+	public
+	void teardown (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		if (
+			isNotNull (
+				backgroundThread)
+		) {
+
+			threadInterruptAndJoinIgnoreInterrupt (
+				backgroundThread);
+
+		}
+
+	}
+
+	// implementation
 
 	public
 	void mainLoop () {

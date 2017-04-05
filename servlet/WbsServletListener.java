@@ -174,7 +174,7 @@ class WbsServletListener
 
 			try {
 
-				watchdogThread.wait ();
+				watchdogThread.join ();
 
 			} catch (InterruptedException interruptedException) {
 
