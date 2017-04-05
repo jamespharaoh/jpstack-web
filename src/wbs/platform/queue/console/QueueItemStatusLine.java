@@ -1,6 +1,8 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.ThreadUtils.threadInterruptAndJoinIgnoreInterrupt;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.thread.ConcurrentUtils.futureValue;
 import static wbs.utils.time.TimeUtils.laterThan;
@@ -11,7 +13,6 @@ import java.util.concurrent.Future;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -24,6 +25,7 @@ import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.NormalLifecycleTeardown;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -137,12 +139,38 @@ class QueueItemStatusLine
 
 	@NormalLifecycleSetup
 	public
-	void setup () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		backgroundThread =
 			threadManager.startThread (
 				this::backgroundLoop,
 				"queue-item-status-line");
+
+	}
+
+	@NormalLifecycleTeardown
+	public
+	void teardown (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"teardown");
+
+		if (
+			isNotNull (
+				backgroundThread)
+		) {
+
+			taskLogger.noticeFormat (
+				"Stopping queue item background thread");
+
+			threadInterruptAndJoinIgnoreInterrupt (
+				backgroundThread);
+
+		}
 
 	}
 
@@ -265,11 +293,12 @@ class QueueItemStatusLine
 			startTime.minus (
 				idleDuration);
 
-		{
+		try (
 
-			@Cleanup
 			HeldLock heldLock =
 				lock.write ();
+
+		) {
 
 			userDatas.values ().removeIf (
 				userData ->
@@ -281,59 +310,62 @@ class QueueItemStatusLine
 
 		// begin transaction and create cache
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				stringFormat (
-					"%s.%s ()",
-					getClass ().getSimpleName (),
-					"getLatestData"),
-				this);
+		try (
 
-		QueueCache queueCache =
-			masterQueueCacheProvider.get ();
+			Transaction transaction =
+				database.beginReadOnly (
+					stringFormat (
+						"%s.%s ()",
+						getClass ().getSimpleName (),
+						"getLatestData"),
+					this);
 
-		// update users
+		) {
 
-		userDatas.values ().forEach (
-			userData -> {
+			QueueCache queueCache =
+				masterQueueCacheProvider.get ();
 
-			UserRec user =
-				userHelper.findRequired (
-					userData.userId ());
+			// update users
 
-			SortedQueueSubjects sortedSubjects =
-				queueSubjectSorterProvider.get ()
+			userDatas.values ().forEach (
+				userData -> {
 
-				.queueCache (
-					queueCache)
+				UserRec user =
+					userHelper.findRequired (
+						userData.userId ());
 
-				.loggedInUser (
-					user)
+				SortedQueueSubjects sortedSubjects =
+					queueSubjectSorterProvider.get ()
 
-				.effectiveUser (
-					user)
+					.queueCache (
+						queueCache)
 
-				.sort (
-					taskLogger);
+					.loggedInUser (
+						user)
 
-			synchronized (userData) {
+					.effectiveUser (
+						user)
 
-				userData
+					.sort (
+						taskLogger);
 
-					.totalAvailableItems (
-						sortedSubjects.totalAvailableItems ())
+				synchronized (userData) {
 
-					.userClaimedItems (
-						sortedSubjects.userClaimedItems ());
+					userData
 
-			}
+						.totalAvailableItems (
+							sortedSubjects.totalAvailableItems ())
 
-		});
+						.userClaimedItems (
+							sortedSubjects.userClaimedItems ());
+
+				}
+
+			});
+
+		}
 
 		// tidy up
-
-		transaction.close ();
 
 		forceUpdate =
 			false;
