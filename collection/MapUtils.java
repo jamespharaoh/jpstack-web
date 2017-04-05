@@ -90,6 +90,16 @@ class MapUtils {
 
 	}
 
+	public static <KeyType>
+	boolean mapDoesNotContainKey (
+			@NonNull Map <KeyType, ?> map,
+			@NonNull KeyType key) {
+
+		return ! map.containsKey (
+			key);
+
+	}
+
 	// item lookup
 
 	public static <KeyType, ValueType>
