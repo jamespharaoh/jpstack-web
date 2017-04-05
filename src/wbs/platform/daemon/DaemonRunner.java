@@ -25,7 +25,13 @@ class DaemonRunner {
 
 		try {
 
-			for (;;) { Thread.sleep (1000); }
+			for (;;) {
+
+				Thread.sleep (1000);
+
+				SDNotify.sendWatchdog ();
+
+			}
 
 		} finally {
 

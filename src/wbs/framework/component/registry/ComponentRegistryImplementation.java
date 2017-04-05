@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -50,7 +51,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -64,6 +64,9 @@ import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.activitymanager.RuntimeExceptionWithTask;
 import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.LateLifecycleSetup;
+import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.NormalLifecycleTeardown;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.UninitializedDependency;
@@ -216,32 +219,37 @@ class ComponentRegistryImplementation
 	List <ComponentDefinition> withAnnotation (
 			@NonNull Class <? extends Annotation> annotationClass) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		try (
 
-		ImmutableList.Builder <ComponentDefinition>
-			componentDefinitionsWithAnnotationBuilder =
-				ImmutableList.builder ();
+			HeldLock heldlock =
+				lock.read ();
 
-		for (
-			ComponentDefinition componentDefinition
-				: definitions
 		) {
 
-			Annotation annotation =
-				componentDefinition.componentClass ().getAnnotation (
-					annotationClass);
+			ImmutableList.Builder <ComponentDefinition>
+				componentDefinitionsWithAnnotationBuilder =
+					ImmutableList.builder ();
 
-			if (annotation == null)
-				continue;
+			for (
+				ComponentDefinition componentDefinition
+					: definitions
+			) {
 
-			componentDefinitionsWithAnnotationBuilder.add (
-				componentDefinition);
+				Annotation annotation =
+					componentDefinition.componentClass ().getAnnotation (
+						annotationClass);
+
+				if (annotation == null)
+					continue;
+
+				componentDefinitionsWithAnnotationBuilder.add (
+					componentDefinition);
+
+			}
+
+			return componentDefinitionsWithAnnotationBuilder.build ();
 
 		}
-
-		return componentDefinitionsWithAnnotationBuilder.build ();
 
 	}
 
@@ -382,190 +390,144 @@ class ComponentRegistryImplementation
 	ComponentRegistryImplementation registerDefinition (
 			@NonNull ComponentDefinition componentDefinition) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.write ();
+		try (
 
-		// sanity check
+			HeldLock heldlock =
+				lock.write ();
 
-		if (componentDefinition.name () == null) {
-
-			throw new RuntimeExceptionWithTask (
-				activityManager.currentTask (),
-				stringFormat (
-					"Component definition has no name"));
-
-		}
-
-		if (componentDefinition.componentClass () == null) {
-
-			throw new RuntimeExceptionWithTask (
-				activityManager.currentTask (),
-				stringFormat (
-					"Component definition %s has no component class",
-					componentDefinition.name ()));
-
-		}
-
-		if (componentDefinition.scope () == null) {
-
-			throw new RuntimeExceptionWithTask (
-				activityManager.currentTask (),
-				stringFormat (
-					"Copmonent definition %s has no scope",
-					componentDefinition.name ()));
-
-		}
-
-		if (
-			byName.containsKey (
-				componentDefinition.name ())
 		) {
 
-			throw new RuntimeExceptionWithTask (
-				activityManager.currentTask (),
-				stringFormat (
-					"Duplicated component definition name %s",
-					componentDefinition.name ()));
+			// sanity check
 
-		}
+			if (componentDefinition.name () == null) {
 
-		if (
-			stringNotInSafe (
-				componentDefinition.scope (),
-				"singleton",
-				"prototype")
-		) {
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
+					stringFormat (
+						"Component definition has no name"));
 
-			throw new RuntimeExceptionWithTask (
-				activityManager.currentTask (),
-				stringFormat (
-					"Component definition %s has invalid scope %s",
-					componentDefinition.name (),
-					componentDefinition.scope ()));
+			}
 
-		}
+			if (componentDefinition.componentClass () == null) {
 
-		Class <?> instantiationClass =
-			ifNull (
-				componentDefinition.factoryClass (),
-				componentDefinition.componentClass ());
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
+					stringFormat (
+						"Component definition %s has no component class",
+						componentDefinition.name ()));
 
-		// check the class looks ok
+			}
 
-		if (! Modifier.isPublic (
-				instantiationClass.getModifiers ())) {
+			if (componentDefinition.scope () == null) {
 
-			throw new RuntimeExceptionWithTask (
-				activityManager.currentTask (),
-				stringFormat (
-					"Component definition %s refers to non-public class %s",
-					componentDefinition.name (),
-					instantiationClass.getName ()));
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
+					stringFormat (
+						"Copmonent definition %s has no scope",
+						componentDefinition.name ()));
 
-		}
+			}
 
-		if (Modifier.isAbstract (
-				instantiationClass.getModifiers ())) {
+			if (
+				byName.containsKey (
+					componentDefinition.name ())
+			) {
 
-			throw new RuntimeExceptionWithTask (
-				activityManager.currentTask (),
-				stringFormat (
-					"Component definition %s refers to abstract class %s",
-					componentDefinition.name (),
-					instantiationClass.getName ()));
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
+					stringFormat (
+						"Duplicated component definition name %s",
+						componentDefinition.name ()));
 
-		}
+			}
 
-		Constructor<?> constructor;
+			if (
+				stringNotInSafe (
+					componentDefinition.scope (),
+					"singleton",
+					"prototype")
+			) {
 
-		try {
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
+					stringFormat (
+						"Component definition %s has invalid scope %s",
+						componentDefinition.name (),
+						componentDefinition.scope ()));
 
-			constructor =
-				instantiationClass.getDeclaredConstructor ();
+			}
 
-		} catch (NoSuchMethodException exception) {
+			Class <?> instantiationClass =
+				ifNull (
+					componentDefinition.factoryClass (),
+					componentDefinition.componentClass ());
 
-			throw new RuntimeExceptionWithTask (
-				activityManager.currentTask (),
-				stringFormat (
-					"Component definition %s refers class %s with no default ",
-					componentDefinition.name (),
-					instantiationClass.getName (),
-					"constructor"));
+			// check the class looks ok
 
-		}
+			if (
+				! Modifier.isPublic (
+					instantiationClass.getModifiers ())
+			) {
 
-		if (
-			! Modifier.isPublic (
-				constructor.getModifiers ())
-		) {
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
+					stringFormat (
+						"Component definition %s refers to non-public class %s",
+						componentDefinition.name (),
+						instantiationClass.getName ()));
 
-			throw new RuntimeExceptionWithTask (
-				activityManager.currentTask (),
-				stringFormat (
-					"Component definition %s ",
-					componentDefinition.name (),
-					"refers to class %s ",
-					instantiationClass.getName (),
-					"with non-public default constructor"));
+			}
 
-		}
+			if (Modifier.isAbstract (
+					instantiationClass.getModifiers ())) {
 
-		// store component definition
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
+					stringFormat (
+						"Component definition %s refers to abstract class %s",
+						componentDefinition.name (),
+						instantiationClass.getName ()));
 
-		definitions.add (
-			componentDefinition);
+			}
 
-		if (
-			stringEqualSafe (
-				componentDefinition.scope (),
-				"singleton")
-		) {
+			Constructor <?> constructor;
 
-			singletons.add (
-				componentDefinition);
+			try {
 
-		}
+				constructor =
+					instantiationClass.getDeclaredConstructor ();
 
-		if (
-			stringEqualSafe (
-				componentDefinition.scope (),
-				"prototype")
-		) {
+			} catch (NoSuchMethodException exception) {
 
-			prototypes.add (
-				componentDefinition);
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
+					stringFormat (
+						"Component definition %s refers class %s with no default ",
+						componentDefinition.name (),
+						instantiationClass.getName (),
+						"constructor"));
 
-		}
+			}
 
-		// index by name
+			if (
+				! Modifier.isPublic (
+					constructor.getModifiers ())
+			) {
 
-		byName.put (
-			componentDefinition.name (),
-			componentDefinition);
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
+					stringFormat (
+						"Component definition %s ",
+						componentDefinition.name (),
+						"refers to class %s ",
+						instantiationClass.getName (),
+						"with non-public default constructor"));
 
-		// index by class
+			}
 
-		if (! componentDefinition.hide ()) {
+			// store component definition
 
-			Set <Class <?>> componentClasses =
-				new HashSet<> ();
-
-			componentClasses.add (
-				componentDefinition.componentClass ());
-
-			componentClasses.addAll (
-				ClassUtils.getAllSuperclasses (
-					componentDefinition.componentClass ()));
-
-			componentClasses.addAll (
-				ClassUtils.getAllInterfaces (
-					componentDefinition.componentClass ()));
-
-			updateIndexByClass (
-				byClass,
-				componentClasses,
+			definitions.add (
 				componentDefinition);
 
 			if (
@@ -574,9 +536,7 @@ class ComponentRegistryImplementation
 					"singleton")
 			) {
 
-				updateIndexByClass (
-					singletonsByClass,
-					componentClasses,
+				singletons.add (
 					componentDefinition);
 
 			}
@@ -587,36 +547,38 @@ class ComponentRegistryImplementation
 					"prototype")
 			) {
 
-				updateIndexByClass (
-					prototypesByClass,
-					componentClasses,
+				prototypes.add (
 					componentDefinition);
 
 			}
 
-		}
+			// index by name
 
-		// index by qualifiers
+			byName.put (
+				componentDefinition.name (),
+				componentDefinition);
 
-		if (! componentDefinition.hide ()) {
+			// index by class
 
-			for (
-				Annotation annotation
-					: componentDefinition.componentClass ()
-						.getDeclaredAnnotations ()
-			) {
+			if (! componentDefinition.hide ()) {
 
-				Qualifier qualifierAnnotation =
-					annotation
-						.annotationType ()
-						.getAnnotation (Qualifier.class);
+				Set <Class <?>> componentClasses =
+					new HashSet<> ();
 
-				if (qualifierAnnotation == null)
-					continue;
+				componentClasses.add (
+					componentDefinition.componentClass ());
 
-				updateIndexByQualifier (
-					byQualifier,
-					annotation,
+				componentClasses.addAll (
+					ClassUtils.getAllSuperclasses (
+						componentDefinition.componentClass ()));
+
+				componentClasses.addAll (
+					ClassUtils.getAllInterfaces (
+						componentDefinition.componentClass ()));
+
+				updateIndexByClass (
+					byClass,
+					componentClasses,
 					componentDefinition);
 
 				if (
@@ -625,9 +587,9 @@ class ComponentRegistryImplementation
 						"singleton")
 				) {
 
-					updateIndexByQualifier (
-						singletonsByQualifier,
-						annotation,
+					updateIndexByClass (
+						singletonsByClass,
+						componentClasses,
 						componentDefinition);
 
 				}
@@ -638,18 +600,71 @@ class ComponentRegistryImplementation
 						"prototype")
 				) {
 
-					updateIndexByQualifier (
-						prototypesByQualifier,
-						annotation,
+					updateIndexByClass (
+						prototypesByClass,
+						componentClasses,
 						componentDefinition);
 
 				}
 
 			}
 
-		}
+			// index by qualifiers
 
-		return this;
+			if (! componentDefinition.hide ()) {
+
+				for (
+					Annotation annotation
+						: componentDefinition.componentClass ()
+							.getDeclaredAnnotations ()
+				) {
+
+					Qualifier qualifierAnnotation =
+						annotation
+							.annotationType ()
+							.getAnnotation (Qualifier.class);
+
+					if (qualifierAnnotation == null)
+						continue;
+
+					updateIndexByQualifier (
+						byQualifier,
+						annotation,
+						componentDefinition);
+
+					if (
+						stringEqualSafe (
+							componentDefinition.scope (),
+							"singleton")
+					) {
+
+						updateIndexByQualifier (
+							singletonsByQualifier,
+							annotation,
+							componentDefinition);
+
+					}
+
+					if (
+						stringEqualSafe (
+							componentDefinition.scope (),
+							"prototype")
+					) {
+
+						updateIndexByQualifier (
+							prototypesByQualifier,
+							annotation,
+							componentDefinition);
+
+					}
+
+				}
+
+			}
+
+			return this;
+
+		}
 
 	}
 
@@ -659,36 +674,41 @@ class ComponentRegistryImplementation
 			@NonNull String componentName,
 			@NonNull Object object) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.write ();
+		try (
 
-		ComponentDefinition componentDefinition =
-			new ComponentDefinition ()
+			HeldLock heldlock =
+				lock.write ();
 
-			.name (
-				componentName)
+		) {
 
-			.componentClass (
-				object.getClass ())
+			ComponentDefinition componentDefinition =
+				new ComponentDefinition ()
 
-			.scope (
-				"singleton")
+				.name (
+					componentName)
 
-			.factoryClass (
-				SingletonComponentFactory.class)
+				.componentClass (
+					object.getClass ())
 
-			.addValueProperty (
-				"object",
-				object)
+				.scope (
+					"singleton")
 
-			.owned (
-				false);
+				.factoryClass (
+					SingletonComponentFactory.class)
 
-		registerDefinition (
-			componentDefinition);
+				.addValueProperty (
+					"object",
+					object)
 
-		return this;
+				.owned (
+					false);
+
+			registerDefinition (
+				componentDefinition);
+
+			return this;
+
+		}
 
 	}
 
@@ -702,20 +722,25 @@ class ComponentRegistryImplementation
 				parentTaskLogger,
 				"registerXmlClasspath");
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.write ();
+		try (
 
-		ComponentsSpec components =
-			(ComponentsSpec)
-			dataFromXml.readClasspath (
-				taskLogger,
-				classpath);
+			HeldLock heldlock =
+				lock.write ();
 
-		components.register (
-			this);
+		) {
 
-		return this;
+			ComponentsSpec components =
+				(ComponentsSpec)
+				dataFromXml.readClasspath (
+					taskLogger,
+					classpath);
+
+			components.register (
+				this);
+
+			return this;
+
+		}
 
 	}
 
@@ -729,20 +754,26 @@ class ComponentRegistryImplementation
 			logContext.nestTaskLogger (
 				parentTaskLogger,
 				"registerXmlClasspath");
-		@Cleanup
-		HeldLock heldlock =
-			lock.write ();
 
-		ComponentsSpec componentsSpec =
-			(ComponentsSpec)
-			dataFromXml.readFilename (
-				taskLogger,
-				filename);
+		try (
 
-		componentsSpec.register (
-			this);
+			HeldLock heldlock =
+				lock.write ();
 
-		return this;
+		) {
+
+			ComponentsSpec componentsSpec =
+				(ComponentsSpec)
+				dataFromXml.readFilename (
+					taskLogger,
+					filename);
+
+			componentsSpec.register (
+				this);
+
+			return this;
+
+		}
 
 	}
 
@@ -776,76 +807,81 @@ class ComponentRegistryImplementation
 				parentTaskLogger,
 				"outputComponentDefinitions");
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		try (
 
-		taskLogger.noticeFormat (
-			"Writing component definitions to %s",
-			outputPath);
+			HeldLock heldlock =
+				lock.read ();
 
-		try {
-
-			FileUtils.deleteDirectory (
-				new File (outputPath));
-
-			FileUtils.forceMkdir (
-				new File (outputPath));
-
-		} catch (IOException exception) {
-
-			taskLogger.warningFormatException (
-				exception,
-				"Error deleting contents of %s",
-				outputPath);
-
-		}
-
-		for (
-			ComponentDefinition componentDefinition
-				: definitions
 		) {
 
-			String outputFile =
+			taskLogger.noticeFormat (
+				"Writing component definitions to %s",
+				outputPath);
+
+			try {
+
+				FileUtils.deleteDirectory (
+					new File (outputPath));
+
+				FileUtils.forceMkdir (
+					new File (outputPath));
+
+			} catch (IOException exception) {
+
+				taskLogger.warningFormatException (
+					exception,
+					"Error deleting contents of %s",
+					outputPath);
+
+			}
+
+			for (
+				ComponentDefinition componentDefinition
+					: definitions
+			) {
+
+				String outputFile =
+					stringFormat (
+						"%s/%s.xml",
+						outputPath,
+						componentDefinition.name ());
+
+				try {
+
+					new DataToXml ().writeToFile (
+						outputFile,
+						componentDefinition);
+
+				} catch (Exception exception) {
+
+					taskLogger.warningFormatException (
+						exception,
+						"Error writing %s",
+						outputFile);
+
+				}
+
+			}
+
+			String orderedSingletonsFile =
 				stringFormat (
-					"%s/%s.xml",
-					outputPath,
-					componentDefinition.name ());
+					"%s/singleton-component-list.xml",
+					outputPath);
 
 			try {
 
 				new DataToXml ().writeToFile (
-					outputFile,
-					componentDefinition);
+					orderedSingletonsFile,
+					singletons);
 
 			} catch (Exception exception) {
 
 				taskLogger.warningFormatException (
 					exception,
 					"Error writing %s",
-					outputFile);
+					orderedSingletonsFile);
 
 			}
-
-		}
-
-		String orderedSingletonsFile =
-			stringFormat (
-				"%s/singleton-component-list.xml",
-				outputPath);
-
-		try {
-
-			new DataToXml ().writeToFile (
-				orderedSingletonsFile,
-				singletons);
-
-		} catch (Exception exception) {
-
-			taskLogger.warningFormatException (
-				exception,
-				"Error writing %s",
-				orderedSingletonsFile);
 
 		}
 
@@ -859,31 +895,36 @@ class ComponentRegistryImplementation
 			@NonNull Set <Class <?>> componentClasses,
 			@NonNull ComponentDefinition componentDefinition) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.write ();
+		try (
 
-		for (
-			Class<?> componentClass
-				: componentClasses
+			HeldLock heldlock =
+				lock.write ();
+
 		) {
 
-			Map <String, ComponentDefinition> componentDefinitionsForClass =
-				index.get (
-					componentClass);
+			for (
+				Class <?> componentClass
+					: componentClasses
+			) {
 
-			if (componentDefinitionsForClass == null) {
+				Map <String, ComponentDefinition> componentDefinitionsForClass =
+					index.get (
+						componentClass);
 
-				index.put (
-					componentClass,
-					componentDefinitionsForClass =
-						new HashMap <> ());
+				if (componentDefinitionsForClass == null) {
+
+					index.put (
+						componentClass,
+						componentDefinitionsForClass =
+							new HashMap <> ());
+
+				}
+
+				componentDefinitionsForClass.put (
+					componentDefinition.name (),
+					componentDefinition);
 
 			}
-
-			componentDefinitionsForClass.put (
-				componentDefinition.name (),
-				componentDefinition);
 
 		}
 
@@ -895,24 +936,29 @@ class ComponentRegistryImplementation
 			@NonNull Annotation annotation,
 			@NonNull ComponentDefinition componentDefinition) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.write ();
+		try (
 
-		List <ComponentDefinition> componentDefinitionsForQualifier =
-			index.get (annotation);
+			HeldLock heldlock =
+				lock.write ();
 
-		if (componentDefinitionsForQualifier == null) {
+		) {
 
-			index.put (
-				annotation,
-				componentDefinitionsForQualifier =
-					new ArrayList <> ());
+			List <ComponentDefinition> componentDefinitionsForQualifier =
+				index.get (annotation);
+
+			if (componentDefinitionsForQualifier == null) {
+
+				index.put (
+					annotation,
+					componentDefinitionsForQualifier =
+						new ArrayList <> ());
+
+			}
+
+			componentDefinitionsForQualifier.add (
+				componentDefinition);
 
 		}
-
-		componentDefinitionsForQualifier.add (
-			componentDefinition);
 
 	}
 
@@ -929,101 +975,106 @@ class ComponentRegistryImplementation
 				parentTaskLogger,
 				"initInjectedPropertyTargetByQualifier");
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		try (
 
-		// lookup target components
+			HeldLock heldlock =
+				lock.read ();
 
-		List <ComponentDefinition> targetComponentDefinitions =
-			ifNull (
-				injectedProperty.prototype ()
-					? prototypesByQualifier.get (
-						qualifier)
-					: singletonsByQualifier.get (
-						qualifier),
-				Collections.emptyList ());
+		) {
 
-		if (injectedProperty.collectionType () == CollectionType.single) {
+			// lookup target components
 
-			if (targetComponentDefinitions.isEmpty ()) {
-
-				taskLogger.errorFormat (
-					"Unable to find %s component of type %s for %s.%s",
+			List <ComponentDefinition> targetComponentDefinitions =
+				ifNull (
 					injectedProperty.prototype ()
-						? "prototype"
-						: "singleton",
-					injectedProperty.targetType ().toString (),
-					classNameSimple (
-						injectedProperty.field ().getDeclaringClass ()),
-					injectedProperty.field ().getName ());
+						? prototypesByQualifier.get (
+							qualifier)
+						: singletonsByQualifier.get (
+							qualifier),
+					Collections.emptyList ());
 
-				return;
+			if (injectedProperty.collectionType () == CollectionType.single) {
+
+				if (targetComponentDefinitions.isEmpty ()) {
+
+					taskLogger.errorFormat (
+						"Unable to find %s component of type %s for %s.%s",
+						injectedProperty.prototype ()
+							? "prototype"
+							: "singleton",
+						injectedProperty.targetType ().toString (),
+						classNameSimple (
+							injectedProperty.field ().getDeclaringClass ()),
+						injectedProperty.field ().getName ());
+
+					return;
+
+				}
+
+				if (targetComponentDefinitions.size () > 1) {
+
+					taskLogger.errorFormat (
+						"Found %s candidate components of type %s for %s.%s",
+						integerToDecimalString (
+							targetComponentDefinitions.size ()),
+						injectedProperty.targetType ().toString (),
+						classNameSimple (
+							injectedProperty.field ().getClass ()),
+						injectedProperty.field ().getName ());
+
+					return;
+
+				}
 
 			}
 
-			if (targetComponentDefinitions.size () > 1) {
+			// register dependencies
 
-				taskLogger.errorFormat (
-					"Found %s candidate components of type %s for %s.%s",
-					integerToDecimalString (
-						targetComponentDefinitions.size ()),
-					injectedProperty.targetType ().toString (),
-					classNameSimple (
-						injectedProperty.field ().getClass ()),
-					injectedProperty.field ().getName ());
+			if (! injectedProperty.prototype ()) {
 
-				return;
+				for (
+					ComponentDefinition targetComponentDefinition
+						: targetComponentDefinitions
+				) {
+
+					if (weak) {
+
+						componentDefinition.weakDependencies ().add (
+							targetComponentDefinition.name ());
+
+					} else {
+
+						componentDefinition.strongDependencies ().add (
+							targetComponentDefinition.name ());
+
+					}
+
+				}
 
 			}
 
-		}
+			// store injected target components
 
-		// register dependencies
-
-		if (! injectedProperty.prototype ()) {
+			List <String> targetComponentDefinitionNames =
+				new ArrayList <> ();
 
 			for (
 				ComponentDefinition targetComponentDefinition
 					: targetComponentDefinitions
 			) {
 
-				if (weak) {
-
-					componentDefinition.weakDependencies ().add (
-						targetComponentDefinition.name ());
-
-				} else {
-
-					componentDefinition.strongDependencies ().add (
-						targetComponentDefinition.name ());
-
-				}
+				targetComponentDefinitionNames.add (
+					targetComponentDefinition.name ());
 
 			}
 
-		}
+			injectedProperty.targetComponentNames (
+				ImmutableList.copyOf (
+					targetComponentDefinitionNames));
 
-		// store injected target components
-
-		List <String> targetComponentDefinitionNames =
-			new ArrayList <> ();
-
-		for (
-			ComponentDefinition targetComponentDefinition
-				: targetComponentDefinitions
-		) {
-
-			targetComponentDefinitionNames.add (
-				targetComponentDefinition.name ());
+			return;
 
 		}
-
-		injectedProperty.targetComponentNames (
-			ImmutableList.copyOf (
-				targetComponentDefinitionNames));
-
-		return;
 
 	}
 
@@ -1032,79 +1083,84 @@ class ComponentRegistryImplementation
 			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.write ();
+		try (
 
-		Class <?> instantiateClass =
-			ifNull (
-				componentDefinition.factoryClass (),
-				componentDefinition.componentClass ());
+			HeldLock heldlock =
+				lock.write ();
 
-		for (
-			Field field
-				: FieldUtils.getAllFields (
-					instantiateClass)
 		) {
 
-			ClassSingletonDependency classSingletonDependencyAnnotation =
-				field.getAnnotation (
-					ClassSingletonDependency.class);
+			Class <?> instantiateClass =
+				ifNull (
+					componentDefinition.factoryClass (),
+					componentDefinition.componentClass ());
 
-			if (
-				isNull (
-					classSingletonDependencyAnnotation)
+			for (
+				Field field
+					: FieldUtils.getAllFields (
+						instantiateClass)
 			) {
-				continue;
+
+				ClassSingletonDependency classSingletonDependencyAnnotation =
+					field.getAnnotation (
+						ClassSingletonDependency.class);
+
+				if (
+					isNull (
+						classSingletonDependencyAnnotation)
+				) {
+					continue;
+				}
+
+				if (
+					classNotEqual (
+						field.getType (),
+						LogContext.class)
+				) {
+					throw new RuntimeException ();
+				}
+
+				String scopedComponentName =
+					stringFormat (
+						"%s:%s",
+						classNameFull (
+							field.getDeclaringClass ()),
+						classNameFull (
+							LogContext.class));
+
+				if (
+					mapContainsKey (
+						byName,
+						scopedComponentName)
+				) {
+					continue;
+				}
+
+				registerDefinition (
+					new ComponentDefinition ()
+
+					.name (
+						scopedComponentName)
+
+					.scope (
+						"singleton")
+
+					.componentClass (
+						LogContext.class)
+
+					.factoryClass (
+						LogContextComponentFactory.class)
+
+					.hide (
+						true)
+
+					.addValueProperty (
+						"componentClass",
+						field.getDeclaringClass ())
+
+				);
+
 			}
-
-			if (
-				classNotEqual (
-					field.getType (),
-					LogContext.class)
-			) {
-				throw new RuntimeException ();
-			}
-
-			String scopedComponentName =
-				stringFormat (
-					"%s:%s",
-					classNameFull (
-						field.getDeclaringClass ()),
-					classNameFull (
-						LogContext.class));
-
-			if (
-				mapContainsKey (
-					byName,
-					scopedComponentName)
-			) {
-				continue;
-			}
-
-			registerDefinition (
-				new ComponentDefinition ()
-
-				.name (
-					scopedComponentName)
-
-				.scope (
-					"singleton")
-
-				.componentClass (
-					LogContext.class)
-
-				.factoryClass (
-					LogContextComponentFactory.class)
-
-				.hide (
-					true)
-
-				.addValueProperty (
-					"componentClass",
-					field.getDeclaringClass ())
-
-			);
 
 		}
 
@@ -1112,20 +1168,55 @@ class ComponentRegistryImplementation
 
 	private
 	void initComponentDefinition (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initComponentDefinition");
 
-		Class <?> instantiateClass =
-			ifNull (
-				componentDefinition.factoryClass (),
-				componentDefinition.componentClass ());
+		try (
 
-		componentDefinition.strongDependencies ().addAll (
-			componentDefinition.referenceProperties ().values ());
+			HeldLock heldlock =
+				lock.read ();
+
+		) {
+
+			Class <?> instantiateClass =
+				ifNull (
+					componentDefinition.factoryClass (),
+					componentDefinition.componentClass ());
+
+			componentDefinition.strongDependencies ().addAll (
+				componentDefinition.referenceProperties ().values ());
+
+			initComponentDefinitionFields (
+				taskLogger,
+				componentDefinition,
+				instantiateClass);
+
+			initComponentDefinitionMethods (
+				taskLogger,
+				componentDefinition,
+				instantiateClass);
+
+			return;
+
+		}
+
+	}
+
+	private
+	void initComponentDefinitionFields (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentDefinition componentDefinition,
+			@NonNull Class <?> instantiateClass) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initComponentDefinitionFields");
 
 		for (
 			Field field
@@ -1330,7 +1421,89 @@ class ComponentRegistryImplementation
 
 		}
 
-		return;
+	}
+
+	private
+	void initComponentDefinitionMethods (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ComponentDefinition componentDefinition,
+			@NonNull Class <?> instantiateClass) {
+
+		for (
+			Method method
+				: instantiateClass.getMethods ()
+		) {
+
+			NormalLifecycleSetup normalLifecycleSetupAnnotation =
+				method.getAnnotation (
+					NormalLifecycleSetup.class);
+
+			LateLifecycleSetup lateLifecycleSetupAnnotation =
+				method.getAnnotation (
+					LateLifecycleSetup.class);
+
+			NormalLifecycleTeardown normalLifecycleTeardownAnnotation =
+				method.getAnnotation (
+					NormalLifecycleTeardown.class);
+
+			long numAnnotations =
+				iterableCount (
+					presentInstances (
+						optionalFromNullable (
+							normalLifecycleSetupAnnotation),
+						optionalFromNullable (
+							lateLifecycleSetupAnnotation),
+						optionalFromNullable (
+							normalLifecycleTeardownAnnotation)));
+
+			if (
+				equalToZero (
+					numAnnotations)
+			) {
+				continue;
+			}
+
+			if (
+				moreThanOne (
+					numAnnotations)
+			) {
+
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask ());
+
+			}
+
+			if (
+				isNotNull (
+					normalLifecycleSetupAnnotation)
+			) {
+
+				componentDefinition.normalSetupMethods ().add (
+					method);
+
+			}
+
+			if (
+				isNotNull (
+					lateLifecycleSetupAnnotation)
+			) {
+
+				componentDefinition.lateSetupMethods ().add (
+					method);
+
+			}
+
+			if (
+				isNotNull (
+					normalLifecycleTeardownAnnotation)
+			) {
+
+				componentDefinition.normalTeardownMethods ().add (
+					method);
+
+			}
+
+		}
 
 	}
 
@@ -1349,73 +1522,78 @@ class ComponentRegistryImplementation
 				parentTaskLogger,
 				"initInjectedFieldByName");
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		try (
 
-		// TODO merge this
+			HeldLock heldlock =
+				lock.read ();
 
-		Optional <ComponentDefinition> targetComponentDefinitionOptional =
-			optionalFromNullable (
-				byName.get (
-					targetComponentName));
-
-		if (
-			optionalIsNotPresent (
-				targetComponentDefinitionOptional)
 		) {
 
-			taskLogger.errorFormat (
-				"Named component %s does not exist for %s.%s",
-				targetComponentName,
-				componentDefinition.name (),
-				field.getName ());
+			// TODO merge this
+
+			Optional <ComponentDefinition> targetComponentDefinitionOptional =
+				optionalFromNullable (
+					byName.get (
+						targetComponentName));
+
+			if (
+				optionalIsNotPresent (
+					targetComponentDefinitionOptional)
+			) {
+
+				taskLogger.errorFormat (
+					"Named component %s does not exist for %s.%s",
+					targetComponentName,
+					componentDefinition.name (),
+					field.getName ());
+
+				return;
+
+			}
+
+			ComponentDefinition targetComponentDefinition =
+				optionalGetRequired (
+					targetComponentDefinitionOptional);
+
+			if (weak) {
+
+				componentDefinition.weakDependencies ().add (
+					targetComponentDefinition.name ());
+
+			} else {
+
+				componentDefinition.strongDependencies ().add (
+					targetComponentDefinition.name ());
+
+			}
+
+			componentDefinition.injectedProperties ().add (
+				new InjectedProperty ()
+
+				.componentDefinition (
+					componentDefinition)
+
+				.field (
+					field)
+
+				.prototype (
+					prototype)
+
+				.initialized (
+					initialized)
+
+				.targetComponentNames (
+					Collections.singletonList (
+						targetComponentName))
+
+				.weak (
+					weak)
+
+			);
 
 			return;
 
 		}
-
-		ComponentDefinition targetComponentDefinition =
-			optionalGetRequired (
-				targetComponentDefinitionOptional);
-
-		if (weak) {
-
-			componentDefinition.weakDependencies ().add (
-				targetComponentDefinition.name ());
-
-		} else {
-
-			componentDefinition.strongDependencies ().add (
-				targetComponentDefinition.name ());
-
-		}
-
-		componentDefinition.injectedProperties ().add (
-			new InjectedProperty ()
-
-			.componentDefinition (
-				componentDefinition)
-
-			.field (
-				field)
-
-			.prototype (
-				prototype)
-
-			.initialized (
-				initialized)
-
-			.targetComponentNames (
-				Collections.singletonList (
-					targetComponentName))
-
-			.weak (
-				weak)
-
-		);
-
-		return;
 
 	}
 
@@ -1431,146 +1609,151 @@ class ComponentRegistryImplementation
 				parentTaskLogger,
 				"initInjectedPropertyField");
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		try (
 
-		Type fieldType =
-			field.getGenericType ();
+			HeldLock heldlock =
+				lock.read ();
 
-		ParameterizedType parameterizedFieldType =
-			field.getGenericType () instanceof ParameterizedType
-				? (ParameterizedType) field.getGenericType ()
-				: null;
+		) {
 
-		Class <?> fieldClass =
-			parameterizedFieldType != null
-				? (Class <?>) parameterizedFieldType.getRawType ()
-				: (Class <?>) fieldType;
+			Type fieldType =
+				field.getGenericType ();
 
-		// handle collections
-
-		Type injectType;
-
-		InjectedProperty.CollectionType collectionType;
-
-		if (fieldClass == List.class
-				&& parameterizedFieldType != null) {
-
-			injectType =
-				parameterizedFieldType
-					.getActualTypeArguments () [0];
-
-			collectionType = CollectionType.list;
-
-		} else if (fieldClass == Map.class
-				&& parameterizedFieldType != null) {
-
-			Type keyType =
-				parameterizedFieldType
-					.getActualTypeArguments () [0];
-
-			ParameterizedType keyParameterizedType =
-				keyType instanceof ParameterizedType
-					? (ParameterizedType) keyType
+			ParameterizedType parameterizedFieldType =
+				field.getGenericType () instanceof ParameterizedType
+					? (ParameterizedType) field.getGenericType ()
 					: null;
 
-			Class<?> keyClass =
-				keyParameterizedType != null
-					? (Class<?>) keyParameterizedType.getRawType ()
-					: (Class<?>) keyType;
+			Class <?> fieldClass =
+				parameterizedFieldType != null
+					? (Class <?>) parameterizedFieldType.getRawType ()
+					: (Class <?>) fieldType;
 
-			if (
-				classNotInSafe (
-					keyClass,
-					String.class,
-					Class.class)
-			) {
+			// handle collections
 
-				taskLogger.errorFormat (
-					"Don't know how to inject map with key type %s for %s.%s",
-					keyType.toString (),
-					componentDefinition.name (),
-					field.getName ());
+			Type injectType;
 
-				return;
+			InjectedProperty.CollectionType collectionType;
+
+			if (fieldClass == List.class
+					&& parameterizedFieldType != null) {
+
+				injectType =
+					parameterizedFieldType
+						.getActualTypeArguments () [0];
+
+				collectionType = CollectionType.list;
+
+			} else if (fieldClass == Map.class
+					&& parameterizedFieldType != null) {
+
+				Type keyType =
+					parameterizedFieldType
+						.getActualTypeArguments () [0];
+
+				ParameterizedType keyParameterizedType =
+					keyType instanceof ParameterizedType
+						? (ParameterizedType) keyType
+						: null;
+
+				Class<?> keyClass =
+					keyParameterizedType != null
+						? (Class<?>) keyParameterizedType.getRawType ()
+						: (Class<?>) keyType;
+
+				if (
+					classNotInSafe (
+						keyClass,
+						String.class,
+						Class.class)
+				) {
+
+					taskLogger.errorFormat (
+						"Don't know how to inject map with key type %s for %s.%s",
+						keyType.toString (),
+						componentDefinition.name (),
+						field.getName ());
+
+					return;
+
+				}
+
+				injectType =
+					parameterizedFieldType
+						.getActualTypeArguments () [1];
+
+				collectionType =
+					keyClass == String.class
+						? CollectionType.componentNameMap
+						: CollectionType.componentClassMap;
+
+			} else {
+
+				injectType =
+					fieldType;
+
+				collectionType =
+					CollectionType.single;
 
 			}
 
-			injectType =
-				parameterizedFieldType
-					.getActualTypeArguments () [1];
+			ParameterizedType parameterizedInjectType =
+				injectType instanceof ParameterizedType
+					? (ParameterizedType) injectType
+					: null;
 
-			collectionType =
-				keyClass == String.class
-					? CollectionType.componentNameMap
-					: CollectionType.componentClassMap;
+			Class<?> injectClass =
+				parameterizedInjectType != null
+					? (Class<?>) parameterizedInjectType.getRawType ()
+					: (Class<?>) injectType;
 
-		} else {
+			// handle providers
 
-			injectType =
-				fieldType;
+			Type valueType;
 
-			collectionType =
-				CollectionType.single;
+			boolean isProvider;
 
-		}
+			if (injectClass == Provider.class) {
 
-		ParameterizedType parameterizedInjectType =
-			injectType instanceof ParameterizedType
-				? (ParameterizedType) injectType
-				: null;
+				if (parameterizedInjectType == null) {
 
-		Class<?> injectClass =
-			parameterizedInjectType != null
-				? (Class<?>) parameterizedInjectType.getRawType ()
-				: (Class<?>) injectType;
+					taskLogger.errorFormat (
+						"No type information for provider %s at %s.%s",
+						injectType.toString (),
+						componentDefinition.name (),
+						field.getName ());
 
-		// handle providers
+					return;
 
-		Type valueType;
+				}
 
-		boolean isProvider;
+				valueType =
+					parameterizedInjectType
+						.getActualTypeArguments () [0];
 
-		if (injectClass == Provider.class) {
+				isProvider = true;
 
-			if (parameterizedInjectType == null) {
+			} else {
 
-				taskLogger.errorFormat (
-					"No type information for provider %s at %s.%s",
-					injectType.toString (),
-					componentDefinition.name (),
-					field.getName ());
+				valueType =
+					injectType;
 
-				return;
+				isProvider = false;
 
 			}
 
-			valueType =
-				parameterizedInjectType
-					.getActualTypeArguments () [0];
+			// return
 
-			isProvider = true;
+			injectedProperty
+				.collectionType (collectionType)
+				.prototype (isProvider)
+				.finalType (fieldType)
+				.injectType (injectType)
+				.targetType (valueType);
 
-		} else {
-
-			valueType =
-				injectType;
-
-			isProvider = false;
+			return;
 
 		}
-
-		// return
-
-		injectedProperty
-			.collectionType (collectionType)
-			.prototype (isProvider)
-			.finalType (fieldType)
-			.injectType (injectType)
-			.targetType (valueType);
-
-		return;
 
 	}
 
@@ -1587,101 +1770,106 @@ class ComponentRegistryImplementation
 				parentTaskLogger,
 				"initInjectedPropertyTargetByClass");
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		try (
 
-		// lookup target components
+			HeldLock heldlock =
+				lock.read ();
 
-		ParameterizedType parameterizedTargetType =
-			injectedProperty.targetType () instanceof ParameterizedType
-				? (ParameterizedType) injectedProperty.targetType ()
-				: null;
+		) {
 
-		Class <?> targetClass =
-			parameterizedTargetType != null
-				? (Class <?>) parameterizedTargetType.getRawType ()
-				: (Class <?>) injectedProperty.targetType ();
+			// lookup target components
 
-		Map <String, ComponentDefinition> targetComponentDefinitions =
-			ifNull (
-				injectedProperty.prototype ()
-					? prototypesByClass.get (
-						targetClass)
-					: singletonsByClass.get (
-						targetClass),
-				Collections.emptyMap ());
+			ParameterizedType parameterizedTargetType =
+				injectedProperty.targetType () instanceof ParameterizedType
+					? (ParameterizedType) injectedProperty.targetType ()
+					: null;
 
-		if (injectedProperty.collectionType () == CollectionType.single) {
+			Class <?> targetClass =
+				parameterizedTargetType != null
+					? (Class <?>) parameterizedTargetType.getRawType ()
+					: (Class <?>) injectedProperty.targetType ();
 
-			if (targetComponentDefinitions.isEmpty ()) {
-
-				taskLogger.errorFormat (
-					"Unable to find %s component of type %s for %s.%s",
+			Map <String, ComponentDefinition> targetComponentDefinitions =
+				ifNull (
 					injectedProperty.prototype ()
-						? "prototype"
-						: "singleton",
-					injectedProperty.targetType ().toString (),
-					componentDefinition.name (),
-					field.getName ());
+						? prototypesByClass.get (
+							targetClass)
+						: singletonsByClass.get (
+							targetClass),
+					Collections.emptyMap ());
 
-				return;
+			if (injectedProperty.collectionType () == CollectionType.single) {
 
-			}
+				if (targetComponentDefinitions.isEmpty ()) {
 
-			if (targetComponentDefinitions.size () > 1) {
+					taskLogger.errorFormat (
+						"Unable to find %s component of type %s for %s.%s",
+						injectedProperty.prototype ()
+							? "prototype"
+							: "singleton",
+						injectedProperty.targetType ().toString (),
+						componentDefinition.name (),
+						field.getName ());
 
-				taskLogger.errorFormat (
-					"Found %s ",
-					integerToDecimalString (
-						targetComponentDefinitions.size ()),
-					"candidate components of type %s ",
-					injectedProperty.targetType ().toString (),
-					"for %s.%s: ",
-					componentDefinition.name (),
-					field.getName (),
-					"%s",
-					joinWithCommaAndSpace (
-						targetComponentDefinitions.keySet ()));
+					return;
 
-				return;
+				}
 
-			}
+				if (targetComponentDefinitions.size () > 1) {
 
-		}
+					taskLogger.errorFormat (
+						"Found %s ",
+						integerToDecimalString (
+							targetComponentDefinitions.size ()),
+						"candidate components of type %s ",
+						injectedProperty.targetType ().toString (),
+						"for %s.%s: ",
+						componentDefinition.name (),
+						field.getName (),
+						"%s",
+						joinWithCommaAndSpace (
+							targetComponentDefinitions.keySet ()));
 
-		// register dependencies
-
-		if (! injectedProperty.prototype ()) {
-
-			for (
-				ComponentDefinition targetComponentDefinition
-					: targetComponentDefinitions.values ()
-			) {
-
-				if (weak) {
-
-					componentDefinition.weakDependencies ().add (
-						targetComponentDefinition.name ());
-
-				} else {
-
-					componentDefinition.strongDependencies ().add (
-						targetComponentDefinition.name ());
+					return;
 
 				}
 
 			}
 
+			// register dependencies
+
+			if (! injectedProperty.prototype ()) {
+
+				for (
+					ComponentDefinition targetComponentDefinition
+						: targetComponentDefinitions.values ()
+				) {
+
+					if (weak) {
+
+						componentDefinition.weakDependencies ().add (
+							targetComponentDefinition.name ());
+
+					} else {
+
+						componentDefinition.strongDependencies ().add (
+							targetComponentDefinition.name ());
+
+					}
+
+				}
+
+			}
+
+			// store injected target components
+
+			injectedProperty.targetComponentNames (
+				ImmutableList.copyOf (
+					targetComponentDefinitions.keySet ()));
+
+			return;
+
 		}
-
-		// store injected target components
-
-		injectedProperty.targetComponentNames (
-			ImmutableList.copyOf (
-				targetComponentDefinitions.keySet ()));
-
-		return;
 
 	}
 

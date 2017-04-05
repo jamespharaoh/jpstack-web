@@ -1,5 +1,6 @@
 package wbs.framework.component.registry;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -60,6 +61,21 @@ class ComponentDefinition {
 	@DataChildren
 	@Getter @Setter
 	List <InjectedProperty> injectedProperties =
+		new ArrayList<> ();
+
+	@DataChildren
+	@Getter @Setter
+	List <Method> normalSetupMethods =
+		new ArrayList<> ();
+
+	@DataChildren
+	@Getter @Setter
+	List <Method> lateSetupMethods =
+		new ArrayList<> ();
+
+	@DataChildren
+	@Getter @Setter
+	List <Method> normalTeardownMethods =
 		new ArrayList<> ();
 
 	@DataChildren

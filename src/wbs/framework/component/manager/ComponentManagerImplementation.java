@@ -2,8 +2,10 @@ package wbs.framework.component.manager;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
+import static wbs.utils.collection.MapUtils.mapDoesNotContainKey;
 import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.doesNotContain;
@@ -47,6 +49,7 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 
 import lombok.Cleanup;
@@ -54,7 +57,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -78,7 +80,6 @@ import wbs.framework.logging.TaskLogger;
 import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
-@Log4j
 public
 class ComponentManagerImplementation
 	implements ComponentManager {
@@ -249,55 +250,60 @@ class ComponentManagerImplementation
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		try (
 
-		Optional <ComponentDefinition> componentDefinitionOptional =
-			registry.byName (
-				componentName);
+			HeldLock heldlock =
+				lock.read ();
 
-		if (
-			optionalIsNotPresent (
-				componentDefinitionOptional)
 		) {
 
-			throw new NoSuchComponentException (
-				stringFormat (
-					"Component definition with name %s does not exist",
-					componentName));
+			Optional <ComponentDefinition> componentDefinitionOptional =
+				registry.byName (
+					componentName);
+
+			if (
+				optionalIsNotPresent (
+					componentDefinitionOptional)
+			) {
+
+				throw new NoSuchComponentException (
+					stringFormat (
+						"Component definition with name %s does not exist",
+						componentName));
+
+			}
+
+			ComponentDefinition componentDefinition =
+				optionalGetRequired (
+					componentDefinitionOptional);
+
+			if (
+				isNotSubclassOf (
+					componentClass,
+					componentDefinition.componentClass ())
+			) {
+
+				throw new NoSuchComponentException (
+					stringFormat (
+						"Component definition with name %s ",
+						componentName,
+						"is of type %s ",
+						componentDefinition.componentClass ().getName (),
+						"instead of %s",
+						componentClass.getName ()));
+
+			}
+
+			@SuppressWarnings ("unchecked")
+			Provider <ComponentType> componentProvider =
+				(Provider <ComponentType>)
+				getComponentProvider (
+					taskLogger,
+					componentDefinition);
+
+			return componentProvider;
 
 		}
-
-		ComponentDefinition componentDefinition =
-			optionalGetRequired (
-				componentDefinitionOptional);
-
-		if (
-			isNotSubclassOf (
-				componentClass,
-				componentDefinition.componentClass ())
-		) {
-
-			throw new NoSuchComponentException (
-				stringFormat (
-					"Component definition with name %s ",
-					componentName,
-					"is of type %s ",
-					componentDefinition.componentClass ().getName (),
-					"instead of %s",
-					componentClass.getName ()));
-
-		}
-
-		@SuppressWarnings ("unchecked")
-		Provider <ComponentType> componentProvider =
-			(Provider <ComponentType>)
-			getComponentProvider (
-				taskLogger,
-				componentDefinition);
-
-		return componentProvider;
 
 	}
 
@@ -305,26 +311,31 @@ class ComponentManagerImplementation
 	Map <String, Object> getAllSingletonComponents (
 			@NonNull TaskLogger taskLogger) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		try (
 
-		return registry.all ().stream ()
+			HeldLock heldlock =
+				lock.read ();
 
-			.filter (
-				componentDefinition ->
-					stringEqualSafe (
-						componentDefinition.scope (),
-						"singleton"))
+		) {
 
-			.collect (
-				Collectors.toMap (
-					ComponentDefinition::name,
+			return registry.all ().stream ()
+
+				.filter (
 					componentDefinition ->
-						getComponent (
-							taskLogger,
-							componentDefinition,
-							true)));
+						stringEqualSafe (
+							componentDefinition.scope (),
+							"singleton"))
+
+				.collect (
+					Collectors.toMap (
+						ComponentDefinition::name,
+						componentDefinition ->
+							getComponent (
+								taskLogger,
+								componentDefinition,
+								true)));
+
+		}
 
 	}
 
@@ -478,6 +489,7 @@ class ComponentManagerImplementation
 		// set properties
 
 		setComponentValueProperties (
+			taskLogger,
 			componentDefinition,
 			protoComponent);
 
@@ -613,7 +625,7 @@ class ComponentManagerImplementation
 						continue;
 					}
 
-					log.debug (
+					taskLogger.debugFormat (
 						stringFormat (
 							"Running eager lifecycle setup method %s.%s",
 							componentDefinition.name (),
@@ -696,28 +708,38 @@ class ComponentManagerImplementation
 
 	private
 	void setComponentValueProperties (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setComponentValueProperties");
 
-		for (
-			Map.Entry <String,Object> valuePropertyEntry
-				: componentDefinition.valueProperties ().entrySet ()
+		try (
+
+			HeldLock heldlock =
+				lock.read ();
+
 		) {
 
-			log.debug (
-				stringFormat (
+			for (
+				Map.Entry <String,Object> valuePropertyEntry
+					: componentDefinition.valueProperties ().entrySet ()
+			) {
+
+				taskLogger.debugFormat (
 					"Setting value property %s.%s",
 					componentDefinition.name (),
-					valuePropertyEntry.getKey ()));
+					valuePropertyEntry.getKey ());
 
-			PropertyUtils.propertySetSimple (
-				component,
-				valuePropertyEntry.getKey (),
-				valuePropertyEntry.getValue ());
+				PropertyUtils.propertySetSimple (
+					component,
+					valuePropertyEntry.getKey (),
+					valuePropertyEntry.getValue ());
+
+			}
 
 		}
 
@@ -1061,189 +1083,194 @@ class ComponentManagerImplementation
 	ComponentManager init (
 			@NonNull TaskLogger taskLogger) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.write ();
+		try (
 
-		if (
-			enumNotEqualSafe (
-				state,
-				State.creation)
+			HeldLock heldlock =
+				lock.write ();
+
 		) {
-			throw new IllegalStateException ();
-		}
-
-		state =
-			State.initialization;
-
-		// set all fields to accessible
-
-		for (
-			ComponentDefinition componentDefinition
-				: registry.all ()
-		) {
-
-			for (
-				InjectedProperty injectedProperty
-					: componentDefinition.injectedProperties ()
-			) {
-
-				injectedProperty.field ().setAccessible (
-					true);
-
-			}
-
-		}
-
-		// instantiate singletons
-
-		for (
-			ComponentDefinition componentDefinition
-				: registry.singletons ()
-		) {
-
-			getComponentRequired (
-				taskLogger,
-				componentDefinition.name (),
-				Object.class);
-
-			// fill in weak links as we go
-
-			Optional <List <Injection>> pendingInjectionsOptional =
-				mapItemForKey (
-					pendingInjectionsByDependencyName,
-					componentDefinition.name ());
 
 			if (
-				optionalIsPresent (
-					pendingInjectionsOptional)
+				enumNotEqualSafe (
+					state,
+					State.creation)
 			) {
-
-				ListIterator <Injection> pendingInjectionIterator =
-					pendingInjectionsOptional.get ().listIterator ();
-
-				while (pendingInjectionIterator.hasNext ()) {
-
-					Injection pendingInjection =
-						pendingInjectionIterator.next ();
-
-					pendingInjection.missingComponents.remove (
-						componentDefinition.name ());
-
-					if (
-						collectionIsEmpty (
-							pendingInjection.missingComponents)
-					) {
-
-						performInjection (
-							taskLogger,
-							pendingInjection);
-
-						pendingInjectionIterator.remove ();
-
-					}
-
-				}
-
-				pendingInjectionsByDependencyName.remove (
-					componentDefinition.name ());
-
+				throw new IllegalStateException ();
 			}
 
-		}
+			state =
+				State.initialization;
 
-		// check we filled all weak dependencies
-
-		if (
-			mapIsNotEmpty (
-				pendingInjectionsByDependencyName)
-		) {
-
-			throw new RuntimeException (
-				stringFormat (
-					"Pending injections not satisfied: %s",
-					joinWithCommaAndSpace (
-						pendingInjectionsByDependencyName.keySet ())));
-
-		}
-
-		// run late setup
-
-		for (
-			Object component
-				: singletonComponents.values ()
-		) {
+			// set all fields to accessible
 
 			for (
-				Method method
-					: component.getClass ().getMethods ()
+				ComponentDefinition componentDefinition
+					: registry.all ()
 			) {
 
-				LateLifecycleSetup lateLifecycleSetupAnnotation =
-					method.getDeclaredAnnotation (
-						LateLifecycleSetup.class);
-
-				if (
-					isNull (
-						lateLifecycleSetupAnnotation)
+				for (
+					InjectedProperty injectedProperty
+						: componentDefinition.injectedProperties ()
 				) {
-					continue;
-				}
 
-				try {
-
-					if (method.getParameterCount () == 0) {
-
-						method.invoke (
-							component);
-
-					} else if (method.getParameterCount () == 1) {
-
-						method.invoke (
-							component,
-							taskLogger);
-
-					} else {
-
-						throw new RuntimeException ();
-
-					}
-
-				} catch (InvocationTargetException invocationTargetException) {
-
-					if (
-						isInstanceOf (
-							RuntimeException.class,
-							invocationTargetException.getTargetException ())
-					) {
-
-						throw (RuntimeException)
-							invocationTargetException.getTargetException ();
-
-					} else {
-
-						throw new RuntimeException (
-							invocationTargetException.getTargetException ());
-
-					}
-
-				} catch (IllegalAccessException illegalAccessException) {
-
-					throw new RuntimeException (
-						illegalAccessException);
+					injectedProperty.field ().setAccessible (
+						true);
 
 				}
 
 			}
 
+			// instantiate singletons
+
+			for (
+				ComponentDefinition componentDefinition
+					: registry.singletons ()
+			) {
+
+				getComponentRequired (
+					taskLogger,
+					componentDefinition.name (),
+					Object.class);
+
+				// fill in weak links as we go
+
+				Optional <List <Injection>> pendingInjectionsOptional =
+					mapItemForKey (
+						pendingInjectionsByDependencyName,
+						componentDefinition.name ());
+
+				if (
+					optionalIsPresent (
+						pendingInjectionsOptional)
+				) {
+
+					ListIterator <Injection> pendingInjectionIterator =
+						pendingInjectionsOptional.get ().listIterator ();
+
+					while (pendingInjectionIterator.hasNext ()) {
+
+						Injection pendingInjection =
+							pendingInjectionIterator.next ();
+
+						pendingInjection.missingComponents.remove (
+							componentDefinition.name ());
+
+						if (
+							collectionIsEmpty (
+								pendingInjection.missingComponents)
+						) {
+
+							performInjection (
+								taskLogger,
+								pendingInjection);
+
+							pendingInjectionIterator.remove ();
+
+						}
+
+					}
+
+					pendingInjectionsByDependencyName.remove (
+						componentDefinition.name ());
+
+				}
+
+			}
+
+			// check we filled all weak dependencies
+
+			if (
+				mapIsNotEmpty (
+					pendingInjectionsByDependencyName)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"Pending injections not satisfied: %s",
+						joinWithCommaAndSpace (
+							pendingInjectionsByDependencyName.keySet ())));
+
+			}
+
+			// run late setup
+
+			for (
+				Object component
+					: singletonComponents.values ()
+			) {
+
+				for (
+					Method method
+						: component.getClass ().getMethods ()
+				) {
+
+					LateLifecycleSetup lateLifecycleSetupAnnotation =
+						method.getDeclaredAnnotation (
+							LateLifecycleSetup.class);
+
+					if (
+						isNull (
+							lateLifecycleSetupAnnotation)
+					) {
+						continue;
+					}
+
+					try {
+
+						if (method.getParameterCount () == 0) {
+
+							method.invoke (
+								component);
+
+						} else if (method.getParameterCount () == 1) {
+
+							method.invoke (
+								component,
+								taskLogger);
+
+						} else {
+
+							throw new RuntimeException ();
+
+						}
+
+					} catch (InvocationTargetException invocationTargetException) {
+
+						if (
+							isInstanceOf (
+								RuntimeException.class,
+								invocationTargetException.getTargetException ())
+						) {
+
+							throw (RuntimeException)
+								invocationTargetException.getTargetException ();
+
+						} else {
+
+							throw new RuntimeException (
+								invocationTargetException.getTargetException ());
+
+						}
+
+					} catch (IllegalAccessException illegalAccessException) {
+
+						throw new RuntimeException (
+							illegalAccessException);
+
+					}
+
+				}
+
+			}
+
+			// return
+
+			state =
+				State.running;
+
+			return this;
+
 		}
-
-		// return
-
-		state =
-			State.running;
-
-		return this;
 
 	}
 
@@ -1251,11 +1278,92 @@ class ComponentManagerImplementation
 	public
 	void close () {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.write ();
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"close ()");
 
-		// TODO
+		taskLogger.noticeFormat (
+			"Closing component manager");
+
+		try (
+
+			HeldLock heldlock =
+				lock.write ();
+
+		) {
+
+			if (
+				! enumEqualSafe (
+					state,
+					State.running)
+			) {
+				return;
+			}
+
+			state =
+				State.teardown;
+
+			List <ComponentDefinition> singletonDefinitions =
+				new ArrayList<> (
+					registry.singletons ());
+
+			Lists.reverse (
+				singletonDefinitions);
+
+			for (
+				ComponentDefinition singletonDefinition
+					: singletonDefinitions
+			) {
+
+				if (
+					mapDoesNotContainKey (
+						singletonComponents,
+						singletonDefinition.name ())
+				) {
+					continue;
+				}
+
+				taskLogger.debugFormat (
+					"Tearing down component: %s",
+					singletonDefinition.name ());
+
+				Object component =
+					mapItemForKeyRequired (
+						singletonComponents,
+						singletonDefinition.name ());
+
+				for (
+					Method teardownMethod
+						: singletonDefinition.normalTeardownMethods ()
+				) {
+
+					try {
+
+						methodInvoke (
+							teardownMethod,
+							component,
+							taskLogger);
+
+					} catch (Exception exception) {
+
+						taskLogger.errorFormatException (
+							exception,
+							"Error calling %s.%s for %s",
+							classNameSimple (
+								teardownMethod.getDeclaringClass ()),
+							teardownMethod.getName (),
+							singletonDefinition.name ());
+
+					}
+
+				}
+
+			}
+
+			state =
+				State.closed;
+
+		}
 
 	}
 
@@ -1277,24 +1385,29 @@ class ComponentManagerImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialized) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		try (
 
-		return new Provider <Object> () {
+			HeldLock heldlock =
+				lock.read ();
 
-			@Override
-			public
-			Object get () {
+		) {
 
-				return getComponent (
-					taskLogger,
-					componentDefinition,
-					initialized);
+			return new Provider <Object> () {
 
-			}
+				@Override
+				public
+				Object get () {
 
-		};
+					return getComponent (
+						taskLogger,
+						componentDefinition,
+						initialized);
+
+				}
+
+			};
+
+		}
 
 	}
 
@@ -1303,7 +1416,7 @@ class ComponentManagerImplementation
 		creation,
 		initialization,
 		running,
-		closing,
+		teardown,
 		closed;
 	}
 

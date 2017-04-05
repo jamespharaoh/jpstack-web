@@ -66,17 +66,27 @@ class ComponentRunner {
 
 			ComponentManager componentManager =
 				initComponentManager (
-					taskLogger)
+					taskLogger);
 
 		) {
 
 			taskLogger.makeException ();
+
+			Thread shutdownHookThread =
+				new Thread (
+					componentManager::close);
+
+			Runtime.getRuntime ().addShutdownHook (
+				shutdownHookThread);
 
 			invokeTarget (
 				taskLogger,
 				componentManager);
 
 			taskLogger.makeException ();
+
+			Runtime.getRuntime ().removeShutdownHook (
+				shutdownHookThread);
 
 		}
 
@@ -113,8 +123,8 @@ class ComponentRunner {
 				.scope (
 					"singleton"))
 
-			.outputPath (
-				"work/runner/components")
+			//.outputPath (
+			//	"work/runner/components")
 
 			.build (
 				taskLogger);

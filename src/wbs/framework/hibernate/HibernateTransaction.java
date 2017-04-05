@@ -342,7 +342,7 @@ class HibernateTransaction
 			} catch (Exception exception) {
 
 				log.fatal (
-					"Error closing session",
+					"Error teardown session",
 					exception);
 
 			}
@@ -361,7 +361,7 @@ class HibernateTransaction
 			} catch (Exception exception) {
 
 				log.fatal (
-					"Error closing active task",
+					"Error teardown active task",
 					exception);
 
 			}

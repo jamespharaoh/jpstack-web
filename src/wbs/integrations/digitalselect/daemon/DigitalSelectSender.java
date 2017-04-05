@@ -164,7 +164,7 @@ class DigitalSelectSender
 
 				taskLogger.warningFormatException (
 					exception,
-					"Got IO exception closing http client");
+					"Got IO exception teardown http client");
 
 			}
 
