@@ -797,12 +797,12 @@ class UserSessionLogicImplementation
 	public final static
 	Duration reloadFrequency =
 		Duration.standardSeconds (
-			1l);
+			5l);
 
 	public final static
 	Duration reloadFrequencyDeviation =
-		Duration.millis (
-			10l);
+		Duration.standardSeconds (
+			1l);
 
 	public final static
 	Duration logoffTime =
