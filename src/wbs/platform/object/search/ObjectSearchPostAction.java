@@ -156,7 +156,8 @@ class ObjectSearchPostAction <
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
-				"goReal");
+				"goReal",
+				true);
 
 		try (
 
@@ -182,6 +183,7 @@ class ObjectSearchPostAction <
 					"New search");
 
 				userSessionLogic.userDataRemove (
+					taskLogger,
 					user,
 					stringFormat (
 						"object_search_%s_results",
@@ -207,10 +209,13 @@ class ObjectSearchPostAction <
 					"Repeat search");
 
 				userSessionLogic.userDataRemove (
+					taskLogger,
 					user,
 					stringFormat (
 						"object_search_%s_results",
 						sessionKey));
+
+				transaction.flush ();
 
 			}
 
@@ -303,6 +308,14 @@ class ObjectSearchPostAction <
 					search,
 					emptyMap (),
 					"search");
+
+			userSessionLogic.userDataObjectStore (
+				taskLogger,
+				user,
+				stringFormat (
+					"object_search_%s_fields",
+					sessionKey),
+				search);
 
 			if (updateResultSet.errorCount () > 0) {
 

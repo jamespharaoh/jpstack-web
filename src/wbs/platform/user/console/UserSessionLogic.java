@@ -66,6 +66,7 @@ interface UserSessionLogic {
 			byte[] value);
 
 	void userDataRemove (
+			TaskLogger parentTaskLogger,
 			UserRec user,
 			String code);
 

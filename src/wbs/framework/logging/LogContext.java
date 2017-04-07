@@ -55,6 +55,35 @@ interface LogContext {
 
 	default
 	TaskLogger nestTaskLogger (
+			@NonNull Optional <TaskLogger> parent,
+			@NonNull String dynamicContext,
+			@NonNull Boolean debugEnabled) {
+
+		return nestTaskLogger (
+			parent,
+			dynamicContext,
+			optionalOf (
+				debugEnabled));
+
+	}
+
+	default
+	TaskLogger nestTaskLogger (
+			@NonNull TaskLogger parent,
+			@NonNull String dynamicContext,
+			@NonNull Boolean debugEnabled) {
+
+		return nestTaskLogger (
+			optionalOf (
+				parent),
+			dynamicContext,
+			optionalOf (
+				debugEnabled));
+
+	}
+
+	default
+	TaskLogger nestTaskLogger (
 			Optional <TaskLogger> parent,
 			String dynamicContext) {
 
