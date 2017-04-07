@@ -104,7 +104,7 @@ class SchemaTableFromModel {
 
 		if (! identityColumnNames.isEmpty ()) {
 
-			List<String> treeColumnNames =
+			List <String> treeColumnNames =
 				ImmutableList.<String>builder ()
 
 				.addAll (

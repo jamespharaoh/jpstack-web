@@ -10,7 +10,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.OptionalUtils.optionalOrElse;
 import static wbs.utils.etc.OptionalUtils.optionalValueNotEqualWithClass;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -572,35 +571,58 @@ class UserSessionLogicImplementation
 		Transaction transaction =
 			database.currentTransaction ();
 
-		UserDataRec userData =
-			optionalOrElse (
-				userDataHelper.findByCode (
-					user,
-					code),
-				() -> userDataHelper.insert (
-					taskLogger,
-					userDataHelper.createInstance ()
+		Optional <UserDataRec> existingUserDataOptional =
+			userDataHelper.findByCode (
+				user,
+				code);
 
-			.setUser (
-				user)
+		if (
+			optionalIsPresent (
+				existingUserDataOptional)
+		) {
 
-			.setCode (
-				code)
+			optionalGetRequired (
+				existingUserDataOptional)
 
-		));
+				.setCreatedTime (
+					transaction.now ())
 
-		userData
+				.setExpiryTime (
+					transaction.now ().plus (
+						Duration.standardDays (
+							1l)))
 
-			.setCreatedTime (
-				transaction.now ())
+				.setData (
+					value)
 
-			.setExpiryTime (
-				transaction.now ().plus (
-					Duration.standardDays (
-						1l)))
+			;
 
-			.setData (
-				value);
+		} else {
+
+			userDataHelper.insert (
+				taskLogger,
+				userDataHelper.createInstance ()
+
+				.setUser (
+					user)
+
+				.setCode (
+					code)
+
+				.setCreatedTime (
+					transaction.now ())
+
+				.setExpiryTime (
+					transaction.now ().plus (
+						Duration.standardDays (
+							1l)))
+
+				.setData (
+					value)
+
+			);
+
+		}
 
 	}
 

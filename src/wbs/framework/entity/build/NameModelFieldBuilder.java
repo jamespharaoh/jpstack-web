@@ -69,7 +69,7 @@ class NameModelFieldBuilder {
 				false)
 
 			.identity (
-				true)
+				false)
 
 			.valueType (
 				String.class)
