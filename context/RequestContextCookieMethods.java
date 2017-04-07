@@ -6,9 +6,11 @@ import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrElse;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.Cookie;
@@ -33,11 +35,12 @@ interface RequestContextCookieMethods
 		) {
 
 			state.cookiesByName =
-				mapWithDerivedKey (
-					ifNull (
-						request ().getCookies (),
-						new Cookie [] {}),
-					Cookie::getName);
+				new HashMap<> (
+					mapWithDerivedKey (
+						ifNull (
+							request ().getCookies (),
+							new Cookie [] {}),
+						Cookie::getName));
 
 		}
 
@@ -54,6 +57,48 @@ interface RequestContextCookieMethods
 				cookiesByName (),
 				key),
 			Cookie::getValue);
+
+	}
+
+	default
+	String cookieRequired (
+			@NonNull String key) {
+
+		return optionalGetRequired (
+			cookie (
+				key));
+
+	}
+
+	default
+	void cookieSet (
+			@NonNull String name,
+			@NonNull String value) {
+
+		State state =
+			requestContextCookieMethodsState ();
+
+		Cookie cookie =
+			new Cookie (
+				name,
+				value);
+
+		state.cookiesByName.put (
+			name,
+			cookie);
+
+		response ().addCookie (
+			cookie);
+
+	}
+
+	default
+	void cookieUnset (
+			@NonNull String name) {
+
+		cookieSet (
+			name,
+			"");
 
 	}
 
