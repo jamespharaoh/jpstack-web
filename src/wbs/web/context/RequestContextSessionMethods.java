@@ -21,11 +21,13 @@ public
 interface RequestContextSessionMethods
 	extends RequestContextCoreMethods {
 
+	@Deprecated
 	default
 	HttpSession session () {
 		return request ().getSession ();
 	}
 
+	@Deprecated
 	default
 	Optional <Serializable> session (
 			@NonNull String key) {
@@ -37,6 +39,7 @@ interface RequestContextSessionMethods
 
 	}
 
+	@Deprecated
 	default
 	Serializable sessionRequired (
 			@NonNull String key) {
@@ -48,6 +51,7 @@ interface RequestContextSessionMethods
 
 	}
 
+	@Deprecated
 	default
 	Serializable sessionOrElseSetRequired (
 			@NonNull String key,
@@ -83,6 +87,7 @@ interface RequestContextSessionMethods
 
 	}
 
+	@Deprecated
 	default
 	String sessionOrEmptyString (
 			@NonNull String key) {
@@ -94,6 +99,7 @@ interface RequestContextSessionMethods
 
 	}
 
+	@Deprecated
 	default
 	void session (
 			@NonNull String key,
@@ -105,6 +111,7 @@ interface RequestContextSessionMethods
 
 	}
 
+	@Deprecated
 	default
 	String sessionId () {
 

@@ -116,7 +116,9 @@ class TaskLogger
 		}
 
 		if (this.debugEnabled) {
+
 			addToParent ();
+
 		}
 
 	}

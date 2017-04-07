@@ -4,11 +4,9 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 
 import com.google.common.base.Optional;
-
-import lombok.NonNull;
 
 import org.joda.time.DateTimeZone;
 
@@ -23,6 +21,8 @@ import wbs.platform.feature.console.FeatureConsoleHelper;
 import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.user.model.UserRec;
 
+import wbs.utils.etc.NumberUtils;
+import wbs.utils.random.RandomLogic;
 import wbs.utils.time.TimeFormatter;
 
 @SingletonComponent ("userConsoleLogic")
@@ -36,6 +36,9 @@ class UserConsoleLogicImplementation
 
 	@SingletonDependency
 	FeatureConsoleHelper featureHelper;
+
+	@SingletonDependency
+	RandomLogic randomLogic;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -61,7 +64,7 @@ class UserConsoleLogicImplementation
 
 	@Override
 	public
-	Optional<UserRec> user () {
+	Optional <UserRec> user () {
 
 		return loggedIn ()
 			? Optional.of (
@@ -102,9 +105,10 @@ class UserConsoleLogicImplementation
 	public
 	Optional <Long> userId () {
 
-		return genericCastUnchecked (
-			requestContext.session (
-				LOGGED_IN_USER_ID_SESSION_KEY));
+		return optionalMapRequired (
+			requestContext.cookie (
+				"wbs-user-id"),
+			NumberUtils::parseIntegerRequired);
 
 	}
 
@@ -113,9 +117,7 @@ class UserConsoleLogicImplementation
 	Long userIdRequired () {
 
 		return optionalGetRequired (
-			genericCastUnchecked (
-				requestContext.session (
-					LOGGED_IN_USER_ID_SESSION_KEY)));
+			userId ());
 
 	}
 
@@ -143,8 +145,8 @@ class UserConsoleLogicImplementation
 	boolean loggedIn () {
 
 		return optionalIsPresent (
-			requestContext.session (
-				LOGGED_IN_USER_ID_SESSION_KEY));
+			requestContext.cookie (
+				"wbs-session-id"));
 
 	}
 
@@ -153,8 +155,8 @@ class UserConsoleLogicImplementation
 	boolean notLoggedIn () {
 
 		return optionalIsNotPresent (
-			requestContext.session (
-				LOGGED_IN_USER_ID_SESSION_KEY));
+			requestContext.cookie (
+				"wbs-session-id"));
 
 	}
 
@@ -191,27 +193,6 @@ class UserConsoleLogicImplementation
 	public
 	Long loggedInUserIdRequired () {
 		return userIdRequired ();
-	}
-
-	@Override
-	public
-	void login (
-			@NonNull Long userId) {
-
-		requestContext.session (
-			LOGGED_IN_USER_ID_SESSION_KEY,
-			userId);
-
-	}
-
-	@Override
-	public
-	void logout () {
-
-		requestContext.session (
-			LOGGED_IN_USER_ID_SESSION_KEY,
-			null);
-
 	}
 
 	// data

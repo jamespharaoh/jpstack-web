@@ -861,8 +861,8 @@ class OptionalUtils {
 
 	}
 
-	public static <From,To>
-	Optional<To> optionalMapRequired (
+	public static <From, To>
+	Optional <To> optionalMapRequired (
 			@NonNull Optional <From> optionalValue,
 			@NonNull Function <? super From, To> mappingFunction) {
 
@@ -884,7 +884,7 @@ class OptionalUtils {
 	}
 
 	public static <From,To>
-	Optional<To> optionalMapOptional (
+	Optional <To> optionalMapOptional (
 			@NonNull Optional<From> optionalValue,
 			@NonNull Function<? super From,Optional<To>> mappingFunction) {
 

@@ -26,9 +26,4 @@ interface UserConsoleLogic
 	boolean loggedIn ();
 	boolean notLoggedIn ();
 
-	void login (
-			Long userId);
-
-	void logout ();
-
 }

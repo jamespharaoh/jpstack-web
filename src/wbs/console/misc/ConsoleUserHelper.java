@@ -11,11 +11,6 @@ interface ConsoleUserHelper
 	Optional <Long> loggedInUserId ();
 	Long loggedInUserIdRequired ();
 
-	void login (
-			Long userId);
-
-	void logout ();
-
 	boolean loggedIn ();
 	boolean notLoggedIn ();
 
