@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -102,49 +101,54 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			return ImmutableList.of ();
 		}
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"findMany",
-				"list of %s ids");
+		try (
 
-		Session session =
-			hibernateDatabase.currentSession ();
+			ActiveTask activeTask =
+				startTask (
+					"findMany",
+					"list of %s ids");
 
-		Criteria criteria =
-			session.createCriteria (
-				objectModel.objectClass ());
+		) {
 
-		criteria.add (
-			Restrictions.in (
-				"id",
-				ids));
+			Session session =
+				hibernateDatabase.currentSession ();
 
-		List <?> recordsUncast =
-			criteria.list ();
+			Criteria criteria =
+				session.createCriteria (
+					objectModel.objectClass ());
 
-		@SuppressWarnings ("unchecked")
-		List <RecordType> records =
-			(List <RecordType>)
-			recordsUncast;
+			criteria.add (
+				Restrictions.in (
+					"id",
+					ids));
 
-		Map <Long, RecordType> recordsById =
-			records.stream ()
+			List <?> recordsUncast =
+				criteria.list ();
 
-			.collect (
-				Collectors.toMap (
-					record ->
-						record.getId (),
-					record ->
-						record));
+			@SuppressWarnings ("unchecked")
+			List <RecordType> records =
+				(List <RecordType>)
+				recordsUncast;
 
-		return ids.stream ()
+			Map <Long, RecordType> recordsById =
+				records.stream ()
 
-			.map (
-				recordsById::get)
+				.collect (
+					Collectors.toMap (
+						record ->
+							record.getId (),
+						record ->
+							record));
 
-			.collect (
-				Collectors.toList ());
+			return ids.stream ()
+
+				.map (
+					recordsById::get)
+
+				.collect (
+					Collectors.toList ());
+
+		}
 
 	}
 
@@ -154,194 +158,199 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			@NonNull GlobalId parentGlobalId,
 			@NonNull String code) {
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"findByParentAndCode",
-				parentGlobalId.toString (),
-				code);
+		try (
 
-		Session session =
-			hibernateDatabase.currentSession ();
+			ActiveTask activeTask =
+				startTask (
+					"findByParentAndCode",
+					parentGlobalId.toString (),
+					code);
 
-		if (
-			isNotNull (
-				objectModel.typeCodeField ())
 		) {
 
-			throw new UnsupportedOperationException (
-				stringFormat (
-					"Object type %s must be looked up by type code",
-					getClass ().getSimpleName ()));
-
-		}
-
-		if (objectModel.isRooted ()) {
+			Session session =
+				hibernateDatabase.currentSession ();
 
 			if (
-				notEqualSafe (
-					parentGlobalId,
-					GlobalId.root)
-			) {
-
-				throw new IllegalArgumentException (
-					stringFormat (
-						"Invalid parent global id %s ",
-						parentGlobalId.toString (),
-						"for rooted object in %s.%s",
-						getClass ().getSimpleName (),
-						"findChildByCode"));
-
-			}
-
-			List<?> list =
-				session.createQuery (
-
-				stringFormat (
-
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
-
-					"WHERE _%s.%s = :code",
-					objectModel.objectName (),
-					objectModel.codeField ().name ()))
-
-				.setString (
-					"code",
-					code)
-
-				.setFlushMode (
-					FlushMode.MANUAL)
-
-				.list ();
-
-			if (list.isEmpty ())
-				return null;
-
-			@SuppressWarnings ("unchecked")
-			RecordType object =
-				(RecordType)
-				list.get (0);
-
-			return object;
-
-		} else if (objectModel.parentTypeIsFixed ()) {
-
-			/*
-			if (parentGlobalId.getTypeId ()
-					!= parentObjectHelperProvider ().objectTypeId ()) {
-
-				throw new IllegalArgumentException (sf (
-					"Invalid parent type id %s for %s (should be %s)",
-					parentGlobalId.getTypeId (),
-					objectClass ().getSimpleName (),
-					parentObjectHelperProvider ().objectTypeId ()));
-
-			}
-			*/
-
-			if (
-				isNull (
-					objectModel.parentField ())
+				isNotNull (
+					objectModel.typeCodeField ())
 			) {
 
 				throw new UnsupportedOperationException (
 					stringFormat (
-						"%sObjectHelper.findByParentAndCode (...)",
-						objectModel.objectName ()));
+						"Object type %s must be looked up by type code",
+						getClass ().getSimpleName ()));
 
 			}
 
-			List <?> list =
-				session.createQuery (
+			if (objectModel.isRooted ()) {
 
-				stringFormat (
+				if (
+					notEqualSafe (
+						parentGlobalId,
+						GlobalId.root)
+				) {
 
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
+					throw new IllegalArgumentException (
+						stringFormat (
+							"Invalid parent global id %s ",
+							parentGlobalId.toString (),
+							"for rooted object in %s.%s",
+							getClass ().getSimpleName (),
+							"findChildByCode"));
 
-					"WHERE _%s.%s.id = :parentId ",
-					objectModel.objectName (),
-					objectModel.parentField ().name (),
+				}
 
-					"AND _%s.%s = :code",
-					objectModel.objectName (),
-					objectModel.codeField ().name ()))
+				List<?> list =
+					session.createQuery (
 
-				.setLong (
-					"parentId",
-					parentGlobalId.objectId ())
+					stringFormat (
 
-				.setString (
-					"code",
-					code)
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
 
-				.setFlushMode (
-					FlushMode.MANUAL)
+						"WHERE _%s.%s = :code",
+						objectModel.objectName (),
+						objectModel.codeField ().name ()))
 
-				.list ();
+					.setString (
+						"code",
+						code)
 
-			if (list.isEmpty ())
-				return null;
+					.setFlushMode (
+						FlushMode.MANUAL)
 
-			@SuppressWarnings ("unchecked")
-			RecordType object =
-				(RecordType)
-				list.get (0);
+					.list ();
 
-			return object;
+				if (list.isEmpty ())
+					return null;
 
-		} else {
+				@SuppressWarnings ("unchecked")
+				RecordType object =
+					(RecordType)
+					list.get (0);
 
-			List<?> list =
-				session.createQuery (
+				return object;
 
-				stringFormat (
+			} else if (objectModel.parentTypeIsFixed ()) {
 
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
+				/*
+				if (parentGlobalId.getTypeId ()
+						!= parentObjectHelperProvider ().objectTypeId ()) {
 
-					"WHERE _%s.%s.id = :parentTypeId ",
-					objectModel.objectName (),
-					objectModel.parentTypeField ().name (),
+					throw new IllegalArgumentException (sf (
+						"Invalid parent type id %s for %s (should be %s)",
+						parentGlobalId.getTypeId (),
+						objectClass ().getSimpleName (),
+						parentObjectHelperProvider ().objectTypeId ()));
 
-					"AND _%s.%s = :parentId ",
-					objectModel.objectName (),
-					objectModel.parentIdField ().name (),
+				}
+				*/
 
-					"AND _%s.%s = :code",
-					objectModel.objectName (),
-					objectModel.codeField ().name ()))
+				if (
+					isNull (
+						objectModel.parentField ())
+				) {
 
-				.setLong (
-					"parentTypeId",
-					parentGlobalId.typeId ())
+					throw new UnsupportedOperationException (
+						stringFormat (
+							"%sObjectHelper.findByParentAndCode (...)",
+							objectModel.objectName ()));
 
-				.setLong (
-					"parentId",
-					parentGlobalId.objectId ())
+				}
 
-				.setString (
-					"code",
-					code)
+				List <?> list =
+					session.createQuery (
 
-				.setFlushMode (
-					FlushMode.MANUAL)
+					stringFormat (
 
-				.list ();
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
 
-			if (list.isEmpty ())
-				return null;
+						"WHERE _%s.%s.id = :parentId ",
+						objectModel.objectName (),
+						objectModel.parentField ().name (),
 
-			@SuppressWarnings ("unchecked")
-			RecordType object =
-				(RecordType)
-				list.get (0);
+						"AND _%s.%s = :code",
+						objectModel.objectName (),
+						objectModel.codeField ().name ()))
 
-			return object;
+					.setLong (
+						"parentId",
+						parentGlobalId.objectId ())
+
+					.setString (
+						"code",
+						code)
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				if (list.isEmpty ())
+					return null;
+
+				@SuppressWarnings ("unchecked")
+				RecordType object =
+					(RecordType)
+					list.get (0);
+
+				return object;
+
+			} else {
+
+				List<?> list =
+					session.createQuery (
+
+					stringFormat (
+
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
+
+						"WHERE _%s.%s.id = :parentTypeId ",
+						objectModel.objectName (),
+						objectModel.parentTypeField ().name (),
+
+						"AND _%s.%s = :parentId ",
+						objectModel.objectName (),
+						objectModel.parentIdField ().name (),
+
+						"AND _%s.%s = :code",
+						objectModel.objectName (),
+						objectModel.codeField ().name ()))
+
+					.setLong (
+						"parentTypeId",
+						parentGlobalId.typeId ())
+
+					.setLong (
+						"parentId",
+						parentGlobalId.objectId ())
+
+					.setString (
+						"code",
+						code)
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				if (list.isEmpty ())
+					return null;
+
+				@SuppressWarnings ("unchecked")
+				RecordType object =
+					(RecordType)
+					list.get (0);
+
+				return object;
+
+			}
 
 		}
 
@@ -353,176 +362,181 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			@NonNull GlobalId parentGlobalId,
 			@NonNull List <String> codes) {
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"findManyByParentAndCode",
-				parentGlobalId.toString (),
-				stringFormat (
-					"%s codes",
-					integerToDecimalString (
-						collectionSize (codes))));
+		try (
 
-		Session session =
-			hibernateDatabase.currentSession ();
+			ActiveTask activeTask =
+				startTask (
+					"findManyByParentAndCode",
+					parentGlobalId.toString (),
+					stringFormat (
+						"%s codes",
+						integerToDecimalString (
+							collectionSize (codes))));
 
-		if (
-			isNotNull (
-				objectModel.typeCodeField ())
 		) {
 
-			throw new UnsupportedOperationException (
-				stringFormat (
-					"Object type %s must be looked up by type code",
-					getClass ().getSimpleName ()));
-
-		}
-
-		if (objectModel.isRooted ()) {
+			Session session =
+				hibernateDatabase.currentSession ();
 
 			if (
-				notEqualSafe (
-					parentGlobalId,
-					GlobalId.root)
-			) {
-
-				throw new IllegalArgumentException (
-					stringFormat (
-						"Invalid parent global id %s ",
-						parentGlobalId.toString (),
-						"for rooted object in %s.%s",
-						getClass ().getSimpleName (),
-						"findChildByCode"));
-
-			}
-
-			List <?> list =
-				session.createQuery (
-
-				stringFormat (
-
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
-
-					"WHERE _%s.%s IN :codes",
-					objectModel.objectName (),
-					objectModel.codeField ().name ()))
-
-				.setParameterList (
-					"codes",
-					codes)
-
-				.setFlushMode (
-					FlushMode.MANUAL)
-
-				.list ();
-
-			return genericCastUnchecked (
-				list);
-
-		} else if (objectModel.parentTypeIsFixed ()) {
-
-			/*
-			if (parentGlobalId.getTypeId ()
-					!= parentObjectHelperProvider ().objectTypeId ()) {
-
-				throw new IllegalArgumentException (sf (
-					"Invalid parent type id %s for %s (should be %s)",
-					parentGlobalId.getTypeId (),
-					objectClass ().getSimpleName (),
-					parentObjectHelperProvider ().objectTypeId ()));
-
-			}
-			*/
-
-			if (
-				isNull (
-					objectModel.parentField ())
+				isNotNull (
+					objectModel.typeCodeField ())
 			) {
 
 				throw new UnsupportedOperationException (
 					stringFormat (
-						"%sObjectHelper.findByParentAndCode (...)",
-						objectModel.objectName ()));
+						"Object type %s must be looked up by type code",
+						getClass ().getSimpleName ()));
 
 			}
 
-			List <?> list =
-				session.createQuery (
+			if (objectModel.isRooted ()) {
 
-				stringFormat (
+				if (
+					notEqualSafe (
+						parentGlobalId,
+						GlobalId.root)
+				) {
 
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
+					throw new IllegalArgumentException (
+						stringFormat (
+							"Invalid parent global id %s ",
+							parentGlobalId.toString (),
+							"for rooted object in %s.%s",
+							getClass ().getSimpleName (),
+							"findChildByCode"));
 
-					"WHERE _%s.%s.id = :parentId ",
-					objectModel.objectName (),
-					objectModel.parentField ().name (),
+				}
 
-					"AND _%s.%s IN :codes",
-					objectModel.objectName (),
-					objectModel.codeField ().name ()))
+				List <?> list =
+					session.createQuery (
 
-				.setLong (
-					"parentId",
-					parentGlobalId.objectId ())
+					stringFormat (
 
-				.setParameterList (
-					"codes",
-					codes)
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
 
-				.setFlushMode (
-					FlushMode.MANUAL)
+						"WHERE _%s.%s IN :codes",
+						objectModel.objectName (),
+						objectModel.codeField ().name ()))
 
-				.list ();
+					.setParameterList (
+						"codes",
+						codes)
 
-			return genericCastUnchecked (
-				list);
+					.setFlushMode (
+						FlushMode.MANUAL)
 
-		} else {
+					.list ();
 
-			List <?> list =
-				session.createQuery (
+				return genericCastUnchecked (
+					list);
 
-				stringFormat (
+			} else if (objectModel.parentTypeIsFixed ()) {
 
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
+				/*
+				if (parentGlobalId.getTypeId ()
+						!= parentObjectHelperProvider ().objectTypeId ()) {
 
-					"WHERE _%s.%s.id = :parentTypeId ",
-					objectModel.objectName (),
-					objectModel.parentTypeField ().name (),
+					throw new IllegalArgumentException (sf (
+						"Invalid parent type id %s for %s (should be %s)",
+						parentGlobalId.getTypeId (),
+						objectClass ().getSimpleName (),
+						parentObjectHelperProvider ().objectTypeId ()));
 
-					"AND _%s.%s = :parentId ",
-					objectModel.objectName (),
-					objectModel.parentIdField ().name (),
+				}
+				*/
 
-					"AND _%s.%s IN :codes",
-					objectModel.objectName (),
-					objectModel.codeField ().name ()))
+				if (
+					isNull (
+						objectModel.parentField ())
+				) {
 
-				.setLong (
-					"parentTypeId",
-					parentGlobalId.typeId ())
+					throw new UnsupportedOperationException (
+						stringFormat (
+							"%sObjectHelper.findByParentAndCode (...)",
+							objectModel.objectName ()));
 
-				.setLong (
-					"parentId",
-					parentGlobalId.objectId ())
+				}
 
-				.setParameterList (
-					"codes",
-					codes)
+				List <?> list =
+					session.createQuery (
 
-				.setFlushMode (
-					FlushMode.MANUAL)
+					stringFormat (
 
-				.list ();
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
 
-			return genericCastUnchecked (
-				list);
+						"WHERE _%s.%s.id = :parentId ",
+						objectModel.objectName (),
+						objectModel.parentField ().name (),
+
+						"AND _%s.%s IN :codes",
+						objectModel.objectName (),
+						objectModel.codeField ().name ()))
+
+					.setLong (
+						"parentId",
+						parentGlobalId.objectId ())
+
+					.setParameterList (
+						"codes",
+						codes)
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				return genericCastUnchecked (
+					list);
+
+			} else {
+
+				List <?> list =
+					session.createQuery (
+
+					stringFormat (
+
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
+
+						"WHERE _%s.%s.id = :parentTypeId ",
+						objectModel.objectName (),
+						objectModel.parentTypeField ().name (),
+
+						"AND _%s.%s = :parentId ",
+						objectModel.objectName (),
+						objectModel.parentIdField ().name (),
+
+						"AND _%s.%s IN :codes",
+						objectModel.objectName (),
+						objectModel.codeField ().name ()))
+
+					.setLong (
+						"parentTypeId",
+						parentGlobalId.typeId ())
+
+					.setLong (
+						"parentId",
+						parentGlobalId.objectId ())
+
+					.setParameterList (
+						"codes",
+						codes)
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				return genericCastUnchecked (
+					list);
+
+			}
 
 		}
 
@@ -549,167 +563,172 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 		}
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"findByParentAndIndex",
-				parentGlobalId.toString (),
-				index.toString ());
+		try (
 
-		if (objectModel.isRooted ()) {
+			ActiveTask activeTask =
+				startTask (
+					"findByParentAndIndex",
+					parentGlobalId.toString (),
+					index.toString ());
 
-			if (
-				notEqualSafe (
-					parentGlobalId,
-					GlobalId.root)
-			) {
+		) {
 
-				throw new IllegalArgumentException (
+			if (objectModel.isRooted ()) {
+
+				if (
+					notEqualSafe (
+						parentGlobalId,
+						GlobalId.root)
+				) {
+
+					throw new IllegalArgumentException (
+						stringFormat (
+							"Invalid parent global id %s ",
+							parentGlobalId.toString (),
+							"for rooted object in %s.%s",
+							getClass ().getSimpleName (),
+							"findChildByCode"));
+
+				}
+
+				List<?> list =
+					session.createQuery (
+
 					stringFormat (
-						"Invalid parent global id %s ",
-						parentGlobalId.toString (),
-						"for rooted object in %s.%s",
-						getClass ().getSimpleName (),
-						"findChildByCode"));
+
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
+
+						"WHERE _%s.%s = :index",
+						objectModel.objectName (),
+						objectModel.indexField ().name ()))
+
+					.setLong (
+						"index",
+						index)
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				if (list.isEmpty ())
+					return null;
+
+				@SuppressWarnings ("unchecked")
+				RecordType object =
+					(RecordType)
+					list.get (0);
+
+				return object;
+
+			} else if (objectModel.parentTypeIsFixed ()) {
+
+				/*
+				if (parentGlobalId.getTypeId ()
+						!= parentObjectHelperProvider ().objectTypeId ()) {
+
+					throw new IllegalArgumentException (sf (
+						"Invalid parent type id %s for %s (should be %s)",
+						parentGlobalId.getTypeId (),
+						objectClass ().getSimpleName (),
+						parentObjectHelperProvider ().objectTypeId ()));
+
+				}
+				*/
+
+				List<?> list =
+					session.createQuery (
+
+					stringFormat (
+
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
+
+						"WHERE _%s.%s.id = :parentId ",
+						objectModel.objectName (),
+						objectModel.parentField ().name (),
+
+						"AND _%s.%s = :index",
+						objectModel.objectName (),
+						objectModel.indexField ().name ()))
+
+					.setLong (
+						"parentId",
+						parentGlobalId.objectId ())
+
+					.setLong (
+						"index",
+						index)
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				if (list.isEmpty ())
+					return null;
+
+				@SuppressWarnings ("unchecked")
+				RecordType object =
+					(RecordType)
+					list.get (0);
+
+				return object;
+
+			} else {
+
+				List<?> list =
+					session.createQuery (
+
+					stringFormat (
+
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
+
+						"WHERE _%s.%s.id = :parentTypeId ",
+						objectModel.objectName (),
+						objectModel.parentTypeField ().name (),
+
+						"AND _%s.%s = :parentId ",
+						objectModel.objectName (),
+						objectModel.parentIdField ().name (),
+
+						"AND _%s.%s = :index",
+						objectModel.objectName (),
+						objectModel.indexField ().name ()))
+
+					.setLong (
+						"parentTypeId",
+						parentGlobalId.typeId ())
+
+					.setLong (
+						"parentId",
+						parentGlobalId.objectId ())
+
+					.setLong (
+						"index",
+						index)
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				if (list.isEmpty ())
+					return null;
+
+				@SuppressWarnings ("unchecked")
+				RecordType object =
+					(RecordType)
+					list.get (0);
+
+				return object;
 
 			}
-
-			List<?> list =
-				session.createQuery (
-
-				stringFormat (
-
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
-
-					"WHERE _%s.%s = :index",
-					objectModel.objectName (),
-					objectModel.indexField ().name ()))
-
-				.setLong (
-					"index",
-					index)
-
-				.setFlushMode (
-					FlushMode.MANUAL)
-
-				.list ();
-
-			if (list.isEmpty ())
-				return null;
-
-			@SuppressWarnings ("unchecked")
-			RecordType object =
-				(RecordType)
-				list.get (0);
-
-			return object;
-
-		} else if (objectModel.parentTypeIsFixed ()) {
-
-			/*
-			if (parentGlobalId.getTypeId ()
-					!= parentObjectHelperProvider ().objectTypeId ()) {
-
-				throw new IllegalArgumentException (sf (
-					"Invalid parent type id %s for %s (should be %s)",
-					parentGlobalId.getTypeId (),
-					objectClass ().getSimpleName (),
-					parentObjectHelperProvider ().objectTypeId ()));
-
-			}
-			*/
-
-			List<?> list =
-				session.createQuery (
-
-				stringFormat (
-
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
-
-					"WHERE _%s.%s.id = :parentId ",
-					objectModel.objectName (),
-					objectModel.parentField ().name (),
-
-					"AND _%s.%s = :index",
-					objectModel.objectName (),
-					objectModel.indexField ().name ()))
-
-				.setLong (
-					"parentId",
-					parentGlobalId.objectId ())
-
-				.setLong (
-					"index",
-					index)
-
-				.setFlushMode (
-					FlushMode.MANUAL)
-
-				.list ();
-
-			if (list.isEmpty ())
-				return null;
-
-			@SuppressWarnings ("unchecked")
-			RecordType object =
-				(RecordType)
-				list.get (0);
-
-			return object;
-
-		} else {
-
-			List<?> list =
-				session.createQuery (
-
-				stringFormat (
-
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
-
-					"WHERE _%s.%s.id = :parentTypeId ",
-					objectModel.objectName (),
-					objectModel.parentTypeField ().name (),
-
-					"AND _%s.%s = :parentId ",
-					objectModel.objectName (),
-					objectModel.parentIdField ().name (),
-
-					"AND _%s.%s = :index",
-					objectModel.objectName (),
-					objectModel.indexField ().name ()))
-
-				.setLong (
-					"parentTypeId",
-					parentGlobalId.typeId ())
-
-				.setLong (
-					"parentId",
-					parentGlobalId.objectId ())
-
-				.setLong (
-					"index",
-					index)
-
-				.setFlushMode (
-					FlushMode.MANUAL)
-
-				.list ();
-
-			if (list.isEmpty ())
-				return null;
-
-			@SuppressWarnings ("unchecked")
-			RecordType object =
-				(RecordType)
-				list.get (0);
-
-			return object;
 
 		}
 
@@ -735,200 +754,205 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 		}
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"findByParentAndTypeAndCode",
-				parentGlobalId.toString (),
-				typeCode,
-				code);
+		try (
 
-		Session session =
-			hibernateDatabase.currentSession ();
+			ActiveTask activeTask =
+				startTask (
+					"findByParentAndTypeAndCode",
+					parentGlobalId.toString (),
+					typeCode,
+					code);
 
-		if (objectModel.isRooted ()) {
+		) {
 
-			if (
-				notEqualSafe (
-					parentGlobalId,
-					GlobalId.root)
-			) {
+			Session session =
+				hibernateDatabase.currentSession ();
 
-				throw new IllegalArgumentException (
+			if (objectModel.isRooted ()) {
+
+				if (
+					notEqualSafe (
+						parentGlobalId,
+						GlobalId.root)
+				) {
+
+					throw new IllegalArgumentException (
+						stringFormat (
+							"Invalid parent global id %s ",
+							parentGlobalId.toString (),
+							"for rooted object in %s.%s",
+							getClass ().getSimpleName (),
+							"findByParentAndCode"));
+
+				}
+
+				List<?> list =
+					session.createQuery (
+
 					stringFormat (
-						"Invalid parent global id %s ",
-						parentGlobalId.toString (),
-						"for rooted object in %s.%s",
-						getClass ().getSimpleName (),
-						"findByParentAndCode"));
+
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
+
+						"WHERE _%s.%s = :%s ",
+						objectModel.objectName (),
+						objectModel.typeCodeField ().name (),
+						objectModel.typeCodeField ().name (),
+
+						"AND _%s.%s = :%s",
+						objectModel.objectName (),
+						objectModel.codeField ().name (),
+						objectModel.codeField ().name ()))
+
+					.setString (
+						objectModel.typeCodeField ().name (),
+						typeCode)
+
+					.setString (
+						objectModel.codeField ().name (),
+						code)
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				if (list.isEmpty ())
+					return null;
+
+				@SuppressWarnings ("unchecked")
+				RecordType object =
+					(RecordType)
+					list.get (0);
+
+				return object;
+
+			} else if (objectModel.parentTypeIsFixed ()) {
+
+				/*
+				if (parentGlobalId.getTypeId ()
+						!= parentObjectHelperProvider ().objectTypeId ()) {
+
+					throw new IllegalArgumentException (sf (
+						"Invalid parent type id %s for %s (should be %s)",
+						parentGlobalId.getTypeId (),
+						objectClass ().getSimpleName (),
+						parentObjectHelperProvider ().objectTypeId ()));
+
+				}
+				*/
+
+				List<?> list =
+					session.createQuery (
+
+					stringFormat (
+
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
+
+						"WHERE _%s.%s.id = :parentId ",
+						objectModel.objectName (),
+						objectModel.parentField ().name (),
+
+						"AND _%s.%s = :%s ",
+						objectModel.objectName (),
+						objectModel.typeCodeField ().name (),
+						objectModel.typeCodeField ().name (),
+
+						"AND _%s.%s = :%s",
+						objectModel.objectName (),
+						objectModel.codeField ().name (),
+						objectModel.codeField ().name ()))
+
+					.setLong (
+						"parentId",
+						parentGlobalId.objectId ())
+
+					.setString (
+						objectModel.typeCodeField ().name (),
+						typeCode)
+
+					.setString (
+						objectModel.codeField ().name (),
+						code)
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				if (list.isEmpty ())
+					return null;
+
+				@SuppressWarnings ("unchecked")
+				RecordType object =
+					(RecordType)
+					list.get (0);
+
+				return object;
+
+			} else {
+
+				List<?> list =
+					session.createQuery (
+
+					stringFormat (
+
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
+
+						"WHERE _%s.%s.id = :parentTypeId ",
+						objectModel.objectName (),
+						objectModel.parentTypeField ().name (),
+
+						"AND _%s.%s = :parentId ",
+						objectModel.objectName (),
+						objectModel.parentIdField ().name (),
+
+						"AND _%s.%s = :%s ",
+						objectModel.objectName (),
+						objectModel.typeCodeField ().name (),
+						objectModel.typeCodeField ().name (),
+
+						"AND _%s.%s = :code",
+						objectModel.objectName (),
+						objectModel.codeField ().name ()))
+
+					.setLong (
+						"parentTypeId",
+						parentGlobalId.typeId ())
+
+					.setLong (
+						"parentId",
+						parentGlobalId.objectId ())
+
+					.setString (
+						objectModel.typeCodeField ().name (),
+						typeCode)
+
+					.setString (
+						objectModel.codeField ().name (),
+						code)
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				if (list.isEmpty ())
+					return null;
+
+				@SuppressWarnings ("unchecked")
+				RecordType object =
+					(RecordType)
+					list.get (0);
+
+				return object;
 
 			}
-
-			List<?> list =
-				session.createQuery (
-
-				stringFormat (
-
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
-
-					"WHERE _%s.%s = :%s ",
-					objectModel.objectName (),
-					objectModel.typeCodeField ().name (),
-					objectModel.typeCodeField ().name (),
-
-					"AND _%s.%s = :%s",
-					objectModel.objectName (),
-					objectModel.codeField ().name (),
-					objectModel.codeField ().name ()))
-
-				.setString (
-					objectModel.typeCodeField ().name (),
-					typeCode)
-
-				.setString (
-					objectModel.codeField ().name (),
-					code)
-
-				.setFlushMode (
-					FlushMode.MANUAL)
-
-				.list ();
-
-			if (list.isEmpty ())
-				return null;
-
-			@SuppressWarnings ("unchecked")
-			RecordType object =
-				(RecordType)
-				list.get (0);
-
-			return object;
-
-		} else if (objectModel.parentTypeIsFixed ()) {
-
-			/*
-			if (parentGlobalId.getTypeId ()
-					!= parentObjectHelperProvider ().objectTypeId ()) {
-
-				throw new IllegalArgumentException (sf (
-					"Invalid parent type id %s for %s (should be %s)",
-					parentGlobalId.getTypeId (),
-					objectClass ().getSimpleName (),
-					parentObjectHelperProvider ().objectTypeId ()));
-
-			}
-			*/
-
-			List<?> list =
-				session.createQuery (
-
-				stringFormat (
-
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
-
-					"WHERE _%s.%s.id = :parentId ",
-					objectModel.objectName (),
-					objectModel.parentField ().name (),
-
-					"AND _%s.%s = :%s ",
-					objectModel.objectName (),
-					objectModel.typeCodeField ().name (),
-					objectModel.typeCodeField ().name (),
-
-					"AND _%s.%s = :%s",
-					objectModel.objectName (),
-					objectModel.codeField ().name (),
-					objectModel.codeField ().name ()))
-
-				.setLong (
-					"parentId",
-					parentGlobalId.objectId ())
-
-				.setString (
-					objectModel.typeCodeField ().name (),
-					typeCode)
-
-				.setString (
-					objectModel.codeField ().name (),
-					code)
-
-				.setFlushMode (
-					FlushMode.MANUAL)
-
-				.list ();
-
-			if (list.isEmpty ())
-				return null;
-
-			@SuppressWarnings ("unchecked")
-			RecordType object =
-				(RecordType)
-				list.get (0);
-
-			return object;
-
-		} else {
-
-			List<?> list =
-				session.createQuery (
-
-				stringFormat (
-
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
-
-					"WHERE _%s.%s.id = :parentTypeId ",
-					objectModel.objectName (),
-					objectModel.parentTypeField ().name (),
-
-					"AND _%s.%s = :parentId ",
-					objectModel.objectName (),
-					objectModel.parentIdField ().name (),
-
-					"AND _%s.%s = :%s ",
-					objectModel.objectName (),
-					objectModel.typeCodeField ().name (),
-					objectModel.typeCodeField ().name (),
-
-					"AND _%s.%s = :code",
-					objectModel.objectName (),
-					objectModel.codeField ().name ()))
-
-				.setLong (
-					"parentTypeId",
-					parentGlobalId.typeId ())
-
-				.setLong (
-					"parentId",
-					parentGlobalId.objectId ())
-
-				.setString (
-					objectModel.typeCodeField ().name (),
-					typeCode)
-
-				.setString (
-					objectModel.codeField ().name (),
-					code)
-
-				.setFlushMode (
-					FlushMode.MANUAL)
-
-				.list ();
-
-			if (list.isEmpty ())
-				return null;
-
-			@SuppressWarnings ("unchecked")
-			RecordType object =
-				(RecordType)
-				list.get (0);
-
-			return object;
 
 		}
 
@@ -941,108 +965,15 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 		Session session =
 			hibernateDatabase.currentSession ();
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"findAll");
+		try (
 
-		List<?> objectsUncast =
-			session.createQuery (
+			ActiveTask activeTask =
+				startTask (
+					"findAll");
 
-			stringFormat (
-				"FROM %s",
-				objectModel.objectClass ().getSimpleName ()))
+		) {
 
-			.setFlushMode (
-				FlushMode.MANUAL)
-
-			.list ();
-
-		@SuppressWarnings ("unchecked")
-		List<RecordType> objects =
-			(List<RecordType>)
-			objectsUncast;
-
-		return objects;
-
-	}
-
-	@Override
-	public
-	List <RecordType> findNotDeleted () {
-
-		Session session =
-			hibernateDatabase.currentSession ();
-
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"findAll");
-
-		List <?> objectsUncast =
-			session.createCriteria (
-				objectModel.objectClass (),
-				"_subject")
-
-			.add (
-				ifNotNullThenElse (
-					objectModel.deletedField (),
-					() -> Restrictions.eq (
-						stringFormat (
-							"_subject.%s",
-							objectModel.deletedField ().columnName ()),
-						false),
-					() -> Restrictions.sqlRestriction (
-						"true")))
-
-
-			.setFlushMode (
-				FlushMode.MANUAL)
-
-			.list ();
-
-		@SuppressWarnings ("unchecked")
-		List<RecordType> objects =
-			(List<RecordType>)
-			objectsUncast;
-
-		return objects;
-
-	}
-
-	@Override
-	public
-	List<RecordType> findAllByParent (
-			@NonNull GlobalId parentGlobalId) {
-
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"findAllByParent",
-				parentGlobalId.toString ());
-
-		Session session =
-			hibernateDatabase.currentSession ();
-
-		if (objectModel.isRooted ()) {
-
-			if (
-				notEqualSafe (
-					parentGlobalId,
-					GlobalId.root)
-			) {
-
-				throw new IllegalArgumentException (
-					stringFormat (
-						"Invalid parent global id %s ",
-						parentGlobalId.toString (),
-						"for rooted object in %s.%s",
-						getClass ().getSimpleName (),
-						"findChildren"));
-
-			}
-
-			List<?> objectsUncast =
+			List <?> objectsUncast =
 				session.createQuery (
 
 				stringFormat (
@@ -1061,80 +992,41 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 			return objects;
 
-		} else if (objectModel.canGetParent ()) {
+		}
 
-			/*
+	}
 
-			TODO enable this again
+	@Override
+	public
+	List <RecordType> findNotDeleted () {
 
-			if (parentGlobalId.getTypeId ()
-					!= parentObjectHelperProvider ().objectTypeId ()) {
+		Session session =
+			hibernateDatabase.currentSession ();
 
-				throw new IllegalArgumentException (sf (
-					"Invalid parent type id %s for %s (should be %s)",
-					parentGlobalId.getTypeId (),
-					objectClass ().getSimpleName (),
-					parentObjectHelperProvider ().objectTypeId ()));
+		try (
 
-			}
+			ActiveTask activeTask =
+				startTask (
+					"findAll");
 
-			*/
-
-			List<?> objectsUncast =
-				session.createQuery (
-
-				stringFormat (
-
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
-
-					"WHERE _%s.%s.id = :parentId",
-					objectModel.objectName (),
-					objectModel.parentField ().name ()))
-
-				.setLong (
-					"parentId",
-					parentGlobalId.objectId ())
-
-				.setFlushMode (
-					FlushMode.MANUAL)
-
-				.list ();
-
-			@SuppressWarnings ("unchecked")
-			List <RecordType> objects =
-				(List <RecordType>)
-				objectsUncast;
-
-			return objects;
-
-		} else {
+		) {
 
 			List <?> objectsUncast =
-				session.createQuery (
+				session.createCriteria (
+					objectModel.objectClass (),
+					"_subject")
 
-				stringFormat (
+				.add (
+					ifNotNullThenElse (
+						objectModel.deletedField (),
+						() -> Restrictions.eq (
+							stringFormat (
+								"_subject.%s",
+								objectModel.deletedField ().columnName ()),
+							false),
+						() -> Restrictions.sqlRestriction (
+							"true")))
 
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
-
-					"WHERE _%s.%s.id = :parentTypeId ",
-					objectModel.objectName (),
-					objectModel.parentTypeField ().name (),
-
-					"AND _%s.%s = :parentId",
-					objectModel.objectName (),
-					objectModel.parentIdField ().name ()))
-
-				.setLong (
-					"parentTypeId",
-					parentGlobalId.typeId ())
-
-				.setLong (
-					"parentId",
-					parentGlobalId.objectId ())
 
 				.setFlushMode (
 					FlushMode.MANUAL)
@@ -1142,11 +1034,158 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				.list ();
 
 			@SuppressWarnings ("unchecked")
-			List <RecordType> objects =
-				(List <RecordType>)
+			List<RecordType> objects =
+				(List<RecordType>)
 				objectsUncast;
 
 			return objects;
+
+		}
+
+	}
+
+	@Override
+	public
+	List<RecordType> findAllByParent (
+			@NonNull GlobalId parentGlobalId) {
+
+		try (
+
+			ActiveTask activeTask =
+				startTask (
+					"findAllByParent",
+					parentGlobalId.toString ());
+
+		) {
+
+			Session session =
+				hibernateDatabase.currentSession ();
+
+			if (objectModel.isRooted ()) {
+
+				if (
+					notEqualSafe (
+						parentGlobalId,
+						GlobalId.root)
+				) {
+
+					throw new IllegalArgumentException (
+						stringFormat (
+							"Invalid parent global id %s ",
+							parentGlobalId.toString (),
+							"for rooted object in %s.%s",
+							getClass ().getSimpleName (),
+							"findChildren"));
+
+				}
+
+				List<?> objectsUncast =
+					session.createQuery (
+
+					stringFormat (
+						"FROM %s",
+						objectModel.objectClass ().getSimpleName ()))
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				@SuppressWarnings ("unchecked")
+				List<RecordType> objects =
+					(List<RecordType>)
+					objectsUncast;
+
+				return objects;
+
+			} else if (objectModel.canGetParent ()) {
+
+				/*
+
+				TODO enable this again
+
+				if (parentGlobalId.getTypeId ()
+						!= parentObjectHelperProvider ().objectTypeId ()) {
+
+					throw new IllegalArgumentException (sf (
+						"Invalid parent type id %s for %s (should be %s)",
+						parentGlobalId.getTypeId (),
+						objectClass ().getSimpleName (),
+						parentObjectHelperProvider ().objectTypeId ()));
+
+				}
+
+				*/
+
+				List<?> objectsUncast =
+					session.createQuery (
+
+					stringFormat (
+
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
+
+						"WHERE _%s.%s.id = :parentId",
+						objectModel.objectName (),
+						objectModel.parentField ().name ()))
+
+					.setLong (
+						"parentId",
+						parentGlobalId.objectId ())
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				@SuppressWarnings ("unchecked")
+				List <RecordType> objects =
+					(List <RecordType>)
+					objectsUncast;
+
+				return objects;
+
+			} else {
+
+				List <?> objectsUncast =
+					session.createQuery (
+
+					stringFormat (
+
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
+
+						"WHERE _%s.%s.id = :parentTypeId ",
+						objectModel.objectName (),
+						objectModel.parentTypeField ().name (),
+
+						"AND _%s.%s = :parentId",
+						objectModel.objectName (),
+						objectModel.parentIdField ().name ()))
+
+					.setLong (
+						"parentTypeId",
+						parentGlobalId.typeId ())
+
+					.setLong (
+						"parentId",
+						parentGlobalId.objectId ())
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				@SuppressWarnings ("unchecked")
+				List <RecordType> objects =
+					(List <RecordType>)
+					objectsUncast;
+
+				return objects;
+
+			}
 
 		}
 
@@ -1231,71 +1270,76 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 			@NonNull Long indexStart,
 			@NonNull Long indexEnd) {
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"findByParentAndIndexRange",
-				parentGlobalId.toString (),
-				indexStart.toString (),
-				indexEnd.toString ());
+		try (
 
-		Session session =
-			hibernateDatabase.currentSession ();
+			ActiveTask activeTask =
+				startTask (
+					"findByParentAndIndexRange",
+					parentGlobalId.toString (),
+					indexStart.toString (),
+					indexEnd.toString ());
 
-		Criteria criteria =
-			session.createCriteria (
-				objectModel.objectClass (),
-				"_" + objectModel.objectName ());
+		) {
 
-		// apply parent restriction
+			Session session =
+				hibernateDatabase.currentSession ();
 
-		applyParentRestrictions (
-			criteria,
-			parentGlobalId);
+			Criteria criteria =
+				session.createCriteria (
+					objectModel.objectClass (),
+					"_" + objectModel.objectName ());
 
-		// apply index range restriction
+			// apply parent restriction
 
-		criteria.add (
-			Restrictions.ge (
-				stringFormat (
-					"_%s.%s",
-					objectModel.objectName (),
-					objectModel.indexField ().name ()),
-				indexStart));
+			applyParentRestrictions (
+				criteria,
+				parentGlobalId);
 
-		criteria.add (
-			Restrictions.lt (
-				stringFormat (
-					"_%s.%s",
-					objectModel.objectName (),
-					objectModel.indexField ().name ()),
-				indexEnd));
+			// apply index range restriction
 
-		// order by index ascending
+			criteria.add (
+				Restrictions.ge (
+					stringFormat (
+						"_%s.%s",
+						objectModel.objectName (),
+						objectModel.indexField ().name ()),
+					indexStart));
 
-		criteria.addOrder (
-			Order.asc (
-				stringFormat (
-					"_%s.%s",
-					objectModel.objectName (),
-					objectModel.indexField ().name ())));
+			criteria.add (
+				Restrictions.lt (
+					stringFormat (
+						"_%s.%s",
+						objectModel.objectName (),
+						objectModel.indexField ().name ()),
+					indexEnd));
 
-		// manual flush mode
+			// order by index ascending
 
-		criteria.setFlushMode (
-			FlushMode.MANUAL);
+			criteria.addOrder (
+				Order.asc (
+					stringFormat (
+						"_%s.%s",
+						objectModel.objectName (),
+						objectModel.indexField ().name ())));
 
-		// execute and return
+			// manual flush mode
 
-		List<?> objectsUncast =
-			criteria.list ();
+			criteria.setFlushMode (
+				FlushMode.MANUAL);
 
-		@SuppressWarnings ("unchecked")
-		List<RecordType> objects =
-			(List<RecordType>)
-			objectsUncast;
+			// execute and return
 
-		return objects;
+			List<?> objectsUncast =
+				criteria.list ();
+
+			@SuppressWarnings ("unchecked")
+			List<RecordType> objects =
+				(List<RecordType>)
+				objectsUncast;
+
+			return objects;
+
+		}
 
 	}
 
@@ -1310,27 +1354,32 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				parentTaskLogger,
 				"insert");
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"insert",
-				"...");
+		try (
 
-		objectModel.hooks ().beforeInsert (
-			taskLogger,
-			object);
+			ActiveTask activeTask =
+				startTask (
+					"insert",
+					"...");
 
-		Session session =
-			hibernateDatabase.currentSession ();
+		) {
 
-		session.save (
-			object);
+			objectModel.hooks ().beforeInsert (
+				taskLogger,
+				object);
 
-		objectModel.hooks ().afterInsert (
-			taskLogger,
-			object);
+			Session session =
+				hibernateDatabase.currentSession ();
 
-		return object;
+			session.save (
+				object);
+
+			objectModel.hooks ().afterInsert (
+				taskLogger,
+				object);
+
+			return object;
+
+		}
 
 	}
 
@@ -1345,31 +1394,36 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 				parentTaskLogger,
 				"insertSpecial");
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"insertSpecial",
-				stringFormat (
-					"id = %s",
-					integerToDecimalString (
-						object.getId ())));
+		try (
 
-		objectModel.hooks ().beforeInsert (
-			taskLogger,
-			object);
+			ActiveTask activeTask =
+				startTask (
+					"insertSpecial",
+					stringFormat (
+						"id = %s",
+						integerToDecimalString (
+							object.getId ())));
 
-		Session session =
-			hibernateDatabase.currentSession ();
+		) {
 
-		session.replicate (
-			object,
-			ReplicationMode.EXCEPTION);
+			objectModel.hooks ().beforeInsert (
+				taskLogger,
+				object);
 
-		objectModel.hooks ().afterInsert (
-			taskLogger,
-			object);
+			Session session =
+				hibernateDatabase.currentSession ();
 
-		return object;
+			session.replicate (
+				object,
+				ReplicationMode.EXCEPTION);
+
+			objectModel.hooks ().afterInsert (
+				taskLogger,
+				object);
+
+			return object;
+
+		}
 
 	}
 
@@ -1378,19 +1432,24 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	RecordType update (
 			@NonNull RecordType object) {
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"update",
-				stringFormat (
-					"id = %s",
-					integerToDecimalString (
-						object.getId ())));
+		try (
 
-		objectModel.hooks ().beforeUpdate (
-			object);
+			ActiveTask activeTask =
+				startTask (
+					"update",
+					stringFormat (
+						"id = %s",
+						integerToDecimalString (
+							object.getId ())));
 
-		return object;
+		) {
+
+			objectModel.hooks ().beforeUpdate (
+				object);
+
+			return object;
+
+		}
 
 	}
 
@@ -1399,22 +1458,27 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	ObjectType remove (
 			@NonNull ObjectType object) {
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"remove",
-				stringFormat (
-					"id = %s",
-					integerToDecimalString (
-						object.getId ())));
+		try (
 
-		Session session =
-			hibernateDatabase.currentSession ();
+			ActiveTask activeTask =
+				startTask (
+					"remove",
+					stringFormat (
+						"id = %s",
+						integerToDecimalString (
+							object.getId ())));
 
-		session.delete (
-			object);
+		) {
 
-		return object;
+			Session session =
+				hibernateDatabase.currentSession ();
+
+			session.delete (
+				object);
+
+			return object;
+
+		}
 
 	}
 
@@ -1437,170 +1501,175 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 
 		}
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"findAllByParentAndType",
-				parentGlobalId.toString (),
-				typeCode);
+		try (
 
-		Session session =
-			hibernateDatabase.currentSession ();
+			ActiveTask activeTask =
+				startTask (
+					"findAllByParentAndType",
+					parentGlobalId.toString (),
+					typeCode);
 
-		if (objectModel.isRooted ()) {
+		) {
 
-			if (
-				notEqualSafe (
-					parentGlobalId,
-					GlobalId.root)
-			) {
+			Session session =
+				hibernateDatabase.currentSession ();
 
-				throw new IllegalArgumentException (
+			if (objectModel.isRooted ()) {
+
+				if (
+					notEqualSafe (
+						parentGlobalId,
+						GlobalId.root)
+				) {
+
+					throw new IllegalArgumentException (
+						stringFormat (
+							"Invalid parent global id %s ",
+							parentGlobalId.toString (),
+							"for rooted object in %s.%s",
+							getClass ().getSimpleName (),
+							"findChildren"));
+
+				}
+
+				List<?> objectsUncast =
+					session.createQuery (
+
 					stringFormat (
-						"Invalid parent global id %s ",
-						parentGlobalId.toString (),
-						"for rooted object in %s.%s",
-						getClass ().getSimpleName (),
-						"findChildren"));
 
-			}
-
-			List<?> objectsUncast =
-				session.createQuery (
-
-				stringFormat (
-
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
-
-					"WHERE _%s.%s = :%s",
-					objectModel.objectName (),
-					objectModel.typeCodeField ().name (),
-					objectModel.typeCodeField ().name ()))
-
-				.setString (
-					objectModel.typeCodeField ().name (),
-					typeCode)
-
-				.setFlushMode (
-					FlushMode.MANUAL)
-
-				.list ();
-
-			@SuppressWarnings ("unchecked")
-			List<RecordType> objects =
-				(List<RecordType>)
-				objectsUncast;
-
-			return objects;
-
-		}
-
-		if (objectModel.canGetParent ()) {
-
-			if (
-				integerNotEqualSafe (
-					parentGlobalId.typeId (),
-					objectModel.parentTypeId ())
-			) {
-
-				throw new IllegalArgumentException (
-					stringFormat (
-						"Invalid parent type id %s for %s (should be %s)",
-						integerToDecimalString (
-							parentGlobalId.typeId ()),
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
 						objectModel.objectName (),
-						integerToDecimalString (
-							objectModel.parentTypeId ())));
+
+						"WHERE _%s.%s = :%s",
+						objectModel.objectName (),
+						objectModel.typeCodeField ().name (),
+						objectModel.typeCodeField ().name ()))
+
+					.setString (
+						objectModel.typeCodeField ().name (),
+						typeCode)
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				@SuppressWarnings ("unchecked")
+				List<RecordType> objects =
+					(List<RecordType>)
+					objectsUncast;
+
+				return objects;
 
 			}
 
-			List <?> objectsUncast =
-				session.createQuery (
+			if (objectModel.canGetParent ()) {
 
-				stringFormat (
+				if (
+					integerNotEqualSafe (
+						parentGlobalId.typeId (),
+						objectModel.parentTypeId ())
+				) {
 
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
+					throw new IllegalArgumentException (
+						stringFormat (
+							"Invalid parent type id %s for %s (should be %s)",
+							integerToDecimalString (
+								parentGlobalId.typeId ()),
+							objectModel.objectName (),
+							integerToDecimalString (
+								objectModel.parentTypeId ())));
 
-					"WHERE _%s.%s.id = :parentId ",
-					objectModel.objectName (),
-					objectModel.parentField ().name (),
+				}
 
-					"AND _%s.%s = :%s",
-					objectModel.objectName (),
-					objectModel.typeCodeField ().name (),
-					objectModel.typeCodeField ().name ()))
+				List <?> objectsUncast =
+					session.createQuery (
 
-				.setLong (
-					"parentId",
-					parentGlobalId.objectId ())
+					stringFormat (
 
-				.setString (
-					objectModel.typeCodeField ().name (),
-					typeCode)
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
 
-				.setFlushMode (
-					FlushMode.MANUAL)
+						"WHERE _%s.%s.id = :parentId ",
+						objectModel.objectName (),
+						objectModel.parentField ().name (),
 
-				.list ();
+						"AND _%s.%s = :%s",
+						objectModel.objectName (),
+						objectModel.typeCodeField ().name (),
+						objectModel.typeCodeField ().name ()))
 
-			@SuppressWarnings ("unchecked")
-			List<RecordType> objects =
-				(List<RecordType>)
-				objectsUncast;
+					.setLong (
+						"parentId",
+						parentGlobalId.objectId ())
 
-			return objects;
+					.setString (
+						objectModel.typeCodeField ().name (),
+						typeCode)
 
-		} else {
+					.setFlushMode (
+						FlushMode.MANUAL)
 
-			List<?> objectsUncast =
-				session.createQuery (
+					.list ();
 
-				stringFormat (
+				@SuppressWarnings ("unchecked")
+				List<RecordType> objects =
+					(List<RecordType>)
+					objectsUncast;
 
-					"FROM %s _%s ",
-					objectModel.objectClass ().getSimpleName (),
-					objectModel.objectName (),
+				return objects;
 
-					"WHERE _%s.%s.id = :parentTypeId ",
-					objectModel.objectName (),
-					objectModel.parentTypeField ().name (),
+			} else {
 
-					"AND _%s.%s = :parentId",
-					objectModel.objectName (),
-					objectModel.parentIdField ().name (),
+				List<?> objectsUncast =
+					session.createQuery (
 
-					"AND _%s.%s = :%s",
-					objectModel.objectName (),
-					objectModel.typeCodeField ().name (),
-					objectModel.typeCodeField ().name ()))
+					stringFormat (
 
-				.setLong (
-					"parentTypeId",
-					parentGlobalId.typeId ())
+						"FROM %s _%s ",
+						objectModel.objectClass ().getSimpleName (),
+						objectModel.objectName (),
 
-				.setLong (
-					"parentId",
-					parentGlobalId.objectId ())
+						"WHERE _%s.%s.id = :parentTypeId ",
+						objectModel.objectName (),
+						objectModel.parentTypeField ().name (),
 
-				.setString (
-					objectModel.typeCodeField ().name (),
-					typeCode)
+						"AND _%s.%s = :parentId",
+						objectModel.objectName (),
+						objectModel.parentIdField ().name (),
 
-				.setFlushMode (
-					FlushMode.MANUAL)
+						"AND _%s.%s = :%s",
+						objectModel.objectName (),
+						objectModel.typeCodeField ().name (),
+						objectModel.typeCodeField ().name ()))
 
-				.list ();
+					.setLong (
+						"parentTypeId",
+						parentGlobalId.typeId ())
 
-			@SuppressWarnings ("unchecked")
-			List<RecordType> objects =
-				(List<RecordType>)
-				objectsUncast;
+					.setLong (
+						"parentId",
+						parentGlobalId.objectId ())
 
-			return objects;
+					.setString (
+						objectModel.typeCodeField ().name (),
+						typeCode)
+
+					.setFlushMode (
+						FlushMode.MANUAL)
+
+					.list ();
+
+				@SuppressWarnings ("unchecked")
+				List<RecordType> objects =
+					(List<RecordType>)
+					objectsUncast;
+
+				return objects;
+
+			}
 
 		}
 
@@ -1611,25 +1680,30 @@ class HibernateObjectDatabaseHelper <RecordType extends Record <RecordType>>
 	RecordType lock (
 			@NonNull RecordType object) {
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"lock",
-				stringFormat (
-					"id = %s",
-					integerToDecimalString (
-						object.getId ())));
+		try (
 
-		Session session =
-			hibernateDatabase.currentSession ();
+			ActiveTask activeTask =
+				startTask (
+					"lock",
+					stringFormat (
+						"id = %s",
+						integerToDecimalString (
+							object.getId ())));
 
-		session.flush ();
+		) {
 
-		session.refresh (
-			object,
-			LockOptions.UPGRADE);
+			Session session =
+				hibernateDatabase.currentSession ();
 
-		return object;
+			session.flush ();
+
+			session.refresh (
+				object,
+				LockOptions.UPGRADE);
+
+			return object;
+
+		}
 
 	}
 
