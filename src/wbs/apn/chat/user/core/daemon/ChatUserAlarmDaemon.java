@@ -6,7 +6,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -139,88 +138,92 @@ class ChatUserAlarmDaemon
 				parentTaskLogger,
 				"doOneAlarm");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserAlarmDaemon.doOneAlarm (alarmId)",
-				this);
+		try (
 
-		// find the alarm and stuff
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserAlarmDaemon.doOneAlarm (alarmId)",
+					this);
+		) {
 
-		ChatUserAlarmRec alarm =
-			chatUserAlarmHelper.findRequired (
-				alarmId);
+			// find the alarm and stuff
 
-		ChatUserRec user =
-			alarm.getChatUser ();
+			ChatUserAlarmRec alarm =
+				chatUserAlarmHelper.findRequired (
+					alarmId);
 
-		ChatUserRec monitor =
-			alarm.getMonitorChatUser ();
+			ChatUserRec user =
+				alarm.getChatUser ();
 
-		// delete the alarm
+			ChatUserRec monitor =
+				alarm.getMonitorChatUser ();
 
-		chatUserAlarmHelper.remove (
-			alarm);
+			// delete the alarm
 
-		// check whether to ignore this alarm
+			chatUserAlarmHelper.remove (
+				alarm);
 
-		ChatCreditCheckResult creditCheckResult =
-			chatCreditLogic.userSpendCreditCheck (
-				taskLogger,
-				user,
-				false,
-				optionalAbsent ());
+			// check whether to ignore this alarm
 
-		boolean ignore =
-			creditCheckResult.failed ();
-
-		ChatUserInitiationReason reason =
-			ignore
-				? ChatUserInitiationReason.alarmIgnore
-				: ChatUserInitiationReason.alarm;
-
-		// create or update the cmi
-
-		if (! ignore) {
-
-			ChatMonitorInboxRec chatMonitorInbox =
-				chatMessageLogic.findOrCreateChatMonitorInbox (
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
 					taskLogger,
-					monitor,
 					user,
-					true);
+					false,
+					optionalAbsent ());
 
-			chatMonitorInbox
+			boolean ignore =
+				creditCheckResult.failed ();
 
-				.setOutbound (
-					true);
+			ChatUserInitiationReason reason =
+				ignore
+					? ChatUserInitiationReason.alarmIgnore
+					: ChatUserInitiationReason.alarm;
+
+			// create or update the cmi
+
+			if (! ignore) {
+
+				ChatMonitorInboxRec chatMonitorInbox =
+					chatMessageLogic.findOrCreateChatMonitorInbox (
+						taskLogger,
+						monitor,
+						user,
+						true);
+
+				chatMonitorInbox
+
+					.setOutbound (
+						true);
+
+			}
+
+			// create a log
+
+			chatUserInitiationLogHelper.insert (
+				taskLogger,
+				chatUserInitiationLogHelper.createInstance ()
+
+				.setChatUser (
+					user)
+
+				.setMonitorChatUser (
+					monitor)
+
+				.setReason (
+					reason)
+
+				.setTimestamp (
+					transaction.now ())
+
+				.setAlarmTime (
+					alarm.getAlarmTime ()));
+
+			// and commit
+
+			transaction.commit ();
 
 		}
-
-		// create a log
-
-		chatUserInitiationLogHelper.insert (
-			taskLogger,
-			chatUserInitiationLogHelper.createInstance ()
-
-			.setChatUser (
-				user)
-
-			.setMonitorChatUser (
-				monitor)
-
-			.setReason (
-				reason)
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setAlarmTime (
-				alarm.getAlarmTime ()));
-
-		// and commit
-
-		transaction.commit ();
 
 	}
 
