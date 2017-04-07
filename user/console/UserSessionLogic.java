@@ -1,5 +1,6 @@
 package wbs.platform.user.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.string.StringUtils.stringToUtf8;
@@ -10,6 +11,7 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
+import org.apache.commons.lang3.SerializationException;
 import org.apache.commons.lang3.SerializationUtils;
 
 import wbs.framework.logging.TaskLogger;
@@ -74,11 +76,19 @@ interface UserSessionLogic {
 			@NonNull UserRec user,
 			@NonNull String code) {
 
-		return optionalMapRequired (
-			userData (
-				user,
-				code),
-			SerializationUtils::deserialize);
+		try {
+
+			return optionalMapRequired (
+				userData (
+					user,
+					code),
+				SerializationUtils::deserialize);
+
+		} catch (SerializationException serializationException) {
+
+			return optionalAbsent ();
+
+		}
 
 	}
 
