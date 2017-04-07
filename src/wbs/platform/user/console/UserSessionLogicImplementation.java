@@ -90,7 +90,7 @@ class UserSessionLogicImplementation
 
 	// state
 
-	Instant lastReload =
+	Instant nextReload =
 		millisToInstant (0);
 
 	Map <Long, String> onlineSessionIdsByUserId =
@@ -382,8 +382,7 @@ class UserSessionLogicImplementation
 		if (
 
 			earlierThan (
-				lastReload.plus (
-					reloadTime),
+				nextReload,
 				now)
 
 			|| stringEqualSafe (
@@ -397,9 +396,6 @@ class UserSessionLogicImplementation
 
 			reload (
 				taskLogger);
-
-			lastReload =
-				now;
 
 			reloaded = true;
 
@@ -428,9 +424,6 @@ class UserSessionLogicImplementation
 
 			reload (
 				taskLogger);
-
-			lastReload =
-				now;
 
 			if (
 				optionalValueNotEqualWithClass (
@@ -467,6 +460,53 @@ class UserSessionLogicImplementation
 
 	private synchronized
 	void reload (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"reloadReal");
+
+		for (
+			long attempt = 0l;
+			attempt < 16l;
+			attempt ++
+		) {
+
+			try {
+
+				reloadReal (
+					taskLogger);
+
+				return;
+
+			} catch (Exception reloadException) {
+
+				try {
+
+					Thread.sleep (
+						attempt);
+
+				} catch (InterruptedException interruptedException) {
+
+					throw new RuntimeException (
+						interruptedException);
+
+				}
+
+			}
+
+		}
+
+		// one last try
+
+		reloadReal (
+			taskLogger);
+
+	}
+
+	private synchronized
+	void reloadReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		TaskLogger taskLogger =
@@ -542,6 +582,13 @@ class UserSessionLogicImplementation
 				new HashMap<> ();
 
 		}
+
+		nextReload =
+			Instant.now ().plus (
+				reloadFrequency.getMillis ()
+				- reloadFrequencyDeviation.getMillis ()
+				+ randomLogic.randomInteger (
+					reloadFrequencyDeviation.getMillis () * 2));
 
 	}
 
@@ -748,9 +795,14 @@ class UserSessionLogicImplementation
 		"wbs-user-id";
 
 	public final static
-	Duration reloadTime =
+	Duration reloadFrequency =
 		Duration.standardSeconds (
 			1l);
+
+	public final static
+	Duration reloadFrequencyDeviation =
+		Duration.millis (
+			10l);
 
 	public final static
 	Duration logoffTime =
