@@ -300,6 +300,31 @@ class StringUtils {
 	}
 
 	public static
+	String joinWithComma (
+			@NonNull Iterable <String> parts) {
+
+		return joinWithSeparator (
+			",",
+			"",
+			parts,
+			"");
+
+	}
+
+	public static
+	String joinWithComma (
+			@NonNull String ... parts) {
+
+		return joinWithSeparator (
+			",",
+			"",
+			Arrays.asList (
+				parts),
+			"");
+
+	}
+
+	public static
 	String joinWithSemicolonAndSpace (
 			@NonNull Iterable <String> parts) {
 
