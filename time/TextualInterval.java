@@ -25,6 +25,7 @@ import static wbs.utils.string.StringUtils.stringSplitSpace;
 import static wbs.utils.string.StringUtils.stringStartsWithSimple;
 import static wbs.utils.time.TimeUtils.millisToInstant;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,7 +53,8 @@ import org.joda.time.format.DateTimeFormatter;
 @Accessors (fluent = true)
 @Value
 public
-class TextualInterval {
+class TextualInterval
+	implements Serializable {
 
 	String sourceText;
 	String genericText;
