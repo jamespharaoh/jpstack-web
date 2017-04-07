@@ -1,5 +1,6 @@
 package wbs.platform.object.search;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
@@ -8,6 +9,7 @@ import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringSplitComma;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -38,6 +40,7 @@ import wbs.framework.logging.TaskLogger;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.console.UserSessionLogic;
 
+import wbs.utils.etc.NumberUtils;
 import wbs.utils.string.FormatWriter;
 
 @Accessors (fluent = true)
@@ -124,13 +127,14 @@ class ObjectSearchCsvResponder <RecordType>
 		// get object ids
 
 		List <Long> objectIdsTemp =
-			genericCastUnchecked (
-				userSessionLogic.userDataObjectRequired (
-					taskLogger,
-					userConsoleLogic.userRequired (),
-					stringFormat (
-						"object_search_%s_results",
-						sessionKey)));
+			iterableMapToList (
+				NumberUtils::parseIntegerRequired,
+				stringSplitComma (
+					userSessionLogic.userDataStringRequired (
+						userConsoleLogic.userRequired (),
+						stringFormat (
+							"object_search_%s_results",
+							sessionKey))));
 
 		objectIds =
 			objectIdsTemp;

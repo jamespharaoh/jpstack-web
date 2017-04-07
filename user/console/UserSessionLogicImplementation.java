@@ -585,6 +585,12 @@ class UserSessionLogicImplementation
 				existingUserDataOptional)
 		) {
 
+			taskLogger.noticeFormat (
+				"Update %s.%s.%s",
+				user.getSlice ().getCode (),
+				user.getUsername (),
+				code);
+
 			optionalGetRequired (
 				existingUserDataOptional)
 
@@ -602,6 +608,12 @@ class UserSessionLogicImplementation
 			;
 
 		} else {
+
+			taskLogger.noticeFormat (
+				"Create %s.%s.%s",
+				user.getSlice ().getCode (),
+				user.getUsername (),
+				code);
 
 			userDataHelper.insert (
 				taskLogger,
@@ -633,8 +645,14 @@ class UserSessionLogicImplementation
 	@Override
 	public
 	void userDataRemove (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull UserRec user,
 			@NonNull String code) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userDataRemove");
 
 		Optional <UserDataRec> userDataOptional =
 			userDataHelper.findByCode (
@@ -646,9 +664,23 @@ class UserSessionLogicImplementation
 				userDataOptional)
 		) {
 
+			taskLogger.noticeFormat (
+				"Remove %s.%s.%s",
+				user.getSlice ().getCode (),
+				user.getUsername (),
+				code);
+
 			userDataHelper.remove (
 				optionalGetRequired (
 					userDataOptional));
+
+		} else {
+
+			taskLogger.noticeFormat (
+				"Remove %s.%s.%s (did not exist)",
+				user.getSlice ().getCode (),
+				user.getUsername (),
+				code);
 
 		}
 

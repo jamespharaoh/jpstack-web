@@ -136,6 +136,7 @@ class ObjectSearchGetAction
 			) {
 
 				userSessionLogic.userDataRemove (
+					taskLogger,
 					user,
 					stringFormat (
 						"object_search_%s_results",
