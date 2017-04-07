@@ -1,13 +1,16 @@
 package wbs.platform.user.console;
 
 import static wbs.utils.collection.MapUtils.mapItemForKey;
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.Misc.hashSha1Base64;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOrElse;
 import static wbs.utils.etc.OptionalUtils.optionalValueNotEqualWithClass;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -38,6 +41,7 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.text.console.TextConsoleHelper;
+import wbs.platform.user.model.UserDataRec;
 import wbs.platform.user.model.UserOnlineRec;
 import wbs.platform.user.model.UserRec;
 import wbs.platform.user.model.UserSessionRec;
@@ -65,6 +69,9 @@ class UserSessionLogicImplementation
 
 	@SingletonDependency
 	TextConsoleHelper textHelper;
+
+	@SingletonDependency
+	UserDataConsoleHelper userDataHelper;
 
 	@SingletonDependency
 	UserConsoleHelper userHelper;
@@ -349,8 +356,8 @@ class UserSessionLogicImplementation
 
 		) {
 
-debugFormat (
-	"Cookies not found");
+			taskLogger.debugFormat (
+				"Cookies not found");
 
 			return false;
 
@@ -382,8 +389,8 @@ debugFormat (
 
 		) {
 
-debugFormat (
-	"Reloading");
+			taskLogger.debugFormat (
+				"Reloading");
 
 			reload (
 				taskLogger);
@@ -406,12 +413,15 @@ debugFormat (
 				sessionId)
 		) {
 
-debugFormat (
-	"Session not found in cache (1)");
+			taskLogger.debugFormat (
+				"Session not found in cache (1)");
 
 			if (reloaded) {
 				return false;
 			}
+
+			taskLogger.debugFormat (
+				"Reloading");
 
 			reload (
 				taskLogger);
@@ -428,8 +438,8 @@ debugFormat (
 					sessionId)
 			) {
 
-debugFormat (
-	"Session not found in cache (2)");
+				taskLogger.debugFormat (
+					"Session not found in cache (2)");
 
 				return false;
 
@@ -439,8 +449,8 @@ debugFormat (
 
 		// update his timestamp next time round
 
-debugFormat (
-	"Session ok");
+		taskLogger.debugFormat (
+			"Session ok");
 
 		activeSessions.put (
 			sessionId,
@@ -527,6 +537,92 @@ debugFormat (
 
 			activeSessions =
 				new HashMap<> ();
+
+		}
+
+	}
+
+	@Override
+	public
+	Optional <byte[]> userData (
+			@NonNull UserRec user,
+			@NonNull String code) {
+
+		return optionalMapRequired (
+			userDataHelper.findByCode (
+				user,
+				code),
+			UserDataRec::getData);
+
+	}
+
+	@Override
+	public
+	void userDataStore (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull UserRec user,
+			@NonNull String code,
+			@NonNull byte[] value) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userDataStore");
+
+		Transaction transaction =
+			database.currentTransaction ();
+
+		UserDataRec userData =
+			optionalOrElse (
+				userDataHelper.findByCode (
+					user,
+					code),
+				() -> userDataHelper.insert (
+					taskLogger,
+					userDataHelper.createInstance ()
+
+			.setUser (
+				user)
+
+			.setCode (
+				code)
+
+		));
+
+		userData
+
+			.setCreatedTime (
+				transaction.now ())
+
+			.setExpiryTime (
+				transaction.now ().plus (
+					Duration.standardDays (
+						1l)))
+
+			.setData (
+				value);
+
+	}
+
+	@Override
+	public
+	void userDataRemove (
+			@NonNull UserRec user,
+			@NonNull String code) {
+
+		Optional <UserDataRec> userDataOptional =
+			userDataHelper.findByCode (
+				user,
+				code);
+
+		if (
+			optionalIsPresent (
+				userDataOptional)
+		) {
+
+			userDataHelper.remove (
+				optionalGetRequired (
+					userDataOptional));
 
 		}
 

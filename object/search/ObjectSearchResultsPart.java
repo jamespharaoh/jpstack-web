@@ -20,6 +20,7 @@ import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringSplitComma;
 import static wbs.utils.time.TimeUtils.localDateNotEqual;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
@@ -78,7 +79,9 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.console.UserSessionLogic;
 
+import wbs.utils.etc.NumberUtils;
 import wbs.utils.etc.PropertyUtils;
 
 @Accessors (fluent = true)
@@ -106,6 +109,9 @@ class ObjectSearchResultsPart <
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
+
+	@SingletonDependency
+	UserSessionLogic userSessionLogic;
 
 	// properties
 
@@ -207,15 +213,23 @@ class ObjectSearchResultsPart <
 		// set search object
 
 		Object searchObject =
-			requestContext.sessionRequired (
-				sessionKey + "Fields");
+			userSessionLogic.userDataObjectRequired (
+				userConsoleLogic.userRequired (),
+				stringFormat (
+					"object_search_%s_fields",
+					sessionKey));
 
 		// get search results for page
 
 		List <Long> allObjectIds =
-			genericCastUnchecked (
-				requestContext.sessionRequired (
-					sessionKey + "Results"));
+			iterableMapToList (
+				NumberUtils::parseIntegerRequired,
+				stringSplitComma (
+					userSessionLogic.userDataStringRequired (
+						userConsoleLogic.userRequired (),
+						stringFormat (
+							"object_search_%s_results",
+							sessionKey))));
 
 		totalObjects =
 			allObjectIds.size ();

@@ -3,7 +3,6 @@ package wbs.platform.core.console;
 import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -163,8 +162,8 @@ class CoreLogonAction
 
 			// attempt logon
 
-debugFormat (
-	"Attempting logon");
+			taskLogger.debugFormat (
+				"Attempting logon");
 
 			Optional <UserSessionRec> userSessionOptional =
 				userSessionLogic.userLogonTry (
@@ -182,8 +181,8 @@ debugFormat (
 					userSessionOptional)
 			) {
 
-debugFormat (
-	"Logon success");
+				taskLogger.debugFormat (
+					"Logon success");
 
 				UserSessionRec userSession =
 					optionalGetRequired (
@@ -198,8 +197,8 @@ debugFormat (
 
 			} else {
 
-debugFormat (
-	"Logon failure");
+				taskLogger.debugFormat (
+					"Logon failure");
 
 				userIdOptional =
 					optionalAbsent ();

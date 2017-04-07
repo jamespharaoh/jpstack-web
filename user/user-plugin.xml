@@ -8,6 +8,7 @@
 
 	<models>
 		<model name="user"/>
+		<model name="userData"/>
 		<model name="userOnline"/>
 		<model name="userPriv"/>
 		<model name="userSession"/>

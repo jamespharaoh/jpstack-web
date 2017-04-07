@@ -1,6 +1,5 @@
 package wbs.platform.core.console;
 
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.string.StringUtils.stringInSafe;
 
@@ -84,8 +83,8 @@ class CoreAuthFilter
 
 		// check the user is ok
 
-debugFormat (
-	"Verify user session");
+		taskLogger.debugFormat (
+			"Verify user session");
 
 		boolean userOk =
 			userSessionLogic.userSessionVerify (
@@ -93,8 +92,8 @@ debugFormat (
 
 		if (userOk) {
 
-debugFormat (
-	"User session verified");
+			taskLogger.debugFormat (
+				"User session verified");
 
 			// and show the page
 
@@ -104,8 +103,8 @@ debugFormat (
 
 		} else {
 
-debugFormat (
-	"User session not verified");
+			taskLogger.debugFormat (
+				"User session not verified");
 
 			// user not ok, either....
 
