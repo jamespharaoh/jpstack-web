@@ -11,7 +11,6 @@ interface RequestContextMethods
 		RequestContextRequestAttributesMethods,
 		RequestContextRequestMethods,
 		RequestContextRequestHeaderMethods,
-		RequestContextResponseMethods,
-		RequestContextSessionMethods {
+		RequestContextResponseMethods {
 
 }

@@ -38,6 +38,8 @@ import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.console.SliceConsoleHelper;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.console.UserSessionLogic;
+import wbs.platform.user.model.UserRec;
 
 import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.core.model.MessageStatus;
@@ -114,6 +116,9 @@ class SimulatorSessionCreateEventAction
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
+
+	@SingletonDependency
+	UserSessionLogic userSessionLogic;
 
 	// prototype dependencies
 
@@ -239,6 +244,9 @@ class SimulatorSessionCreateEventAction
 
 		) {
 
+			UserRec user =
+				userConsoleLogic.userRequired ();
+
 			SimulatorSessionRec simulatorSession =
 				simulatorSessionHelper.findFromContextRequired ();
 
@@ -265,20 +273,28 @@ class SimulatorSessionCreateEventAction
 
 			// store in session
 
-			requestContext.session (
-				"simulatorNumFrom",
+			userSessionLogic.userDataStringStore (
+				taskLogger,
+				user,
+				"simulator_num_from",
 				numFrom);
 
-			requestContext.session (
-				"simulatorNumTo",
+			userSessionLogic.userDataStringStore (
+				taskLogger,
+				user,
+				"simulator_num_to",
 				numTo);
 
-			requestContext.session (
-				"simulatorMessage",
+			userSessionLogic.userDataStringStore (
+				taskLogger,
+				user,
+				"simulator_message",
 				messageText);
 
-			requestContext.session (
-				"simulatorNetworkId",
+			userSessionLogic.userDataStringStore (
+				taskLogger,
+				user,
+				"simulator_network_id",
 				network.getId ().toString ());
 
 			// work out route

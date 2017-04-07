@@ -1,5 +1,6 @@
 package wbs.test.simulator.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalOrEmptyString;
 import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlDataAttribute;
 import static wbs.web.utils.HtmlBlockUtils.htmlDivClose;
@@ -35,6 +36,9 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.console.UserSessionLogic;
+
 import wbs.sms.network.console.NetworkConsoleHelper;
 import wbs.sms.network.model.NetworkRec;
 import wbs.sms.route.core.console.RouteConsoleHelper;
@@ -52,6 +56,12 @@ class SimulatorSessionConsolePart
 
 	@SingletonDependency
 	RouteConsoleHelper routeHelper;
+
+	@SingletonDependency
+	UserConsoleLogic userConsoleLogic;
+
+	@SingletonDependency
+	UserSessionLogic userSessionLogic;
 
 	// state
 
@@ -180,8 +190,10 @@ class SimulatorSessionConsolePart
 			() -> htmlSelect (
 				"network",
 				networkOptions,
-				requestContext.sessionOrEmptyString (
-					"simulatorNetworkId"),
+				optionalOrEmptyString (
+					userSessionLogic.userDataString (
+						userConsoleLogic.userRequired (),
+						"simulator_network_id")),
 				htmlClassAttribute (
 					"networkSelect")));
 
@@ -191,9 +203,12 @@ class SimulatorSessionConsolePart
 				"<input",
 				" class=\"numFromText\"",
 				" type=\"text\"",
-				" value=\"%h\">",
-				requestContext.sessionOrEmptyString (
-					"simulatorNumFrom")));
+				" value=\"%h\"",
+				optionalOrEmptyString (
+					userSessionLogic.userDataString (
+						userConsoleLogic.userRequired (),
+						"simulator_num_from")),
+				">"));
 
 		htmlTableDetailsRowWriteHtml (
 			"Num to",
@@ -202,8 +217,10 @@ class SimulatorSessionConsolePart
 				" class=\"numToText\"",
 				" type=\"text\"",
 				" value=\"%h\"",
-				requestContext.sessionOrEmptyString (
-					"simulatorNumTo"),
+				optionalOrEmptyString (
+					userSessionLogic.userDataString (
+						userConsoleLogic.userRequired (),
+						"simulator_num_to")),
 				">"));
 
 		htmlTableDetailsRowWriteHtml (
@@ -213,8 +230,10 @@ class SimulatorSessionConsolePart
 				" class=\"messageText\"",
 				" type=\"text\"",
 				" value=\"%h\"",
-				requestContext.sessionOrEmptyString (
-					"simulatorMessage"),
+				optionalOrEmptyString (
+					userSessionLogic.userDataString (
+						userConsoleLogic.userRequired (),
+						"simulator_message")),
 				">"));
 
 		htmlTableClose ();

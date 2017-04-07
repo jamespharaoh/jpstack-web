@@ -2,6 +2,7 @@ package wbs.platform.object.search;
 
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.Serializable;
 import java.util.List;
@@ -16,9 +17,17 @@ import lombok.experimental.Accessors;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.console.UserSessionLogic;
+import wbs.platform.user.model.UserRec;
 
 import wbs.web.responder.Responder;
 
@@ -31,7 +40,19 @@ class ObjectSearchGetAction
 	// singleton dependencies
 
 	@SingletonDependency
+	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
+
+	@SingletonDependency
+	UserConsoleLogic userConsoleLogic;
+
+	@SingletonDependency
+	UserSessionLogic userSessionLogic;
 
 	// properties
 
@@ -60,38 +81,69 @@ class ObjectSearchGetAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
-		Optional <Serializable> searchOptional =
-			requestContext.session (
-				sessionKey + "Fields");
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
-		Optional <List <?>> objectIdsOptional =
-			genericCastUnchecked (
-				requestContext.session (
-					sessionKey + "Results"));
+		try (
 
-		if (
-
-			optionalIsNotPresent (
-				searchOptional)
-
-			|| optionalIsNotPresent (
-				objectIdsOptional)
+			Transaction transaction =
+				database.beginReadWrite (
+					"ObjectSearchGetAction.goReal",
+					this);
 
 		) {
 
-			requestContext.session (
-				sessionKey + "Results",
-				null);
+			UserRec user =
+				userConsoleLogic.userRequired ();
 
-			return responder (
-				searchResponderName);
+			Optional <Serializable> searchOptional =
+				userSessionLogic.userDataObject (
+					user,
+					stringFormat (
+						"object_search_%s_fields",
+						sessionKey));
 
-		} else {
+			Optional <List <?>> objectIdsOptional =
+				genericCastUnchecked (
+					userSessionLogic.userDataObject (
+						user,
+						stringFormat (
+							"object_search_%s_results",
+							sessionKey)));
 
-			return responder (
-				searchResultsResponderName);
+			if (
+
+				optionalIsNotPresent (
+					searchOptional)
+
+				|| optionalIsNotPresent (
+					objectIdsOptional)
+
+			) {
+
+				userSessionLogic.userDataRemove (
+					user,
+					stringFormat (
+						"object_search_%s_results",
+						sessionKey));
+
+				transaction.commit ();
+
+				return responder (
+					searchResponderName);
+
+			} else {
+
+				transaction.commit ();
+
+				return responder (
+					searchResultsResponderName);
+
+			}
 
 		}
 

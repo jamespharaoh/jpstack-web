@@ -1,13 +1,14 @@
 package wbs.apn.chat.user.core.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalOrElse;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.emptyStringIfNull;
 import static wbs.utils.string.StringUtils.objectToStringNullSafe;
 import static wbs.web.utils.HtmlInputUtils.htmlSelect;
 import static wbs.web.utils.HtmlTableUtils.htmlTableDetailsRowWriteHtml;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -24,6 +25,9 @@ import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.console.UserSessionLogic;
 
 @Deprecated
 @PrototypeComponent ("chatUserSearchOldPart")
@@ -51,6 +55,12 @@ class ChatUserSearchOldPart
 	@SingletonDependency
 	@Named ("chatUserSearchSubPagesPerPage")
 	Integer subPagesPerPage;
+
+	@SingletonDependency
+	UserConsoleLogic userConsoleLogic;
+
+	@SingletonDependency
+	UserSessionLogic userSessionLogic;
 
 	// implementation
 
@@ -99,10 +109,12 @@ class ChatUserSearchOldPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		Map <String, String> params =
-			genericCastUnchecked (
-				requestContext.sessionOrElseSetRequired (
-					"chatUserSearchParams",
-					() -> new HashMap<> ()));
+			optionalOrElse (
+				genericCastUnchecked (
+					userSessionLogic.userDataObject (
+						userConsoleLogic.userRequired (),
+						"chat_user_search_params")),
+				() -> emptyMap ());
 
 		formatWriter.writeFormat (
 			"<form",

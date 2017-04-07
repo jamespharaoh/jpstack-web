@@ -3,8 +3,10 @@ package wbs.platform.object.search;
 import static wbs.utils.etc.OptionalUtils.optionalCast;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOrElse;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
@@ -44,6 +46,9 @@ import wbs.framework.entity.record.Record;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.platform.user.console.UserConsoleLogic;
+import wbs.platform.user.console.UserSessionLogic;
+
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchPart")
 public
@@ -63,6 +68,12 @@ class ObjectSearchPart <
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	UserConsoleLogic userConsoleLogic;
+
+	@SingletonDependency
+	UserSessionLogic userSessionLogic;
 
 	// properties
 
@@ -113,11 +124,15 @@ class ObjectSearchPart <
 			@NonNull TaskLogger parentTaskLogger) {
 
 		search =
-			genericCastUnchecked (
-				requestContext.sessionOrElseSetRequired (
-					sessionKey + "Fields",
-					() -> classInstantiate (
-						searchClass)));
+			optionalOrElse (
+				genericCastUnchecked (
+					userSessionLogic.userDataObject (
+						userConsoleLogic.userRequired (),
+						stringFormat (
+							"object_search_%s_fields",
+							sessionKey))),
+				() -> classInstantiate (
+					searchClass));
 
 		updateResultSet =
 			optionalCast (
