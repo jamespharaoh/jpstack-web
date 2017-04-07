@@ -1,4 +1,4 @@
-package wbs.platform.user.logic;
+package wbs.platform.user.console;
 
 import com.google.common.base.Optional;
 
@@ -8,26 +8,27 @@ import wbs.platform.user.model.UserRec;
 import wbs.platform.user.model.UserSessionRec;
 
 public
-interface UserLogic {
+interface UserSessionLogic {
 
 	UserSessionRec userLogon (
 			TaskLogger parentTaskLogger,
 			UserRec user,
-			String sessionId,
 			Optional <String> userAgent,
-			Optional <String> consoleDeployment);
-
-	void userLogoff (
-			TaskLogger parentTaskLogger,
-			UserRec user);
+			Optional <String> consoleDeploymentCode);
 
 	Optional <UserSessionRec> userLogonTry (
 			TaskLogger parentTaskLogger,
 			String sliceCode,
 			String username,
 			String password,
-			String sessionId,
 			Optional <String> userAgent,
-			Optional <String> consoleDeployment);
+			Optional <String> consoleDeploymentCode);
+
+	void userLogoff (
+			TaskLogger parentTaskLogger,
+			UserRec user);
+
+	boolean userSessionVerify (
+			TaskLogger parentTaskLogger);
 
 }

@@ -1,16 +1,10 @@
 package wbs.platform.core.console;
 
-import static wbs.utils.etc.Misc.isNull;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.etc.OptionalUtils.optionalValueNotEqualSafe;
-import static wbs.utils.string.StringUtils.stringEqualSafe;
+import static wbs.utils.etc.DebugUtils.debugFormat;
+import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.string.StringUtils.stringInSafe;
-import static wbs.utils.time.TimeUtils.earlierThan;
-import static wbs.utils.time.TimeUtils.millisToInstant;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.inject.Provider;
 import javax.servlet.Filter;
@@ -22,8 +16,6 @@ import javax.servlet.ServletResponse;
 
 import lombok.NonNull;
 
-import org.joda.time.Instant;
-
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
@@ -34,15 +26,11 @@ import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
-import wbs.platform.user.logic.UserLogic;
-import wbs.platform.user.model.UserOnlineObjectHelper;
-import wbs.platform.user.model.UserOnlineRec;
-import wbs.platform.user.model.UserRec;
+import wbs.platform.user.console.UserSessionLogic;
 
 import wbs.web.responder.Responder;
 
@@ -69,204 +57,12 @@ class CoreAuthFilter
 	UserConsoleLogic userConsoleLogic;
 
 	@SingletonDependency
-	UserLogic userLogic;
-
-	@SingletonDependency
-	UserOnlineObjectHelper userOnlineHelper;
-
-	@SingletonDependency
 	UserPrivChecker userPrivChecker;
 
+	@SingletonDependency
+	UserSessionLogic userSessionLogic;
+
 	// constants
-
-	final static
-	int reloadTime = 10 * 1000;
-
-	final static
-	int logoffTime = 5 * 60 * 1000;
-
-	Instant lastReload =
-		millisToInstant (0);
-
-	Map <Long, String> onlineSessionIdsByUserId;
-
-	Map <String, Instant> activeSessions =
-		new HashMap<> ();
-
-	private synchronized
-	void reload (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"reload");
-
-		try (
-
-			Transaction transaction =
-				database.beginReadWrite (
-					"CoreAuthFilter.reload ()",
-					this);
-
-		) {
-
-			onlineSessionIdsByUserId =
-				new HashMap <> ();
-
-			for (
-				UserOnlineRec online
-					: userOnlineHelper.findAll ()
-			) {
-
-				UserRec user =
-					online.getUser ();
-
-				// update his timestamp if appropriate
-
-				if (
-					activeSessions.containsKey (
-						online.getSessionId ())
-				)
-
-					online
-
-						.setTimestamp (
-							activeSessions.get (
-								online.getSessionId ()));
-
-				// check if he has been disabled or timed out
-
-				if (
-
-					! user.getActive ()
-
-					|| earlierThan (
-						online.getTimestamp ().plus (
-							logoffTime),
-						transaction.now ())
-
-				) {
-
-					userLogic.userLogoff (
-						taskLogger,
-						user);
-
-					continue;
-
-				}
-
-				// ok put him in the ok list
-
-				onlineSessionIdsByUserId.put (
-					user.getId (),
-					online.getSessionId ());
-
-			}
-
-			transaction.commit ();
-
-			activeSessions =
-				new HashMap<> ();
-
-		}
-
-	}
-
-	/**
-	 * Performs the main authorisation. Calls reload () to refresh caches if
-	 * necessary then checks the user's session against them. Also adds us to an
-	 * "active" list which updates our user record with a timestamp
-	 * automatically when the caches are updated.
-	 */
-	private synchronized
-	boolean checkUser (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"checkUser");
-
-		Instant now =
-			Instant.now ();
-
-		// check there is a user id
-
-		if (userConsoleLogic.notLoggedIn ()) {
-			return false;
-		}
-
-		// reload if overdue or not done yet, always for root path
-
-		boolean reloaded = false;
-
-		if (
-
-			isNull (
-				onlineSessionIdsByUserId)
-
-			|| earlierThan (
-				lastReload.plus (
-					reloadTime),
-				now)
-
-			|| stringEqualSafe (
-				requestContext.servletPath (),
-				"/")
-
-		) {
-
-			reload (
-				taskLogger);
-
-			lastReload =
-				now;
-
-			reloaded = true;
-
-		}
-
-		// check his session is valid, reload if it doesn't look right still
-
-		if (
-			optionalValueNotEqualSafe (
-				optionalFromNullable (
-					onlineSessionIdsByUserId.get (
-						userConsoleLogic.userIdRequired ())),
-				requestContext.sessionId ())
-		) {
-
-			if (reloaded)
-				return false;
-
-			reload (
-				taskLogger);
-
-			lastReload =
-				now;
-
-			if (
-				optionalValueNotEqualSafe (
-					optionalFromNullable (
-						onlineSessionIdsByUserId.get (
-							userConsoleLogic.userIdRequired ())),
-					requestContext.sessionId ())
-			) {
-				return false;
-			}
-
-		}
-
-		// update his timestamp next time round
-
-		activeSessions.put (
-			requestContext.sessionId (),
-			now);
-
-		return true;
-
-	}
 
 	@Override
 	public
@@ -280,18 +76,25 @@ class CoreAuthFilter
 
 		TaskLogger taskLogger =
 			logContext.createTaskLogger (
-				"doFilter");
+				"doFilter",
+				true);
 
 		String path =
 			requestContext.servletPath ();
 
 		// check the user is ok
 
+debugFormat (
+	"Verify user session");
+
 		boolean userOk =
-			checkUser (
+			userSessionLogic.userSessionVerify (
 				taskLogger);
 
 		if (userOk) {
+
+debugFormat (
+	"User session verified");
 
 			// and show the page
 
@@ -300,6 +103,9 @@ class CoreAuthFilter
 				response);
 
 		} else {
+
+debugFormat (
+	"User session not verified");
 
 			// user not ok, either....
 
@@ -362,13 +168,17 @@ class CoreAuthFilter
 	@Override
 	public
 	void destroy () {
+
+		doNothing ();
+
 	}
 
 	@Override
 	public
 	void init (
-			FilterConfig filterConfig)
-		throws ServletException {
+			@NonNull FilterConfig filterConfig) {
+
+		doNothing ();
 
 	}
 

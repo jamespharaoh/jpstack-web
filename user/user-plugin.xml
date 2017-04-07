@@ -13,10 +13,6 @@
 		<model name="userSession"/>
 	</models>
 
-	<layer name="logic">
-		<component class="logic.UserLogicImplementation"/>
-	</layer>
-
 	<layer name="console">
 		<component class="console.UserConsoleLogicImplementation"/>
 		<component class="console.UserPasswordAction"/>
@@ -24,6 +20,7 @@
 		<component class="console.UserPrivsEditorAction"/>
 		<component class="console.UserPrivsEditorPart"/>
 		<component class="console.UserPrivsSummaryPart"/>
+		<component class="console.UserSessionLogicImplementation"/>
 		<component class="console.UserStatsGrouper"/>
 		<component class="console.SupervisorHelperImplementation"/>
 		<component class="console.SupervisorUserStatsGrouperBuilder"/>

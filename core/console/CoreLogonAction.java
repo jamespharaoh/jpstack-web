@@ -3,6 +3,7 @@ package wbs.platform.core.console;
 import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
+import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -32,7 +33,7 @@ import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.service.model.ServiceObjectHelper;
 import wbs.platform.user.console.UserConsoleLogic;
-import wbs.platform.user.logic.UserLogic;
+import wbs.platform.user.console.UserSessionLogic;
 import wbs.platform.user.model.UserRec;
 import wbs.platform.user.model.UserSessionRec;
 
@@ -61,7 +62,7 @@ class CoreLogonAction
 	UserConsoleLogic userConsoleLogic;
 
 	@SingletonDependency
-	UserLogic userLogic;
+	UserSessionLogic userSessionLogic;
 
 	@SingletonDependency
 	WbsConfig wbsConfig;
@@ -162,13 +163,15 @@ class CoreLogonAction
 
 			// attempt logon
 
+debugFormat (
+	"Attempting logon");
+
 			Optional <UserSessionRec> userSessionOptional =
-				userLogic.userLogonTry (
+				userSessionLogic.userLogonTry (
 					taskLogger,
 					slice.toLowerCase (),
 					username.toLowerCase (),
 					password,
-					requestContext.sessionId (),
 					requestContext.header (
 						"User-Agent"),
 					requestContext.cookie (
@@ -178,6 +181,9 @@ class CoreLogonAction
 				optionalIsPresent (
 					userSessionOptional)
 			) {
+
+debugFormat (
+	"Logon success");
 
 				UserSessionRec userSession =
 					optionalGetRequired (
@@ -191,6 +197,9 @@ class CoreLogonAction
 						user.getId ());
 
 			} else {
+
+debugFormat (
+	"Logon failure");
 
 				userIdOptional =
 					optionalAbsent ();
@@ -233,9 +242,6 @@ class CoreLogonAction
 			username,
 			integerToDecimalString (
 				userId));
-
-		userConsoleLogic.login (
-			userId);
 
 		// and redirect to the console proper
 
