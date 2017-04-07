@@ -123,10 +123,16 @@ class ObjectSearchPart <
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		search =
 			optionalOrElse (
 				genericCastUnchecked (
 					userSessionLogic.userDataObject (
+						taskLogger,
 						userConsoleLogic.userRequired (),
 						stringFormat (
 							"object_search_%s_fields",

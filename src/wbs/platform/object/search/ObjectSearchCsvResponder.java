@@ -106,10 +106,16 @@ class ObjectSearchCsvResponder <RecordType>
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		// set search object
 
 		searchObject =
 			userSessionLogic.userDataObjectRequired (
+				taskLogger,
 				userConsoleLogic.userRequired (),
 				stringFormat (
 					"object_search_%s_fields",
@@ -120,6 +126,7 @@ class ObjectSearchCsvResponder <RecordType>
 		List <Long> objectIdsTemp =
 			genericCastUnchecked (
 				userSessionLogic.userDataObjectRequired (
+					taskLogger,
 					userConsoleLogic.userRequired (),
 					stringFormat (
 						"object_search_%s_results",

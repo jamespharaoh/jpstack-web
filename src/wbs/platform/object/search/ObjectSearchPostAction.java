@@ -250,6 +250,7 @@ class ObjectSearchPostAction <
 				genericCastUnchecked (
 					optionalOrElse (
 						userSessionLogic.userDataObject (
+							taskLogger,
 							user,
 							stringFormat (
 								"object_search_%s_fields",

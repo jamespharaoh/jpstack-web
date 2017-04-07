@@ -102,6 +102,7 @@ class ObjectSearchGetAction
 
 			Optional <Serializable> searchOptional =
 				userSessionLogic.userDataObject (
+					taskLogger,
 					user,
 					stringFormat (
 						"object_search_%s_fields",
@@ -110,6 +111,7 @@ class ObjectSearchGetAction
 			Optional <List <?>> objectIdsOptional =
 				genericCastUnchecked (
 					userSessionLogic.userDataObject (
+						taskLogger,
 						user,
 						stringFormat (
 							"object_search_%s_results",

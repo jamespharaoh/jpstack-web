@@ -108,10 +108,16 @@ class ChatUserSearchOldPart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		Map <String, String> params =
 			optionalOrElse (
 				genericCastUnchecked (
 					userSessionLogic.userDataObject (
+						taskLogger,
 						userConsoleLogic.userRequired (),
 						"chat_user_search_params")),
 				() -> emptyMap ());
