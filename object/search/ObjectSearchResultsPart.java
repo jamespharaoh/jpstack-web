@@ -214,6 +214,7 @@ class ObjectSearchResultsPart <
 
 		Object searchObject =
 			userSessionLogic.userDataObjectRequired (
+				taskLogger,
 				userConsoleLogic.userRequired (),
 				stringFormat (
 					"object_search_%s_fields",

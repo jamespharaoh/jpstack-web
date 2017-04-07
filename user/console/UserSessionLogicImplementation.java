@@ -17,12 +17,16 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.utils.time.TimeUtils.millisToInstant;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
+
+import org.apache.commons.lang3.SerializationException;
+import org.apache.commons.lang3.SerializationUtils;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
@@ -650,6 +654,57 @@ class UserSessionLogicImplementation
 
 	}
 
+	@Override
+	public
+	Optional <Serializable> userDataObject (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull UserRec user,
+			@NonNull String code) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userDataObject");
+
+		try {
+
+			return optionalMapRequired (
+				userData (
+					user,
+					code),
+				SerializationUtils::deserialize);
+
+		} catch (SerializationException serializationException) {
+
+			taskLogger.warningFormatException (
+				serializationException,
+				"Error deserializing user data %s.%s.%s",
+				user.getSlice ().getCode (),
+				user.getUsername (),
+				code);
+
+			return optionalAbsent ();
+
+		}
+
+	}
+
+	@Override
+	public
+	void userDataObjectStore (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull UserRec user,
+			@NonNull String code,
+			@NonNull Serializable value) {
+
+		userDataStore (
+			parentTaskLogger,
+			user,
+			code,
+			SerializationUtils.serialize (
+				value));
+
+	}
 	// constants
 
 	public final static
