@@ -784,6 +784,7 @@ class UserSessionLogicImplementation
 				value));
 
 	}
+
 	// constants
 
 	public final static
