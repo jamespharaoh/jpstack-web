@@ -1,8 +1,10 @@
 package wbs.platform.object.search;
 
+import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.string.StringUtils.stringSplitComma;
 
 import java.io.Serializable;
 import java.util.List;
@@ -28,6 +30,8 @@ import wbs.framework.logging.TaskLogger;
 import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.console.UserSessionLogic;
 import wbs.platform.user.model.UserRec;
+
+import wbs.utils.etc.NumberUtils;
 
 import wbs.web.responder.Responder;
 
@@ -108,14 +112,18 @@ class ObjectSearchGetAction
 						"object_search_%s_fields",
 						sessionKey));
 
-			Optional <List <?>> objectIdsOptional =
-				genericCastUnchecked (
-					userSessionLogic.userDataObject (
-						taskLogger,
+			Optional <List <Long>> objectIdsOptional =
+				optionalMapRequired (
+					userSessionLogic.userDataString (
 						user,
 						stringFormat (
 							"object_search_%s_results",
-							sessionKey)));
+							sessionKey)),
+					objectIdStrings ->
+						iterableMapToList (
+							NumberUtils::parseIntegerRequired,
+							stringSplitComma (
+								objectIdStrings)));
 
 			if (
 
