@@ -90,6 +90,6 @@ class DaemonRunner {
 	public final static
 	Duration restartFrequencyDeviation =
 		Duration.standardMinutes (
-			5l);
+			15l);
 
 }
