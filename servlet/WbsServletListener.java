@@ -1,10 +1,17 @@
 package wbs.platform.servlet;
 
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitComma;
+import static wbs.utils.string.StringUtils.stringSplitSimple;
+import static wbs.utils.time.TimeUtils.earlierThan;
 
+import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,12 +25,17 @@ import javax.servlet.http.HttpServletRequest;
 
 import lombok.NonNull;
 
+import org.joda.time.Duration;
+import org.joda.time.Instant;
+
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.component.tools.ComponentManagerBuilder;
 import wbs.framework.component.tools.ThreadLocalProxyComponentFactory;
 import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.random.RandomLogic;
 
 import info.faljse.SDNotify.SDNotify;
 import wbs.web.context.RequestContextImplementation;
@@ -48,6 +60,8 @@ class WbsServletListener
 	ComponentManager componentManager;
 
 	Thread watchdogThread;
+
+	RandomLogic randomLogic;
 
 	// public implementation
 
@@ -116,6 +130,12 @@ class WbsServletListener
 		servletContext.setAttribute (
 			"wbs-application-context",
 			componentManager);
+
+		randomLogic =
+			componentManager.getComponentRequired (
+				taskLogger,
+				"randomLogic",
+				RandomLogic.class);
 
 		// systemd integration
 
@@ -328,11 +348,22 @@ class WbsServletListener
 	private
 	void watchdogThread () {
 
-		for (;;) {
+		Instant restartTime =
+			Instant.now ().plus (
+				restartFrequency.getMillis ()
+				- restartFrequencyDeviation.getMillis ()
+				+ randomLogic.randomInteger (
+					restartFrequencyDeviation.getMillis () * 2));
+
+		while (
+			earlierThan (
+				Instant.now (),
+				restartTime)
+		) {
 
 			try {
 
-				Thread.sleep (5000);
+				Thread.sleep (1000);
 
 			} catch (InterruptedException exception) {
 
@@ -344,6 +375,65 @@ class WbsServletListener
 
 		}
 
+		shutdown ();
+
 	}
+
+	private
+	void shutdown () {
+
+		// send sigterm
+
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"shutdown ()");
+
+		taskLogger.noticeFormat (
+			"Automatic restart");
+
+		String processName =
+			ManagementFactory.getRuntimeMXBean ().getName ();
+
+		List <String> processNameParts =
+			stringSplitSimple (
+				"@",
+				processName);
+
+		Long processId =
+			parseIntegerRequired (
+				listFirstElementRequired (
+					processNameParts));
+
+		try {
+
+			Runtime.getRuntime ().exec (
+				stringFormat (
+					"kill -SIGTERM %s",
+					integerToDecimalString (
+						processId)));
+
+		} catch (IOException ioException) {
+
+			taskLogger.noticeFormatException (
+				ioException,
+				"Failed to kill -SIGTERM, calling System.exit (1)");
+
+			System.exit (1);
+
+		}
+
+	}
+
+	// constants
+
+	public final static
+	Duration restartFrequency =
+		Duration.standardHours (
+			1l);
+
+	public final static
+	Duration restartFrequencyDeviation =
+		Duration.standardMinutes (
+			15l);
 
 }
