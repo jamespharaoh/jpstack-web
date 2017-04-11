@@ -22,18 +22,19 @@
 		<fixture name="messageTemplate"/>
 	</fixtures>
 
-	<layer name="logic">
-		<component class="logic.MessageTemplateLogicImplementation"/>
-	</layer>
-
 	<layer name="api">
 		<component class="api.MessageTemplateMessagesGetAction"/>
 	</layer>
 
 	<layer name="console">
+		<component class="console.MessageTemplateDatabaseSettingsCopyFormHelper"/>
 		<component class="console.MessageTemplateEntryValueFieldsProvider"/>
 		<component class="console.MessageTemplateEntryValueFieldsProvider$Config"/>
 		<component class="console.MessageTemplateEntryValueFormFieldDataProvider"/>
+	</layer>
+
+	<layer name="logic">
+		<component class="logic.MessageTemplateLogicImplementation"/>
 	</layer>
 
 	<api-modules>

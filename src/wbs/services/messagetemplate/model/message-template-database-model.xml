@@ -30,6 +30,15 @@
 
 	</collections>
 
+	<event-types>
+
+		<event-type
+			name="Message template database copied"
+			text="%0 copied types from %1 to %2"
+			admin="yes"/>
+
+	</event-types>
+
 	<priv-types>
 
 		<!-- message template database -->
