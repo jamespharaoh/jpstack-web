@@ -60,6 +60,11 @@
 					label="Types"
 					priv-key="messageTemplateDatabase.manage"/>
 
+				<context-tab-form-action-page
+					name="copy"
+					fields="copy"
+					submit-label="copy"/>
+
 			</section>
 
 			<context-link
@@ -114,6 +119,16 @@
 		<parent-field/>
 		<name-field/>
 		<description-field/>
+
+	</field-set>
+
+	<field-set
+		name="copy"
+		class="wbs.services.messagetemplate.console.MessageTemplateCopyForm">
+
+		<object-field
+			name="sourceMessageTemplateDatabaseId"
+			object-type="messageTemplateDatabase"/>
 
 	</field-set>
 
