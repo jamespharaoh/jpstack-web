@@ -1,4 +1,4 @@
-package wbs.services.messagetemplate.model;
+package wbs.services.messagetemplate.logic;
 
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
@@ -27,6 +27,13 @@ import wbs.framework.object.ObjectManager;
 import wbs.platform.queue.logic.QueueLogic;
 
 import wbs.utils.random.RandomLogic;
+
+import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
+import wbs.services.messagetemplate.model.MessageTemplateEntryValueRec;
+import wbs.services.messagetemplate.model.MessageTemplateFieldTypeObjectHelper;
+import wbs.services.messagetemplate.model.MessageTemplateFieldTypeRec;
+import wbs.services.messagetemplate.model.MessageTemplateFieldValueObjectHelper;
+import wbs.services.messagetemplate.model.MessageTemplateFieldValueRec;
 
 public
 class MessageTemplateEntryValueHooks
