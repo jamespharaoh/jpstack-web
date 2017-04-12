@@ -13,13 +13,9 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
@@ -72,21 +68,6 @@ class ImChatMessageTemplateSetGetAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		DataFromJson dataFromJson =
-			new DataFromJson ();
-
-		// decode request
-
-		JSONObject jsonValue =
-			(JSONObject)
-			JSONValue.parse (
-				requestContext.reader ());
-
-		ImChatMessageTemplateSetGetRequest request =
-			dataFromJson.fromJson (
-				ImChatMessageTemplateSetGetRequest.class,
-				jsonValue);
-
 		// begin transaction
 
 		try (
@@ -106,10 +87,14 @@ class ImChatMessageTemplateSetGetAction
 						requestContext.requestStringRequired (
 							"imChatId")));
 
+			String messageTemplateSetCode =
+				requestContext.requestStringRequired (
+					"messageTemplateSetCode");
+
 			Optional <MessageTemplateSetRec> messageTemplateSetOptional =
 				messageTemplateSetHelper.findByCode (
 					imChat.getMessageTemplateDatabase (),
-					request.code ());
+					messageTemplateSetCode);
 
 			if (
 				optionalIsNotPresent (
@@ -125,7 +110,7 @@ class ImChatMessageTemplateSetGetAction
 					.message (
 						stringFormat (
 							"The message template set code '%s' ",
-							request.code (),
+							messageTemplateSetCode,
 							"is not recognised for this service"))
 
 				;

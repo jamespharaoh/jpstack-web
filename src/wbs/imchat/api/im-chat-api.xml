@@ -44,7 +44,9 @@
 		</resource>
 
 		<resource name="message-template-set">
-			<post-action name="messageTemplateSetGet"/>
+		<variable name="messageTemplateSetCode">
+			<get-action name="messageTemplateSetGet"/>
+		</variable>
 		</resource>
 
 		<resource name="price-point-list">
