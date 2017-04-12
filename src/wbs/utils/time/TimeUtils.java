@@ -472,6 +472,28 @@ class TimeUtils {
 	}
 
 	public static
+	Instant instantSumDuration (
+			@NonNull Instant instant,
+			@NonNull Duration duration0) {
+
+		return instant.plus (
+			duration0);
+
+	}
+
+	public static
+	Instant instantSumDuration (
+			@NonNull Instant instant,
+			@NonNull Duration duration0,
+			@NonNull Duration duration1) {
+
+		return instant
+			.plus (duration0)
+			.plus (duration1);
+
+	}
+
+	public static
 	DateTimeFormatter isoDateFormat =
 		DateTimeFormat.forPattern (
 			"yyyy-MM-dd'T'HH:mm:ss'Z'")

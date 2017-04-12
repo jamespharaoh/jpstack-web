@@ -58,6 +58,7 @@ import wbs.platform.event.logic.EventLogic;
 import wbs.platform.object.core.model.ObjectTypeObjectHelper;
 import wbs.platform.scaffold.model.RootObjectHelper;
 import wbs.platform.text.model.TextObjectHelper;
+import wbs.platform.updatelog.logic.UpdateManager;
 import wbs.platform.user.console.UserConsoleLogic;
 
 import wbs.utils.etc.PropertyUtils;
@@ -107,6 +108,9 @@ class ObjectCreateAction <
 
 	@SingletonDependency
 	TextObjectHelper textHelper;
+
+	@SingletonDependency
+	UpdateManager updateManager;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -205,9 +209,9 @@ class ObjectCreateAction <
 				createPrivCode)
 		) {
 
-			Record<?> createDelegate =
+			Record <?> createDelegate =
 				createPrivDelegate != null
-					? (Record<?>) objectManager.dereferenceObsolete (
+					? (Record <?>) objectManager.dereferenceObsolete (
 						parent,
 						createPrivDelegate)
 					: parent;
@@ -409,6 +413,18 @@ class ObjectCreateAction <
 				"create");
 
 		}
+
+		// signal update
+
+		updateManager.signalUpdate (
+			taskLogger,
+			"user_privs",
+			userConsoleLogic.userIdRequired ());
+
+		updateManager.signalUpdate (
+			taskLogger,
+			"privs",
+			0l);
 
 		// commit transaction
 
