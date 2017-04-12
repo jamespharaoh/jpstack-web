@@ -3,6 +3,7 @@ package wbs.imchat.api;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.string.StringUtils.joinWithFullStop;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.underscoreToHyphen;
 
 import javax.inject.Provider;
@@ -122,8 +123,12 @@ class ImChatMessageTemplateSetGetAction
 						"code-invalid")
 
 					.message (
-						"The set code provided is incorrect or the set is no " +
-						"longer active");
+						stringFormat (
+							"The message template set code '%s' ",
+							request.code (),
+							"is not recognised for this service"))
+
+				;
 
 				return jsonResponderProvider.get ()
 
