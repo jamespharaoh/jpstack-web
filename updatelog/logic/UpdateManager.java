@@ -2,6 +2,9 @@ package wbs.platform.updatelog.logic;
 
 import static wbs.utils.etc.NumberUtils.integerEqualSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.time.TimeUtils.earlierThan;
+import static wbs.utils.time.TimeUtils.instantSumDuration;
+import static wbs.utils.time.TimeUtils.millisToInstant;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +13,9 @@ import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+
+import org.joda.time.Duration;
+import org.joda.time.Instant;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -60,16 +66,19 @@ class UpdateManager {
 	// properties
 
 	@Getter @Setter
-	long intervalMs = 3000;
+	Duration reloadFrequency =
+		Duration.standardSeconds (
+			1l);
 
-	long reloadTime = 0;
+	Instant reloadTime =
+		millisToInstant (0);
 
 	long masterVersion = -2;
 
-	Map<String,UpdateStuff> secondaryVersions =
+	Map <String, UpdateStuff> secondaryVersions =
 		new HashMap<> ();
 
-	Map<String,Map<Long,UpdateStuff>> tertiaryVersions =
+	Map <String, Map <Long, UpdateStuff>> tertiaryVersions =
 		new HashMap<> ();
 
 	private
@@ -116,15 +125,21 @@ class UpdateManager {
 
 		// check it is time
 
-		long now =
-			System.currentTimeMillis ();
+		Instant now =
+			Instant.now ();
 
-		if (now < reloadTime)
+		if (
+			earlierThan (
+				now,
+				reloadTime)
+		) {
 			return;
+		}
 
 		reloadTime =
-			+ now
-			+ intervalMs;
+			instantSumDuration (
+				now,
+				reloadFrequency);
 
 		// hit the db
 
@@ -152,8 +167,10 @@ class UpdateManager {
 
 		// markall secondary versions as dirty
 
-		for (UpdateStuff updateStuff
-				: secondaryVersions.values ()) {
+		for (
+			UpdateStuff updateStuff
+				: secondaryVersions.values ()
+		) {
 
 			updateStuff.dirty = true;
 
@@ -360,10 +377,14 @@ class UpdateManager {
 
 		// check master
 
-		long now =
-			System.currentTimeMillis ();
+		Instant now =
+			Instant.now ();
 
-		if (reloadTime < now) {
+		if (
+			earlierThan (
+				reloadTime,
+				now)
+		) {
 
 			return getVersionDb (
 				taskLogger,
@@ -389,7 +410,7 @@ class UpdateManager {
 
 		// check tertiary
 
-		Map<Long,UpdateStuff> map =
+		Map <Long, UpdateStuff> map =
 			tertiaryVersions.get (
 				table);
 
