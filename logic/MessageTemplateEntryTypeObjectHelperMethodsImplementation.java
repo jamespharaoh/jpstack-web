@@ -8,7 +8,6 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
