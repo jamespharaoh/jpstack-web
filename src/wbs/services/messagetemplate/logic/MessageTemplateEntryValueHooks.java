@@ -6,8 +6,6 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
-import javax.inject.Provider;
-
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -15,18 +13,10 @@ import lombok.NonNull;
 import org.hibernate.TransientObjectException;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
-import wbs.framework.component.annotations.PrototypeDependency;
-import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
-import wbs.framework.database.Database;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHooks;
-import wbs.framework.object.ObjectManager;
-
-import wbs.platform.queue.logic.QueueLogic;
-
-import wbs.utils.random.RandomLogic;
 
 import wbs.services.messagetemplate.model.MessageTemplateEntryTypeRec;
 import wbs.services.messagetemplate.model.MessageTemplateEntryValueRec;
@@ -41,9 +31,6 @@ class MessageTemplateEntryValueHooks
 
 	// singleton dependencies
 
-	@SingletonDependency
-	Database database;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -52,17 +39,6 @@ class MessageTemplateEntryValueHooks
 
 	@WeakSingletonDependency
 	MessageTemplateFieldValueObjectHelper messageTemplateFieldValueHelper;
-
-	@SingletonDependency
-	RandomLogic randomLogic;
-
-	// prototype dependencies
-
-	@PrototypeDependency
-	Provider <ObjectManager> objectManager;
-
-	@PrototypeDependency
-	Provider <QueueLogic> queueLogic;
 
 	// implementation
 
