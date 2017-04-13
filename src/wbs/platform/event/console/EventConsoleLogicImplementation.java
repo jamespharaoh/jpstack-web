@@ -7,6 +7,7 @@ import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.instantToDateNullSafe;
 import static wbs.utils.time.TimeUtils.millisToInstant;
+import static wbs.utils.time.TimeUtils.millisecondsToDuration;
 import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
 import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
@@ -100,8 +101,8 @@ class EventConsoleLogicImplementation
 			objectManager.getMinorChildren (
 				object);
 
-		List<GlobalId> objectGlobalIds =
-			new ArrayList<GlobalId> ();
+		List <GlobalId> objectGlobalIds =
+			new ArrayList<> ();
 
 		objectGlobalIds.add (
 			objectManager.getGlobalId (
@@ -222,11 +223,26 @@ class EventConsoleLogicImplementation
 							millisToInstant (
 								eventLink.getRefId ())));
 
+			} else if (
+				integerEqualSafe (
+					eventLink.getTypeId (),
+					EventLogic.durationEventLinkType)
+			) {
+
+				// duration
+
+				text =
+					text.replaceAll (
+						"%" + eventLink.getIndex (),
+						userConsoleLogic.prettyDuration (
+							millisecondsToDuration (
+								eventLink.getRefId ())));
+
 			} else {
 
 				// locate referenced object
 
-				Record<?> object =
+				Record <?> object =
 					objectManager.findObject (
 						new GlobalId (
 							eventLink.getTypeId (),
