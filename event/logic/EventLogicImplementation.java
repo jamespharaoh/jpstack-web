@@ -3,10 +3,12 @@ package wbs.platform.event.logic;
 import static wbs.utils.etc.NumberUtils.fromJavaInteger;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import lombok.NonNull;
 
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
@@ -262,6 +264,30 @@ class EventLogicImplementation
 
 				.setRefId (
 					instant.getMillis ());
+
+		}
+
+		// store durations directly
+
+		if (linkObject instanceof Duration) {
+
+			Duration duration =
+				genericCastUnchecked (
+					linkObject);
+
+			return eventLinkHelper.createInstance ()
+
+				.setEvent (
+					event)
+
+				.setIndex (
+					index)
+
+				.setTypeId (
+					EventLogic.durationEventLinkType)
+
+				.setRefId (
+					duration.getMillis ());
 
 		}
 

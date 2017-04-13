@@ -25,4 +25,7 @@ interface EventLogic {
 	public final static
 	long instantEventLinkType = -3l;
 
+	public final static
+	long durationEventLinkType = -4l;
+
 }
