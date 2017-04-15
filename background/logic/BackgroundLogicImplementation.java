@@ -1,10 +1,193 @@
 package wbs.platform.background.logic;
 
+import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.collection.CollectionUtils.listSecondElementRequired;
+import static wbs.utils.collection.MapUtils.mapContainsKey;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.hyphenToUnderscore;
+import static wbs.utils.string.StringUtils.stringNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringSplitFullStop;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Provider;
+
+import lombok.NonNull;
+
+import org.joda.time.Duration;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.component.manager.ComponentManager;
+import wbs.framework.component.manager.ComponentMetaData;
+import wbs.framework.component.registry.ComponentDefinition;
+import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
+import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.background.model.BackgroundProcessObjectHelper;
+import wbs.platform.background.model.BackgroundProcessRec;
+import wbs.platform.object.core.model.ObjectTypeObjectHelper;
+import wbs.platform.object.core.model.ObjectTypeRec;
 
 @SingletonComponent ("backgroundLogic")
 public
 class BackgroundLogicImplementation
 	implements BackgroundLogic {
+
+	// singleton components
+
+	@SingletonDependency
+	BackgroundProcessObjectHelper backgroundProcessHelper;
+
+	@SingletonDependency
+	ComponentManager componentManager;
+
+	@SingletonDependency
+	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
+	ObjectTypeObjectHelper objectTypeHelper;
+
+	// prototype components
+
+	@PrototypeDependency
+	Provider <BackgroundProcessHelperImplementation>
+	backgroundProcessHelperImplementationProvider;
+
+	// state
+
+	Map <String, String> backgroundProcessComponentNames =
+		new HashMap<> ();
+
+	// implementation
+
+	@Override
+	public
+	BackgroundProcessHelper registerBackgroundProcess (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String backgroundProcessName,
+			@NonNull Object component) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"registerBackgroundProcess");
+
+		List <String> backgroundProcessNameParts =
+			stringSplitFullStop (
+				backgroundProcessName);
+
+		if (
+			! collectionHasTwoElements (
+				backgroundProcessNameParts)
+		) {
+			throw new RuntimeException ();
+		}
+
+		String parentTypeCode =
+			listFirstElementRequired (
+				backgroundProcessNameParts);
+
+		String backgroundProcessCode =
+			listSecondElementRequired (
+				backgroundProcessNameParts);
+
+		Long backgroundProcessId;
+		Boolean backgroundProcessDebugEnabled;
+		Duration backgroundProcessFrequency;
+
+		try (
+
+			Transaction transaction =
+				database.beginReadOnly (
+					"SleepingDaemonService.setup ()",
+					this);
+		) {
+
+			ObjectTypeRec parentType =
+				objectTypeHelper.findByCodeRequired (
+					GlobalId.root,
+					hyphenToUnderscore (
+						parentTypeCode));
+
+			BackgroundProcessRec backgroundProcess =
+				backgroundProcessHelper.findByCodeRequired (
+					parentType,
+					hyphenToUnderscore (
+						backgroundProcessCode));
+
+			backgroundProcessId =
+				backgroundProcess.getId ();
+
+			backgroundProcessDebugEnabled =
+				backgroundProcess.getDebug ();
+
+			backgroundProcessFrequency =
+				backgroundProcess.getFrequency ();
+
+			taskLogger.noticeFormat (
+				"Found background process %s with id %s",
+				backgroundProcessName,
+				integerToDecimalString (
+					backgroundProcess.getId ()));
+
+		}
+
+		ComponentMetaData componentMetaData =
+			componentManager.componentMetaData (
+				component);
+
+		ComponentDefinition componentDefinition =
+			componentMetaData.definition ();
+
+		if (
+			stringNotEqualSafe (
+				componentDefinition.scope (),
+				"singleton")
+		) {
+			throw new RuntimeException ();
+		}
+
+		if (
+			mapContainsKey (
+				backgroundProcessComponentNames,
+				backgroundProcessName)
+		) {
+			throw new RuntimeException ();
+		}
+
+		backgroundProcessComponentNames.put (
+			backgroundProcessName,
+			componentDefinition.name ());
+
+		return backgroundProcessHelperImplementationProvider.get ()
+
+			.parentTypeCode (
+				parentTypeCode)
+
+			.backgroundProcessCode (
+				backgroundProcessCode)
+
+			.backgroundProcessId (
+				backgroundProcessId)
+
+			.backgroundProcessFrequency (
+				backgroundProcessFrequency)
+
+			.backgroundProcessDebugEnabled (
+				backgroundProcessDebugEnabled);
+
+	}
 
 }

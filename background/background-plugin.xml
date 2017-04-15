@@ -21,6 +21,7 @@
 
 	<layer name="logic">
 		<component class="logic.BackgroundLogicImplementation"/>
+		<component class="logic.BackgroundProcessHelperImplementation"/>
 	</layer>
 
 	<layer name="model-meta">
