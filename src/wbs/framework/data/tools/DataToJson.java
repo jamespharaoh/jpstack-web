@@ -1,5 +1,6 @@
 package wbs.framework.data.tools;
 
+import static wbs.utils.etc.EnumUtils.enumNameHyphens;
 import static wbs.utils.etc.ReflectionUtils.fieldGet;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -30,6 +31,14 @@ class DataToJson {
 		if (simpleClasses.contains (dataValue.getClass ())) {
 
 			return dataValue;
+
+		} else if (dataValue instanceof Enum) {
+
+			Enum <?> dataEnum =
+				(Enum <?>) dataValue;
+
+			return enumNameHyphens (
+				dataEnum);
 
 		} else if (dataValue instanceof List) {
 

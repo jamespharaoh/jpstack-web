@@ -51,6 +51,18 @@
 			name="functionaljava"
 			rev="3.0"/>
 
+		<!-- grizzly -->
+
+		<dependency
+			org="org.glassfish.grizzly"
+			name="grizzly-framework"
+			rev="2.3.30"/>
+
+		<dependency
+			org="org.glassfish.grizzly"
+			name="grizzly-http-server"
+			rev="2.3.30"/>
+
 		<!-- guava -->
 
 		<dependency

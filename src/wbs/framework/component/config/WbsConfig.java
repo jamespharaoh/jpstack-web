@@ -72,6 +72,9 @@ class WbsConfig {
 		required = true)
 	WbsConfigEmail email;
 
+	@DataChild
+	WbsConfigProcessApi processApi;
+
 	// security
 
 	@DataAttribute (
@@ -96,6 +99,13 @@ class WbsConfig {
 	List <String> testUsers =
 		new ArrayList<> ();
 
+	// unknown elements
+
+	@DataChildren (
+		direct = true)
+	List <Object> otherElements =
+		new ArrayList<> ();
+
 	// implementation
 
 	public static
@@ -115,7 +125,8 @@ class WbsConfig {
 				ImmutableList.of (
 					WbsConfig.class,
 					WbsConfigDatabase.class,
-					WbsConfigEmail.class))
+					WbsConfigEmail.class,
+					WbsConfigProcessApi.class))
 
 			.build ();
 

@@ -1,0 +1,10 @@
+<plugin
+	name="framework-process-api"
+	package="wbs.framework.processapi">
+
+	<layer name="process-api">
+		<component class="ProcessApiServer"/>
+		<component class="ProcessApiStatusHandler"/>
+	</layer>
+
+</plugin>

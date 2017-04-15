@@ -11,9 +11,11 @@ import static wbs.utils.etc.EnumUtils.enumNotEqualSafe;
 import static wbs.utils.etc.Misc.doesNotContain;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
@@ -114,7 +116,7 @@ class ComponentManagerImplementation
 	Set <String> singletonComponentsFailed =
 		new HashSet<> ();
 
-	Map <Object, ComponentMetaData> componentMetaDatas =
+	Map <Object, ComponentMetaDataImplementation> componentMetaDatas =
 		new MapMaker ()
 			.weakKeys ()
 			.makeMap ();
@@ -506,7 +508,7 @@ class ComponentManagerImplementation
 		// call factory
 
 		Object component;
-		ComponentMetaData componentMetaData;
+		ComponentMetaDataImplementation componentMetaData;
 
 		if (
 			isNotNull (
@@ -586,7 +588,7 @@ class ComponentManagerImplementation
 			@NonNull TaskLogger taskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component,
-			@NonNull ComponentMetaData componentMetaData) {
+			@NonNull ComponentMetaDataImplementation componentMetaData) {
 
 		synchronized (componentMetaData) {
 
@@ -675,7 +677,7 @@ class ComponentManagerImplementation
 	}
 
 	private
-	ComponentMetaData findOrCreateMetaDataForComponent (
+	ComponentMetaDataImplementation findOrCreateMetaDataForComponent (
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component) {
 
@@ -685,8 +687,8 @@ class ComponentManagerImplementation
 			component,
 			_component -> {
 
-			ComponentMetaData newComponentMetaData =
-				new ComponentMetaData ();
+			ComponentMetaDataImplementation newComponentMetaData =
+				new ComponentMetaDataImplementation ();
 
 			newComponentMetaData.definition =
 				componentDefinition;
@@ -1411,6 +1413,17 @@ class ComponentManagerImplementation
 
 	}
 
+	@Override
+	public
+	ComponentMetaData componentMetaData (
+			@NonNull Object component) {
+
+		return requiredValue (
+			componentMetaDatas.get (
+				component));
+
+	}
+
 	private static
 	enum State {
 		creation,
@@ -1421,10 +1434,34 @@ class ComponentManagerImplementation
 	}
 
 	public static
-	class ComponentMetaData {
+	class ComponentMetaDataImplementation
+		implements ComponentMetaData {
+
 		ComponentDefinition definition;
 		WeakReference <Object> component;
 		ComponentState state;
+
+		@Override
+		public
+		ComponentDefinition definition () {
+			return definition;
+		}
+
+		@Override
+		public
+		Optional <Object> component () {
+
+			return optionalFromNullable (
+				component.get ());
+
+		}
+
+		@Override
+		public
+		ComponentState state () {
+			return state;
+		}
+
 	}
 
 	public static

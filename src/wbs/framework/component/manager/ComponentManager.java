@@ -41,6 +41,9 @@ interface ComponentManager
 
 	List <String> requestComponentNames ();
 
+	ComponentMetaData componentMetaData (
+			Object component);
+
 	@Override
 	void close ();
 

@@ -60,9 +60,7 @@ writeClasspath world = do
 				".jar" ]
 
 			sourcePath = concat [
-				"/root/",
-				bldName build,
-				"/binaries/libraries/",
+				"/root/projects/wbs-platform/wbs-binaries/libraries/",
 				libName library,
 				"-source-",
 				libVersion library,

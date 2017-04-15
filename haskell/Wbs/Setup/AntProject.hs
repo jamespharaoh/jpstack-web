@@ -746,8 +746,8 @@ writeBuildFile world = do
 				makeArgValue "wbs-test",
 				makeArgValue "wbs.test",
 				makeArgValue (
-					"utils,config,data,entity,schema,sql,model,hibernate," ++
-					"object,logic,daemon,model-meta"),
+					"config,daemon,data,entity,hibernate,logic,model," ++
+					"model-meta,utils,object,process-api,schema,sql"),
 				makeArgValue "",
 				makeArgValue "wbs.platform.daemon.DaemonRunner",
 				makeArgValue "runDaemon"

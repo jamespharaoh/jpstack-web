@@ -40,6 +40,10 @@
 			package="wbs.framework.exception"/>
 
 		<plugin
+			name="framework-process-api"
+			package="wbs.framework.processapi"/>
+
+		<plugin
 			name="hibernate"
 			package="wbs.framework.hibernate"/>
 

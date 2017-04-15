@@ -137,6 +137,7 @@
       <fileset dir="src/wbs/framework/entity/api/files"/>
       <fileset dir="src/wbs/framework/fixtures/api/files"/>
       <fileset dir="src/wbs/framework/exception/api/files"/>
+      <fileset dir="src/wbs/framework/processapi/api/files"/>
       <fileset dir="src/wbs/framework/hibernate/api/files"/>
       <fileset dir="src/wbs/framework/object/api/files"/>
       <fileset dir="src/wbs/framework/schema/api/files"/>
@@ -316,6 +317,7 @@
       <fileset dir="src/wbs/framework/entity/console/files"/>
       <fileset dir="src/wbs/framework/fixtures/console/files"/>
       <fileset dir="src/wbs/framework/exception/console/files"/>
+      <fileset dir="src/wbs/framework/processapi/console/files"/>
       <fileset dir="src/wbs/framework/hibernate/console/files"/>
       <fileset dir="src/wbs/framework/object/console/files"/>
       <fileset dir="src/wbs/framework/schema/console/files"/>
@@ -519,7 +521,7 @@
     <java classname="wbs.framework.component.tools.ComponentRunner" classpathref="classpath" failonerror="true">
       <arg value="wbs-test"/>
       <arg value="wbs.test"/>
-      <arg value="utils,config,data,entity,schema,sql,model,hibernate,object,logic,daemon,model-meta"/>
+      <arg value="config,daemon,data,entity,hibernate,logic,model,model-meta,utils,object,process-api,schema,sql"/>
       <arg value=""/>
       <arg value="wbs.platform.daemon.DaemonRunner"/>
       <arg value="runDaemon"/>
