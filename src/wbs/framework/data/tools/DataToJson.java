@@ -1,6 +1,7 @@
 package wbs.framework.data.tools;
 
 import static wbs.utils.etc.EnumUtils.enumNameHyphens;
+import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.ReflectionUtils.fieldGet;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -97,8 +98,8 @@ class DataToJson {
 
 			}
 
-			ImmutableMap.Builder<String,Object> jsonValueBuilder =
-				ImmutableMap.<String,Object>builder ();
+			ImmutableMap.Builder <String, Object> jsonValueBuilder =
+				ImmutableMap.builder ();
 
 			for (
 				Field field
@@ -123,7 +124,9 @@ class DataToJson {
 					continue;
 
 				jsonValueBuilder.put (
-					field.getName (),
+					ifNull (
+						dataAttribute.name (),
+						field.getName ()),
 					toJson (fieldValue));
 
 			}
