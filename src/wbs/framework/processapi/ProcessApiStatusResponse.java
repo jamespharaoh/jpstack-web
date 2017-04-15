@@ -20,14 +20,17 @@ import wbs.framework.data.annotations.DataClass;
 public
 class ProcessApiStatusResponse {
 
-	@DataAttribute
+	@DataAttribute (
+		name = "status")
 	ProcessApiIcingaStatus status;
 
-	@DataAttribute
+	@DataAttribute (
+		name = "status-message")
 	String statusMessage;
 
-	@DataAttribute
-	List <String> additionalMessage;
+	@DataAttribute (
+		name = "additional-messages")
+	List <String> additionalMessages;
 
 	public static
 	class Builder {
@@ -200,7 +203,7 @@ class ProcessApiStatusResponse {
 					joinWithCommaAndSpace (
 						statusMessages))
 
-				.additionalMessage (
+				.additionalMessages (
 					additionalMessages);
 
 		}
