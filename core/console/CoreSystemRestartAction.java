@@ -63,7 +63,8 @@ class CoreSystemRestartAction
 
 	@Override
 	protected
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"coreSystemRestartResponder");
@@ -86,6 +87,7 @@ class CoreSystemRestartAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"goReal ()",
 					this);
 

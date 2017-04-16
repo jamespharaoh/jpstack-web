@@ -111,6 +111,7 @@ class BackgroundLogicImplementation
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"SleepingDaemonService.setup ()",
 					this);
 		) {

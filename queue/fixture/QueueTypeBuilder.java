@@ -128,6 +128,7 @@ class QueueTypeBuilder
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"QueueTypeBuilder.createQueueType ()",
 					this);
 

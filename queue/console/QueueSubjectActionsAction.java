@@ -27,7 +27,8 @@ class QueueSubjectActionsAction
 
 	@Override
 	protected
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"queueSubjectActionsResponder");
@@ -39,7 +40,7 @@ class QueueSubjectActionsAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws ServletException {
 
 		/*

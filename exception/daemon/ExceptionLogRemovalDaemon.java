@@ -65,6 +65,7 @@ class ExceptionLogRemovalDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ExceptionLogRemovalDaemon.runOnce ()",
 					this);
 

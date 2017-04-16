@@ -290,7 +290,12 @@ class ObjectCreatePageBuilder <
 	}
 
 	void setDefaults (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setDefaults");
 
 		consoleHelper =
 			container.consoleHelper ();

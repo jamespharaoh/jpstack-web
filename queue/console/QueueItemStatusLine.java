@@ -314,6 +314,7 @@ class QueueItemStatusLine
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					stringFormat (
 						"%s.%s ()",
 						getClass ().getSimpleName (),

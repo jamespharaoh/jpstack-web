@@ -338,6 +338,7 @@ class UpdateManager {
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"UpdateManager.getVersionDb (table, ref)",
 					this);
 

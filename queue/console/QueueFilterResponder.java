@@ -1,9 +1,8 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.joinWithNewline;
-
-import java.io.IOException;
 
 import lombok.NonNull;
 
@@ -11,10 +10,12 @@ import org.joda.time.Instant;
 
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
@@ -33,6 +34,9 @@ class QueueFilterResponder
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
@@ -47,8 +51,12 @@ class QueueFilterResponder
 	@Override
 	public
 	void execute (
-			@NonNull TaskLogger parentTaskLogger)
-		throws IOException {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"execute");
 
 		requestContext.setHeader (
 			"Content-Type",
@@ -67,6 +75,7 @@ class QueueFilterResponder
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"QueueFilterResponder.execute ()",
 					this);
 
@@ -77,7 +86,8 @@ class QueueFilterResponder
 					userConsoleLogic.sliceRequired ().getFilter (),
 					defaultFilter);
 
-			requestContext.outputStream ().write (
+			writeBytes (
+				requestContext.outputStream (),
 				filter.getBytes ());
 
 		}

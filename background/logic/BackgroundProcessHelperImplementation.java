@@ -117,6 +117,7 @@ class BackgroundProcessHelperImplementation
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"SleepingDaemonService.setBackgroundProcessStart",
 					this);
 
@@ -200,6 +201,7 @@ class BackgroundProcessHelperImplementation
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"SleepingDaemonService.setBackgroundProcessStop",
 					this);
 

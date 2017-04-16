@@ -95,9 +95,10 @@ class EventConsoleLogicImplementation
 	@Override
 	public
 	PagePart makeEventsPart (
-			PermanentRecord<?> object) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull PermanentRecord <?> object) {
 
-		List<Record<?>> children =
+		List <Record <?>> children =
 			objectManager.getMinorChildren (
 				object);
 
@@ -129,7 +130,7 @@ class EventConsoleLogicImplementation
 	@Override
 	public
 	PagePartFactory makeEventsPartFactory (
-			ObjectLookup <?> objectLookup) {
+			@NonNull ObjectLookup <?> objectLookup) {
 
 		return taskLogger -> {
 
@@ -137,6 +138,7 @@ class EventConsoleLogicImplementation
 
 				Transaction transaction =
 					database.beginReadOnly (
+						taskLogger,
 						stringFormat (
 							"%s.%s.%s ()",
 							"EventConsoleLogic",
@@ -152,6 +154,7 @@ class EventConsoleLogicImplementation
 							requestContext.consoleContextStuffRequired ()));
 
 				return makeEventsPart (
+					taskLogger,
 					object);
 
 			}

@@ -518,6 +518,7 @@ class UserSessionLogicImplementation
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"UserSessionLogicImplementation.reload ()",
 					this);
 

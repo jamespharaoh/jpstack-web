@@ -125,6 +125,7 @@ class PrivTypeBuilder
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"PrivTypeBuilder.createPrivType ()",
 					this);
 

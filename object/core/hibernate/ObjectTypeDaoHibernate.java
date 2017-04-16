@@ -55,7 +55,6 @@ class ObjectTypeDaoHibernate
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		@SuppressWarnings ("unused")
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
@@ -65,6 +64,7 @@ class ObjectTypeDaoHibernate
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"setup (taskLogger)",
 					this);
 

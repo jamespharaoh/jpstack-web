@@ -69,8 +69,12 @@ class GroupPrivsAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("groupPrivsResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"groupPrivsResponder");
+
 	}
 
 	// implementation
@@ -92,6 +96,7 @@ class GroupPrivsAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"GroupPrivsAction.goReal ()",
 					this);
 

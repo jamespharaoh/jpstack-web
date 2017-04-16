@@ -93,15 +93,18 @@ class ExceptionStatusLine
 		) {
 
 			numExceptions =
-				numExceptionsCache.get ();
+				numExceptionsCache.get (
+					taskLogger);
 
 			numExceptionsFatal =
-				numFatalExceptionsCache.get ();
+				numFatalExceptionsCache.get (
+					taskLogger);
 
 		} else {
 
 			numExceptionsFatal =
-				numFatalExceptionsCache.get ();
+				numFatalExceptionsCache.get (
+					taskLogger);
 
 		}
 

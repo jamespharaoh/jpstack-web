@@ -51,8 +51,12 @@ class QueueClaimAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("queueHomeResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"queueHomeResponder");
+
 	}
 
 	// implementation
@@ -76,6 +80,7 @@ class QueueClaimAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"QueueClaimAction.goReal ()",
 					this);
 

@@ -26,12 +26,14 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
@@ -50,16 +52,19 @@ class ObjectSettingsAction <
 	// singleton dependencies
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
-
-	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
 	Database database;
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// properties
 
@@ -99,8 +104,11 @@ class ObjectSettingsAction <
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
 		return detailsResponder.get ();
+
 	}
 
 	// implementation
@@ -108,7 +116,12 @@ class ObjectSettingsAction <
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// check access
 
@@ -128,6 +141,7 @@ class ObjectSettingsAction <
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ObjectSettingsAction.goReal ()",
 					this);
 

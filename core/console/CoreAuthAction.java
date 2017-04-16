@@ -40,15 +40,9 @@ class CoreAuthAction
 	Provider<Responder> deniedResponder;
 
 	@Override
-	protected
-	Responder backupResponder () {
-		return null;
-	}
-
-	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		if (
 			! lookup.lookup (

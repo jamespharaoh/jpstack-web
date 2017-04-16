@@ -13,10 +13,12 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -40,6 +42,9 @@ class UserPasswordAction
 	@SingletonDependency
 	EventLogic eventLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserPrivChecker privChecker;
 
@@ -53,14 +58,23 @@ class UserPasswordAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("userPasswordResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"userPasswordResponder");
+
 	}
 
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		String password1 =
 			requestContext.parameterRequired (
@@ -74,6 +88,7 @@ class UserPasswordAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"UserPasswordAction.goReal ()",
 					this);
 

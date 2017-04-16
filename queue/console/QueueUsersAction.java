@@ -10,10 +10,12 @@ import lombok.NonNull;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.model.QueueItemClaimObjectHelper;
@@ -38,6 +40,9 @@ class QueueUsersAction
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	QueueItemClaimObjectHelper queueItemClaimHelper;
 
@@ -54,8 +59,12 @@ class QueueUsersAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("queueUsersResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"queueUsersResponder");
+
 	}
 
 	// implementation
@@ -63,7 +72,12 @@ class QueueUsersAction
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// get params
 
@@ -99,6 +113,7 @@ class QueueUsersAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"QueueUsersAction.goReal ()",
 					this);
 

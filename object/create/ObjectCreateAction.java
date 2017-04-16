@@ -160,7 +160,8 @@ class ObjectCreateAction <
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			responderName ());
@@ -188,6 +189,7 @@ class ObjectCreateAction <
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ObjectCreateAction.goReal ()",
 					this);
 

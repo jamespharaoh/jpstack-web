@@ -127,6 +127,7 @@ class BackgroundProcessBuilder
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"BackgroundProcessBuilder.createBackgroundProcess ()",
 					this);
 

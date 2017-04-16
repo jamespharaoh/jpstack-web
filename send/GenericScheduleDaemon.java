@@ -74,6 +74,7 @@ class GenericScheduleDaemon <
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"GenericScheduleDaemon.runOnce ()",
 					this);
 
@@ -123,6 +124,7 @@ class GenericScheduleDaemon <
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"GenericScheduleDaemon.runJob (jobId)",
 					this);
 

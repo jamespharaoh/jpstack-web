@@ -128,6 +128,7 @@ class AffiliateTypeBuilder {
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"AffiliateTypeBuilder.createAffiliateType ()",
 					this);
 

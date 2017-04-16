@@ -7,6 +7,8 @@ import com.google.common.base.Optional;
 import org.hibernate.Criteria;
 import org.joda.time.Interval;
 
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.model.UserRec;
 
 public
@@ -25,6 +27,7 @@ interface QueueItemDaoMethods {
 			QueueItemSearch search);
 
 	List <Optional <UserQueueReport>> searchUserQueueReports (
+			TaskLogger parentTaskLogger,
 			QueueItemSearch search,
 			List <Long> ids);
 

@@ -53,13 +53,20 @@ class PrivHooks
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
 
 		try (
 
 			Transaction transaction =
 				database.beginReadOnly (
-					"privHooks.init ()",
+					taskLogger,
+					"setup ()",
 					this);
 
 		) {

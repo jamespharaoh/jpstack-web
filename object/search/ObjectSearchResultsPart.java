@@ -313,7 +313,12 @@ class ObjectSearchResultsPart <
 	}
 
 	void prepareTargetContext (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepareTargetContext");
 
 		ConsoleContextType targetContextType =
 			consoleManager.contextType (

@@ -3,23 +3,31 @@ package wbs.platform.misc;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.utils.time.TimeUtils.millisToInstant;
 
-import javax.inject.Provider;
+import lombok.NonNull;
 
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 public abstract
-class CachedGetter<Type>
-	implements Provider<Type> {
+class CachedGetter <Type> {
 
-	long reloadTimeMs = 1000;
+	// singleton dependencies
 
-	public
-	CachedGetter () {
-	}
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// properties
+
+	Long reloadTimeMs = 1000l;
+
+	// constructors
 
 	public
 	CachedGetter (
-			long newReloadTimeMs) {
+			@NonNull Long newReloadTimeMs) {
 
 		reloadTimeMs =
 			newReloadTimeMs;
@@ -28,7 +36,7 @@ class CachedGetter<Type>
 
 	public
 	void setReloadTimeSecs (
-			int secs) {
+			@NonNull Long secs) {
 
 		reloadTimeMs =
 			secs * 1000;
@@ -43,11 +51,17 @@ class CachedGetter<Type>
 		millisToInstant (0);
 
 	public abstract
-	Type refresh ();
+	Type refresh (
+			TaskLogger parentTaskLogger);
 
-	@Override
 	public synchronized
-	Type get () {
+	Type get (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"get");
 
 		// call refresh if necessary
 
@@ -59,7 +73,8 @@ class CachedGetter<Type>
 		) {
 
 			value =
-				refresh ();
+				refresh (
+					taskLogger);
 
 			lastReload =
 				Instant.now ();

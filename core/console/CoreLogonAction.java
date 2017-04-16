@@ -70,7 +70,8 @@ class CoreLogonAction
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"coreLogonResponder");
@@ -155,6 +156,7 @@ class CoreLogonAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"CoreLogonAction.goReal ()",
 					this);
 

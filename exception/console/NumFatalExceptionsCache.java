@@ -1,7 +1,11 @@
 package wbs.platform.exception.console;
 
+import lombok.NonNull;
+
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.exception.model.ExceptionLogObjectHelper;
 import wbs.platform.misc.CachedGetter;
 
@@ -19,13 +23,16 @@ class NumFatalExceptionsCache
 
 	public
 	NumFatalExceptionsCache () {
-		super (1000);
+		super (1000l);
 	}
 
 	@Override
 	public
-	Long refresh () {
+	Long refresh (
+			@NonNull TaskLogger parentTaskLogger) {
+
 		return exceptionLogHelper.countWithAlertAndFatal ();
+
 	}
 
 }

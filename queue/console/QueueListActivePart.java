@@ -152,7 +152,12 @@ class QueueListActivePart
 	@Override
 	public
 	void renderHtmlBodyContent (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
 		htmlTableOpenList ();
 

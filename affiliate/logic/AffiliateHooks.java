@@ -53,12 +53,19 @@ class AffiliateHooks
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void init (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"init");
 
 		try (
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"AffiliateHooks.init ()",
 					this);
 
