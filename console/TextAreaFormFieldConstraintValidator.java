@@ -1,11 +1,13 @@
 package wbs.services.messagetemplate.console;
 
-import lombok.NonNull;
-
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+
 import wbs.console.forms.FormFieldConstraintValidator;
+
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("textAreaFormFieldValueValidator")
 public
@@ -14,9 +16,10 @@ class TextAreaFormFieldConstraintValidator<Container>
 
 	@Override
 	public
-	Optional<String> validate (
+	Optional <String> validate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Optional<String> nativeValue) {
+			@NonNull Optional <String> nativeValue) {
 
 		/*
 		MessageTemplateTypeRec messageTemplateType =
