@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -56,17 +55,18 @@ class AffiliateHooks
 	public
 	void init () {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"AffiliateHooks.init ()",
-				this);
+		try (
 
-		affiliateTypeIdsByParentTypeId =
-			affiliateTypeDao.findAll ().stream ()
+			Transaction transaction =
+				database.beginReadOnly (
+					"AffiliateHooks.init ()",
+					this);
 
-			.collect (
-				Collectors.groupingBy (
+		) {
+
+			affiliateTypeIdsByParentTypeId =
+				affiliateTypeDao.findAll ().stream ().collect (
+					Collectors.groupingBy (
 
 				affiliateType ->
 					affiliateType.getParentType ().getId (),
@@ -77,6 +77,8 @@ class AffiliateHooks
 					Collectors.toList ()))
 
 			);
+
+		}
 
 	}
 

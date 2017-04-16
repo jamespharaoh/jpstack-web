@@ -7,7 +7,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.sql.SQLException;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
@@ -125,49 +124,54 @@ class AffiliateTypeBuilder {
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"AffiliateTypeBuilder.createAffiliateType ()",
-				this);
+		try (
 
-		// lookup parent type
+			Transaction transaction =
+				database.beginReadWrite (
+					"AffiliateTypeBuilder.createAffiliateType ()",
+					this);
 
-		String parentTypeCode =
-			camelToUnderscore (
-				ifNull (
-					spec.subject (),
-					parent.name ()));
+		) {
 
-		ObjectTypeRec parentType =
-			objectTypeHelper.findByCodeRequired (
-				GlobalId.root,
-				parentTypeCode);
+			// lookup parent type
 
-		// create affiliate type
+			String parentTypeCode =
+				camelToUnderscore (
+					ifNull (
+						spec.subject (),
+						parent.name ()));
 
-		affiliateTypeHelper.insert (
-			taskLogger,
-			affiliateTypeHelper.createInstance ()
+			ObjectTypeRec parentType =
+				objectTypeHelper.findByCodeRequired (
+					GlobalId.root,
+					parentTypeCode);
 
-			.setParentType (
-				parentType)
+			// create affiliate type
 
-			.setCode (
-				simplifyToCodeRequired (
-					spec.name ()))
+			affiliateTypeHelper.insert (
+				taskLogger,
+				affiliateTypeHelper.createInstance ()
 
-			.setName (
-				spec.name ())
+				.setParentType (
+					parentType)
 
-			.setDescription (
-				spec.description ())
+				.setCode (
+					simplifyToCodeRequired (
+						spec.name ()))
 
-		);
+				.setName (
+					spec.name ())
 
-		// commit transaction
+				.setDescription (
+					spec.description ())
 
-		transaction.commit ();
+			);
+
+			// commit transaction
+
+			transaction.commit ();
+
+		}
 
 	}
 

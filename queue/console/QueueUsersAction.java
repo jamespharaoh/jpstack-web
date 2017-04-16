@@ -1,11 +1,10 @@
 package wbs.platform.queue.console;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.util.List;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -96,74 +95,79 @@ class QueueUsersAction
 
 		}
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"QueueUsersAction.goReal ()",
-				this);
+		try (
 
-		// load stuff
+			Transaction transaction =
+				database.beginReadWrite (
+					"QueueUsersAction.goReal ()",
+					this);
 
-		UserRec theUser =
-			userHelper.findRequired (
-				userId);
+		) {
 
-		// load items
+			// load stuff
 
-		List<QueueItemClaimRec> queueItemClaims =
-			queueItemClaimHelper.findClaimed (
-				theUser);
+			UserRec theUser =
+				userHelper.findRequired (
+					userId);
 
-		int numQueueItems =
-			queueItemClaims.size ();
+			// load items
 
-		// process items
-
-		for (QueueItemClaimRec queueItemClaim
-				: queueItemClaims) {
-
-			QueueItemRec queueItem =
-				queueItemClaim.getQueueItem ();
-
-			if (reclaim) {
-
-				queueConsoleLogic.reclaimQueueItem (
-					taskLogger,
-					queueItem,
-					theUser,
-					userConsoleLogic.userRequired ());
-
-			} else {
-
-				queueConsoleLogic.unclaimQueueItem (
-					queueItem,
+			List<QueueItemClaimRec> queueItemClaims =
+				queueItemClaimHelper.findClaimed (
 					theUser);
+
+			int numQueueItems =
+				queueItemClaims.size ();
+
+			// process items
+
+			for (QueueItemClaimRec queueItemClaim
+					: queueItemClaims) {
+
+				QueueItemRec queueItem =
+					queueItemClaim.getQueueItem ();
+
+				if (reclaim) {
+
+					queueConsoleLogic.reclaimQueueItem (
+						taskLogger,
+						queueItem,
+						theUser,
+						userConsoleLogic.userRequired ());
+
+				} else {
+
+					queueConsoleLogic.unclaimQueueItem (
+						queueItem,
+						theUser);
+
+				}
 
 			}
 
-		}
+			transaction.commit ();
 
-		transaction.commit ();
+			// add notice
 
-		// add notice
+			if (reclaim) {
 
-		if (reclaim) {
-
-			requestContext.addNotice (
-				stringFormatObsolete (
+				requestContext.addNoticeFormat (
 					"Reclaimed %s queue items",
-					numQueueItems));
+					integerToDecimalString (
+						numQueueItems));
 
-		} else {
+			} else {
 
-			requestContext.addNotice (
-				stringFormatObsolete (
+				requestContext.addNoticeFormat (
 					"Unclaimed %s queue items",
-					numQueueItems));
+					integerToDecimalString (
+						numQueueItems));
+
+			}
+
+			return null;
 
 		}
-
-		return null;
 
 	}
 

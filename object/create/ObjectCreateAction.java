@@ -23,7 +23,6 @@ import java.util.List;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -185,327 +184,332 @@ class ObjectCreateAction <
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ObjectCreateAction.goReal ()",
-				this);
+		try (
 
-		// determine parent
+			Transaction transaction =
+				database.beginReadWrite (
+					"ObjectCreateAction.goReal ()",
+					this);
 
-		determineParent ();
-
-		if (
-			isNull (
-				parent)
-		) {
-			return null;
-		}
-
-		// check permissions
-
-		if (
-			isNotNull (
-				createPrivCode)
 		) {
 
-			Record <?> createDelegate =
-				createPrivDelegate != null
-					? (Record <?>) objectManager.dereferenceObsolete (
-						parent,
-						createPrivDelegate)
-					: parent;
-
+			// determine parent
+	
+			determineParent ();
+	
 			if (
-				! privChecker.canRecursive (
-					createDelegate,
+				isNull (
+					parent)
+			) {
+				return null;
+			}
+	
+			// check permissions
+	
+			if (
+				isNotNull (
 					createPrivCode)
 			) {
-
-				requestContext.addError (
-					"Permission denied");
-
+	
+				Record <?> createDelegate =
+					createPrivDelegate != null
+						? (Record <?>) objectManager.dereferenceObsolete (
+							parent,
+							createPrivDelegate)
+						: parent;
+	
+				if (
+					! privChecker.canRecursive (
+						createDelegate,
+						createPrivCode)
+				) {
+	
+					requestContext.addError (
+						"Permission denied");
+	
+					return null;
+	
+				}
+	
+			}
+	
+			// create new record
+	
+			ObjectType object =
+				consoleHelper.createInstance ();
+	
+			// set parent
+	
+			if (
+	
+				isNotNull (
+					parent)
+	
+				&& ! parentHelper.isRoot ()
+	
+			) {
+	
+				consoleHelper.setParent (
+					object,
+					parent);
+	
+			}
+	
+			// set type code
+	
+			if (consoleHelper.typeCodeExists ()) {
+	
+				PropertyUtils.propertySetAuto (
+					object,
+					consoleHelper.typeCodeFieldName (),
+					typeCode);
+	
+			}
+	
+			// perform updates
+	
+			if (formFieldsProvider != null) {
+	
+				prepareFieldSet (
+					taskLogger);
+	
+			}
+	
+			UpdateResultSet updateResultSet =
+				formFieldLogic.update (
+					taskLogger,
+					requestContext,
+					formFieldSet,
+					object,
+					ImmutableMap.of (),
+					"create");
+	
+			if (updateResultSet.errorCount () > 0) {
+	
+				formFieldLogic.reportErrors (
+					requestContext,
+					updateResultSet,
+					"create");
+	
+				requestContext.request (
+					"objectCreateUpdateResultSet",
+					updateResultSet);
+	
 				return null;
-
+	
 			}
-
-		}
-
-		// create new record
-
-		ObjectType object =
-			consoleHelper.createInstance ();
-
-		// set parent
-
-		if (
-
-			isNotNull (
-				parent)
-
-			&& ! parentHelper.isRoot ()
-
-		) {
-
-			consoleHelper.setParent (
-				object,
-				parent);
-
-		}
-
-		// set type code
-
-		if (consoleHelper.typeCodeExists ()) {
-
-			PropertyUtils.propertySetAuto (
-				object,
-				consoleHelper.typeCodeFieldName (),
-				typeCode);
-
-		}
-
-		// perform updates
-
-		if (formFieldsProvider != null) {
-
-			prepareFieldSet (
-				taskLogger);
-
-		}
-
-		UpdateResultSet updateResultSet =
-			formFieldLogic.update (
+	
+			// set create time
+	
+			if (createTimeFieldName != null) {
+	
+				Class<?> createTimeFieldClass =
+					PropertyUtils.propertyClassForObject (
+						object,
+						createTimeFieldName);
+	
+				if (createTimeFieldClass == Instant.class) {
+	
+					PropertyUtils.propertySetAuto (
+						object,
+						createTimeFieldName,
+						transaction.now ());
+	
+				} else if (createTimeFieldClass == Date.class) {
+	
+					PropertyUtils.propertySetAuto (
+						object,
+						createTimeFieldName,
+						instantToDateNullSafe (
+							transaction.now ()));
+	
+				} else {
+	
+					throw new RuntimeException ();
+	
+				}
+	
+			}
+	
+			// set create user
+	
+			if (createUserFieldName != null) {
+	
+				PropertyUtils.propertySetAuto (
+					object,
+					createUserFieldName,
+					userConsoleLogic.userRequired ());
+	
+			}
+	
+			// before create hook
+	
+			consoleHelper ().consoleHooks ().beforeCreate (
+				object);
+	
+			// insert
+	
+			consoleHelper.insert (
 				taskLogger,
-				requestContext,
-				formFieldSet,
-				object,
-				ImmutableMap.of (),
-				"create");
-
-		if (updateResultSet.errorCount () > 0) {
-
-			formFieldLogic.reportErrors (
-				requestContext,
-				updateResultSet,
-				"create");
-
-			requestContext.request (
-				"objectCreateUpdateResultSet",
-				updateResultSet);
-
-			return null;
-
-		}
-
-		// set create time
-
-		if (createTimeFieldName != null) {
-
-			Class<?> createTimeFieldClass =
-				PropertyUtils.propertyClassForObject (
-					object,
-					createTimeFieldName);
-
-			if (createTimeFieldClass == Instant.class) {
-
-				PropertyUtils.propertySetAuto (
-					object,
-					createTimeFieldName,
-					transaction.now ());
-
-			} else if (createTimeFieldClass == Date.class) {
-
-				PropertyUtils.propertySetAuto (
-					object,
-					createTimeFieldName,
-					instantToDateNullSafe (
-						transaction.now ()));
-
+				object);
+	
+			// after create hook
+	
+			consoleHelper ().consoleHooks ().afterCreate (
+				object);
+	
+			// create event
+	
+			Object objectRef =
+				consoleHelper.codeExists ()
+					? consoleHelper.getCode (object)
+					: object.getId ();
+	
+			if (consoleHelper.ephemeral ()) {
+	
+				eventLogic.createEvent (
+					taskLogger,
+					"object_created_in",
+					userConsoleLogic.userRequired (),
+					objectRef,
+					consoleHelper.shortName (),
+					parent);
+	
 			} else {
-
-				throw new RuntimeException ();
-
+	
+				eventLogic.createEvent (
+					taskLogger,
+					"object_created",
+					userConsoleLogic.userRequired (),
+					object,
+					parent);
+	
 			}
-
-		}
-
-		// set create user
-
-		if (createUserFieldName != null) {
-
-			PropertyUtils.propertySetAuto (
-				object,
-				createUserFieldName,
-				userConsoleLogic.userRequired ());
-
-		}
-
-		// before create hook
-
-		consoleHelper ().consoleHooks ().beforeCreate (
-			object);
-
-		// insert
-
-		consoleHelper.insert (
-			taskLogger,
-			object);
-
-		// after create hook
-
-		consoleHelper ().consoleHooks ().afterCreate (
-			object);
-
-		// create event
-
-		Object objectRef =
-			consoleHelper.codeExists ()
-				? consoleHelper.getCode (object)
-				: object.getId ();
-
-		if (consoleHelper.ephemeral ()) {
-
-			eventLogic.createEvent (
-				taskLogger,
-				"object_created_in",
-				userConsoleLogic.userRequired (),
-				objectRef,
-				consoleHelper.shortName (),
-				parent);
-
-		} else {
-
-			eventLogic.createEvent (
-				taskLogger,
-				"object_created",
-				userConsoleLogic.userRequired (),
-				object,
-				parent);
-
-		}
-
-		// update events
-
-		if (object instanceof PermanentRecord) {
-
-			formFieldLogic.runUpdateHooks (
-				taskLogger,
-				formFieldSet,
-				updateResultSet,
-				object,
-				(PermanentRecord <?>) object,
-				optionalAbsent (),
-				optionalAbsent (),
-				"create");
-
-		} else {
-
-			formFieldLogic.runUpdateHooks (
-				taskLogger,
-				formFieldSet,
-				updateResultSet,
-				object,
-				(PermanentRecord<?>) parent,
-				optionalOf (
-					objectRef),
-				optionalOf (
-					consoleHelper.shortName ()),
-				"create");
-
-		}
-
-		// signal update
-
-		updateManager.signalUpdate (
-			taskLogger,
-			"user_privs",
-			userConsoleLogic.userIdRequired ());
-
-		updateManager.signalUpdate (
-			taskLogger,
-			"privs",
-			0l);
-
-		// commit transaction
-
-		transaction.commit ();
-
-		// prepare next page
-
-		requestContext.addNotice (
-			stringFormat (
-				"%s created",
-				capitalise (
-					consoleHelper.shortName ())));
-
-		requestContext.setEmptyFormData ();
-
-		privChecker.refresh (
-			taskLogger);
-
-		List <String> targetContextTypeNameParts =
-			stringSplitSlash (
-				targetContextTypeName);
-
-		if (
-			collectionHasOneElement (
-				targetContextTypeNameParts)
-		) {
-
-			ConsoleContextType targetContextType =
-				consoleManager.contextType (
-					targetContextTypeName,
-					true);
-
-			ConsoleContext targetContext =
-				consoleManager.relatedContextRequired (
+	
+			// update events
+	
+			if (object instanceof PermanentRecord) {
+	
+				formFieldLogic.runUpdateHooks (
 					taskLogger,
-					requestContext.consoleContextRequired (),
-					targetContextType);
-
-			consoleManager.changeContext (
-				taskLogger,
-				targetContext,
-				"/" + object.getId ());
-
-		} else if (
-			collectionHasTwoElements (
-				targetContextTypeNameParts)
-		) {
-
-			ConsoleContextType targetParentContextType =
-				consoleManager.contextType (
-					listFirstElementRequired (
-						targetContextTypeNameParts),
-					true);
-
-			ConsoleContext targetParentContext =
-				consoleManager.relatedContextRequired (
+					formFieldSet,
+					updateResultSet,
+					object,
+					(PermanentRecord <?>) object,
+					optionalAbsent (),
+					optionalAbsent (),
+					"create");
+	
+			} else {
+	
+				formFieldLogic.runUpdateHooks (
 					taskLogger,
-					requestContext.consoleContextRequired (),
-					targetParentContextType);
-
-			ConsoleContextType targetContextType =
-				consoleManager.contextType (
-					listSecondElementRequired (
-						targetContextTypeNameParts),
-					true);
-
-			ConsoleContext targetContext =
-				consoleManager.relatedContextRequired (
-					taskLogger,
-					targetParentContext,
-					targetContextType);
-
-			consoleManager.changeContext (
+					formFieldSet,
+					updateResultSet,
+					object,
+					(PermanentRecord<?>) parent,
+					optionalOf (
+						objectRef),
+					optionalOf (
+						consoleHelper.shortName ()),
+					"create");
+	
+			}
+	
+			// signal update
+	
+			updateManager.signalUpdate (
 				taskLogger,
-				targetContext,
-				"/" + object.getId ());
+				"user_privs",
+				userConsoleLogic.userIdRequired ());
+	
+			updateManager.signalUpdate (
+				taskLogger,
+				"privs",
+				0l);
+	
+			// commit transaction
+	
+			transaction.commit ();
+	
+			// prepare next page
+	
+			requestContext.addNotice (
+				stringFormat (
+					"%s created",
+					capitalise (
+						consoleHelper.shortName ())));
+	
+			requestContext.setEmptyFormData ();
+	
+			privChecker.refresh (
+				taskLogger);
+	
+			List <String> targetContextTypeNameParts =
+				stringSplitSlash (
+					targetContextTypeName);
+	
+			if (
+				collectionHasOneElement (
+					targetContextTypeNameParts)
+			) {
+	
+				ConsoleContextType targetContextType =
+					consoleManager.contextType (
+						targetContextTypeName,
+						true);
+	
+				ConsoleContext targetContext =
+					consoleManager.relatedContextRequired (
+						taskLogger,
+						requestContext.consoleContextRequired (),
+						targetContextType);
+	
+				consoleManager.changeContext (
+					taskLogger,
+					targetContext,
+					"/" + object.getId ());
+	
+			} else if (
+				collectionHasTwoElements (
+					targetContextTypeNameParts)
+			) {
+	
+				ConsoleContextType targetParentContextType =
+					consoleManager.contextType (
+						listFirstElementRequired (
+							targetContextTypeNameParts),
+						true);
+	
+				ConsoleContext targetParentContext =
+					consoleManager.relatedContextRequired (
+						taskLogger,
+						requestContext.consoleContextRequired (),
+						targetParentContextType);
+	
+				ConsoleContextType targetContextType =
+					consoleManager.contextType (
+						listSecondElementRequired (
+							targetContextTypeNameParts),
+						true);
+	
+				ConsoleContext targetContext =
+					consoleManager.relatedContextRequired (
+						taskLogger,
+						targetParentContext,
+						targetContextType);
+	
+				consoleManager.changeContext (
+					taskLogger,
+					targetContext,
+					"/" + object.getId ());
+	
+			}
+	
+			return responder (
+				targetResponderName);
 
 		}
-
-		return responder (
-			targetResponderName);
 
 	}
 

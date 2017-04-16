@@ -9,7 +9,6 @@ import static wbs.utils.time.TimeUtils.millisToInstant;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -335,32 +334,37 @@ class UpdateManager {
 				parentTaskLogger,
 				"getVersionDb");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"UpdateManager.getVersionDb (table, ref)",
-				this);
+		try (
 
-		refreshMaster (
-			taskLogger);
+			Transaction transaction =
+				database.beginReadOnly (
+					"UpdateManager.getVersionDb (table, ref)",
+					this);
 
-		refreshSecondary (
-			taskLogger,
-			table);
+		) {
 
-		refreshTertiary (
-			taskLogger,
-			table,
-			ref);
+			refreshMaster (
+				taskLogger);
 
-		Map <Long, UpdateStuff> map =
-			tertiaryVersions.get (
+			refreshSecondary (
+				taskLogger,
 				table);
 
-		UpdateStuff stuff2 =
-			map.get (ref);
+			refreshTertiary (
+				taskLogger,
+				table,
+				ref);
 
-		return stuff2.version;
+			Map <Long, UpdateStuff> map =
+				tertiaryVersions.get (
+					table);
+
+			UpdateStuff stuff2 =
+				map.get (ref);
+
+			return stuff2.version;
+
+		}
 
 	}
 

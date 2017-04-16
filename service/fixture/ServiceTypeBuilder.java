@@ -7,7 +7,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.sql.SQLException;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.builder.Builder;
@@ -125,46 +124,51 @@ class ServiceTypeBuilder
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ServiceTypeBuilder.createServiceType ()",
-				this);
+		try (
 
-		// lookup parent type
+			Transaction transaction =
+				database.beginReadWrite (
+					"ServiceTypeBuilder.createServiceType ()",
+					this);
 
-		String parentTypeCode =
-			camelToUnderscore (
-				ifNull (
-					spec.subject (),
-					parent.name ()));
+		) {
 
-		ObjectTypeRec parentType =
-			objectTypeHelper.findByCodeRequired (
-				GlobalId.root,
-				parentTypeCode);
+			// lookup parent type
 
-		// create service type
+			String parentTypeCode =
+				camelToUnderscore (
+					ifNull (
+						spec.subject (),
+						parent.name ()));
 
-		serviceTypeHelper.insert (
-			taskLogger,
-			serviceTypeHelper.createInstance ()
+			ObjectTypeRec parentType =
+				objectTypeHelper.findByCodeRequired (
+					GlobalId.root,
+					parentTypeCode);
 
-			.setParentType (
-				parentType)
+			// create service type
 
-			.setCode (
-				simplifyToCodeRequired (
-					spec.name ()))
+			serviceTypeHelper.insert (
+				taskLogger,
+				serviceTypeHelper.createInstance ()
 
-			.setDescription (
-				spec.description ())
+				.setParentType (
+					parentType)
 
-		);
+				.setCode (
+					simplifyToCodeRequired (
+						spec.name ()))
 
-		// commit transaction
+				.setDescription (
+					spec.description ())
 
-		transaction.commit ();
+			);
+
+			// commit transaction
+
+			transaction.commit ();
+
+		}
 
 	}
 

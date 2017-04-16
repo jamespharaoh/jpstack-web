@@ -7,7 +7,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.sql.SQLException;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.builder.Builder;
@@ -125,77 +124,82 @@ class QueueTypeBuilder
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"QueueTypeBuilder.createQueueType ()",
-				this);
+		try (
 
-		// lookup parent type
+			Transaction transaction =
+				database.beginReadWrite (
+					"QueueTypeBuilder.createQueueType ()",
+					this);
 
-		String parentTypeCode =
-			camelToUnderscore (
-				ifNull (
-					spec.parent (),
-					parent.name ()));
+		) {
 
-		ObjectTypeRec parentType =
-			objectTypeHelper.findByCodeRequired (
-				GlobalId.root,
-				parentTypeCode);
+			// lookup parent type
 
-		// lookup subject type
+			String parentTypeCode =
+				camelToUnderscore (
+					ifNull (
+						spec.parent (),
+						parent.name ()));
 
-		String subjectTypeCode =
-			camelToUnderscore (
-				spec.subject ());
+			ObjectTypeRec parentType =
+				objectTypeHelper.findByCodeRequired (
+					GlobalId.root,
+					parentTypeCode);
 
-		ObjectTypeRec subjectType =
-			objectTypeHelper.findByCodeRequired (
-				GlobalId.root,
-				subjectTypeCode);
+			// lookup subject type
 
-		// lookup ref type
+			String subjectTypeCode =
+				camelToUnderscore (
+					spec.subject ());
 
-		String refTypeCode =
-			camelToUnderscore (
-				spec.ref ());
+			ObjectTypeRec subjectType =
+				objectTypeHelper.findByCodeRequired (
+					GlobalId.root,
+					subjectTypeCode);
 
-		ObjectTypeRec refType =
-			objectTypeHelper.findByCodeRequired (
-				GlobalId.root,
-				refTypeCode);
+			// lookup ref type
 
-		// create queue type
+			String refTypeCode =
+				camelToUnderscore (
+					spec.ref ());
 
-		queueTypeHelper.insert (
-			taskLogger,
-			queueTypeHelper.createInstance ()
+			ObjectTypeRec refType =
+				objectTypeHelper.findByCodeRequired (
+					GlobalId.root,
+					refTypeCode);
 
-			.setParentType (
-				parentType)
+			// create queue type
 
-			.setCode (
-				simplifyToCodeRequired (
-					spec.name ()))
+			queueTypeHelper.insert (
+				taskLogger,
+				queueTypeHelper.createInstance ()
 
-			.setDescription (
-				spec.description ())
+				.setParentType (
+					parentType)
 
-			.setSubjectType (
-				subjectType)
+				.setCode (
+					simplifyToCodeRequired (
+						spec.name ()))
 
-			.setRefType (
-				refType)
+				.setDescription (
+					spec.description ())
 
-			.setDefaultPriority (
-				spec.defaultPriority ())
+				.setSubjectType (
+					subjectType)
 
-		);
+				.setRefType (
+					refType)
 
-		// commit transaction
+				.setDefaultPriority (
+					spec.defaultPriority ())
 
-		transaction.commit ();
+			);
+
+			// commit transaction
+
+			transaction.commit ();
+
+		}
 
 	}
 
