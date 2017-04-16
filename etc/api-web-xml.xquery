@@ -56,19 +56,20 @@ declare variable $mode external;
 
 		<param-value>{
 			string-join ((
-				'utils',
+				'api'
 				'config',
 				'data',
 				'entity',
-				'schema',
-				'sql',
+				'hibernate',
+				'logic',
 				'model',
 				'model-meta',
-				'hibernate',
 				'object',
-				'logic',
+				'process-api',
+				'schema',
+				'sql',
+				'utils',
 				'web',
-				'api'
 			), ',')
 		}</param-value>
 
