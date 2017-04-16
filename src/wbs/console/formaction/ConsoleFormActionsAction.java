@@ -11,7 +11,6 @@ import javax.servlet.ServletException;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -87,37 +86,42 @@ class ConsoleFormActionsAction
 		Object formState =
 			formAction.helper ().constructFormState ();
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ContextFormActionAction.goReal ()",
-				this);
+		try (
 
-		formAction.helper ().updatePassiveFormState (
-			genericCastUnchecked (
-				formState));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ContextFormActionAction.goReal ()",
+					this);
 
-		UpdateResultSet updateResultSet =
-			formFieldLogic.update (
-				taskLogger,
-				requestContext,
-				formAction.formFields (),
-				formState,
-				ImmutableMap.of (),
-				formName);
+		) {
 
-		if (updateResultSet.errorCount () > 0) {
-			return null;
-		}
-
-		Optional <Responder> responder =
-			formAction.helper ().processFormSubmission (
-				taskLogger,
-				transaction,
+			formAction.helper ().updatePassiveFormState (
 				genericCastUnchecked (
 					formState));
 
-		return responder.orNull ();
+			UpdateResultSet updateResultSet =
+				formFieldLogic.update (
+					taskLogger,
+					requestContext,
+					formAction.formFields (),
+					formState,
+					ImmutableMap.of (),
+					formName);
+
+			if (updateResultSet.errorCount () > 0) {
+				return null;
+			}
+
+			Optional <Responder> responder =
+				formAction.helper ().processFormSubmission (
+					taskLogger,
+					transaction,
+					genericCastUnchecked (
+						formState));
+
+			return responder.orNull ();
+
+		}
 
 	}
 

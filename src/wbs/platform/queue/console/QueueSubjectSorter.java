@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.Setter;
@@ -143,138 +142,143 @@ class QueueSubjectSorter {
 				parentTaskLogger,
 				"sort");
 
-		@Cleanup
-		ActiveTask activeTask =
-			activityManager.start (
-				"logic",
-				stringFormat (
-					"%s.%s (%s)",
-					getClass ().getSimpleName (),
-					"sort",
-					joinWithCommaAndSpace (
-						stringFormatObsolete (
-							"queue=%s",
-							ifNull (
-								queue,
-								"null")),
-						stringFormatObsolete (
-							"effectiveUser=%s",
-							ifNull (
-								effectiveUser,
-								"null")))),
-				this);
+		try (
 
-		loggedInUserPrivChecker =
-			userPrivCheckerBuilderProvider.get ()
+			ActiveTask activeTask =
+				activityManager.start (
+					"logic",
+					stringFormat (
+						"%s.%s (%s)",
+						getClass ().getSimpleName (),
+						"sort",
+						joinWithCommaAndSpace (
+							stringFormatObsolete (
+								"queue=%s",
+								ifNull (
+									queue,
+									"null")),
+							stringFormatObsolete (
+								"effectiveUser=%s",
+								ifNull (
+									effectiveUser,
+									"null")))),
+					this);
 
-			.userId (
-				loggedInUser.getId ())
-
-			.build (
-				taskLogger);
-
-		if (
-			isNotNull (
-				effectiveUser)
 		) {
 
-			effectiveUserPrivChecker =
+			loggedInUserPrivChecker =
 				userPrivCheckerBuilderProvider.get ()
 
 				.userId (
-					effectiveUser.getId ())
+					loggedInUser.getId ())
 
 				.build (
 					taskLogger);
 
-		}
-
-		transaction =
-			database.currentTransaction ();
-
-		// process queue subjects
-
-		List <QueueSubjectRec> queueSubjects =
-			ifThenElse (
+			if (
 				isNotNull (
-					queue),
+					effectiveUser)
+			) {
 
-			() ->
-				queueCache.findQueueSubjects (
-					queue),
+				effectiveUserPrivChecker =
+					userPrivCheckerBuilderProvider.get ()
 
-			() ->
-				queueCache.findQueueSubjects ()
+					.userId (
+						effectiveUser.getId ())
 
-		);
+					.build (
+						taskLogger);
 
-		queueSubjects.forEach (
-			queueSubject ->
-				processSubject (
-					taskLogger,
-					queueSubject));
+			}
 
-		// convert subjects to list, filter and sort
+			transaction =
+				database.currentTransaction ();
 
-		result.availableSubjects =
-			subjectInfos.stream ()
+			// process queue subjects
 
-			.filter (
-				subjectInfo ->
-					effectiveUser == null || subjectInfo.available)
+			List <QueueSubjectRec> queueSubjects =
+				ifThenElse (
+					isNotNull (
+						queue),
 
-			.sorted (
-				effectiveUser != null
-					? SubjectInfo.effectiveTimeComparator
-					: SubjectInfo.createdTimeComparator)
+				() ->
+					queueCache.findQueueSubjects (
+						queue),
 
-			.collect (
-				Collectors.toList ());
+				() ->
+					queueCache.findQueueSubjects ()
 
-		// convert queues to list, filter and sort
+			);
 
-		result.allQueues =
-			queueInfos.values ().stream ()
+			queueSubjects.forEach (
+				queueSubject ->
+					processSubject (
+						taskLogger,
+						queueSubject));
 
-			.sorted (
-				effectiveUser != null
-					? QueueInfo.oldestAvailableComparator
-					: QueueInfo.oldestComparator)
+			// convert subjects to list, filter and sort
 
-			.filter (
-				queueInfo ->
-					collectionIsNotEmpty (
-						queueInfo.subjectInfos))
+			result.availableSubjects =
+				subjectInfos.stream ()
 
-			.collect (
-				Collectors.toList ());
+				.filter (
+					subjectInfo ->
+						effectiveUser == null || subjectInfo.available)
 
-		// filter available queues
-
-		result.availableQueues =
-			result.allQueues.stream ()
-
-			.filter (
-				queueInfo ->
-					effectiveUser == null
-						|| queueInfo.availableItems > 0)
-
-			.collect (
-				Collectors.toList ());
-
-		// sort subjects in each queue
-
-		result.allQueues.forEach (
-			queueInfo ->
-				Collections.sort (
-					queueInfo.subjectInfos,
+				.sorted (
 					effectiveUser != null
 						? SubjectInfo.effectiveTimeComparator
-						: SubjectInfo.createdTimeComparator));
+						: SubjectInfo.createdTimeComparator)
 
-		// and return
+				.collect (
+					Collectors.toList ());
 
-		return result;
+			// convert queues to list, filter and sort
+
+			result.allQueues =
+				queueInfos.values ().stream ()
+
+				.sorted (
+					effectiveUser != null
+						? QueueInfo.oldestAvailableComparator
+						: QueueInfo.oldestComparator)
+
+				.filter (
+					queueInfo ->
+						collectionIsNotEmpty (
+							queueInfo.subjectInfos))
+
+				.collect (
+					Collectors.toList ());
+
+			// filter available queues
+
+			result.availableQueues =
+				result.allQueues.stream ()
+
+				.filter (
+					queueInfo ->
+						effectiveUser == null
+							|| queueInfo.availableItems > 0)
+
+				.collect (
+					Collectors.toList ());
+
+			// sort subjects in each queue
+
+			result.allQueues.forEach (
+				queueInfo ->
+					Collections.sort (
+						queueInfo.subjectInfos,
+						effectiveUser != null
+							? SubjectInfo.effectiveTimeComparator
+							: SubjectInfo.createdTimeComparator));
+
+			// and return
+
+			return result;
+
+		}
 
 	}
 

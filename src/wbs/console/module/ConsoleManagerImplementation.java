@@ -29,7 +29,6 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -1159,27 +1158,32 @@ class ConsoleManagerImplementation
 
 		contextStuff.reset ();
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ConsoleManager.chatContext (...)",
-				this);
+		try (
 
-		context.initContext (
-			taskLogger,
-			pathParts,
-			contextStuff);
+			Transaction transaction =
+				database.beginReadOnly (
+					"ConsoleManager.chatContext (...)",
+					this);
 
-		context.initTabContext (
-			contextStuff);
+		) {
 
-		transaction.close ();
+			context.initContext (
+				taskLogger,
+				pathParts,
+				contextStuff);
 
-		if (pathParts.size () > 0)
-			throw new RuntimeException ();
+			context.initTabContext (
+				contextStuff);
 
-		requestContext.consoleContext (
-			context);
+			transaction.close ();
+
+			if (pathParts.size () > 0)
+				throw new RuntimeException ();
+
+			requestContext.consoleContext (
+				context);
+
+		}
 
 	}
 
@@ -1255,244 +1259,249 @@ class ConsoleManagerImplementation
 			"processing path %s",
 			path);
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ConsoleManagerImplementation.fileForPath (path)",
-				this);
+		try (
 
-		PathSupply pathParts =
-			pathParts (path);
+			Transaction transaction =
+				database.beginReadOnly (
+					"ConsoleManagerImplementation.fileForPath (path)",
+					this);
 
-		ConsoleContextTab parentContextTab =
-			null;
+		) {
 
-		String firstContextName =
-			pathParts.next ();
+			PathSupply pathParts =
+				pathParts (path);
 
-		ConsoleContext consoleContext =
-			context (
-				firstContextName,
-				true);
+			ConsoleContextTab parentContextTab =
+				null;
 
-		ConsoleContextStuff contextStuff =
-			null;
-
-		requestContext.foreignContextPath (
-			"");
-
-		while (true) {
-
-			taskLogger.debugFormat (
-				"starting lap with context %s",
-				consoleContext.name ());
-
-			try {
-
-				String contextStuffPath =
-					stripLastPath (
-						pathParts.used ());
-
-				contextStuff =
-					contextStuffProvider.get ()
-						.foreignPath (contextStuffPath)
-						.consoleContext (consoleContext)
-						.parentContextStuff (contextStuff)
-						.embeddedParentContextTab (parentContextTab);
-
-				consoleContext.initContext (
-					taskLogger,
-					pathParts,
-					contextStuff);
-
-				consoleContext.initTabContext (
-					contextStuff);
-
-				taskLogger.debugFormat (
-					"context initialised");
-
-				if (pathParts.size () == 0) {
-
-					taskLogger.debugFormat (
-						"no more path parts, looking up default file");
-
-					String defaultLocalFile =
-						consoleContext
-							.contextType ()
-							.lookupDefaultFileName (requestContext);
-
-					if (
-						defaultLocalFile == null
-						|| defaultLocalFile.length () == 0
-					) {
-
-						taskLogger.errorFormat (
-							"context %s has no default file",
-							consoleContext.name ());
-
-						throw new HttpNotFoundException (
-							optionalAbsent (),
-							emptyList ());
-
-					}
-
-					taskLogger.debugFormat (
-						"got default file %s",
-						defaultLocalFile);
-
-					String defaultUrl =
-						resolveLocalFile (
-							contextStuff,
-							contextStuff.consoleContext (),
-							defaultLocalFile);
-
-					taskLogger.debugFormat (
-						"redirecting to \"%s\"",
-						defaultUrl);
-
-					throw new ExternalRedirectException (
-						requestContext.resolveApplicationUrl (
-							contextStuff.substitutePlaceholders (
-								defaultUrl)));
-
-				}
-
-				if (pathParts.size () == 1) {
-
-					taskLogger.debugFormat (
-						"single path part left, looking up file");
-
-					String file =
-						pathParts.next ();
-
-					taskLogger.debugFormat (
-						"file name is %s",
-						file);
-
-					requestContext.consoleContext (
-						consoleContext);
-
-					requestContext.consoleContextStuff (
-						contextStuff);
-
-					WebFile webFile =
-						consoleContext
-							.files ()
-							.get (file);
-
-					if (webFile == null) {
-
-						taskLogger.errorFormat (
-							"context %s has no file %s",
-							consoleContext.name (),
-							file);
-
-						throw new HttpNotFoundException (
-							optionalAbsent (),
-							emptyList ());
-
-					}
-
-					taskLogger.debugFormat (
-						"returning successful resolution");
-
-					return webFile;
-
-				}
-
-			} catch (ExternalRedirectException exception) {
-
-				throw exception;
-
-			} catch (Exception exception) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"error initialising context %s",
-						consoleContext.name ()),
-					exception);
-
-			}
-
-			// process links
-
-			taskLogger.debugFormat (
-				"multiple remaining path parts, assuming link");
-
-			String link =
+			String firstContextName =
 				pathParts.next ();
 
-			if (
-				stringNotEqualSafe (
-					link,
-					"-")
-			) {
-				throw new RuntimeException ();
-			}
+			ConsoleContext consoleContext =
+				context (
+					firstContextName,
+					true);
+
+			ConsoleContextStuff contextStuff =
+				null;
 
 			requestContext.foreignContextPath (
-				pathParts.used ());
+				"");
 
-			String nextPathPart =
-				pathParts.next ();
+			while (true) {
 
-			taskLogger.debugFormat (
-				"context name from path \"%s\"",
-				nextPathPart);
+				taskLogger.debugFormat (
+					"starting lap with context %s",
+					consoleContext.name ());
 
-			String contextName =
-				"link:" + nextPathPart;
+				try {
 
-			consoleContext =
-				consoleContextsByName.get (
-					contextName);
+					String contextStuffPath =
+						stripLastPath (
+							pathParts.used ());
 
-			if (consoleContext == null) {
+					contextStuff =
+						contextStuffProvider.get ()
+							.foreignPath (contextStuffPath)
+							.consoleContext (consoleContext)
+							.parentContextStuff (contextStuff)
+							.embeddedParentContextTab (parentContextTab);
 
-				taskLogger.errorFormat (
-					"context not found \"%s\"",
-					contextName);
+					consoleContext.initContext (
+						taskLogger,
+						pathParts,
+						contextStuff);
 
-				throw new HttpNotFoundException (
-					optionalAbsent (),
-					emptyList ());
+					consoleContext.initTabContext (
+						contextStuff);
 
-			}
+					taskLogger.debugFormat (
+						"context initialised");
 
-			ConsoleContext searchConsoleContext =
-				consoleContext;
+					if (pathParts.size () == 0) {
 
-			while (
-				isNotNull (
-					searchConsoleContext.parentContextName ())
-			) {
+						taskLogger.debugFormat (
+							"no more path parts, looking up default file");
 
-				searchConsoleContext =
+						String defaultLocalFile =
+							consoleContext
+								.contextType ()
+								.lookupDefaultFileName (requestContext);
+
+						if (
+							defaultLocalFile == null
+							|| defaultLocalFile.length () == 0
+						) {
+
+							taskLogger.errorFormat (
+								"context %s has no default file",
+								consoleContext.name ());
+
+							throw new HttpNotFoundException (
+								optionalAbsent (),
+								emptyList ());
+
+						}
+
+						taskLogger.debugFormat (
+							"got default file %s",
+							defaultLocalFile);
+
+						String defaultUrl =
+							resolveLocalFile (
+								contextStuff,
+								contextStuff.consoleContext (),
+								defaultLocalFile);
+
+						taskLogger.debugFormat (
+							"redirecting to \"%s\"",
+							defaultUrl);
+
+						throw new ExternalRedirectException (
+							requestContext.resolveApplicationUrl (
+								contextStuff.substitutePlaceholders (
+									defaultUrl)));
+
+					}
+
+					if (pathParts.size () == 1) {
+
+						taskLogger.debugFormat (
+							"single path part left, looking up file");
+
+						String file =
+							pathParts.next ();
+
+						taskLogger.debugFormat (
+							"file name is %s",
+							file);
+
+						requestContext.consoleContext (
+							consoleContext);
+
+						requestContext.consoleContextStuff (
+							contextStuff);
+
+						WebFile webFile =
+							consoleContext
+								.files ()
+								.get (file);
+
+						if (webFile == null) {
+
+							taskLogger.errorFormat (
+								"context %s has no file %s",
+								consoleContext.name (),
+								file);
+
+							throw new HttpNotFoundException (
+								optionalAbsent (),
+								emptyList ());
+
+						}
+
+						taskLogger.debugFormat (
+							"returning successful resolution");
+
+						return webFile;
+
+					}
+
+				} catch (ExternalRedirectException exception) {
+
+					throw exception;
+
+				} catch (Exception exception) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"error initialising context %s",
+							consoleContext.name ()),
+						exception);
+
+				}
+
+				// process links
+
+				taskLogger.debugFormat (
+					"multiple remaining path parts, assuming link");
+
+				String link =
+					pathParts.next ();
+
+				if (
+					stringNotEqualSafe (
+						link,
+						"-")
+				) {
+					throw new RuntimeException ();
+				}
+
+				requestContext.foreignContextPath (
+					pathParts.used ());
+
+				String nextPathPart =
+					pathParts.next ();
+
+				taskLogger.debugFormat (
+					"context name from path \"%s\"",
+					nextPathPart);
+
+				String contextName =
+					"link:" + nextPathPart;
+
+				consoleContext =
 					consoleContextsByName.get (
-						searchConsoleContext.parentContextName ());
+						contextName);
 
-			}
+				if (consoleContext == null) {
 
-			String parentContextTabName =
-				stringFormat (
-					"%s",
-					searchConsoleContext.name ());
+					taskLogger.errorFormat (
+						"context not found \"%s\"",
+						contextName);
 
-			parentContextTab =
-				contextTabs.get (
-					parentContextTabName);
+					throw new HttpNotFoundException (
+						optionalAbsent (),
+						emptyList ());
 
-			if (parentContextTab == null) {
+				}
 
-				throw new RuntimeException (
+				ConsoleContext searchConsoleContext =
+					consoleContext;
+
+				while (
+					isNotNull (
+						searchConsoleContext.parentContextName ())
+				) {
+
+					searchConsoleContext =
+						consoleContextsByName.get (
+							searchConsoleContext.parentContextName ());
+
+				}
+
+				String parentContextTabName =
 					stringFormat (
-						"no parent tab %s",
-						parentContextTabName));
+						"%s",
+						searchConsoleContext.name ());
+
+				parentContextTab =
+					contextTabs.get (
+						parentContextTabName);
+
+				if (parentContextTab == null) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"no parent tab %s",
+							parentContextTabName));
+
+				}
+
+				taskLogger.debugFormat (
+					"link complete");
 
 			}
-
-			taskLogger.debugFormat (
-				"link complete");
 
 		}
 

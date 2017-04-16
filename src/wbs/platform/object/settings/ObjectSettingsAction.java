@@ -11,7 +11,6 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -125,108 +124,113 @@ class ObjectSettingsAction <
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ObjectSettingsAction.goReal ()",
-				this);
+		try (
 
-		object =
-			objectLookup.lookupObject (
-				requestContext.consoleContextStuffRequired ());
+			Transaction transaction =
+				database.beginReadWrite (
+					"ObjectSettingsAction.goReal ()",
+					this);
 
-		// perform update
+		) {
 
-		if (formFieldsProvider != null) {
+			object =
+				objectLookup.lookupObject (
+					requestContext.consoleContextStuffRequired ());
 
-			prepareParent ();
+			// perform update
 
-			prepareFieldSet (
-				taskLogger);
+			if (formFieldsProvider != null) {
 
-		}
+				prepareParent ();
 
-		UpdateResultSet updateResultSet =
-			formFieldLogic.update (
-				taskLogger,
-				requestContext,
-				formFieldSet,
-				object,
-				emptyMap (),
-				"settings");
+				prepareFieldSet (
+					taskLogger);
 
-		if (updateResultSet.errorCount () > 0) {
+			}
 
-			formFieldLogic.reportErrors (
-				requestContext,
-				updateResultSet,
-				"settings");
-
-			requestContext.request (
-				"objectSettingsUpdateResultSet",
-				updateResultSet);
-
-			return null;
-
-		}
-
-		if (updateResultSet.updateCount () == 0) {
-
-			requestContext.addWarning (
-				"No changes made");
-
-			return null;
-
-		}
-
-		// create events
-
-		if (object instanceof PermanentRecord) {
-
-			formFieldLogic.runUpdateHooks (
-				taskLogger,
-				formFieldSet,
-				updateResultSet,
-				object,
-				(PermanentRecord <?>) object,
-				optionalAbsent (),
-				optionalAbsent (),
-				"settings");
-
-		} else {
-
-			PermanentRecord <?> linkObject =
-				genericCastUnchecked (
-					objectManager.getParentRequired (
-						object));
-
-			Object objectRef =
-				PropertyUtils.propertyGetAuto (
+			UpdateResultSet updateResultSet =
+				formFieldLogic.update (
+					taskLogger,
+					requestContext,
+					formFieldSet,
 					object,
-					objectRefName);
+					emptyMap (),
+					"settings");
 
-			formFieldLogic.runUpdateHooks (
-				taskLogger,
-				formFieldSet,
-				updateResultSet,
-				object,
-				linkObject,
-				optionalOf (
-					objectRef),
-				optionalOf (
-					objectType),
-				"settings");
+			if (updateResultSet.errorCount () > 0) {
+
+				formFieldLogic.reportErrors (
+					requestContext,
+					updateResultSet,
+					"settings");
+
+				requestContext.request (
+					"objectSettingsUpdateResultSet",
+					updateResultSet);
+
+				return null;
+
+			}
+
+			if (updateResultSet.updateCount () == 0) {
+
+				requestContext.addWarning (
+					"No changes made");
+
+				return null;
+
+			}
+
+			// create events
+
+			if (object instanceof PermanentRecord) {
+
+				formFieldLogic.runUpdateHooks (
+					taskLogger,
+					formFieldSet,
+					updateResultSet,
+					object,
+					(PermanentRecord <?>) object,
+					optionalAbsent (),
+					optionalAbsent (),
+					"settings");
+
+			} else {
+
+				PermanentRecord <?> linkObject =
+					genericCastUnchecked (
+						objectManager.getParentRequired (
+							object));
+
+				Object objectRef =
+					PropertyUtils.propertyGetAuto (
+						object,
+						objectRefName);
+
+				formFieldLogic.runUpdateHooks (
+					taskLogger,
+					formFieldSet,
+					updateResultSet,
+					object,
+					linkObject,
+					optionalOf (
+						objectRef),
+					optionalOf (
+						objectType),
+					"settings");
+
+			}
+
+			// commit
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Details updated");
+
+			return detailsResponder.get ();
 
 		}
-
-		// commit
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Details updated");
-
-		return detailsResponder.get ();
 
 	}
 

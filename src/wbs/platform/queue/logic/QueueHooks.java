@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -64,33 +63,38 @@ class QueueHooks
 	public
 	void init () {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"queueTypeHooks.init ()",
-				this);
+		try (
 
-		// preload object types
+			Transaction transaction =
+				database.beginReadOnly (
+					"queueTypeHooks.init ()",
+					this);
 
-		objectTypeDao.findAll ();
+		) {
 
-		// load queue types and construct index
+			// preload object types
 
-		queueTypeIdsByParentTypeId =
-			queueTypeDao.findAll ().stream ()
+			objectTypeDao.findAll ();
 
-			.collect (
-				Collectors.groupingBy (
+			// load queue types and construct index
 
-				queueType ->
-					queueType.getParentType ().getId (),
+			queueTypeIdsByParentTypeId =
+				queueTypeDao.findAll ().stream ()
 
-				Collectors.mapping (
+				.collect (
+					Collectors.groupingBy (
+
 					queueType ->
-						queueType.getId (),
-					Collectors.toList ()))
+						queueType.getParentType ().getId (),
 
-			);
+					Collectors.mapping (
+						queueType ->
+							queueType.getId (),
+						Collectors.toList ()))
+
+				);
+
+		}
 
 	}
 

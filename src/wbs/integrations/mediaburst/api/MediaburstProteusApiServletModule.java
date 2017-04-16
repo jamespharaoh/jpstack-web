@@ -17,7 +17,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -136,36 +135,41 @@ class MediaburstProteusApiServletModule
 				return;
 			}
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"MediaburstProteusApiServletModule.reportFile.doPost ()",
-					this);
+			try (
 
-			RouteRec route =
-				routeHelper.findRequired (
-					requestContext.requestIntegerRequired (
-						"routeId"));
+				Transaction transaction =
+					database.beginReadWrite (
+						"MediaburstProteusApiServletModule.reportFile.doPost ()",
+						this);
 
-			reportLogic.deliveryReport (
-				taskLogger,
-				route,
-				reportRequestResult.otherId,
-				reportRequestResult.status,
-				Optional.of (
-					reportRequestResult.statusString),
-				Optional.absent (),
-				Optional.of (
-					joinWithSpace (
-						stringFormat (
-							"status=%s",
-							reportRequestResult.statusString),
-						stringFormat (
-							"errCode=%s",
-							reportRequestResult.errCode))),
-				Optional.absent ());
+			) {
 
-			transaction.commit ();
+				RouteRec route =
+					routeHelper.findRequired (
+						requestContext.requestIntegerRequired (
+							"routeId"));
+
+				reportLogic.deliveryReport (
+					taskLogger,
+					route,
+					reportRequestResult.otherId,
+					reportRequestResult.status,
+					Optional.of (
+						reportRequestResult.statusString),
+					Optional.absent (),
+					Optional.of (
+						joinWithSpace (
+							stringFormat (
+								"status=%s",
+								reportRequestResult.statusString),
+							stringFormat (
+								"errCode=%s",
+								reportRequestResult.errCode))),
+					Optional.absent ());
+
+				transaction.commit ();
+
+			}
 
 		}
 

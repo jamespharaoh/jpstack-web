@@ -6,7 +6,6 @@ import static wbs.utils.time.TimeUtils.earlierThan;
 
 import java.util.List;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -143,143 +142,148 @@ class ChatUserQuietDaemon
 				parentTaskLogger,
 				"doUser");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserQuietDaemon.doUser (chatUserId)",
-				this);
+		try (
 
-		// find the user
-
-		ChatUserRec user =
-			chatUserHelper.findRequired (
-				chatUserId);
-
-		String userPath =
-			objectManager.objectPath (
-				user);
-
-		// check and clear the outbound message flag
-
-		if (
-
-			isNull (
-				user.getNextQuietOutbound ())
-
-			|| earlierThan (
-				transaction.now (),
-				user.getNextQuietOutbound ())
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserQuietDaemon.doUser (chatUserId)",
+					this);
 
 		) {
-			return;
-		}
 
-		user
+			// find the user
 
-			.setNextQuietOutbound (
-				null);
+			ChatUserRec user =
+				chatUserHelper.findRequired (
+					chatUserId);
 
-		// check if they have been barred
+			String userPath =
+				objectManager.objectPath (
+					user);
 
-		if (user.getBarred ()) {
+			// check and clear the outbound message flag
 
-			taskLogger.noticeFormat (
-				"Skipping quiet alarm for %s: barred",
-				userPath);
+			if (
 
-			transaction.commit ();
+				isNull (
+					user.getNextQuietOutbound ())
 
-			return;
-		}
+				|| earlierThan (
+					transaction.now (),
+					user.getNextQuietOutbound ())
 
-		if (user.getCreditMode () == ChatUserCreditMode.barred) {
+			) {
+				return;
+			}
 
-			taskLogger.noticeFormat (
-				"Skipping quiet alarm for %s: barred",
-				userPath);
+			user
 
-			transaction.commit ();
+				.setNextQuietOutbound (
+					null);
 
-			return;
+			// check if they have been barred
 
-		}
+			if (user.getBarred ()) {
 
-		// check if they are a "good" user
+				taskLogger.noticeFormat (
+					"Skipping quiet alarm for %s: barred",
+					userPath);
 
-		if (user.getCreditSuccess () < 300) {
+				transaction.commit ();
 
-			taskLogger.noticeFormat (
-				"Skipping quiet alarm for %s: low credit success",
-				userPath);
+				return;
+			}
 
-			transaction.commit ();
+			if (user.getCreditMode () == ChatUserCreditMode.barred) {
 
-			return;
-		}
+				taskLogger.noticeFormat (
+					"Skipping quiet alarm for %s: barred",
+					userPath);
 
-		// find a monitor
+				transaction.commit ();
 
-		ChatUserRec monitor =
-			chatLogic.getOnlineMonitorForOutbound (
-				user);
+				return;
 
-		if (monitor == null) {
+			}
 
-			taskLogger.noticeFormat (
-				"Skipping quiet alarm for %s: no available monitor",
-				userPath);
+			// check if they are a "good" user
 
-			transaction.commit ();
+			if (user.getCreditSuccess () < 300) {
 
-			return;
-		}
+				taskLogger.noticeFormat (
+					"Skipping quiet alarm for %s: low credit success",
+					userPath);
 
-		String monitorPath =
-			objectManager.objectPath (
-				monitor);
+				transaction.commit ();
 
-		// create or update the inbox
+				return;
+			}
 
-		ChatMonitorInboxRec chatMonitorInbox =
-			chatMessageLogic.findOrCreateChatMonitorInbox (
+			// find a monitor
+
+			ChatUserRec monitor =
+				chatLogic.getOnlineMonitorForOutbound (
+					user);
+
+			if (monitor == null) {
+
+				taskLogger.noticeFormat (
+					"Skipping quiet alarm for %s: no available monitor",
+					userPath);
+
+				transaction.commit ();
+
+				return;
+			}
+
+			String monitorPath =
+				objectManager.objectPath (
+					monitor);
+
+			// create or update the inbox
+
+			ChatMonitorInboxRec chatMonitorInbox =
+				chatMessageLogic.findOrCreateChatMonitorInbox (
+					taskLogger,
+					monitor,
+					user,
+					true);
+
+			chatMonitorInbox
+
+				.setOutbound (
+					true);
+
+			// create a log
+
+			chatUserInitiationLogHelper.insert (
 				taskLogger,
-				monitor,
-				user,
-				true);
+				chatUserInitiationLogHelper.createInstance ()
 
-		chatMonitorInbox
+				.setChatUser (
+					user)
 
-			.setOutbound (
-				true);
+				.setMonitorChatUser (
+					monitor)
 
-		// create a log
+				.setReason (
+					ChatUserInitiationReason.quietUser)
 
-		chatUserInitiationLogHelper.insert (
-			taskLogger,
-			chatUserInitiationLogHelper.createInstance ()
+				.setTimestamp (
+					transaction.now ())
 
-			.setChatUser (
-				user)
+			);
 
-			.setMonitorChatUser (
-				monitor)
+			// and return
 
-			.setReason (
-				ChatUserInitiationReason.quietUser)
+			taskLogger.noticeFormat (
+				"Setting quiet alarm for %s with %s",
+				userPath,
+				monitorPath);
 
-			.setTimestamp (
-				transaction.now ())
+			transaction.commit ();
 
-		);
-
-		// and return
-
-		taskLogger.noticeFormat (
-			"Setting quiet alarm for %s with %s",
-			userPath,
-			monitorPath);
-
-		transaction.commit ();
+		}
 
 	}
 

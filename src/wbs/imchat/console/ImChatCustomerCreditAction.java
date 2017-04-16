@@ -9,7 +9,6 @@ import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -93,122 +92,127 @@ class ImChatCustomerCreditAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatCustomerCreditAction.goReal ()",
-				this);
+		try (
 
-		// process form fields
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatCustomerCreditAction.goReal ()",
+					this);
 
-		FormFieldSet <ImChatCustomerCreditRequest> formFields =
-			imChatCustomerConsoleModule.formFieldSet (
-				"credit-request",
-				ImChatCustomerCreditRequest.class);
+		) {
 
-		ImChatCustomerCreditRequest request =
-			ifNotPresent (
+			// process form fields
 
-			optionalCast (
-				ImChatCustomerCreditRequest.class,
+			FormFieldSet <ImChatCustomerCreditRequest> formFields =
+				imChatCustomerConsoleModule.formFieldSet (
+					"credit-request",
+					ImChatCustomerCreditRequest.class);
+
+			ImChatCustomerCreditRequest request =
+				ifNotPresent (
+
+				optionalCast (
+					ImChatCustomerCreditRequest.class,
+					requestContext.request (
+						"imChatCustomerCreditRequest")),
+
+				Optional.of (
+					new ImChatCustomerCreditRequest ())
+
+			);
+
+			request.customer (
+				imChatCustomerHelper.findFromContextRequired ());
+
+			UpdateResultSet updateResultSet =
+				formFieldLogic.update (
+					taskLogger,
+					requestContext,
+					formFields,
+					request,
+					emptyMap (),
+					"credit");
+
+			if (updateResultSet.errorCount () > 0) {
+
 				requestContext.request (
-					"imChatCustomerCreditRequest")),
+					"imChatCustomerCreditUpdateResults",
+					updateResultSet);
 
-			Optional.of (
-				new ImChatCustomerCreditRequest ())
+				formFieldLogic.reportErrors (
+					requestContext,
+					updateResultSet,
+					"credit");
 
-		);
+				return null;
 
-		request.customer (
-			imChatCustomerHelper.findFromContextRequired ());
+			}
 
-		UpdateResultSet updateResultSet =
-			formFieldLogic.update (
+			// create credit log
+
+			imChatCustomerCreditHelper.insert (
 				taskLogger,
-				requestContext,
-				formFields,
-				request,
-				emptyMap (),
-				"credit");
+				imChatCustomerCreditHelper.createInstance ()
 
-		if (updateResultSet.errorCount () > 0) {
+				.setImChatCustomer (
+					request.customer ())
 
-			requestContext.request (
-				"imChatCustomerCreditUpdateResults",
-				updateResultSet);
+				.setIndex (
+					request.customer ().getNumCredits ())
 
-			formFieldLogic.reportErrors (
-				requestContext,
-				updateResultSet,
-				"credit");
+				.setTimestamp (
+					transaction.now ())
+
+				.setUser (
+					userConsoleLogic.userRequired ())
+
+				.setReason (
+					request.reason ())
+
+				.setCreditAmount (
+					request.creditAmount ())
+
+				.setCreditBalanceBefore (
+					request.customer ().getBalance ())
+
+				.setCreditBalanceAfter (
+					+ request.customer ().getBalance ()
+					+ request.creditAmount ())
+
+				.setBillAmount (
+					request.billAmount ())
+
+			);
+
+			// update customer
+
+			request.customer ()
+
+				.setNumCredits (
+					request.customer.getNumCredits () + 1)
+
+				.setBalance (
+					+ request.customer ().getBalance ()
+					+ request.creditAmount ())
+
+				.setTotalPurchaseValue (
+					+ request.customer ().getTotalPurchaseValue ()
+					+ request.creditAmount ())
+
+				.setTotalPurchasePrice (
+					+ request.customer ().getTotalPurchasePrice ()
+					+ request.billAmount ());
+
+			// complete transaction
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Customer credit applied");
 
 			return null;
 
 		}
-
-		// create credit log
-
-		imChatCustomerCreditHelper.insert (
-			taskLogger,
-			imChatCustomerCreditHelper.createInstance ()
-
-			.setImChatCustomer (
-				request.customer ())
-
-			.setIndex (
-				request.customer ().getNumCredits ())
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setUser (
-				userConsoleLogic.userRequired ())
-
-			.setReason (
-				request.reason ())
-
-			.setCreditAmount (
-				request.creditAmount ())
-
-			.setCreditBalanceBefore (
-				request.customer ().getBalance ())
-
-			.setCreditBalanceAfter (
-				+ request.customer ().getBalance ()
-				+ request.creditAmount ())
-
-			.setBillAmount (
-				request.billAmount ())
-
-		);
-
-		// update customer
-
-		request.customer ()
-
-			.setNumCredits (
-				request.customer.getNumCredits () + 1)
-
-			.setBalance (
-				+ request.customer ().getBalance ()
-				+ request.creditAmount ())
-
-			.setTotalPurchaseValue (
-				+ request.customer ().getTotalPurchaseValue ()
-				+ request.creditAmount ())
-
-			.setTotalPurchasePrice (
-				+ request.customer ().getTotalPurchasePrice ()
-				+ request.billAmount ());
-
-		// complete transaction
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Customer credit applied");
-
-		return null;
 
 	}
 

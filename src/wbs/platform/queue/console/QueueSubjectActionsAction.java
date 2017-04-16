@@ -2,15 +2,15 @@ package wbs.platform.queue.console;
 
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
-import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("queueSubjectActionsAction")
@@ -42,15 +42,14 @@ class QueueSubjectActionsAction
 			@NonNull TaskLogger taskLogger)
 		throws ServletException {
 
+		/*
+
 		// begin transaction
 
-		@Cleanup
 		Transaction transaction =
 			database.beginReadWrite (
 				"QueueSubjectActionsAction.goReal ()",
 				this);
-
-		/*
 
 		// load data
 

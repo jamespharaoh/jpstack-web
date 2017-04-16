@@ -9,7 +9,6 @@ import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.json.simple.JSONObject;
@@ -22,6 +21,7 @@ import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.imchat.model.ImChatConversationObjectHelper;
 import wbs.imchat.model.ImChatConversationRec;
 import wbs.imchat.model.ImChatCustomerRec;
@@ -88,112 +88,117 @@ class ImChatMessageListAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ImChatMessageListAction.handle ()",
-				this);
+		try (
 
-		// lookup session
+			Transaction transaction =
+				database.beginReadOnly (
+					"ImChatMessageListAction.handle ()",
+					this);
 
-		ImChatSessionRec session =
-			imChatSessionHelper.findBySecret (
-				request.sessionSecret ());
-
-		if (
-			session == null
-			|| ! session.getActive ()
 		) {
 
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
+			// lookup session
 
-				.reason (
-					"session-invalid")
+			ImChatSessionRec session =
+				imChatSessionHelper.findBySecret (
+					request.sessionSecret ());
 
-				.message (
-					"The session secret is invalid or the session is no " +
-					"longer active");
+			if (
+				session == null
+				|| ! session.getActive ()
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"session-invalid")
+
+					.message (
+						"The session secret is invalid or the session is no " +
+						"longer active");
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						failureResponse);
+
+			}
+
+			ImChatCustomerRec customer =
+				session.getImChatCustomer ();
+
+			// find conversation
+
+			ImChatConversationRec conversation =
+				imChatConversationHelper.findByIndexRequired (
+					customer,
+					request.conversationIndex ());
+
+			if (
+				isNotNull (
+					conversation.getEndTime ())
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"conversation-ended")
+
+					.message (
+						"This conversation has already ended");
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						failureResponse);
+
+			}
+
+			// retrieve messages
+
+			List<ImChatMessageRec> allMessages =
+				ImmutableList.copyOf (
+					conversation.getMessages ());
+
+			List<ImChatMessageRec> newMessages =
+				ImmutableList.copyOf (
+					allMessages.subList (
+						toJavaIntegerRequired (
+							request.messageIndex ()),
+						allMessages.size ()));
+
+			// create response
+
+			ImChatMessageListSuccess messageListSuccessResponse =
+				new ImChatMessageListSuccess ()
+
+				.customer (
+					imChatApiLogic.customerData (
+						customer))
+
+				.conversation (
+					imChatApiLogic.conversationData (
+						conversation));
+
+			for (
+				ImChatMessageRec message
+					: newMessages
+			) {
+
+				messageListSuccessResponse.messages.add (
+					imChatApiLogic.messageData (
+						message));
+
+			}
 
 			return jsonResponderProvider.get ()
 
 				.value (
-					failureResponse);
+					messageListSuccessResponse);
 
 		}
-
-		ImChatCustomerRec customer =
-			session.getImChatCustomer ();
-
-		// find conversation
-
-		ImChatConversationRec conversation =
-			imChatConversationHelper.findByIndexRequired (
-				customer,
-				request.conversationIndex ());
-
-		if (
-			isNotNull (
-				conversation.getEndTime ())
-		) {
-
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"conversation-ended")
-
-				.message (
-					"This conversation has already ended");
-
-			return jsonResponderProvider.get ()
-
-				.value (
-					failureResponse);
-
-		}
-
-		// retrieve messages
-
-		List<ImChatMessageRec> allMessages =
-			ImmutableList.copyOf (
-				conversation.getMessages ());
-
-		List<ImChatMessageRec> newMessages =
-			ImmutableList.copyOf (
-				allMessages.subList (
-					toJavaIntegerRequired (
-						request.messageIndex ()),
-					allMessages.size ()));
-
-		// create response
-
-		ImChatMessageListSuccess messageListSuccessResponse =
-			new ImChatMessageListSuccess ()
-
-			.customer (
-				imChatApiLogic.customerData (
-					customer))
-
-			.conversation (
-				imChatApiLogic.conversationData (
-					conversation));
-
-		for (
-			ImChatMessageRec message
-				: newMessages
-		) {
-
-			messageListSuccessResponse.messages.add (
-				imChatApiLogic.messageData (
-					message));
-
-		}
-
-		return jsonResponderProvider.get ()
-
-			.value (
-				messageListSuccessResponse);
 
 	}
 

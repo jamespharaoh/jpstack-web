@@ -9,7 +9,6 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -83,100 +82,105 @@ class G8waveInFile
 			ServletException,
 			IOException {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"G8waveInFile.doPost ()",
-				this);
+		try (
 
-		// get request stuff
+			Transaction transaction =
+				database.beginReadWrite (
+					"G8waveInFile.doPost ()",
+					this);
 
-		Long routeId =
-			requestContext.requestIntegerRequired (
-				"route_id");
+		) {
 
-		// get params in local variables
+			// get request stuff
 
-		String numFromParam =
-			requestContext.parameterRequired (
-				"telno");
+			Long routeId =
+				requestContext.requestIntegerRequired (
+					"route_id");
 
-		String numToParam =
-			requestContext.parameterRequired (
-				"shortcode");
+			// get params in local variables
 
-		String networkParam =
-			optionalOrNull (
-				requestContext.parameter (
-					"network"));
+			String numFromParam =
+				requestContext.parameterRequired (
+					"telno");
 
-		String messageParam =
-			requestContext.parameterRequired (
-				"message");
+			String numToParam =
+				requestContext.parameterRequired (
+					"shortcode");
 
-		Long networkId = null;
+			String networkParam =
+				optionalOrNull (
+					requestContext.parameter (
+						"network"));
 
-		if (networkParam != null) {
+			String messageParam =
+				requestContext.parameterRequired (
+					"message");
 
-			if (networkParam.equals("ORANGE"))
-				networkId = 1l;
+			Long networkId = null;
 
-			else if (networkParam.equals("VODA"))
-				networkId = 2l;
+			if (networkParam != null) {
 
-			else if (networkParam.equals("TMOB"))
-				networkId = 3l;
+				if (networkParam.equals("ORANGE"))
+					networkId = 1l;
 
-			else if (networkParam.equals("O2"))
-				networkId = 4l;
+				else if (networkParam.equals("VODA"))
+					networkId = 2l;
 
-			else if (networkParam.equals("THREE"))
-				networkId = 6l;
+				else if (networkParam.equals("TMOB"))
+					networkId = 3l;
 
-			else
-				throw new ServletException (
-					"Unknown network: " + networkParam);
+				else if (networkParam.equals("O2"))
+					networkId = 4l;
+
+				else if (networkParam.equals("THREE"))
+					networkId = 6l;
+
+				else
+					throw new ServletException (
+						"Unknown network: " + networkParam);
+			}
+
+			// load the stuff
+
+			RouteRec route =
+				routeHelper.findRequired (
+					routeId);
+
+			NetworkRec network =
+				networkId == null
+					? null
+					: networkHelper.findRequired (
+						networkId);
+
+			// insert the message
+
+			smsInboxLogic.inboxInsert (
+				taskLogger,
+				optionalAbsent (),
+				textHelper.findOrCreate (
+					taskLogger,
+					messageParam),
+				smsNumberHelper.findOrCreate (
+					taskLogger,
+					numFromParam),
+				numToParam,
+				route,
+				optionalFromNullable (
+					network),
+				optionalAbsent (),
+				emptyList (),
+				optionalAbsent (),
+				optionalAbsent ());
+
+			transaction.commit ();
+
+			FormatWriter formatWriter =
+				requestContext.formatWriter ();
+
+			formatWriter.writeLineFormat (
+				"OK");
+
 		}
-
-		// load the stuff
-
-		RouteRec route =
-			routeHelper.findRequired (
-				routeId);
-
-		NetworkRec network =
-			networkId == null
-				? null
-				: networkHelper.findRequired (
-					networkId);
-
-		// insert the message
-
-		smsInboxLogic.inboxInsert (
-			taskLogger,
-			optionalAbsent (),
-			textHelper.findOrCreate (
-				taskLogger,
-				messageParam),
-			smsNumberHelper.findOrCreate (
-				taskLogger,
-				numFromParam),
-			numToParam,
-			route,
-			optionalFromNullable (
-				network),
-			optionalAbsent (),
-			emptyList (),
-			optionalAbsent (),
-			optionalAbsent ());
-
-		transaction.commit ();
-
-		FormatWriter formatWriter =
-			requestContext.formatWriter ();
-
-		formatWriter.writeLineFormat (
-			"OK");
 
 	}
 

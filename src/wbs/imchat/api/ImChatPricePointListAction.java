@@ -9,7 +9,6 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
@@ -20,11 +19,13 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.currency.logic.CurrencyLogic;
+
 import wbs.imchat.model.ImChatObjectHelper;
 import wbs.imchat.model.ImChatPricePointObjectHelper;
 import wbs.imchat.model.ImChatPricePointRec;
 import wbs.imchat.model.ImChatRec;
-import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.web.action.Action;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.JsonResponder;
@@ -69,73 +70,78 @@ class ImChatPricePointListAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ImChatPricePointListAction.handle ()",
-				this);
+		try (
 
-		ImChatRec imChat =
-			imChatHelper.findRequired (
-				parseIntegerRequired (
-					requestContext.requestStringRequired (
-						"imChatId")));
+			Transaction transaction =
+				database.beginReadOnly (
+					"ImChatPricePointListAction.handle ()",
+					this);
 
-		// retrieve price points
+		) {
 
-		List<ImChatPricePointRec> pricePoints =
-			imChatPricePointHelper.findByParent (
-				imChat);
+			ImChatRec imChat =
+				imChatHelper.findRequired (
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"imChatId")));
 
-		Collections.sort (
-			pricePoints,
-			new Comparator<ImChatPricePointRec> () {
+			// retrieve price points
 
-			@Override
-			public
-			int compare (
-					ImChatPricePointRec left,
-					ImChatPricePointRec right) {
+			List<ImChatPricePointRec> pricePoints =
+				imChatPricePointHelper.findByParent (
+					imChat);
 
-				return new CompareToBuilder ()
+			Collections.sort (
+				pricePoints,
+				new Comparator<ImChatPricePointRec> () {
 
-					.append (
-						left.getOrder (),
-						right.getOrder ())
+				@Override
+				public
+				int compare (
+						ImChatPricePointRec left,
+						ImChatPricePointRec right) {
 
-					.append (
-						left.getCode (),
-						right.getCode ())
+					return new CompareToBuilder ()
 
-					.toComparison ();
+						.append (
+							left.getOrder (),
+							right.getOrder ())
+
+						.append (
+							left.getCode (),
+							right.getCode ())
+
+						.toComparison ();
+
+				}
+
+			});
+
+			// create response
+
+			List<ImChatPricePointData> pricePointDatas =
+				new ArrayList<ImChatPricePointData> ();
+
+			for (
+				ImChatPricePointRec pricePoint
+					: pricePoints
+			) {
+
+				if (pricePoint.getDeleted ())
+					continue;
+
+				pricePointDatas.add (
+					imChatApiLogic.pricePointData (
+						pricePoint));
 
 			}
 
-		});
+			return jsonResponderProvider.get ()
 
-		// create response
-
-		List<ImChatPricePointData> pricePointDatas =
-			new ArrayList<ImChatPricePointData> ();
-
-		for (
-			ImChatPricePointRec pricePoint
-				: pricePoints
-		) {
-
-			if (pricePoint.getDeleted ())
-				continue;
-
-			pricePointDatas.add (
-				imChatApiLogic.pricePointData (
-					pricePoint));
+				.value (
+					pricePointDatas);
 
 		}
-
-		return jsonResponderProvider.get ()
-
-			.value (
-				pricePointDatas);
 
 	}
 

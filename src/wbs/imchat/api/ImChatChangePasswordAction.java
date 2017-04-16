@@ -4,7 +4,6 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.json.simple.JSONObject;
@@ -17,6 +16,7 @@ import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.imchat.model.ImChatCustomerObjectHelper;
 import wbs.imchat.model.ImChatCustomerRec;
 import wbs.imchat.model.ImChatSessionObjectHelper;
@@ -77,81 +77,86 @@ class ImChatChangePasswordAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatChangePasswordAction.handle ()",
-				this);
+		try (
 
-		// lookup session
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatChangePasswordAction.handle ()",
+					this);
 
-		ImChatSessionRec session =
-			imChatSessionHelper.findBySecret (
-				changePasswordRequest.sessionSecret ());
-
-		if (
-			session == null
-			|| ! session.getActive ()
 		) {
 
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
+			// lookup session
 
-				.reason (
-					"session-invalid")
+			ImChatSessionRec session =
+				imChatSessionHelper.findBySecret (
+					changePasswordRequest.sessionSecret ());
 
-				.message (
-					"The session secret is invalid or the session is no " +
-					"longer active");
+			if (
+				session == null
+				|| ! session.getActive ()
+			) {
 
-			return jsonResponderProvider.get ()
-				.value (failureResponse);
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
 
-		}
+					.reason (
+						"session-invalid")
 
-		// check current password
-
-		ImChatCustomerRec imChatcustomer =
-			session.getImChatCustomer ();
-
-		if (
-			stringNotEqualSafe (
-				changePasswordRequest.currentPassword (),
-				imChatcustomer.getPassword ())
-		) {
-
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"incorrect-password")
-
-				.message (
-					"The specified password is incorrect.");
+					.message (
+						"The session secret is invalid or the session is no " +
+						"longer active");
 
 				return jsonResponderProvider.get ()
 					.value (failureResponse);
 
+			}
+
+			// check current password
+
+			ImChatCustomerRec imChatcustomer =
+				session.getImChatCustomer ();
+
+			if (
+				stringNotEqualSafe (
+					changePasswordRequest.currentPassword (),
+					imChatcustomer.getPassword ())
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"incorrect-password")
+
+					.message (
+						"The specified password is incorrect.");
+
+					return jsonResponderProvider.get ()
+						.value (failureResponse);
+
+			}
+
+			// update customer password
+
+			imChatcustomer
+
+				.setPassword (
+					changePasswordRequest.newPassword);
+
+			// create response
+
+			ImChatForgotPasswordSuccess successResponse =
+				new ImChatForgotPasswordSuccess ();
+
+			// commit and return
+
+			transaction.commit ();
+
+			return jsonResponderProvider.get ()
+				.value (successResponse);
+
 		}
-
-		// update customer password
-
-		imChatcustomer
-
-			.setPassword (
-				changePasswordRequest.newPassword);
-
-		// create response
-
-		ImChatForgotPasswordSuccess successResponse =
-			new ImChatForgotPasswordSuccess ();
-
-		// commit and return
-
-		transaction.commit ();
-
-		return jsonResponderProvider.get ()
-			.value (successResponse);
 
 	}
 

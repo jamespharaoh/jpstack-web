@@ -7,7 +7,6 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.json.simple.JSONObject;
@@ -106,136 +105,141 @@ class ImChatSessionStartAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatSessionStartAction.handle ()",
-				this);
+		try (
 
-		ImChatRec imChat =
-			imChatHelper.findRequired (
-				parseIntegerRequired (
-					requestContext.requestStringRequired (
-						"imChatId")));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatSessionStartAction.handle ()",
+					this);
 
-		// lookup customer
-
-		ImChatCustomerRec customer =
-			imChatCustomerHelper.findByEmail (
-				imChat,
-				startRequest.email ());
-
-		if (customer == null) {
-
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"email-invalid")
-
-				.message (
-					"No customer with that email address exists");
-
-			return jsonResponderProvider.get ()
-
-				.value (
-					failureResponse);
-
-		}
-
-		// verify password
-
-		if (
-			stringNotEqualSafe (
-				customer.getPassword (),
-				startRequest.password ())
 		) {
 
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
+			ImChatRec imChat =
+				imChatHelper.findRequired (
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"imChatId")));
 
-				.reason (
-					"password-invalid")
+			// lookup customer
 
-				.message (
-					"The supplied password is not correct");
+			ImChatCustomerRec customer =
+				imChatCustomerHelper.findByEmail (
+					imChat,
+					startRequest.email ());
+
+			if (customer == null) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"email-invalid")
+
+					.message (
+						"No customer with that email address exists");
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						failureResponse);
+
+			}
+
+			// verify password
+
+			if (
+				stringNotEqualSafe (
+					customer.getPassword (),
+					startRequest.password ())
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"password-invalid")
+
+					.message (
+						"The supplied password is not correct");
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						failureResponse);
+
+			}
+
+			// create session
+
+			ImChatSessionRec session =
+				imChatSessionHelper.insert (
+					taskLogger,
+					imChatSessionHelper.createInstance ()
+
+				.setImChatCustomer (
+					customer)
+
+				.setSecret (
+					randomLogic.generateLowercase (20))
+
+				.setActive (
+					true)
+
+				.setStartTime (
+					transaction.now ())
+
+				.setUpdateTime (
+					transaction.now ())
+
+				.setUserAgentText (
+					optionalOrNull (
+						textHelper.findOrCreate (
+							taskLogger,
+							optionalFromNullable (
+								startRequest.userAgent ()))))
+
+				.setIpAddress (
+					optionalOrNull (
+						requestContext.realIp ()))
+
+			);
+
+			customer
+
+				.setActiveSession (
+					session)
+
+				.setLastSession (
+					transaction.now ());
+
+			// create response
+
+			ImChatSessionStartSuccess successResponse =
+				new ImChatSessionStartSuccess ()
+
+				.sessionSecret (
+					session.getSecret ())
+
+				.customer (
+					imChatApiLogic.customerData (
+						customer))
+
+				.conversation (
+					customer.getCurrentConversation () != null
+						? imChatApiLogic.conversationData (
+							customer.getCurrentConversation ())
+						: null);
+
+			// commit and return
+
+			transaction.commit ();
 
 			return jsonResponderProvider.get ()
 
 				.value (
-					failureResponse);
+					successResponse);
 
 		}
-
-		// create session
-
-		ImChatSessionRec session =
-			imChatSessionHelper.insert (
-				taskLogger,
-				imChatSessionHelper.createInstance ()
-
-			.setImChatCustomer (
-				customer)
-
-			.setSecret (
-				randomLogic.generateLowercase (20))
-
-			.setActive (
-				true)
-
-			.setStartTime (
-				transaction.now ())
-
-			.setUpdateTime (
-				transaction.now ())
-
-			.setUserAgentText (
-				optionalOrNull (
-					textHelper.findOrCreate (
-						taskLogger,
-						optionalFromNullable (
-							startRequest.userAgent ()))))
-
-			.setIpAddress (
-				optionalOrNull (
-					requestContext.realIp ()))
-
-		);
-
-		customer
-
-			.setActiveSession (
-				session)
-
-			.setLastSession (
-				transaction.now ());
-
-		// create response
-
-		ImChatSessionStartSuccess successResponse =
-			new ImChatSessionStartSuccess ()
-
-			.sessionSecret (
-				session.getSecret ())
-
-			.customer (
-				imChatApiLogic.customerData (
-					customer))
-
-			.conversation (
-				customer.getCurrentConversation () != null
-					? imChatApiLogic.conversationData (
-						customer.getCurrentConversation ())
-					: null);
-
-		// commit and return
-
-		transaction.commit ();
-
-		return jsonResponderProvider.get ()
-
-			.value (
-				successResponse);
 
 	}
 

@@ -11,7 +11,6 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -73,116 +72,121 @@ class MessageTemplateMessagesGetAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"MessageTemplateMessagesGetAction.handle ()",
-				this);
+		try (
 
-		// lookup message template stuff
+			Transaction transaction =
+				database.beginReadOnly (
+					"MessageTemplateMessagesGetAction.handle ()",
+					this);
 
-		String sliceCode =
-			hyphenToUnderscore (
-				requestContext.requestStringRequired (
-					"sliceCode"));
-
-		String messageTemplateDatabaseCode =
-			hyphenToUnderscore (
-				requestContext.requestStringRequired (
-					"messageTemplateDatabaseCode"));
-
-		Optional<MessageTemplateDatabaseRec> messageTemplateDatabaseOptional =
-			messageTemplateDatabaseHelper.findByCode (
-				GlobalId.root,
-				sliceCode,
-				messageTemplateDatabaseCode);
-
-		if (
-			optionalIsNotPresent (
-				messageTemplateDatabaseOptional)
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Message template database not found: %s.%s",
-					sliceCode,
-					messageTemplateDatabaseCode));
+			// lookup message template stuff
 
-		}
-
-		MessageTemplateDatabaseRec messageTemplateDatabase =
-			messageTemplateDatabaseOptional.get ();
-
-		MessageTemplateSetRec messageTemplateSet =
-			messageTemplateSetHelper.findByCodeRequired (
-				messageTemplateDatabase,
+			String sliceCode =
 				hyphenToUnderscore (
 					requestContext.requestStringRequired (
-						"messageTemplateSetCode")));
+						"sliceCode"));
 
-		// create response
+			String messageTemplateDatabaseCode =
+				hyphenToUnderscore (
+					requestContext.requestStringRequired (
+						"messageTemplateDatabaseCode"));
 
-		ImmutableMap.Builder<String,String> messagesBuilder =
-			ImmutableMap.<String,String>builder ();
+			Optional<MessageTemplateDatabaseRec> messageTemplateDatabaseOptional =
+				messageTemplateDatabaseHelper.findByCode (
+					GlobalId.root,
+					sliceCode,
+					messageTemplateDatabaseCode);
 
-		for (
-			MessageTemplateEntryTypeRec entryType
-				: messageTemplateDatabase.getMessageTemplateEntryTypes ()
-		) {
-
-			if (entryType.getDeleted ()) {
-				continue;
-			}
-
-			MessageTemplateEntryValueRec entryValue =
-				messageTemplateSet.getMessageTemplateEntryValues ().get (
-					entryType.getId ());
-
-			for (
-				MessageTemplateFieldTypeRec fieldType
-					: entryType.getMessageTemplateFieldTypes ()
+			if (
+				optionalIsNotPresent (
+					messageTemplateDatabaseOptional)
 			) {
 
-				if (fieldType.getDeleted ()) {
+				throw new RuntimeException (
+					stringFormat (
+						"Message template database not found: %s.%s",
+						sliceCode,
+						messageTemplateDatabaseCode));
+
+			}
+
+			MessageTemplateDatabaseRec messageTemplateDatabase =
+				messageTemplateDatabaseOptional.get ();
+
+			MessageTemplateSetRec messageTemplateSet =
+				messageTemplateSetHelper.findByCodeRequired (
+					messageTemplateDatabase,
+					hyphenToUnderscore (
+						requestContext.requestStringRequired (
+							"messageTemplateSetCode")));
+
+			// create response
+
+			ImmutableMap.Builder<String,String> messagesBuilder =
+				ImmutableMap.<String,String>builder ();
+
+			for (
+				MessageTemplateEntryTypeRec entryType
+					: messageTemplateDatabase.getMessageTemplateEntryTypes ()
+			) {
+
+				if (entryType.getDeleted ()) {
 					continue;
 				}
 
-				MessageTemplateFieldValueRec fieldValue =
-					entryValue != null && ! entryValue.getDeleted ()
-						? entryValue.getFields ().get (
-							fieldType.getId ())
-						: null;
+				MessageTemplateEntryValueRec entryValue =
+					messageTemplateSet.getMessageTemplateEntryValues ().get (
+						entryType.getId ());
 
-				String key =
-					joinWithFullStop (
-						underscoreToHyphen (
-							entryType.getCode ()),
-						underscoreToHyphen (
-							fieldType.getCode ()));
+				for (
+					MessageTemplateFieldTypeRec fieldType
+						: entryType.getMessageTemplateFieldTypes ()
+				) {
 
-				String value =
-					fieldValue != null && ! fieldValue.getDeleted ()
-						? fieldValue.getStringValue ()
-						: fieldType.getDefaultValue ();
+					if (fieldType.getDeleted ()) {
+						continue;
+					}
 
-				messagesBuilder.put (
-					key,
-					value);
+					MessageTemplateFieldValueRec fieldValue =
+						entryValue != null && ! entryValue.getDeleted ()
+							? entryValue.getFields ().get (
+								fieldType.getId ())
+							: null;
+
+					String key =
+						joinWithFullStop (
+							underscoreToHyphen (
+								entryType.getCode ()),
+							underscoreToHyphen (
+								fieldType.getCode ()));
+
+					String value =
+						fieldValue != null && ! fieldValue.getDeleted ()
+							? fieldValue.getStringValue ()
+							: fieldType.getDefaultValue ();
+
+					messagesBuilder.put (
+						key,
+						value);
+
+				}
 
 			}
 
+			MessageTemplateSetGetSuccess successResponse =
+				new MessageTemplateSetGetSuccess ()
+
+				.messages (
+					messagesBuilder.build ());
+
+			return jsonResponderProvider.get ()
+
+				.value (
+					successResponse);
+
 		}
-
-		MessageTemplateSetGetSuccess successResponse =
-			new MessageTemplateSetGetSuccess ()
-
-			.messages (
-				messagesBuilder.build ());
-
-		return jsonResponderProvider.get ()
-
-			.value (
-				successResponse);
 
 	}
 

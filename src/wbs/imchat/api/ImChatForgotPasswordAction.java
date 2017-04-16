@@ -5,7 +5,6 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.json.simple.JSONObject;
@@ -97,63 +96,68 @@ class ImChatForgotPasswordAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatForgotPasswordAction.handle ()",
-				this);
+		try (
 
-		ImChatRec imChat =
-			imChatHelper.findRequired (
-				parseIntegerRequired (
-					requestContext.requestStringRequired (
-						"imChatId")));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatForgotPasswordAction.handle ()",
+					this);
 
-		// check for existing
+		) {
 
-		ImChatCustomerRec imChatCustomer =
-			imChatCustomerHelper.findByEmail (
-				imChat,
-				forgotPasswordRequest.email ());
+			ImChatRec imChat =
+				imChatHelper.findRequired (
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"imChatId")));
 
-		if (imChatCustomer == null) {
+			// check for existing
 
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
+			ImChatCustomerRec imChatCustomer =
+				imChatCustomerHelper.findByEmail (
+					imChat,
+					forgotPasswordRequest.email ());
 
-				.reason (
-					"email-invalid")
+			if (imChatCustomer == null) {
 
-				.message (
-					"There is no customer with the email address specified");
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"email-invalid")
+
+					.message (
+						"There is no customer with the email address specified");
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						failureResponse);
+
+			}
+
+			// generate new password
+
+			imChatLogic.customerPasswordGenerate (
+				taskLogger,
+				imChatCustomer,
+				optionalAbsent ());
+
+			// create response
+
+			ImChatForgotPasswordSuccess successResponse =
+				new ImChatForgotPasswordSuccess ();
+
+			// commit and return
+
+			transaction.commit ();
 
 			return jsonResponderProvider.get ()
 
 				.value (
-					failureResponse);
+					successResponse);
 
 		}
-
-		// generate new password
-
-		imChatLogic.customerPasswordGenerate (
-			taskLogger,
-			imChatCustomer,
-			optionalAbsent ());
-
-		// create response
-
-		ImChatForgotPasswordSuccess successResponse =
-			new ImChatForgotPasswordSuccess ();
-
-		// commit and return
-
-		transaction.commit ();
-
-		return jsonResponderProvider.get ()
-
-			.value (
-				successResponse);
 
 	}
 

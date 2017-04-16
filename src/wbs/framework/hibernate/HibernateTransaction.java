@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -122,14 +121,15 @@ class HibernateTransaction
 
 		// create session
 
-		{
+		try (
 
-			@Cleanup
 			ActiveTask activeTask =
 				hibernateDatabase.activityManager.start (
 					"database",
 					"HibernateTransaction.begin () - create session",
 					this);
+
+		) {
 
 			session =
 				hibernateDatabase.sessionFactory.withOptions ()
@@ -143,14 +143,15 @@ class HibernateTransaction
 
 		// begin transaction
 
-		{
+		try (
 
-			@Cleanup
 			ActiveTask activeTask =
 				hibernateDatabase.activityManager.start (
 					"database",
 					"HibernateTransaction.begin () - begin transaction",
 					this);
+
+		) {
 
 			hibernateTransaction =
 				session.beginTransaction ();
@@ -159,14 +160,15 @@ class HibernateTransaction
 
 		// get server process id
 
-		{
+		try (
 
-			@Cleanup
 			ActiveTask activeTask =
 				hibernateDatabase.activityManager.start (
 					"database",
 					"HibernateTransaction.begin () - get server process id",
 					this);
+
+		) {
 
 			serverProcessId =
 				session.doReturningWork (

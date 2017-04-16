@@ -9,9 +9,7 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -34,7 +32,6 @@ import wbs.sms.message.report.logic.SmsDeliveryReportLogic;
 import wbs.web.context.RequestContext;
 import wbs.web.file.AbstractWebFile;
 
-@Log4j
 @SingletonComponent ("digitalSelectRouteReportFile")
 public
 class DigitalSelectRouteReportFile
@@ -81,11 +78,11 @@ class DigitalSelectRouteReportFile
 				"routeId");
 
 		String msgidParam =
-			requestContext.parameterOrNull (
+			requestContext.parameterRequired (
 				"msgid");
 
 		String statParam =
-			requestContext.parameterOrNull (
+			requestContext.parameterRequired (
 				"stat");
 
 		// debugging
@@ -109,54 +106,58 @@ class DigitalSelectRouteReportFile
 
 		// start transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"DigitalSelectRouteReportFile.doPost ()",
-				this);
+		try (
 
-		DigitalSelectRouteOutRec digitalSelectRouteOut =
-			digitalSelectRouteOutHelper.findRequired (
-				routeId);
+			Transaction transaction =
+				database.beginReadWrite (
+					"DigitalSelectRouteReportFile.doPost ()",
+					this);
 
-		// store report
+		) {
 
-		try {
+			DigitalSelectRouteOutRec digitalSelectRouteOut =
+				digitalSelectRouteOutHelper.findRequired (
+					routeId);
 
-			reportLogic.deliveryReport (
-				taskLogger,
-				digitalSelectRouteOut.getRoute (),
-				msgidParam,
-				newMessageStatus,
-				optionalOf (
-					statParam),
-				optionalAbsent (),
-				optionalAbsent (),
-				optionalAbsent ());
+			// store report
 
-		} catch (NoSuchMessageException exception) {
+			try {
 
-			// handle regular unrecognised message ids with a log warning and
-			// custom HTTP response code
+				reportLogic.deliveryReport (
+					taskLogger,
+					digitalSelectRouteOut.getRoute (),
+					msgidParam,
+					newMessageStatus,
+					optionalOf (
+						statParam),
+					optionalAbsent (),
+					optionalAbsent (),
+					optionalAbsent ());
 
-			// TODO expose frequent errors like this better somehow
+			} catch (NoSuchMessageException exception) {
 
-			log.warn (
-				stringFormat (
+				// handle regular unrecognised message ids with a log warning and
+				// custom HTTP response code
+
+				// TODO expose frequent errors like this better somehow
+
+				taskLogger.warningFormat (
 					"Received delivery report for unknown message %s",
-					msgidParam));
+					msgidParam);
 
-			requestContext.sendError (
-				409l,
-				"Message does not exist");
+				requestContext.sendError (
+					409l,
+					"Message does not exist");
 
-			return;
+				return;
+
+			}
+
+			// commit
+
+			transaction.commit ();
 
 		}
-
-		// commit
-
-		transaction.commit ();
 
 	}
 

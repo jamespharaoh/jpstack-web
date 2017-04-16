@@ -22,7 +22,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.apache.commons.lang3.Range;
@@ -205,13 +204,14 @@ class ChatBroadcastSendAction
 				LogSeverity.debug,
 				"Broadcast send");
 
-		try {
+		try (
 
-			@Cleanup
 			Transaction transaction =
 				database.beginReadWrite (
 					"ChatBroadcastSendAction.goReal ()",
 					this);
+
+		) {
 
 			// load form
 

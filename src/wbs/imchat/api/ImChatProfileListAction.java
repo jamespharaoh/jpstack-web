@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -17,6 +16,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.imchat.model.ImChatObjectHelper;
 import wbs.imchat.model.ImChatProfileObjectHelper;
 import wbs.imchat.model.ImChatProfileRec;
@@ -63,51 +63,56 @@ class ImChatProfileListAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ImChatProfileListAction.handle ()",
-				this);
+		try (
 
-		ImChatRec imChat =
-			imChatHelper.findRequired (
-				parseIntegerRequired (
-					requestContext.requestStringRequired (
-						"imChatId")));
+			Transaction transaction =
+				database.beginReadOnly (
+					"ImChatProfileListAction.handle ()",
+					this);
 
-		// retrieve profiles
-
-		List <ImChatProfileRec> profiles =
-			imChatProfileHelper.findByParent (
-				imChat);
-
-		Collections.sort (
-			profiles);
-
-		// create response
-
-		List <ImChatProfileData> profileDatas =
-			new ArrayList<> ();
-
-		for (
-			ImChatProfileRec profile
-				: profiles
 		) {
 
-			if (profile.getDeleted ())
-				continue;
+			ImChatRec imChat =
+				imChatHelper.findRequired (
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"imChatId")));
 
-			if (profile.getState () == ImChatProfileState.disabled)
-				continue;
+			// retrieve profiles
 
-			profileDatas.add (
-				imChatApiLogic.profileData (
-					profile));
+			List <ImChatProfileRec> profiles =
+				imChatProfileHelper.findByParent (
+					imChat);
+
+			Collections.sort (
+				profiles);
+
+			// create response
+
+			List <ImChatProfileData> profileDatas =
+				new ArrayList<> ();
+
+			for (
+				ImChatProfileRec profile
+					: profiles
+			) {
+
+				if (profile.getDeleted ())
+					continue;
+
+				if (profile.getState () == ImChatProfileState.disabled)
+					continue;
+
+				profileDatas.add (
+					imChatApiLogic.profileData (
+						profile));
+
+			}
+
+			return jsonResponderProvider.get ()
+				.value (profileDatas);
 
 		}
-
-		return jsonResponderProvider.get ()
-			.value (profileDatas);
 
 	}
 

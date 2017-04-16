@@ -7,12 +7,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Cleanup;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.IOUtils;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -123,39 +123,44 @@ class JigsawApi {
 
 			// make call
 
-			@Cleanup
-			CloseableHttpClient httpClient =
-				HttpClientBuilder.create ()
-					.build ();
+			try (
 
-			HttpPost post =
-				new HttpPost (url);
+				CloseableHttpClient httpClient =
+					HttpClientBuilder.create ()
+						.build ();
 
-			StringEntity postEntity =
-				new StringEntity (json, "utf-8");
+			) {
 
-			postEntity.setContentType ("application/json");
+				HttpPost post =
+					new HttpPost (url);
 
-			post.setEntity (postEntity);
+				StringEntity postEntity =
+					new StringEntity (json, "utf-8");
 
-			HttpResponse response =
-				httpClient.execute (post);
+				postEntity.setContentType ("application/json");
 
-			// output response (for debugging)
-			if (log.isDebugEnabled ()) {
-				HttpEntity responseEntity = response.getEntity ();
-				byte[] responseBytes = IOUtils.toByteArray (responseEntity.getContent ());
-				log.debug ("Response entity " + new String (responseBytes, "utf-8"));
-			}
+				post.setEntity (postEntity);
 
-			// check status
-			int status = response.getStatusLine ().getStatusCode ();
-			if (status != 200) {
-				throw new RuntimeException ("Jigsaw API call failed with status code " + status);
-			}
+				HttpResponse response =
+					httpClient.execute (post);
 
-			for (String token : request.tokens) {
-				log.info ("Jigsaw push notification sent to " + request.applicationIdentifier + ": " + token);
+				// output response (for debugging)
+				if (log.isDebugEnabled ()) {
+					HttpEntity responseEntity = response.getEntity ();
+					byte[] responseBytes = IOUtils.toByteArray (responseEntity.getContent ());
+					log.debug ("Response entity " + new String (responseBytes, "utf-8"));
+				}
+
+				// check status
+				int status = response.getStatusLine ().getStatusCode ();
+				if (status != 200) {
+					throw new RuntimeException ("Jigsaw API call failed with status code " + status);
+				}
+
+				for (String token : request.tokens) {
+					log.info ("Jigsaw push notification sent to " + request.applicationIdentifier + ": " + token);
+				}
+
 			}
 
 		} catch (Exception e) {

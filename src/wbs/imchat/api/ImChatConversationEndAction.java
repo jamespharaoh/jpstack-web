@@ -9,7 +9,6 @@ import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.json.simple.JSONObject;
@@ -22,6 +21,7 @@ import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.imchat.logic.ImChatLogic;
 import wbs.imchat.model.ImChatConversationObjectHelper;
 import wbs.imchat.model.ImChatConversationRec;
@@ -100,111 +100,116 @@ class ImChatConversationEndAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatConversationEndAction.handle ()",
-				this);
+		try (
 
-		ImChatRec imChat =
-			imChatHelper.findRequired (
-				parseIntegerRequired (
-					requestContext.requestStringRequired (
-						"imChatId")));
-
-		// lookup session and customer
-
-		ImChatSessionRec session =
-			imChatSessionHelper.findBySecret (
-				endRequest.sessionSecret ());
-
-		ImChatCustomerRec customer =
-			session.getImChatCustomer ();
-
-		if (
-
-			isNull (
-				session)
-
-			|| ! session.getActive ()
-
-			|| referenceNotEqualWithClass (
-				ImChatRec.class,
-				imChat,
-				customer.getImChat ())
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatConversationEndAction.handle ()",
+					this);
 
 		) {
 
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
+			ImChatRec imChat =
+				imChatHelper.findRequired (
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"imChatId")));
 
-				.reason (
-					"session-invalid")
+			// lookup session and customer
 
-				.message (
-					"The session secret is invalid or the session is no " +
-					"longer active");
+			ImChatSessionRec session =
+				imChatSessionHelper.findBySecret (
+					endRequest.sessionSecret ());
+
+			ImChatCustomerRec customer =
+				session.getImChatCustomer ();
+
+			if (
+
+				isNull (
+					session)
+
+				|| ! session.getActive ()
+
+				|| referenceNotEqualWithClass (
+					ImChatRec.class,
+					imChat,
+					customer.getImChat ())
+
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"session-invalid")
+
+					.message (
+						"The session secret is invalid or the session is no " +
+						"longer active");
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						failureResponse);
+
+			}
+
+			// get conversation
+
+			if (
+
+				lessThanZero (
+					endRequest.conversationIndex ())
+
+				|| notLessThan (
+					endRequest.conversationIndex (),
+					customer.getNumConversations ())
+
+			) {
+
+				throw new RuntimeException ();
+
+			}
+
+			ImChatConversationRec conversation =
+				imChatConversationHelper.findByIndexRequired (
+					customer,
+					endRequest.conversationIndex ());
+
+			// end conversation
+
+			if (
+				referenceEqualWithClass (
+					ImChatConversationRec.class,
+					conversation,
+					customer.getCurrentConversation ())
+			) {
+
+				imChatLogic.conversationEnd (
+					conversation);
+
+			}
+
+			// create response
+
+			ImChatConversationEndSuccess successResponse =
+				new ImChatConversationEndSuccess ()
+
+				.customer (
+					imChatApiLogic.customerData (
+						customer));
+
+			// commit and return
+
+			transaction.commit ();
 
 			return jsonResponderProvider.get ()
 
 				.value (
-					failureResponse);
+					successResponse);
 
 		}
-
-		// get conversation
-
-		if (
-
-			lessThanZero (
-				endRequest.conversationIndex ())
-
-			|| notLessThan (
-				endRequest.conversationIndex (),
-				customer.getNumConversations ())
-
-		) {
-
-			throw new RuntimeException ();
-
-		}
-
-		ImChatConversationRec conversation =
-			imChatConversationHelper.findByIndexRequired (
-				customer,
-				endRequest.conversationIndex ());
-
-		// end conversation
-
-		if (
-			referenceEqualWithClass (
-				ImChatConversationRec.class,
-				conversation,
-				customer.getCurrentConversation ())
-		) {
-
-			imChatLogic.conversationEnd (
-				conversation);
-
-		}
-
-		// create response
-
-		ImChatConversationEndSuccess successResponse =
-			new ImChatConversationEndSuccess ()
-
-			.customer (
-				imChatApiLogic.customerData (
-					customer));
-
-		// commit and return
-
-		transaction.commit ();
-
-		return jsonResponderProvider.get ()
-
-			.value (
-				successResponse);
 
 	}
 

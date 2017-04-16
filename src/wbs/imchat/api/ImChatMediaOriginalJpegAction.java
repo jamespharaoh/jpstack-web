@@ -6,7 +6,6 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -15,11 +14,13 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
-import wbs.imchat.model.ImChatObjectHelper;
-import wbs.imchat.model.ImChatProfileObjectHelper;
+
 import wbs.platform.media.model.ContentRec;
 import wbs.platform.media.model.MediaObjectHelper;
 import wbs.platform.media.model.MediaRec;
+
+import wbs.imchat.model.ImChatObjectHelper;
+import wbs.imchat.model.ImChatProfileObjectHelper;
 import wbs.web.action.Action;
 import wbs.web.context.RequestContext;
 import wbs.web.exceptions.HttpNotFoundException;
@@ -65,54 +66,59 @@ class ImChatMediaOriginalJpegAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ImChatMediaOriginalJpecAction.handle ()",
-				this);
+		try (
 
-		// retrieve media data
+			Transaction transaction =
+				database.beginReadOnly (
+					"ImChatMediaOriginalJpecAction.handle ()",
+					this);
 
-		MediaRec media =
-			mediaHelper.findOrThrow (
-				Long.parseLong (
-					requestContext.requestStringRequired (
-						"mediaId")),
-				() -> new HttpNotFoundException (
-					optionalAbsent (),
-					emptyList ()));
-
-		// check content hash
-
-		ContentRec content =
-			media.getContent ();
-
-		Long hash =
-			Math.abs (
-				content.getHash ());
-
-		if (
-			stringNotEqualSafe (
-				hash.toString (),
-				requestContext.requestStringRequired (
-					"mediaContentHash"))
 		) {
 
-			throw new HttpNotFoundException (
-				optionalAbsent (),
-				emptyList ());
+			// retrieve media data
+
+			MediaRec media =
+				mediaHelper.findOrThrow (
+					Long.parseLong (
+						requestContext.requestStringRequired (
+							"mediaId")),
+					() -> new HttpNotFoundException (
+						optionalAbsent (),
+						emptyList ()));
+
+			// check content hash
+
+			ContentRec content =
+				media.getContent ();
+
+			Long hash =
+				Math.abs (
+					content.getHash ());
+
+			if (
+				stringNotEqualSafe (
+					hash.toString (),
+					requestContext.requestStringRequired (
+						"mediaContentHash"))
+			) {
+
+				throw new HttpNotFoundException (
+					optionalAbsent (),
+					emptyList ());
+
+			}
+
+			// create response
+
+			return imChatMediaResponderProvider.get ()
+
+				.data (
+					content.getData ())
+
+				.contentType (
+					media.getMediaType ().getMimeType ());
 
 		}
-
-		// create response
-
-		return imChatMediaResponderProvider.get ()
-
-			.data (
-				content.getData ())
-
-			.contentType (
-				media.getMediaType ().getMimeType ());
 
 	}
 

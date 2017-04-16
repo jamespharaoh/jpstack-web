@@ -8,7 +8,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -104,112 +103,117 @@ class SimulatorSenderHelper
 				parentTaskLogger,
 				"performSend");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"SimulatorSender.sendMessage (messageId)",
-				this);
+		try (
 
-		MessageRec message =
-			messageHelper.findRequired (
-				state.messageId);
+			Transaction transaction =
+				database.beginReadWrite (
+					"SimulatorSender.sendMessage (messageId)",
+					this);
 
-		RouteRec route =
-			message.getRoute ();
-
-		NetworkRec network =
-			message.getNetwork ();
-
-		// create event data
-
-		Object data =
-			ImmutableMap.<String,Object>builder ()
-
-			.put (
-				"message",
-				ImmutableMap.<String,Object>builder ()
-					.put ("id", message.getId ())
-					.put ("numFrom", message.getNumFrom ())
-					.put ("numTo", message.getNumTo ())
-					.put ("text", message.getText ().getText ())
-					.build ())
-
-			.put (
-				"route",
-				ImmutableMap.<String,Object>builder ()
-					.put ("id", route.getId ())
-					.put ("code", route.getCode ())
-					.put ("outCharge", route.getOutCharge ())
-					.build ())
-
-			.put (
-				"network",
-				ImmutableMap.<String,Object>builder ()
-					.put ("id", network.getId ())
-					.put ("code", network.getCode ())
-					.build ())
-
-			.build ();
-
-		// lookup session
-
-		Optional<SimulatorSessionNumberRec> simulatorSessionNumberOptional =
-			simulatorSessionNumberHelper.find (
-				message.getNumber ().getId ());
-
-		if (
-			optionalIsNotPresent (
-				simulatorSessionNumberOptional)
 		) {
+
+			MessageRec message =
+				messageHelper.findRequired (
+					state.messageId);
+
+			RouteRec route =
+				message.getRoute ();
+
+			NetworkRec network =
+				message.getNetwork ();
+
+			// create event data
+
+			Object data =
+				ImmutableMap.<String,Object>builder ()
+
+				.put (
+					"message",
+					ImmutableMap.<String,Object>builder ()
+						.put ("id", message.getId ())
+						.put ("numFrom", message.getNumFrom ())
+						.put ("numTo", message.getNumTo ())
+						.put ("text", message.getText ().getText ())
+						.build ())
+
+				.put (
+					"route",
+					ImmutableMap.<String,Object>builder ()
+						.put ("id", route.getId ())
+						.put ("code", route.getCode ())
+						.put ("outCharge", route.getOutCharge ())
+						.build ())
+
+				.put (
+					"network",
+					ImmutableMap.<String,Object>builder ()
+						.put ("id", network.getId ())
+						.put ("code", network.getCode ())
+						.build ())
+
+				.build ();
+
+			// lookup session
+
+			Optional<SimulatorSessionNumberRec> simulatorSessionNumberOptional =
+				simulatorSessionNumberHelper.find (
+					message.getNumber ().getId ());
+
+			if (
+				optionalIsNotPresent (
+					simulatorSessionNumberOptional)
+			) {
+
+				return new PerformSendResult ()
+
+					.status (
+						PerformSendStatus.remoteError)
+
+					.statusMessage (
+						"No session for number");
+
+			}
+
+			SimulatorSessionNumberRec simulatorSessionNumber =
+				simulatorSessionNumberOptional.get ();
+
+			// create event
+
+			SimulatorEventRec event =
+				simulatorEventHelper.insert (
+					taskLogger,
+					simulatorEventHelper.createInstance ()
+
+				.setSimulatorSession (
+					simulatorSessionNumber.getSimulatorSession ())
+
+				.setType (
+					"message_out")
+
+				.setTimestamp (
+					transaction.now ())
+
+				.setData (
+					JSONValue.toJSONString (data)));
+
+			// finish up
+
+			transaction.commit ();
+
+			state.otherIds (
+				ImmutableList.of (
+					Long.toString (
+						event.getId ())));
 
 			return new PerformSendResult ()
 
 				.status (
-					PerformSendStatus.remoteError)
+					PerformSendStatus.success)
 
 				.statusMessage (
 					"No session for number");
 
 		}
-
-		SimulatorSessionNumberRec simulatorSessionNumber =
-			simulatorSessionNumberOptional.get ();
-
-		// create event
-
-		SimulatorEventRec event =
-			simulatorEventHelper.insert (
-				taskLogger,
-				simulatorEventHelper.createInstance ()
-
-			.setSimulatorSession (
-				simulatorSessionNumber.getSimulatorSession ())
-
-			.setType (
-				"message_out")
-
-			.setTimestamp (
-				transaction.now ())
-
-			.setData (
-				JSONValue.toJSONString (data)));
-
-		// finish up
-
-		transaction.commit ();
-
-		state.otherIds (
-			ImmutableList.of (
-				Long.toString (
-					event.getId ())));
-
-		return new PerformSendResult ()
-
-			.status (
-				PerformSendStatus.success)
-
-			.statusMessage (
-				"No session for number");
 
 	}
 

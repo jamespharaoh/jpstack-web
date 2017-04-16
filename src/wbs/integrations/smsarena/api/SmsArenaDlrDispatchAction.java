@@ -9,7 +9,6 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -216,45 +215,50 @@ class SmsArenaDlrDispatchAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"SmsArenaDlrDispatchAction.handleDispatch ()",
-				this);
+		try (
 
-		// find the route
+			Transaction transaction =
+				database.beginReadWrite (
+					"SmsArenaDlrDispatchAction.handleDispatch ()",
+					this);
 
-		RouteRec route =
-			routeHelper.findRequired (
-				requestContext.requestIntegerRequired (
-					"routeId"));
+		) {
 
-		SmsArenaRouteInRec smsArenaRouteIn =
-			smsArenaRouteInHelper.findRequired (
-				route.getId ());
+			// find the route
 
-		// get the code and create the report
+			RouteRec route =
+				routeHelper.findRequired (
+					requestContext.requestIntegerRequired (
+						"routeId"));
 
-		SmsArenaReportCodeRec reportCode =
-			smsArenaReportCodeHelper.findByCodeRequired (
-				smsArenaRouteIn.getSmsArenaConfig (),
-				dlr);
+			SmsArenaRouteInRec smsArenaRouteIn =
+				smsArenaRouteInHelper.findRequired (
+					route.getId ());
 
-		reportLogic.deliveryReport (
-			taskLogger,
-			route,
-			id,
-			reportCode.getMessageStatus (),
-			Optional.of (
-				dlr),
-			Optional.absent (),
-			Optional.absent (),
-			Optional.absent ());
+			// get the code and create the report
 
-		transaction.commit ();
+			SmsArenaReportCodeRec reportCode =
+				smsArenaReportCodeHelper.findByCodeRequired (
+					smsArenaRouteIn.getSmsArenaConfig (),
+					dlr);
 
-		return textResponderProvider.get ()
-				.text ("success");
+			reportLogic.deliveryReport (
+				taskLogger,
+				route,
+				id,
+				reportCode.getMessageStatus (),
+				Optional.of (
+					dlr),
+				Optional.absent (),
+				Optional.absent (),
+				Optional.absent ());
+
+			transaction.commit ();
+
+			return textResponderProvider.get ()
+					.text ("success");
+
+		}
 
 	}
 
@@ -269,36 +273,41 @@ class SmsArenaDlrDispatchAction
 
 		// create the log for the delivery report
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"SmsArenaDlrDispatchAction.writeLog ()",
-				this);
+		try (
 
-		RouteRec route =
-			routeHelper.findRequired (
-				requestContext.requestIntegerRequired (
-					"routeId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"SmsArenaDlrDispatchAction.writeLog ()",
+					this);
 
-		smsArenaDlrReportLogHelper.insert (
-			taskLogger,
-			smsArenaDlrReportLogHelper.createInstance ()
+		) {
 
-			.setRoute (
-				route)
+			RouteRec route =
+				routeHelper.findRequired (
+					requestContext.requestIntegerRequired (
+						"routeId"));
 
-			.setType (
-				SmsArenaDlrReportLogType.smsDelivery)
+			smsArenaDlrReportLogHelper.insert (
+				taskLogger,
+				smsArenaDlrReportLogHelper.createInstance ()
 
-			.setTimestamp (
-				transaction.now ())
+				.setRoute (
+					route)
 
-			.setDetails (
-				debugLog.toString ())
+				.setType (
+					SmsArenaDlrReportLogType.smsDelivery)
 
-		);
+				.setTimestamp (
+					transaction.now ())
 
-		transaction.commit ();
+				.setDetails (
+					debugLog.toString ())
+
+			);
+
+			transaction.commit ();
+
+		}
 
 	}
 

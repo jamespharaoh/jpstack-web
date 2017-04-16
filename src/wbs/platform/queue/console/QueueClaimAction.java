@@ -1,6 +1,5 @@
 package wbs.platform.queue.console;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -73,40 +72,45 @@ class QueueClaimAction
 				requestContext.parameterRequired (
 					"queue_id"));
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"QueueClaimAction.goReal ()",
-				this);
+		try (
 
-		QueueRec queue =
-			queueHelper.findRequired (
-				queueId);
+			Transaction transaction =
+				database.beginReadWrite (
+					"QueueClaimAction.goReal ()",
+					this);
 
-		QueueItemRec queueItem =
-			queueConsoleLogic.claimQueueItem (
-				taskLogger,
-				queue,
-				userConsoleLogic.userRequired ());
+		) {
 
-		if (queueItem == null) {
+			QueueRec queue =
+				queueHelper.findRequired (
+					queueId);
 
-			requestContext.addError (
-				"No more items to claim in this queue");
+			QueueItemRec queueItem =
+				queueConsoleLogic.claimQueueItem (
+					taskLogger,
+					queue,
+					userConsoleLogic.userRequired ());
 
-			return null;
+			if (queueItem == null) {
+
+				requestContext.addError (
+					"No more items to claim in this queue");
+
+				return null;
+
+			}
+
+			Responder responder =
+				queuePageFactoryManager.getItemResponder (
+					taskLogger,
+					requestContext,
+					queueItem);
+
+			transaction.commit ();
+
+			return responder;
 
 		}
-
-		Responder responder =
-			queuePageFactoryManager.getItemResponder (
-				taskLogger,
-				requestContext,
-				queueItem);
-
-		transaction.commit ();
-
-		return responder;
 
 	}
 

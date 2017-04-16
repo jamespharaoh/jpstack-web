@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
@@ -120,82 +119,91 @@ class UrbanAirshipApi {
 
 			// make call
 
-			@Cleanup
-			CloseableHttpClient httpClient =
-				HttpClientBuilder.create ()
-					.build ();
+			try (
 
-			Credentials credentials =
-				new UsernamePasswordCredentials (
-					username,
-					password);
+				CloseableHttpClient httpClient =
+					HttpClientBuilder.create ()
+						.build ();
 
-			HttpPost post =
-				new HttpPost (url);
+			) {
 
-			HttpContext httpContext =
-				new HttpClientContext ();
+				Credentials credentials =
+					new UsernamePasswordCredentials (
+						username,
+						password);
 
-			post.addHeader (
-				new BasicScheme ().authenticate (
-					credentials,
-					post,
-					httpContext));
+				HttpPost post =
+					new HttpPost (url);
 
-			StringEntity postEntity =
-				new StringEntity (json, "utf-8");
+				HttpContext httpContext =
+					new HttpClientContext ();
 
-			postEntity.setContentType ("application/json");
+				post.addHeader (
+					new BasicScheme ().authenticate (
+						credentials,
+						post,
+						httpContext));
 
-			post.setEntity (postEntity);
+				StringEntity postEntity =
+					new StringEntity (json, "utf-8");
 
-			// output request for debugging
+				postEntity.setContentType ("application/json");
 
-			if (log.isDebugEnabled ()) {
+				post.setEntity (postEntity);
 
-				log.debug ("Request entity: " + json);
+				// output request for debugging
 
-				for (Header header : post.getAllHeaders ())
-					log.debug ("Request header " + header.getName () + ": " + header.getValue ());
+				if (log.isDebugEnabled ()) {
+
+					log.debug ("Request entity: " + json);
+
+					for (Header header : post.getAllHeaders ())
+						log.debug ("Request header " + header.getName () + ": " + header.getValue ());
+
+				}
+
+				HttpResponse response =
+					httpClient.execute (post);
+
+				// output response (for debugging)
+
+				if (log.isDebugEnabled ()) {
+
+					HttpEntity responseEntity =
+						response.getEntity ();
+
+					byte[] responseBytes =
+						IOUtils.toByteArray (responseEntity.getContent ());
+
+					log.debug ("Response entity " + new String (responseBytes, "utf-8"));
+
+					for (Header header : response.getAllHeaders ())
+						log.debug ("Response header " + header.getName () + ": " + header.getValue ());
+
+				}
+
+				// check status
+
+				int status =
+					response.getStatusLine ().getStatusCode ();
+
+				if (status != 200) {
+
+					log.debug ("Urban Airship API call failed with status code " + status + ": " +
+						response.getStatusLine ().getReasonPhrase ());
+
+					throw new RuntimeException ("Urban Airship API call failed with status code " + status);
+
+				}
 
 			}
 
-			HttpResponse response =
-				httpClient.execute (post);
+		} catch (Exception exception) {
 
-			// output response (for debugging)
+			throw new RuntimeException (
+				"Unable to contact Urban Airship server",
+				exception);
 
-			if (log.isDebugEnabled ()) {
-
-				HttpEntity responseEntity =
-					response.getEntity ();
-
-				byte[] responseBytes =
-					IOUtils.toByteArray (responseEntity.getContent ());
-
-				log.debug ("Response entity " + new String (responseBytes, "utf-8"));
-
-				for (Header header : response.getAllHeaders ())
-					log.debug ("Response header " + header.getName () + ": " + header.getValue ());
-
-			}
-
-			// check status
-
-			int status =
-				response.getStatusLine ().getStatusCode ();
-
-			if (status != 200) {
-
-				log.debug ("Urban Airship API call failed with status code " + status + ": " +
-					response.getStatusLine ().getReasonPhrase ());
-
-				throw new RuntimeException ("Urban Airship API call failed with status code " + status);
-
-			}
-
-		} catch (Exception e) {
-			throw new RuntimeException ("Unable to contact Urban Airship server", e);
 		}
 
 	}

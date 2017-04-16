@@ -7,7 +7,6 @@ import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -121,108 +120,113 @@ class TxtNationRouteInFile
 
 		// start transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"TxtNationRouteInFile.doPost ()",
-				this);
+		try (
 
-		TxtNationRouteInRec txtNationRouteIn =
-			txtNationRouteInHelper.findOrThrow (
-				routeId,
-				() -> new RuntimeException (
+			Transaction transaction =
+				database.beginReadWrite (
+					"TxtNationRouteInFile.doPost ()",
+					this);
+
+		) {
+
+			TxtNationRouteInRec txtNationRouteIn =
+				txtNationRouteInHelper.findOrThrow (
+					routeId,
+					() -> new RuntimeException (
+						stringFormat (
+							"No txtNation inbound route info for route %s",
+							integerToDecimalString (
+								routeId))));
+
+			// sanity checks
+
+			if (
+				stringNotEqualSafe (
+					actionParam,
+					"mpush_ir_message")
+			) {
+
+				throw new RuntimeException (
 					stringFormat (
-						"No txtNation inbound route info for route %s",
-						integerToDecimalString (
-							routeId))));
+						"Got unrecognised action: %s",
+						actionParam));
 
-		// sanity checks
+			}
 
-		if (
-			stringNotEqualSafe (
-				actionParam,
-				"mpush_ir_message")
-		) {
+			if (
+				stringNotEqualSafe (
+					countryParam,
+					"UK")
+			) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"Got unrecognised action: %s",
-					actionParam));
+				throw new RuntimeException (
+					stringFormat (
+						"Got unrecognised country: %s",
+						countryParam));
 
-		}
+			}
 
-		if (
-			stringNotEqualSafe (
-				countryParam,
-				"UK")
-		) {
+			String numberFrom;
 
-			throw new RuntimeException (
-				stringFormat (
-					"Got unrecognised country: %s",
-					countryParam));
+			try {
 
-		}
+				numberFrom =
+					numberFormatLogic.parse (
+						txtNationRouteIn.getNumberFormat (),
+						numberParam);
 
-		String numberFrom;
+			} catch (WbsNumberFormatException exception) {
 
-		try {
+				throw new RuntimeException (
+					stringFormat (
+						"Invalid number: %s",
+						numberParam));
 
-			numberFrom =
-				numberFormatLogic.parse (
-					txtNationRouteIn.getNumberFormat (),
-					numberParam);
+			}
 
-		} catch (WbsNumberFormatException exception) {
+			String numberTo;
 
-			throw new RuntimeException (
-				stringFormat (
-					"Invalid number: %s",
-					numberParam));
+			try {
 
-		}
+				numberTo =
+					numberFormatLogic.parse (
+						txtNationRouteIn.getNumberFormat (),
+						shortcodeParam);
 
-		String numberTo;
+			} catch (WbsNumberFormatException exception) {
 
-		try {
+				throw new RuntimeException (
+					stringFormat (
+						"Invalid shortcode: %s",
+						shortcodeParam));
 
-			numberTo =
-				numberFormatLogic.parse (
-					txtNationRouteIn.getNumberFormat (),
-					shortcodeParam);
+			}
 
-		} catch (WbsNumberFormatException exception) {
+			// store message
 
-			throw new RuntimeException (
-				stringFormat (
-					"Invalid shortcode: %s",
-					shortcodeParam));
-
-		}
-
-		// store message
-
-		smsInboxLogic.inboxInsert (
-			taskLogger,
-			optionalOf (
-				idParam),
-			textHelper.findOrCreate (
+			smsInboxLogic.inboxInsert (
 				taskLogger,
-				messageParam),
-			smsNumberHelper.findOrCreate (
-				taskLogger,
-				numberFrom),
-			numberTo,
-			txtNationRouteIn.getRoute (),
-			optionalAbsent (),
-			optionalAbsent (),
-			emptyList (),
-			optionalAbsent (),
-			optionalAbsent ());
+				optionalOf (
+					idParam),
+				textHelper.findOrCreate (
+					taskLogger,
+					messageParam),
+				smsNumberHelper.findOrCreate (
+					taskLogger,
+					numberFrom),
+				numberTo,
+				txtNationRouteIn.getRoute (),
+				optionalAbsent (),
+				optionalAbsent (),
+				emptyList (),
+				optionalAbsent (),
+				optionalAbsent ());
 
-		// commit
+			// commit
 
-		transaction.commit ();
+			transaction.commit ();
+
+		}
 
 		// send response
 

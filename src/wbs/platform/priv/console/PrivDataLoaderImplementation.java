@@ -24,7 +24,6 @@ import javax.sql.DataSource;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -240,166 +239,140 @@ class PrivDataLoaderImplementation
 			SharedData newData =
 				new SharedData ();
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadOnlyJoin (
-					"PrivDataLoaderImplementation.PrivDataReloader.get ()",
-					this);
+			try (
 
-			// start timer
+				Transaction transaction =
+					database.beginReadOnlyJoin (
+						"PrivDataLoaderImplementation.PrivDataReloader.get ()",
+						this);
 
-			taskLogger.debugFormat (
-				"Priv reload started");
-
-			Instant startTime =
-				Instant.now ();
-
-			// get privs, filter those we can't get parent for
-
-			List <PrivRec> privs =
-				new ArrayList<> ();
-
-			for (
-				PrivRec priv
-					: privHelper.findAll ()
 			) {
 
-				Either <Optional <Record <?>>, String> privParentOrError =
-					objectManager.getParentOrError (
-						priv);
+				// start timer
 
-				if (
-					isSuccess (
-						privParentOrError)
+				taskLogger.debugFormat (
+					"Priv reload started");
+
+				Instant startTime =
+					Instant.now ();
+
+				// get privs, filter those we can't get parent for
+
+				List <PrivRec> privs =
+					new ArrayList<> ();
+
+				for (
+					PrivRec priv
+						: privHelper.findAll ()
 				) {
 
-					privs.add (
-						priv);
-
-				} else {
-
-					taskLogger.warningFormat (
-						"Error getting parent for priv %s: ",
-						integerToDecimalString (
-							priv.getId ()),
-						"type = %s, ",
-						priv.getParentType ().getCode (),
-						"id = %s: ",
-						integerToDecimalString (
-							priv.getParentId ()),
-						"%s",
-						getError (
-							privParentOrError));
-
-				}
-
-			}
-
-			// build objectDatasByObjectId
-
-			for (
-				PrivRec priv
-					: privs
-			) {
-
-				GlobalId objectId =
-					new GlobalId (
-						priv.getParentType ().getId (),
-						priv.getParentId ());
-
-				ObjectData objectData =
-					newData.objectDatasByObjectId.get (
-						objectId);
-
-				if (objectData == null) {
-
-					objectData =
-						new ObjectData ();
-
-					newData.objectDatasByObjectId.put (
-						objectId,
-						objectData);
-
-				}
-
-				objectData.privIdsByCode.put (
-					priv.getCode (),
-					priv.getId ());
-
-			}
-
-			// sort out objectTypeIdsByClassName
-
-			Collection <ObjectTypeRec> objectTypes =
-				objectTypeHelper.findAll ();
-
-			for (
-				ObjectTypeRec objectType
-					: objectTypes
-			) {
-
-				Optional <Class <?>> objectClassOptional =
-					objectManager.objectClassForTypeCode (
-						objectType.getCode ());
-
-				if (
-					optionalIsPresent (
-						objectClassOptional)
-				) {
-
-					newData.objectTypeIdsByClassName.put (
-						objectClassOptional.get ().getName (),
-						objectType.getId ());
-
-				} else {
-
-					taskLogger.warningFormat (
-						"Ignoring unknown object type %s",
-						objectType.getCode ());
-
-				}
-
-			}
-
-			// do chainedPrivIds and managePrivIds
-
-			for (
-				PrivRec priv
-					: privs
-			) {
-
-				Either <Optional <Record <?>>, String> parentOrError =
-					objectManager.getParentOrError (
-						priv);
-
-				if (
-					isError (
-						parentOrError)
-				) {
-
-					taskLogger.warningFormat (
-						"Error getting parent for priv %s: %s",
-						integerToDecimalString (
-							priv.getId ()),
-						getError (
-							parentOrError));
-
-					continue;
-
-				}
-
-				Record <?> parent =
-					optionalGetRequired (
-						resultValueRequired (
-							parentOrError));
-
-				try {
-
-					// do chainedPrivIds
-
-					Either <Optional <Record <?>>, String> grandParentOrError =
+					Either <Optional <Record <?>>, String> privParentOrError =
 						objectManager.getParentOrError (
-							parent);
+							priv);
+
+					if (
+						isSuccess (
+							privParentOrError)
+					) {
+
+						privs.add (
+							priv);
+
+					} else {
+
+						taskLogger.warningFormat (
+							"Error getting parent for priv %s: ",
+							integerToDecimalString (
+								priv.getId ()),
+							"type = %s, ",
+							priv.getParentType ().getCode (),
+							"id = %s: ",
+							integerToDecimalString (
+								priv.getParentId ()),
+							"%s",
+							getError (
+								privParentOrError));
+
+					}
+
+				}
+
+				// build objectDatasByObjectId
+
+				for (
+					PrivRec priv
+						: privs
+				) {
+
+					GlobalId objectId =
+						new GlobalId (
+							priv.getParentType ().getId (),
+							priv.getParentId ());
+
+					ObjectData objectData =
+						newData.objectDatasByObjectId.get (
+							objectId);
+
+					if (objectData == null) {
+
+						objectData =
+							new ObjectData ();
+
+						newData.objectDatasByObjectId.put (
+							objectId,
+							objectData);
+
+					}
+
+					objectData.privIdsByCode.put (
+						priv.getCode (),
+						priv.getId ());
+
+				}
+
+				// sort out objectTypeIdsByClassName
+
+				Collection <ObjectTypeRec> objectTypes =
+					objectTypeHelper.findAll ();
+
+				for (
+					ObjectTypeRec objectType
+						: objectTypes
+				) {
+
+					Optional <Class <?>> objectClassOptional =
+						objectManager.objectClassForTypeCode (
+							objectType.getCode ());
+
+					if (
+						optionalIsPresent (
+							objectClassOptional)
+					) {
+
+						newData.objectTypeIdsByClassName.put (
+							objectClassOptional.get ().getName (),
+							objectType.getId ());
+
+					} else {
+
+						taskLogger.warningFormat (
+							"Ignoring unknown object type %s",
+							objectType.getCode ());
+
+					}
+
+				}
+
+				// do chainedPrivIds and managePrivIds
+
+				for (
+					PrivRec priv
+						: privs
+				) {
+
+					Either <Optional <Record <?>>, String> parentOrError =
+						objectManager.getParentOrError (
+							priv);
 
 					if (
 						isError (
@@ -407,7 +380,7 @@ class PrivDataLoaderImplementation
 					) {
 
 						taskLogger.warningFormat (
-							"Error getting grandparent for priv %s: %s",
+							"Error getting parent for priv %s: %s",
 							integerToDecimalString (
 								priv.getId ()),
 							getError (
@@ -417,128 +390,159 @@ class PrivDataLoaderImplementation
 
 					}
 
-					if (
-						optionalIsPresent (
+					Record <?> parent =
+						optionalGetRequired (
 							resultValueRequired (
-								grandParentOrError))
-					) {
+								parentOrError));
 
-						Record <?> grandParent =
-							optionalGetRequired (
-								resultValueRequired (
-									grandParentOrError));
+					try {
 
-						Optional <Long> chainedPrivIdOptional =
-							getChainedPrivId (
-								taskLogger,
-								newData,
-								grandParent,
-								priv.getCode ());
+						// do chainedPrivIds
+
+						Either <Optional <Record <?>>, String> grandParentOrError =
+							objectManager.getParentOrError (
+								parent);
 
 						if (
-							optionalIsPresent (
-								chainedPrivIdOptional)
+							isError (
+								parentOrError)
 						) {
 
-							Long chainedPrivId =
-								optionalGetRequired (
-									chainedPrivIdOptional);
+							taskLogger.warningFormat (
+								"Error getting grandparent for priv %s: %s",
+								integerToDecimalString (
+									priv.getId ()),
+								getError (
+									parentOrError));
 
-							newData.chainedPrivIds.put (
-								priv.getId (),
-								chainedPrivId);
+							continue;
 
 						}
 
-					}
-
-					// do managePrivIds and object data managePrivId
-
-					GlobalId objectId =
-						objectManager.getGlobalId (
-							parent);
-
-					ObjectData objectData =
-						newData.objectDatasByObjectId.get (
-							objectId);
-
-					if (
-						stringEqualSafe (
-							priv.getCode (),
-							"manage")
-					) {
-
-						newData.managePrivIds.put (
-							priv.getId (),
-							priv.getId ());
-
-						objectData.managePrivId =
-							priv.getId ();
-
-					} else {
-
-						Optional <Long> managePrivIdOptional =
-							getChainedPrivId (
-								taskLogger,
-								newData,
-								parent,
-								"manage");
-
 						if (
 							optionalIsPresent (
-								managePrivIdOptional)
+								resultValueRequired (
+									grandParentOrError))
 						) {
 
-							Long managePrivId =
+							Record <?> grandParent =
 								optionalGetRequired (
-									managePrivIdOptional);
+									resultValueRequired (
+										grandParentOrError));
+
+							Optional <Long> chainedPrivIdOptional =
+								getChainedPrivId (
+									taskLogger,
+									newData,
+									grandParent,
+									priv.getCode ());
+
+							if (
+								optionalIsPresent (
+									chainedPrivIdOptional)
+							) {
+
+								Long chainedPrivId =
+									optionalGetRequired (
+										chainedPrivIdOptional);
+
+								newData.chainedPrivIds.put (
+									priv.getId (),
+									chainedPrivId);
+
+							}
+
+						}
+
+						// do managePrivIds and object data managePrivId
+
+						GlobalId objectId =
+							objectManager.getGlobalId (
+								parent);
+
+						ObjectData objectData =
+							newData.objectDatasByObjectId.get (
+								objectId);
+
+						if (
+							stringEqualSafe (
+								priv.getCode (),
+								"manage")
+						) {
 
 							newData.managePrivIds.put (
 								priv.getId (),
-								managePrivId);
+								priv.getId ());
 
 							objectData.managePrivId =
-								managePrivId;
+								priv.getId ();
+
+						} else {
+
+							Optional <Long> managePrivIdOptional =
+								getChainedPrivId (
+									taskLogger,
+									newData,
+									parent,
+									"manage");
+
+							if (
+								optionalIsPresent (
+									managePrivIdOptional)
+							) {
+
+								Long managePrivId =
+									optionalGetRequired (
+										managePrivIdOptional);
+
+								newData.managePrivIds.put (
+									priv.getId (),
+									managePrivId);
+
+								objectData.managePrivId =
+									managePrivId;
+
+							}
 
 						}
 
+					} catch (Exception exception) {
+
+						throw new RuntimeException (
+							stringFormat (
+								"Error loading priv %s",
+								integerToDecimalString (
+									priv.getId ())),
+							exception);
+
 					}
-
-				} catch (Exception exception) {
-
-					throw new RuntimeException (
-						stringFormat (
-							"Error loading priv %s",
-							integerToDecimalString (
-								priv.getId ())),
-						exception);
 
 				}
 
+				newData.objectTypeCodesById =
+					Collections.unmodifiableMap (
+						objectTypeHelper.findAll ().stream ()
+
+					.collect (
+						Collectors.toMap (
+							ObjectTypeRec::getId,
+							ObjectTypeRec::getCode))
+
+				);
+
+				// end timer
+
+				Instant endTime =
+					Instant.now ();
+
+				taskLogger.debugFormat (
+					"Reload complete (%sms)",
+					integerToDecimalString (
+						endTime.getMillis () - startTime.getMillis ()));
+
+				return newData;
+
 			}
-
-			newData.objectTypeCodesById =
-				Collections.unmodifiableMap (
-					objectTypeHelper.findAll ().stream ()
-
-				.collect (
-					Collectors.toMap (
-						ObjectTypeRec::getId,
-						ObjectTypeRec::getCode))
-
-			);
-
-			// end timer
-
-			Instant endTime =
-				Instant.now ();
-
-			taskLogger.debugFormat (
-				"Reload complete (%sms)",
-				integerToDecimalString (
-					endTime.getMillis () - startTime.getMillis ()));
-
-			return newData;
 
 		}
 
@@ -662,92 +666,97 @@ class PrivDataLoaderImplementation
 			UserData newData =
 				new UserData ();
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadOnly (
-					"PrivDataLoaderImplementation.UserDataReloader.get ()",
-					this);
+			try (
 
-			// start timer
+				Transaction transaction =
+					database.beginReadOnly (
+						"PrivDataLoaderImplementation.UserDataReloader.get ()",
+						this);
 
-			taskLogger.debugFormat (
-				"User %s priv reload started",
-				integerToDecimalString (
-					userId));
-
-			Instant startTime =
-				Instant.now ();
-
-			// get user
-
-			UserRec user =
-				userHelper.findRequired (
-					userId);
-
-			// do user-specific privs
-
-			for (
-				UserPrivRec userPriv
-					: user.getUserPrivs ()
 			) {
 
-				PrivRec priv =
-					userPriv.getPriv ();
+				// start timer
 
-				PrivPair privPair =
-					new PrivPair ();
+				taskLogger.debugFormat (
+					"User %s priv reload started",
+					integerToDecimalString (
+						userId));
 
-				privPair.can =
-					userPriv.getCan ();
+				Instant startTime =
+					Instant.now ();
 
-				newData.privPairsByPrivId.put (
-					priv.getId (),
-					privPair);
+				// get user
 
-			}
+				UserRec user =
+					userHelper.findRequired (
+						userId);
 
-			// do group privs
+				// do user-specific privs
 
-			for (GroupRec group
-					: user.getGroups ()) {
+				for (
+					UserPrivRec userPriv
+						: user.getUserPrivs ()
+				) {
 
-				for (PrivRec priv
-						: group.getPrivs ()) {
+					PrivRec priv =
+						userPriv.getPriv ();
 
 					PrivPair privPair =
-						newData.privPairsByPrivId.get (
-							priv.getId ());
+						new PrivPair ();
 
-					if (privPair == null) {
+					privPair.can =
+						userPriv.getCan ();
 
-						privPair =
-							new PrivPair ();
-
-						newData.privPairsByPrivId.put (
-							priv.getId (),
-							privPair);
-
-					}
-
-					privPair.can = true;
+					newData.privPairsByPrivId.put (
+						priv.getId (),
+						privPair);
 
 				}
 
+				// do group privs
+
+				for (GroupRec group
+						: user.getGroups ()) {
+
+					for (PrivRec priv
+							: group.getPrivs ()) {
+
+						PrivPair privPair =
+							newData.privPairsByPrivId.get (
+								priv.getId ());
+
+						if (privPair == null) {
+
+							privPair =
+								new PrivPair ();
+
+							newData.privPairsByPrivId.put (
+								priv.getId (),
+								privPair);
+
+						}
+
+						privPair.can = true;
+
+					}
+
+				}
+
+				// end timer
+
+				Instant endTime =
+					Instant.now ();
+
+				taskLogger.debugFormat (
+					"User %s priv reload complere (%sms)",
+					integerToDecimalString (
+						userId),
+					integerToDecimalString (
+						endTime.getMillis () - startTime.getMillis ()));
+
+				return newData;
+
 			}
-
-			// end timer
-
-			Instant endTime =
-				Instant.now ();
-
-			taskLogger.debugFormat (
-				"User %s priv reload complere (%sms)",
-				integerToDecimalString (
-					userId),
-				integerToDecimalString (
-					endTime.getMillis () - startTime.getMillis ()));
-
-			return newData;
 
 		}
 

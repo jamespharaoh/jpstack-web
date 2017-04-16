@@ -2,7 +2,6 @@ package wbs.imchat.api;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.json.simple.JSONObject;
@@ -15,6 +14,7 @@ import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.imchat.model.ImChatCustomerObjectHelper;
 import wbs.imchat.model.ImChatCustomerRec;
 import wbs.imchat.model.ImChatSessionObjectHelper;
@@ -75,64 +75,69 @@ class ImChatSessionLoadAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatSessionLoadAction.handle ()",
-				this);
+		try (
 
-		// lookup session
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatSessionLoadAction.handle ()",
+					this);
 
-		ImChatSessionRec session =
-			imChatSessionHelper.findBySecret (
-				sessionLoadRequest.sessionSecret ());
-
-		if (
-			session == null
-			|| ! session.getActive ()
 		) {
 
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
+			// lookup session
 
-				.reason (
-					"session-invalid")
+			ImChatSessionRec session =
+				imChatSessionHelper.findBySecret (
+					sessionLoadRequest.sessionSecret ());
 
-				.message (
-					"The session secret is invalid or the session is no " +
-					"longer active");
+			if (
+				session == null
+				|| ! session.getActive ()
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"session-invalid")
+
+					.message (
+						"The session secret is invalid or the session is no " +
+						"longer active");
+
+				return jsonResponderProvider.get ()
+					.value (failureResponse);
+
+			}
+
+			// get customer and conversation
+
+			ImChatCustomerRec customer =
+				session.getImChatCustomer ();
+
+			// create response
+
+			ImChatSessionLoadSuccess successResponse =
+				new ImChatSessionLoadSuccess ()
+
+				.customer (
+					imChatApiLogic.customerData (
+						customer))
+
+				.conversation (
+					customer.getCurrentConversation () != null
+						? imChatApiLogic.conversationData (
+							customer.getCurrentConversation ())
+						: null);
+
+			// commit and return
+
+			transaction.commit ();
 
 			return jsonResponderProvider.get ()
-				.value (failureResponse);
+				.value (successResponse);
 
 		}
-
-		// get customer and conversation
-
-		ImChatCustomerRec customer =
-			session.getImChatCustomer ();
-
-		// create response
-
-		ImChatSessionLoadSuccess successResponse =
-			new ImChatSessionLoadSuccess ()
-
-			.customer (
-				imChatApiLogic.customerData (
-					customer))
-
-			.conversation (
-				customer.getCurrentConversation () != null
-					? imChatApiLogic.conversationData (
-						customer.getCurrentConversation ())
-					: null);
-
-		// commit and return
-
-		transaction.commit ();
-
-		return jsonResponderProvider.get ()
-			.value (successResponse);
 
 	}
 

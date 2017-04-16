@@ -399,73 +399,78 @@ class ChatMessagePendingFormAction
 
 		}
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatMessagePendingFormAction.goReject ()",
-				this);
+		try (
 
-		// get database objects
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatMessagePendingFormAction.goReject ()",
+					this);
 
-		ChatMessageRec chatMessage =
-			chatMessageHelper.findFromContextRequired ();
+		) {
 
-		// confirm message status
+			// get database objects
 
-		if (chatMessage.getStatus () != ChatMessageStatus.moderatorPending) {
+			ChatMessageRec chatMessage =
+				chatMessageHelper.findFromContextRequired ();
 
-			requestContext.addError (
-				"Message is already approved");
+			// confirm message status
 
-			return responder ("queueHomeResponder");
+			if (chatMessage.getStatus () != ChatMessageStatus.moderatorPending) {
+
+				requestContext.addError (
+					"Message is already approved");
+
+				return responder ("queueHomeResponder");
+
+			}
+
+			// remove the queue item
+
+			queueLogic.processQueueItem (
+				chatMessage.getQueueItem (),
+				userConsoleLogic.userRequired ());
+
+			// update the chatMessage
+
+			chatMessage
+
+				.setModerator (
+					userConsoleLogic.userRequired ())
+
+				.setStatus (
+					ChatMessageStatus.moderatorRejected)
+
+				.setEditedText (
+					null);
+
+			// and send help message
+
+			chatHelpLogic.sendHelpMessage (
+				taskLogger,
+				userConsoleLogic.userRequired (),
+				chatMessage.getFromUser (),
+				messageParam,
+				optionalOf (
+					chatMessage.getThreadId ()),
+				optionalAbsent ());
+
+			// inc rejection count
+
+			chatMessageLogic.chatUserRejectionCountInc (
+				taskLogger,
+				chatMessage.getFromUser (),
+				smsMessageHelper.findRequired (
+					chatMessage.getThreadId ()));
+
+			transaction.commit ();
+
+			requestContext.addNotice (
+				"Rejection sent");
+
+			return responder (
+				"queueHomeResponder");
 
 		}
-
-		// remove the queue item
-
-		queueLogic.processQueueItem (
-			chatMessage.getQueueItem (),
-			userConsoleLogic.userRequired ());
-
-		// update the chatMessage
-
-		chatMessage
-
-			.setModerator (
-				userConsoleLogic.userRequired ())
-
-			.setStatus (
-				ChatMessageStatus.moderatorRejected)
-
-			.setEditedText (
-				null);
-
-		// and send help message
-
-		chatHelpLogic.sendHelpMessage (
-			taskLogger,
-			userConsoleLogic.userRequired (),
-			chatMessage.getFromUser (),
-			messageParam,
-			optionalOf (
-				chatMessage.getThreadId ()),
-			optionalAbsent ());
-
-		// inc rejection count
-
-		chatMessageLogic.chatUserRejectionCountInc (
-			taskLogger,
-			chatMessage.getFromUser (),
-			smsMessageHelper.findRequired (
-				chatMessage.getThreadId ()));
-
-		transaction.commit ();
-
-		requestContext.addNotice (
-			"Rejection sent");
-
-		return responder (
-			"queueHomeResponder");
 
 	}
 

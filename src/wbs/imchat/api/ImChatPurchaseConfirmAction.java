@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.json.simple.JSONObject;
@@ -19,6 +18,16 @@ import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.integrations.paypal.logic.PaypalApi;
+import wbs.integrations.paypal.logic.PaypalLogic;
+import wbs.integrations.paypal.model.PaypalAccountRec;
+import wbs.integrations.paypal.model.PaypalPaymentObjectHelper;
+import wbs.integrations.paypal.model.PaypalPaymentRec;
+import wbs.integrations.paypal.model.PaypalPaymentState;
+
+import wbs.platform.currency.logic.CurrencyLogic;
+
 import wbs.imchat.model.ImChatCustomerRec;
 import wbs.imchat.model.ImChatObjectHelper;
 import wbs.imchat.model.ImChatPricePointObjectHelper;
@@ -27,13 +36,6 @@ import wbs.imchat.model.ImChatPurchaseRec;
 import wbs.imchat.model.ImChatRec;
 import wbs.imchat.model.ImChatSessionObjectHelper;
 import wbs.imchat.model.ImChatSessionRec;
-import wbs.integrations.paypal.logic.PaypalApi;
-import wbs.integrations.paypal.logic.PaypalLogic;
-import wbs.integrations.paypal.model.PaypalAccountRec;
-import wbs.integrations.paypal.model.PaypalPaymentObjectHelper;
-import wbs.integrations.paypal.model.PaypalPaymentRec;
-import wbs.integrations.paypal.model.PaypalPaymentState;
-import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.web.action.Action;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.JsonResponder;
@@ -108,191 +110,196 @@ class ImChatPurchaseConfirmAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatPurchaseConfirmAction.handle ()",
-				this);
+		try (
 
-		ImChatRec imChat =
-			imChatHelper.findRequired (
-				parseIntegerRequired (
-					requestContext.requestStringRequired (
-						"imChatId")));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatPurchaseConfirmAction.handle ()",
+					this);
 
-		// lookup session and customer
-
-		ImChatSessionRec session =
-			imChatSessionHelper.findBySecret (
-				purchaseRequest.sessionSecret ());
-
-		if (
-			session == null
-			|| ! session.getActive ()
 		) {
 
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
+			ImChatRec imChat =
+				imChatHelper.findRequired (
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"imChatId")));
 
-				.reason (
-					"session-invalid")
+			// lookup session and customer
 
-				.message (
-					"The session secret is invalid or the session is no " +
-					"longer active");
+			ImChatSessionRec session =
+				imChatSessionHelper.findBySecret (
+					purchaseRequest.sessionSecret ());
+
+			if (
+				session == null
+				|| ! session.getActive ()
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"session-invalid")
+
+					.message (
+						"The session secret is invalid or the session is no " +
+						"longer active");
+
+				return jsonResponderProvider.get ()
+					.value (failureResponse);
+
+			}
+
+			ImChatCustomerRec customer =
+				session.getImChatCustomer ();
+
+			// lookup purchase
+
+			ImChatPurchaseRec purchase =
+				imChatPurchaseHelper.findByToken (
+					purchaseRequest.purchaseToken ());
+
+			if (
+				purchase == null
+				|| purchase.getImChatCustomer () != customer
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"purchase-invalid")
+
+					.message (
+						"The purchase id is not valid");
+
+				return jsonResponderProvider.get ()
+					.value (failureResponse);
+
+			}
+
+			// lookup paypal payment
+
+			PaypalPaymentRec paypalPayment =
+				purchase.getPaypalPayment ();
+
+			if (paypalPayment == null)
+				throw new RuntimeException ();
+
+			if (paypalPayment.getState () != PaypalPaymentState.pending) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"purchase-invalid")
+
+					.message (
+						"The purchase id is not valid");
+
+				return jsonResponderProvider.get ()
+					.value (failureResponse);
+
+			}
+
+			// confirm payment and obtain payerId
+
+			PaypalAccountRec paypalAccount =
+				imChat.getPaypalAccount ();
+
+			Map <String, String> expressCheckoutProperties =
+				paypalLogic.expressCheckoutProperties (
+					paypalAccount);
+
+			Boolean checkoutSuccess;
+
+			try {
+
+				checkoutSuccess =
+					paypalApi.doExpressCheckout (
+						paypalPayment.getPaypalToken (),
+						paypalPayment.getPaypalPayerId (),
+						currencyLogic.formatSimple (
+							imChat.getBillingCurrency (),
+							paypalPayment.getValue ()),
+						expressCheckoutProperties);
+
+			} catch (InterruptedException interruptedException) {
+
+				Thread.currentThread ().interrupt ();
+
+				throw new RuntimeException (
+					interruptedException);
+
+			}
+
+			if (! checkoutSuccess) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"payment-invalid")
+
+					.message (
+						"The payment failed");
+
+				return jsonResponderProvider.get ()
+					.value (failureResponse);
+
+			}
+
+			// update payment status
+
+			paypalPayment
+
+				.setState (
+					PaypalPaymentState.confirmed);
+
+			// update purchase
+
+			purchase
+
+				.setCompletedTime (
+					transaction.now ());
+
+			// update customer
+
+			customer
+
+				.setBalance (
+					+ customer.getBalance ()
+					+ purchase.getValue ())
+
+				.setTotalPurchaseValue (
+					+ customer.getTotalPurchaseValue ()
+					+ purchase.getValue ())
+
+				.setTotalPurchasePrice (
+					+ customer.getTotalPurchasePrice ()
+					+ purchase.getPrice ())
+
+				.setLastSession (
+					transaction.now ());
+
+			// create response
+
+			ImChatPurchaseConfirmSuccess successResponse =
+				new ImChatPurchaseConfirmSuccess ()
+
+				.customer (
+					imChatApiLogic.customerData (
+						customer));
+
+			// commit and return
+
+			transaction.commit ();
 
 			return jsonResponderProvider.get ()
-				.value (failureResponse);
+				.value (successResponse);
 
 		}
-
-		ImChatCustomerRec customer =
-			session.getImChatCustomer ();
-
-		// lookup purchase
-
-		ImChatPurchaseRec purchase =
-			imChatPurchaseHelper.findByToken (
-				purchaseRequest.purchaseToken ());
-
-		if (
-			purchase == null
-			|| purchase.getImChatCustomer () != customer
-		) {
-
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"purchase-invalid")
-
-				.message (
-					"The purchase id is not valid");
-
-			return jsonResponderProvider.get ()
-				.value (failureResponse);
-
-		}
-
-		// lookup paypal payment
-
-		PaypalPaymentRec paypalPayment =
-			purchase.getPaypalPayment ();
-
-		if (paypalPayment == null)
-			throw new RuntimeException ();
-
-		if (paypalPayment.getState () != PaypalPaymentState.pending) {
-
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"purchase-invalid")
-
-				.message (
-					"The purchase id is not valid");
-
-			return jsonResponderProvider.get ()
-				.value (failureResponse);
-
-		}
-
-		// confirm payment and obtain payerId
-
-		PaypalAccountRec paypalAccount =
-			imChat.getPaypalAccount ();
-
-		Map <String, String> expressCheckoutProperties =
-			paypalLogic.expressCheckoutProperties (
-				paypalAccount);
-
-		Boolean checkoutSuccess;
-
-		try {
-
-			checkoutSuccess =
-				paypalApi.doExpressCheckout (
-					paypalPayment.getPaypalToken (),
-					paypalPayment.getPaypalPayerId (),
-					currencyLogic.formatSimple (
-						imChat.getBillingCurrency (),
-						paypalPayment.getValue ()),
-					expressCheckoutProperties);
-
-		} catch (InterruptedException interruptedException) {
-
-			Thread.currentThread ().interrupt ();
-
-			throw new RuntimeException (
-				interruptedException);
-
-		}
-
-		if (! checkoutSuccess) {
-
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"payment-invalid")
-
-				.message (
-					"The payment failed");
-
-			return jsonResponderProvider.get ()
-				.value (failureResponse);
-
-		}
-
-		// update payment status
-
-		paypalPayment
-
-			.setState (
-				PaypalPaymentState.confirmed);
-
-		// update purchase
-
-		purchase
-
-			.setCompletedTime (
-				transaction.now ());
-
-		// update customer
-
-		customer
-
-			.setBalance (
-				+ customer.getBalance ()
-				+ purchase.getValue ())
-
-			.setTotalPurchaseValue (
-				+ customer.getTotalPurchaseValue ()
-				+ purchase.getValue ())
-
-			.setTotalPurchasePrice (
-				+ customer.getTotalPurchasePrice ()
-				+ purchase.getPrice ())
-
-			.setLastSession (
-				transaction.now ());
-
-		// create response
-
-		ImChatPurchaseConfirmSuccess successResponse =
-			new ImChatPurchaseConfirmSuccess ()
-
-			.customer (
-				imChatApiLogic.customerData (
-					customer));
-
-		// commit and return
-
-		transaction.commit ();
-
-		return jsonResponderProvider.get ()
-			.value (successResponse);
 
 	}
 

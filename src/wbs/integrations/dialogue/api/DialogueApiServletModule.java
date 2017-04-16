@@ -19,7 +19,6 @@ import javax.servlet.ServletException;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.apache.commons.codec.DecoderException;
@@ -319,73 +318,78 @@ class DialogueApiServletModule
 
 			// save the message
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"DialogueApiServletModule.inFile.doPost ()",
-					this);
+			try (
 
-			RouteRec route =
-				routeHelper.findRequired (
-					routeId);
+				Transaction transaction =
+					database.beginReadWrite (
+						"DialogueApiServletModule.inFile.doPost ()",
+						this);
 
-			NetworkRec network =
-				networkId == null
-					? null
-					: networkHelper.findRequired (
-						networkId);
+			) {
 
-			// if it's a concatenated message...
+				RouteRec route =
+					routeHelper.findRequired (
+						routeId);
 
-			ConcatenatedInformationElement concat =
-				userDataHeader != null
-					? userDataHeader.find (
-						ConcatenatedInformationElement.class)
-					: null;
+				NetworkRec network =
+					networkId == null
+						? null
+						: networkHelper.findRequired (
+							networkId);
 
-			if (concat != null) {
+				// if it's a concatenated message...
 
-				// insert a part message
+				ConcatenatedInformationElement concat =
+					userDataHeader != null
+						? userDataHeader.find (
+							ConcatenatedInformationElement.class)
+						: null;
 
-				inboxMultipartLogic.insertInboxMultipart (
-					taskLogger,
-					route,
-					concat.getRef (),
-					concat.getSeqMax (),
-					concat.getSeqNum (),
-					numToParam,
-					numFromParam,
-					null,
-					network,
-					idParam,
-					message);
+				if (concat != null) {
 
-			} else {
+					// insert a part message
 
-				// insert a message
-
-				smsInboxLogic.inboxInsert (
-					taskLogger,
-					optionalOf (
-						idParam),
-					textHelper.findOrCreate (
+					inboxMultipartLogic.insertInboxMultipart (
 						taskLogger,
-						message),
-					smsNumberHelper.findOrCreate (
+						route,
+						concat.getRef (),
+						concat.getSeqMax (),
+						concat.getSeqNum (),
+						numToParam,
+						numFromParam,
+						null,
+						network,
+						idParam,
+						message);
+
+				} else {
+
+					// insert a message
+
+					smsInboxLogic.inboxInsert (
 						taskLogger,
-						numFromParam),
-					numToParam,
-					route,
-					optionalOf (
-						network),
-					optionalAbsent (),
-					emptyList (),
-					optionalAbsent (),
-					optionalAbsent ());
+						optionalOf (
+							idParam),
+						textHelper.findOrCreate (
+							taskLogger,
+							message),
+						smsNumberHelper.findOrCreate (
+							taskLogger,
+							numFromParam),
+						numToParam,
+						route,
+						optionalOf (
+							network),
+						optionalAbsent (),
+						emptyList (),
+						optionalAbsent (),
+						optionalAbsent ());
+
+				}
+
+				transaction.commit ();
 
 			}
-
-			transaction.commit ();
 
 			FormatWriter formatWriter =
 				requestContext.formatWriter ();

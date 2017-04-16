@@ -10,7 +10,6 @@ import static wbs.utils.string.StringUtils.underscoreToHyphen;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.json.simple.JSONObject;
@@ -106,156 +105,161 @@ class ImChatDetailsUpdateAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatDetailsUpdateAction.handler ()",
-				this);
+		try (
 
-		ImChatRec imChat =
-			imChatHelper.findRequired (
-				parseIntegerRequired (
-					requestContext.requestStringRequired (
-						"imChatId")));
-
-		// lookup session
-
-		ImChatSessionRec session =
-			imChatSessionHelper.findBySecret (
-				detailsUpdateRequest.sessionSecret ());
-
-		ImChatCustomerRec customer =
-			session.getImChatCustomer ();
-
-		if (
-
-			isNull (
-				session)
-
-			|| ! session.getActive ()
-
-			|| referenceNotEqualWithClass (
-				ImChatRec.class,
-				customer.getImChat (),
-				imChat)
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatDetailsUpdateAction.handler ()",
+					this);
 
 		) {
 
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
+			ImChatRec imChat =
+				imChatHelper.findRequired (
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"imChatId")));
 
-				.reason (
-					"session-invalid")
+			// lookup session
 
-				.message (
-					"The session secret is invalid or the session is no " +
-					"longer active");
+			ImChatSessionRec session =
+				imChatSessionHelper.findBySecret (
+					detailsUpdateRequest.sessionSecret ());
 
-			return jsonResponderProvider.get ()
-
-				.value (
-					failureResponse);
-
-		}
-
-		// update details
-
-		for (
-			ImChatCustomerDetailTypeRec detailType
-				: imChat.getCustomerDetailTypes ()
-		) {
+			ImChatCustomerRec customer =
+				session.getImChatCustomer ();
 
 			if (
-				doesNotContain (
-					detailsUpdateRequest.details ().keySet (),
-					underscoreToHyphen (
-						detailType.getCode ()))
+
+				isNull (
+					session)
+
+				|| ! session.getActive ()
+
+				|| referenceNotEqualWithClass (
+					ImChatRec.class,
+					customer.getImChat (),
+					imChat)
+
 			) {
-				continue;
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"session-invalid")
+
+					.message (
+						"The session secret is invalid or the session is no " +
+						"longer active");
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						failureResponse);
+
 			}
 
-			String stringValue =
-				detailsUpdateRequest.details ().get (
-					underscoreToHyphen (
-						detailType.getCode ()));
+			// update details
 
-			ImChatCustomerDetailValueRec detailValue =
-				customer.getDetails ().get (
-					detailType.getId ());
-
-			if (
-				isNotNull (
-					detailValue)
+			for (
+				ImChatCustomerDetailTypeRec detailType
+					: imChat.getCustomerDetailTypes ()
 			) {
 
 				if (
-					stringEqualSafe (
-						detailValue.getValue (),
-						stringValue)
+					doesNotContain (
+						detailsUpdateRequest.details ().keySet (),
+						underscoreToHyphen (
+							detailType.getCode ()))
 				) {
 					continue;
 				}
 
-				detailValue
+				String stringValue =
+					detailsUpdateRequest.details ().get (
+						underscoreToHyphen (
+							detailType.getCode ()));
 
-					.setValue (
-						stringValue);
+				ImChatCustomerDetailValueRec detailValue =
+					customer.getDetails ().get (
+						detailType.getId ());
 
-			} else {
+				if (
+					isNotNull (
+						detailValue)
+				) {
 
-				detailValue =
-					imChatCustomerDetailValueHelper.insert (
-						taskLogger,
-						imChatCustomerDetailValueHelper.createInstance ()
+					if (
+						stringEqualSafe (
+							detailValue.getValue (),
+							stringValue)
+					) {
+						continue;
+					}
 
-					.setImChatCustomer (
-						customer)
+					detailValue
 
-					.setImChatCustomerDetailType (
-						detailType)
+						.setValue (
+							stringValue);
 
-					.setValue (
-						stringValue)
+				} else {
 
-				);
+					detailValue =
+						imChatCustomerDetailValueHelper.insert (
+							taskLogger,
+							imChatCustomerDetailValueHelper.createInstance ()
 
-				customer.getDetails ().put (
-					detailType.getId (),
-					detailValue);
+						.setImChatCustomer (
+							customer)
+
+						.setImChatCustomerDetailType (
+							detailType)
+
+						.setValue (
+							stringValue)
+
+					);
+
+					customer.getDetails ().put (
+						detailType.getId (),
+						detailValue);
+
+				}
+
+				eventLogic.createEvent (
+					taskLogger,
+					"im_chat_customer_detail_updated",
+					customer,
+					detailType,
+					stringValue);
 
 			}
 
-			eventLogic.createEvent (
-				taskLogger,
-				"im_chat_customer_detail_updated",
-				customer,
-				detailType,
-				stringValue);
+			customer
+
+				.setDetailsCompleted (
+					true);
+
+			// create response
+
+			ImChatDetailsUpdateSuccess successResponse =
+				new ImChatDetailsUpdateSuccess ()
+
+				.customer (
+					imChatApiLogic.customerData (
+						customer));
+
+			// commit and return
+
+			transaction.commit ();
+
+			return jsonResponderProvider.get ()
+
+				.value (
+					successResponse);
 
 		}
-
-		customer
-
-			.setDetailsCompleted (
-				true);
-
-		// create response
-
-		ImChatDetailsUpdateSuccess successResponse =
-			new ImChatDetailsUpdateSuccess ()
-
-			.customer (
-				imChatApiLogic.customerData (
-					customer));
-
-		// commit and return
-
-		transaction.commit ();
-
-		return jsonResponderProvider.get ()
-
-			.value (
-				successResponse);
 
 	}
 

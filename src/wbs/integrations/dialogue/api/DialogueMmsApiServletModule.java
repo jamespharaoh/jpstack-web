@@ -314,115 +314,120 @@ class DialogueMmsApiServletModule
 					parentTaskLogger,
 					"reportFile.doPost");
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"DialogueMmsApiServletModule.reportFile.doPost ()",
-					this);
+			try (
 
-			if (requestContext.parameterMap ().size () == 0) {
-				return;
-			}
+				Transaction transaction =
+					database.beginReadWrite (
+						"DialogueMmsApiServletModule.reportFile.doPost ()",
+						this);
 
-			// temporary, output all parameters
-
-			taskLogger.debugFormat (
-				"Parameter count %s",
-				integerToDecimalString (
-					requestContext.parameterMap ().size ()));
-
-			for (
-				Map.Entry <String, List <String>> entry
-					: requestContext.parameterMap ().entrySet ()
 			) {
 
+				if (requestContext.parameterMap ().size () == 0) {
+					return;
+				}
+
+				// temporary, output all parameters
+
+				taskLogger.debugFormat (
+					"Parameter count %s",
+					integerToDecimalString (
+						requestContext.parameterMap ().size ()));
+
 				for (
-					String value
-						: entry.getValue ()
+					Map.Entry <String, List <String>> entry
+						: requestContext.parameterMap ().entrySet ()
 				) {
 
-					taskLogger.debugFormat (
-						"%s = %s",
-						entry.getKey (),
-						value);
+					for (
+						String value
+							: entry.getValue ()
+					) {
+
+						taskLogger.debugFormat (
+							"%s = %s",
+							entry.getKey (),
+							value);
+
+					}
 
 				}
 
-			}
+				// int routeId = requestContext.getRequestInt ("routeId");
 
-			// int routeId = requestContext.getRequestInt ("routeId");
+				String userKeyParam =
+					requestContext.parameterRequired (
+						"X-Mms-User-Key");
 
-			String userKeyParam =
-				requestContext.parameterRequired (
-					"X-Mms-User-Key");
+				Long messageId;
 
-			Long messageId;
+				try {
 
-			try {
+					messageId =
+						Long.parseLong (
+							userKeyParam);
 
-				messageId =
+				} catch (NumberFormatException exception) {
+
+					throw new ServletException (
+						stringFormat (
+							"Ignoring dialogue MMS report with invalid user key, ",
+							"X-Mms-User-Key=%s",
+							userKeyParam));
+
+				}
+
+				MessageRec message =
+					messageHelper.findRequired (
+						messageId);
+
+				if (
+					stringNotEqualSafe (
+						message.getMessageType ().getCode (),
+						"mms")
+				) {
+
+					throw new ServletException (
+						"Message is not MMS: " + messageId);
+
+				}
+
+				String deliveryReportParam =
+					requestContext.parameterRequired (
+						"X-Mms-Delivery-Report");
+
+				MessageStatus newMessageStatus = null;
+
+				long statusCode =
 					Long.parseLong (
-						userKeyParam);
+						deliveryReportParam,
+						16);
 
-			} catch (NumberFormatException exception) {
+				if (statusCode == 0) {
 
-				throw new ServletException (
-					stringFormat (
-						"Ignoring dialogue MMS report with invalid user key, ",
-						"X-Mms-User-Key=%s",
-						userKeyParam));
+					newMessageStatus =
+						MessageStatus.delivered;
 
-			}
+				} else {
 
-			MessageRec message =
-				messageHelper.findRequired (
-					messageId);
+					newMessageStatus =
+						MessageStatus.undelivered;
 
-			if (
-				stringNotEqualSafe (
-					message.getMessageType ().getCode (),
-					"mms")
-			) {
+				}
 
-				throw new ServletException (
-					"Message is not MMS: " + messageId);
+				reportLogic.deliveryReport (
+					taskLogger,
+					message,
+					newMessageStatus,
+					optionalOf (
+						deliveryReportParam),
+					optionalAbsent (),
+					optionalAbsent (),
+					optionalAbsent ());
 
-			}
-
-			String deliveryReportParam =
-				requestContext.parameterRequired (
-					"X-Mms-Delivery-Report");
-
-			MessageStatus newMessageStatus = null;
-
-			long statusCode =
-				Long.parseLong (
-					deliveryReportParam,
-					16);
-
-			if (statusCode == 0) {
-
-				newMessageStatus =
-					MessageStatus.delivered;
-
-			} else {
-
-				newMessageStatus =
-					MessageStatus.undelivered;
+				transaction.commit ();
 
 			}
-
-			reportLogic.deliveryReport (
-				taskLogger,
-				message,
-				newMessageStatus,
-				optionalOf (
-					deliveryReportParam),
-				optionalAbsent (),
-				optionalAbsent (),
-				optionalAbsent ());
-
-			transaction.commit ();
 
 		}
 

@@ -14,7 +14,6 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiAction;
@@ -85,13 +84,14 @@ class ForwarderOutAction
 				parentTaskLogger,
 				"goApi");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ForwarderOutAction.goApi ()",
-				this);
+		try (
 
-		try {
+			Transaction transaction =
+				database.beginReadWrite (
+					"ForwarderOutAction.goApi ()",
+					this);
+
+		) {
 
 			String slice = null, code = null, password = null;
 			String message = null, numfrom = null, numto = null;

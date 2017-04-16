@@ -9,7 +9,6 @@ import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableList;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -91,120 +90,125 @@ class SubscriptionDeliveryNoticeHandler
 				parentTaskLogger,
 				"handle");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"SubscriptionDeliveryNoticeHandler.handle (deliveryId, ref)",
-				this);
+		try (
 
-		DeliveryRec delivery =
-			deliveryHelper.findRequired (
-				deliveryId);
+			Transaction transaction =
+				database.beginReadWrite (
+					"SubscriptionDeliveryNoticeHandler.handle (deliveryId, ref)",
+					this);
 
-		MessageRec message =
-			delivery.getMessage ();
-
-		SubscriptionBillRec subscriptionBill =
-			subscriptionBillHelper.findRequired (
-				message.getRef ());
-
-		SubscriptionNumberRec subscriptionNumber =
-			subscriptionBill.getSubscriptionNumber ();
-
-		SubscriptionRec subscription =
-			subscriptionNumber.getSubscription ();
-
-		if (
-			subscriptionBill.getState () == SubscriptionBillState.pending
-			&& delivery.getNewMessageStatus ().isBadType ()
 		) {
 
-			// delivery failure
+			DeliveryRec delivery =
+				deliveryHelper.findRequired (
+					deliveryId);
 
-			subscriptionBill
+			MessageRec message =
+				delivery.getMessage ();
 
-				.setState (
-					SubscriptionBillState.failed);
+			SubscriptionBillRec subscriptionBill =
+				subscriptionBillHelper.findRequired (
+					message.getRef ());
+
+			SubscriptionNumberRec subscriptionNumber =
+				subscriptionBill.getSubscriptionNumber ();
+
+			SubscriptionRec subscription =
+				subscriptionNumber.getSubscription ();
 
 			if (
-				referenceNotEqualWithClass (
-					SubscriptionBillRec.class,
-					subscriptionNumber.getPendingSubscriptionBill (),
-					subscriptionBill)
+				subscriptionBill.getState () == SubscriptionBillState.pending
+				&& delivery.getNewMessageStatus ().isBadType ()
 			) {
+
+				// delivery failure
+
+				subscriptionBill
+
+					.setState (
+						SubscriptionBillState.failed);
+
+				if (
+					referenceNotEqualWithClass (
+						SubscriptionBillRec.class,
+						subscriptionNumber.getPendingSubscriptionBill (),
+						subscriptionBill)
+				) {
+
+					subscriptionNumber
+
+						.setPendingSubscriptionBill (
+							null);
+
+				}
+
+			} else if (
+				subscriptionBill.getState () != SubscriptionBillState.delivered
+				&& delivery.getNewMessageStatus ().isGoodType ()
+			) {
+
+				// delivery success
+
+				subscriptionBill
+
+					.setState (
+						SubscriptionBillState.delivered)
+
+					.setDeliveredTime (
+						transaction.now ());
 
 				subscriptionNumber
 
-					.setPendingSubscriptionBill (
-						null);
+					.setBalance (
+						subscriptionNumber.getBalance ()
+						+ subscription.getCreditsPerBill ());
 
-			}
+				if (
+					referenceNotEqualWithClass (
+						SubscriptionBillRec.class,
+						subscriptionNumber.getPendingSubscriptionBill (),
+						subscriptionBill)
+				) {
 
-		} else if (
-			subscriptionBill.getState () != SubscriptionBillState.delivered
-			&& delivery.getNewMessageStatus ().isGoodType ()
-		) {
+					subscriptionNumber
 
-			// delivery success
+						.setPendingSubscriptionBill (
+							null);
 
-			subscriptionBill
+				}
 
-				.setState (
-					SubscriptionBillState.delivered)
+				// send pending
 
-				.setDeliveredTime (
-					transaction.now ());
+				if (
 
-			subscriptionNumber
-
-				.setBalance (
 					subscriptionNumber.getBalance ()
-					+ subscription.getCreditsPerBill ());
+						> subscription.getDebitsPerSend ()
 
-			if (
-				referenceNotEqualWithClass (
-					SubscriptionBillRec.class,
-					subscriptionNumber.getPendingSubscriptionBill (),
-					subscriptionBill)
-			) {
+					&& isNotNull (
+						subscriptionNumber.getPendingSubscriptionSendNumber ())
 
-				subscriptionNumber
+				) {
 
-					.setPendingSubscriptionBill (
-						null);
+					subscriptionLogic.sendNow (
+						taskLogger,
+						subscriptionNumber.getPendingSubscriptionSendNumber ());
 
-			}
+				}
 
-			// send pending
+			} else {
 
-			if (
-
-				subscriptionNumber.getBalance ()
-					> subscription.getDebitsPerSend ()
-
-				&& isNotNull (
-					subscriptionNumber.getPendingSubscriptionSendNumber ())
-
-			) {
-
-				subscriptionLogic.sendNow (
-					taskLogger,
-					subscriptionNumber.getPendingSubscriptionSendNumber ());
+				// nothing to do
 
 			}
 
-		} else {
+			// clean up
 
-			// nothing to do
+			deliveryHelper.remove (
+				delivery);
+
+			transaction.commit ();
 
 		}
-
-		// clean up
-
-		deliveryHelper.remove (
-			delivery);
-
-		transaction.commit ();
 
 	}
 

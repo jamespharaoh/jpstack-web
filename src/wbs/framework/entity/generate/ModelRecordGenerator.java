@@ -14,7 +14,6 @@ import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -147,95 +146,100 @@ class ModelRecordGenerator {
 				directory,
 				recordClassName);
 
-		@Cleanup
-		FormatWriter formatWriter =
-			new AtomicFileWriter (
-				filename);
+		try (
 
-		JavaClassUnitWriter classUnitWriter =
-			javaClassUnitWriterProvider.get ()
+			FormatWriter formatWriter =
+				new AtomicFileWriter (
+					filename);
 
-			.formatWriter (
-				formatWriter)
-
-			.packageNameFormat (
-				"%s.model",
-				plugin.packageName ());
-
-		JavaClassWriter modelWriter =
-			javaClassWriterProvider.get ()
-
-			.className (
-				recordClassName)
-
-			.addClassModifier (
-				"public")
-
-			.addImplements (
-				imports ->
-					stringFormat (
-						"%s <%s>",
-						imports.register (
-							modelInterfacesByType.get (
-								modelMeta.type ())),
-						imports.registerFormat (
-							"%s.model.%s",
-							modelMeta.plugin ().packageName (),
-							recordClassName)));
-
-		for (
-			ModelImplementsInterfaceSpec implementsInterface
-				: modelMeta.implementsInterfaces ()
 		) {
 
-			modelWriter.addImplementsFormat (
-				"%s.%s",
-				implementsInterface.packageName (),
-				implementsInterface.name ());
+			JavaClassUnitWriter classUnitWriter =
+				javaClassUnitWriterProvider.get ()
 
-		}
+				.formatWriter (
+					formatWriter)
 
-		modelWriter
+				.packageNameFormat (
+					"%s.model",
+					plugin.packageName ());
 
-			.addBlock (
-				this::writeConstructor)
+			JavaClassWriter modelWriter =
+				javaClassWriterProvider.get ()
 
-			.addBlock (
-				this::writeFields)
+				.className (
+					recordClassName)
 
-			.addBlock (
-				this::writeCollections)
+				.addClassModifier (
+					"public")
 
-			.addBlock (
-				this::writeEquals);
+				.addImplements (
+					imports ->
+						stringFormat (
+							"%s <%s>",
+							imports.register (
+								modelInterfacesByType.get (
+									modelMeta.type ())),
+							imports.registerFormat (
+								"%s.model.%s",
+								modelMeta.plugin ().packageName (),
+								recordClassName)));
 
-		if (modelMeta.type ().record ()) {
+			for (
+				ModelImplementsInterfaceSpec implementsInterface
+					: modelMeta.implementsInterfaces ()
+			) {
+
+				modelWriter.addImplementsFormat (
+					"%s.%s",
+					implementsInterface.packageName (),
+					implementsInterface.name ());
+
+			}
 
 			modelWriter
 
 				.addBlock (
-					this::writeCompareTo)
+					this::writeConstructor)
 
 				.addBlock (
-					this::writeToString);
+					this::writeFields)
+
+				.addBlock (
+					this::writeCollections)
+
+				.addBlock (
+					this::writeEquals);
+
+			if (modelMeta.type ().record ()) {
+
+				modelWriter
+
+					.addBlock (
+						this::writeCompareTo)
+
+					.addBlock (
+						this::writeToString);
+
+			}
+
+			classUnitWriter.addBlock (
+				modelWriter);
+
+			if (taskLogger.errors ()) {
+				return;
+			}
+
+			classUnitWriter.write (
+				taskLogger);
+
+			if (taskLogger.errors ()) {
+				return;
+			}
+
+			formatWriter.commit ();
 
 		}
-
-		classUnitWriter.addBlock (
-			modelWriter);
-
-		if (taskLogger.errors ()) {
-			return;
-		}
-
-		classUnitWriter.write (
-			taskLogger);
-
-		if (taskLogger.errors ()) {
-			return;
-		}
-
-		formatWriter.commit ();
 
 	}
 

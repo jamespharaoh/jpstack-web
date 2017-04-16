@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -187,45 +186,50 @@ class UnwiredPlazaApiServletModule
 
 			// begin transaction
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"UnwiredPlazaApiServletModule.reportFile.doGet ()",
-					this);
+			try (
 
-			RouteRec route =
-				routeHelper.findRequired (
-					routeId);
+				Transaction transaction =
+					database.beginReadWrite (
+						"UnwiredPlazaApiServletModule.reportFile.doGet ()",
+						this);
 
-			// process delivery report
+			) {
 
-			reportLogic.deliveryReport (
-				taskLogger,
-				route,
-				id.toString (),
-				result,
-				Optional.of (
-					statusParam),
-				Optional.of (
-					stringFormat (
-						"%s — %s",
-						statusCode,
-						subStatusCode)),
-				Optional.of (
-					joinWithSpace (
+				RouteRec route =
+					routeHelper.findRequired (
+						routeId);
+
+				// process delivery report
+
+				reportLogic.deliveryReport (
+					taskLogger,
+					route,
+					id.toString (),
+					result,
+					Optional.of (
+						statusParam),
+					Optional.of (
 						stringFormat (
-							"status = %s",
-							statusParam),
-						stringFormat (
-							"substatus = %s",
-							subStatusParam),
-						stringFormat (
-							"final = %s",
-							integerToDecimalString (
-								finalValue)))),
-				Optional.absent ());
+							"%s — %s",
+							statusCode,
+							subStatusCode)),
+					Optional.of (
+						joinWithSpace (
+							stringFormat (
+								"status = %s",
+								statusParam),
+							stringFormat (
+								"substatus = %s",
+								subStatusParam),
+							stringFormat (
+								"final = %s",
+								integerToDecimalString (
+									finalValue)))),
+					Optional.absent ());
 
-			transaction.commit ();
+				transaction.commit ();
+
+			}
 
 		}
 

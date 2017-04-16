@@ -10,6 +10,7 @@ import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -19,7 +20,6 @@ import java.util.List;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
@@ -230,64 +230,69 @@ class HibernateDao {
 			@NonNull Class <Record> theClass,
 			@NonNull Criteria criteria) {
 
-		@Cleanup
-		ActiveTask activeTask =
-			activityManager.start (
-				"hibernate",
-				stringFormat (
-					"%s.%s",
-					getClass ().getSimpleName (),
-					methodName),
-				this);
+		try (
 
-		// perform the operation
+			ActiveTask activeTask =
+				activityManager.start (
+					"hibernate",
+					stringFormat (
+						"%s.%s",
+						getClass ().getSimpleName (),
+						methodName),
+					this);
 
-		List <?> objectList =
-			criteria.list ();
-
-		// handle empty list
-
-		if (
-			collectionIsEmpty (
-				objectList)
-		) {
-			return optionalAbsent ();
-		}
-
-		// handle multiple results error
-
-		if (
-			collectionDoesNotHaveOneElement (
-				objectList)
 		) {
 
-			throw new RuntimeException (
-				stringFormat (
-					"%s.%s (...) ",
-					classNameSimple (
-						getClass ()),
-					methodName,
-					"should only find zero or one results but found %s",
-					integerToDecimalString (
-						objectList.size ())));
+			// perform the operation
+
+			List <?> objectList =
+				criteria.list ();
+
+			// handle empty list
+
+			if (
+				collectionIsEmpty (
+					objectList)
+			) {
+				return optionalAbsent ();
+			}
+
+			// handle multiple results error
+
+			if (
+				collectionDoesNotHaveOneElement (
+					objectList)
+			) {
+
+				throw new RuntimeException (
+					stringFormat (
+						"%s.%s (...) ",
+						classNameSimple (
+							getClass ()),
+						methodName,
+						"should only find zero or one results but found %s",
+						integerToDecimalString (
+							objectList.size ())));
+
+			}
+
+			// check the object type
+
+			if (
+				isNotInstanceOf (
+					theClass,
+					objectList.get (0))
+			) {
+				throw new ClassCastException ();
+			}
+
+			// cast and return
+
+			return optionalOf (
+				theClass.cast (
+					objectList.get (0)));
 
 		}
-
-		// check the object type
-
-		if (
-			isNotInstanceOf (
-				theClass,
-				objectList.get (0))
-		) {
-			throw new ClassCastException ();
-		}
-
-		// cast and return
-
-		return optionalOf (
-			theClass.cast (
-				objectList.get (0)));
 
 	}
 
@@ -340,47 +345,52 @@ class HibernateDao {
 			@NonNull Class <Record> theClass,
 			@NonNull Criteria criteria) {
 
-		@Cleanup
-		ActiveTask activeTask =
-			activityManager.start (
-				"hibernate",
-				stringFormat (
-					"%s.%s",
-					getClass ().getSimpleName (),
-					methodName),
-				this);
+		try (
 
-		// perform the operation
-
-		List <?> objectList =
-			criteria.list ();
-
-		// check the first object at least is of the right type
-
-		if (
-
-			collectionIsNotEmpty (
-				objectList)
-
-			&& isNotInstanceOf (
-				theClass,
-				objectList.get (0))
+			ActiveTask activeTask =
+				activityManager.start (
+					"hibernate",
+					stringFormat (
+						"%s.%s",
+						getClass ().getSimpleName (),
+						methodName),
+					this);
 
 		) {
 
-			throw new ClassCastException ();
+			// perform the operation
+
+			List <?> objectList =
+				criteria.list ();
+
+			// check the first object at least is of the right type
+
+			if (
+
+				collectionIsNotEmpty (
+					objectList)
+
+				&& isNotInstanceOf (
+					theClass,
+					objectList.get (0))
+
+			) {
+
+				throw new ClassCastException ();
+
+			}
+
+			// forcibly cast the whole list
+
+			List <Record> recordList =
+				genericCastUnchecked (
+					objectList);
+
+			// and return
+
+			return recordList;
 
 		}
-
-		// forcibly cast the whole list
-
-		@SuppressWarnings ("unchecked")
-		List <Record> recordList =
-			(List <Record>) objectList;
-
-		// and return
-
-		return recordList;
 
 	}
 

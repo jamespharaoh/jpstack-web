@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -143,14 +142,15 @@ class DbPool
 				&& usedConnections.size () == maxConnections
 			) {
 
-				@Cleanup
-				ActiveTask activeTask =
-					activityManager.start (
-						"database",
-						"DbPool.getConnection () - waiting",
-						this);
+				try (
 
-				try {
+					ActiveTask activeTask =
+						activityManager.start (
+							"database",
+							"DbPool.getConnection () - waiting",
+							this);
+
+				) {
 
 					lock.wait ();
 
@@ -188,14 +188,15 @@ class DbPool
 
 		// create a new connection
 
-		{
+		try (
 
-			@Cleanup
 			ActiveTask activeTask =
 				activityManager.start (
 					"database",
 					"DbPool.getConnection () - connecting",
 					this);
+
+		) {
 
 			connectionStuff.realConnection =
 				dataSource.getConnection ();
@@ -409,16 +410,16 @@ class DbPool
 
 		void fetchServerProcessId () {
 
-			try {
+			try (
 
-				@Cleanup
 				Statement statement =
 					realConnection.createStatement ();
 
-				@Cleanup
 				ResultSet resultSet =
 					statement.executeQuery (
 						"SELECT pg_backend_pid ()");
+
+			) {
 
 				if (! resultSet.next ()) {
 

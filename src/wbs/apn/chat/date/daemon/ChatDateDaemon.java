@@ -687,208 +687,213 @@ class ChatDateDaemon
 
 		boolean status = false;
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatDateDaemon.doUser (otherUserInfos, thisUserId)",
-				this);
+		try (
 
-		ChatUserRec thisUser =
-			chatUserHelper.findRequired (
-				thisUserId);
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatDateDaemon.doUser (otherUserInfos, thisUserId)",
+					this);
 
-		ChatRec chat =
-			thisUser.getChat ();
-
-		int hour =
-			transaction
-				.now ()
-				.toDateTime (chatMiscLogic.timezone (chat))
-				.getHourOfDay ();
-
-		LocalDate today =
-			transaction
-				.now ()
-				.toDateTime (chatMiscLogic.timezone (chat))
-				.toLocalDate ();
-
-		// inc the daily count thing as appropriate
-
-		long oldDailyCount =
-			thisUser.getDateDailyCount ();
-
-		LocalDate oldDailyDate =
-			thisUser.getDateDailyDate ();
-
-		if (thisUser.getDateDailyDate () != null) {
-
-			for (
-				LocalDate day = thisUser.getDateDailyDate ();
-				day.compareTo (today) < 0;
-				day = day.plusDays (1)
-			) {
-
-				long dailyCount =
-					thisUser.getDateDailyCount ();
-
-				long dailyMax =
-					thisUser.getDateDailyMax ();
-
-				thisUser.setDateDailyCount (
-					min (
-						dailyCount + dailyMax,
-						dailyMax));
-
-			}
-
-		}
-
-		thisUser
-
-			.setDateDailyDate (
-				today);
-
-		taskLogger.debugFormat (
-
-			"Updated %s: ",
-			integerToDecimalString (
-				thisUser.getId ()),
-
-			"dailyCount %s to %s, ",
-			integerToDecimalString (
-				oldDailyCount),
-			integerToDecimalString (
-				thisUser.getDateDailyCount ()),
-
-			"dailyDate %s to %s",
-			ifNotNullThenElse (
-				oldDailyDate,
-				() -> timeFormatter.dateString (
-					oldDailyDate),
-				() -> "none"),
-			timeFormatter.dateString (
-				thisUser.getDateDailyDate ()));
-
-		// check the user still wants a date message
-
-		if (thisUser.getDateDailyCount () < 1) {
-
-			taskLogger.debugFormat (
-				"Ignoring %s (daily check failed)",
-				objectManager.objectPathMini (
-					thisUser));
-
-			return false;
-
-		}
-
-		ChatCreditCheckResult creditCheckResult =
-			chatCreditLogic.userSpendCreditCheck (
-				taskLogger,
-				thisUser,
-				false,
-				optionalAbsent ());
-
-		if (creditCheckResult.failed ()) {
-
-			taskLogger.debugFormat (
-				"Ignoring %s ",
-				integerToDecimalString (
-					thisUserId),
-				"(%s)",
-				creditCheckResult.details ());
-
-			return false;
-
-		}
-
-		if (
-			! checkHours (
-				hour,
-				thisUser.getDateStartHour (),
-				thisUser.getDateEndHour ())
 		) {
 
+			ChatUserRec thisUser =
+				chatUserHelper.findRequired (
+					thisUserId);
+
+			ChatRec chat =
+				thisUser.getChat ();
+
+			int hour =
+				transaction
+					.now ()
+					.toDateTime (chatMiscLogic.timezone (chat))
+					.getHourOfDay ();
+
+			LocalDate today =
+				transaction
+					.now ()
+					.toDateTime (chatMiscLogic.timezone (chat))
+					.toLocalDate ();
+
+			// inc the daily count thing as appropriate
+
+			long oldDailyCount =
+				thisUser.getDateDailyCount ();
+
+			LocalDate oldDailyDate =
+				thisUser.getDateDailyDate ();
+
+			if (thisUser.getDateDailyDate () != null) {
+
+				for (
+					LocalDate day = thisUser.getDateDailyDate ();
+					day.compareTo (today) < 0;
+					day = day.plusDays (1)
+				) {
+
+					long dailyCount =
+						thisUser.getDateDailyCount ();
+
+					long dailyMax =
+						thisUser.getDateDailyMax ();
+
+					thisUser.setDateDailyCount (
+						min (
+							dailyCount + dailyMax,
+							dailyMax));
+
+				}
+
+			}
+
+			thisUser
+
+				.setDateDailyDate (
+					today);
+
 			taskLogger.debugFormat (
-				"Ignoring %s (time check failed)",
-				objectManager.objectPathMini (
-					thisUser));
 
-			return false;
-
-		}
-
-		if (thisUser.getOnline ()) {
-
-			taskLogger.debugFormat (
-				"Ignoring %s (online check failed)",
-				objectManager.objectPathMini (
-					thisUser));
-
-			return false;
-
-		}
-
-		if (thisUser.getDateMode () == ChatUserDateMode.none) {
-
-			taskLogger.debugFormat (
-				"Ignoring %s ",
+				"Updated %s: ",
 				integerToDecimalString (
-					thisUserId),
-				"(dating mode check failed)");
+					thisUser.getId ()),
 
-			return false;
+				"dailyCount %s to %s, ",
+				integerToDecimalString (
+					oldDailyCount),
+				integerToDecimalString (
+					thisUser.getDateDailyCount ()),
 
-		}
+				"dailyDate %s to %s",
+				ifNotNullThenElse (
+					oldDailyDate,
+					() -> timeFormatter.dateString (
+						oldDailyDate),
+					() -> "none"),
+				timeFormatter.dateString (
+					thisUser.getDateDailyDate ()));
 
-		// and send them
+			// check the user still wants a date message
 
-		if (thisUser.getDateMode () == ChatUserDateMode.photo) {
+			if (thisUser.getDateDailyCount () < 1) {
 
-			if (
+				taskLogger.debugFormat (
+					"Ignoring %s (daily check failed)",
+					objectManager.objectPathMini (
+						thisUser));
 
-				sendSingleLot (
-					taskLogger,
-					thisUser,
-					otherUserInfos,
-					true,
-					true,
-					false,
-					3)
+				return false;
 
-				|| sendSingleLot (
-					taskLogger,
-					thisUser,
-					otherUserInfos,
-					false,
-					false,
-					true,
-					1)
-
-			) {
-				status = true;
 			}
 
-		} else {
-
-			if (
-				sendSingleLot (
+			ChatCreditCheckResult creditCheckResult =
+				chatCreditLogic.userSpendCreditCheck (
 					taskLogger,
 					thisUser,
-					otherUserInfos,
 					false,
-					true,
-					true,
-					1)
-			) {
-				status = true;
+					optionalAbsent ());
+
+			if (creditCheckResult.failed ()) {
+
+				taskLogger.debugFormat (
+					"Ignoring %s ",
+					integerToDecimalString (
+						thisUserId),
+					"(%s)",
+					creditCheckResult.details ());
+
+				return false;
+
 			}
 
+			if (
+				! checkHours (
+					hour,
+					thisUser.getDateStartHour (),
+					thisUser.getDateEndHour ())
+			) {
+
+				taskLogger.debugFormat (
+					"Ignoring %s (time check failed)",
+					objectManager.objectPathMini (
+						thisUser));
+
+				return false;
+
+			}
+
+			if (thisUser.getOnline ()) {
+
+				taskLogger.debugFormat (
+					"Ignoring %s (online check failed)",
+					objectManager.objectPathMini (
+						thisUser));
+
+				return false;
+
+			}
+
+			if (thisUser.getDateMode () == ChatUserDateMode.none) {
+
+				taskLogger.debugFormat (
+					"Ignoring %s ",
+					integerToDecimalString (
+						thisUserId),
+					"(dating mode check failed)");
+
+				return false;
+
+			}
+
+			// and send them
+
+			if (thisUser.getDateMode () == ChatUserDateMode.photo) {
+
+				if (
+
+					sendSingleLot (
+						taskLogger,
+						thisUser,
+						otherUserInfos,
+						true,
+						true,
+						false,
+						3)
+
+					|| sendSingleLot (
+						taskLogger,
+						thisUser,
+						otherUserInfos,
+						false,
+						false,
+						true,
+						1)
+
+				) {
+					status = true;
+				}
+
+			} else {
+
+				if (
+					sendSingleLot (
+						taskLogger,
+						thisUser,
+						otherUserInfos,
+						false,
+						true,
+						true,
+						1)
+				) {
+					status = true;
+				}
+
+			}
+
+			transaction.commit ();
+
+			return status;
+
 		}
-
-		transaction.commit ();
-
-		return status;
 
 	}
 

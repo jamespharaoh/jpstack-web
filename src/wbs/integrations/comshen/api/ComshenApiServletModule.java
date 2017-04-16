@@ -9,7 +9,6 @@ import java.util.regex.Matcher;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -94,57 +93,62 @@ class ComshenApiServletModule
 					parentTaskLogger,
 					"reportFile.doGet");
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"ComshenApiServletModule.reportFile.doGet ()",
-					this);
+			try (
 
-			Long routeId =
-				requestContext.requestIntegerRequired (
-					"routeId");
+				Transaction transaction =
+					database.beginReadWrite (
+						"ComshenApiServletModule.reportFile.doGet ()",
+						this);
 
-			String idParam =
-				requestContext.parameterOrNull (
-					"id");
+			) {
 
-			String statParam =
-				requestContext.parameterOrNull (
-					"stat");
+				Long routeId =
+					requestContext.requestIntegerRequired (
+						"routeId");
 
-			String errParam =
-				requestContext.parameterOrNull (
-					"err");
+				String idParam =
+					requestContext.parameterOrNull (
+						"id");
 
-			RouteRec route =
-				routeHelper.findRequired (
-					routeId);
+				String statParam =
+					requestContext.parameterOrNull (
+						"stat");
 
-			MessageStatus result =
-				statToResult.get (
-					statParam);
+				String errParam =
+					requestContext.parameterOrNull (
+						"err");
 
-			// process delivery report
+				RouteRec route =
+					routeHelper.findRequired (
+						routeId);
 
-			reportLogic.deliveryReport (
-				taskLogger,
-				route,
-				idParam,
-				result,
-				Optional.of (
-					statParam),
-				Optional.absent (),
-				Optional.of (
-					joinWithSpace (
-						stringFormat (
-							"stat=%s",
-							statParam),
-						stringFormat (
-							"err=%s",
-							errParam))),
-				Optional.absent ());
+				MessageStatus result =
+					statToResult.get (
+						statParam);
 
-			transaction.commit ();
+				// process delivery report
+
+				reportLogic.deliveryReport (
+					taskLogger,
+					route,
+					idParam,
+					result,
+					Optional.of (
+						statParam),
+					Optional.absent (),
+					Optional.of (
+						joinWithSpace (
+							stringFormat (
+								"stat=%s",
+								statParam),
+							stringFormat (
+								"err=%s",
+								errParam))),
+					Optional.absent ());
+
+				transaction.commit ();
+
+			}
 
 		}
 

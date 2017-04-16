@@ -27,7 +27,6 @@ import javax.inject.Provider;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -863,60 +862,65 @@ class ForwarderApiModule
 					parentTaskLogger,
 					"handle");
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"ForwarderApiModule.SendExRpcHandler.handle (source)",
-					this);
+			try (
 
-			// authenticate
+				Transaction transaction =
+					database.beginReadWrite (
+						"ForwarderApiModule.SendExRpcHandler.handle (source)",
+						this);
 
-			forwarder =
-				forwarderApiLogic.rpcAuth (source);
+			) {
 
-			// get params
+				// authenticate
 
-			getParams (
-				taskLogger,
-				source);
+				forwarder =
+					forwarderApiLogic.rpcAuth (source);
 
-			// bail on any request-invalid classErrors
+				// get params
 
-			if (errors.size () > 0) {
+				getParams (
+					taskLogger,
+					source);
 
-				return Rpc.rpcError (
-					"forwarder-send-ex-response",
-					Rpc.stRequestInvalid,
-					"request-invalid",
-					errors);
+				// bail on any request-invalid classErrors
 
-			}
+				if (errors.size () > 0) {
 
-			// fill in the SendTemplates
+					return Rpc.rpcError (
+						"forwarder-send-ex-response",
+						Rpc.stRequestInvalid,
+						"request-invalid",
+						errors);
 
-			createTemplate ();
+				}
 
-			// check the template is ok
+				// fill in the SendTemplates
 
-			checkTemplate (
-				taskLogger);
+				createTemplate ();
 
-			// send the message (if appropriate)
+				// check the template is ok
 
-			if (! cancel) {
-
-				sendTemplate (
+				checkTemplate (
 					taskLogger);
 
+				// send the message (if appropriate)
+
+				if (! cancel) {
+
+					sendTemplate (
+						taskLogger);
+
+				}
+
+				// return
+
+				collectErrors ();
+
+				transaction.commit ();
+
+				return makeResult ();
+
 			}
-
-			// return
-
-			collectErrors ();
-
-			transaction.commit ();
-
-			return makeResult ();
 
 		}
 
@@ -1806,43 +1810,48 @@ class ForwarderApiModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"ForwarderApiModule.QueryExRpcHandler.handle (source)",
-					this);
+			try (
 
-			// authenticate
+				Transaction transaction =
+					database.beginReadWrite (
+						"ForwarderApiModule.QueryExRpcHandler.handle (source)",
+						this);
 
-			forwarder =
-				forwarderApiLogic.rpcAuth (source);
+			) {
 
-			// get params
+				// authenticate
 
-			getParams (source);
+				forwarder =
+					forwarderApiLogic.rpcAuth (source);
 
-			// bail on any request-invalid classErrors
+				// get params
 
-			if (errors.iterator ().hasNext ()) {
+				getParams (source);
 
-				return Rpc.rpcError (
-					"forwarder-query-ex-response",
-					Rpc.stRequestInvalid,
-					"request-invalid",
-					errors);
+				// bail on any request-invalid classErrors
+
+				if (errors.iterator ().hasNext ()) {
+
+					return Rpc.rpcError (
+						"forwarder-query-ex-response",
+						Rpc.stRequestInvalid,
+						"request-invalid",
+						errors);
+
+				}
+
+				// do the stuff
+
+				findMessages ();
+				checkIdsMatch ();
+
+				// return
+
+				transaction.commit ();
+
+				return makeSuccess ();
 
 			}
-
-			// do the stuff
-
-			findMessages ();
-			checkIdsMatch ();
-
-			// return
-
-			transaction.commit ();
-
-			return makeSuccess ();
 
 		}
 
@@ -2168,39 +2177,44 @@ class ForwarderApiModule
 					parentTaskLogger,
 					"peekExRpcHandler.handle");
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadOnly (
-					"ForwarderApiModule.PeekExRpcHandler.handle (source)",
-					this);
+			try (
 
-			// authenticate
+				Transaction transaction =
+					database.beginReadOnly (
+						"ForwarderApiModule.PeekExRpcHandler.handle (source)",
+						this);
 
-			forwarder =
-				forwarderApiLogic.rpcAuth (source);
+			) {
 
-			// get params
+				// authenticate
 
-			getParams (source);
+				forwarder =
+					forwarderApiLogic.rpcAuth (source);
 
-			// bail on any request-invalid classErrors
+				// get params
 
-			if (errors.iterator ().hasNext ())
-				return Rpc.rpcError (
-					"forwarder-peek-ex-ersponse",
-					Rpc.stRequestInvalid,
-					"request-invalid",
-					errors);
+				getParams (source);
 
-			// find stuff
+				// bail on any request-invalid classErrors
 
-			RpcResult result =
-				makeSuccess (
-					taskLogger);
+				if (errors.iterator ().hasNext ())
+					return Rpc.rpcError (
+						"forwarder-peek-ex-ersponse",
+						Rpc.stRequestInvalid,
+						"request-invalid",
+						errors);
 
-			// commit
+				// find stuff
 
-			return result;
+				RpcResult result =
+					makeSuccess (
+						taskLogger);
+
+				// commit
+
+				return result;
+
+			}
 
 		}
 

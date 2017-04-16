@@ -4,7 +4,6 @@ import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -13,9 +12,11 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.currency.logic.CurrencyLogic;
+
 import wbs.imchat.model.ImChatObjectHelper;
 import wbs.imchat.model.ImChatRec;
-import wbs.platform.currency.logic.CurrencyLogic;
 import wbs.web.action.Action;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.JsonResponder;
@@ -57,36 +58,41 @@ class ImChatServiceGetAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ImChatServiceGetAction.handle ()",
-				this);
+		try (
 
-		ImChatRec imChat =
-			imChatHelper.findRequired (
-				parseIntegerRequired (
-					requestContext.requestStringRequired (
-						"imChatId")));
+			Transaction transaction =
+				database.beginReadOnly (
+					"ImChatServiceGetAction.handle ()",
+					this);
 
-		// create response
+		) {
 
-		ImChatServiceData serviceData =
-			new ImChatServiceData ()
+			ImChatRec imChat =
+				imChatHelper.findRequired (
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"imChatId")));
 
-			.profilePageBeforeLogin (
-				imChat.getProfilePageBeforeLogin ())
+			// create response
 
-			.createDetails (
-				imChatApiLogic.createDetailData (
-					imChat));
+			ImChatServiceData serviceData =
+				new ImChatServiceData ()
 
-		// return
+				.profilePageBeforeLogin (
+					imChat.getProfilePageBeforeLogin ())
 
-		return jsonResponderProvider.get ()
+				.createDetails (
+					imChatApiLogic.createDetailData (
+						imChat));
 
-			.value (
-				serviceData);
+			// return
+
+			return jsonResponderProvider.get ()
+
+				.value (
+					serviceData);
+
+		}
 
 	}
 

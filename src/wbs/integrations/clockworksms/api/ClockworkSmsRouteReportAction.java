@@ -18,7 +18,6 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiLoggingAction;
@@ -177,99 +176,104 @@ class ClockworkSmsRouteReportAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ClockworkSmsRouteOutAction.handle ()",
-				this);
+		try (
 
-		// lookup route
-
-		Optional <RouteRec> smsRouteOptional =
-			smsRouteHelper.find (
-				Long.parseLong (
-					requestContext.requestStringRequired (
-						"smsRouteId")));
-
-		if (
-
-			optionalIsNotPresent (
-				smsRouteOptional)
-
-			|| booleanEqual (
-				smsRouteOptional.get ().getDeleted (),
-				true)
-
-			|| booleanEqual (
-				smsRouteOptional.get ().getCanSend (),
-				false)
-
-			|| booleanEqual (
-				smsRouteOptional.get ().getDeliveryReports (),
-				false)
+			Transaction transaction =
+				database.beginReadWrite (
+					"ClockworkSmsRouteOutAction.handle ()",
+					this);
 
 		) {
 
-			throw new HttpNotFoundException (
-				optionalAbsent (),
-				emptyList ());
+			// lookup route
+
+			Optional <RouteRec> smsRouteOptional =
+				smsRouteHelper.find (
+					Long.parseLong (
+						requestContext.requestStringRequired (
+							"smsRouteId")));
+
+			if (
+
+				optionalIsNotPresent (
+					smsRouteOptional)
+
+				|| booleanEqual (
+					smsRouteOptional.get ().getDeleted (),
+					true)
+
+				|| booleanEqual (
+					smsRouteOptional.get ().getCanSend (),
+					false)
+
+				|| booleanEqual (
+					smsRouteOptional.get ().getDeliveryReports (),
+					false)
+
+			) {
+
+				throw new HttpNotFoundException (
+					optionalAbsent (),
+					emptyList ());
+
+			}
+
+			RouteRec smsRoute =
+				optionalGetRequired (
+					smsRouteOptional);
+
+			// lookup clockwork sms route in
+
+			Optional <ClockworkSmsRouteOutRec> clockworkSmsRouteOutOptional =
+				clockworkSmsRouteOutHelper.find (
+					smsRoute.getId ());
+
+			if (
+
+				optionalIsNotPresent (
+					clockworkSmsRouteOutOptional)
+
+				|| booleanEqual (
+					clockworkSmsRouteOutOptional.get ().getDeleted (),
+					true)
+
+			) {
+
+				throw new HttpNotFoundException (
+					optionalAbsent (),
+					emptyList ());
+
+			}
+
+			ClockworkSmsRouteOutRec clockworkSmsRouteOut =
+				optionalGetRequired (
+					clockworkSmsRouteOutOptional);
+
+			// iterate delivery reports
+
+			response =
+				new ClockworkSmsRouteReportResponse ();
+
+			for (
+				ClockworkSmsRouteReportRequest.Item item
+					: request.items ()
+			) {
+
+				response.items.add (
+					handleDeliveryReport (
+						taskLogger,
+						clockworkSmsRouteOut,
+						item));
+
+			}
+
+			// commit and return
+
+			transaction.commit ();
+
+			success = true;
 
 		}
-
-		RouteRec smsRoute =
-			optionalGetRequired (
-				smsRouteOptional);
-
-		// lookup clockwork sms route in
-
-		Optional <ClockworkSmsRouteOutRec> clockworkSmsRouteOutOptional =
-			clockworkSmsRouteOutHelper.find (
-				smsRoute.getId ());
-
-		if (
-
-			optionalIsNotPresent (
-				clockworkSmsRouteOutOptional)
-
-			|| booleanEqual (
-				clockworkSmsRouteOutOptional.get ().getDeleted (),
-				true)
-
-		) {
-
-			throw new HttpNotFoundException (
-				optionalAbsent (),
-				emptyList ());
-
-		}
-
-		ClockworkSmsRouteOutRec clockworkSmsRouteOut =
-			optionalGetRequired (
-				clockworkSmsRouteOutOptional);
-
-		// iterate delivery reports
-
-		response =
-			new ClockworkSmsRouteReportResponse ();
-
-		for (
-			ClockworkSmsRouteReportRequest.Item item
-				: request.items ()
-		) {
-
-			response.items.add (
-				handleDeliveryReport (
-					taskLogger,
-					clockworkSmsRouteOut,
-					item));
-
-		}
-
-		// commit and return
-
-		transaction.commit ();
-
-		success = true;
 
 	}
 
@@ -471,37 +475,42 @@ class ClockworkSmsRouteReportAction
 				parentTaskLogger,
 				"storeLog");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ClockworkSmsRouteReportAction.storeLog ()",
-				this);
+		try (
 
-		clockworkSmsInboundLogHelper.insert (
-			taskLogger,
-			clockworkSmsInboundLogHelper.createInstance ()
+			Transaction transaction =
+				database.beginReadWrite (
+					"ClockworkSmsRouteReportAction.storeLog ()",
+					this);
 
-			.setRoute (
-				smsRouteHelper.findRequired (
-					Long.parseLong (
-						requestContext.requestStringRequired (
-							"smsRouteId"))))
+		) {
 
-			.setType (
-				ClockworkSmsInboundLogType.smsDelivery)
+			clockworkSmsInboundLogHelper.insert (
+				taskLogger,
+				clockworkSmsInboundLogHelper.createInstance ()
 
-			.setTimestamp (
-				transaction.now ())
+				.setRoute (
+					smsRouteHelper.findRequired (
+						Long.parseLong (
+							requestContext.requestStringRequired (
+								"smsRouteId"))))
 
-			.setDetails (
-				debugLog)
+				.setType (
+					ClockworkSmsInboundLogType.smsDelivery)
 
-			.setSuccess (
-				success)
+				.setTimestamp (
+					transaction.now ())
 
-		);
+				.setDetails (
+					debugLog)
 
-		transaction.commit ();
+				.setSuccess (
+					success)
+
+			);
+
+			transaction.commit ();
+
+		}
 
 	}
 

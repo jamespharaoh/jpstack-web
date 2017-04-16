@@ -8,7 +8,6 @@ import static wbs.utils.time.TimeUtils.earlierThan;
 
 import java.util.List;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -139,96 +138,101 @@ class ChatUserJoinOutboundDaemon
 				parentTaskLogger,
 				"doChatUserJoinOutbound");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				stringFormat (
-					"%s.%s (%s)",
-					"ChatUserJoinOutboundDaemon",
-					"doChatUserJoinOutbound",
+		try (
+
+			Transaction transaction =
+				database.beginReadWrite (
 					stringFormat (
-						"chatUserId = %s",
-						integerToDecimalString (
-							chatUserId))),
-				this);
-
-		// find the user
-
-		ChatUserRec user =
-			chatUserHelper.findRequired (
-				chatUserId);
-
-		// check and clear the outbound message flag
-
-		if (
-
-			isNull (
-				user.getNextJoinOutbound ())
-
-			|| earlierThan (
-				transaction.now (),
-				user.getNextJoinOutbound ())
+						"%s.%s (%s)",
+						"ChatUserJoinOutboundDaemon",
+						"doChatUserJoinOutbound",
+						stringFormat (
+							"chatUserId = %s",
+							integerToDecimalString (
+								chatUserId))),
+					this);
 
 		) {
 
-			return;
+			// find the user
 
-		}
+			ChatUserRec user =
+				chatUserHelper.findRequired (
+					chatUserId);
 
-		user
+			// check and clear the outbound message flag
 
-			.setNextJoinOutbound (
-				null);
+			if (
 
-		// find a monitor
+				isNull (
+					user.getNextJoinOutbound ())
 
-		ChatUserRec monitor =
-			chatMiscLogic.getOnlineMonitorForOutbound (
-				user);
+				|| earlierThan (
+					transaction.now (),
+					user.getNextJoinOutbound ())
 
-		if (monitor == null) {
+			) {
+
+				return;
+
+			}
+
+			user
+
+				.setNextJoinOutbound (
+					null);
+
+			// find a monitor
+
+			ChatUserRec monitor =
+				chatMiscLogic.getOnlineMonitorForOutbound (
+					user);
+
+			if (monitor == null) {
+
+				transaction.commit ();
+
+				return;
+
+			}
+
+			// create or update the cmi
+
+			ChatMonitorInboxRec chatMonitorInbox =
+				chatMessageLogic.findOrCreateChatMonitorInbox (
+					taskLogger,
+					monitor,
+					user,
+					true);
+
+			chatMonitorInbox
+
+				.setOutbound (
+					true);
+
+			// create a log
+
+			chatUserInitiationLogHelper.insert (
+				taskLogger,
+				chatUserInitiationLogHelper.createInstance ()
+
+				.setChatUser (
+					user)
+
+				.setMonitorChatUser (
+					monitor)
+
+				.setReason (
+					ChatUserInitiationReason.joinUser)
+
+				.setTimestamp (
+					transaction.now ())
+
+			);
 
 			transaction.commit ();
 
-			return;
-
 		}
-
-		// create or update the cmi
-
-		ChatMonitorInboxRec chatMonitorInbox =
-			chatMessageLogic.findOrCreateChatMonitorInbox (
-				taskLogger,
-				monitor,
-				user,
-				true);
-
-		chatMonitorInbox
-
-			.setOutbound (
-				true);
-
-		// create a log
-
-		chatUserInitiationLogHelper.insert (
-			taskLogger,
-			chatUserInitiationLogHelper.createInstance ()
-
-			.setChatUser (
-				user)
-
-			.setMonitorChatUser (
-				monitor)
-
-			.setReason (
-				ChatUserInitiationReason.joinUser)
-
-			.setTimestamp (
-				transaction.now ())
-
-		);
-
-		transaction.commit ();
 
 	}
 

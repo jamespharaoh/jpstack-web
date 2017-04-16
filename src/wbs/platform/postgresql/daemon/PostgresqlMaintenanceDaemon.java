@@ -23,7 +23,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.joda.time.DateTime;
@@ -125,11 +124,12 @@ class PostgresqlMaintenanceDaemon
 			"%s maintenance starting",
 			frequencyName);
 
-		try {
+		try (
 
-			@Cleanup
 			Connection connnection =
 				dataSource.getConnection ();
+
+		) {
 
 			connnection.setTransactionIsolation (
 				Connection.TRANSACTION_SERIALIZABLE);
@@ -139,7 +139,7 @@ class PostgresqlMaintenanceDaemon
 
 			// get list of commands
 
-			List<Command> commands =
+			List <Command> commands =
 				fetchCommands (
 					connnection,
 					frequency);
@@ -153,97 +153,102 @@ class PostgresqlMaintenanceDaemon
 					"last_output = ? " +
 				"WHERE id = ?";
 
-			@Cleanup
-			PreparedStatement updateStatement =
-				connnection.prepareStatement (
-					updateQuery);
+			try (
 
-			Statement statement =
-				connnection.createStatement ();
+				PreparedStatement updateStatement =
+					connnection.prepareStatement (
+						updateQuery);
 
-			// for each command...
-
-			for (
-				Command command
-					: commands
 			) {
 
-				// output a pretty message
+				Statement statement =
+					connnection.createStatement ();
 
-				taskLogger.debugFormat (
-					"executing \"%s\"",
-					command.command);
+				// for each command...
 
-				try {
+				for (
+					Command command
+						: commands
+				) {
 
-					// perform (and time) the command
+					// output a pretty message
 
-					Instant time1 =
-						Instant.now ();
-
-					statement.execute (
+					taskLogger.debugFormat (
+						"executing \"%s\"",
 						command.command);
 
-					Instant time2 =
-						Instant.now ();
+					try {
 
-					// collect output
+						// perform (and time) the command
 
-					StringBuilder stringBuilder =
-						new StringBuilder ();
+						Instant time1 =
+							Instant.now ();
 
-					SQLWarning warning =
-						statement.getWarnings ();
+						statement.execute (
+							command.command);
 
-					while (warning != null) {
+						Instant time2 =
+							Instant.now ();
 
-						if (warning.toString () != null) {
+						// collect output
 
-							if (stringBuilder.length () > 0)
-								stringBuilder.append ("\n");
+						StringBuilder stringBuilder =
+							new StringBuilder ();
 
-							stringBuilder.append (
-								warning.toString ());
+						SQLWarning warning =
+							statement.getWarnings ();
+
+						while (warning != null) {
+
+							if (warning.toString () != null) {
+
+								if (stringBuilder.length () > 0)
+									stringBuilder.append ("\n");
+
+								stringBuilder.append (
+									warning.toString ());
+
+							}
+
+							warning =
+								warning.getNextWarning ();
 
 						}
 
-						warning =
-							warning.getNextWarning ();
+						statement.clearWarnings ();
+
+						// and update the db
+
+						updateStatement.setTimestamp (
+							1,
+							new Timestamp (
+								time1.getMillis ()));
+
+						updateStatement.setLong (
+							2,
+							time2.getMillis () - time1.getMillis ());
+
+						updateStatement.setString (
+							3,
+							stringBuilder.toString ());
+
+						updateStatement.setInt (
+							4,
+							command.id);
+
+						updateStatement.execute ();
+
+					} catch (Exception exception) {
+
+						exceptionLogger.logThrowable (
+							taskLogger,
+							"daemon",
+							getClass ().getSimpleName (),
+							exception,
+							optionalAbsent (),
+							GenericExceptionResolution.tryAgainLater);
 
 					}
-
-					statement.clearWarnings ();
-
-					// and update the db
-
-					updateStatement.setTimestamp (
-						1,
-						new Timestamp (
-							time1.getMillis ()));
-
-					updateStatement.setLong (
-						2,
-						time2.getMillis () - time1.getMillis ());
-
-					updateStatement.setString (
-						3,
-						stringBuilder.toString ());
-
-					updateStatement.setInt (
-						4,
-						command.id);
-
-					updateStatement.execute ();
-
-				} catch (Exception exception) {
-
-					exceptionLogger.logThrowable (
-						taskLogger,
-						"daemon",
-						getClass ().getSimpleName (),
-						exception,
-						optionalAbsent (),
-						GenericExceptionResolution.tryAgainLater);
 
 				}
 

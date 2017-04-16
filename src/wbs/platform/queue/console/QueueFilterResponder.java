@@ -5,19 +5,22 @@ import static wbs.utils.string.StringUtils.joinWithNewline;
 
 import java.io.IOException;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.joda.time.Instant;
 
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.console.UserConsoleLogic;
+
 import wbs.utils.time.TimeFormatter;
+
 import wbs.web.responder.Responder;
 
 @PrototypeComponent ("queueFilterResponder")
@@ -60,19 +63,24 @@ class QueueFilterResponder
 			timeFormatter.httpTimestampString (
 				Instant.now ()));
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"QueueFilterResponder.execute ()",
-				this);
+		try (
 
-		String filter =
-			ifNull (
-				userConsoleLogic.sliceRequired ().getFilter (),
-				defaultFilter);
+			Transaction transaction =
+				database.beginReadOnly (
+					"QueueFilterResponder.execute ()",
+					this);
 
-		requestContext.outputStream ().write (
-			filter.getBytes ());
+		) {
+
+			String filter =
+				ifNull (
+					userConsoleLogic.sliceRequired ().getFilter (),
+					defaultFilter);
+
+			requestContext.outputStream ().write (
+				filter.getBytes ());
+
+		}
 
 	}
 

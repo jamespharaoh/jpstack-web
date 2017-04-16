@@ -11,7 +11,6 @@ import java.util.Map;
 
 import javax.inject.Named;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -19,6 +18,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.rpc.core.Rpc;
 import wbs.platform.rpc.core.RpcDefinition;
 import wbs.platform.rpc.core.RpcHandler;
@@ -26,6 +26,7 @@ import wbs.platform.rpc.core.RpcList;
 import wbs.platform.rpc.core.RpcResult;
 import wbs.platform.rpc.core.RpcSource;
 import wbs.platform.rpc.core.RpcType;
+
 import wbs.smsapps.forwarder.model.ForwarderMessageInObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderMessageInRec;
 import wbs.smsapps.forwarder.model.ForwarderMessageOutRec;
@@ -79,58 +80,63 @@ class ForwarderUnqueueExRpcHandler
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RpcSource source) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ForwarderUnqueueExRpcHandler.handle (source)",
-				this);
+		try (
 
-		// authenticate
+			Transaction transaction =
+				database.beginReadWrite (
+					"ForwarderUnqueueExRpcHandler.handle (source)",
+					this);
 
-		forwarder =
-			forwarderApiLogic.rpcAuth (source);
+		) {
 
-		// get params
+			// authenticate
 
-		getParams (source);
+			forwarder =
+				forwarderApiLogic.rpcAuth (source);
 
-		// bail on any request-invalid classErrors
+			// get params
 
-		if (statusMessages.size () > 0) {
+			getParams (source);
 
-			return Rpc.rpcError (
-				"forwarder-unqueue-ex-response",
-				Rpc.stRequestInvalid,
-				"request-invalid",
-				statusMessages);
+			// bail on any request-invalid classErrors
+
+			if (statusMessages.size () > 0) {
+
+				return Rpc.rpcError (
+					"forwarder-unqueue-ex-response",
+					Rpc.stRequestInvalid,
+					"request-invalid",
+					statusMessages);
+
+			}
+
+			// find unqueueExMessages and reports
+
+			findMessages ();
+			findReports ();
+
+			if (numFailed > 0 && ! allowPartial)
+				cancel = true;
+
+			// unqueue them (unless we are cancelling)
+
+			if (! cancel) {
+				unqueueMessages ();
+				unqueueReports ();
+			}
+
+			// return
+
+			if (cancel)
+				return makeCancelledResult ();
+
+			transaction.commit ();
+
+			return numFailed == 0
+				? makeSuccessResult ()
+				: makePartialResult ();
 
 		}
-
-		// find unqueueExMessages and reports
-
-		findMessages ();
-		findReports ();
-
-		if (numFailed > 0 && ! allowPartial)
-			cancel = true;
-
-		// unqueue them (unless we are cancelling)
-
-		if (! cancel) {
-			unqueueMessages ();
-			unqueueReports ();
-		}
-
-		// return
-
-		if (cancel)
-			return makeCancelledResult ();
-
-		transaction.commit ();
-
-		return numFailed == 0
-			? makeSuccessResult ()
-			: makePartialResult ();
 
 	}
 

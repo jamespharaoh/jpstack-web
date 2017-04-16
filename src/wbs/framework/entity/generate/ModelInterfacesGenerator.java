@@ -7,7 +7,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -371,80 +370,85 @@ class ModelInterfacesGenerator {
 
 		// write interface
 
-		@Cleanup
-		AtomicFileWriter formatWriter =
-			new AtomicFileWriter (
-				filename);
+		try (
 
-		JavaClassUnitWriter classUnitWriter =
-			javaClassUnitWriterProvider.get ()
+			AtomicFileWriter formatWriter =
+				new AtomicFileWriter (
+					filename);
 
-			.formatWriter (
-				formatWriter)
+		) {
 
-			.packageNameFormat (
-				"%s.console",
-				plugin.packageName ());
+			JavaClassUnitWriter classUnitWriter =
+				javaClassUnitWriterProvider.get ()
 
-		JavaInterfaceWriter consoleHelperWriter =
-			javaInterfaceWriterProvider.get ()
+				.formatWriter (
+					formatWriter)
 
-			.interfaceName (
-				consoleHelperName)
+				.packageNameFormat (
+					"%s.console",
+					plugin.packageName ());
 
-			.addInterfaceModifier (
-				"public");
+			JavaInterfaceWriter consoleHelperWriter =
+				javaInterfaceWriterProvider.get ()
 
-		if (gotObjectHelperMethods) {
+				.interfaceName (
+					consoleHelperName)
+
+				.addInterfaceModifier (
+					"public");
+
+			if (gotObjectHelperMethods) {
+
+				consoleHelperWriter
+
+					.addInterfaceFormat (
+						"%s.model.%s",
+						plugin.packageName (),
+						objectHelperMethodsName);
+
+			}
+
+			if (gotDaoMethods) {
+
+				consoleHelperWriter
+
+					.addInterfaceFormat (
+						"%s.model.%s",
+						plugin.packageName (),
+						daoMethodsName);
+
+			}
 
 			consoleHelperWriter
 
-				.addInterfaceFormat (
-					"%s.model.%s",
-					plugin.packageName (),
-					objectHelperMethodsName);
+				.addInterface (
+					imports ->
+						stringFormat (
+							"%s <%s>",
+							imports.register (
+								"wbs.console.helper.core.ConsoleHelper"),
+							imports.registerFormat (
+								"%s.model.%s",
+								plugin.packageName (),
+								recordName)));
+
+			classUnitWriter.addBlock (
+				consoleHelperWriter);
+
+			if (taskLogger.errors ()) {
+				return;
+			}
+
+			classUnitWriter.write (
+				taskLogger);
+
+			if (taskLogger.errors ()) {
+				return;
+			}
+
+			formatWriter.commit ();
 
 		}
-
-		if (gotDaoMethods) {
-
-			consoleHelperWriter
-
-				.addInterfaceFormat (
-					"%s.model.%s",
-					plugin.packageName (),
-					daoMethodsName);
-
-		}
-
-		consoleHelperWriter
-
-			.addInterface (
-				imports ->
-					stringFormat (
-						"%s <%s>",
-						imports.register (
-							"wbs.console.helper.core.ConsoleHelper"),
-						imports.registerFormat (
-							"%s.model.%s",
-							plugin.packageName (),
-							recordName)));
-
-		classUnitWriter.addBlock (
-			consoleHelperWriter);
-
-		if (taskLogger.errors ()) {
-			return;
-		}
-
-		classUnitWriter.write (
-			taskLogger);
-
-		if (taskLogger.errors ()) {
-			return;
-		}
-
-		formatWriter.commit ();
 
 	}
 

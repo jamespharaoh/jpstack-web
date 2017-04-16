@@ -19,9 +19,7 @@ import javax.xml.parsers.SAXParserFactory;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
-import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -34,9 +32,11 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.integrations.dialogue.model.DialogueMmsRouteObjectHelper;
@@ -48,7 +48,6 @@ import wbs.sms.message.core.model.MessageRec;
 import wbs.sms.message.outbox.daemon.AbstractSmsSender1;
 import wbs.sms.message.outbox.model.OutboxRec;
 
-@Log4j
 @SingletonComponent ("dialogueMmsSender")
 public
 class DialogueMmsSender
@@ -58,6 +57,9 @@ class DialogueMmsSender
 
 	@SingletonDependency
 	DialogueMmsRouteObjectHelper dialogueMmsRouteHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	WbsConfig wbsConfig;
@@ -128,20 +130,27 @@ class DialogueMmsSender
 			@NonNull DialogueMmsOutbox dialogueMmsOutbox)
 		throws SendFailureException {
 
-		try {
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendMessage");
 
-			log.debug (
-				stringFormat (
-					"Sending %s",
-					integerToDecimalString (
-						dialogueMmsOutbox.outbox.getMessage ().getId ())));
+		taskLogger.debugFormat (
+			"Sending %s",
+			integerToDecimalString (
+				dialogueMmsOutbox.outbox.getMessage ().getId ()));
 
-			@Cleanup
+		try (
+
 			CloseableHttpResponse httpResponse =
 				doRequest (
+					taskLogger,
 					dialogueMmsOutbox);
 
+		) {
+
 			return doResponse (
+				taskLogger,
 				httpResponse);
 
 		} catch (IOException exception) {
@@ -157,146 +166,162 @@ class DialogueMmsSender
 
 	private
 	CloseableHttpResponse doRequest (
-			DialogueMmsOutbox dialogueMmsOutbox)
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull DialogueMmsOutbox dialogueMmsOutbox)
 		throws
 			SendFailureException,
 			IOException {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doRequest");
+
 		MessageRec smsMessage =
 			dialogueMmsOutbox.outbox.getMessage ();
 
-		@Cleanup
-		CloseableHttpClient httpClient =
-			HttpClientBuilder.create ()
-				.build ();
+		try (
 
-		HttpPost post =
-			new HttpPost (
-				dialogueMmsOutbox.dialogueMmsRoute.getUrl ());
+			CloseableHttpClient httpClient =
+				HttpClientBuilder.create ()
+					.build ();
 
-		MultipartEntityBuilder multipartEntityBuilder =
-			MultipartEntityBuilder.create ();
-
-		multipartEntityBuilder.addTextBody (
-			"X-Mms-Account",
-			dialogueMmsOutbox.dialogueMmsRoute.getAccount ());
-
-		multipartEntityBuilder.addTextBody (
-			"X-Mms-Username",
-			dialogueMmsOutbox.dialogueMmsRoute.getUsername ());
-
-		multipartEntityBuilder.addTextBody (
-			"X-Mms-Password",
-			dialogueMmsOutbox.dialogueMmsRoute.getPassword ());
-
-		multipartEntityBuilder.addTextBody (
-			"X-Mms-Recipient-Addresses",
-			smsMessage.getNumTo ());
-
-		multipartEntityBuilder.addTextBody (
-			"X-Mms-Originating-Address",
-			smsMessage.getNumFrom ());
-
-		multipartEntityBuilder.addTextBody (
-			"X-Mms-User-Tag",
-			dialogueMmsOutbox.dialogueMmsRoute.getAccount ());
-
-		multipartEntityBuilder.addTextBody (
-			"X-Mms-User-Key",
-			Long.toString (
-				smsMessage.getId ()));
-
-		if (isNotNull (
-				smsMessage.getSubjectText ())) {
-
-			multipartEntityBuilder.addTextBody (
-				"X-Mms-Subject",
-				smsMessage.getSubjectText ().getText ());
-
-		}
-
-		multipartEntityBuilder.addTextBody (
-			"X-Mms-Delivery-Report",
-			smsMessage.getRoute ().getDeliveryReports ()
-				? "Y"
-				: "N");
-
-		if (smsMessage.getRoute ().getDeliveryReports ()) {
-
-			// TODO what?
-
-			multipartEntityBuilder.addTextBody (
-				"X-Mms-Reply-Path",
-				stringFormat (
-					"%s",
-					wbsConfig.apiUrl (),
-					"/dialogueMMS/route",
-					"/%u",
-					integerToDecimalString (
-						smsMessage.getRoute ().getId ()),
-					"/report"));
-
-		}
-
-		String smilString =
-			createSmil (
-				dialogueMmsOutbox);
-
-		log.info (
-			stringFormat (
-				"SMIL: %s",
-				smilString));
-
-		multipartEntityBuilder.addBinaryBody (
-			"filename",
-			smilString.getBytes (),
-			ContentType.create (
-				"application/smil",
-				"utf-8"),
-			"ordering.smi");
-
-		for (
-			MediaRec media
-				: dialogueMmsOutbox.outbox.getMessage ().getMedias ()
 		) {
 
-			String contentType =
-				media.getMediaType ().getMimeType ();
+			HttpPost post =
+				new HttpPost (
+					dialogueMmsOutbox.dialogueMmsRoute.getUrl ());
 
-			if (media.getEncoding() != null) {
+			MultipartEntityBuilder multipartEntityBuilder =
+				MultipartEntityBuilder.create ();
 
-				contentType =
-					stringFormat (
-						"%s; charset=%s",
-						contentType,
-						media.getEncoding ());
+			multipartEntityBuilder.addTextBody (
+				"X-Mms-Account",
+				dialogueMmsOutbox.dialogueMmsRoute.getAccount ());
+
+			multipartEntityBuilder.addTextBody (
+				"X-Mms-Username",
+				dialogueMmsOutbox.dialogueMmsRoute.getUsername ());
+
+			multipartEntityBuilder.addTextBody (
+				"X-Mms-Password",
+				dialogueMmsOutbox.dialogueMmsRoute.getPassword ());
+
+			multipartEntityBuilder.addTextBody (
+				"X-Mms-Recipient-Addresses",
+				smsMessage.getNumTo ());
+
+			multipartEntityBuilder.addTextBody (
+				"X-Mms-Originating-Address",
+				smsMessage.getNumFrom ());
+
+			multipartEntityBuilder.addTextBody (
+				"X-Mms-User-Tag",
+				dialogueMmsOutbox.dialogueMmsRoute.getAccount ());
+
+			multipartEntityBuilder.addTextBody (
+				"X-Mms-User-Key",
+				Long.toString (
+					smsMessage.getId ()));
+
+			if (isNotNull (
+					smsMessage.getSubjectText ())) {
+
+				multipartEntityBuilder.addTextBody (
+					"X-Mms-Subject",
+					smsMessage.getSubjectText ().getText ());
 
 			}
 
+			multipartEntityBuilder.addTextBody (
+				"X-Mms-Delivery-Report",
+				smsMessage.getRoute ().getDeliveryReports ()
+					? "Y"
+					: "N");
+
+			if (smsMessage.getRoute ().getDeliveryReports ()) {
+
+				// TODO what?
+
+				multipartEntityBuilder.addTextBody (
+					"X-Mms-Reply-Path",
+					stringFormat (
+						"%s",
+						wbsConfig.apiUrl (),
+						"/dialogueMMS/route",
+						"/%u",
+						integerToDecimalString (
+							smsMessage.getRoute ().getId ()),
+						"/report"));
+
+			}
+
+			String smilString =
+				createSmil (
+					dialogueMmsOutbox);
+
+			taskLogger.noticeFormat (
+				"SMIL: %s",
+				smilString);
+
 			multipartEntityBuilder.addBinaryBody (
 				"filename",
-				media.getContent ().getData (),
+				smilString.getBytes (),
 				ContentType.create (
-					contentType),
-				ifNull (
-					media.getFilename (),
-					"file.jpg"));
+					"application/smil",
+					"utf-8"),
+				"ordering.smi");
+
+			for (
+				MediaRec media
+					: dialogueMmsOutbox.outbox.getMessage ().getMedias ()
+			) {
+
+				String contentType =
+					media.getMediaType ().getMimeType ();
+
+				if (media.getEncoding() != null) {
+
+					contentType =
+						stringFormat (
+							"%s; charset=%s",
+							contentType,
+							media.getEncoding ());
+
+				}
+
+				multipartEntityBuilder.addBinaryBody (
+					"filename",
+					media.getContent ().getData (),
+					ContentType.create (
+						contentType),
+					ifNull (
+						media.getFilename (),
+						"file.jpg"));
+
+			}
+
+			post.setEntity (
+				multipartEntityBuilder.build ());
+
+			return httpClient.execute (
+				post);
 
 		}
-
-		post.setEntity (
-			multipartEntityBuilder.build ());
-
-		return httpClient.execute (
-			post);
 
 	}
 
 	Optional <List <String>> doResponse (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull HttpResponse response)
 		throws
 			IOException,
 			SendFailureException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doResponse");
 
 		MyHandler handler =
 			new MyHandler ();
@@ -320,10 +345,9 @@ class DialogueMmsSender
 
 			}
 
-			log.info (
-				stringFormat (
-					"Response: %s",
-					stringBuilder.toString ()));
+			taskLogger.noticeFormat (
+				"Response: %s",
+				stringBuilder.toString ());
 
 			ByteArrayInputStream byteArrayInputStream =
 				new ByteArrayInputStream (
@@ -353,16 +377,17 @@ class DialogueMmsSender
 
 		if (handler.statusCode == null) {
 
-			log.error (
+			taskLogger.errorFormat (
 				"Invalid XML received: no MessageStatusCode");
 
 			throw tempFailure (
 				"Invalid XML received: no MessageStatusCode");
 
 		}
+
 		if (handler.statusText == null) {
 
-			log.error (
+			taskLogger.errorFormat (
 				"Invalid XML received: no MessageStatusText");
 
 			throw tempFailure (
@@ -380,9 +405,11 @@ class DialogueMmsSender
 
 		if (handler.messageId == null) {
 
-			log.error("Invalid XML received: no MessageId");
+			taskLogger.errorFormat (
+				"Invalid XML received: no MessageId");
 
-			throw tempFailure("Invalid XML received: no MessageId");
+			throw tempFailure (
+				"Invalid XML received: no MessageId");
 
 		}
 

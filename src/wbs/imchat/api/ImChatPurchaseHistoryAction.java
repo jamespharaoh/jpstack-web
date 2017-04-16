@@ -8,7 +8,6 @@ import javax.inject.Provider;
 
 import com.google.common.collect.Lists;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.json.simple.JSONObject;
@@ -21,13 +20,15 @@ import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.utils.time.TimeFormatter;
+
 import wbs.imchat.model.ImChatCustomerObjectHelper;
 import wbs.imchat.model.ImChatCustomerRec;
 import wbs.imchat.model.ImChatPurchaseObjectHelper;
 import wbs.imchat.model.ImChatPurchaseRec;
 import wbs.imchat.model.ImChatSessionObjectHelper;
 import wbs.imchat.model.ImChatSessionRec;
-import wbs.utils.time.TimeFormatter;
 import wbs.web.action.Action;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.JsonResponder;
@@ -90,80 +91,85 @@ class ImChatPurchaseHistoryAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"ImChatPurchaseHistoryAction.handle ()",
-				this);
+		try (
 
-		// lookup session and customer
+			Transaction transaction =
+				database.beginReadOnly (
+					"ImChatPurchaseHistoryAction.handle ()",
+					this);
 
-		ImChatSessionRec session =
-				imChatSessionHelper.findBySecret (
-						purchaseHistoryRequest.sessionSecret ());
-
-		if (
-			session == null
-			|| ! session.getActive ()
 		) {
 
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
+			// lookup session and customer
 
-				.reason (
-					"session-invalid")
+			ImChatSessionRec session =
+					imChatSessionHelper.findBySecret (
+							purchaseHistoryRequest.sessionSecret ());
 
-				.message (
-					"The session secret is invalid or the session is no " +
-					"longer active");
+			if (
+				session == null
+				|| ! session.getActive ()
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"session-invalid")
+
+					.message (
+						"The session secret is invalid or the session is no " +
+						"longer active");
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						failureResponse);
+
+			}
+
+			ImChatCustomerRec customer =
+				session.getImChatCustomer ();
+
+			// retrieve purchases
+
+			List<ImChatPurchaseRec> purchases =
+				Lists.reverse (
+					customer.getPurchases ());
+
+			// create response
+
+			ImChatPurchaseHistorySuccess purchaseHistoryResponse =
+				new ImChatPurchaseHistorySuccess ()
+
+				.customer (
+					imChatApiLogic.customerData (
+						customer));
+
+			for (
+				ImChatPurchaseRec purchase
+					: purchases
+			) {
+
+				if (
+					isNull (
+						purchase.getCompletedTime ())
+				) {
+					continue;
+				}
+
+				purchaseHistoryResponse.purchases.add (
+					imChatApiLogic.purchaseHistoryData (
+						purchase));
+
+			}
 
 			return jsonResponderProvider.get ()
 
 				.value (
-					failureResponse);
+					purchaseHistoryResponse);
 
 		}
-
-		ImChatCustomerRec customer =
-			session.getImChatCustomer ();
-
-		// retrieve purchases
-
-		List<ImChatPurchaseRec> purchases =
-			Lists.reverse (
-				customer.getPurchases ());
-
-		// create response
-
-		ImChatPurchaseHistorySuccess purchaseHistoryResponse =
-			new ImChatPurchaseHistorySuccess ()
-
-			.customer (
-				imChatApiLogic.customerData (
-					customer));
-
-		for (
-			ImChatPurchaseRec purchase
-				: purchases
-		) {
-
-			if (
-				isNull (
-					purchase.getCompletedTime ())
-			) {
-				continue;
-			}
-
-			purchaseHistoryResponse.purchases.add (
-				imChatApiLogic.purchaseHistoryData (
-					purchase));
-
-		}
-
-		return jsonResponderProvider.get ()
-
-			.value (
-				purchaseHistoryResponse);
 
 	}
 

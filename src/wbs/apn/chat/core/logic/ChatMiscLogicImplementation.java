@@ -20,7 +20,6 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.joda.time.DateTimeZone;
@@ -517,71 +516,76 @@ class ChatMiscLogicImplementation
 				void success (
 						LongLat longLat) {
 
-					@Cleanup
-					Transaction transaction =
-						database.beginReadWrite (
-							stringFormat (
-								"%s.%s.%s.%s (...)",
-								"ChatMiscLogicImplementation",
-								"userJoin",
-								"locatorCallback",
-								"success"),
-							this);
+					try (
 
-					ChatUserRec chatUser =
-						chatUserHelper.findRequired (
-							chatUserId);
-
-					if (longLat == null) {
-						throw new NullPointerException ();
-					}
-
-					{
-
-						if (
-							! transaction.contains (
-								chatUser)
-						) {
-
-							throw new IllegalStateException (
+						Transaction transaction =
+							database.beginReadWrite (
 								stringFormat (
-									"Chat user %s not in transaction",
-									integerToDecimalString (
-										chatUser.getId ())));
+									"%s.%s.%s.%s (...)",
+									"ChatMiscLogicImplementation",
+									"userJoin",
+									"locatorCallback",
+									"success"),
+								this);
+
+					) {
+
+						ChatUserRec chatUser =
+							chatUserHelper.findRequired (
+								chatUserId);
+
+						if (longLat == null) {
+							throw new NullPointerException ();
+						}
+
+						{
+
+							if (
+								! transaction.contains (
+									chatUser)
+							) {
+
+								throw new IllegalStateException (
+									stringFormat (
+										"Chat user %s not in transaction",
+										integerToDecimalString (
+											chatUser.getId ())));
+
+							}
 
 						}
 
+						chatUser
+
+							.setLocationLongLat (
+								longLat)
+
+							.setLocationBackupLongLat (
+								longLat)
+
+							.setLocationTime (
+								transaction.now ());
+
+						LocatorRec locator =
+							locatorHelper.findRequired (
+								locatorId);
+
+						eventLogic.createEvent (
+							taskLogger,
+							"chat_user_location_locator",
+							chatUser,
+							longLat.longitude (),
+							longLat.latitude (),
+							locator);
+
+						transaction.commit ();
+
+						taskLogger.noticeFormat (
+							"Got location for %s: %s",
+							chatUser.getCode (),
+							longLat.toString ());
+
 					}
-
-					chatUser
-
-						.setLocationLongLat (
-							longLat)
-
-						.setLocationBackupLongLat (
-							longLat)
-
-						.setLocationTime (
-							transaction.now ());
-
-					LocatorRec locator =
-						locatorHelper.findRequired (
-							locatorId);
-
-					eventLogic.createEvent (
-						taskLogger,
-						"chat_user_location_locator",
-						chatUser,
-						longLat.longitude (),
-						longLat.latitude (),
-						locator);
-
-					transaction.commit ();
-
-					taskLogger.noticeFormat (
-						"Got location for %s: %s",
-						chatUser.getCode (),
-						longLat.toString ());
 
 				}
 

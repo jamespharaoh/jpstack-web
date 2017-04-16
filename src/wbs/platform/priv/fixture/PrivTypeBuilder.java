@@ -5,7 +5,6 @@ import static wbs.utils.string.CodeUtils.simplifyToCodeRequired;
 import static wbs.utils.string.StringUtils.camelToUnderscore;
 import static wbs.utils.string.StringUtils.stringFormat;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.builder.Builder;
@@ -122,52 +121,57 @@ class PrivTypeBuilder
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"PrivTypeBuilder.createPrivType ()",
-				this);
+		try (
 
-		// lookup parent type
+			Transaction transaction =
+				database.beginReadWrite (
+					"PrivTypeBuilder.createPrivType ()",
+					this);
 
-		String parentTypeCode =
-			camelToUnderscore (
-				ifNull (
-					spec.subject (),
-					parent.name ()));
+		) {
 
-		ObjectTypeRec parentType =
-			objectTypeHelper.findByCodeRequired (
-				GlobalId.root,
-				parentTypeCode);
+			// lookup parent type
 
-		// create priv type
+			String parentTypeCode =
+				camelToUnderscore (
+					ifNull (
+						spec.subject (),
+						parent.name ()));
 
-		privTypeHelper.insert (
-			taskLogger,
-			privTypeHelper.createInstance ()
+			ObjectTypeRec parentType =
+				objectTypeHelper.findByCodeRequired (
+					GlobalId.root,
+					parentTypeCode);
 
-			.setParentObjectType (
-				parentType)
+			// create priv type
 
-			.setCode (
-				simplifyToCodeRequired (
-					spec.name ()))
+			privTypeHelper.insert (
+				taskLogger,
+				privTypeHelper.createInstance ()
 
-			.setDescription (
-				spec.description ())
+				.setParentObjectType (
+					parentType)
 
-			.setHelp (
-				spec.description ())
+				.setCode (
+					simplifyToCodeRequired (
+						spec.name ()))
 
-			.setTemplate (
-				spec.template ())
+				.setDescription (
+					spec.description ())
 
-		);
+				.setHelp (
+					spec.description ())
 
-		// commit transaction
+				.setTemplate (
+					spec.template ())
 
-		transaction.commit ();
+			);
+
+			// commit transaction
+
+			transaction.commit ();
+
+		}
 
 	}
 

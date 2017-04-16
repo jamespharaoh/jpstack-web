@@ -7,7 +7,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiLoggingAction;
@@ -211,38 +210,43 @@ class OxygenateRouteReportAction
 				parentTaskLogger,
 				"storeLog");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				stringFormat (
-					"%s.%s ()",
-					getClass ().getSimpleName (),
-					"storeLog"),
-				this);
+		try (
 
-		oxygenateInboundLogHelper.insert (
-			taskLogger,
-			oxygenateInboundLogHelper.createInstance ()
+			Transaction transaction =
+				database.beginReadWrite (
+					stringFormat (
+						"%s.%s ()",
+						getClass ().getSimpleName (),
+						"storeLog"),
+					this);
 
-			.setRoute (
-				smsRouteHelper.findRequired (
-					smsRouteId))
+		) {
 
-			.setType (
-				OxygenateInboundLogType.smsDelivery)
+			oxygenateInboundLogHelper.insert (
+				taskLogger,
+				oxygenateInboundLogHelper.createInstance ()
 
-			.setTimestamp (
-				transaction.now ())
+				.setRoute (
+					smsRouteHelper.findRequired (
+						smsRouteId))
 
-			.setDetails (
-				debugLog)
+				.setType (
+					OxygenateInboundLogType.smsDelivery)
 
-			.setSuccess (
-				success)
+				.setTimestamp (
+					transaction.now ())
 
-		);
+				.setDetails (
+					debugLog)
 
-		transaction.commit ();
+				.setSuccess (
+					success)
+
+			);
+
+			transaction.commit ();
+
+		}
 
 	}
 

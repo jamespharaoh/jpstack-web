@@ -5,11 +5,11 @@ import java.util.Map;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
 import wbs.api.mvc.ApiAction;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -18,11 +18,14 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.text.web.TextResponder;
+
 import wbs.smsapps.forwarder.logic.ForwarderNotFoundException;
 import wbs.smsapps.forwarder.logic.IncorrectPasswordException;
 import wbs.smsapps.forwarder.logic.ReportableException;
 import wbs.smsapps.forwarder.model.ForwarderRec;
+
 import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
 
@@ -58,13 +61,14 @@ class ForwarderInAction
 	Responder goApi (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ForwarderInAction.goApi ()",
-				this);
+		try (
 
-		try {
+			Transaction transaction =
+				database.beginReadWrite (
+					"ForwarderInAction.goApi ()",
+					this);
+
+		) {
 
 			String slice =
 				requestContext.parameterOrNull ("slice");

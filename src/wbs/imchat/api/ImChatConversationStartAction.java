@@ -110,174 +110,179 @@ class ImChatConversationStartAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatConversationStartAction.handle ()",
-				this);
+		try (
 
-		ImChatRec imChat =
-			imChatHelper.findRequired (
-				parseIntegerRequired (
-					requestContext.requestStringRequired (
-						"imChatId")));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatConversationStartAction.handle ()",
+					this);
 
-		// lookup session and customer
-
-		ImChatSessionRec session =
-			imChatSessionHelper.findBySecret (
-				startRequest.sessionSecret ());
-
-		if (
-			session == null
-			|| ! session.getActive ()
 		) {
 
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
+			ImChatRec imChat =
+				imChatHelper.findRequired (
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"imChatId")));
 
-				.reason (
-					"session-invalid")
+			// lookup session and customer
 
-				.message (
-					"The session secret is invalid or the session is no " +
-					"longer active");
+			ImChatSessionRec session =
+				imChatSessionHelper.findBySecret (
+					startRequest.sessionSecret ());
+
+			if (
+				session == null
+				|| ! session.getActive ()
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"session-invalid")
+
+					.message (
+						"The session secret is invalid or the session is no " +
+						"longer active");
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						failureResponse);
+
+			}
+
+			ImChatCustomerRec customer =
+				session.getImChatCustomer ();
+
+			// lookup profile
+
+			Optional <ImChatProfileRec> profileOptional =
+				imChatProfileHelper.findByCode (
+					imChat,
+					hyphenToUnderscore (
+						startRequest.profileCode ()));
+
+			if (
+
+				optionalIsNotPresent (
+					profileOptional)
+
+				|| booleanEqual (
+					profileOptional.get ().getDeleted (),
+					true)
+
+				|| referenceNotEqualWithClass (
+					ImChatRec.class,
+					profileOptional.get ().getImChat (),
+					imChat)
+
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"profile-invalid")
+
+					.message (
+						"The profile id is invalid");
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						failureResponse);
+
+			}
+
+			ImChatProfileRec profile =
+				profileOptional.get ();
+
+			// check state
+
+			if (
+				isNotNull (
+					customer.getCurrentConversation ())
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"conversation-already")
+
+					.message (
+						"There is already a conversation in progres");
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						failureResponse);
+
+			}
+
+			// create conversation
+
+			ImChatConversationRec conversation =
+				imChatConversationHelper.insert (
+					taskLogger,
+					imChatConversationHelper.createInstance ()
+
+				.setImChatCustomer (
+					customer)
+
+				.setImChatProfile (
+					profile)
+
+				.setIndex (
+					customer.getNumConversations ())
+
+				.setStartTime (
+					transaction.now ())
+
+				.setPendingReply (
+					false)
+
+			);
+
+			// update customer
+
+			customer
+
+				.setNumConversations (
+					customer.getNumConversations () + 1)
+
+				.setCurrentConversation (
+					conversation);
+
+			// create response
+
+			ImChatConversationStartSuccess successResponse =
+				new ImChatConversationStartSuccess ()
+
+				.customer (
+					imChatApiLogic.customerData (
+						customer))
+
+				.profile (
+					imChatApiLogic.profileData (
+						profile))
+
+				.conversation (
+					imChatApiLogic.conversationData (
+						conversation));
+
+			// commit and return
+
+			transaction.commit ();
 
 			return jsonResponderProvider.get ()
 
 				.value (
-					failureResponse);
+					successResponse);
 
 		}
-
-		ImChatCustomerRec customer =
-			session.getImChatCustomer ();
-
-		// lookup profile
-
-		Optional <ImChatProfileRec> profileOptional =
-			imChatProfileHelper.findByCode (
-				imChat,
-				hyphenToUnderscore (
-					startRequest.profileCode ()));
-
-		if (
-
-			optionalIsNotPresent (
-				profileOptional)
-
-			|| booleanEqual (
-				profileOptional.get ().getDeleted (),
-				true)
-
-			|| referenceNotEqualWithClass (
-				ImChatRec.class,
-				profileOptional.get ().getImChat (),
-				imChat)
-
-		) {
-
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"profile-invalid")
-
-				.message (
-					"The profile id is invalid");
-
-			return jsonResponderProvider.get ()
-
-				.value (
-					failureResponse);
-
-		}
-
-		ImChatProfileRec profile =
-			profileOptional.get ();
-
-		// check state
-
-		if (
-			isNotNull (
-				customer.getCurrentConversation ())
-		) {
-
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"conversation-already")
-
-				.message (
-					"There is already a conversation in progres");
-
-			return jsonResponderProvider.get ()
-
-				.value (
-					failureResponse);
-
-		}
-
-		// create conversation
-
-		ImChatConversationRec conversation =
-			imChatConversationHelper.insert (
-				taskLogger,
-				imChatConversationHelper.createInstance ()
-
-			.setImChatCustomer (
-				customer)
-
-			.setImChatProfile (
-				profile)
-
-			.setIndex (
-				customer.getNumConversations ())
-
-			.setStartTime (
-				transaction.now ())
-
-			.setPendingReply (
-				false)
-
-		);
-
-		// update customer
-
-		customer
-
-			.setNumConversations (
-				customer.getNumConversations () + 1)
-
-			.setCurrentConversation (
-				conversation);
-
-		// create response
-
-		ImChatConversationStartSuccess successResponse =
-			new ImChatConversationStartSuccess ()
-
-			.customer (
-				imChatApiLogic.customerData (
-					customer))
-
-			.profile (
-				imChatApiLogic.profileData (
-					profile))
-
-			.conversation (
-				imChatApiLogic.conversationData (
-					conversation));
-
-		// commit and return
-
-		transaction.commit ();
-
-		return jsonResponderProvider.get ()
-
-			.value (
-				successResponse);
 
 	}
 

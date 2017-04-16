@@ -26,7 +26,6 @@ import java.util.List;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiLoggingAction;
@@ -370,37 +369,42 @@ class OxygenateRouteInMmsNewAction
 				parentTaskLogger,
 				"storeLog");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ClockworkSmsRouteInAction.storeLog ()",
-				this);
+		try (
 
-		oxygenateInboundLogHelper.insert (
-			taskLogger,
-			oxygenateInboundLogHelper.createInstance ()
+			Transaction transaction =
+				database.beginReadWrite (
+					"ClockworkSmsRouteInAction.storeLog ()",
+					this);
 
-			.setRoute (
-				smsRouteHelper.findRequired (
-					Long.parseLong (
-						requestContext.requestStringRequired (
-							"smsRouteId"))))
+		) {
 
-			.setType (
-				OxygenateInboundLogType.mmsMessage)
+			oxygenateInboundLogHelper.insert (
+				taskLogger,
+				oxygenateInboundLogHelper.createInstance ()
 
-			.setTimestamp (
-				transaction.now ())
+				.setRoute (
+					smsRouteHelper.findRequired (
+						Long.parseLong (
+							requestContext.requestStringRequired (
+								"smsRouteId"))))
 
-			.setDetails (
-				debugLog)
+				.setType (
+					OxygenateInboundLogType.mmsMessage)
 
-			.setSuccess (
-				success)
+				.setTimestamp (
+					transaction.now ())
 
-		);
+				.setDetails (
+					debugLog)
 
-		transaction.commit ();
+				.setSuccess (
+					success)
+
+			);
+
+			transaction.commit ();
+
+		}
 
 	}
 

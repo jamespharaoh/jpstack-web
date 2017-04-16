@@ -18,7 +18,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -30,6 +29,7 @@ import org.joda.time.LocalDate;
 
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -38,7 +38,6 @@ import wbs.framework.component.scaffold.PluginEnumTypeSpec;
 import wbs.framework.component.scaffold.PluginManager;
 import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.hibernate.EnumUserType;
-import wbs.framework.logging.DefaultLogContext;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -48,21 +47,19 @@ public
 class SchemaTypesHelperImplementation
 	implements SchemaTypesHelper {
 
-	private final static
-	LogContext logContext =
-		DefaultLogContext.forClass (
-			SchemaTypesHelperImplementation.class);
-
 	// singleton dependencies
 
 	@SingletonDependency
 	ActivityManager activityManager;
 
-	@SingletonDependency
-	SchemaNamesHelper schemaNamesHelper;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	PluginManager pluginManager;
+
+	@SingletonDependency
+	SchemaNamesHelper schemaNamesHelper;
 
 	// properties
 
@@ -77,7 +74,12 @@ class SchemaTypesHelperImplementation
 	@NormalLifecycleSetup
 	public
 	void init (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"init");
 
 		initTypeNames (
 			taskLogger);
@@ -163,222 +165,69 @@ class SchemaTypesHelperImplementation
 			ImmutableMap.Builder<String,List<String>> enumTypesBuilder,
 			PluginEnumTypeSpec enumType) {
 
-		@Cleanup
-		ActiveTask activeTask =
-			activityManager.start (
-				"schema",
-				"schemaTypesHelper.initEnumType (...)",
-				this);
+		try (
 
-		String enumClassName =
-			stringFormat (
-				"%s.model.%s",
-				enumType.plugin ().packageName (),
-				capitalise (enumType.name ()));
+			ActiveTask activeTask =
+				activityManager.start (
+					"schema",
+					"schemaTypesHelper.initEnumType (...)",
+					this);
 
-		Class enumClass;
+		) {
 
-		try {
-
-			enumClass =
-				Class.forName (
-					enumClassName);
-
-		} catch (ClassNotFoundException exception) {
-
-			taskLog.errorFormat (
-				"No such class %s",
-				enumClassName);
-
-			return;
-
-		}
-
-		EnumUserType enumUserType =
-			new EnumUserType ()
-
-			.sqlType (
-				1111)
-
-			.enumClass (
-				enumClass)
-
-			.auto (
-				String.class);
-
-		String typeName =
-			camelToUnderscore (
-				enumClass.getSimpleName ());
-
-		fieldTypeNamesBuilder.put (
-			enumClass,
-			ImmutableList.<String>of (
-				typeName));
-
-		if (enumUserType.sqlType () == 1111) {
-
-			ImmutableList.Builder<String> enumValuesBuilder =
-				ImmutableList.<String>builder ();
-
-			for (
-				Object enumValue
-					: enumUserType.databaseValues ()
-			) {
-
-				enumValuesBuilder.add (
-					(String) enumValue);
-
-			}
-
-			enumTypesBuilder.put (
-				typeName,
-				enumValuesBuilder.build ());
-
-		}
-
-	}
-
-	void initCustomType (
-			TaskLogger taskLog,
-			ImmutableMap.Builder<Class<?>,List<String>> fieldTypeNamesBuilder,
-			ImmutableMap.Builder<String,List<String>> enumTypesBuilder,
-			PluginCustomTypeSpec customType) {
-
-		@Cleanup
-		ActiveTask activeTask =
-			activityManager.start (
-				"schema",
+			String enumClassName =
 				stringFormat (
-					"schemaTypesHelper.initCustomType (%s)",
-					joinWithCommaAndSpace (
-						", ",
-						"taskLog",
-						"fieldTypeNamesBuilder",
-						"enumTypesBuilder",
-						stringFormat (
-							"customType:%s",
-							customType.name ()))),
-				this);
+					"%s.model.%s",
+					enumType.plugin ().packageName (),
+					capitalise (enumType.name ()));
 
-		String objectClassName =
-			stringFormat (
-				"%s.model.%s",
-				customType.plugin ().packageName (),
-				capitalise (
-					customType.name ()));
+			Class enumClass;
 
-		Optional <Class <?>> objectClassOptional =
-			classForName (
-				objectClassName);
+			try {
 
-		if (
-			optionalIsNotPresent (
-				objectClassOptional)
-		) {
+				enumClass =
+					Class.forName (
+						enumClassName);
 
-			taskLog.errorFormat (
-				"No such class %s",
-				objectClassName);
-
-		}
-
-		String helperClassName =
-			stringFormat (
-				"%s.hibernate.%sType",
-				customType.plugin ().packageName (),
-				capitalise (
-					customType.name ()));
-
-		Optional<Class<?>> helperClassOptional =
-			classForName (
-				helperClassName);
-
-		if (
-			optionalIsNotPresent (
-				helperClassOptional)
-		) {
-
-			taskLog.errorFormat (
-				"No such class %s",
-				helperClassName);
-
-		}
-
-		if (
-
-			optionalIsNotPresent (
-				objectClassOptional)
-
-			|| optionalIsNotPresent (
-				helperClassOptional)
-
-		) {
-			return;
-		}
-
-		Class<?> objectClass =
-			objectClassOptional.get ();
-
-		Class<?> helperClass =
-			helperClassOptional.get ();
-
-		Object helper;
-
-		try {
-
-			helper =
-				helperClass.newInstance ();
-
-		} catch (Exception exception) {
-
-			taskLog.errorFormatException (
-				exception,
-				"Error instantiating %s",
-				helperClass.getName ());
-
-			return;
-
-		}
-
-		if (helper instanceof EnumUserType) {
-
-			EnumUserType<?,?> enumHelper =
-				(EnumUserType<?,?>)
-				helper;
-
-			String typeName =
-				enumHelper.sqlType () == 1111
-
-				? camelToUnderscore (
-					enumHelper.enumClass ().getSimpleName ())
-
-				: builtinSqlTypeNames.get (
-					enumHelper.sqlType ());
-
-			if (typeName == null) {
+			} catch (ClassNotFoundException exception) {
 
 				taskLog.errorFormat (
-					"Don't know how to handle sql type %s for %s",
-					integerToDecimalString (
-						enumHelper.sqlType ()),
-					helper.getClass ().getName ());
+					"No such class %s",
+					enumClassName);
 
 				return;
 
 			}
 
-			fieldTypeNamesBuilder.put (
-				objectClass,
-				ImmutableList.<String>of (typeName));
+			EnumUserType enumUserType =
+				new EnumUserType ()
 
-			if (enumHelper.sqlType () == 1111) {
+				.sqlType (
+					1111)
+
+				.enumClass (
+					enumClass)
+
+				.auto (
+					String.class);
+
+			String typeName =
+				camelToUnderscore (
+					enumClass.getSimpleName ());
+
+			fieldTypeNamesBuilder.put (
+				enumClass,
+				ImmutableList.<String>of (
+					typeName));
+
+			if (enumUserType.sqlType () == 1111) {
 
 				ImmutableList.Builder<String> enumValuesBuilder =
 					ImmutableList.<String>builder ();
 
 				for (
 					Object enumValue
-						: enumHelper.databaseValues ()
+						: enumUserType.databaseValues ()
 				) {
 
 					enumValuesBuilder.add (
@@ -392,59 +241,222 @@ class SchemaTypesHelperImplementation
 
 			}
 
-			return;
-
 		}
 
-		if (helper instanceof CompositeUserType) {
+	}
 
-			CompositeUserType compositeUserType =
-				(CompositeUserType)
-				helper;
+	void initCustomType (
+			TaskLogger taskLog,
+			ImmutableMap.Builder<Class<?>,List<String>> fieldTypeNamesBuilder,
+			ImmutableMap.Builder<String,List<String>> enumTypesBuilder,
+			PluginCustomTypeSpec customType) {
 
-			ImmutableList.Builder<String> typeNamesBuilder =
-				ImmutableList.<String>builder ();
+		try (
 
-			for (
-				Type propertyType
-					: compositeUserType.getPropertyTypes ()
+			ActiveTask activeTask =
+				activityManager.start (
+					"schema",
+					stringFormat (
+						"schemaTypesHelper.initCustomType (%s)",
+						joinWithCommaAndSpace (
+							", ",
+							"taskLog",
+							"fieldTypeNamesBuilder",
+							"enumTypesBuilder",
+							stringFormat (
+								"customType:%s",
+								customType.name ()))),
+					this);
+
+		) {
+
+			String objectClassName =
+				stringFormat (
+					"%s.model.%s",
+					customType.plugin ().packageName (),
+					capitalise (
+						customType.name ()));
+
+			Optional <Class <?>> objectClassOptional =
+				classForName (
+					objectClassName);
+
+			if (
+				optionalIsNotPresent (
+					objectClassOptional)
 			) {
 
+				taskLog.errorFormat (
+					"No such class %s",
+					objectClassName);
+
+			}
+
+			String helperClassName =
+				stringFormat (
+					"%s.hibernate.%sType",
+					customType.plugin ().packageName (),
+					capitalise (
+						customType.name ()));
+
+			Optional<Class<?>> helperClassOptional =
+				classForName (
+					helperClassName);
+
+			if (
+				optionalIsNotPresent (
+					helperClassOptional)
+			) {
+
+				taskLog.errorFormat (
+					"No such class %s",
+					helperClassName);
+
+			}
+
+			if (
+
+				optionalIsNotPresent (
+					objectClassOptional)
+
+				|| optionalIsNotPresent (
+					helperClassOptional)
+
+			) {
+				return;
+			}
+
+			Class<?> objectClass =
+				objectClassOptional.get ();
+
+			Class<?> helperClass =
+				helperClassOptional.get ();
+
+			Object helper;
+
+			try {
+
+				helper =
+					helperClass.newInstance ();
+
+			} catch (Exception exception) {
+
+				taskLog.errorFormatException (
+					exception,
+					"Error instantiating %s",
+					helperClass.getName ());
+
+				return;
+
+			}
+
+			if (helper instanceof EnumUserType) {
+
+				EnumUserType<?,?> enumHelper =
+					(EnumUserType<?,?>)
+					helper;
+
 				String typeName =
-					builtinFieldTypeNames.get (
-						propertyType.getReturnedClass ());
+					enumHelper.sqlType () == 1111
+
+					? camelToUnderscore (
+						enumHelper.enumClass ().getSimpleName ())
+
+					: builtinSqlTypeNames.get (
+						enumHelper.sqlType ());
 
 				if (typeName == null) {
 
 					taskLog.errorFormat (
 						"Don't know how to handle sql type %s for %s",
-						classNameSimple (
-							propertyType.getReturnedClass ()),
+						integerToDecimalString (
+							enumHelper.sqlType ()),
 						helper.getClass ().getName ());
 
 					return;
 
 				}
 
-				typeNamesBuilder.add (
-					typeName);
+				fieldTypeNamesBuilder.put (
+					objectClass,
+					ImmutableList.<String>of (typeName));
+
+				if (enumHelper.sqlType () == 1111) {
+
+					ImmutableList.Builder<String> enumValuesBuilder =
+						ImmutableList.<String>builder ();
+
+					for (
+						Object enumValue
+							: enumHelper.databaseValues ()
+					) {
+
+						enumValuesBuilder.add (
+							(String) enumValue);
+
+					}
+
+					enumTypesBuilder.put (
+						typeName,
+						enumValuesBuilder.build ());
+
+				}
+
+				return;
 
 			}
 
-			fieldTypeNamesBuilder.put (
-				compositeUserType.returnedClass (),
-				typeNamesBuilder.build ());
+			if (helper instanceof CompositeUserType) {
+
+				CompositeUserType compositeUserType =
+					(CompositeUserType)
+					helper;
+
+				ImmutableList.Builder<String> typeNamesBuilder =
+					ImmutableList.<String>builder ();
+
+				for (
+					Type propertyType
+						: compositeUserType.getPropertyTypes ()
+				) {
+
+					String typeName =
+						builtinFieldTypeNames.get (
+							propertyType.getReturnedClass ());
+
+					if (typeName == null) {
+
+						taskLog.errorFormat (
+							"Don't know how to handle sql type %s for %s",
+							classNameSimple (
+								propertyType.getReturnedClass ()),
+							helper.getClass ().getName ());
+
+						return;
+
+					}
+
+					typeNamesBuilder.add (
+						typeName);
+
+				}
+
+				fieldTypeNamesBuilder.put (
+					compositeUserType.returnedClass (),
+					typeNamesBuilder.build ());
+
+				return;
+
+			}
+
+			taskLog.errorFormat (
+				"Don't know how to handle %s",
+				classNameSimple (
+					helper.getClass ()));
 
 			return;
 
 		}
-
-		taskLog.errorFormat (
-			"Don't know how to handle %s",
-			classNameSimple (
-				helper.getClass ()));
-
-		return;
 
 	}
 

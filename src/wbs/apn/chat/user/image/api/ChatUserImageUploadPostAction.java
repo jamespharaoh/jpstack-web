@@ -10,7 +10,6 @@ import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 import java.io.FileOutputStream;
 import java.util.List;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.apache.commons.fileupload.FileItem;
@@ -77,193 +76,203 @@ class ChatUserImageUploadPostAction
 				parentTaskLogger,
 				"goApi");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserImageUploadPostAction.goApi ()",
-				this);
+		try (
 
-		ChatUserImageUploadTokenRec imageUploadToken =
-			chatUserImageUploadTokenHelper.findByToken (
-				requestContext.requestStringRequired (
-					"chatUserImageUploadToken"));
-
-		// check the expiry time
-
-		boolean expired =
-			transaction.now ().isAfter (
-				imageUploadToken.getExpiryTime ());
-
-		if (expired) {
-
-			// update token
-
-			imageUploadToken
-
-				.setFirstExpiredTime (
-					imageUploadToken.getFirstExpiredTime () != null
-						? imageUploadToken.getFirstExpiredTime ()
-						: transaction.now ())
-
-				.setLastExpiredTime (
-					transaction.now ())
-
-				.setNumExpired (
-					imageUploadToken.getNumExpired () + 1);
-
-			// commit and show expiry page
-
-			transaction.commit ();
-
-			return responder (
-				taskLogger,
-				"chatUserImageUploadExpiredPage");
-
-		}
-
-		try {
-
-			// update the image
-
-			List <FileItem> fileItems =
-				requestContext.fileItems ();
-
-			if (
-				collectionDoesNotHaveOneElement (
-					fileItems)
-			) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"Wrong number of file items: %s",
-						integerToDecimalString (
-							fileItems.size ())));
-
-			}
-
-			FileItem fileItem =
-				listFirstElementRequired (
-					fileItems);
-
-			if (
-				stringNotEqualSafe (
-					fileItem.getFieldName (),
-					"file")
-			) {
-
-				throw new RuntimeException (
-					stringFormat (
-						"File item has wrong name: %s",
-						fileItem.getName ()));
-
-			}
-
-			if (taskLogger.debugEnabled ()) {
-
-				try {
-
-					String filename =
-						stringFormat (
-							"/tmp/%s",
-							randomLogic.generateLowercase (10));
-
-					IOUtils.write (
-						fileItem.get (),
-						new FileOutputStream (
-							filename));
-
-					taskLogger.debugFormat (
-						"Written %s bytes to temporary file %s",
-						integerToDecimalString (
-							fileItem.get ().length),
-						filename);
-
-				} catch (Exception exception) {
-
-					taskLogger.debugFormatException (
-						exception,
-						"Error writing image data to debug file");
-
-				}
-
-			}
-
-			chatUserLogic.setImage (
-				taskLogger,
-				imageUploadToken.getChatUser (),
-				ChatUserImageType.image,
-				fileItem.get (),
-				fileItem.getName (),
-				/*fileItem.getContentType (),*/
-				"image/jpeg",
-				optionalAbsent (),
-				false);
-
-			// update token
-
-			imageUploadToken
-
-				.setFirstUploadTime (
-					imageUploadToken.getFirstUploadTime () != null
-						? imageUploadToken.getFirstUploadTime ()
-						: transaction.now ())
-
-				.setLastUploadTime (
-					transaction.now ())
-
-				.setNumUploads (
-					imageUploadToken.getNumUploads () + 1);
-
-			// commit and show confirmation page
-
-			transaction.commit ();
-
-			return responder (
-				taskLogger,
-				"chatUserImageUploadSuccessPage");
-
-		} catch (Exception exception) {
-
-			// log exception
-
-			exceptionLogger.logThrowable (
-				taskLogger,
-				"webapi",
-				requestContext.requestPath (),
-				exception,
-				optionalAbsent (),
-				GenericExceptionResolution.ignoreWithUserWarning);
-
-			// start new transaction
-
-			@Cleanup
-			Transaction errorTransaction =
+			Transaction transaction =
 				database.beginReadWrite (
 					"ChatUserImageUploadPostAction.goApi ()",
 					this);
 
-			// update token
+		) {
 
-			imageUploadToken
+			ChatUserImageUploadTokenRec imageUploadToken =
+				chatUserImageUploadTokenHelper.findByToken (
+					requestContext.requestStringRequired (
+						"chatUserImageUploadToken"));
 
-				.setFirstFailedTime (
-					imageUploadToken.getFirstFailedTime () != null
-						? imageUploadToken.getFirstFailedTime ()
-						: transaction.now ())
+			// check the expiry time
 
-				.setLastFailedTime (
-					transaction.now ())
+			boolean expired =
+				transaction.now ().isAfter (
+					imageUploadToken.getExpiryTime ());
 
-				.setNumFailures (
-					imageUploadToken.getNumFailures () + 1);
+			if (expired) {
 
-			// commit and show error page
+				// update token
 
-			errorTransaction.commit ();
+				imageUploadToken
 
-			return responder (
-				taskLogger,
-				"chatUserImageUploadErrorPage");
+					.setFirstExpiredTime (
+						imageUploadToken.getFirstExpiredTime () != null
+							? imageUploadToken.getFirstExpiredTime ()
+							: transaction.now ())
+
+					.setLastExpiredTime (
+						transaction.now ())
+
+					.setNumExpired (
+						imageUploadToken.getNumExpired () + 1);
+
+				// commit and show expiry page
+
+				transaction.commit ();
+
+				return responder (
+					taskLogger,
+					"chatUserImageUploadExpiredPage");
+
+			}
+
+			try {
+
+				// update the image
+
+				List <FileItem> fileItems =
+					requestContext.fileItems ();
+
+				if (
+					collectionDoesNotHaveOneElement (
+						fileItems)
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"Wrong number of file items: %s",
+							integerToDecimalString (
+								fileItems.size ())));
+
+				}
+
+				FileItem fileItem =
+					listFirstElementRequired (
+						fileItems);
+
+				if (
+					stringNotEqualSafe (
+						fileItem.getFieldName (),
+						"file")
+				) {
+
+					throw new RuntimeException (
+						stringFormat (
+							"File item has wrong name: %s",
+							fileItem.getName ()));
+
+				}
+
+				if (taskLogger.debugEnabled ()) {
+
+					try {
+
+						String filename =
+							stringFormat (
+								"/tmp/%s",
+								randomLogic.generateLowercase (10));
+
+						IOUtils.write (
+							fileItem.get (),
+							new FileOutputStream (
+								filename));
+
+						taskLogger.debugFormat (
+							"Written %s bytes to temporary file %s",
+							integerToDecimalString (
+								fileItem.get ().length),
+							filename);
+
+					} catch (Exception exception) {
+
+						taskLogger.debugFormatException (
+							exception,
+							"Error writing image data to debug file");
+
+					}
+
+				}
+
+				chatUserLogic.setImage (
+					taskLogger,
+					imageUploadToken.getChatUser (),
+					ChatUserImageType.image,
+					fileItem.get (),
+					fileItem.getName (),
+					/*fileItem.getContentType (),*/
+					"image/jpeg",
+					optionalAbsent (),
+					false);
+
+				// update token
+
+				imageUploadToken
+
+					.setFirstUploadTime (
+						imageUploadToken.getFirstUploadTime () != null
+							? imageUploadToken.getFirstUploadTime ()
+							: transaction.now ())
+
+					.setLastUploadTime (
+						transaction.now ())
+
+					.setNumUploads (
+						imageUploadToken.getNumUploads () + 1);
+
+				// commit and show confirmation page
+
+				transaction.commit ();
+
+				return responder (
+					taskLogger,
+					"chatUserImageUploadSuccessPage");
+
+			} catch (Exception exception) {
+
+				// log exception
+
+				exceptionLogger.logThrowable (
+					taskLogger,
+					"webapi",
+					requestContext.requestPath (),
+					exception,
+					optionalAbsent (),
+					GenericExceptionResolution.ignoreWithUserWarning);
+
+				// start new transaction
+
+				try (
+
+					Transaction errorTransaction =
+						database.beginReadWrite (
+							"ChatUserImageUploadPostAction.goApi ()",
+							this);
+
+				) {
+
+					// update token
+
+					imageUploadToken
+
+						.setFirstFailedTime (
+							imageUploadToken.getFirstFailedTime () != null
+								? imageUploadToken.getFirstFailedTime ()
+								: transaction.now ())
+
+						.setLastFailedTime (
+							transaction.now ())
+
+						.setNumFailures (
+							imageUploadToken.getNumFailures () + 1);
+
+					// commit and show error page
+
+					errorTransaction.commit ();
+
+					return responder (
+						taskLogger,
+						"chatUserImageUploadErrorPage");
+
+				}
+
+			}
 
 		}
 

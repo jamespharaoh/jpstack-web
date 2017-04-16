@@ -1,11 +1,9 @@
 package wbs.apn.chat.user.image.api;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiAction;
-import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
-import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -13,6 +11,9 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
+import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
 
@@ -47,70 +48,75 @@ class ChatUserImageUploadViewAction
 				parentTaskLogger,
 				"goApi");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatUserImageUploadViewAction.goApi ()",
-				this);
+		try (
 
-		ChatUserImageUploadTokenRec imageUploadToken =
-			chatUserImageUploadTokenHelper.findByToken (
-				requestContext.requestStringRequired (
-					"chatUserImageUploadToken"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatUserImageUploadViewAction.goApi ()",
+					this);
 
-		// check the expiry time
+		) {
 
-		boolean expired =
-			transaction.now ().isAfter (
-				imageUploadToken.getExpiryTime ());
+			ChatUserImageUploadTokenRec imageUploadToken =
+				chatUserImageUploadTokenHelper.findByToken (
+					requestContext.requestStringRequired (
+						"chatUserImageUploadToken"));
 
-		if (expired) {
+			// check the expiry time
 
-			// update token
+			boolean expired =
+				transaction.now ().isAfter (
+					imageUploadToken.getExpiryTime ());
 
-			imageUploadToken
+			if (expired) {
 
-				.setFirstExpiredTime (
-					imageUploadToken.getFirstExpiredTime () != null
-						? imageUploadToken.getFirstExpiredTime ()
-						: transaction.now ())
+				// update token
 
-				.setLastExpiredTime (
-					transaction.now ())
+				imageUploadToken
 
-				.setNumExpired (
-					imageUploadToken.getNumExpired () + 1);
+					.setFirstExpiredTime (
+						imageUploadToken.getFirstExpiredTime () != null
+							? imageUploadToken.getFirstExpiredTime ()
+							: transaction.now ())
 
-			// commit and show expiry page
+					.setLastExpiredTime (
+						transaction.now ())
 
-			transaction.commit ();
+					.setNumExpired (
+						imageUploadToken.getNumExpired () + 1);
 
-			return responder (
-				taskLogger,
-				"chatUserImageUploadExpiredPage");
+				// commit and show expiry page
 
-		} else {
+				transaction.commit ();
 
-			imageUploadToken
+				return responder (
+					taskLogger,
+					"chatUserImageUploadExpiredPage");
 
-				.setFirstViewTime (
-					imageUploadToken.getFirstViewTime () != null
-						? imageUploadToken.getFirstViewTime ()
-						: transaction.now ())
+			} else {
 
-				.setLastViewTime (
-					transaction.now ())
+				imageUploadToken
 
-				.setNumViews (
-					imageUploadToken.getNumViews () + 1);
+					.setFirstViewTime (
+						imageUploadToken.getFirstViewTime () != null
+							? imageUploadToken.getFirstViewTime ()
+							: transaction.now ())
 
-			// commit and show form page
+					.setLastViewTime (
+						transaction.now ())
 
-			transaction.commit ();
+					.setNumViews (
+						imageUploadToken.getNumViews () + 1);
 
-			return responder (
-				taskLogger,
-				"chatUserImageUploadFormPage");
+				// commit and show form page
+
+				transaction.commit ();
+
+				return responder (
+					taskLogger,
+					"chatUserImageUploadFormPage");
+
+			}
 
 		}
 

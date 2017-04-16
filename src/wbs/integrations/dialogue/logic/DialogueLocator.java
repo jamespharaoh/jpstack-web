@@ -100,32 +100,37 @@ class DialogueLocator
 			@NonNull LocatorInfo locatorInfo,
 			@NonNull Long locatorId) {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"DialogueLocator.lookupDialogueLocator (...)",
-				this);
+		try (
 
-		LocatorRec locator =
-			locatorHelper.findRequired (
-				locatorId);
+			Transaction transaction =
+				database.beginReadOnly (
+					"DialogueLocator.lookupDialogueLocator (...)",
+					this);
 
-		DialogueLocatorRec dialogueLocator =
-			genericCastUnchecked (
-				objectManager.getParentRequired (
-					locator));
+		) {
 
-		locatorInfo.url =
-			dialogueLocator.getUrl ();
+			LocatorRec locator =
+				locatorHelper.findRequired (
+					locatorId);
 
-		locatorInfo.account =
-			dialogueLocator.getAccount ();
+			DialogueLocatorRec dialogueLocator =
+				genericCastUnchecked (
+					objectManager.getParentRequired (
+						locator));
 
-		locatorInfo.organiser =
-			dialogueLocator.getOrganiser ();
+			locatorInfo.url =
+				dialogueLocator.getUrl ();
 
-		locatorInfo.password =
-			dialogueLocator.getPassword ();
+			locatorInfo.account =
+				dialogueLocator.getAccount ();
+
+			locatorInfo.organiser =
+				dialogueLocator.getOrganiser ();
+
+			locatorInfo.password =
+				dialogueLocator.getPassword ();
+
+		}
 
 	}
 

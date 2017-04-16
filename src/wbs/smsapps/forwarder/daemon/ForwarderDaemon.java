@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.joda.time.Duration;
@@ -444,79 +443,89 @@ class ForwarderDaemon
 					parentTaskLogger,
 					"WorkerThread.doMessage");
 
-			@Cleanup
-			Transaction checkTransaction =
-				database.beginReadWrite (
-					stringFormat (
-						"%s.%s.%s (%s)",
-						"ForwarderDaemon",
-						"WorkerThread",
-						"doMessage",
+			try (
+
+				Transaction checkTransaction =
+					database.beginReadWrite (
 						stringFormat (
-							"forwarderMessageInId = %s",
-							integerToDecimalString (
-								forwarderMessageInId))),
-					this);
+							"%s.%s.%s (%s)",
+							"ForwarderDaemon",
+							"WorkerThread",
+							"doMessage",
+							stringFormat (
+								"forwarderMessageInId = %s",
+								integerToDecimalString (
+									forwarderMessageInId))),
+						this);
 
-			ForwarderMessageInRec forwarderMessageIn =
-				forwarderMessageInHelper.findRequired (
-					forwarderMessageInId);
-
-			// check if we should cancel it
-
-			long timeout =
-				forwarderMessageIn
-					.getForwarder ()
-					.getInboundTimeoutSecs ();
-
-			if (
-
-				timeout > 0
-
-				&& earlierThan (
-					forwarderMessageIn.getCreatedTime ().plus (
-						Duration.standardSeconds (
-							timeout)),
-					checkTransaction.now ())
 			) {
 
-				forwarderMessageIn =
+				ForwarderMessageInRec forwarderMessageIn =
 					forwarderMessageInHelper.findRequired (
-						forwarderMessageIn.getId ());
+						forwarderMessageInId);
 
-				forwarderMessageIn
+				// check if we should cancel it
 
-					.setCancelledTime (
-						checkTransaction.now ());
+				long timeout =
+					forwarderMessageIn
+						.getForwarder ()
+						.getInboundTimeoutSecs ();
 
-				checkTransaction.commit ();
+				if (
 
-				return;
+					timeout > 0
 
-			} else {
+					&& earlierThan (
+						forwarderMessageIn.getCreatedTime ().plus (
+							Duration.standardSeconds (
+								timeout)),
+						checkTransaction.now ())
+				) {
 
-				checkTransaction.commit ();
+					forwarderMessageIn =
+						forwarderMessageInHelper.findRequired (
+							forwarderMessageIn.getId ());
+
+					forwarderMessageIn
+
+						.setCancelledTime (
+							checkTransaction.now ());
+
+					checkTransaction.commit ();
+
+					return;
+
+				} else {
+
+					checkTransaction.commit ();
+
+				}
+
+				// send it
+
+				boolean success =
+					doSend (
+						taskLogger,
+						forwarderMessageIn);
+
+				try (
+
+					Transaction resultTransaction =
+						database.beginReadWrite (
+							"ForwarderDaemon.WorkerThread.doMessage",
+							this);
+
+				) {
+
+					doResult (
+						forwarderMessageIn.getId (),
+						success);
+
+					resultTransaction.commit ();
+
+				}
 
 			}
-
-			// send it
-
-			boolean success =
-				doSend (
-					taskLogger,
-					forwarderMessageIn);
-
-			@Cleanup
-			Transaction resultTransaction =
-				database.beginReadWrite (
-					"ForwarderDaemon.WorkerThread.doMessage",
-					this);
-
-			doResult (
-				forwarderMessageIn.getId (),
-				success);
-
-			resultTransaction.commit ();
 
 		}
 

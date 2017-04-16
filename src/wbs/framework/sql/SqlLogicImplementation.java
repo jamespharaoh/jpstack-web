@@ -10,7 +10,6 @@ import javax.sql.DataSource;
 
 import com.google.common.collect.ImmutableSet;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -39,11 +38,12 @@ class SqlLogicImplementation
 	public
 	void init () {
 
-		try {
+		try (
 
-			@Cleanup
 			Connection connection =
 				dataSource.getConnection ();
+
+		) {
 
 			sqlKeywords =
 				ImmutableSet.<String>builder ()

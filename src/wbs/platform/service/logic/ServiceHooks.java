@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -64,23 +63,24 @@ class ServiceHooks
 	public
 	void init () {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"serviceHooks.init ()",
-				this);
+		try (
 
-		// preload object types
+			Transaction transaction =
+				database.beginReadOnly (
+					"serviceHooks.init ()",
+					this);
 
-		objectTypeDao.findAll ();
+		) {
 
-		// load service types and construct index
+			// preload object types
 
-		serviceTypeIdsByParentTypeId =
-			serviceTypeDao.findAll ().stream ()
+			objectTypeDao.findAll ();
 
-			.collect (
-				Collectors.groupingBy (
+			// load service types and construct index
+
+			serviceTypeIdsByParentTypeId =
+				serviceTypeDao.findAll ().stream ().collect (
+					Collectors.groupingBy (
 
 				serviceType ->
 					serviceType.getParentType ().getId (),
@@ -91,6 +91,8 @@ class ServiceHooks
 					Collectors.toList ()))
 
 			);
+
+		}
 
 	}
 

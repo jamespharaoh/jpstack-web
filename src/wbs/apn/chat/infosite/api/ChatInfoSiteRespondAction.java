@@ -4,7 +4,6 @@ import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiAction;
@@ -63,49 +62,54 @@ class ChatInfoSiteRespondAction
 				parentTaskLogger,
 				"goApi");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatInfoSiteRespondAction.goApi ()",
-				this);
+		try (
 
-		ChatInfoSiteRec infoSite =
-			chatInfoSiteHelper.findRequired (
-				requestContext.requestIntegerRequired (
-					"chatInfoSiteId"));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatInfoSiteRespondAction.goApi ()",
+					this);
 
-		if (
-			stringNotEqualSafe (
-				infoSite.getToken (),
-				requestContext.requestStringRequired (
-					"chatInfoSiteToken"))
 		) {
 
-			throw new RuntimeException (
-				"Token mismatch");
+			ChatInfoSiteRec infoSite =
+				chatInfoSiteHelper.findRequired (
+					requestContext.requestIntegerRequired (
+						"chatInfoSiteId"));
+
+			if (
+				stringNotEqualSafe (
+					infoSite.getToken (),
+					requestContext.requestStringRequired (
+						"chatInfoSiteToken"))
+			) {
+
+				throw new RuntimeException (
+					"Token mismatch");
+
+			}
+
+			ChatUserRec otherUser =
+				chatUserHelper.findRequired (
+					requestContext.parameterIntegerRequired (
+						"otherUserId"));
+
+			chatMessageLogic.chatMessageSendFromUser (
+				taskLogger,
+				infoSite.getChatUser (),
+				otherUser,
+				requestContext.parameterRequired (
+					"text"),
+				optionalAbsent (),
+				ChatMessageMethod.infoSite,
+				emptyList ());
+
+			transaction.commit ();
+
+			return responder (
+				taskLogger,
+				"chatInfoSiteMessageSentResponder");
 
 		}
-
-		ChatUserRec otherUser =
-			chatUserHelper.findRequired (
-				requestContext.parameterIntegerRequired (
-					"otherUserId"));
-
-		chatMessageLogic.chatMessageSendFromUser (
-			taskLogger,
-			infoSite.getChatUser (),
-			otherUser,
-			requestContext.parameterRequired (
-				"text"),
-			optionalAbsent (),
-			ChatMessageMethod.infoSite,
-			emptyList ());
-
-		transaction.commit ();
-
-		return responder (
-			taskLogger,
-			"chatInfoSiteMessageSentResponder");
 
 	}
 

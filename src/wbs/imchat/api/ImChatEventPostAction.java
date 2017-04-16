@@ -14,7 +14,6 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.json.simple.JSONObject;
@@ -105,256 +104,261 @@ class ImChatEventPostAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatEventPostAction.handle ()",
-				this);
+		try (
 
-		ImChatRec imChat =
-			imChatHelper.findRequired (
-				parseIntegerRequired (
-					requestContext.requestStringRequired (
-						"imChatId")));
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatEventPostAction.handle ()",
+					this);
 
-		// write events
-
-		long timestampAdjustment =
-			+ transaction.now ().getMillis ()
-			- eventPostRequest.timestamp ();
-
-		for (
-			ImChatEventItemRequest eventItemRequest
-				: eventPostRequest.events ()
 		) {
 
-			// lookup session
+			ImChatRec imChat =
+				imChatHelper.findRequired (
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"imChatId")));
 
-			ImChatSessionRec session = null;
-			ImChatCustomerRec customer = null;
+			// write events
 
-			if (
-				isNotNull (
-					eventItemRequest.sessionSecret ())
+			long timestampAdjustment =
+				+ transaction.now ().getMillis ()
+				- eventPostRequest.timestamp ();
+
+			for (
+				ImChatEventItemRequest eventItemRequest
+					: eventPostRequest.events ()
 			) {
 
-				session =
-					imChatSessionHelper.findBySecret (
-						eventItemRequest.sessionSecret ());
+				// lookup session
+
+				ImChatSessionRec session = null;
+				ImChatCustomerRec customer = null;
 
 				if (
 					isNotNull (
-						session)
+						eventItemRequest.sessionSecret ())
 				) {
 
-					customer =
-						session.getImChatCustomer ();
+					session =
+						imChatSessionHelper.findBySecret (
+							eventItemRequest.sessionSecret ());
 
 					if (
-
-						! session.getActive ()
-
-						|| referenceNotEqualWithClass (
-							ImChatRec.class,
-							session.getImChatCustomer ().getImChat (),
-							imChat)
-
+						isNotNull (
+							session)
 					) {
-						session = null;
-						customer = null;
+
+						customer =
+							session.getImChatCustomer ();
+
+						if (
+
+							! session.getActive ()
+
+							|| referenceNotEqualWithClass (
+								ImChatRec.class,
+								session.getImChatCustomer ().getImChat (),
+								imChat)
+
+						) {
+							session = null;
+							customer = null;
+						}
+
 					}
 
 				}
 
-			}
-
-			imChatEventHelper.insert (
-				taskLogger,
-				imChatEventHelper.createInstance ()
-
-				.setImChat (
-					imChat)
-
-				.setTimestamp (
-					transaction.now ())
-
-				.setIndex (
-					eventItemRequest.index ())
-
-				.setClientTimestamp (
-					millisToInstant (
-						eventItemRequest.timestamp ()))
-
-				.setAdjustedTimestamp (
-					millisToInstant (
-						+ eventItemRequest.timestamp ()
-						+ timestampAdjustment))
-
-				.setInvocationToken (
-					eventPostRequest.invocationToken ())
-
-				.setImChatSession (
-					session)
-
-				.setImChatCustomer (
-					customer)
-
-				.setSource (
-					requestContext.header ("x-forwarded-for") != null
-						? joinWithCommaAndSpace (
-							requestContext.headerRequired (
-								"x-forwarded-for"),
-							requestContext.request ().getRemoteHost ())
-						: requestContext.request ().getRemoteHost ())
-
-				.setType (
-					eventItemRequest.type ())
-
-				.setPayload (
-					eventItemRequest.payload ().toJSONString ())
-
-			);
-
-			// write exceptions
-
-			if (
-				stringEqualSafe (
-					eventItemRequest.type (),
-					"unhandled-error")
-			) {
-
-				JSONObject payload =
-					eventItemRequest.payload ();
-
-				exceptionLogger.logSimple (
+				imChatEventHelper.insert (
 					taskLogger,
-					"external",
+					imChatEventHelper.createInstance ()
 
-					objectToString (
-						ifNull (
-							payload.get ("source"),
-							"unknown")),
+					.setImChat (
+						imChat)
 
-					objectToString (
-						ifNull (
-							payload.get ("message"),
-							"unknown")),
+					.setTimestamp (
+						transaction.now ())
 
-					stringFormat (
+					.setIndex (
+						eventItemRequest.index ())
 
-						"URL: %s\n",
+					.setClientTimestamp (
+						millisToInstant (
+							eventItemRequest.timestamp ()))
+
+					.setAdjustedTimestamp (
+						millisToInstant (
+							+ eventItemRequest.timestamp ()
+							+ timestampAdjustment))
+
+					.setInvocationToken (
+						eventPostRequest.invocationToken ())
+
+					.setImChatSession (
+						session)
+
+					.setImChatCustomer (
+						customer)
+
+					.setSource (
+						requestContext.header ("x-forwarded-for") != null
+							? joinWithCommaAndSpace (
+								requestContext.headerRequired (
+									"x-forwarded-for"),
+								requestContext.request ().getRemoteHost ())
+							: requestContext.request ().getRemoteHost ())
+
+					.setType (
+						eventItemRequest.type ())
+
+					.setPayload (
+						eventItemRequest.payload ().toJSONString ())
+
+				);
+
+				// write exceptions
+
+				if (
+					stringEqualSafe (
+						eventItemRequest.type (),
+						"unhandled-error")
+				) {
+
+					JSONObject payload =
+						eventItemRequest.payload ();
+
+					exceptionLogger.logSimple (
+						taskLogger,
+						"external",
+
 						objectToString (
 							ifNull (
-								payload.get ("url"),
+								payload.get ("source"),
 								"unknown")),
 
-						"Line: %s\n",
-						objectToString (
-							ifNull (
-								payload.get ("line"),
-								"unknown")),
-
-						"Column: %s\n",
-						objectToString (
-							ifNull (
-								payload.get ("column"),
-								"unknown")),
-
-						"Message: %s\n",
 						objectToString (
 							ifNull (
 								payload.get ("message"),
 								"unknown")),
 
-						"User agent: %s\n",
+						stringFormat (
+
+							"URL: %s\n",
+							objectToString (
+								ifNull (
+									payload.get ("url"),
+									"unknown")),
+
+							"Line: %s\n",
+							objectToString (
+								ifNull (
+									payload.get ("line"),
+									"unknown")),
+
+							"Column: %s\n",
+							objectToString (
+								ifNull (
+									payload.get ("column"),
+									"unknown")),
+
+							"Message: %s\n",
+							objectToString (
+								ifNull (
+									payload.get ("message"),
+									"unknown")),
+
+							"User agent: %s\n",
+							objectToString (
+								ifNull (
+									payload.get ("userAgent"),
+									"unknown")),
+
+							"\n",
+
+							"Trace:\n",
+							objectToString (
+								ifNull (
+									payload.get ("trace"),
+									""))),
+
+						Optional.absent (),
+
+						GenericExceptionResolution.ignoreWithThirdPartyWarning);
+
+				} else if (
+					stringEqualSafe (
+						eventItemRequest.type (),
+						"api-error")
+				) {
+
+					JSONObject payload =
+						eventItemRequest.payload ();
+
+					exceptionLogger.logSimple (
+						taskLogger,
+						"external",
+
 						objectToString (
 							ifNull (
-								payload.get ("userAgent"),
+								payload.get ("source"),
 								"unknown")),
 
-						"\n",
-
-						"Trace:\n",
-						objectToString (
-							ifNull (
-								payload.get ("trace"),
-								""))),
-
-					Optional.absent (),
-
-					GenericExceptionResolution.ignoreWithThirdPartyWarning);
-
-			} else if (
-				stringEqualSafe (
-					eventItemRequest.type (),
-					"api-error")
-			) {
-
-				JSONObject payload =
-					eventItemRequest.payload ();
-
-				exceptionLogger.logSimple (
-					taskLogger,
-					"external",
-
-					objectToString (
-						ifNull (
-							payload.get ("source"),
-							"unknown")),
-
-					objectToString (
-						ifNull (
-							payload.get ("error"),
-							"unknown")),
-
-					stringFormat (
-
-						"Error: %s\n",
 						objectToString (
 							ifNull (
 								payload.get ("error"),
 								"unknown")),
 
-						"Path: %s\n",
-						objectToString (
-							ifNull (
-								payload.get ("path"),
-								"none")),
+						stringFormat (
 
-						"User agent: %s\n",
-						objectToString (
-							ifNull (
-								payload.get ("userAgent"),
-								"unknown")),
+							"Error: %s\n",
+							objectToString (
+								ifNull (
+									payload.get ("error"),
+									"unknown")),
 
-						"Request: %s\n",
-						objectToString (
-							ifNull (
-								payload.get ("request"),
-								"none")),
+							"Path: %s\n",
+							objectToString (
+								ifNull (
+									payload.get ("path"),
+									"none")),
 
-						"Response: %s\n",
-						objectToString (
-							ifNull (
-								payload.get ("response"),
-								"none"))),
+							"User agent: %s\n",
+							objectToString (
+								ifNull (
+									payload.get ("userAgent"),
+									"unknown")),
 
-					Optional.absent (),
+							"Request: %s\n",
+							objectToString (
+								ifNull (
+									payload.get ("request"),
+									"none")),
 
-					GenericExceptionResolution.ignoreWithThirdPartyWarning);
+							"Response: %s\n",
+							objectToString (
+								ifNull (
+									payload.get ("response"),
+									"none"))),
+
+						Optional.absent (),
+
+						GenericExceptionResolution.ignoreWithThirdPartyWarning);
+
+				}
 
 			}
 
+			// commit and return
+
+			transaction.commit ();
+
+			return jsonResponderProvider.get ()
+
+				.value (
+					"HELLO WORLD");
+
 		}
-
-		// commit and return
-
-		transaction.commit ();
-
-		return jsonResponderProvider.get ()
-
-			.value (
-				"HELLO WORLD");
 
 	}
 

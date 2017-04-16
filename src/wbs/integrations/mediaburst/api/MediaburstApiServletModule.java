@@ -26,9 +26,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
-import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
@@ -64,7 +62,6 @@ import wbs.web.pathhandler.PathHandler;
 import wbs.web.pathhandler.RegexpPathHandler;
 import wbs.web.responder.WebModule;
 
-@Log4j
 @SingletonComponent ("meidaburtApiServletModule")
 public
 class MediaburstApiServletModule
@@ -424,90 +421,93 @@ class MediaburstApiServletModule
 					parentTaskLogger,
 					"reportFile.doGet");
 
-			@Cleanup
-			Transaction transaction =
-				database.beginReadWrite (
-					"MediaburstApiServletModule.reportFile.doGet ()",
-					this);
+			try (
 
-			RouteRec route =
-				routeHelper.findRequired (
-					requestContext.requestIntegerRequired (
-						"routeId"));
+				Transaction transaction =
+					database.beginReadWrite (
+						"MediaburstApiServletModule.reportFile.doGet ()",
+						this);
 
-			String statusParam =
-				lowercase (
-					requestContext.parameterRequired (
-						"status"));
+			) {
 
-			if (! messageStatusStrings.contains (statusParam)) {
+				RouteRec route =
+					routeHelper.findRequired (
+						requestContext.requestIntegerRequired (
+							"routeId"));
 
-				throw new RuntimeException (
-					"Unknown message status: " + statusParam);
-
-			}
-
-			MessageStatus newMessageStatus =
-				stringToMessageStatus.get (
-					statusParam.toLowerCase ());
-
-			String deliverCodeParam =
-				requestContext.parameterOrDefault (
-					"deliver_code",
-					"");
-
-			try {
-
-				if (
-					isNotNull (
-						newMessageStatus)
-				) {
-
-					reportLogic.deliveryReport (
-						taskLogger,
-						route,
+				String statusParam =
+					lowercase (
 						requestContext.parameterRequired (
-							"msg_id"),
-						newMessageStatus,
-						optionalOf (
-							statusParam),
-						optionalAbsent (),
-						optionalOf (
-							joinWithSpace (
-								stringFormat (
-									"status=%s",
-									statusParam),
-								stringFormat (
-									"deliver_code=%s",
-									deliverCodeParam))),
-						optionalAbsent ());
+							"status"));
+
+				if (! messageStatusStrings.contains (statusParam)) {
+
+					throw new RuntimeException (
+						"Unknown message status: " + statusParam);
 
 				}
 
-				transaction.commit ();
+				MessageStatus newMessageStatus =
+					stringToMessageStatus.get (
+						statusParam.toLowerCase ());
 
-			} catch (NoSuchMessageException exception) {
+				String deliverCodeParam =
+					requestContext.parameterOrDefault (
+						"deliver_code",
+						"");
 
-				log.fatal (
-					stringFormat (
+				try {
+
+					if (
+						isNotNull (
+							newMessageStatus)
+					) {
+
+						reportLogic.deliveryReport (
+							taskLogger,
+							route,
+							requestContext.parameterRequired (
+								"msg_id"),
+							newMessageStatus,
+							optionalOf (
+								statusParam),
+							optionalAbsent (),
+							optionalOf (
+								joinWithSpace (
+									stringFormat (
+										"status=%s",
+										statusParam),
+									stringFormat (
+										"deliver_code=%s",
+										deliverCodeParam))),
+							optionalAbsent ());
+
+					}
+
+					transaction.commit ();
+
+				} catch (NoSuchMessageException exception) {
+
+					taskLogger.fatalFormat (
 						"Ignoring report for unknown message %s/%s",
 						integerToDecimalString (
 							requestContext.requestIntegerRequired (
 								"routeId")),
 						requestContext.parameterRequired (
-							"msg_id")));
+							"msg_id"));
 
-			} catch (InvalidMessageStateException exception) {
+				} catch (InvalidMessageStateException exception) {
 
-				log.fatal (
-					stringFormat (
+					taskLogger.fatalFormat (
 						"Ignoring report for message %s/%s: %s",
 						integerToDecimalString (
 							requestContext.requestIntegerRequired (
 								"routeId")),
 						requestContext.parameterRequired (
 							"msg_id"),
-						exception.getMessage ()));
+						exception.getMessage ());
+
+				}
 
 			}
 

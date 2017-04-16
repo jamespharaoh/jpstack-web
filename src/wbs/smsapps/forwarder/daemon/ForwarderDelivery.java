@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import com.google.common.collect.ImmutableList;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -74,124 +73,129 @@ class ForwarderDelivery
 				parentTaskLogger,
 				"handle");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ForwarderDelivery.handle (deliveryId, ref)",
-				this);
+		try (
 
-		// get the delivery
+			Transaction transaction =
+				database.beginReadWrite (
+					"ForwarderDelivery.handle (deliveryId, ref)",
+					this);
 
-		DeliveryRec delivery =
-			deliveryHelper.findRequired (
-				deliveryId);
+		) {
 
-		// lookup the forwarder message out
+			// get the delivery
 
-		ForwarderMessageOutRec forwarderMessageOut =
-			forwarderMessageOutHelper.findRequired (
-				delivery.getMessage ().getRef ());
+			DeliveryRec delivery =
+				deliveryHelper.findRequired (
+					deliveryId);
 
-		// unhold / cancel next message(s) if required
+			// lookup the forwarder message out
 
-		if (
-			forwarderMessageOut.getNextForwarderMessageOut () != null
-			&& forwarderMessageOut
-				.getNextForwarderMessageOut ()
-				.getMessage ()
-				.getStatus ()
-					== MessageStatus.held) {
+			ForwarderMessageOutRec forwarderMessageOut =
+				forwarderMessageOutHelper.findRequired (
+					delivery.getMessage ().getRef ());
 
-			if (delivery.getNewMessageStatus ().isGoodType ()) {
+			// unhold / cancel next message(s) if required
 
-				outboxLogic.unholdMessage (
-					taskLogger,
-					forwarderMessageOut
-						.getNextForwarderMessageOut ()
-						.getMessage ());
+			if (
+				forwarderMessageOut.getNextForwarderMessageOut () != null
+				&& forwarderMessageOut
+					.getNextForwarderMessageOut ()
+					.getMessage ()
+					.getStatus ()
+						== MessageStatus.held) {
 
-			}
+				if (delivery.getNewMessageStatus ().isGoodType ()) {
 
-			if (delivery.getNewMessageStatus ().isBadType ()) {
-
-				for (
-
-					ForwarderMessageOutRec nextForwarderMessageOut =
-						forwarderMessageOut.getNextForwarderMessageOut ();
-
-					nextForwarderMessageOut != null;
-
-					nextForwarderMessageOut =
-						nextForwarderMessageOut.getNextForwarderMessageOut ()
-
-				) {
-
-					outboxLogic.cancelMessage (
+					outboxLogic.unholdMessage (
 						taskLogger,
-						nextForwarderMessageOut.getMessage ());
+						forwarderMessageOut
+							.getNextForwarderMessageOut ()
+							.getMessage ());
+
+				}
+
+				if (delivery.getNewMessageStatus ().isBadType ()) {
+
+					for (
+
+						ForwarderMessageOutRec nextForwarderMessageOut =
+							forwarderMessageOut.getNextForwarderMessageOut ();
+
+						nextForwarderMessageOut != null;
+
+						nextForwarderMessageOut =
+							nextForwarderMessageOut.getNextForwarderMessageOut ()
+
+					) {
+
+						outboxLogic.cancelMessage (
+							taskLogger,
+							nextForwarderMessageOut.getMessage ());
+
+					}
 
 				}
 
 			}
 
-		}
+			// do reports if required
 
-		// do reports if required
+			if (forwarderMessageOut.getForwarder ().getReportEnabled ()) {
 
-		if (forwarderMessageOut.getForwarder ().getReportEnabled ()) {
+				// create the forwarder message out report
 
-			// create the forwarder message out report
+				ForwarderMessageOutReportRec forwarderMessageOutReport =
+					forwarderMessageOutReportHelper.insert (
+						taskLogger,
+						forwarderMessageOutReportHelper.createInstance ()
 
-			ForwarderMessageOutReportRec forwarderMessageOutReport =
-				forwarderMessageOutReportHelper.insert (
-					taskLogger,
-					forwarderMessageOutReportHelper.createInstance ()
+					.setForwarderMessageOut (
+						forwarderMessageOut)
 
-				.setForwarderMessageOut (
-					forwarderMessageOut)
+					.setIndex (
+						forwarderMessageOut.getReportIndexNext ())
 
-				.setIndex (
-					forwarderMessageOut.getReportIndexNext ())
+					.setOldMessageStatus (
+						delivery.getOldMessageStatus ())
 
-				.setOldMessageStatus (
-					delivery.getOldMessageStatus ())
+					.setNewMessageStatus (
+						delivery.getNewMessageStatus ())
 
-				.setNewMessageStatus (
-					delivery.getNewMessageStatus ())
-
-				.setCreatedTime (
-					transaction.now ())
-
-			);
-
-			// update the forwarder message out
-
-			if (forwarderMessageOut.getReportIndexPending () == null) {
-
-				forwarderMessageOut
-
-					.setReportIndexPending (
-						forwarderMessageOutReport.getIndex ())
-
-					.setReportRetryTime (
+					.setCreatedTime (
 						transaction.now ())
 
-					.setReportTries (
-						0l);
+				);
+
+				// update the forwarder message out
+
+				if (forwarderMessageOut.getReportIndexPending () == null) {
+
+					forwarderMessageOut
+
+						.setReportIndexPending (
+							forwarderMessageOutReport.getIndex ())
+
+						.setReportRetryTime (
+							transaction.now ())
+
+						.setReportTries (
+							0l);
+
+				}
+
+				forwarderMessageOut.setReportIndexNext (
+					forwarderMessageOut.getReportIndexNext () + 1);
 
 			}
 
-			forwarderMessageOut.setReportIndexNext (
-				forwarderMessageOut.getReportIndexNext () + 1);
+			// remove the dnq
+
+			deliveryHelper.remove (
+				delivery);
+
+			transaction.commit ();
 
 		}
-
-		// remove the dnq
-
-		deliveryHelper.remove (
-			delivery);
-
-		transaction.commit ();
 
 	}
 

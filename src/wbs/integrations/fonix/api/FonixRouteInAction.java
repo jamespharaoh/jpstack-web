@@ -12,7 +12,6 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiLoggingAction;
@@ -271,37 +270,42 @@ class FonixRouteInAction
 				parentTaskLogger,
 				"storeLog");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ClockworkSmsRouteInAction.storeLog ()",
-				this);
+		try (
 
-		fonixInboundLogHelper.insert (
-			taskLogger,
-			fonixInboundLogHelper.createInstance ()
+			Transaction transaction =
+				database.beginReadWrite (
+					"ClockworkSmsRouteInAction.storeLog ()",
+					this);
 
-			.setRoute (
-				smsRouteHelper.findRequired (
-					Long.parseLong (
-						requestContext.requestStringRequired (
-							"smsRouteId"))))
+		) {
 
-			.setType (
-				FonixInboundLogType.smsMessage)
+			fonixInboundLogHelper.insert (
+				taskLogger,
+				fonixInboundLogHelper.createInstance ()
 
-			.setTimestamp (
-				transaction.now ())
+				.setRoute (
+					smsRouteHelper.findRequired (
+						Long.parseLong (
+							requestContext.requestStringRequired (
+								"smsRouteId"))))
 
-			.setDetails (
-				debugLog)
+				.setType (
+					FonixInboundLogType.smsMessage)
 
-			.setSuccess (
-				success)
+				.setTimestamp (
+					transaction.now ())
 
-		);
+				.setDetails (
+					debugLog)
 
-		transaction.commit ();
+				.setSuccess (
+					success)
+
+			);
+
+			transaction.commit ();
+
+		}
 
 	}
 

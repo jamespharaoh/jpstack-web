@@ -141,33 +141,38 @@ class ComponentManagerImplementation
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {
 
-		@Cleanup
-		HeldLock heldLock =
-			lock.read ();
+		try (
 
-		Optional <ComponentDefinition> componentDefinitionOptional =
-			registry.byName (
-				componentName);
+			HeldLock heldLock =
+				lock.read ();
 
-		if (
-			optionalIsNotPresent (
-				componentDefinitionOptional)
 		) {
 
-			return optionalAbsent ();
+			Optional <ComponentDefinition> componentDefinitionOptional =
+				registry.byName (
+					componentName);
+	
+			if (
+				optionalIsNotPresent (
+					componentDefinitionOptional)
+			) {
+	
+				return optionalAbsent ();
+	
+			}
+	
+			ComponentDefinition componentDefinition =
+				optionalGetRequired (
+					componentDefinitionOptional);
+	
+			return optionalOf (
+				componentClass.cast (
+					getComponent (
+						taskLogger,
+						componentDefinition,
+						true)));
 
 		}
-
-		ComponentDefinition componentDefinition =
-			optionalGetRequired (
-				componentDefinitionOptional);
-
-		return optionalOf (
-			componentClass.cast (
-				getComponent (
-					taskLogger,
-					componentDefinition,
-					true)));
 
 	}
 
@@ -178,35 +183,40 @@ class ComponentManagerImplementation
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {
 
-		@Cleanup
-		HeldLock heldLock =
-			lock.read ();
+		try (
 
-		Optional <ComponentDefinition> componentDefinitionOptional =
-			registry.byName (
-				componentName);
+			HeldLock heldLock =
+				lock.read ();
 
-		if (
-			optionalIsNotPresent (
-				componentDefinitionOptional)
 		) {
 
-			throw new NoSuchComponentException (
-				stringFormat (
-					"Component definition with name %s does not exist",
-					componentName));
+			Optional <ComponentDefinition> componentDefinitionOptional =
+				registry.byName (
+					componentName);
+	
+			if (
+				optionalIsNotPresent (
+					componentDefinitionOptional)
+			) {
+	
+				throw new NoSuchComponentException (
+					stringFormat (
+						"Component definition with name %s does not exist",
+						componentName));
+	
+			}
+	
+			ComponentDefinition componentDefinition =
+				optionalGetRequired (
+					componentDefinitionOptional);
+	
+			return componentClass.cast (
+				getComponent (
+					taskLogger,
+					componentDefinition,
+					true));
 
 		}
-
-		ComponentDefinition componentDefinition =
-			optionalGetRequired (
-				componentDefinitionOptional);
-
-		return componentClass.cast (
-			getComponent (
-				taskLogger,
-				componentDefinition,
-				true));
 
 	}
 
@@ -218,30 +228,35 @@ class ComponentManagerImplementation
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Supplier <ComponentType> orElse) {
 
-		@Cleanup
-		HeldLock heldLock =
-			lock.read ();
+		try (
 
-		Optional <ComponentDefinition> componentDefinitionOptional =
-			registry.byName (
-				componentName);
+			HeldLock heldLock =
+				lock.read ();
 
-		if (
-			optionalIsNotPresent (
-				componentDefinitionOptional)
 		) {
-			return orElse.get ();
+
+			Optional <ComponentDefinition> componentDefinitionOptional =
+				registry.byName (
+					componentName);
+	
+			if (
+				optionalIsNotPresent (
+					componentDefinitionOptional)
+			) {
+				return orElse.get ();
+			}
+	
+			ComponentDefinition componentDefinition =
+				optionalGetRequired (
+					componentDefinitionOptional);
+	
+			return componentClass.cast (
+				getComponent (
+					taskLogger,
+					componentDefinition,
+					true));
+
 		}
-
-		ComponentDefinition componentDefinition =
-			optionalGetRequired (
-				componentDefinitionOptional);
-
-		return componentClass.cast (
-			getComponent (
-				taskLogger,
-				componentDefinition,
-				true));
 
 	}
 
@@ -347,105 +362,110 @@ class ComponentManagerImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialize) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		try (
 
-		if (
-			stringEqualSafe (
-				componentDefinition.scope (),
-				"prototype")
+			HeldLock heldlock =
+				lock.read ();
+
 		) {
 
-			return instantiateComponent (
-				taskLogger,
-				componentDefinition,
-				initialize);
-
-		} else if (
-			stringEqualSafe (
-				componentDefinition.scope (),
-				"singleton")
-		) {
-
-			if (! initialize) {
-				throw new IllegalArgumentException ();
-			}
-
-			Object component =
-				singletonComponents.get (
-					componentDefinition.name ());
-
-			if (component != null)
-				return component;
-
 			if (
-				singletonComponentsInCreation.contains (
-					componentDefinition.name ())
-			) {
-
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
-					stringFormat (
-						"Singleton component %s already in creation (%s)",
-						componentDefinition.name (),
-						joinWithCommaAndSpace (
-							singletonComponentsInCreation)));
-
-			}
-
-			if (
-				singletonComponentsFailed.contains (
-					componentDefinition.name ())
-			) {
-
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
-					stringFormat (
-						"Singleton component %s already failed",
-						componentDefinition.name ()));
-
-			}
-
-			singletonComponentsInCreation.add (
-				componentDefinition.name ());
-
-			try {
-
-				component =
-					instantiateComponent (
-						taskLogger,
-						componentDefinition,
-						true);
-
-				singletonComponents.put (
-					componentDefinition.name (),
-					component);
-
-			} finally {
-
-				singletonComponentsInCreation.remove (
-					componentDefinition.name ());
-
-				if (component == null) {
-
-					singletonComponentsFailed.add (
-						componentDefinition.name ());
-
-				}
-
-			}
-
-			return component;
-
-		} else {
-
-			throw new RuntimeExceptionWithTask (
-				activityManager.currentTask (),
-				stringFormat (
-					"Unrecognised scope %s for component %s",
+				stringEqualSafe (
 					componentDefinition.scope (),
-					componentDefinition.name ()));
+					"prototype")
+			) {
+	
+				return instantiateComponent (
+					taskLogger,
+					componentDefinition,
+					initialize);
+	
+			} else if (
+				stringEqualSafe (
+					componentDefinition.scope (),
+					"singleton")
+			) {
+	
+				if (! initialize) {
+					throw new IllegalArgumentException ();
+				}
+	
+				Object component =
+					singletonComponents.get (
+						componentDefinition.name ());
+	
+				if (component != null)
+					return component;
+	
+				if (
+					singletonComponentsInCreation.contains (
+						componentDefinition.name ())
+				) {
+	
+					throw new RuntimeExceptionWithTask (
+						activityManager.currentTask (),
+						stringFormat (
+							"Singleton component %s already in creation (%s)",
+							componentDefinition.name (),
+							joinWithCommaAndSpace (
+								singletonComponentsInCreation)));
+	
+				}
+	
+				if (
+					singletonComponentsFailed.contains (
+						componentDefinition.name ())
+				) {
+	
+					throw new RuntimeExceptionWithTask (
+						activityManager.currentTask (),
+						stringFormat (
+							"Singleton component %s already failed",
+							componentDefinition.name ()));
+	
+				}
+	
+				singletonComponentsInCreation.add (
+					componentDefinition.name ());
+	
+				try {
+	
+					component =
+						instantiateComponent (
+							taskLogger,
+							componentDefinition,
+							true);
+	
+					singletonComponents.put (
+						componentDefinition.name (),
+						component);
+	
+				} finally {
+	
+					singletonComponentsInCreation.remove (
+						componentDefinition.name ());
+	
+					if (component == null) {
+	
+						singletonComponentsFailed.add (
+							componentDefinition.name ());
+	
+					}
+	
+				}
+	
+				return component;
+	
+			} else {
+	
+				throw new RuntimeExceptionWithTask (
+					activityManager.currentTask (),
+					stringFormat (
+						"Unrecognised scope %s for component %s",
+						componentDefinition.scope (),
+						componentDefinition.name ()));
+	
+			}
 
 		}
 
@@ -462,124 +482,128 @@ class ComponentManagerImplementation
 				parentTaskLogger,
 				"instantiateComponent");
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		try (
 
-		@Cleanup
-		ActiveTask activeTask =
-			activityManager.start (
-				"application-context",
-				stringFormat (
-					"instantiateComponent (%s)",
-					componentDefinition.name ()),
-				this);
+			HeldLock heldlock =
+				lock.read ();
 
-		taskLogger.debugFormat (
-			"Instantiating %s (%s)",
-			componentDefinition.name (),
-			componentDefinition.scope ());
-
-		// instantiate
-
-		Object protoComponent =
-			classInstantiate (
-				ifNull (
-					componentDefinition.factoryClass (),
-					componentDefinition.componentClass ()));
-
-		// set properties
-
-		setComponentValueProperties (
-			taskLogger,
-			componentDefinition,
-			protoComponent);
-
-		setComponentReferenceProperties (
-			taskLogger,
-			componentDefinition,
-			protoComponent);
-
-		setComponentInjectedProperties (
-			taskLogger,
-			componentDefinition,
-			protoComponent);
-
-		// call factory
-
-		Object component;
-		ComponentMetaDataImplementation componentMetaData;
-
-		if (
-			isNotNull (
-				componentDefinition.factoryClass ())
-		) {
-
-			ComponentFactory componentFactory =
-				(ComponentFactory)
-				protoComponent;
-
-			component =
-				componentFactory.makeComponent (
-					taskLogger);
-
-			if (
-				isNull (
-					component)
-			) {
-
-				throw new RuntimeExceptionWithTask (
-					activityManager.currentTask (),
+			ActiveTask activeTask =
+				activityManager.start (
+					"application-context",
 					stringFormat (
-						"Factory component returned null for %s",
-						componentDefinition.name ()));
-
-			}
-
-			componentMetaData =
-				findOrCreateMetaDataForComponent (
-					componentDefinition,
-					component);
-
-		} else {
-
-			component =
-				protoComponent;
-
-			componentMetaData =
-				findOrCreateMetaDataForComponent (
-					componentDefinition,
-					component);
-
-		}
-
-		// initialize
-
-		if (
-
-			initialize
-
-			&& enumEqualSafe (
-				componentMetaData.state,
-				ComponentState.uninitialized)
+						"instantiateComponent (%s)",
+						componentDefinition.name ()),
+					this);
 
 		) {
 
-			initializeComponent (
+			taskLogger.debugFormat (
+				"Instantiating %s (%s)",
+				componentDefinition.name (),
+				componentDefinition.scope ());
+	
+			// instantiate
+	
+			Object protoComponent =
+				classInstantiate (
+					ifNull (
+						componentDefinition.factoryClass (),
+						componentDefinition.componentClass ()));
+	
+			// set properties
+	
+			setComponentValueProperties (
 				taskLogger,
 				componentDefinition,
-				component,
-				componentMetaData);
+				protoComponent);
+	
+			setComponentReferenceProperties (
+				taskLogger,
+				componentDefinition,
+				protoComponent);
+	
+			setComponentInjectedProperties (
+				taskLogger,
+				componentDefinition,
+				protoComponent);
+	
+			// call factory
+	
+			Object component;
+			ComponentMetaDataImplementation componentMetaData;
+	
+			if (
+				isNotNull (
+					componentDefinition.factoryClass ())
+			) {
+	
+				ComponentFactory componentFactory =
+					(ComponentFactory)
+					protoComponent;
+	
+				component =
+					componentFactory.makeComponent (
+						taskLogger);
+	
+				if (
+					isNull (
+						component)
+				) {
+	
+					throw new RuntimeExceptionWithTask (
+						activityManager.currentTask (),
+						stringFormat (
+							"Factory component returned null for %s",
+							componentDefinition.name ()));
+	
+				}
+	
+				componentMetaData =
+					findOrCreateMetaDataForComponent (
+						componentDefinition,
+						component);
+	
+			} else {
+	
+				component =
+					protoComponent;
+	
+				componentMetaData =
+					findOrCreateMetaDataForComponent (
+						componentDefinition,
+						component);
+	
+			}
+	
+			// initialize
+	
+			if (
+	
+				initialize
+	
+				&& enumEqualSafe (
+					componentMetaData.state,
+					ComponentState.uninitialized)
+	
+			) {
+	
+				initializeComponent (
+					taskLogger,
+					componentDefinition,
+					component,
+					componentMetaData);
+	
+			}
+	
+			// and finish
+	
+			taskLogger.debugFormat (
+				"Component %s instantiated successfully",
+				componentDefinition.name ());
+	
+			return component;
 
 		}
-
-		// and finish
-
-		taskLogger.debugFormat (
-			"Component %s instantiated successfully",
-			componentDefinition.name ());
-
-		return component;
 
 	}
 
@@ -758,30 +782,35 @@ class ComponentManagerImplementation
 				parentTaskLogger,
 				"setComponentReferenceProperties");
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		try (
 
-		for (
-			Map.Entry <String,String> entry
-				: componentDefinition.referenceProperties ().entrySet ()
+			HeldLock heldlock =
+				lock.read ();
+
 		) {
 
-			taskLogger.debugFormat (
-				"Setting reference property %s.%s",
-				componentDefinition.name (),
-				entry.getKey ());
-
-			Object target =
-				getComponentRequired (
-					taskLogger,
-					entry.getValue (),
-					Object.class);
-
-			PropertyUtils.propertySetSimple (
-				component,
-				entry.getKey (),
-				target);
+			for (
+				Map.Entry <String,String> entry
+					: componentDefinition.referenceProperties ().entrySet ()
+			) {
+	
+				taskLogger.debugFormat (
+					"Setting reference property %s.%s",
+					componentDefinition.name (),
+					entry.getKey ());
+	
+				Object target =
+					getComponentRequired (
+						taskLogger,
+						entry.getValue (),
+						Object.class);
+	
+				PropertyUtils.propertySetSimple (
+					component,
+					entry.getKey (),
+					target);
+	
+			}
 
 		}
 
@@ -793,20 +822,25 @@ class ComponentManagerImplementation
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component) {
 
-		@Cleanup
-		HeldLock heldlock =
-			lock.read ();
+		try (
 
-		for (
-			InjectedProperty injectedProperty
-				: componentDefinition.injectedProperties ()
+			HeldLock heldlock =
+				lock.read ();
+
 		) {
 
-			injectProperty (
-				taskLogger,
-				componentDefinition,
-				component,
-				injectedProperty);
+			for (
+				InjectedProperty injectedProperty
+					: componentDefinition.injectedProperties ()
+			) {
+	
+				injectProperty (
+					taskLogger,
+					componentDefinition,
+					component,
+					injectedProperty);
+	
+			}
 
 		}
 

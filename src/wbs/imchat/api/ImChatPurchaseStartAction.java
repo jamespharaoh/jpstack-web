@@ -3,6 +3,7 @@ package wbs.imchat.api;
 import static wbs.utils.etc.LogicUtils.booleanEqual;
 import static wbs.utils.etc.LogicUtils.referenceNotEqualWithClass;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.string.StringUtils.hyphenToUnderscore;
@@ -13,7 +14,6 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.json.simple.JSONObject;
@@ -189,234 +189,239 @@ class ImChatPurchaseStartAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatPurchaseStartAction.createPurchase ()",
-				this);
+		try (
 
-		ImChatRec imChat =
-			imChatHelper.findRequired (
-				parseIntegerRequired (
-					requestContext.requestStringRequired (
-						"imChatId")));
-
-		imChatDevelopmentMode =
-			imChat.getDevelopmentMode ();
-
-		// lookup session and customer
-
-		ImChatSessionRec session =
-			imChatSessionHelper.findBySecret (
-				purchaseRequest.sessionSecret ());
-
-		if (
-			session == null
-			|| ! session.getActive ()
-		) {
-
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
-
-				.reason (
-					"session-invalid")
-
-				.message (
-					"The session secret is invalid or the session is no " +
-					"longer active");
-
-			return Optional.of (
-				jsonResponderProvider.get ()
-
-				.value (
-					failureResponse)
-
-			);
-
-		}
-
-		// get customer
-
-		ImChatCustomerRec customer =
-			session.getImChatCustomer ();
-
-		customerId =
-			customer.getId ();
-
-		// lookup price point
-
-		Optional<ImChatPricePointRec> pricePointOptional =
-			imChatPricePointHelper.findByCode (
-				imChat,
-				hyphenToUnderscore (
-					purchaseRequest.pricePointCode ()));
-
-		if (
-
-			optionalIsNotPresent (
-				pricePointOptional)
-
-			|| referenceNotEqualWithClass (
-				ImChatRec.class,
-				pricePointOptional.get ().getImChat (),
-				imChat)
-
-			|| booleanEqual (
-				pricePointOptional.get ().getDeleted (),
-				true)
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatPurchaseStartAction.createPurchase ()",
+					this);
 
 		) {
 
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
+			ImChatRec imChat =
+				imChatHelper.findRequired (
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"imChatId")));
 
-				.reason (
-					"price-point-invalid")
+			imChatDevelopmentMode =
+				imChat.getDevelopmentMode ();
 
-				.message (
-					"The price point id is invalid");
+			// lookup session and customer
 
-			return Optional.of (
-				jsonResponderProvider.get ()
+			ImChatSessionRec session =
+				imChatSessionHelper.findBySecret (
+					purchaseRequest.sessionSecret ());
 
-				.value (
-					failureResponse)
+			if (
+				session == null
+				|| ! session.getActive ()
+			) {
 
-			);
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
 
-		}
+					.reason (
+						"session-invalid")
 
-		ImChatPricePointRec pricePoint =
-			pricePointOptional.get ();
+					.message (
+						"The session secret is invalid or the session is no " +
+						"longer active");
 
-		// get paypal account
+				return Optional.of (
+					jsonResponderProvider.get ()
 
-		PaypalAccountRec paypalAccount =
-			imChat.getPaypalAccount ();
+					.value (
+						failureResponse)
 
-		paypalExpressCheckoutProperties =
-			paypalLogic.expressCheckoutProperties (
-				paypalAccount);
+				);
 
-		// create paypal payment
+			}
 
-		PaypalPaymentRec paypalPayment;
+			// get customer
 
-		if (imChat.getDevelopmentMode ()) {
+			ImChatCustomerRec customer =
+				session.getImChatCustomer ();
 
-			paypalPayment = null;
+			customerId =
+				customer.getId ();
 
-		} else {
+			// lookup price point
 
-			paypalPayment =
-				paypalPaymentHelper.insert (
+			Optional<ImChatPricePointRec> pricePointOptional =
+				imChatPricePointHelper.findByCode (
+					imChat,
+					hyphenToUnderscore (
+						purchaseRequest.pricePointCode ()));
+
+			if (
+
+				optionalIsNotPresent (
+					pricePointOptional)
+
+				|| referenceNotEqualWithClass (
+					ImChatRec.class,
+					pricePointOptional.get ().getImChat (),
+					imChat)
+
+				|| booleanEqual (
+					pricePointOptional.get ().getDeleted (),
+					true)
+
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"price-point-invalid")
+
+					.message (
+						"The price point id is invalid");
+
+				return Optional.of (
+					jsonResponderProvider.get ()
+
+					.value (
+						failureResponse)
+
+				);
+
+			}
+
+			ImChatPricePointRec pricePoint =
+				pricePointOptional.get ();
+
+			// get paypal account
+
+			PaypalAccountRec paypalAccount =
+				imChat.getPaypalAccount ();
+
+			paypalExpressCheckoutProperties =
+				paypalLogic.expressCheckoutProperties (
+					paypalAccount);
+
+			// create paypal payment
+
+			PaypalPaymentRec paypalPayment;
+
+			if (imChat.getDevelopmentMode ()) {
+
+				paypalPayment = null;
+
+			} else {
+
+				paypalPayment =
+					paypalPaymentHelper.insert (
+						taskLogger,
+						paypalPaymentHelper.createInstance ()
+
+					.setPaypalAccount (
+						paypalAccount)
+
+					.setTimestamp (
+						transaction.now ())
+
+					.setValue (
+						customer.getDeveloperMode ()
+							? 1
+							: pricePoint.getPrice ())
+
+					.setState (
+						PaypalPaymentState.started)
+
+				);
+
+			}
+
+			// create purchase
+
+			ImChatPurchaseRec purchase =
+				imChatPurchaseHelper.insert (
 					taskLogger,
-					paypalPaymentHelper.createInstance ()
+					imChatPurchaseHelper.createInstance ()
 
-				.setPaypalAccount (
-					paypalAccount)
+				.setImChatCustomer (
+					customer)
 
-				.setTimestamp (
-					transaction.now ())
+				.setIndex (
+					customer.getNumPurchases ())
 
-				.setValue (
+				.setToken (
+					randomLogic.generateLowercase (
+						20))
+
+				.setImChatSession (
+					session)
+
+				.setImChatPricePoint (
+					pricePoint)
+
+				.setState (
+					ImChatPurchaseState.creating)
+
+				.setPrice (
 					customer.getDeveloperMode ()
 						? 1
 						: pricePoint.getPrice ())
 
-				.setState (
-					PaypalPaymentState.started)
+				.setValue (
+					pricePoint.getValue ())
+
+				.setCreatedTime (
+					transaction.now ())
+
+				.setCompletedTime (
+					imChat.getDevelopmentMode ()
+						? transaction.now ()
+						: null)
+
+				.setPaypalPayment (
+					paypalPayment)
 
 			);
 
+			purchaseId =
+				purchase.getId ();
+
+			purchasePriceString =
+				currencyLogic.formatSimple (
+					imChat.getBillingCurrency (),
+					purchase.getPrice ());
+
+			purchaseSuccessUrl =
+				purchaseRequest.successUrl ().replace (
+					"{token}",
+					purchase.getToken ());
+
+			purchaseFailureUrl =
+				purchaseRequest.failureUrl ().replace (
+					"{token}",
+					purchase.getToken ());
+
+			purchaseCheckoutUrl =
+				paypalAccount.getCheckoutUrl ();
+
+			// update customer
+
+			customer
+
+				.setNumPurchases (
+					customer.getNumPurchases () + 1)
+
+				.setBalance (
+					imChat.getDevelopmentMode ()
+						? customer.getBalance ()
+							+ pricePoint.getValue ()
+						: customer.getBalance ());
+
+			// commit and return
+
+			transaction.commit ();
+
+			return optionalAbsent ();
+
 		}
-
-		// create purchase
-
-		ImChatPurchaseRec purchase =
-			imChatPurchaseHelper.insert (
-				taskLogger,
-				imChatPurchaseHelper.createInstance ()
-
-			.setImChatCustomer (
-				customer)
-
-			.setIndex (
-				customer.getNumPurchases ())
-
-			.setToken (
-				randomLogic.generateLowercase (
-					20))
-
-			.setImChatSession (
-				session)
-
-			.setImChatPricePoint (
-				pricePoint)
-
-			.setState (
-				ImChatPurchaseState.creating)
-
-			.setPrice (
-				customer.getDeveloperMode ()
-					? 1
-					: pricePoint.getPrice ())
-
-			.setValue (
-				pricePoint.getValue ())
-
-			.setCreatedTime (
-				transaction.now ())
-
-			.setCompletedTime (
-				imChat.getDevelopmentMode ()
-					? transaction.now ()
-					: null)
-
-			.setPaypalPayment (
-				paypalPayment)
-
-		);
-
-		purchaseId =
-			purchase.getId ();
-
-		purchasePriceString =
-			currencyLogic.formatSimple (
-				imChat.getBillingCurrency (),
-				purchase.getPrice ());
-
-		purchaseSuccessUrl =
-			purchaseRequest.successUrl ().replace (
-				"{token}",
-				purchase.getToken ());
-
-		purchaseFailureUrl =
-			purchaseRequest.failureUrl ().replace (
-				"{token}",
-				purchase.getToken ());
-
-		purchaseCheckoutUrl =
-			paypalAccount.getCheckoutUrl ();
-
-		// update customer
-
-		customer
-
-			.setNumPurchases (
-				customer.getNumPurchases () + 1)
-
-			.setBalance (
-				imChat.getDevelopmentMode ()
-					? customer.getBalance ()
-						+ pricePoint.getValue ()
-					: customer.getBalance ());
-
-		// commit and return
-
-		transaction.commit ();
-
-		return Optional.absent ();
 
 	}
 
@@ -459,38 +464,43 @@ class ImChatPurchaseStartAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatPurchaseStartAction.updatePurchase",
-				this);
+		try (
 
-		// update purchase
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatPurchaseStartAction.updatePurchase",
+					this);
 
-		ImChatPurchaseRec purchase =
-			imChatPurchaseHelper.findRequired (
-				purchaseId);
+		) {
 
-		purchase
+			// update purchase
 
-			.setState (
-				redirectUrl.isPresent ()
-					? ImChatPurchaseState.created
-					: ImChatPurchaseState.createFailed);
+			ImChatPurchaseRec purchase =
+				imChatPurchaseHelper.findRequired (
+					purchaseId);
 
-		// process customer
+			purchase
 
-		ImChatCustomerRec customer =
-			imChatCustomerHelper.findRequired (
-				customerId);
+				.setState (
+					redirectUrl.isPresent ()
+						? ImChatPurchaseState.created
+						: ImChatPurchaseState.createFailed);
 
-		customerData =
-			imChatApiLogic.customerData (
-				customer);
+			// process customer
 
-		// commit transaction
+			ImChatCustomerRec customer =
+				imChatCustomerHelper.findRequired (
+					customerId);
 
-		transaction.commit ();
+			customerData =
+				imChatApiLogic.customerData (
+					customer);
+
+			// commit transaction
+
+			transaction.commit ();
+
+		}
 
 	}
 

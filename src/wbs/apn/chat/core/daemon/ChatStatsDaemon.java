@@ -181,45 +181,50 @@ class ChatStatsDaemon
 				parentTaskLogger,
 				"doStats");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ChatStatsDaemon.doStats (timestamp, chatId)",
-				this);
+		try (
 
-		ChatRec chat =
-			chatHelper.findRequired (
-				chatId);
+			Transaction transaction =
+				database.beginReadWrite (
+					"ChatStatsDaemon.doStats (timestamp, chatId)",
+					this);
 
-		long numUsers =
-			chatUserHelper.countOnline (
-				chat,
-				ChatUserType.user);
+		) {
 
-		long numMonitors =
-			chatUserHelper.countOnline (
-				chat,
-				ChatUserType.monitor);
+			ChatRec chat =
+				chatHelper.findRequired (
+					chatId);
 
-		// insert stats
+			long numUsers =
+				chatUserHelper.countOnline (
+					chat,
+					ChatUserType.user);
 
-		chatStatsHelper.insert (
-			taskLogger,
-			chatStatsHelper.createInstance ()
+			long numMonitors =
+				chatUserHelper.countOnline (
+					chat,
+					ChatUserType.monitor);
 
-			.setChat (
-				chat)
+			// insert stats
 
-			.setTimestamp (
-				timestamp)
+			chatStatsHelper.insert (
+				taskLogger,
+				chatStatsHelper.createInstance ()
 
-			.setNumUsers (
-				numUsers)
+				.setChat (
+					chat)
 
-			.setNumMonitors (
-				numMonitors));
+				.setTimestamp (
+					timestamp)
 
-		transaction.commit ();
+				.setNumUsers (
+					numUsers)
+
+				.setNumMonitors (
+					numMonitors));
+
+			transaction.commit ();
+
+		}
 
 	}
 

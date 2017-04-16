@@ -15,7 +15,6 @@ import java.util.List;
 import javax.inject.Provider;
 import javax.sql.DataSource;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -126,25 +125,30 @@ class SchemaTool {
 
 		// write sql
 
-		@Cleanup
-		AtomicFileWriter fileWriter =
-			new AtomicFileWriter (
-				"work/schema.sql");
+		try (
 
-		for (
-			String sqlStatement
-				: sqlStatements
+			AtomicFileWriter fileWriter =
+				new AtomicFileWriter (
+					"work/schema.sql");
+
 		) {
 
-			fileWriter.writeString (
-				sqlStatement);
+			for (
+				String sqlStatement
+					: sqlStatements
+			) {
 
-			fileWriter.writeString (
-				";\n");
+				fileWriter.writeString (
+					sqlStatement);
+
+				fileWriter.writeString (
+					";\n");
+
+			}
+
+			fileWriter.close ();
 
 		}
-
-		fileWriter.close ();
 
 	}
 
@@ -156,60 +160,64 @@ class SchemaTool {
 				parentTaskLogger,
 				"executeSchemaSqlScript");
 
-		try {
+		// execute sql
 
-			// execute sql
+		try (
 
-			@Cleanup
 			Connection connection =
 				dataSource.getConnection ();
+
+		) {
 
 			connection.setAutoCommit (
 				false);
 
-			@Cleanup
-			Statement statement =
-				connection.createStatement ();
-
-			taskLogger.noticeFormat (
-				"Running schema create script");
-
 			int errors = 0;
 
-			for (
-				String sqlStatement
-					: sqlStatements
+			try (
+
+				Statement statement =
+					connection.createStatement ();
+
 			) {
 
-				try {
+				taskLogger.noticeFormat (
+					"Running schema create script");
 
-					statement.execute (
-						sqlStatement);
+				for (
+					String sqlStatement
+						: sqlStatements
+				) {
 
-				} catch (Exception exception) {
+					try {
 
-					if (errors == 0) {
-
-						taskLogger.errorFormatException (
-							exception,
-							"Error: %s",
+						statement.execute (
 							sqlStatement);
 
-					} else if (errors < 100) {
+					} catch (Exception exception) {
 
-						taskLogger.errorFormat (
-							"Error: %s",
-							sqlStatement);
+						if (errors == 0) {
+
+							taskLogger.errorFormatException (
+								exception,
+								"Error: %s",
+								sqlStatement);
+
+						} else if (errors < 100) {
+
+							taskLogger.errorFormat (
+								"Error: %s",
+								sqlStatement);
+
+						}
+
+						errors ++;
 
 					}
-
-					errors ++;
 
 				}
 
 			}
-
-			statement.close ();
 
 			if (errors > 100) {
 
@@ -235,8 +243,6 @@ class SchemaTool {
 			taskLogger.noticeFormat (
 				"Schema created successfully");
 
-			connection.close ();
-
 		} catch (SQLException sqlException) {
 
 			throw new RuntimeException (
@@ -254,82 +260,85 @@ class SchemaTool {
 				parentTaskLogger,
 				"createObjectTypes");
 
-		try {
+		try (
 
-			@Cleanup
 			Connection connection =
 				dataSource.getConnection ();
+
+		) {
 
 			connection.setAutoCommit (
 				false);
 
-			@Cleanup
-			PreparedStatement nextObjectTypeIdStatement =
-				connection.prepareStatement (
-					stringFormat (
-						"SELECT ",
-							"nextval ('object_type_id_seq')"));
+			try (
 
-			@Cleanup
-			PreparedStatement insertObjectTypeStatement =
-				connection.prepareStatement (
-					stringFormat (
-						"INSERT INTO object_type (",
-							"id, ",
-							"code) ",
-						"VALUES (",
-							"?, ",
-							"?)"));
+				PreparedStatement nextObjectTypeIdStatement =
+					connection.prepareStatement (
+						stringFormat (
+							"SELECT ",
+								"nextval ('object_type_id_seq')"));
 
-			taskLogger.noticeFormat (
-				"Creating object types");
+				PreparedStatement insertObjectTypeStatement =
+					connection.prepareStatement (
+						stringFormat (
+							"INSERT INTO object_type (",
+								"id, ",
+								"code) ",
+							"VALUES (",
+								"?, ",
+								"?)"));
 
-			for (
-				Model <?> model
-					: entityHelper.models ()
 			) {
 
-				int objectTypeId;
+				taskLogger.noticeFormat (
+					"Creating object types");
 
-				if (
-					stringEqualSafe (
-						model.objectTypeCode (),
-						"root")
+				for (
+					Model <?> model
+						: entityHelper.models ()
 				) {
 
-					objectTypeId = 0;
+					int objectTypeId;
 
-				} else {
+					if (
+						stringEqualSafe (
+							model.objectTypeCode (),
+							"root")
+					) {
 
-					ResultSet objectTypeIdResultSet =
-						nextObjectTypeIdStatement.executeQuery ();
+						objectTypeId = 0;
 
-					objectTypeIdResultSet.next ();
+					} else {
 
-					objectTypeId =
-						objectTypeIdResultSet.getInt (
-							1);
+						ResultSet objectTypeIdResultSet =
+							nextObjectTypeIdStatement.executeQuery ();
+
+						objectTypeIdResultSet.next ();
+
+						objectTypeId =
+							objectTypeIdResultSet.getInt (
+								1);
+
+					}
+
+					insertObjectTypeStatement.setInt (
+						1,
+						objectTypeId);
+
+					insertObjectTypeStatement.setString (
+						2,
+						model.objectTypeCode ());
+
+					insertObjectTypeStatement.executeUpdate ();
 
 				}
 
-				insertObjectTypeStatement.setInt (
-					1,
-					objectTypeId);
+				connection.commit ();
 
-				insertObjectTypeStatement.setString (
-					2,
-					model.objectTypeCode ());
-
-				insertObjectTypeStatement.executeUpdate ();
+				taskLogger.noticeFormat (
+					"Object types created successfully");
 
 			}
-
-			connection.commit ();
-
-			taskLogger.noticeFormat (
-				"Object types created successfully");
-
-			connection.close ();
 
 		} catch (SQLException sqlException) {
 

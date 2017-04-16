@@ -7,7 +7,6 @@ import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 
 import javax.inject.Provider;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.json.simple.JSONObject;
@@ -97,92 +96,97 @@ class ImChatConditionsAcceptAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"ImChatConditionsAcceptAction.handle ()",
-				this);
+		try (
 
-		ImChatRec imChat =
-			imChatHelper.findRequired (
-				parseIntegerRequired (
-					requestContext.requestStringRequired (
-						"imChatId")));
-
-		// lookup session
-
-		ImChatSessionRec session =
-			imChatSessionHelper.findBySecret (
-				conditionsAcceptRequest.sessionSecret ());
-
-		ImChatCustomerRec customer =
-			session.getImChatCustomer ();
-
-		if (
-
-			isNull (
-				session)
-
-			|| not (
-				session.getActive ())
-
-			|| referenceNotEqualWithClass (
-				ImChatRec.class,
-				customer.getImChat (),
-				imChat)
+			Transaction transaction =
+				database.beginReadWrite (
+					"ImChatConditionsAcceptAction.handle ()",
+					this);
 
 		) {
 
-			ImChatFailure failureResponse =
-				new ImChatFailure ()
+			ImChatRec imChat =
+				imChatHelper.findRequired (
+					parseIntegerRequired (
+						requestContext.requestStringRequired (
+							"imChatId")));
 
-				.reason (
-					"session-invalid")
+			// lookup session
 
-				.message (
-					"The session secret is invalid or the session is no " +
-					"longer active");
+			ImChatSessionRec session =
+				imChatSessionHelper.findBySecret (
+					conditionsAcceptRequest.sessionSecret ());
+
+			ImChatCustomerRec customer =
+				session.getImChatCustomer ();
+
+			if (
+
+				isNull (
+					session)
+
+				|| not (
+					session.getActive ())
+
+				|| referenceNotEqualWithClass (
+					ImChatRec.class,
+					customer.getImChat (),
+					imChat)
+
+			) {
+
+				ImChatFailure failureResponse =
+					new ImChatFailure ()
+
+					.reason (
+						"session-invalid")
+
+					.message (
+						"The session secret is invalid or the session is no " +
+						"longer active");
+
+				return jsonResponderProvider.get ()
+
+					.value (
+						failureResponse);
+
+			}
+
+			if (! customer.getAcceptedTermsAndConditions ()) {
+
+				// accept terms and conditions
+
+				customer
+
+					.setAcceptedTermsAndConditions (
+						true);
+
+				eventLogic.createEvent (
+					taskLogger,
+					"im_chat_customer_conditions_accepted",
+					customer);
+
+			}
+
+			// create response
+
+			ImChatConditionsAcceptSuccess successResponse =
+				new ImChatConditionsAcceptSuccess ()
+
+				.customer (
+					imChatApiLogic.customerData (
+						customer));
+
+			// commit and return
+
+			transaction.commit ();
 
 			return jsonResponderProvider.get ()
 
 				.value (
-					failureResponse);
+					successResponse);
 
 		}
-
-		if (! customer.getAcceptedTermsAndConditions ()) {
-
-			// accept terms and conditions
-
-			customer
-
-				.setAcceptedTermsAndConditions (
-					true);
-
-			eventLogic.createEvent (
-				taskLogger,
-				"im_chat_customer_conditions_accepted",
-				customer);
-
-		}
-
-		// create response
-
-		ImChatConditionsAcceptSuccess successResponse =
-			new ImChatConditionsAcceptSuccess ()
-
-			.customer (
-				imChatApiLogic.customerData (
-					customer));
-
-		// commit and return
-
-		transaction.commit ();
-
-		return jsonResponderProvider.get ()
-
-			.value (
-				successResponse);
 
 	}
 

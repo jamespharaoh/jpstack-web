@@ -5,7 +5,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.sql.SQLException;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j;
 
@@ -109,33 +108,38 @@ class EventTypeBuilder {
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"EventTypeBuilder.createEventType ()",
-				this);
+		try (
 
-		// create event type
+			Transaction transaction =
+				database.beginReadWrite (
+					"EventTypeBuilder.createEventType ()",
+					this);
 
-		eventTypeHelper.insert (
-			taskLogger,
-			eventTypeHelper.createInstance ()
+		) {
 
-			.setCode (
-				simplifyToCodeRequired (
-					spec.name ()))
+			// create event type
 
-			.setDescription (
-				spec.text ())
+			eventTypeHelper.insert (
+				taskLogger,
+				eventTypeHelper.createInstance ()
 
-			.setAdmin (
-				spec.admin ())
+				.setCode (
+					simplifyToCodeRequired (
+						spec.name ()))
 
-		);
+				.setDescription (
+					spec.text ())
 
-		// commit transaction
+				.setAdmin (
+					spec.admin ())
 
-		transaction.commit ();
+			);
+
+			// commit transaction
+
+			transaction.commit ();
+
+		}
 
 	}
 

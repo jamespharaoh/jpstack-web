@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -56,33 +55,38 @@ class PrivHooks
 	public
 	void init () {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"privHooks.init ()",
-				this);
+		try (
 
-		// preload object types
+			Transaction transaction =
+				database.beginReadOnly (
+					"privHooks.init ()",
+					this);
 
-		objectTypeDao.findAll ();
+		) {
 
-		// load priv types and construct index
+			// preload object types
 
-		privTypeIdsByParentTypeId =
-			privTypeDao.findAll ().stream ()
+			objectTypeDao.findAll ();
 
-			.collect (
-				Collectors.groupingBy (
+			// load priv types and construct index
 
-				privType ->
-					privType.getParentObjectType ().getId (),
+			privTypeIdsByParentTypeId =
+				privTypeDao.findAll ().stream ()
 
-				Collectors.mapping (
+				.collect (
+					Collectors.groupingBy (
+
 					privType ->
-						privType.getId (),
-					Collectors.toList ()))
+						privType.getParentObjectType ().getId (),
 
-			);
+					Collectors.mapping (
+						privType ->
+							privType.getId (),
+						Collectors.toList ()))
+
+				);
+
+		}
 
 	}
 

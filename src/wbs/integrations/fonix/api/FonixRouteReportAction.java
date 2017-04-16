@@ -14,7 +14,6 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.api.mvc.ApiLoggingAction;
@@ -147,90 +146,95 @@ class FonixRouteReportAction
 
 		// begin transaction
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				stringFormat (
-					"%s.%s ()",
-					getClass ().getSimpleName (),
-					"updateDatabase"),
-				this);
+		try (
 
-		// lookup route
-
-		Optional <RouteRec> smsRouteOptional =
-			smsRouteHelper.find (
-				Long.parseLong (
-					requestContext.requestStringRequired (
-						"smsRouteId")));
-
-		if (
-
-			optionalIsNotPresent (
-				smsRouteOptional)
-
-			|| booleanEqual (
-				smsRouteOptional.get ().getDeleted (),
-				true)
-
-			|| booleanEqual (
-				smsRouteOptional.get ().getCanSend (),
-				false)
-
-			|| booleanEqual (
-				smsRouteOptional.get ().getDeliveryReports (),
-				false)
+			Transaction transaction =
+				database.beginReadWrite (
+					stringFormat (
+						"%s.%s ()",
+						getClass ().getSimpleName (),
+						"updateDatabase"),
+					this);
 
 		) {
 
-			throw new HttpNotFoundException (
-				optionalAbsent (),
-				emptyList ());
+			// lookup route
+
+			Optional <RouteRec> smsRouteOptional =
+				smsRouteHelper.find (
+					Long.parseLong (
+						requestContext.requestStringRequired (
+							"smsRouteId")));
+
+			if (
+
+				optionalIsNotPresent (
+					smsRouteOptional)
+
+				|| booleanEqual (
+					smsRouteOptional.get ().getDeleted (),
+					true)
+
+				|| booleanEqual (
+					smsRouteOptional.get ().getCanSend (),
+					false)
+
+				|| booleanEqual (
+					smsRouteOptional.get ().getDeliveryReports (),
+					false)
+
+			) {
+
+				throw new HttpNotFoundException (
+					optionalAbsent (),
+					emptyList ());
+
+			}
+
+			RouteRec smsRoute =
+				optionalGetRequired (
+					smsRouteOptional);
+
+			// lookup fonix route in
+
+			Optional <FonixRouteOutRec> fonixRouteOutOptional =
+				fonixRouteOutHelper.find (
+					smsRoute.getId ());
+
+			if (
+
+				optionalIsNotPresent (
+					fonixRouteOutOptional)
+
+				|| booleanEqual (
+					fonixRouteOutOptional.get ().getDeleted (),
+					true)
+
+			) {
+
+				throw new HttpNotFoundException (
+					optionalAbsent (),
+					emptyList ());
+
+			}
+
+			FonixRouteOutRec fonixRouteOut =
+				optionalGetRequired (
+					fonixRouteOutOptional);
+
+			// process delivery report
+
+			handleDeliveryReport (
+				taskLogger,
+				fonixRouteOut);
+
+			// commit and return
+
+			transaction.commit ();
+
+			success = true;
 
 		}
-
-		RouteRec smsRoute =
-			optionalGetRequired (
-				smsRouteOptional);
-
-		// lookup fonix route in
-
-		Optional <FonixRouteOutRec> fonixRouteOutOptional =
-			fonixRouteOutHelper.find (
-				smsRoute.getId ());
-
-		if (
-
-			optionalIsNotPresent (
-				fonixRouteOutOptional)
-
-			|| booleanEqual (
-				fonixRouteOutOptional.get ().getDeleted (),
-				true)
-
-		) {
-
-			throw new HttpNotFoundException (
-				optionalAbsent (),
-				emptyList ());
-
-		}
-
-		FonixRouteOutRec fonixRouteOut =
-			optionalGetRequired (
-				fonixRouteOutOptional);
-
-		// process delivery report
-
-		handleDeliveryReport (
-			taskLogger,
-			fonixRouteOut);
-
-		// commit and return
-
-		transaction.commit ();
-
-		success = true;
 
 	}
 
@@ -351,40 +355,45 @@ class FonixRouteReportAction
 				parentTaskLogger,
 				"storeLog");
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				stringFormat (
-					"%s.%s ()",
-					getClass ().getSimpleName (),
-					"storeLog"),
-				this);
+		try (
 
-		fonixInboundLogHelper.insert (
-			taskLogger,
-			fonixInboundLogHelper.createInstance ()
+			Transaction transaction =
+				database.beginReadWrite (
+					stringFormat (
+						"%s.%s ()",
+						getClass ().getSimpleName (),
+						"storeLog"),
+					this);
 
-			.setRoute (
-				smsRouteHelper.findRequired (
-					Long.parseLong (
-						requestContext.requestStringRequired (
-							"smsRouteId"))))
+		) {
 
-			.setType (
-				FonixInboundLogType.smsDelivery)
+			fonixInboundLogHelper.insert (
+				taskLogger,
+				fonixInboundLogHelper.createInstance ()
 
-			.setTimestamp (
-				transaction.now ())
+				.setRoute (
+					smsRouteHelper.findRequired (
+						Long.parseLong (
+							requestContext.requestStringRequired (
+								"smsRouteId"))))
 
-			.setDetails (
-				debugLog)
+				.setType (
+					FonixInboundLogType.smsDelivery)
 
-			.setSuccess (
-				success)
+				.setTimestamp (
+					transaction.now ())
 
-		);
+				.setDetails (
+					debugLog)
 
-		transaction.commit ();
+				.setSuccess (
+					success)
+
+			);
+
+			transaction.commit ();
+
+		}
 
 	}
 
