@@ -8,7 +8,6 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 
 import java.util.List;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.joda.time.Instant;
@@ -103,39 +102,44 @@ class TicketStateTimeDaemon
 
 		// get all the unqueued tickets
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"TicketStateTimeDaemon.runOnce ()",
-				this);
+		try (
 
-		List<TicketRec> tickets =
-			ticketHelper.findUnqueuedTickets ();
+			Transaction transaction =
+				database.beginReadOnly (
+					"TicketStateTimeDaemon.runOnce ()",
+					this);
 
-		transaction.close ();
-
-		// then call doTicketTimeCheck for each one
-
-		for (
-			TicketRec ticket
-				: tickets
 		) {
 
-			try {
+			List<TicketRec> tickets =
+				ticketHelper.findUnqueuedTickets ();
 
-				doTicketTimeCheck (
-					taskLogger,
-					ticket.getId ());
+			transaction.close ();
 
-			} catch (Exception exception) {
+			// then call doTicketTimeCheck for each one
 
-				exceptionLogger.logThrowable (
-					taskLogger,
-					"daemon",
-					"TicketStateTimeDaemon",
-					exception,
-					optionalAbsent (),
-					GenericExceptionResolution.tryAgainLater);
+			for (
+				TicketRec ticket
+					: tickets
+			) {
+
+				try {
+
+					doTicketTimeCheck (
+						taskLogger,
+						ticket.getId ());
+
+				} catch (Exception exception) {
+
+					exceptionLogger.logThrowable (
+						taskLogger,
+						"daemon",
+						"TicketStateTimeDaemon",
+						exception,
+						optionalAbsent (),
+						GenericExceptionResolution.tryAgainLater);
+
+				}
 
 			}
 
@@ -158,69 +162,74 @@ class TicketStateTimeDaemon
 			integerToDecimalString (
 				ticketId));
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadWrite (
-				"TicketStateTimeDaemon.doTicketTImeCheck (ticketId)",
-				this);
+		try (
 
-		// find the ticket
-
-		TicketRec ticket =
-			ticketHelper.findRequired (
-				ticketId);
-
-		// check if the ticket is already in a queue
-
-		if (
-			isNotNull (
-				ticket.getQueueItem ())
-		) {
-			return;
-		}
-
-		// check if the ticket is ready to be queued
-
-		Integer timeComparison =
-			Instant.now ().compareTo (
-				ticket.getTimestamp ());
-
-		if (
-
-			notLessThanZero (
-				timeComparison)
-
-			&& booleanEqual (
-				ticket.getTicketState ().getShowInQueue (),
-				true)
+			Transaction transaction =
+				database.beginReadWrite (
+					"TicketStateTimeDaemon.doTicketTImeCheck (ticketId)",
+					this);
 
 		) {
 
-			// create queue item
+			// find the ticket
 
-			QueueItemRec queueItem =
-				queueLogic.createQueueItem (
-					taskLogger,
-					ticket.getTicketState (),
-					"default",
-					ticket,
-					ticket,
-					ticket.getCode (),
-					ticket.getTicketState().toString());
+			TicketRec ticket =
+				ticketHelper.findRequired (
+					ticketId);
 
-			// add queue item to ticket
+			// check if the ticket is already in a queue
 
-			ticket
+			if (
+				isNotNull (
+					ticket.getQueueItem ())
+			) {
+				return;
+			}
 
-				.setQueueItem (
-					queueItem);
+			// check if the ticket is ready to be queued
 
-			ticket.setQueued (
-				true);
+			Integer timeComparison =
+				Instant.now ().compareTo (
+					ticket.getTimestamp ());
+
+			if (
+
+				notLessThanZero (
+					timeComparison)
+
+				&& booleanEqual (
+					ticket.getTicketState ().getShowInQueue (),
+					true)
+
+			) {
+
+				// create queue item
+
+				QueueItemRec queueItem =
+					queueLogic.createQueueItem (
+						taskLogger,
+						ticket.getTicketState (),
+						"default",
+						ticket,
+						ticket,
+						ticket.getCode (),
+						ticket.getTicketState().toString());
+
+				// add queue item to ticket
+
+				ticket
+
+					.setQueueItem (
+						queueItem);
+
+				ticket.setQueued (
+					true);
+
+			}
+
+			transaction.commit ();
 
 		}
-
-		transaction.commit ();
 
 	}
 
