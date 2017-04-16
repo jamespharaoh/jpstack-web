@@ -2,13 +2,13 @@ package wbs.web.responder;
 
 import java.io.IOException;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.context.RequestContext;
 
 public
@@ -55,25 +55,30 @@ class AbstractResponder
 			@NonNull TaskLogger parentTaskLogger)
 		throws IOException {
 
-		@Cleanup
-		Transaction transaction =
-			database.beginReadOnly (
-				"AbstractResponder.execute ()",
-				this);
+		try (
 
-		setup ();
+			Transaction transaction =
+				database.beginReadOnly (
+					"AbstractResponder.execute ()",
+					this);
 
-		try {
+		) {
 
-			prepare ();
+			setup ();
 
-			goHeaders ();
+			try {
 
-			goContent ();
+				prepare ();
 
-		} finally {
+				goHeaders ();
 
-			tearDown ();
+				goContent ();
+
+			} finally {
+
+				tearDown ();
+
+			}
 
 		}
 

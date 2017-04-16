@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.framework.activitymanager.ActiveTask;
@@ -82,39 +81,44 @@ class WbsServlet
 							"wbs-debug"),
 						"no")));
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"doGet");
+		try (
 
-		try {
+			ActiveTask activeTask =
+				startTask (
+					"doGet");
 
-			WebFile file =
-				processPath (
-					taskLogger);
+		) {
 
-			if (file != null) {
+			try {
 
-				file.doGet (
-					taskLogger);
+				WebFile file =
+					processPath (
+						taskLogger);
 
-			} else {
+				if (file != null) {
 
-				handleNotFound (
-					taskLogger);
+					file.doGet (
+						taskLogger);
+
+				} else {
+
+					handleNotFound (
+						taskLogger);
+
+				}
+
+				activeTask.success ();
+
+			} catch (Throwable throwable) {
+
+				activeTask.fail (
+					throwable);
+
+				handleException (
+					taskLogger,
+					throwable);
 
 			}
-
-			activeTask.success ();
-
-		} catch (Throwable throwable) {
-
-			activeTask.fail (
-				throwable);
-
-			handleException (
-				taskLogger,
-				throwable);
 
 		}
 
@@ -126,11 +130,6 @@ class WbsServlet
 			ServletException,
 			IOException {
 
-		@Cleanup
-		ActiveTask activeTask =
-			startTask (
-				"doPost");
-
 		TaskLogger taskLogger =
 			logContext.createTaskLogger (
 				"doPost",
@@ -140,7 +139,13 @@ class WbsServlet
 							"wbs-debug"),
 						"no")));
 
-		try {
+		try (
+
+			ActiveTask activeTask =
+				startTask (
+					"doPost");
+
+		) {
 
 			WebFile file =
 				processPath (
