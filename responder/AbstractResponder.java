@@ -4,9 +4,11 @@ import java.io.IOException;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.web.context.RequestContext;
@@ -19,6 +21,9 @@ class AbstractResponder
 
 	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	RequestContext requestContext;
@@ -55,10 +60,16 @@ class AbstractResponder
 			@NonNull TaskLogger parentTaskLogger)
 		throws IOException {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"execute");
+
 		try (
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"AbstractResponder.execute ()",
 					this);
 

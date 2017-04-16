@@ -18,18 +18,21 @@ interface RequestContextDebugMethods
 
 	default
 	void debugDump (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		debugDump (
-			taskLogger,
+			parentTaskLogger,
 			true);
 
 	}
 
 	default
 	void debugDump (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			boolean doFiles) {
+
+		TaskLogger taskLogger =
+			parentTaskLogger;
 
 		if (! taskLogger.debugEnabled ()) {
 			return;

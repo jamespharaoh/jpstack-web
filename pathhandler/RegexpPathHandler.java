@@ -73,7 +73,7 @@ class RegexpPathHandler
 	@Override
 	public
 	WebFile processPath (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String path)
 		throws ServletException {
 
