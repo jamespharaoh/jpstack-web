@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
@@ -281,12 +280,13 @@ class Misc {
 
 		boolean success = false;
 
-		try {
+		try (
 
-			@Cleanup
 			OutputStream outputStream =
 				new FileOutputStream (
 					tempFile.file ());
+
+		) {
 
 			success = true;
 
@@ -327,24 +327,27 @@ class Misc {
 
 			// debug log any error output
 
-			@Cleanup
-			BufferedReader bufferedReader =
-				new BufferedReader (
-					new InputStreamReader (
-						process.getErrorStream (),
-						"utf-8"));
+			try (
 
-			String line;
+				BufferedReader bufferedReader =
+					new BufferedReader (
+						new InputStreamReader (
+							process.getErrorStream (),
+							"utf-8"));
 
-			while ((line = bufferedReader.readLine ()) != null) {
+			) {
 
-				taskLogger.debugFormat (
-					"%s",
-					line);
+				String line;
+
+				while ((line = bufferedReader.readLine ()) != null) {
+
+					taskLogger.debugFormat (
+						"%s",
+						line);
+
+				}
 
 			}
-
-			bufferedReader.close ();
 
 			try {
 
@@ -398,71 +401,75 @@ class Misc {
 
 		// create the input and output files
 
-		@Cleanup
-		TempFile inFile =
-			createTempFileWithData (
-				inExtension,
-				data);
+		try (
 
-		@Cleanup
-		TempFile outFile =
-			createTempFile (
-				outExtension);
+			TempFile inFile =
+				createTempFileWithData (
+					inExtension,
+					data);
 
-		// stick the filenames into the command
+			TempFile outFile =
+				createTempFile (
+					outExtension);
 
-		for (
-			List <String> command
-				: commands
 		) {
 
-			List <String> newCommand =
-				command.stream ()
+			// stick the filenames into the command
 
-				.map (
-					commandItem ->
-						ifThenElse (
-							stringEqualSafe (
-								commandItem,
-								"<in>"),
-							() -> inFile.path (),
-							() -> commandItem))
+			for (
+				List <String> command
+					: commands
+			) {
 
-				.map (
-					commandItem ->
-						ifThenElse (
-							stringEqualSafe (
-								commandItem,
-								"<out>"),
-							() -> outFile.path (),
-							() -> commandItem))
+				List <String> newCommand =
+					command.stream ()
 
-				.collect (
-					Collectors.toList ());
+					.map (
+						commandItem ->
+							ifThenElse (
+								stringEqualSafe (
+									commandItem,
+									"<in>"),
+								() -> inFile.path (),
+								() -> commandItem))
 
-			// run the command
+					.map (
+						commandItem ->
+							ifThenElse (
+								stringEqualSafe (
+									commandItem,
+									"<out>"),
+								() -> outFile.path (),
+								() -> commandItem))
 
-			int status =
-				runCommand (
-					taskLogger,
-					newCommand);
+					.collect (
+						Collectors.toList ());
 
-			if (status != 0)
-				throw new RuntimeException ("Command returned " + status);
+				// run the command
 
-		}
+				int status =
+					runCommand (
+						taskLogger,
+						newCommand);
 
-		// read the output file
+				if (status != 0)
+					throw new RuntimeException ("Command returned " + status);
 
-		try {
+			}
 
-			return FileUtils.readFileToByteArray (
-				outFile.file ());
+			// read the output file
 
-		} catch (IOException ioException) {
+			try {
 
-			throw new RuntimeIoException (
-				ioException);
+				return FileUtils.readFileToByteArray (
+					outFile.file ());
+
+			} catch (IOException ioException) {
+
+				throw new RuntimeIoException (
+					ioException);
+
+			}
 
 		}
 
