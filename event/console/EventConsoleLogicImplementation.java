@@ -163,8 +163,14 @@ class EventConsoleLogicImplementation
 	@Override
 	public
 	void writeEventHtml (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull EventRec event) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeEventHtml");
 
 		EventTypeRec eventType =
 			event.getEventType ();
@@ -254,6 +260,7 @@ class EventConsoleLogicImplementation
 					new StringFormatWriter ();
 
 				writeObjectAsHtml (
+					taskLogger,
 					objectFormatWriter,
 					object);
 
@@ -287,8 +294,14 @@ class EventConsoleLogicImplementation
 	@Override
 	public
 	void writeObjectAsHtml (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Object object) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeObjectAsHtml");
 
 		if (object instanceof Integer) {
 
@@ -313,8 +326,10 @@ class EventConsoleLogicImplementation
 
 			htmlLinkWriteHtml (
 				objectManager.localLink (
+					taskLogger,
 					media),
 				() -> mediaConsoleLogic.writeMediaThumb32 (
+					taskLogger,
 					formatWriter,
 					media));
 
@@ -325,6 +340,7 @@ class EventConsoleLogicImplementation
 				object;
 
 			objectManager.writeHtmlForObject (
+				taskLogger,
 				formatWriter,
 				dataObject,
 				optionalAbsent (),
@@ -430,6 +446,7 @@ class EventConsoleLogicImplementation
 				new StringFormatWriter ();
 
 			writeEventHtml (
+				taskLogger,
 				eventFormatWriter,
 				event);
 

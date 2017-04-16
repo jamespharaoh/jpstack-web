@@ -343,6 +343,7 @@ class ObjectBrowsePart <ObjectType extends Record <ObjectType>>
 							targetContext.pathPrefix (),
 							"/%s",
 							consoleHelper.getPathId (
+								taskLogger,
 								object))))
 
 			);

@@ -263,18 +263,21 @@ class QueueDebugPart
 					formatWriter.writeLineFormat (
 						"Slice: <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
+							taskLogger,
 							queueInfo.slice ()),
 						queueInfo.slice ().getCode ());
 
 					formatWriter.writeLineFormat (
 						"Type: <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
+							taskLogger,
 							queueParentType),
 						queueParentType.getCode ());
 
 					formatWriter.writeLineFormat (
 						"Service: <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
+							taskLogger,
 							queueParent),
 						objectManager.objectPathMini (
 							queueParent,
@@ -283,6 +286,7 @@ class QueueDebugPart
 					formatWriter.writeLineFormat (
 						"Queue: <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
+							taskLogger,
 							queueInfo.queue ()),
 						queueInfo.queue ().getCode ());
 
@@ -387,6 +391,7 @@ class QueueDebugPart
 
 				htmlLinkWrite (
 					objectManager.localLink (
+						taskLogger,
 						subjectInfo.subject ()),
 					objectManager.objectPathMini (
 						subjectInfo.subject (),
@@ -414,6 +419,7 @@ class QueueDebugPart
 							: stringFormat (
 								"<a href=\"%h\">%h</a>",
 								objectManager.localLink (
+									taskLogger,
 									subjectInfo.preferredUser ()),
 								objectManager.objectPathMini (
 									subjectInfo.preferredUser ()))
@@ -546,6 +552,7 @@ class QueueDebugPart
 					formatWriter.writeLineFormat (
 						"Claimed: yes, by <a href=\"%h\">%h</a><br>",
 						objectManager.localLink (
+							taskLogger,
 							subjectInfo.claimedByUser ()),
 						objectManager.objectPathMini (
 							subjectInfo.claimedByUser ()));

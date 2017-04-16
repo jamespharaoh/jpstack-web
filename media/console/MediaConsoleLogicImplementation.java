@@ -18,8 +18,11 @@ import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.logic.MediaLogic;
 import wbs.platform.media.model.MediaRec;
@@ -33,6 +36,9 @@ class MediaConsoleLogicImplementation
 	implements MediaConsoleLogic {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaConsoleHelper mediaHelper;
@@ -54,7 +60,13 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	String mediaUrl (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull MediaRec media) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"mediaUrl");
 
 		if (
 			mediaLogic.isImage (
@@ -64,6 +76,7 @@ class MediaConsoleLogicImplementation
 			return stringFormat (
 				"%s",
 				mediaHelper.getDefaultContextPath (
+					taskLogger,
 					media),
 				"/media.image");
 
@@ -81,9 +94,15 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaContent (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media,
 			@NonNull String rotate) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeMediaContent");
 
 		String mimeType =
 			media.getMediaType ().getMimeType ();
@@ -126,7 +145,9 @@ class MediaConsoleLogicImplementation
 				" href=\"%h\"",
 				stringFormat (
 					"%s",
-					mediaHelper.getDefaultContextPath (media),
+					mediaHelper.getDefaultContextPath (
+						taskLogger,
+						media),
 					"/media.video"),
 
 				" style=\"%h\"",
@@ -182,7 +203,9 @@ class MediaConsoleLogicImplementation
 				" href=\"%h\"",
 				stringFormat (
 					"%s",
-					mediaHelper.getDefaultContextPath (media),
+					mediaHelper.getDefaultContextPath (
+						taskLogger,
+						media),
 					"/media.audio.mp3"),
 
 				" style=\"%h\"",
@@ -231,7 +254,9 @@ class MediaConsoleLogicImplementation
 				" src=\"%h\"",
 				stringFormat (
 					"%s",
-					mediaHelper.getDefaultContextPath (media),
+					mediaHelper.getDefaultContextPath (
+						taskLogger,
+						media),
 					"/media.image",
 					ifThenElse (
 						stringIsEmpty (
@@ -257,9 +282,15 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	String mediaUrlScaled (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull MediaRec media,
 			@NonNull Integer width,
 			@NonNull Integer height) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"mediaUrlScaled");
 
 		MediaTypeRec mediaType =
 			media.getMediaType ();
@@ -276,6 +307,7 @@ class MediaConsoleLogicImplementation
 		return stringFormat (
 			"%s",
 			mediaHelper.getDefaultContextPath (
+				taskLogger,
 				media),
 			"/media.imageScale",
 			"?width=%u",
@@ -290,10 +322,16 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaContentScaled (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media,
 			@NonNull Integer width,
 			@NonNull Integer height) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeMediaContentScaled");
 
 		MediaTypeRec mediaType =
 			media.getMediaType ();
@@ -318,6 +356,7 @@ class MediaConsoleLogicImplementation
 			formatWriter.writeLineFormat (
 				"<img src=\"%h\">",
 				mediaUrlScaled (
+					taskLogger,
 					media,
 					width,
 					height));
@@ -335,9 +374,15 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaThumb100 (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media,
 			@NonNull String rotate) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeMediaThumb100");
 
 		if (
 			mediaLogic.isText (
@@ -367,6 +412,7 @@ class MediaConsoleLogicImplementation
 				stringFormat (
 					"%s",
 					mediaHelper.getDefaultContextPath (
+						taskLogger,
 						media),
 					"/media.thumb100",
 					ifThenElse (
@@ -387,8 +433,14 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaThumb100OrText (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeMediaThumb100OrText");
 
 		if (
 			stringEqualSafe (
@@ -405,6 +457,7 @@ class MediaConsoleLogicImplementation
 		} else {
 
 			writeMediaThumb100 (
+				taskLogger,
 				formatWriter,
 				media,
 				"");
@@ -416,8 +469,14 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaThumb100Rot90 (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeMediaThumb100Rot90");
 
 		if (media.getThumb100Content () == null) {
 
@@ -433,7 +492,9 @@ class MediaConsoleLogicImplementation
 				" src=\"%h\"",
 				stringFormat (
 					"%s",
-					mediaHelper.getDefaultContextPath (media),
+					mediaHelper.getDefaultContextPath (
+						taskLogger,
+						media),
 					"/media.thumb100Rot90"),
 
 				" alt=\"%h\"",
@@ -448,8 +509,14 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaThumb32 (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeMediaThumb32");
 
 		if (media.getThumb32Content () == null) {
 
@@ -465,7 +532,9 @@ class MediaConsoleLogicImplementation
 				" src=\"%h\"",
 				stringFormat (
 					"%s",
-					mediaHelper.getDefaultContextPath (media),
+					mediaHelper.getDefaultContextPath (
+						taskLogger,
+						media),
 					"/media.thumb32"),
 
 				" alt=\"%h\"",
@@ -480,8 +549,14 @@ class MediaConsoleLogicImplementation
 	@Override
 	public
 	void writeMediaThumb32OrText (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull MediaRec media) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeMediaThumb32OrText");
 
 		if (
 			stringEqualSafe (
@@ -498,6 +573,7 @@ class MediaConsoleLogicImplementation
 		} else {
 
 			writeMediaThumb32 (
+				taskLogger,
 				formatWriter,
 				media);
 

@@ -756,6 +756,7 @@ class ObjectListPart <
 							targetContext.pathPrefix (),
 							"/%s",
 							consoleHelper.getPathId (
+								taskLogger,
 								object))))
 
 			);
