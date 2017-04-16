@@ -41,7 +41,6 @@ import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.logging.LogContext;
-import wbs.framework.logging.LogSeverity;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.object.core.console.ObjectTypeConsoleHelper;
@@ -62,7 +61,6 @@ import wbs.sms.number.core.model.NumberRec;
 import wbs.sms.number.format.logic.NumberFormatLogic;
 import wbs.sms.number.format.logic.WbsNumberFormatException;
 
-import wbs.utils.etc.ProfileLogger;
 import wbs.utils.time.TextualInterval;
 
 import wbs.apn.chat.bill.logic.ChatCreditLogic;
@@ -208,12 +206,6 @@ class ChatBroadcastSendAction
 		boolean send =
 			requestContext.formIsPresent (
 				"send");
-
-		ProfileLogger profileLogger =
-			new ProfileLogger (
-				taskLogger,
-				LogSeverity.debug,
-				"Broadcast send");
 
 		try (
 
@@ -383,16 +375,10 @@ class ChatBroadcastSendAction
 
 				// start transaction
 
-				profileLogger.lap (
-					"start transaction");
-
 				ChatRec chat =
 					chatHelper.findFromContextRequired ();
 
 				// lookup user
-
-				profileLogger.lap (
-					"lookup user");
 
 				Optional <ChatUserRec> fromChatUserOptional =
 					chatUserHelper.findByCode (
@@ -445,8 +431,6 @@ class ChatBroadcastSendAction
 					new ArrayList<> ();
 
 				if (form.search ()) {
-
-					profileLogger.lap ("perform search");
 
 					ChatUserSearch search =
 						new ChatUserSearch ()
@@ -516,8 +500,6 @@ class ChatBroadcastSendAction
 
 				if (! form.search ()) {
 
-					profileLogger.lap ("check numbers");
-
 					try {
 
 						List <String> allNumbers =
@@ -575,9 +557,6 @@ class ChatBroadcastSendAction
 				}
 
 				// purge numbers
-
-				profileLogger.lap (
-					"purge numbers");
 
 				int removedNumbers = 0;
 
@@ -674,17 +653,12 @@ class ChatBroadcastSendAction
 
 				if (verify) {
 
-					profileLogger.end ();
-
 					return responder (
 						"chatBroadcastVerifyResponder");
 
 				}
 
 				// perform send
-
-				profileLogger.lap (
-					"perform send");
 
 				String messageString =
 					joinWithoutSeparator (
@@ -860,11 +834,7 @@ class ChatBroadcastSendAction
 
 				}
 
-				profileLogger.lap ("commit");
-
 				transaction.commit ();
-
-				profileLogger.end ();
 
 				requestContext.addNoticeFormat (
 					"Message sent to %s users",
@@ -894,8 +864,6 @@ class ChatBroadcastSendAction
 				"chatBroadcastSendResponder");
 
 		} catch (RuntimeException exception) {
-
-			profileLogger.error (exception);
 
 			throw exception;
 

@@ -10,7 +10,7 @@ class LoggedErrorsException
 	extends RuntimeException {
 
 	@Getter
-	TaskLogger taskLogger;
+	TaskLogger parentTaskLogger;
 
 	public
 	LoggedErrorsException (
@@ -20,8 +20,8 @@ class LoggedErrorsException
 		super (
 			message);
 
-		this.taskLogger =
-			taskLogger;
+		this.parentTaskLogger =
+			parentTaskLogger;
 
 	}
 

@@ -10,7 +10,7 @@ class FatalErrorException
 	extends RuntimeException {
 
 	@Getter
-	TaskLogger taskLogger;
+	TaskLogger parentTaskLogger;
 
 	public
 	FatalErrorException (
@@ -20,8 +20,8 @@ class FatalErrorException
 		super (
 			message);
 
-		this.taskLogger =
-			taskLogger;
+		this.parentTaskLogger =
+			parentTaskLogger;
 
 	}
 
@@ -35,8 +35,8 @@ class FatalErrorException
 			message,
 			cause);
 
-		this.taskLogger =
-			taskLogger;
+		this.parentTaskLogger =
+			parentTaskLogger;
 
 	}
 
