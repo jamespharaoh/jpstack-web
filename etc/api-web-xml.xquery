@@ -56,7 +56,7 @@ declare variable $mode external;
 
 		<param-value>{
 			string-join ((
-				'api'
+				'api',
 				'config',
 				'data',
 				'entity',
@@ -69,7 +69,7 @@ declare variable $mode external;
 				'schema',
 				'sql',
 				'utils',
-				'web',
+				'web'
 			), ',')
 		}</param-value>
 

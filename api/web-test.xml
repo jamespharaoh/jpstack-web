@@ -12,7 +12,7 @@
 	</context-param>
 	<context-param>
 		<param-name>layerNames</param-name>
-		<param-value>utils,config,data,entity,schema,sql,model,model-meta,hibernate,object,logic,web,api</param-value>
+		<param-value>api,config,data,entity,hibernate,logic,model,model-meta,object,process-api,schema,sql,utils,web</param-value>
 	</context-param>
 	<!-- listeners -->
 	<listener>
