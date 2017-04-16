@@ -269,6 +269,7 @@ class ObjectSearchPostAction <
 				search);
 
 			consoleHelper.consoleHooks ().applySearchFilter (
+				taskLogger,
 				search);
 
 			if (

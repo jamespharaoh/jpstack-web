@@ -9,10 +9,12 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -45,6 +47,9 @@ class GroupPrivsAction
 	@SingletonDependency
 	GroupConsoleHelper groupHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserPrivChecker privChecker;
 
@@ -73,7 +78,12 @@ class GroupPrivsAction
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		long numRevoked = 0;
 		long numGranted = 0;
@@ -113,8 +123,13 @@ class GroupPrivsAction
 
 				// check we have permission to update this priv
 
-				if (! privChecker.canGrant (priv.getId ()))
+				if (
+					! privChecker.canGrant (
+						taskLogger,
+						priv.getId ())
+				) {
 					continue;
+				}
 
 				if (! oldCan && newCan) {
 

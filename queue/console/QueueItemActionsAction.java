@@ -95,6 +95,7 @@ class QueueItemActionsAction
 
 			canSupervise =
 				queueConsoleLogic.canSupervise (
+					taskLogger,
 					queueItem.getQueue ());
 
 			if (! canSupervise) {

@@ -20,10 +20,13 @@ import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
@@ -36,6 +39,9 @@ class QueueItemQueueStatsProvider
 	implements StatsProvider {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -56,8 +62,14 @@ class QueueItemQueueStatsProvider
 	@Override
 	public
 	StatsDataSet getStats (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull StatsPeriod statsPeriod,
 			@NonNull Map <String, Object> conditions) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getStats");
 
 		if (statsPeriod.granularity () != StatsGranularity.hour)
 			throw new IllegalArgumentException ();
@@ -119,6 +131,7 @@ class QueueItemQueueStatsProvider
 
 			if (
 				! privChecker.canRecursive (
+					taskLogger,
 					parent,
 					"supervisor")
 			) {
@@ -191,6 +204,7 @@ class QueueItemQueueStatsProvider
 
 			if (
 				! privChecker.canRecursive (
+					taskLogger,
 					parent,
 					"supervisor")
 			) {

@@ -23,9 +23,11 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -40,6 +42,9 @@ class UserPrivsSummaryPart
 	extends AbstractPagePart {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -64,6 +69,11 @@ class UserPrivsSummaryPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		Map <Long, PrivStuff> privStuffsByPrivId =
 			new HashMap<> ();
 
@@ -81,6 +91,7 @@ class UserPrivsSummaryPart
 
 			if (
 				! privChecker.canGrant (
+					taskLogger,
 					userPriv.getPriv ().getId ())
 			) {
 				continue;
@@ -123,9 +134,13 @@ class UserPrivsSummaryPart
 
 				// check we can see this priv
 
-				if (! privChecker.canGrant (
-						priv.getId ()))
+				if (
+					! privChecker.canGrant (
+						taskLogger,
+						priv.getId ())
+				) {
 					continue;
+				}
 
 				// find or create the priv stuff
 

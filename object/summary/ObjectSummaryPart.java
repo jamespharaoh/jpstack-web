@@ -15,6 +15,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.part.PagePart;
 import wbs.console.part.PagePartFactory;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.logging.LogContext;
@@ -65,6 +66,7 @@ class ObjectSummaryPart
 					taskLogger);
 
 			pagePart.setup (
+				taskLogger,
 				Collections.emptyMap ());
 
 			pagePart.prepare (

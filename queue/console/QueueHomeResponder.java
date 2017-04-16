@@ -364,7 +364,13 @@ class QueueHomeResponder
 	}
 
 	protected
-	void goQueues () {
+	void goQueues (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goQueues");
 
 		htmlHeadingTwoWrite (
 			"Queues");
@@ -383,7 +389,9 @@ class QueueHomeResponder
 		// render queue stuff
 
 		renderOptions ();
-		renderQueueItems ();
+
+		renderQueueItems (
+			taskLogger);
 
 	}
 
@@ -473,7 +481,13 @@ class QueueHomeResponder
 	}
 
 	private
-	void renderQueueItems () {
+	void renderQueueItems (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderQueueItems");
 
 		// table open
 
@@ -636,6 +650,7 @@ class QueueHomeResponder
 
 			if (
 				privChecker.canRecursive (
+					taskLogger,
 					objectManager.getParentRequired (
 						queueInfo.queue ()),
 					"supervisor")
@@ -791,14 +806,20 @@ class QueueHomeResponder
 	@Override
 	protected
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger parentTaskLoggers) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContents");
 
 		renderLinks ();
 
 		requestContext.flushNotices (
 			formatWriter);
 
-		goQueues ();
+		goQueues (
+			taskLogger);
 
 		goMyItems ();
 

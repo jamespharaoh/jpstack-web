@@ -14,10 +14,12 @@ import wbs.console.part.PagePart;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.status.console.StatusLine;
@@ -31,6 +33,9 @@ class ExceptionStatusLine
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	NumExceptionsCache numExceptionsCache;
@@ -70,6 +75,11 @@ class ExceptionStatusLine
 	Future <String> getUpdateScript (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getUpdateScript");
+
 		Long numExceptions = 0l;
 		Long numExceptionsFatal = 0l;
 
@@ -77,6 +87,7 @@ class ExceptionStatusLine
 
 		if (
 			privChecker.canRecursive (
+				taskLogger,
 				GlobalId.root,
 				"alert")
 		) {

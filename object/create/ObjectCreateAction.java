@@ -194,87 +194,88 @@ class ObjectCreateAction <
 		) {
 
 			// determine parent
-	
+
 			determineParent ();
-	
+
 			if (
 				isNull (
 					parent)
 			) {
 				return null;
 			}
-	
+
 			// check permissions
-	
+
 			if (
 				isNotNull (
 					createPrivCode)
 			) {
-	
+
 				Record <?> createDelegate =
 					createPrivDelegate != null
 						? (Record <?>) objectManager.dereferenceObsolete (
 							parent,
 							createPrivDelegate)
 						: parent;
-	
+
 				if (
 					! privChecker.canRecursive (
+						taskLogger,
 						createDelegate,
 						createPrivCode)
 				) {
-	
+
 					requestContext.addError (
 						"Permission denied");
-	
+
 					return null;
-	
+
 				}
-	
+
 			}
-	
+
 			// create new record
-	
+
 			ObjectType object =
 				consoleHelper.createInstance ();
-	
+
 			// set parent
-	
+
 			if (
-	
+
 				isNotNull (
 					parent)
-	
+
 				&& ! parentHelper.isRoot ()
-	
+
 			) {
-	
+
 				consoleHelper.setParent (
 					object,
 					parent);
-	
+
 			}
-	
+
 			// set type code
-	
+
 			if (consoleHelper.typeCodeExists ()) {
-	
+
 				PropertyUtils.propertySetAuto (
 					object,
 					consoleHelper.typeCodeFieldName (),
 					typeCode);
-	
+
 			}
-	
+
 			// perform updates
-	
+
 			if (formFieldsProvider != null) {
-	
+
 				prepareFieldSet (
 					taskLogger);
-	
+
 			}
-	
+
 			UpdateResultSet updateResultSet =
 				formFieldLogic.update (
 					taskLogger,
@@ -283,90 +284,90 @@ class ObjectCreateAction <
 					object,
 					ImmutableMap.of (),
 					"create");
-	
+
 			if (updateResultSet.errorCount () > 0) {
-	
+
 				formFieldLogic.reportErrors (
 					requestContext,
 					updateResultSet,
 					"create");
-	
+
 				requestContext.request (
 					"objectCreateUpdateResultSet",
 					updateResultSet);
-	
+
 				return null;
-	
+
 			}
-	
+
 			// set create time
-	
+
 			if (createTimeFieldName != null) {
-	
+
 				Class<?> createTimeFieldClass =
 					PropertyUtils.propertyClassForObject (
 						object,
 						createTimeFieldName);
-	
+
 				if (createTimeFieldClass == Instant.class) {
-	
+
 					PropertyUtils.propertySetAuto (
 						object,
 						createTimeFieldName,
 						transaction.now ());
-	
+
 				} else if (createTimeFieldClass == Date.class) {
-	
+
 					PropertyUtils.propertySetAuto (
 						object,
 						createTimeFieldName,
 						instantToDateNullSafe (
 							transaction.now ()));
-	
+
 				} else {
-	
+
 					throw new RuntimeException ();
-	
+
 				}
-	
+
 			}
-	
+
 			// set create user
-	
+
 			if (createUserFieldName != null) {
-	
+
 				PropertyUtils.propertySetAuto (
 					object,
 					createUserFieldName,
 					userConsoleLogic.userRequired ());
-	
+
 			}
-	
+
 			// before create hook
-	
+
 			consoleHelper ().consoleHooks ().beforeCreate (
 				object);
-	
+
 			// insert
-	
+
 			consoleHelper.insert (
 				taskLogger,
 				object);
-	
+
 			// after create hook
-	
+
 			consoleHelper ().consoleHooks ().afterCreate (
 				object);
-	
+
 			// create event
-	
+
 			Object objectRef =
 				consoleHelper.codeExists ()
 					? consoleHelper.getCode (object)
 					: object.getId ();
-	
+
 			if (consoleHelper.ephemeral ()) {
-	
+
 				eventLogic.createEvent (
 					taskLogger,
 					"object_created_in",
@@ -374,22 +375,22 @@ class ObjectCreateAction <
 					objectRef,
 					consoleHelper.shortName (),
 					parent);
-	
+
 			} else {
-	
+
 				eventLogic.createEvent (
 					taskLogger,
 					"object_created",
 					userConsoleLogic.userRequired (),
 					object,
 					parent);
-	
+
 			}
-	
+
 			// update events
-	
+
 			if (object instanceof PermanentRecord) {
-	
+
 				formFieldLogic.runUpdateHooks (
 					taskLogger,
 					formFieldSet,
@@ -399,9 +400,9 @@ class ObjectCreateAction <
 					optionalAbsent (),
 					optionalAbsent (),
 					"create");
-	
+
 			} else {
-	
+
 				formFieldLogic.runUpdateHooks (
 					taskLogger,
 					formFieldSet,
@@ -413,99 +414,99 @@ class ObjectCreateAction <
 					optionalOf (
 						consoleHelper.shortName ()),
 					"create");
-	
+
 			}
-	
+
 			// signal update
-	
+
 			updateManager.signalUpdate (
 				taskLogger,
 				"user_privs",
 				userConsoleLogic.userIdRequired ());
-	
+
 			updateManager.signalUpdate (
 				taskLogger,
 				"privs",
 				0l);
-	
+
 			// commit transaction
-	
+
 			transaction.commit ();
-	
+
 			// prepare next page
-	
+
 			requestContext.addNotice (
 				stringFormat (
 					"%s created",
 					capitalise (
 						consoleHelper.shortName ())));
-	
+
 			requestContext.setEmptyFormData ();
-	
+
 			privChecker.refresh (
 				taskLogger);
-	
+
 			List <String> targetContextTypeNameParts =
 				stringSplitSlash (
 					targetContextTypeName);
-	
+
 			if (
 				collectionHasOneElement (
 					targetContextTypeNameParts)
 			) {
-	
+
 				ConsoleContextType targetContextType =
 					consoleManager.contextType (
 						targetContextTypeName,
 						true);
-	
+
 				ConsoleContext targetContext =
 					consoleManager.relatedContextRequired (
 						taskLogger,
 						requestContext.consoleContextRequired (),
 						targetContextType);
-	
+
 				consoleManager.changeContext (
 					taskLogger,
 					targetContext,
 					"/" + object.getId ());
-	
+
 			} else if (
 				collectionHasTwoElements (
 					targetContextTypeNameParts)
 			) {
-	
+
 				ConsoleContextType targetParentContextType =
 					consoleManager.contextType (
 						listFirstElementRequired (
 							targetContextTypeNameParts),
 						true);
-	
+
 				ConsoleContext targetParentContext =
 					consoleManager.relatedContextRequired (
 						taskLogger,
 						requestContext.consoleContextRequired (),
 						targetParentContextType);
-	
+
 				ConsoleContextType targetContextType =
 					consoleManager.contextType (
 						listSecondElementRequired (
 							targetContextTypeNameParts),
 						true);
-	
+
 				ConsoleContext targetContext =
 					consoleManager.relatedContextRequired (
 						taskLogger,
 						targetParentContext,
 						targetContextType);
-	
+
 				consoleManager.changeContext (
 					taskLogger,
 					targetContext,
 					"/" + object.getId ());
-	
+
 			}
-	
+
 			return responder (
 				targetResponderName);
 

@@ -90,6 +90,7 @@ class CoreTitledResponder
 			taskLogger);
 
 		pagePart.setup (
+			taskLogger,
 			emptyMap ());
 
 	}
@@ -200,6 +201,7 @@ class CoreTitledResponder
 
 			if (
 				privChecker.canRecursive (
+					taskLogger,
 					GlobalId.root,
 					"debug")
 			) {

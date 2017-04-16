@@ -106,10 +106,16 @@ class CoreSystemRestartPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		apiDeployments =
 			iterableFilterToList (
 				apiDeployment ->
 					userPrivChecker.canRecursive (
+						taskLogger,
 						apiDeployment,
 						"restart"),
 				apiDeploymentHelper.findAllNotDeletedEntities ());
@@ -121,6 +127,7 @@ class CoreSystemRestartPart
 			iterableFilterToList (
 				consoleDeployment ->
 					userPrivChecker.canRecursive (
+						taskLogger,
 						consoleDeployment,
 						"restart"),
 				consoleDeploymentHelper.findAllNotDeletedEntities ());
@@ -132,6 +139,7 @@ class CoreSystemRestartPart
 			iterableFilterToList (
 				daemonDeployment ->
 					userPrivChecker.canRecursive (
+						taskLogger,
 						daemonDeployment,
 						"restart"),
 				daemonDeploymentHelper.findAllNotDeletedEntities ());

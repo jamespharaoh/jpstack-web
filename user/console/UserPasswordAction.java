@@ -94,6 +94,7 @@ class UserPasswordAction
 					userConsoleLogic.userRequired ())
 
 				&& ! privChecker.canRecursive (
+					taskLogger,
 					user,
 					"manage")
 

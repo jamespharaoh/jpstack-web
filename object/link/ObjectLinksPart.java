@@ -183,6 +183,7 @@ class ObjectLinksPart <
 
 			if (
 				! privChecker.canRecursive (
+					taskLogger,
 					targetObject,
 					"manage")
 			) {
@@ -247,6 +248,7 @@ class ObjectLinksPart <
 
 			if (
 				! privChecker.canRecursive (
+					taskLogger,
 					targetObject,
 					"manage")
 			) {

@@ -124,8 +124,13 @@ class UserPrivsEditorAction
 
 				// check we have permission to update this priv
 
-				if (! privChecker.canGrant (priv.getId ()))
+				if (
+					! privChecker.canGrant (
+						taskLogger,
+						priv.getId ())
+				) {
 					continue;
+				}
 
 				boolean changed = false;
 

@@ -57,13 +57,20 @@ class ConsoleDeploymentRestartFormActionHelper
 
 	@Override
 	public
-	Pair <Boolean, Boolean> canBePerformed () {
+	Pair <Boolean, Boolean> canBePerformed (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"canBePerformed");
 
 		ConsoleDeploymentRec consoleDeployment =
 			consoleDeploymentHelper.findFromContextRequired ();
 
 		boolean show =
 			userPrivChecker.canRecursive (
+				taskLogger,
 				consoleDeployment,
 				"restart");
 

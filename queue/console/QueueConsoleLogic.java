@@ -444,7 +444,13 @@ class QueueConsoleLogic {
 
 	public
 	boolean canSupervise (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueRec queue) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"canSupervise");
 
 		QueueTypeSpec queueTypeSpec =
 			queueTypeSpec (
@@ -460,6 +466,7 @@ class QueueConsoleLogic {
 				supervisorParts [0]);
 
 		return privChecker.canRecursive (
+			taskLogger,
 			supervisorDelegate,
 			supervisorParts [1]);
 
