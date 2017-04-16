@@ -289,12 +289,20 @@ class QueueSubjectSorter {
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueSubjectRec subject) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"processSubject");
+
 		// get queue info
 
 		QueueInfo queueInfo =
 			queueInfos.computeIfAbsent (
 				subject.getQueue (),
-				this::createQueueInfo);
+				queue ->
+					createQueueInfo (
+						taskLogger,
+						queue));
 
 		// check we can see this queue
 
@@ -439,10 +447,12 @@ class QueueSubjectSorter {
 			subjectInfo.preferredByOverflowOperator = (
 
 				preferredUserPrivChecker.canRecursive (
+					taskLogger,
 					queueInfo.queue,
 					"reply_overflow")
 
 				&& ! preferredUserPrivChecker.canSimple (
+					taskLogger,
 					queueInfo.queue,
 					"reply")
 
@@ -546,7 +556,13 @@ class QueueSubjectSorter {
 
 	private
 	QueueInfo createQueueInfo (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueRec queue) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createQueueInfo");
 
 		QueueInfo queueInfo =
 			new QueueInfo ();
@@ -565,21 +581,25 @@ class QueueSubjectSorter {
 
 		queueInfo.canReplyExplicit =
 			checkPrivExplicit (
+				taskLogger,
 				queue,
 				"reply");
 
 		queueInfo.canReplyImplicit =
 			checkPrivImplicit (
+				taskLogger,
 				queue,
 				"reply");
 
 		queueInfo.canReplyOverflowExplicit =
 			checkPrivExplicit (
+				taskLogger,
 				queue,
 				"reply_overflow");
 
 		queueInfo.canReplyOverflowImplicit =
 			checkPrivImplicit (
+				taskLogger,
 				queue,
 				"reply_overflow");
 
@@ -601,11 +621,18 @@ class QueueSubjectSorter {
 
 	private
 	boolean checkPrivExplicit (
-			@NonNull Record<?> parent,
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Record <?> parent,
 			@NonNull String privCode) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"checkPrivExplicit");
 
 		if (
 			! loggedInUserPrivChecker.canRecursive (
+				taskLogger,
 				parent,
 				"reply")
 		) {
@@ -622,6 +649,7 @@ class QueueSubjectSorter {
 		} else {
 
 			return effectiveUserPrivChecker.canSimple (
+				taskLogger,
 				parent,
 				privCode);
 
@@ -631,11 +659,18 @@ class QueueSubjectSorter {
 
 	private
 	boolean checkPrivImplicit (
-			@NonNull Record<?> parent,
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Record <?> parent,
 			@NonNull String privCode) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"checkPrivImplicit");
 
 		if (
 			! loggedInUserPrivChecker.canRecursive (
+				taskLogger,
 				parent,
 				"reply")
 		) {
@@ -652,6 +687,7 @@ class QueueSubjectSorter {
 		} else {
 
 			return effectiveUserPrivChecker.canRecursive (
+				taskLogger,
 				parent,
 				privCode);
 

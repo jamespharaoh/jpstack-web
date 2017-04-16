@@ -5,6 +5,7 @@
 	<layer name="console">
 		<component class="UserPrivCheckerBuilder"/>
 		<component class="UserPrivCheckerImplementation"/>
+		<component class="UserPrivData"/>
 	</layer>
 
 </plugin>

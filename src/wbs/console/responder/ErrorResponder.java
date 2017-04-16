@@ -55,6 +55,11 @@ class ErrorResponder
 	void renderHtmlBodyContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContents");
+
 		htmlHeadingOneWrite (
 			title);
 
@@ -71,6 +76,7 @@ class ErrorResponder
 		if (
 			exception != null
 			&& privChecker.canRecursive (
+				taskLogger,
 				GlobalId.root,
 				"debug")
 		) {

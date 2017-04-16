@@ -14,9 +14,12 @@ import lombok.experimental.Accessors;
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.priv.UserPrivChecker;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("parentFormFieldConstraintValidator")
@@ -28,6 +31,9 @@ class ParentFormFieldConstraintValidator <
 	implements FormFieldConstraintValidator <Container, Native> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -48,8 +54,14 @@ class ParentFormFieldConstraintValidator <
 	@Override
 	public
 	Optional <String> validate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Optional <Native> nativeValue) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"validate");
 
 		Record <?> privDelegate =
 			createPrivDelegate != null
@@ -61,6 +73,7 @@ class ParentFormFieldConstraintValidator <
 
 		if (
 			! privChecker.canRecursive (
+				taskLogger,
 				privDelegate,
 				createPrivCode)
 		) {

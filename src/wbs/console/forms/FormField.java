@@ -28,6 +28,7 @@ interface FormField <Container, Generic, Native, Interface>
 	@Override
 	default
 	boolean canView (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 

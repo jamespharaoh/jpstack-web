@@ -190,6 +190,7 @@ class ObjectLinksAction
 
 				if (
 					! privChecker.canRecursive (
+						taskLogger,
 						targetObject,
 						"manage")
 				) {

@@ -61,9 +61,16 @@ class ConsoleFormActionsPart
 	@Override
 	public
 	void setup (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Map <String, Object> parameters) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
+
 		super.setup (
+			taskLogger,
 			parameters);
 
 		pageParts =
@@ -72,7 +79,8 @@ class ConsoleFormActionsPart
 			.map (
 				formAction ->
 					Pair.of (
-						formAction.helper ().canBePerformed (),
+						formAction.helper ().canBePerformed (
+							taskLogger),
 						formAction))
 
 			.filter (
@@ -117,6 +125,7 @@ class ConsoleFormActionsPart
 		pageParts.forEach (
 			pagePart ->
 				pagePart.setup (
+					taskLogger,
 					parameters));
 
 	}

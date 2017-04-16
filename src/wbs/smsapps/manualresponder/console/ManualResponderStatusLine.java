@@ -24,11 +24,13 @@ import wbs.console.feature.FeatureChecker;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.misc.CachedGetter;
@@ -54,6 +56,9 @@ class ManualResponderStatusLine
 
 	@SingletonDependency
 	FeatureChecker featureChecker;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ManualResponderRequestObjectHelper manualResponderRequestHelper;
@@ -102,8 +107,14 @@ class ManualResponderStatusLine
 	Future <String> getUpdateScript (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getUpdateScript");
+
 		if (
 			! featureChecker.checkFeatureAccess (
+				taskLogger,
 				"queue_items_status_line")
 		) {
 

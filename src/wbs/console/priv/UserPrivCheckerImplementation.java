@@ -89,9 +89,11 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canRecursive (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long privId) {
 
 		return target.canRecursive (
+			parentTaskLogger,
 			privId);
 
 	}
@@ -99,10 +101,12 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canRecursive (
-			GlobalId parentGlobalId,
-			String... privCodes) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull GlobalId parentGlobalId,
+			@NonNull String ... privCodes) {
 
 		return target.canRecursive (
+			parentTaskLogger,
 			parentGlobalId,
 			privCodes);
 
@@ -111,11 +115,13 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canRecursive (
-			@NonNull Class<? extends Record<?>> parentClass,
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Class <? extends Record <?>> parentClass,
 			@NonNull Long parentId,
-			@NonNull String... privCodes) {
+			@NonNull String ... privCodes) {
 
 		return target.canRecursive (
+			parentTaskLogger,
 			parentClass,
 			parentId,
 			privCodes);
@@ -125,10 +131,12 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canRecursive (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> parentObject,
 			@NonNull String ... privCodes) {
 
 		return target.canRecursive (
+			parentTaskLogger,
 			parentObject,
 			privCodes);
 
@@ -137,10 +145,12 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canSimple (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull GlobalId parentGlobalId,
 			@NonNull String ... privCodes) {
 
 		return target.canSimple (
+			parentTaskLogger,
 			parentGlobalId,
 			privCodes);
 
@@ -149,10 +159,12 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canSimple (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> parentObject,
 			@NonNull String... privCodes) {
 
 		return target.canSimple (
+			parentTaskLogger,
 			parentObject,
 			privCodes);
 
@@ -161,9 +173,11 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canRecursive (
-			Map <Object, Collection <String>> map) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Map <Object, Collection <String>> map) {
 
 		return target.canRecursive (
+			parentTaskLogger,
 			map);
 
 	}
@@ -171,9 +185,11 @@ class UserPrivCheckerImplementation
 	@Override
 	public
 	boolean canGrant (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long privId) {
 
 		return target.canGrant (
+			parentTaskLogger,
 			privId);
 
 	}

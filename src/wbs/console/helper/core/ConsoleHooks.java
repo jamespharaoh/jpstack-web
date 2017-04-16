@@ -8,6 +8,7 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 public
 interface ConsoleHooks <RecordType extends Record <RecordType>> {
@@ -31,6 +32,7 @@ interface ConsoleHooks <RecordType extends Record <RecordType>> {
 
 	default
 	void applySearchFilter (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object searchObject) {
 
 		doNothing ();

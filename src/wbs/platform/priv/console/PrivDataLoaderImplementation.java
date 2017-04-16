@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.inject.Provider;
 import javax.sql.DataSource;
 
 import com.google.common.base.Optional;
@@ -39,6 +40,7 @@ import wbs.console.priv.UserPrivDataLoader;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentProvider;
@@ -93,6 +95,11 @@ class PrivDataLoaderImplementation
 
 	@SingletonDependency
 	UserObjectHelper userHelper;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <UserPrivData> userPrivDataProvider;
 
 	// properties
 
@@ -156,19 +163,19 @@ class PrivDataLoaderImplementation
 				parentTaskLogger,
 				"getUserPrivData");
 
-		UserPrivData ret =
-			new UserPrivData ();
+		UserPrivData userPrivData =
+			userPrivDataProvider.get ();
 
-		ret.sharedData =
+		userPrivData.sharedData =
 			getPrivData (
 				taskLogger);
 
-		ret.userData =
+		userPrivData.userData =
 			getUserData (
 				taskLogger,
 				userId);
 
-		return ret;
+		return userPrivData;
 
 	}
 

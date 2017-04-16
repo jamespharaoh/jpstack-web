@@ -151,8 +151,14 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	boolean canView (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"canView");
 
 		// check feature
 
@@ -162,6 +168,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				featureCode)
 
 			&& ! featureChecker.checkFeatureAccess (
+				taskLogger,
 				featureCode)
 
 		) {
@@ -190,8 +197,8 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				privParts.get (0);
 
 			return privChecker.canRecursive (
-				(Record<?>)
-				container,
+				taskLogger,
+				(Record<?>) container,
 				privCode);
 
 		} else if (
@@ -213,6 +220,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 					hints);
 
 			return privChecker.canRecursive (
+				taskLogger,
 				delegate,
 				privCode);
 
@@ -669,6 +677,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 		Optional <String> constraintError =
 			constraintValidator.validate (
+				taskLogger,
 				container,
 				newNativeValue);
 

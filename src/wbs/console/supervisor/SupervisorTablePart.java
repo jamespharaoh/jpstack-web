@@ -17,6 +17,7 @@ import lombok.experimental.Accessors;
 
 import wbs.console.part.AbstractPagePart;
 import wbs.console.part.PagePart;
+
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.logging.LogContext;
@@ -65,6 +66,7 @@ class SupervisorTablePart
 				pagePartFactory.get ();
 
 			pagePart.setup (
+				taskLogger,
 				parameters);
 
 			pagePart.prepare (

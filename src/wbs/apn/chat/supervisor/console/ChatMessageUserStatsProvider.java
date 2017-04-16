@@ -14,20 +14,25 @@ import lombok.NonNull;
 
 import org.joda.time.Instant;
 
-import wbs.apn.chat.contact.model.ChatContactRec;
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageRec;
-import wbs.apn.chat.contact.model.ChatMessageSearch;
-import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsDatum;
 import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.contact.model.ChatContactRec;
+import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
+import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.contact.model.ChatMessageSearch;
+import wbs.apn.chat.core.model.ChatObjectHelper;
+import wbs.apn.chat.core.model.ChatRec;
 
 @SingletonComponent ("chatMessageUserStatsProvider")
 public
@@ -42,6 +47,9 @@ class ChatMessageUserStatsProvider
 	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserPrivChecker privChecker;
 
@@ -50,8 +58,14 @@ class ChatMessageUserStatsProvider
 	@Override
 	public
 	StatsDataSet getStats (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull StatsPeriod period,
 			@NonNull Map <String, Object> conditions) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getStats");
 
 		if (period.granularity () != StatsGranularity.hour)
 			throw new IllegalArgumentException ();
@@ -85,10 +99,14 @@ class ChatMessageUserStatsProvider
 
 		for (ChatRec chat : chats) {
 
-			if (! privChecker.canRecursive (
+			if (
+				! privChecker.canRecursive (
+					taskLogger,
 					chat,
-					"supervisor"))
+					"supervisor")
+			) {
 				continue;
+			}
 
 			StatsDataSet singleStatsDataSet =
 				getStatsForChat (

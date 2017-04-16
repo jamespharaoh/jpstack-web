@@ -25,12 +25,14 @@ import wbs.console.module.ConsoleManager;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.PermanentRecord;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -73,6 +75,9 @@ class ObjectTicketCreateAction <
 
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleObjectManager objectManager;
@@ -167,7 +172,12 @@ class ObjectTicketCreateAction <
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// begin transaction
 
@@ -207,9 +217,12 @@ class ObjectTicketCreateAction <
 							createPrivDelegate)
 						: ticketManager;
 
-				if (! privChecker.canRecursive (
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
 						createDelegate,
-						createPrivCode)) {
+						createPrivCode)
+				) {
 
 					requestContext.addError (
 						"Permission denied");

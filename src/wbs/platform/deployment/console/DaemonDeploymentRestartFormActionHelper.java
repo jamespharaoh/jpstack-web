@@ -57,13 +57,20 @@ class DaemonDeploymentRestartFormActionHelper
 
 	@Override
 	public
-	Pair <Boolean, Boolean> canBePerformed () {
+	Pair <Boolean, Boolean> canBePerformed (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"canBePerformed");
 
 		DaemonDeploymentRec daemonDeployment =
 			daemonDeploymentHelper.findFromContextRequired ();
 
 		boolean show =
 			userPrivChecker.canRecursive (
+				taskLogger,
 				daemonDeployment,
 				"restart");
 

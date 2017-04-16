@@ -3,20 +3,27 @@ package wbs.apn.chat.user.core.console;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.joda.time.Instant;
 
-import wbs.apn.chat.user.core.model.ChatUserDateMode;
-import wbs.apn.chat.user.core.model.ChatUserSearch;
-import wbs.apn.chat.user.core.console.ChatUserConsoleHelper;
-import wbs.apn.chat.user.core.model.ChatUserDao;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.sms.number.core.console.NumberPlugin;
 import wbs.sms.number.core.model.NumberRec;
+
+import wbs.apn.chat.user.core.model.ChatUserDao;
+import wbs.apn.chat.user.core.model.ChatUserDateMode;
+import wbs.apn.chat.user.core.model.ChatUserRec;
+import wbs.apn.chat.user.core.model.ChatUserSearch;
 
 @SingletonComponent ("chatUserNumberLinkProvider")
 public
@@ -31,11 +38,14 @@ class ChatUserNumberLinkProvider
 	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
 
-	@SingletonDependency
-	ConsoleRequestContext requestContext;
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	// details
 
@@ -131,9 +141,16 @@ class ChatUserNumberLinkProvider
 
 				@Override
 				public
-				boolean canView () {
+				boolean canView (
+						@NonNull TaskLogger parentTaskLogger) {
+
+					TaskLogger taskLogger =
+						logContext.nestTaskLogger (
+							parentTaskLogger,
+							"canView");
 
 					return privChecker.canRecursive (
+						taskLogger,
 						chatUser.getChat (),
 						"chat_user_create",
 						"chat_user_view",
@@ -199,9 +216,16 @@ class ChatUserNumberLinkProvider
 
 					@Override
 					public
-					boolean canView () {
+					boolean canView (
+							@NonNull TaskLogger parentTaskLogger) {
+
+						TaskLogger taskLogger =
+							logContext.nestTaskLogger (
+								parentTaskLogger,
+								"canView");
 
 						return privChecker.canRecursive (
+							taskLogger,
 							chatUser.getChat (),
 							"chat_user_create",
 							"chat_user_view",
@@ -283,9 +307,16 @@ class ChatUserNumberLinkProvider
 
 					@Override
 					public
-					boolean canView () {
+					boolean canView (
+							@NonNull TaskLogger parentTaskLogger) {
+
+						TaskLogger taskLogger =
+							logContext.nestTaskLogger (
+								parentTaskLogger,
+								"canView");
 
 						return privChecker.canRecursive (
+							taskLogger,
 							chatUser.getChat (),
 							"chat_user_create",
 							"chat_user_view",

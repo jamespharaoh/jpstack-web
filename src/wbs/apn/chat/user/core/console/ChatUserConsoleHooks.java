@@ -13,6 +13,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
 
@@ -51,6 +52,7 @@ class ChatUserConsoleHooks
 	@Override
 	public
 	void applySearchFilter (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object searchObject) {
 
 		if (searchObject instanceof Map) {

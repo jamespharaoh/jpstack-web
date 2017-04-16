@@ -518,6 +518,7 @@ class ManualResponderRequestPendingSummaryPart
 
 		if (
 			privChecker.canRecursive (
+				taskLogger,
 				manualResponder,
 				"number")
 		) {

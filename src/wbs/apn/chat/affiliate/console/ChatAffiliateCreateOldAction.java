@@ -188,9 +188,12 @@ class ChatAffiliateCreateOldAction
 
 			// check permissions
 
-			if (! privChecker.canRecursive (
+			if (
+				! privChecker.canRecursive (
+					taskLogger,
 					chatScheme,
-					"affiliate_create")) {
+					"affiliate_create")
+			) {
 
 				requestContext.addError ("Access denied");
 

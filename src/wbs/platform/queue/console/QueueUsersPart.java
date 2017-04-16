@@ -84,6 +84,11 @@ class QueueUsersPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		Map <Long, UserData> temp =
 			new HashMap<> ();
 
@@ -107,6 +112,7 @@ class QueueUsersPart
 
 			if (
 				! privChecker.canRecursive (
+					taskLogger,
 					parent,
 					"manage")
 			) {

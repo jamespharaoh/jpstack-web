@@ -1,17 +1,24 @@
 package wbs.smsapps.subscription.console;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import org.joda.time.Instant;
 
 import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.sms.number.core.console.NumberPlugin;
 import wbs.sms.number.core.model.NumberRec;
+
 import wbs.smsapps.subscription.model.SubscriptionSubRec;
 
 @Accessors (chain = true)
@@ -21,6 +28,9 @@ class SubscriptionNumberAdvice
 	implements NumberPlugin.Link {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
@@ -81,9 +91,16 @@ class SubscriptionNumberAdvice
 
 	@Override
 	public
-	boolean canView () {
+	boolean canView (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"canView");
 
 		return privChecker.canRecursive (
+			taskLogger,
 			subscriptionSub
 				.getSubscriptionNumber ()
 				.getSubscription (),

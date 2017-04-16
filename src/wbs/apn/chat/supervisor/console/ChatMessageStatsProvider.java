@@ -9,17 +9,20 @@ import lombok.NonNull;
 
 import org.joda.time.Instant;
 
-import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
-import wbs.apn.chat.contact.model.ChatMessageRec;
-import wbs.apn.chat.contact.model.ChatMessageSearch;
-import wbs.apn.chat.user.core.model.ChatUserType;
 import wbs.console.reporting.StatsDataSet;
 import wbs.console.reporting.StatsDatum;
 import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
+
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
+import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.contact.model.ChatMessageSearch;
+import wbs.apn.chat.user.core.model.ChatUserType;
 
 @SingletonComponent ("chatMessageStatsProvider")
 public
@@ -36,6 +39,7 @@ class ChatMessageStatsProvider
 	@Override
 	public
 	StatsDataSet getStats (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull StatsPeriod period,
 			@NonNull Map <String, Object> conditions) {
 

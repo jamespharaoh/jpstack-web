@@ -2,14 +2,21 @@ package wbs.apn.chat.contact.console;
 
 import com.google.common.collect.ImmutableList;
 
-import wbs.apn.chat.contact.model.ChatUserInitiationLogSearch;
-import wbs.apn.chat.contact.model.ChatUserInitiationLogRec;
-import wbs.apn.chat.core.console.ChatConsoleHelper;
-import wbs.apn.chat.core.model.ChatRec;
+import lombok.NonNull;
+
 import wbs.console.helper.core.ConsoleHooks;
 import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.apn.chat.contact.model.ChatUserInitiationLogRec;
+import wbs.apn.chat.contact.model.ChatUserInitiationLogSearch;
+import wbs.apn.chat.core.console.ChatConsoleHelper;
+import wbs.apn.chat.core.model.ChatRec;
 
 @SingletonComponent ("chatUserInitiationLogConsoleHooks")
 public
@@ -21,6 +28,9 @@ class ChatUserInitiationLogConsoleHooks
 	@SingletonDependency
 	ChatConsoleHelper chatHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserPrivChecker privChecker;
 
@@ -29,7 +39,13 @@ class ChatUserInitiationLogConsoleHooks
 	@Override
 	public
 	void applySearchFilter (
-			Object searchObject) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Object searchObject) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"applySearchFilter");
 
 		ChatUserInitiationLogSearch search =
 			(ChatUserInitiationLogSearch)
@@ -52,6 +68,7 @@ class ChatUserInitiationLogConsoleHooks
 
 			if (
 				! privChecker.canRecursive (
+					taskLogger,
 					chat,
 					"supervisor")
 			) {

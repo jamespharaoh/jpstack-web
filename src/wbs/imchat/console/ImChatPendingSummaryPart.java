@@ -155,6 +155,11 @@ class ImChatPendingSummaryPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		// get field sets
 
 		customerFields =
@@ -193,6 +198,7 @@ class ImChatPendingSummaryPart
 
 		canSupervise =
 			privChecker.canRecursive (
+				taskLogger,
 				imChat,
 				"supervisor");
 

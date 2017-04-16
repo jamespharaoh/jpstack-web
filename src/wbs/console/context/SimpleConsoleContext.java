@@ -177,6 +177,7 @@ class SimpleConsoleContext
 
 				if (
 					privChecker.canRecursive (
+						taskLogger,
 						GlobalId.root,
 						listSecondElementRequired (
 							privCodeParts))

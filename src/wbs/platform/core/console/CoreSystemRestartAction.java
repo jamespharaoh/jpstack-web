@@ -169,6 +169,7 @@ class CoreSystemRestartAction
 
 		if (
 			! userPrivChecker.canRecursive (
+				taskLogger,
 				apiDeployment,
 				"restart")
 		) {
@@ -225,6 +226,7 @@ class CoreSystemRestartAction
 
 		if (
 			! userPrivChecker.canRecursive (
+				taskLogger,
 				consoleDeployment,
 				"restart")
 		) {
@@ -281,6 +283,7 @@ class CoreSystemRestartAction
 
 		if (
 			! userPrivChecker.canRecursive (
+				taskLogger,
 				daemonDeployment,
 				"restart")
 		) {

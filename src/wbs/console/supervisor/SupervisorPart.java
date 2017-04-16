@@ -361,6 +361,7 @@ class SupervisorPart
 
 			StatsDataSet statsDataSet =
 				statsProvider.getStats (
+					taskLogger,
 					statsPeriod,
 					statsConditions);
 
@@ -409,6 +410,7 @@ class SupervisorPart
 					taskLogger);
 
 			pagePart.setup (
+				taskLogger,
 				partParameters);
 
 			pagePart.prepare (

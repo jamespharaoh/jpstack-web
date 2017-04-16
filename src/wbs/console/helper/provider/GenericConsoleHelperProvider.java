@@ -362,6 +362,7 @@ class GenericConsoleHelperProvider <
 
 			if (
 				privChecker.canRecursive (
+					taskLogger,
 					privObject,
 					privCode)
 			) {
@@ -621,6 +622,7 @@ class GenericConsoleHelperProvider <
 
 				if (
 					privChecker.canRecursive (
+						taskLogger,
 						privObject,
 						privCode)
 				) {
@@ -717,6 +719,7 @@ class GenericConsoleHelperProvider <
 					viewDelegatePrivCode);
 
 				return privChecker.canRecursive (
+					taskLogger,
 					delegate,
 					viewDelegatePrivCode);
 
@@ -745,6 +748,7 @@ class GenericConsoleHelperProvider <
 			"Delegating to priv checker");
 
 		return privChecker.canRecursive (
+			taskLogger,
 			object);
 
 	}

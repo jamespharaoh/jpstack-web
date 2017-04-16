@@ -16,9 +16,11 @@ import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.string.FormatWriter;
@@ -32,6 +34,9 @@ class AbstractPagePart
 	@SingletonDependency
 	protected
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	protected
@@ -92,6 +97,7 @@ class AbstractPagePart
 	@Override
 	public
 	void setup (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Map <String, Object> parameters) {
 
 		if (requestContext == null) {

@@ -67,6 +67,7 @@ class UserPrivCheckerBuilder {
 		@Override
 		public
 		boolean canRecursive (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Long privId) {
 
 			return userPrivData.canNormal (
@@ -77,10 +78,12 @@ class UserPrivCheckerBuilder {
 		@Override
 		public
 		boolean canRecursive (
-				GlobalId parentGlobalId,
-				String... privCodes) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull GlobalId parentGlobalId,
+				@NonNull String ... privCodes) {
 
 			return userPrivData.canList (
+				parentTaskLogger,
 				parentGlobalId,
 				Arrays.asList (privCodes),
 				true);
@@ -90,6 +93,7 @@ class UserPrivCheckerBuilder {
 		@Override
 		public
 		boolean canRecursive (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Class<? extends Record<?>> parentClass,
 				@NonNull Long parentId,
 				@NonNull String... privCodes) {
@@ -99,6 +103,7 @@ class UserPrivCheckerBuilder {
 					parentClass);
 
 			return userPrivData.canList (
+				parentTaskLogger,
 				new GlobalId (
 					parentTypeId,
 					parentId),
@@ -111,6 +116,7 @@ class UserPrivCheckerBuilder {
 		@Override
 		public
 		boolean canRecursive (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Record <?> parentObject,
 				@NonNull String ... privCodes) {
 
@@ -119,6 +125,7 @@ class UserPrivCheckerBuilder {
 					parentObject.getClass ());
 
 			return userPrivData.canList (
+				parentTaskLogger,
 				new GlobalId (
 					parentObjectTypeId,
 					parentObject.getId ()),
@@ -131,12 +138,15 @@ class UserPrivCheckerBuilder {
 		@Override
 		public
 		boolean canSimple (
-				GlobalId parentGlobalId,
-				String... privCodes) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull GlobalId parentGlobalId,
+				@NonNull String ... privCodes) {
 
 			return userPrivData.canList (
+				parentTaskLogger,
 				parentGlobalId,
-				Arrays.asList (privCodes),
+				Arrays.asList (
+					privCodes),
 				false);
 
 		}
@@ -144,6 +154,7 @@ class UserPrivCheckerBuilder {
 		@Override
 		public
 		boolean canSimple (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Record<?> parentObject,
 				@NonNull String... privCodes) {
 
@@ -152,6 +163,7 @@ class UserPrivCheckerBuilder {
 					parentObject.getClass ());
 
 			return userPrivData.canList (
+				parentTaskLogger,
 				new GlobalId (
 					parentObjectTypeId,
 					parentObject.getId ()),
@@ -164,10 +176,13 @@ class UserPrivCheckerBuilder {
 		@Override
 		public
 		boolean canRecursive (
-				Map<Object,Collection<String>> map) {
+				@NonNull TaskLogger parentTaskLogger,
+				@NonNull Map <Object, Collection <String>> map) {
 
-			for (Map.Entry<Object,Collection<String>> ent
-					: map.entrySet ()) {
+			for (
+				Map.Entry <Object, Collection <String>> ent
+					: map.entrySet ()
+			) {
 
 				Object key =
 					ent.getKey ();
@@ -208,6 +223,7 @@ class UserPrivCheckerBuilder {
 						privCodes)
 
 					&& userPrivData.canList (
+						parentTaskLogger,
 						parentObjectId,
 						privCodes,
 						true)
@@ -222,6 +238,7 @@ class UserPrivCheckerBuilder {
 						privCodes)
 
 					&& userPrivData.canList (
+						parentTaskLogger,
 						parentObjectId,
 						Collections.<String>emptyList (),
 						true)
@@ -239,6 +256,7 @@ class UserPrivCheckerBuilder {
 		@Override
 		public
 		boolean canGrant (
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Long privId) {
 
 			Long managePrivId =

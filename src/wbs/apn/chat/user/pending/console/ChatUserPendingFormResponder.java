@@ -285,6 +285,7 @@ class ChatUserPendingFormResponder
 
 			if (
 				privChecker.canRecursive (
+					taskLogger,
 					GlobalId.root,
 					"manage")
 			) {

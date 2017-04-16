@@ -151,20 +151,20 @@ class ComponentManagerImplementation
 			Optional <ComponentDefinition> componentDefinitionOptional =
 				registry.byName (
 					componentName);
-	
+
 			if (
 				optionalIsNotPresent (
 					componentDefinitionOptional)
 			) {
-	
+
 				return optionalAbsent ();
-	
+
 			}
-	
+
 			ComponentDefinition componentDefinition =
 				optionalGetRequired (
 					componentDefinitionOptional);
-	
+
 			return optionalOf (
 				componentClass.cast (
 					getComponent (
@@ -193,23 +193,23 @@ class ComponentManagerImplementation
 			Optional <ComponentDefinition> componentDefinitionOptional =
 				registry.byName (
 					componentName);
-	
+
 			if (
 				optionalIsNotPresent (
 					componentDefinitionOptional)
 			) {
-	
+
 				throw new NoSuchComponentException (
 					stringFormat (
 						"Component definition with name %s does not exist",
 						componentName));
-	
+
 			}
-	
+
 			ComponentDefinition componentDefinition =
 				optionalGetRequired (
 					componentDefinitionOptional);
-	
+
 			return componentClass.cast (
 				getComponent (
 					taskLogger,
@@ -238,18 +238,18 @@ class ComponentManagerImplementation
 			Optional <ComponentDefinition> componentDefinitionOptional =
 				registry.byName (
 					componentName);
-	
+
 			if (
 				optionalIsNotPresent (
 					componentDefinitionOptional)
 			) {
 				return orElse.get ();
 			}
-	
+
 			ComponentDefinition componentDefinition =
 				optionalGetRequired (
 					componentDefinitionOptional);
-	
+
 			return componentClass.cast (
 				getComponent (
 					taskLogger,
@@ -374,34 +374,34 @@ class ComponentManagerImplementation
 					componentDefinition.scope (),
 					"prototype")
 			) {
-	
+
 				return instantiateComponent (
 					taskLogger,
 					componentDefinition,
 					initialize);
-	
+
 			} else if (
 				stringEqualSafe (
 					componentDefinition.scope (),
 					"singleton")
 			) {
-	
+
 				if (! initialize) {
 					throw new IllegalArgumentException ();
 				}
-	
+
 				Object component =
 					singletonComponents.get (
 						componentDefinition.name ());
-	
+
 				if (component != null)
 					return component;
-	
+
 				if (
 					singletonComponentsInCreation.contains (
 						componentDefinition.name ())
 				) {
-	
+
 					throw new RuntimeExceptionWithTask (
 						activityManager.currentTask (),
 						stringFormat (
@@ -409,62 +409,62 @@ class ComponentManagerImplementation
 							componentDefinition.name (),
 							joinWithCommaAndSpace (
 								singletonComponentsInCreation)));
-	
+
 				}
-	
+
 				if (
 					singletonComponentsFailed.contains (
 						componentDefinition.name ())
 				) {
-	
+
 					throw new RuntimeExceptionWithTask (
 						activityManager.currentTask (),
 						stringFormat (
 							"Singleton component %s already failed",
 							componentDefinition.name ()));
-	
+
 				}
-	
+
 				singletonComponentsInCreation.add (
 					componentDefinition.name ());
-	
+
 				try {
-	
+
 					component =
 						instantiateComponent (
 							taskLogger,
 							componentDefinition,
 							true);
-	
+
 					singletonComponents.put (
 						componentDefinition.name (),
 						component);
-	
+
 				} finally {
-	
+
 					singletonComponentsInCreation.remove (
 						componentDefinition.name ());
-	
+
 					if (component == null) {
-	
+
 						singletonComponentsFailed.add (
 							componentDefinition.name ());
-	
+
 					}
-	
+
 				}
-	
+
 				return component;
-	
+
 			} else {
-	
+
 				throw new RuntimeExceptionWithTask (
 					activityManager.currentTask (),
 					stringFormat (
 						"Unrecognised scope %s for component %s",
 						componentDefinition.scope (),
 						componentDefinition.name ()));
-	
+
 			}
 
 		}
@@ -501,106 +501,106 @@ class ComponentManagerImplementation
 				"Instantiating %s (%s)",
 				componentDefinition.name (),
 				componentDefinition.scope ());
-	
+
 			// instantiate
-	
+
 			Object protoComponent =
 				classInstantiate (
 					ifNull (
 						componentDefinition.factoryClass (),
 						componentDefinition.componentClass ()));
-	
+
 			// set properties
-	
+
 			setComponentValueProperties (
 				taskLogger,
 				componentDefinition,
 				protoComponent);
-	
+
 			setComponentReferenceProperties (
 				taskLogger,
 				componentDefinition,
 				protoComponent);
-	
+
 			setComponentInjectedProperties (
 				taskLogger,
 				componentDefinition,
 				protoComponent);
-	
+
 			// call factory
-	
+
 			Object component;
 			ComponentMetaDataImplementation componentMetaData;
-	
+
 			if (
 				isNotNull (
 					componentDefinition.factoryClass ())
 			) {
-	
+
 				ComponentFactory componentFactory =
 					(ComponentFactory)
 					protoComponent;
-	
+
 				component =
 					componentFactory.makeComponent (
 						taskLogger);
-	
+
 				if (
 					isNull (
 						component)
 				) {
-	
+
 					throw new RuntimeExceptionWithTask (
 						activityManager.currentTask (),
 						stringFormat (
 							"Factory component returned null for %s",
 							componentDefinition.name ()));
-	
+
 				}
-	
+
 				componentMetaData =
 					findOrCreateMetaDataForComponent (
 						componentDefinition,
 						component);
-	
+
 			} else {
-	
+
 				component =
 					protoComponent;
-	
+
 				componentMetaData =
 					findOrCreateMetaDataForComponent (
 						componentDefinition,
 						component);
-	
+
 			}
-	
+
 			// initialize
-	
+
 			if (
-	
+
 				initialize
-	
+
 				&& enumEqualSafe (
 					componentMetaData.state,
 					ComponentState.uninitialized)
-	
+
 			) {
-	
+
 				initializeComponent (
 					taskLogger,
 					componentDefinition,
 					component,
 					componentMetaData);
-	
+
 			}
-	
+
 			// and finish
-	
+
 			taskLogger.debugFormat (
 				"Component %s instantiated successfully",
 				componentDefinition.name ());
-	
+
 			return component;
 
 		}
@@ -793,23 +793,23 @@ class ComponentManagerImplementation
 				Map.Entry <String,String> entry
 					: componentDefinition.referenceProperties ().entrySet ()
 			) {
-	
+
 				taskLogger.debugFormat (
 					"Setting reference property %s.%s",
 					componentDefinition.name (),
 					entry.getKey ());
-	
+
 				Object target =
 					getComponentRequired (
 						taskLogger,
 						entry.getValue (),
 						Object.class);
-	
+
 				PropertyUtils.propertySetSimple (
 					component,
 					entry.getKey (),
 					target);
-	
+
 			}
 
 		}
@@ -833,13 +833,13 @@ class ComponentManagerImplementation
 				InjectedProperty injectedProperty
 					: componentDefinition.injectedProperties ()
 			) {
-	
+
 				injectProperty (
 					taskLogger,
 					componentDefinition,
 					component,
 					injectedProperty);
-	
+
 			}
 
 		}

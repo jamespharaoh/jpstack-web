@@ -553,6 +553,7 @@ class ObjectListPart <
 
 				if (
 					! criteriaSpec.evaluate (
+						taskLogger,
 						consoleHelper,
 						object)
 				) {

@@ -203,9 +203,12 @@ class ChatMonitorInboxFormAction
 
 				// check if they can ignore
 
-				if (! privChecker.canRecursive (
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
 						chat,
-						"manage")) {
+						"manage")
+				) {
 
 					requestContext.addError (
 						"Can't ignore");

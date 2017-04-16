@@ -521,6 +521,7 @@ class FormFieldLogic {
 
 			if (
 				! formField.canView (
+					taskLogger,
 					object,
 					hints)
 			) {
@@ -588,6 +589,11 @@ class FormFieldLogic {
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"outputFormTemporarilyHidden");
+
 		for (
 			FormField <Container, ?, ?, ?> formField
 				: formFieldSet.formFields ()
@@ -595,6 +601,7 @@ class FormFieldLogic {
 
 			if (
 				! formField.canView (
+					taskLogger,
 					object,
 					hints)
 			) {
@@ -638,6 +645,7 @@ class FormFieldLogic {
 
 			if (
 				! formField.canView (
+					taskLogger,
 					object,
 					hints)
 			) {
@@ -1107,6 +1115,7 @@ class FormFieldLogic {
 
 			if (
 				! formField.canView (
+					taskLogger,
 					object,
 					hints)
 			) {
@@ -1141,8 +1150,14 @@ class FormFieldLogic {
 			@NonNull Container object,
 			@NonNull Map <String, Object> hints) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"outputFormDebug");
+
 		if (
 			! privChecker.canSimple (
+				taskLogger,
 				GlobalId.root,
 				"debug")
 		) {

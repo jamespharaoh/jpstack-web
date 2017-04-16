@@ -18,6 +18,7 @@ class NullUserPrivChecker
 	@Override
 	public
 	boolean canRecursive (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long privId) {
 
 		return false;
@@ -27,6 +28,7 @@ class NullUserPrivChecker
 	@Override
 	public
 	boolean canRecursive (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull GlobalId parentObjectId,
 			@NonNull String ... privCodes) {
 
@@ -37,6 +39,7 @@ class NullUserPrivChecker
 	@Override
 	public
 	boolean canRecursive (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Class <? extends Record <?>> parentObjectClass,
 			@NonNull Long parentObjectId,
 			@NonNull String ... privCodes) {
@@ -48,6 +51,7 @@ class NullUserPrivChecker
 	@Override
 	public
 	boolean canRecursive (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object,
 			@NonNull String ... privCodes) {
 
@@ -58,6 +62,7 @@ class NullUserPrivChecker
 	@Override
 	public
 	boolean canSimple (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull GlobalId parentObjectId,
 			@NonNull String ... privCodes) {
 
@@ -68,6 +73,7 @@ class NullUserPrivChecker
 	@Override
 	public
 	boolean canSimple (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> parentObject,
 			@NonNull String ... privCodes) {
 
@@ -78,6 +84,7 @@ class NullUserPrivChecker
 	@Override
 	public
 	boolean canRecursive (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Map <Object, Collection <String>> map) {
 
 		return false;
@@ -87,6 +94,7 @@ class NullUserPrivChecker
 	@Override
 	public
 	boolean canGrant (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long privId) {
 
 		return false;

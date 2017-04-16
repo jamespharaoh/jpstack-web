@@ -298,18 +298,19 @@ class HtmlResponder
 	void renderDebugInformation (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderDebugInformation");
+
 		if (
 			! privChecker.canSimple (
+				taskLogger,
 				GlobalId.root,
 				"debug")
 		) {
 			return;
 		}
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"renderDebugInformation");
 
 		formatWriter.writeLineFormatIncreaseIndent (
 			"<!--");

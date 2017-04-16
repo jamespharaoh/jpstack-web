@@ -143,6 +143,7 @@ class BroadcastNumbersAction
 
 			if (
 				! privChecker.canRecursive (
+					taskLogger,
 					broadcastConfig,
 					"manage")
 			) {

@@ -33,8 +33,10 @@ import org.joda.time.Instant;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.DurationFormatter;
@@ -63,6 +65,9 @@ class ChatAffiliateComparePart
 	@SingletonDependency
 	DurationFormatter durationFormatter;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserPrivChecker privChecker;
 
@@ -77,6 +82,11 @@ class ChatAffiliateComparePart
 	public
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		// check units
 
@@ -185,10 +195,11 @@ class ChatAffiliateComparePart
 		// now select and sort the ones we are allowed to see
 
 		chatAffiliateWithNewUserCounts =
-			new ArrayList<ChatAffiliateWithNewUserCount> ();
+			new ArrayList<> ();
 
 		if (
 			privChecker.canRecursive (
+				taskLogger,
 				chat,
 				"stats")
 		) {
@@ -204,8 +215,14 @@ class ChatAffiliateComparePart
 				ChatAffiliateRec chatAffiliate =
 					chatAffiliateWithNewUserCount.chatAffiliate;
 
-				if (! privChecker.canRecursive (chatAffiliate, "stats"))
+				if (
+					! privChecker.canRecursive (
+						taskLogger,
+						chatAffiliate,
+						"stats")
+				) {
 					continue;
+				}
 
 				chatAffiliateWithNewUserCounts.add (
 					chatAffiliateWithNewUserCount);

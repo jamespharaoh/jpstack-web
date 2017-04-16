@@ -126,8 +126,14 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 	@Override
 	public
 	boolean canView (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"canView");
 
 		// check feature
 
@@ -137,6 +143,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 				featureCode)
 
 			&& ! featureChecker.checkFeatureAccess (
+				taskLogger,
 				featureCode)
 
 		) {
@@ -165,8 +172,8 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 				privParts.get (0);
 
 			return privChecker.canRecursive (
-				(Record<?>)
-				container,
+				taskLogger,
+				(Record<?>) container,
 				privCode);
 
 		} else if (
@@ -188,6 +195,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 					hints);
 
 			return privChecker.canRecursive (
+				taskLogger,
 				delegate,
 				privCode);
 

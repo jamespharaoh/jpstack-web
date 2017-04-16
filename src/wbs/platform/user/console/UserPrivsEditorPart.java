@@ -27,10 +27,12 @@ import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
@@ -47,6 +49,9 @@ class UserPrivsEditorPart
 	extends AbstractPagePart {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ObjectManager objectManager;
@@ -114,6 +119,11 @@ class UserPrivsEditorPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		// build the privs tree
 
 		List <PrivRec> privs =
@@ -124,9 +134,13 @@ class UserPrivsEditorPart
 				: privs
 		) {
 
-			if (! privChecker.canGrant (
-					priv.getId ()))
+			if (
+				! privChecker.canGrant (
+					taskLogger,
+					priv.getId ())
+			) {
 				continue;
+			}
 
 			Record <?> parentObject =
 				objectManager.getParentRequired (

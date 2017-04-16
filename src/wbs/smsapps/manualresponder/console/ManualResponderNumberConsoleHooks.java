@@ -9,6 +9,7 @@ import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
 
@@ -38,6 +39,7 @@ class ManualResponderNumberConsoleHooks
 	@Override
 	public
 	void applySearchFilter (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object searchObject) {
 
 		ManualResponderNumberSearch search =

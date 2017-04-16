@@ -35,8 +35,10 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
@@ -59,11 +61,14 @@ class ChatAffiliateCreateOldPart
 	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
-
-	@SingletonDependency
 	@Named
 	EnumConsoleHelper <?> genderConsoleHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
 
 	@SingletonDependency
 	@Named
@@ -83,6 +88,11 @@ class ChatAffiliateCreateOldPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		ChatRec chat =
 			chatHelper.findFromContextRequired ();
 
@@ -92,6 +102,7 @@ class ChatAffiliateCreateOldPart
 			.filter (
 				chatScheme ->
 					privChecker.canRecursive (
+						taskLogger,
 						chatScheme,
 						"affiliate_create"))
 

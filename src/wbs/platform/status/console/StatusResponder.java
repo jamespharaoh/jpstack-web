@@ -127,6 +127,7 @@ class StatusResponder
 					taskLogger);
 
 			pagePart.setup (
+				taskLogger,
 				Collections.emptyMap ());
 
 			pageParts.add (

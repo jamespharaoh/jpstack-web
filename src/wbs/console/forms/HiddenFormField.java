@@ -104,8 +104,14 @@ class HiddenFormField <Container, Generic, Native>
 	@Override
 	public
 	boolean canView (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"canView");
 
 		if (
 			isNull (
@@ -127,8 +133,8 @@ class HiddenFormField <Container, Generic, Native>
 				privParts.get (0);
 
 			return privChecker.canRecursive (
-				(Record <?>)
-				container,
+				taskLogger,
+				(Record <?>) container,
 				privCode);
 
 		} else if (
@@ -150,6 +156,7 @@ class HiddenFormField <Container, Generic, Native>
 					hints);
 
 			return privChecker.canRecursive (
+				taskLogger,
 				delegate,
 				privCode);
 

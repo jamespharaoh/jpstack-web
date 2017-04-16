@@ -13,14 +13,24 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
+@PrototypeComponent ("userPrivData")
 public
 class UserPrivData {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// properties
 
 	public
 	SharedData sharedData;
@@ -140,9 +150,15 @@ class UserPrivData {
 
 	public
 	boolean canList (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull GlobalId parentObjectId,
 			@NonNull Collection <String> privCodes,
 			@NonNull Boolean recurse) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"canList");
 
 		ObjectData objectData =
 			sharedData.objectDatasByObjectId.get (
@@ -153,10 +169,9 @@ class UserPrivData {
 				objectData)
 		) {
 
-			log.warn (
-				stringFormat (
-					"No priv data for %s",
-					parentObjectId.toString ()));
+			taskLogger.warningFormat (
+				"No priv data for %s",
+				parentObjectId.toString ());
 
 			return false;
 
@@ -221,13 +236,12 @@ class UserPrivData {
 
 					}
 
-					log.warn (
-						stringFormat (
-							"Unknown priv %s on object type %s (%s)",
-							privCode,
-							objectTypeCode,
-							integerToDecimalString (
-								parentObjectId.objectId ())));
+					taskLogger.warningFormat (
+						"Unknown priv %s on object type %s (%s)",
+						privCode,
+						objectTypeCode,
+						integerToDecimalString (
+							parentObjectId.objectId ()));
 
 					return false;
 

@@ -151,6 +151,7 @@ class TabbedResponder
 		if (pagePart != null) {
 
 			pagePart.setup (
+				taskLogger,
 				Collections.emptyMap ());
 
 		}
@@ -455,6 +456,7 @@ class TabbedResponder
 
 			if (
 				privChecker.canSimple (
+					taskLogger,
 					GlobalId.root,
 					"debug")
 			) {

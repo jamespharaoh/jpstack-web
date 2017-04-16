@@ -21,8 +21,10 @@ import lombok.NonNull;
 import wbs.console.part.AbstractPagePart;
 import wbs.console.priv.UserPrivChecker;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.affiliate.console.ChatAffiliateUsersSummaryConsoleHelper;
@@ -47,6 +49,9 @@ class ChatReportStatisticsPart
 
 	@SingletonDependency
 	ChatUsersSummaryConsoleHelper chatUsersSummaryHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
@@ -80,6 +85,11 @@ class ChatReportStatisticsPart
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		chat =
 			chatHelper.findFromContextRequired ();
 
@@ -94,6 +104,7 @@ class ChatReportStatisticsPart
 
 			if (
 				! privChecker.canRecursive (
+					taskLogger,
 					chatAffiliateUsersSummary.getChatAffiliate (),
 					"chat_user_view")
 			) {
@@ -146,6 +157,7 @@ class ChatReportStatisticsPart
 
 		canMonitor =
 			privChecker.canRecursive (
+				taskLogger,
 				chat,
 				"monitor");
 

@@ -6,11 +6,17 @@ import lombok.NonNull;
 
 import wbs.console.helper.core.ConsoleHooks;
 import wbs.console.priv.UserPrivChecker;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
+
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
+
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestSearch;
@@ -21,6 +27,9 @@ class ManualResponderRequestConsoleHooks
 	implements ConsoleHooks <ManualResponderRequestRec> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ManualResponderConsoleHelper manualResponderHelper;
@@ -39,7 +48,13 @@ class ManualResponderRequestConsoleHooks
 	@Override
 	public
 	void applySearchFilter (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object searchObject) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"applySearchFilter");
 
 		ManualResponderRequestSearch search =
 			(ManualResponderRequestSearch)
@@ -62,6 +77,7 @@ class ManualResponderRequestConsoleHooks
 
 			if (
 				! privChecker.canRecursive (
+					taskLogger,
 					manualResponder,
 					"supervisor")
 			) {
@@ -85,6 +101,7 @@ class ManualResponderRequestConsoleHooks
 
 			if (
 				! privChecker.canRecursive (
+					taskLogger,
 					user,
 					"supervisor")
 			) {

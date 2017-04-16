@@ -213,6 +213,11 @@ class ImChatPendingFormResponder
 	void renderHtmlBodyContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContents");
+
 		requestContext.flushNotices (
 			formatWriter);
 
@@ -221,12 +226,19 @@ class ImChatPendingFormResponder
 		htmlHeadingTwoWrite (
 			"Reply to IM chat");
 
-		renderForm ();
+		renderForm (
+			taskLogger);
 
 	}
 
 	private
-	void renderForm () {
+	void renderForm (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderForm");
 
 		// form open
 
@@ -265,7 +277,8 @@ class ImChatPendingFormResponder
 
 		}
 
-		renderIgnore ();
+		renderIgnore (
+			taskLogger);
 
 		// table close
 
@@ -559,10 +572,17 @@ class ImChatPendingFormResponder
 
 	}
 
-	void renderIgnore () {
+	void renderIgnore (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderIgnore");
 
 		if (
 			! privChecker.canRecursive (
+				taskLogger,
 				imChat,
 				"supervisor")
 		) {

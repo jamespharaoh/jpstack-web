@@ -200,6 +200,7 @@ class ConsoleExceptionHandler
 
 				if (
 					privChecker.canSimple (
+						taskLogger,
 						GlobalId.root,
 						"debug")
 				) {

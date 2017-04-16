@@ -1,10 +1,11 @@
 package wbs.console.forms;
 
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
-
-import com.google.common.base.Optional;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("nameFormFieldConstraintValidator")
 public
@@ -13,9 +14,10 @@ class NameFormFieldConstraintValidator<Container>
 
 	@Override
 	public
-	Optional<String> validate (
+	Optional <String> validate (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Optional<String> nativeValue) {
+			@NonNull Optional <String> nativeValue) {
 
 		/*
 

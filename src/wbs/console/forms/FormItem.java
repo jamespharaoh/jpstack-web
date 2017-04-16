@@ -13,6 +13,8 @@ import lombok.NonNull;
 
 import wbs.console.html.ScriptRef;
 
+import wbs.framework.logging.TaskLogger;
+
 public
 interface FormItem <Container> {
 
@@ -46,6 +48,7 @@ interface FormItem <Container> {
 
 	default
 	boolean canView (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints) {
 

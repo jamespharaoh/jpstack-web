@@ -27,7 +27,8 @@ public
 interface ConsoleFormActionHelper <FormState> {
 
 	default
-	Pair <Boolean, Boolean> canBePerformed () {
+	Pair <Boolean, Boolean> canBePerformed (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return Pair.of (
 			true,

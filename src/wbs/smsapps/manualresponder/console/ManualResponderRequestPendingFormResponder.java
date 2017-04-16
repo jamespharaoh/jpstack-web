@@ -272,6 +272,7 @@ class ManualResponderRequestPendingFormResponder
 
 		manager =
 			privChecker.canRecursive (
+				taskLogger,
 				manualResponder,
 				"manage");
 
@@ -332,6 +333,11 @@ class ManualResponderRequestPendingFormResponder
 	void renderHtmlBodyContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContents");
+
 		requestContext.flushNotices (
 			formatWriter);
 
@@ -348,6 +354,7 @@ class ManualResponderRequestPendingFormResponder
 		} else if (
 
 			! privChecker.canRecursive (
+				taskLogger,
 				manualResponder,
 				"reply")
 
@@ -364,6 +371,7 @@ class ManualResponderRequestPendingFormResponder
 
 			() -> not (
 				privChecker.canRecursive (
+					taskLogger,
 					manualResponder,
 					"manage"))
 

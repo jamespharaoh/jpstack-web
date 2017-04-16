@@ -160,6 +160,7 @@ class QueueDebugPart
 
 			.filter (queueInfo ->
 				userPrivChecker.canRecursive (
+					taskLogger,
 					queueInfo.queue (),
 					"supervisor"))
 
