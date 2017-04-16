@@ -226,6 +226,7 @@ class ChatUserSummaryPart
 			htmlTableDetailsRowWriteHtml (
 				"Pic",
 				() -> mediaConsoleLogic.writeMediaThumb100 (
+					taskLogger,
 					chatUser.getChatUserImageList ().get (0).getMedia ()));
 
 		}

@@ -4,6 +4,7 @@ import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.etc.EnumUtils.enumEqualSafe;
 import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.EnumUtils.enumNotInSafe;
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.LogicUtils.referenceEqualWithClass;
 import static wbs.utils.etc.Misc.isNotNull;
@@ -16,7 +17,6 @@ import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalNotEqualAndPresentWithClass;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
 import static wbs.utils.time.TimeUtils.earlierThan;
 import static wbs.utils.time.TimeUtils.laterThan;
 
@@ -152,16 +152,18 @@ class QueueSubjectSorter {
 						getClass ().getSimpleName (),
 						"sort",
 						joinWithCommaAndSpace (
-							stringFormatObsolete (
+							stringFormat (
 								"queue=%s",
-								ifNull (
+								ifNotNullThenElse (
 									queue,
-									"null")),
-							stringFormatObsolete (
+									() -> queue.toString (),
+									() -> "null"),
+							stringFormat (
 								"effectiveUser=%s",
-								ifNull (
+								ifNotNullThenElse (
 									effectiveUser,
-									"null")))),
+									() -> effectiveUser.toString (),
+									() -> "null"))))),
 					this);
 
 		) {

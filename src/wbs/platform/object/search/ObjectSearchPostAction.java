@@ -429,6 +429,7 @@ class ObjectSearchPostAction <
 								targetContext.get ().pathPrefix (),
 								"/%s",
 								consoleHelper.getPathId (
+									taskLogger,
 									objectIds.get (
 										0))));
 
@@ -446,6 +447,7 @@ class ObjectSearchPostAction <
 						.targetUrl (
 							requestContext.resolveLocalUrl (
 								consoleHelper.getDefaultLocalPathGeneric (
+									taskLogger,
 									object)));
 
 

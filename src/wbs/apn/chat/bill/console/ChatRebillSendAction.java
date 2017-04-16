@@ -191,6 +191,7 @@ class ChatRebillSendAction
 						Pair.of (
 							chatUser,
 							chatCreditLogic.userBillCheck (
+								taskLogger,
 								chatUser,
 								billCheckOptions)))
 

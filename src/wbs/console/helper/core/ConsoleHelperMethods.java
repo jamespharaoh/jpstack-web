@@ -4,6 +4,8 @@ import static wbs.utils.etc.TypeUtils.dynamicCast;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+
 import wbs.console.helper.provider.ConsoleHelperProvider;
 
 import wbs.framework.codegen.DoNotDelegate;
@@ -24,13 +26,16 @@ interface ConsoleHelperMethods <
 	String idKey ();
 
 	String getPathId (
+			TaskLogger parentTaskLogger,
 			RecordType object);
 
 	default
 	String getPathIdGeneric (
+			TaskLogger parentTaskLogger,
 			Record <?> object) {
 
 		return getPathId (
+			parentTaskLogger,
 			dynamicCast (
 				objectHelper ().objectClass (),
 				object));
@@ -38,16 +43,20 @@ interface ConsoleHelperMethods <
 	}
 
 	String getPathId (
+			TaskLogger parentTaskLogger,
 			Long objectId);
 
 	String getDefaultContextPath (
+			TaskLogger parentTaskLogger,
 			RecordType object);
 
 	default
 	String getDefaultContextPathGeneric (
-			Record <?> object) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Record <?> object) {
 
 		return getDefaultContextPath (
+			parentTaskLogger,
 			dynamicCast (
 				objectHelper ().objectClass (),
 				object));
@@ -55,13 +64,16 @@ interface ConsoleHelperMethods <
 	}
 
 	String getDefaultLocalPath (
+			TaskLogger parentTaskLogger,
 			RecordType object);
 
 	default
 	String getDefaultLocalPathGeneric (
-			Record <?> object) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Record <?> object) {
 
 		return getDefaultLocalPath (
+			parentTaskLogger,
 			dynamicCast (
 				objectHelper ().objectClass (),
 				object));
@@ -77,6 +89,7 @@ interface ConsoleHelperMethods <
 	RecordType findFromContextRequired ();
 
 	void writeHtml (
+			TaskLogger parentTaskLogger,
 			FormatWriter formatWriter,
 			RecordType object,
 			Optional <Record <?>> assumedRoot,
@@ -84,12 +97,14 @@ interface ConsoleHelperMethods <
 
 	default
 	void writeHtmlGeneric (
+			TaskLogger parentTaskLogger,
 			FormatWriter formatWriter,
 			Record <?> object,
 			Optional <Record <?>> assumedRoot,
 			Boolean mini) {
 
 		writeHtml (
+			parentTaskLogger,
 			formatWriter,
 			dynamicCast (
 				objectHelper ().objectClass (),

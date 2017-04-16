@@ -7,9 +7,10 @@ import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.nullIfEmptyString;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +42,7 @@ import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 import wbs.framework.data.annotations.DataName;
 import wbs.framework.data.annotations.DataReference;
+
 import wbs.utils.etc.PropertyUtils;
 import wbs.utils.io.RuntimeIoException;
 
@@ -529,9 +531,10 @@ class DataToXml {
 		} else {
 
 			throw new RuntimeException (
-				stringFormatObsolete (
+				stringFormat (
 					"Don't know how to handle collection of type %s",
-					children.getClass ()));
+					classNameSimple (
+						children.getClass ())));
 
 		}
 

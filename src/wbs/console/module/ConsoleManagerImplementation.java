@@ -647,6 +647,7 @@ class ConsoleManagerImplementation
 			try {
 
 				contextType.resolveTabSpecs (
+					taskLogger,
 					contextTabs);
 
 			} catch (Exception exception) {
@@ -1349,6 +1350,7 @@ class ConsoleManagerImplementation
 
 						String defaultUrl =
 							resolveLocalFile (
+								taskLogger,
 								contextStuff,
 								contextStuff.consoleContext (),
 								defaultLocalFile);
@@ -1723,9 +1725,15 @@ class ConsoleManagerImplementation
 	@Override
 	public
 	String resolveLocalFile (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ConsoleContextStuff contextStuff,
 			@NonNull ConsoleContext consoleContext,
 			@NonNull String localFile) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"resolveLocalFile");
 
 		if (localFile.charAt (0) == '/') {
 
@@ -1812,6 +1820,7 @@ class ConsoleManagerImplementation
 				contextStuff.foreignPath (),
 				targetContext.get ().pathPrefix (),
 				consoleContext.localPathForStuff (
+					taskLogger,
 					contextStuff));
 
 		} else {
@@ -1821,6 +1830,7 @@ class ConsoleManagerImplementation
 				contextStuff.foreignPath (),
 				consoleContext.pathPrefix (),
 				consoleContext.localPathForStuff (
+					taskLogger,
 					contextStuff),
 				"/",
 				contextStuff.substitutePlaceholders (

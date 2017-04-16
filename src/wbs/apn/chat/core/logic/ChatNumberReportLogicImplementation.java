@@ -1,27 +1,28 @@
 package wbs.apn.chat.core.logic;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.time.TimeUtils.laterThan;
 
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.Duration;
 import org.joda.time.Instant;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.sms.number.core.model.ChatUserNumberReportObjectHelper;
 import wbs.sms.number.core.model.ChatUserNumberReportRec;
 import wbs.sms.number.core.model.NumberRec;
 
-@Log4j
 @SingletonComponent ("chatNumberReportLogic")
 public
 class ChatNumberReportLogicImplementation
@@ -35,12 +36,21 @@ class ChatNumberReportLogicImplementation
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// implementation
 
 	@Override
 	public
 	boolean isNumberReportSuccessful (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull NumberRec number) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"isNumberReportSuccessful");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -61,8 +71,9 @@ class ChatNumberReportLogicImplementation
 
 			// no DR yet for this number
 
-			log.debug (
-				"REPORT NULL " + number.getNumber ());
+			taskLogger.debugFormat (
+				"REPORT NULL %s",
+				number.getNumber ());
 
 			return true;
 
@@ -73,11 +84,10 @@ class ChatNumberReportLogicImplementation
 
 		if (numberReport.getLastSuccess () != null) {
 
-			log.debug (
-				stringFormat (
-					"REPORT LAST SUCCESS %s %s",
-					numberReport.getLastSuccess ().toString (),
-					number.getNumber ()));
+			taskLogger.debugFormat (
+				"REPORT LAST SUCCESS %s %s",
+				numberReport.getLastSuccess ().toString (),
+				number.getNumber ());
 
 			return laterThan (
 				numberReport.getLastSuccess (),
@@ -87,11 +97,10 @@ class ChatNumberReportLogicImplementation
 
 		if (numberReport.getFirstFailure () != null) {
 
-			log.debug (
-				stringFormat (
-					"REPORT FIRST FAILURE %s %s",
-					numberReport.getFirstFailure ().toString (),
-					number.getNumber ()));
+			taskLogger.debugFormat (
+				"REPORT FIRST FAILURE %s %s",
+				numberReport.getFirstFailure ().toString (),
+				number.getNumber ());
 
 			return laterThan (
 				numberReport.getFirstFailure (),
@@ -101,8 +110,9 @@ class ChatNumberReportLogicImplementation
 
 		// shouldn't happen
 
-		log.debug (
-			"REPORT ERROR " + number.getNumber ());
+		taskLogger.debugFormat (
+			"REPORT ERROR %s",
+			number.getNumber ());
 
 		return true;
 
@@ -111,7 +121,13 @@ class ChatNumberReportLogicImplementation
 	@Override
 	public
 	boolean isNumberReportPastPermanentDeliveryConstraint (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull NumberRec number) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"isNumberReportPastPermanentDeliveryConstraint");
 
 		Optional<ChatUserNumberReportRec> numberReportOptional =
 			chatUserNumberReportHelper.find (
@@ -124,7 +140,9 @@ class ChatNumberReportLogicImplementation
 
 			// no DR yet for this number
 
-			log.debug ("REPORT PERMANENT NULL " + number.getNumber ());
+			taskLogger.debugFormat (
+				"REPORT PERMANENT NULL %s",
+				number.getNumber ());
 
 			return false;
 
@@ -138,8 +156,11 @@ class ChatNumberReportLogicImplementation
 			long count =
 				numberReport.getPermanentFailureCount ();
 
-			log.debug ("REPORT PERMANENT COUNT " + count + " "
-					+ number.getNumber ());
+			taskLogger.debugFormat (
+				"REPORT PERMANENT COUNT %s %s",
+				integerToDecimalString (
+					count),
+				number.getNumber ());
 
 			// disabled at sam's request
 			// if (count >= 42)

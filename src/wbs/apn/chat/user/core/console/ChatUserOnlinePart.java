@@ -183,6 +183,11 @@ class ChatUserOnlinePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlTableOpenList ();
 
 		htmlTableHeaderRowWrite (
@@ -236,6 +241,7 @@ class ChatUserOnlinePart
 				htmlTableCellOpen ();
 
 				mediaConsoleLogic.writeMediaThumb32 (
+					taskLogger,
 					chatUser.getChatUserImageList ().get (0).getMedia ());
 
 				htmlTableCellClose ();

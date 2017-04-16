@@ -3,6 +3,7 @@ package wbs.console.forms;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.ResultUtils.errorResultFormat;
 import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.ResultUtils.successResultAbsent;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 import java.util.Map;
@@ -15,6 +16,7 @@ import org.joda.time.LocalDate;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.TimeFormatter;
 
@@ -35,6 +37,7 @@ class DateFormFieldInterfaceMapping <Container>
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <LocalDate> genericValue) {
@@ -46,8 +49,7 @@ class DateFormFieldInterfaceMapping <Container>
 				genericValue)
 		) {
 
-			return successResult (
-				Optional.absent ());
+			return successResultAbsent ();
 
 		}
 

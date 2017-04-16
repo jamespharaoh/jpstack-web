@@ -22,6 +22,7 @@ import wbs.console.misc.ConsoleUserHelper;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.TextualInterval;
 
@@ -95,10 +96,11 @@ class TimestampFromFormFieldInterfaceMapping <Container>
 
 	@Override
 	public
-	Either<Optional<String>,String> genericToInterface (
+	Either <Optional <String>, String> genericToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Instant> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Instant> genericValue) {
 
 		if (
 			optionalIsNotPresent (

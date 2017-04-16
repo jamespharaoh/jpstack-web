@@ -1,6 +1,7 @@
 package wbs.console.helper.provider;
 
 import wbs.console.context.ConsoleContextStuff;
+
 import wbs.framework.entity.record.Record;
 import wbs.framework.logging.TaskLogger;
 
@@ -16,12 +17,15 @@ interface ConsoleHelperProvider <
 	String idKey ();
 
 	String getPathId (
+			TaskLogger parentTaskLogger,
 			Long objectId);
 
 	String getDefaultContextPath (
+			TaskLogger parentTaskLogger,
 			RecordType object);
 
 	String localPath (
+			TaskLogger parentTaskLogger,
 			RecordType object);
 
 	boolean canView (

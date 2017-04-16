@@ -3,6 +3,7 @@ package wbs.console.object;
 import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
@@ -70,14 +71,21 @@ class AbstractObjectContext
 	@Override
 	public
 	String localPathForStuff (
-			ConsoleContextStuff stuff) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConsoleContextStuff stuff) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"localPathForStuff");
 
 		return stringFormat (
 			"/%s",
 			encodeId (
-				(Long)
-				stuff.get (
-					requestIdKey ())));
+				taskLogger,
+				genericCastUnchecked (
+					stuff.get (
+						requestIdKey ()))));
 
 	}
 
@@ -106,11 +114,18 @@ class AbstractObjectContext
 
 	protected
 	Long decodeId (
-			String encodedId) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String encodedId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"decodeId");
 
 		if (cryptor () != null) {
 
 			return cryptor ().decryptInteger (
+				taskLogger,
 				encodedId);
 
 		} else {
@@ -124,11 +139,18 @@ class AbstractObjectContext
 
 	protected
 	String encodeId (
-			Long numericId) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Long numericId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"encodeId");
 
 		if (cryptor () != null) {
 
 			return cryptor ().encryptInteger (
+				taskLogger,
 				numericId);
 
 		} else {
@@ -154,6 +176,7 @@ class AbstractObjectContext
 
 		Long localId =
 			decodeId (
+				taskLogger,
 				pathParts.next ());
 
 		contextStuff.set (

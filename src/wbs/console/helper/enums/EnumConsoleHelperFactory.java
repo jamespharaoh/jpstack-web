@@ -4,12 +4,10 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.tools.ComponentFactory;
 import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @Accessors (fluent = true)
 public
 class EnumConsoleHelperFactory <EnumType extends Enum <EnumType>>

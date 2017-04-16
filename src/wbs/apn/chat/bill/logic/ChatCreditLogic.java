@@ -52,6 +52,7 @@ interface ChatCreditLogic {
 			ChatUserRec chatUser);
 
 	Optional <String> userBillCheck (
+			TaskLogger parentTaskLogger,
 			ChatUserRec chatUser,
 			BillCheckOptions options);
 

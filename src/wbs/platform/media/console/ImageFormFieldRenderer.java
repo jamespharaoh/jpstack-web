@@ -102,9 +102,15 @@ class ImageFormFieldRenderer <Container>
 			@NonNull FormType formType,
 			@NonNull String formName) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderFormInput");
+
 		if (interfaceValue.isPresent ()) {
 
 			renderHtmlComplex (
+				taskLogger,
 				htmlWriter,
 				container,
 				hints,
@@ -270,17 +276,24 @@ class ImageFormFieldRenderer <Container>
 	@Override
 	public
 	void renderHtmlSimple (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue,
 			boolean link) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlSimple");
+
 		if (! interfaceValue.isPresent ()) {
 			return;
 		}
 
 		mediaConsoleLogic.writeMediaThumb32 (
+			taskLogger,
 			htmlWriter,
 			interfaceValue.get ());
 
@@ -297,16 +310,23 @@ class ImageFormFieldRenderer <Container>
 	@Override
 	public
 	void renderHtmlComplex (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map<String,Object> hints,
 			@NonNull Optional<MediaRec> interfaceValue) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlComplex");
 
 		if (! interfaceValue.isPresent ()) {
 			return;
 		}
 
 		mediaConsoleLogic.writeMediaThumb100 (
+			taskLogger,
 			htmlWriter,
 			interfaceValue.get ());
 

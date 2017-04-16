@@ -140,6 +140,7 @@ class ChatUserPendingSummaryPart
 				chatUser.getChatUserImageList (),
 
 			() -> mediaConsoleLogic.writeMediaContent (
+				taskLogger,
 				formatWriter,
 				chatUser.getChatUserImageList ().get (0).getMedia ()),
 
@@ -160,6 +161,7 @@ class ChatUserPendingSummaryPart
 
 				htmlTableCellWriteHtml (
 					() -> mediaConsoleLogic.writeMediaContent (
+						taskLogger,
 						formatWriter,
 						newImage.getMedia ()));
 			},
@@ -182,6 +184,7 @@ class ChatUserPendingSummaryPart
 				chatUser.getChatUserVideoList (),
 
 			() -> mediaConsoleLogic.writeMediaContent (
+				taskLogger,
 				chatUser.getChatUserImageList ().get (0).getMedia ()),
 
 			() -> formatWriter.writeFormat (
@@ -201,6 +204,7 @@ class ChatUserPendingSummaryPart
 
 				htmlTableCellWriteHtml (
 					() -> mediaConsoleLogic.writeMediaContent (
+						taskLogger,
 						newVideo.getMedia ()));
 
 			},
@@ -223,6 +227,7 @@ class ChatUserPendingSummaryPart
 				chatUser.getChatUserAudioList (),
 
 			() -> mediaConsoleLogic.writeMediaContent (
+				taskLogger,
 				chatUser.getChatUserAudioList ().get (0).getMedia ()),
 
 			() -> formatWriter.writeFormat (
@@ -242,6 +247,7 @@ class ChatUserPendingSummaryPart
 
 				htmlTableCellWriteHtml (
 					() -> mediaConsoleLogic.writeMediaContent (
+						taskLogger,
 						newAudio.getMedia ()));
 
 			},

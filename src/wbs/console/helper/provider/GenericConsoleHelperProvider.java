@@ -392,11 +392,18 @@ class GenericConsoleHelperProvider <
 	@Override
 	public
 	String getPathId (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long objectId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getPathId");
 
 		if (cryptor != null) {
 
 			return cryptor.encryptInteger (
+				taskLogger,
 				objectId);
 
 		} else {
@@ -411,7 +418,13 @@ class GenericConsoleHelperProvider <
 	@Override
 	public
 	String getDefaultContextPath (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getDefaultContextPath");
 
 		StringSubstituter stringSubstituter =
 			new StringSubstituter ();
@@ -441,6 +454,7 @@ class GenericConsoleHelperProvider <
 
 				"/%s",
 				getPathId (
+					taskLogger,
 					object.getId ()));
 
 		return stringSubstituter.substitute (
@@ -451,7 +465,13 @@ class GenericConsoleHelperProvider <
 	@Override
 	public
 	String localPath (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"localPath");
 
 		String urlTemplate =
 
@@ -461,6 +481,7 @@ class GenericConsoleHelperProvider <
 
 				"/%s",
 				getPathId (
+					taskLogger,
 					object.getId ()));
 
 		StringSubstituter stringSubstituter =

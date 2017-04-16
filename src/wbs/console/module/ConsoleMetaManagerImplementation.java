@@ -21,7 +21,6 @@ import javax.inject.Provider;
 import com.google.common.collect.ImmutableList;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.FileUtils;
 
@@ -30,13 +29,15 @@ import wbs.console.context.ConsoleContextHint;
 import wbs.console.context.ConsoleContextLink;
 import wbs.console.context.ResolvedConsoleContextExtensionPoint;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataToXml;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @SingletonComponent ("consoleMetaManagerImpl")
 public
 class ConsoleMetaManagerImplementation
@@ -46,6 +47,9 @@ class ConsoleMetaManagerImplementation
 
 	@SingletonDependency
 	Map <String, ConsoleMetaModule> consoleMetaModules;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -67,7 +71,13 @@ class ConsoleMetaManagerImplementation
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void init (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"init");
 
 		// reset output dir
 
@@ -83,9 +93,9 @@ class ConsoleMetaManagerImplementation
 
 		} catch (IOException exception) {
 
-			log.error (
-				"Error deleting contents of work/console/meta-module",
-				exception);
+			taskLogger.errorFormatException (
+				exception,
+				"Error deleting contents of work/console/meta-module");
 
 		}
 
@@ -193,10 +203,9 @@ class ConsoleMetaManagerImplementation
 
 			} catch (Exception exception) {
 
-				log.warn (
-					stringFormat (
-						"Error writing %s",
-						outputFileName));
+				taskLogger.warningFormat (
+					"Error writing %s",
+					outputFileName);
 
 			}
 

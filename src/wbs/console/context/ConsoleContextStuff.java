@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Provider;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
@@ -22,6 +24,7 @@ import wbs.console.tab.Tab;
 import wbs.console.tab.TabList;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 
 import wbs.utils.string.AbstractStringSubstituter;
@@ -38,6 +41,11 @@ class ConsoleContextStuff {
 
 	@SingletonDependency
 	ConsoleManager consoleManager;
+
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <TabList> tabListProvider;
 
 	// properties
 
@@ -92,7 +100,7 @@ class ConsoleContextStuff {
 			new HashMap<String, Tab>();
 
 		TabList tabList =
-			new TabList ();
+			tabListProvider.get ();
 
 		tabsByNameByContext.put (
 			consoleContext,

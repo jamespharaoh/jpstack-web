@@ -193,6 +193,7 @@ class HiddenFormField <Container, Generic, Native>
 			requiredValue (
 				eitherGetLeft (
 					csvMapping.genericToInterface (
+						taskLogger,
 						container,
 						hints,
 						genericValue)));

@@ -4,9 +4,7 @@ import static wbs.utils.collection.IterableUtils.iterableMapToList;
 
 import java.util.List;
 
-import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
@@ -28,7 +26,6 @@ import wbs.apn.chat.core.model.ChatStatsObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserType;
 
-@Log4j
 @SingletonComponent ("chatStatsDaemon")
 public
 class ChatStatsDaemon
@@ -82,7 +79,11 @@ class ChatStatsDaemon
 
 			}
 
-			log.debug (
+			TaskLogger taskLogger =
+				logContext.createTaskLogger (
+					"runService ()");
+
+			taskLogger.debugFormat (
 				"Doing stats");
 
 			doStats (

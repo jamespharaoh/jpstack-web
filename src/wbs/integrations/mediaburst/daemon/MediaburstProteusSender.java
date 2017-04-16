@@ -4,7 +4,6 @@ import static wbs.utils.etc.NumberUtils.integerInSafe;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -370,14 +369,15 @@ class MediaburstProteusSender
 
 						Xom.xomElem (
 							"DlrUrl",
-							stringFormatObsolete (
+							stringFormat (
 								"%s",
 								wbsConfig.apiUrl (),
 								"/mediaburst",
 								"/proteus",
 								"/route",
 								"/%u",
-								state.route.getId (),
+								integerToDecimalString (
+									state.route.getId ()),
 								"/report")),
 
 						Xom.xomElem (

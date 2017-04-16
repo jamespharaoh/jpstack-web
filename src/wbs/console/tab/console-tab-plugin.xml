@@ -4,6 +4,7 @@
 
 	<layer name="console">
 		<component class="ConsoleContextTab"/>
+		<component class="TabList"/>
 		<component class="TabbedResponder"/>
 		<component class="TabContextResponder"/>
 	</layer>

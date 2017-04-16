@@ -257,6 +257,11 @@ class ChatUserPendingFormResponder
 	void renderHtmlBodyContents (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContents");
+
 		htmlHeadingOneWrite (
 			"Chat user—approve info");
 
@@ -384,6 +389,7 @@ class ChatUserPendingFormResponder
 				htmlTableCellOpen ();
 
 				mediaConsoleLogic.writeMediaThumb100 (
+					taskLogger,
 					image.getMedia ());
 
 				htmlTableCellClose ();
@@ -409,6 +415,7 @@ class ChatUserPendingFormResponder
 				htmlTableCellOpen ();
 
 				mediaConsoleLogic.writeMediaThumb100 (
+					taskLogger,
 					video.getMedia ());
 
 				htmlTableCellClose ();

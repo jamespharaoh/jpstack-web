@@ -1,5 +1,7 @@
 package wbs.console.tab;
 
+import wbs.framework.logging.TaskLogger;
+
 public abstract
 class Tab {
 
@@ -25,26 +27,9 @@ class Tab {
 
 	}
 
-	/**
-	 * Returns the URL set in the constructor. Override this to dynamically
-	 * change the URL by request.
-	 *
-	 * @param requestContext
-	 *            the request context.
-	 * @return the url to link to.
-	 */
-
 	public abstract
-	String getUrl ();
-
-	/**
-	 * Called to check if the tab should be displayed. Override this to make a
-	 * tab appear and disappear dynamically depending on the request.
-	 *
-	 * @param requestContext
-	 *            the request context.
-	 * @return true if the tab should be displayed.
-	 */
+	String getUrl (
+			TaskLogger parentTaskLogger);
 
 	public
 	boolean isAvailable () {

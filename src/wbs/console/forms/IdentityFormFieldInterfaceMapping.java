@@ -9,6 +9,7 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 import fj.data.Either;
 
@@ -32,9 +33,10 @@ class IdentityFormFieldInterfaceMapping<Container,Type>
 	@Override
 	public
 	Either<Optional<Type>,String> genericToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Type> value) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Type> value) {
 
 		return successResult (
 			value);

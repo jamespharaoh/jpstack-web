@@ -11,7 +11,9 @@ import wbs.console.context.ConsoleContextStuff;
 import wbs.console.context.ConsoleContextType;
 import wbs.console.supervisor.SupervisorConfig;
 import wbs.console.tab.ConsoleContextTab;
+
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.responder.Responder;
 
 public
@@ -43,12 +45,12 @@ interface ConsoleManager {
 			String name,
 			ConsoleContextStuff contextStuff);
 
-	Optional<ConsoleContext> contextWithParentOfType (
+	Optional <ConsoleContext> contextWithParentOfType (
 			ConsoleContext parentContext,
 			ConsoleContextType contextType,
 			boolean required);
 
-	Optional<ConsoleContext> contextWithParentOfType (
+	Optional <ConsoleContext> contextWithParentOfType (
 			ConsoleContext parentContext,
 			ConsoleContextType contextType);
 
@@ -63,10 +65,11 @@ interface ConsoleManager {
 	ConsoleContext contextWithoutParentOfTypeRequired (
 			ConsoleContextType contextType);
 
-	Optional<ConsoleContext> contextWithoutParentOfType (
+	Optional <ConsoleContext> contextWithoutParentOfType (
 			ConsoleContextType contextType);
 
 	String resolveLocalFile (
+			TaskLogger parentTaskLogger,
 			ConsoleContextStuff contextStuff,
 			ConsoleContext consoleContext,
 			String localFile);

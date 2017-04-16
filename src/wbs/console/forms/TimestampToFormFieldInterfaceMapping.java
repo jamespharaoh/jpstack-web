@@ -5,6 +5,8 @@ import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.ResultUtils.errorResultFormat;
 import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.ResultUtils.successResultAbsent;
+import static wbs.utils.etc.ResultUtils.successResultPresent;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
 import java.util.Map;
@@ -22,6 +24,7 @@ import wbs.console.misc.ConsoleUserHelper;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.TextualInterval;
 
@@ -93,6 +96,7 @@ class TimestampToFormFieldInterfaceMapping <Container>
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Instant> genericValue) {
@@ -102,15 +106,13 @@ class TimestampToFormFieldInterfaceMapping <Container>
 				genericValue)
 		) {
 
-			return successResult (
-				Optional.<String>absent ());
+			return successResultAbsent ();
 
 		}
 
-		return successResult (
-			Optional.of (
-				formFieldPreferences.timestampWithTimezoneString (
-					genericValue.get ())));
+		return successResultPresent (
+			formFieldPreferences.timestampWithTimezoneString (
+				genericValue.get ()));
 
 	}
 

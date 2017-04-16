@@ -21,6 +21,7 @@ import org.joda.time.DateTime;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.TimeFormatter;
 
@@ -87,10 +88,11 @@ class TimestampTimezoneFormFieldInterfaceMapping <Container>
 
 	@Override
 	public
-	Either<Optional<String>,String> genericToInterface (
+	Either <Optional <String>, String> genericToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<DateTime> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <DateTime> genericValue) {
 
 		if (! genericValue.isPresent ()) {
 

@@ -21,7 +21,10 @@ import lombok.experimental.Accessors;
 
 import org.apache.commons.lang3.Range;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import fj.data.Either;
 
@@ -39,6 +42,11 @@ class RangeFormFieldInterfaceMapping <
 		Range <Interface>
 	> {
 
+	// singleton depdendencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// properties
 
 	@Getter @Setter
@@ -49,9 +57,15 @@ class RangeFormFieldInterfaceMapping <
 	@Override
 	public
 	Either <Optional <Range <Interface>>, String> genericToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Range <Generic>> genericValue) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"genericToInterface");
 
 		if (
 			optionalIsNotPresent (
@@ -67,6 +81,7 @@ class RangeFormFieldInterfaceMapping <
 
 		Either <Optional <Interface>, String> leftResult =
 			itemMapping.genericToInterface (
+				taskLogger,
 				container,
 				hints,
 				Optional.of (
@@ -98,9 +113,10 @@ class RangeFormFieldInterfaceMapping <
 
 		Either <Optional <Interface>, String> rightResult =
 			itemMapping.genericToInterface (
+				taskLogger,
 				container,
 				hints,
-				Optional.of (
+				optionalOf (
 					genericValue.get ().getMaximum ()));
 
 		if (

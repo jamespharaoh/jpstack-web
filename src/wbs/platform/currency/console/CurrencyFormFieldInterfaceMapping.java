@@ -5,6 +5,7 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.ResultUtils.errorResult;
 import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.ResultUtils.successResultAbsent;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Map;
@@ -20,6 +21,7 @@ import wbs.console.forms.FormFieldInterfaceMapping;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -127,18 +129,18 @@ class CurrencyFormFieldInterfaceMapping <Container>
 
 	@Override
 	public
-	Either<Optional<String>,String> genericToInterface (
+	Either <Optional <String>, String> genericToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Long> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Long> genericValue) {
 
 		if (
 			optionalIsNotPresent (
 				genericValue)
 		) {
 
-			return successResult (
-				Optional.<String>absent ());
+			return successResultAbsent ();
 
 		}
 

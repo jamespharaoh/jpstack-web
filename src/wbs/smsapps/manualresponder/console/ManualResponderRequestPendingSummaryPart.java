@@ -489,7 +489,8 @@ class ManualResponderRequestPendingSummaryPart
 
 		goSessionDetails ();
 
-		goRequestHistory ();
+		goRequestHistory (
+			taskLogger);
 
 		htmlDivClose ();
 
@@ -585,6 +586,7 @@ class ManualResponderRequestPendingSummaryPart
 				htmlTableDetailsRowWriteHtml (
 					"Text media",
 					() -> mediaConsoleLogic.writeMediaContent (
+						taskLogger,
 						media));
 
 			} else if (
@@ -596,10 +598,12 @@ class ManualResponderRequestPendingSummaryPart
 					"Image media",
 					() -> htmlLinkWriteHtml (
 						mediaConsoleLogic.mediaUrlScaled (
+							taskLogger,
 							media,
 							600,
 							600),
 						() -> mediaConsoleLogic.writeMediaThumb100 (
+							taskLogger,
 							media)));
 
 			} else {
@@ -839,7 +843,14 @@ class ManualResponderRequestPendingSummaryPart
 
 	}
 
-	void goRequestHistory () {
+	private
+	void goRequestHistory (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goRequestHistory");
 
 		if (oldRequests.isEmpty ())
 			return;
@@ -943,6 +954,7 @@ class ManualResponderRequestPendingSummaryPart
 				) {
 
 					mediaConsoleLogic.writeMediaThumb32 (
+						taskLogger,
 						media);
 
 				}

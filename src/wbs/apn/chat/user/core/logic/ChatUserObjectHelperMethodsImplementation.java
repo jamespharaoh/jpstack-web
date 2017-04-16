@@ -1,5 +1,7 @@
 package wbs.apn.chat.user.core.logic;
 
+import static wbs.utils.etc.Misc.isNull;
+
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
@@ -83,8 +85,14 @@ class ChatUserObjectHelperMethodsImplementation
 			// check number
 
 			if (
-				! chatNumberReportLogic.isNumberReportSuccessful (number)
-				&& number.getArchiveDate () == null
+
+				! chatNumberReportLogic.isNumberReportSuccessful (
+					taskLogger,
+					number)
+
+				&& isNull (
+					number.getArchiveDate ())
+
 			) {
 
 				taskLogger.debugFormat (

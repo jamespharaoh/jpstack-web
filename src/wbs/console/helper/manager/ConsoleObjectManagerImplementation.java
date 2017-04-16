@@ -20,7 +20,6 @@ import java.util.SortedMap;
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.helper.core.ConsoleHelper;
 import wbs.console.html.HtmlTableCellWriter;
@@ -47,7 +46,6 @@ import fj.data.Either;
  * and checking privs. At the back end this delegates to ObjectHelper objects
  * which are provided by the various ConsoleModules.
  */
-@Log4j
 @SingletonComponent ("consoleObjectManager")
 public
 class ConsoleObjectManagerImplementation
@@ -193,6 +191,7 @@ class ConsoleObjectManagerImplementation
 				.href (
 					requestContext.resolveLocalUrl (
 						objectHelper.getDefaultLocalPathGeneric (
+							taskLogger,
 							object)))
 
 				.target (
@@ -221,25 +220,30 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	void writeHtmlForObject (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull Record <?> object,
 			@NonNull Optional <Record <?>> assumedRootOptional,
 			@NonNull Boolean mini) {
 
-		if (log.isDebugEnabled ()) {
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeHtmlForObject");
 
-			log.debug (
-				stringFormat (
-					"%s.htmlForObject (%s, %s, %s)",
-					getClass ().getName (),
-					objectManager.objectPath (
-						object),
-					optionalMapRequiredOrDefault (
-						objectManager::objectPath,
-						assumedRootOptional,
-						"—"),
-					Boolean.toString (
-						mini)));
+		if (taskLogger.debugEnabled ()) {
+
+			taskLogger.debugFormat (
+				"%s.htmlForObject (%s, %s, %s)",
+				getClass ().getName (),
+				objectManager.objectPath (
+					object),
+				optionalMapRequiredOrDefault (
+					objectManager::objectPath,
+					assumedRootOptional,
+					"—"),
+				Boolean.toString (
+					mini));
 
 		}
 
@@ -248,6 +252,7 @@ class ConsoleObjectManagerImplementation
 				object);
 
 		objectHelper.writeHtmlGeneric (
+			taskLogger,
 			formatWriter,
 			object,
 			assumedRootOptional,
@@ -258,10 +263,16 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	void objectToSimpleHtml (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			Object object,
 			Record <?> assumedRoot,
 			boolean mini) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"objectToSimpleHtml");
 
 		if (
 			object instanceof Integer
@@ -278,6 +289,7 @@ class ConsoleObjectManagerImplementation
 				(Record <?>) object;
 
 			writeHtmlForObject (
+				taskLogger,
 				formatWriter,
 				dataObject,
 				optionalFromNullable (
@@ -289,9 +301,8 @@ class ConsoleObjectManagerImplementation
 				object)
 		) {
 
-			log.warn (
-				new RuntimeException (
-					"Null object is deprecated"));
+			taskLogger.warningFormat (
+				"Null object is deprecated");
 
 			formatWriter.writeFormat (
 				"NULL");
@@ -330,6 +341,7 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String contextName (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object) {
 
 		ConsoleHelper<?> objectHelper =
@@ -356,7 +368,13 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String contextLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"contextLink");
 
 		ConsoleHelper <?> objectHelper =
 			findConsoleHelperRequired (
@@ -364,6 +382,7 @@ class ConsoleObjectManagerImplementation
 
 		return requestContext.resolveContextUrl (
 			objectHelper.getDefaultContextPathGeneric (
+				taskLogger,
 				object));
 
 	}
@@ -371,7 +390,13 @@ class ConsoleObjectManagerImplementation
 	@Override
 	public
 	String localLink (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"localLink");
 
 		ConsoleHelper <?> objectHelper =
 			findConsoleHelperRequired (
@@ -379,6 +404,7 @@ class ConsoleObjectManagerImplementation
 
 		return requestContext.resolveLocalUrl (
 			objectHelper.getDefaultLocalPathGeneric (
+				taskLogger,
 				object));
 
 	}

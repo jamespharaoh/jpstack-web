@@ -231,6 +231,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			requiredValue (
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
+						taskLogger,
 						container,
 						hints,
 						genericValue)));
@@ -283,6 +284,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			requiredValue (
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
+						taskLogger,
 						container,
 						hints,
 						genericValue)));
@@ -327,6 +329,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			requiredValue (
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
+						taskLogger,
 						container,
 						hints,
 						genericValue)));
@@ -375,6 +378,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			requiredValue (
 				eitherGetLeft (
 					interfaceMapping.genericToInterface (
+						taskLogger,
 						container,
 						hints,
 						genericValue)));
@@ -390,6 +394,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 			htmlWriter);
 
 		renderer.renderHtmlComplex (
+			taskLogger,
 			htmlWriter,
 			container,
 			hints,
@@ -443,6 +448,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 		Optional <String> csvValueOptional =
 			resultValueRequired (
 				csvMapping.genericToInterface (
+					taskLogger,
 					container,
 					hints,
 					genericValue));

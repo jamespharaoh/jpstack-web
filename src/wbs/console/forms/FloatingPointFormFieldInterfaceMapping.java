@@ -13,6 +13,7 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 import fj.data.Either;
 
@@ -54,10 +55,11 @@ class FloatingPointFormFieldInterfaceMapping<Container>
 
 	@Override
 	public
-	Either<Optional<String>,String> genericToInterface (
+	Either <Optional <String>, String> genericToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<Double> genericValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <Double> genericValue) {
 
 		if (
 			optionalIsNotPresent (

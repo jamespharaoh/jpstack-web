@@ -12,13 +12,23 @@ import java.util.List;
 import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.utils.string.FormatWriter;
 
+@PrototypeComponent ("tabList")
 public
 class TabList {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -154,7 +164,13 @@ class TabList {
 
 	public
 	Prepared prepare (
-			Tab currentTab) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Tab currentTab) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		Prepared prepared =
 			new Prepared ();
@@ -176,7 +192,8 @@ class TabList {
 
 			prepared.preparedTabs.add (
 				new PreparedTab (
-					tabRef.getTab ().getUrl (),
+					tabRef.getTab ().getUrl (
+						taskLogger),
 					tabRef.getLabel (),
 					tabRef.getTab () == currentTab));
 
@@ -186,7 +203,8 @@ class TabList {
 
 			prepared.preparedTabs.add (
 				new PreparedTab (
-					currentTab.getUrl (),
+					currentTab.getUrl (
+						taskLogger),
 					currentTab.getDefaultLabel (),
 					true));
 

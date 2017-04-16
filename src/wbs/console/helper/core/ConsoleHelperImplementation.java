@@ -18,10 +18,12 @@ import wbs.console.helper.provider.ConsoleHelperProvider;
 import wbs.console.lookup.ObjectLookup;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectHelper;
 
@@ -41,6 +43,9 @@ class ConsoleHelperImplementation <
 		ObjectLookup <RecordType> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@WeakSingletonDependency
 	ConsoleObjectManager objectManager;
@@ -72,9 +77,16 @@ class ConsoleHelperImplementation <
 	@Override
 	public
 	String getPathId (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getPathId");
+
 		return consoleHelperProvider.getPathId (
+			taskLogger,
 			object.getId ());
 
 	}
@@ -82,9 +94,16 @@ class ConsoleHelperImplementation <
 	@Override
 	public
 	String getPathId (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long objectId) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getPathId");
+
 		return consoleHelperProvider.getPathId (
+			taskLogger,
 			objectId);
 
 	}
@@ -92,9 +111,16 @@ class ConsoleHelperImplementation <
 	@Override
 	public
 	String getDefaultContextPath (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getDefaultContextPath");
+
 		return consoleHelperProvider.getDefaultContextPath (
+			taskLogger,
 			object);
 
 	}
@@ -102,9 +128,16 @@ class ConsoleHelperImplementation <
 	@Override
 	public
 	String getDefaultLocalPath (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RecordType object) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getDefaultLocalPath");
+
 		return consoleHelperProvider.localPath (
+			taskLogger,
 			object);
 
 	}
@@ -144,10 +177,16 @@ class ConsoleHelperImplementation <
 	@Override
 	public
 	void writeHtml (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter formatWriter,
 			@NonNull RecordType object,
 			@NonNull Optional <Record <?>> assumedRoot,
 			@NonNull Boolean mini) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeHtml");
 
 		Optional <String> optionalHtml =
 			consoleHooks.getHtml (
@@ -173,6 +212,7 @@ class ConsoleHelperImplementation <
 				"<a href=\"%h\">%h</a>",
 				requestContext.resolveLocalUrl (
 					getDefaultLocalPath (
+						taskLogger,
 						object)),
 				path);
 

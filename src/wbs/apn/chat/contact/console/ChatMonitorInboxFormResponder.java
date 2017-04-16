@@ -29,7 +29,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
 import wbs.console.html.ScriptRef;
@@ -49,7 +48,6 @@ import wbs.apn.chat.user.core.model.ChatUserAlarmRec;
 import wbs.apn.chat.user.core.model.ChatUserOperatorLabel;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 
-@Log4j
 @PrototypeComponent ("chatMonitorInboxFormResponder")
 public
 class ChatMonitorInboxFormResponder
@@ -105,6 +103,11 @@ class ChatMonitorInboxFormResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
 		Optional <ChatMonitorInboxRec> chatMonitorInboxOptional =
 			chatMonitorInboxHelper.findFromContext ();
 
@@ -116,12 +119,11 @@ class ChatMonitorInboxFormResponder
 			requestContext.addError (
 				"Chat monitor inbox item not found");
 
-			log.error (
-				stringFormat (
-					"Chat monitor inbox not found: %s",
-					integerToDecimalString (
-						requestContext.stuffIntegerRequired (
-							"chatMonitorInboxId"))));
+			taskLogger.errorFormat (
+				"Chat monitor inbox not found: %s",
+				integerToDecimalString (
+					requestContext.stuffIntegerRequired (
+						"chatMonitorInboxId")));
 
 			return;
 

@@ -1092,27 +1092,6 @@ class StringUtils {
 
 	}
 
-	@Deprecated
-	public static
-	String stringFormatObsolete (
-			Object ... arguments) {
-
-		return StringFormatter.standardArray (
-			arguments);
-
-	}
-
-	@Deprecated
-	public static
-	String stringFormatListObsolete (
-			List <?> arguments) {
-
-		return stringFormatObsolete (
-			arguments.toArray (
-				new Object [] {}));
-
-	}
-
 	public static
 	String fixNewlines (
 			@NonNull String input) {

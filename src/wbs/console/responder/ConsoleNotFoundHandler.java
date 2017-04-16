@@ -69,7 +69,8 @@ class ConsoleNotFoundHandler
 
 		@Override
 		public
-		String getUrl () {
+		String getUrl (
+				@NonNull TaskLogger parentTaskLogger) {
 
 			return requestContext.requestPath ();
 

@@ -444,6 +444,7 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	@Override
 	public
 	void renderHtmlSimple (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,

@@ -196,14 +196,21 @@ class ChatUserSearchOldResultsPart
 
 		}
 
-		prepare0 ();
+		prepare0 (
+			taskLogger);
 
 		prepare1 ();
 
 	}
 
 	private
-	void prepare0 () {
+	void prepare0 (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare0");
 
 		PageBuilder pageBuilder =
 			pageBuilders [0];
@@ -270,6 +277,7 @@ class ChatUserSearchOldResultsPart
 					pageBuilder.writer ());
 
 				mediaConsoleLogic.writeMediaThumb32 (
+					taskLogger,
 					pageBuilder.writer (),
 					chatUser.getChatUserImageList ().get (0).getMedia ());
 

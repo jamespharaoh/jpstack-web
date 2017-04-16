@@ -1,5 +1,7 @@
 package wbs.console.request;
 
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 
@@ -7,16 +9,22 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("cryptorImplementation")
 @Accessors (fluent = true)
-@Log4j
 public
 class CryptorImplementation
 	implements Cryptor {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// properties
 
@@ -28,7 +36,13 @@ class CryptorImplementation
 	@Override
 	public
 	String encryptInteger (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long input) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"encryptInteger");
 
 		try {
 
@@ -50,19 +64,23 @@ class CryptorImplementation
 				(Cipher.ENCRYPT_MODE,
 				secretKey);
 
-			String ret =
+			String output =
 				toHex (
 					cipher.doFinal (
 						clearText));
 
-			log.debug (
-				"encrypted " + input + " as " + ret);
+			taskLogger.debugFormat (
+				"encrypted %s as %s",
+				integerToDecimalString (
+					input),
+				output);
 
-			return ret;
+			return output;
 
 		} catch (Exception exception) {
 
-			throw new RuntimeException(exception);
+			throw new RuntimeException (
+				exception);
 
 		}
 
@@ -71,7 +89,13 @@ class CryptorImplementation
 	@Override
 	public
 	Long decryptInteger (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String input) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"decryptInteger");
 
 		try {
 
@@ -91,19 +115,23 @@ class CryptorImplementation
 				cipher.doFinal (
 					cipherText);
 
-			Long ret = 0l
-				| ((clearText[0] & 0xff) << 56)
-				| ((clearText[1] & 0xff) << 48)
-				| ((clearText[2] & 0xff) << 40)
-				| ((clearText[3] & 0xff) << 32)
-				| ((clearText[4] & 0xff) << 24)
-				| ((clearText[5] & 0xff) << 16)
-				| ((clearText[6] & 0xff) << 8)
-				| ((clearText[7] & 0xff) << 0);
+			Long output = 0l
+				| ((clearText [0] & 0xff) << 56)
+				| ((clearText [1] & 0xff) << 48)
+				| ((clearText [2] & 0xff) << 40)
+				| ((clearText [3] & 0xff) << 32)
+				| ((clearText [4] & 0xff) << 24)
+				| ((clearText [5] & 0xff) << 16)
+				| ((clearText [6] & 0xff) << 8)
+				| ((clearText [7] & 0xff) << 0);
 
-			log.debug ("decrypted " + input + " as " + ret);
+			taskLogger.debugFormat (
+				"decrypted %s as %s",
+				input,
+				integerToDecimalString (
+					output));
 
-			return ret;
+			return output;
 
 		} catch (Exception exception) {
 

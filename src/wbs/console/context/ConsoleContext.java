@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -13,9 +14,11 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.Tab;
 import wbs.console.tab.TabList;
+
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.file.WebFile;
 
 @Accessors (fluent = true)
@@ -82,7 +85,8 @@ class ConsoleContext
 
 	public
 	String localPathForStuff (
-			ConsoleContextStuff contextStuff) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConsoleContextStuff contextStuff) {
 
 		return "";
 

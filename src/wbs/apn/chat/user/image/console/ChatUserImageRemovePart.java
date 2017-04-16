@@ -9,8 +9,10 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.console.MediaConsoleLogic;
@@ -27,6 +29,9 @@ class ChatUserImageRemovePart
 
 	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
@@ -52,6 +57,11 @@ class ChatUserImageRemovePart
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
+
 		htmlFormOpenPost ();
 
 		if (chatUser.getChatUserImageList ().isEmpty ()) {
@@ -64,6 +74,7 @@ class ChatUserImageRemovePart
 			htmlParagraphOpen ();
 
 			mediaConsoleLogic.writeMediaContent (
+				taskLogger,
 				chatUser.getChatUserImageList ().get (0).getMedia ());
 
 			htmlParagraphClose ();
@@ -91,6 +102,7 @@ class ChatUserImageRemovePart
 			htmlParagraphOpen ();
 
 			mediaConsoleLogic.writeMediaContent (
+				taskLogger,
 				chatUser.getChatUserVideoList ().get (0).getMedia ());
 
 			htmlParagraphClose ();

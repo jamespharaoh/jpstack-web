@@ -273,6 +273,7 @@ class ChatSupervisorConversationPart
 				monitorChatUser.getChatUserImageList (),
 
 			() -> mediaConsoleLogic.writeMediaThumb100 (
+				taskLogger,
 				formatWriter,
 				monitorChatUser.getChatUserImageList ().get (0)
 					.getMedia ()),
@@ -287,6 +288,7 @@ class ChatSupervisorConversationPart
 				userChatUser.getChatUserImageList (),
 
 			() -> mediaConsoleLogic.writeMediaThumb100 (
+				taskLogger,
 				formatWriter,
 				userChatUser.getChatUserImageList ().get (0).getMedia ()),
 

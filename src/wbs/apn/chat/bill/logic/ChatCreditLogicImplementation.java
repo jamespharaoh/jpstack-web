@@ -722,8 +722,14 @@ class ChatCreditLogicImplementation
 	@Override
 	public
 	Optional <String> userBillCheck (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserRec chatUser,
 			@NonNull BillCheckOptions options) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userBillCheck");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -748,6 +754,7 @@ class ChatCreditLogicImplementation
 		if (
 
 			! chatNumberReportLogic.isNumberReportSuccessful (
+				taskLogger,
 				chatUser.getNumber ())
 
 			&& ! options.includeFailed ()
@@ -768,6 +775,7 @@ class ChatCreditLogicImplementation
 		if (
 			chatNumberReportLogic
 				.isNumberReportPastPermanentDeliveryConstraint (
+					taskLogger,
 					chatUser.getNumber ())
 		) {
 
@@ -917,6 +925,7 @@ class ChatCreditLogicImplementation
 
 		Optional <String> reasonOptional =
 			userBillCheck (
+				taskLogger,
 				chatUser,
 				options);
 

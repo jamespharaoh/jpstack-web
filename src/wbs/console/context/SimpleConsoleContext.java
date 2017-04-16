@@ -114,16 +114,24 @@ class SimpleConsoleContext
 	@Override
 	public
 	String localPathForStuff (
-			ConsoleContextStuff stuff) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConsoleContextStuff stuff) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"localPathForStuff");
 
 		if (parentContext () != null) {
 
 			return parentContext ().localPathForStuff (
+				taskLogger,
 				stuff);
 
 		} else {
 
 			return super.localPathForStuff (
+				taskLogger,
 				stuff);
 
 		}

@@ -12,6 +12,7 @@ import com.google.common.base.Optional;
 import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.logging.TaskLogger;
 
 import fj.data.Either;
 
@@ -30,6 +31,7 @@ class EnumCsvFormFieldInterfaceMapping <
 	@Override
 	public
 	Either <Optional <String>, String> genericToInterface (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Generic> genericValue) {

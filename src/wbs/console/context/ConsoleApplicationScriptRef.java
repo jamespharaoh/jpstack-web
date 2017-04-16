@@ -1,6 +1,7 @@
 package wbs.console.context;
 
-import static wbs.utils.string.StringUtils.stringFormatObsolete;
+import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Random;
 
@@ -53,14 +54,15 @@ class ConsoleApplicationScriptRef
 	@Override
 	public
 	String getUrl (
-			ConsoleRequestContext requestContext) {
+			@NonNull ConsoleRequestContext requestContext) {
 
 		return requestContext.resolveApplicationUrl (
-			stringFormatObsolete (
+			stringFormat (
 				"%s",
 				applicationSource,
 				"?v=%u",
-				reloadHack));
+				integerToDecimalString (
+					reloadHack)));
 
 	}
 

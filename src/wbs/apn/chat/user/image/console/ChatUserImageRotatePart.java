@@ -16,8 +16,10 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.console.MediaConsoleLogic;
@@ -34,6 +36,9 @@ class ChatUserImageRotatePart
 
 	@SingletonDependency
 	ChatUserConsoleHelper chatUserHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	MediaConsoleLogic mediaConsoleLogic;
@@ -58,6 +63,11 @@ class ChatUserImageRotatePart
 	public
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBodyContent");
 
 		if (chatUser.getChatUserImageList ().isEmpty ()) {
 
@@ -104,6 +114,7 @@ class ChatUserImageRotatePart
 		htmlTableCellOpen ();
 
 		mediaConsoleLogic.writeMediaThumb100 (
+			taskLogger,
 			chatUser.getChatUserImageList ().get (0).getMedia ());
 
 		htmlTableCellClose ();
@@ -131,6 +142,7 @@ class ChatUserImageRotatePart
 		htmlTableCellOpen ();
 
 		mediaConsoleLogic.writeMediaThumb100 (
+			taskLogger,
 			chatUser.getChatUserImageList ().get (0).getMedia (),
 			"90");
 
@@ -160,6 +172,7 @@ class ChatUserImageRotatePart
 		htmlTableCellOpen ();
 
 		mediaConsoleLogic.writeMediaThumb100 (
+			taskLogger,
 			chatUser.getChatUserImageList ().get (0).getMedia (),
 			"180");
 
@@ -188,6 +201,7 @@ class ChatUserImageRotatePart
 		htmlTableCellOpen ();
 
 		mediaConsoleLogic.writeMediaThumb100 (
+			taskLogger,
 			chatUser.getChatUserImageList ().get (0).getMedia (),
 			"270");
 

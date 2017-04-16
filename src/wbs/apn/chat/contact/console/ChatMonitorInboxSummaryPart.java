@@ -385,7 +385,10 @@ class ChatMonitorInboxSummaryPart
 
 		goName ();
 		goInfo ();
-		goPic ();
+
+		goPic (
+			taskLogger);
+
 		goLocation ();
 		goDob ();
 		goScheme ();
@@ -588,7 +591,14 @@ class ChatMonitorInboxSummaryPart
 
 	}
 
-	void goPic () {
+	private
+	void goPic (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goPic");
 
 		htmlTableRowOpen ();
 
@@ -601,6 +611,7 @@ class ChatMonitorInboxSummaryPart
 
 			() ->
 				mediaConsoleLogic.writeMediaThumb100 (
+					taskLogger,
 					formatWriter,
 					monitorChatUser.getChatUserImageList ().get (0)
 						.getMedia ()),
@@ -616,6 +627,7 @@ class ChatMonitorInboxSummaryPart
 
 			() ->
 				mediaConsoleLogic.writeMediaThumb100 (
+					taskLogger,
 					formatWriter,
 					userChatUser.getChatUserImageList ().get (0).getMedia ()),
 

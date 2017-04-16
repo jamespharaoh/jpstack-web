@@ -302,6 +302,7 @@ interface ConsoleObjectManagerMethods {
 
 
 	void writeHtmlForObject (
+			TaskLogger parentTaskLogger,
 			FormatWriter formatWriter,
 			Record <?> object,
 			Optional <Record <?>> assumedRootOptional,
@@ -309,6 +310,7 @@ interface ConsoleObjectManagerMethods {
 
 	default
 	String htmlForObject (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object,
 			@NonNull Optional <Record <?>> assumedRootOptional,
 			@NonNull Boolean mini) {
@@ -317,6 +319,7 @@ interface ConsoleObjectManagerMethods {
 			new StringFormatWriter ();
 
 		writeHtmlForObject (
+			parentTaskLogger,
 			formatWriter,
 			object,
 			assumedRootOptional,
@@ -331,15 +334,19 @@ interface ConsoleObjectManagerMethods {
 			Record <?> object);
 
 	String contextName (
+			TaskLogger parentTaskLogger,
 			Record <?> object);
 
 	String contextLink (
+			TaskLogger parentTaskLogger,
 			Record <?> object);
 
 	String localLink (
+			TaskLogger parentTaskLogger,
 			Record <?> object);
 
 	void objectToSimpleHtml (
+			TaskLogger parentTaskLogger,
 			FormatWriter formatWriter,
 			Object object,
 			Record <?> assumedRoot,

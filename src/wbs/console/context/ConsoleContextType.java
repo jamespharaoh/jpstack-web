@@ -11,26 +11,35 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.tab.ConsoleContextTab;
 import wbs.console.tab.ContextTabPlacement;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.web.file.WebFile;
 
 @Accessors (fluent = true)
-@Log4j
 @DataClass ("context-type")
 @PrototypeComponent ("concoleContextType")
 public
 class ConsoleContextType {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// properties
 
 	@DataAttribute
 	@Getter @Setter
@@ -50,6 +59,8 @@ class ConsoleContextType {
 
 	@Getter @Setter
 	String defaultFileName;
+
+	// implementation
 
 	public
 	String lookupDefaultFileName (
@@ -113,7 +124,13 @@ class ConsoleContextType {
 
 	public
 	void resolveTabSpecs (
-			Map<String,ConsoleContextTab> allContextTabs) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Map <String, ConsoleContextTab> allContextTabs) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"resolveTabSpecs");
 
 		List<String> resolvedNames =
 			new LinkedList<String> ();
@@ -170,12 +187,11 @@ class ConsoleContextType {
 					String tabName =
 						tabPlacement.tabName ();
 
-					log.error (
-						stringFormat (
-							"Location %s not found for tab %s in %s",
-							tabLocation,
-							tabName,
-							name));
+					taskLogger.errorFormat (
+						"Location %s not found for tab %s in %s",
+						tabLocation,
+						tabName,
+						name);
 
 				}
 

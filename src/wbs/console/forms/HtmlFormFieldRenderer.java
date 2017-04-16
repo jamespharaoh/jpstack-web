@@ -91,6 +91,7 @@ class HtmlFormFieldRenderer <Container>
 	@Override
 	public
 	void renderHtmlSimple (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,

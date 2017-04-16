@@ -79,6 +79,7 @@ interface FormFieldRenderer <Container, Interface> {
 				colspan));
 
 		renderHtmlSimple (
+			parentTaskLogger,
 			htmlWriter,
 			container,
 			hints,
@@ -107,6 +108,7 @@ interface FormFieldRenderer <Container, Interface> {
 				colspan));
 
 		renderHtmlSimple (
+			parentTaskLogger,
 			htmlWriter,
 			container,
 			hints,
@@ -118,6 +120,7 @@ interface FormFieldRenderer <Container, Interface> {
 	}
 
 	void renderHtmlSimple (
+			TaskLogger parentTaskLogger,
 			FormatWriter htmlWriter,
 			Container container,
 			Map <String, Object> hints,
@@ -126,12 +129,14 @@ interface FormFieldRenderer <Container, Interface> {
 
 	default
 	void renderHtmlComplex (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
 			@NonNull Map <String, Object> hints,
 			@NonNull Optional <Interface> interfaceValue) {
 
 		renderHtmlSimple (
+			parentTaskLogger,
 			htmlWriter,
 			container,
 			hints,

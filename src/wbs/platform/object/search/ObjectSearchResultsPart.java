@@ -603,8 +603,9 @@ class ObjectSearchResultsPart <
 					htmlDataAttribute (
 						"target-href",
 						objectUrl (
-							(Record<?>)
-							result))
+							taskLogger,
+							genericCastUnchecked (
+								result)))
 
 				);
 
@@ -666,8 +667,9 @@ class ObjectSearchResultsPart <
 						() -> htmlDataAttribute (
 							"target-href",
 							objectUrl (
-								(Record <?>)
-								result)))
+								taskLogger,
+								genericCastUnchecked (
+									result))))
 
 				));
 
@@ -691,7 +693,13 @@ class ObjectSearchResultsPart <
 
 	private
 	String objectUrl (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Record <?> object) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"objectUrl");
 
 		if (
 			optionalIsPresent (
@@ -704,12 +712,14 @@ class ObjectSearchResultsPart <
 					targetContext.get ().pathPrefix (),
 					"/%s",
 					consoleHelper.getPathIdGeneric (
+						taskLogger,
 						object)));
 
 		} else {
 
 			return requestContext.resolveLocalUrl (
 				consoleHelper.getDefaultLocalPathGeneric (
+					taskLogger,
 					object));
 
 		}

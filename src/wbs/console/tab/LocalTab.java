@@ -1,9 +1,12 @@
 package wbs.console.tab;
 
+import lombok.NonNull;
+
 import wbs.console.lookup.BooleanLookup;
 import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 public
 class LocalTab
@@ -43,7 +46,8 @@ class LocalTab
 
 	@Override
 	public
-	String getUrl () {
+	String getUrl (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return requestContext.resolveLocalUrl (
 			localUrl);

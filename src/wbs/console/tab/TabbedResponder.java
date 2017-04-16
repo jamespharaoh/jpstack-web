@@ -347,6 +347,11 @@ class TabbedResponder
 	void renderTabs (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderTabs");
+
 		for (
 			MyLayer myLayer
 				: myLayers
@@ -386,7 +391,8 @@ class TabbedResponder
 
 					htmlLinkWrite (
 						formatWriter,
-						tabRef.getTab ().getUrl (),
+						tabRef.getTab ().getUrl (
+							taskLogger),
 						tabRef.getLabel (),
 						htmlClassAttribute (
 							"selected"));
@@ -395,7 +401,8 @@ class TabbedResponder
 
 					htmlLinkWrite (
 						formatWriter,
-						tabRef.getTab ().getUrl (),
+						tabRef.getTab ().getUrl (
+							taskLogger),
 						tabRef.getLabel ());
 
 				}
