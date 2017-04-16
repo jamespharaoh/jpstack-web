@@ -24,6 +24,7 @@ import static wbs.utils.etc.ReflectionUtils.fieldSet;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
@@ -330,14 +331,10 @@ class ComponentManagerImplementation
 
 			}
 
-			@SuppressWarnings ("unchecked")
-			Provider <ComponentType> componentProvider =
-				(Provider <ComponentType>)
+			return genericCastUnchecked (
 				getComponentProvider (
 					taskLogger,
-					componentDefinition);
-
-			return componentProvider;
+					componentDefinition));
 
 		}
 
