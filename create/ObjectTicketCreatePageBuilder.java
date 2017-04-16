@@ -171,8 +171,13 @@ class ObjectTicketCreatePageBuilder
 	}
 
 	void buildTab (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"buildTab");
 
 		consoleModule.addContextTab (
 			taskLogger,
@@ -303,7 +308,12 @@ class ObjectTicketCreatePageBuilder
 	// defaults
 
 	void setDefaults (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setDefaults");
 
 		name =
 			spec.name ();
