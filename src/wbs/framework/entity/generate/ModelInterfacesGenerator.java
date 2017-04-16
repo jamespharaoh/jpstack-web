@@ -70,7 +70,12 @@ class ModelInterfacesGenerator {
 
 	public
 	void generateInterfaces (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"generateInterfaces");
 
 		setup ();
 		findRelated ();
@@ -257,7 +262,12 @@ class ModelInterfacesGenerator {
 
 	private
 	void generateDaoInterface (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"generateDaoInterface");
 
 		if (! gotDaoMethods) {
 			return;

@@ -13,11 +13,13 @@ import lombok.NonNull;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.currency.logic.CurrencyLogic;
@@ -53,6 +55,9 @@ class ImChatPricePointListAction
 	@SingletonDependency
 	ImChatPricePointObjectHelper imChatPricePointHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RequestContext requestContext;
 
@@ -68,12 +73,18 @@ class ImChatPricePointListAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
+
 		// begin transaction
 
 		try (
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ImChatPricePointListAction.handle ()",
 					this);
 

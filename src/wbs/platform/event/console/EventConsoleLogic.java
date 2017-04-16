@@ -15,6 +15,7 @@ public
 interface EventConsoleLogic {
 
 	PagePart makeEventsPart (
+			TaskLogger parentTaskLogger,
 			PermanentRecord <?> object);
 
 	PagePartFactory makeEventsPartFactory (

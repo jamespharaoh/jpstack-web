@@ -331,10 +331,15 @@ class ConsoleFile
 	@Override
 	public
 	void doPost (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws
 			ServletException,
 			IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doPost");
 
 		if (
 

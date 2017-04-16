@@ -98,19 +98,19 @@ class ChatUserPendingFormAction
 	CommandObjectHelper commandHelper;
 
 	@SingletonDependency
-	ConsoleObjectManager objectManager;
-
-	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
 	Database database;
 
 	@ClassSingletonDependency
 	LogContext logContext;
 
 	@SingletonDependency
+	ConsoleObjectManager objectManager;
+
+	@SingletonDependency
 	QueueLogic queueLogic;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
@@ -128,12 +128,19 @@ class ChatUserPendingFormAction
 
 	@Override
 	protected
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"backupResponder");
 
 		try (
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserPendingFormAction.backupResponder ()",
 					this);
 
@@ -168,7 +175,10 @@ class ChatUserPendingFormAction
 				requestContext.parameter (
 					"chatUserDismiss"))
 		) {
-			return goDismiss ();
+
+			return goDismiss (
+				taskLogger);
+
 		}
 
 		if (
@@ -176,7 +186,10 @@ class ChatUserPendingFormAction
 				requestContext.parameter (
 					"chatUserNameApprove"))
 		) {
-			return goApproveName ();
+
+			return goApproveName (
+				taskLogger);
+
 		}
 
 		if (
@@ -197,6 +210,7 @@ class ChatUserPendingFormAction
 		) {
 
 			return goApproveImage (
+				taskLogger,
 				PendingMode.image);
 
 		}
@@ -208,6 +222,7 @@ class ChatUserPendingFormAction
 		) {
 
 			return goApproveImage (
+				taskLogger,
 				PendingMode.video);
 
 		}
@@ -219,6 +234,7 @@ class ChatUserPendingFormAction
 		) {
 
 			return goApproveImage (
+				taskLogger,
 				PendingMode.audio);
 
 		}
@@ -287,12 +303,19 @@ class ChatUserPendingFormAction
 	}
 
 	private
-	Responder goDismiss () {
+	Responder goDismiss (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goDismiss");
 
 		try (
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserPendingFormAction.goDismiss ()",
 					this);
 
@@ -315,12 +338,19 @@ class ChatUserPendingFormAction
 	}
 
 	private
-	Responder goApproveName () {
+	Responder goApproveName (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goApproveName");
 
 		try (
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserPendingFormAction.goApproveName ()",
 					this);
 
@@ -424,6 +454,7 @@ class ChatUserPendingFormAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserPendingFormAction.goApproveInfo ()",
 					this);
 
@@ -524,7 +555,13 @@ class ChatUserPendingFormAction
 
 	private
 	Responder goApproveImage (
-			PendingMode mode) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull PendingMode mode) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goApproveImage");
 
 		Responder responder;
 
@@ -535,6 +572,7 @@ class ChatUserPendingFormAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserPendingFormAction.goApproveImage",
 					this);
 
@@ -692,6 +730,7 @@ class ChatUserPendingFormAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserPendingFormAction.goRejectName ()",
 					this);
 
@@ -801,6 +840,7 @@ class ChatUserPendingFormAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserPendingFormAction.goRejectInfo ()",
 					this);
 
@@ -1058,6 +1098,7 @@ class ChatUserPendingFormAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserPendingFormAction.goRejectImage ()",
 					this);
 

@@ -146,6 +146,7 @@ class OxygenateRouteInSmsAction
 		} catch (RuntimeException exception) {
 
 			logFailure (
+				taskLogger,
 				exception);
 
 			throw exception;
@@ -224,7 +225,13 @@ class OxygenateRouteInSmsAction
 	}
 
 	void logFailure (
-			Throwable exception) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Throwable exception) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"logFailure");
 
 		debugLog.append (
 			stringFormat (
@@ -235,6 +242,7 @@ class OxygenateRouteInSmsAction
 			stringFormat (
 				"%s\n",
 				exceptionLogic.throwableDump (
+					taskLogger,
 					exception)));
 
 	}
@@ -251,6 +259,7 @@ class OxygenateRouteInSmsAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"Oxygen8InboundSmsAction.storeLog ()",
 					this);
 
@@ -376,6 +385,7 @@ class OxygenateRouteInSmsAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"Oxygen8InboundSmsAction.updateDatabase ()",
 					this);
 

@@ -66,6 +66,7 @@ class ChatInfoSiteRespondAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatInfoSiteRespondAction.goApi ()",
 					this);
 

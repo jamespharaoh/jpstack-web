@@ -622,8 +622,13 @@ class ComponentManagerBuilder {
 	}
 
 	void registerFixtureLayerComponents (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginSpec plugin) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"registerFixtureLayerComponents");
 
 		for (
 			PluginFixtureSpec fixture
@@ -748,8 +753,13 @@ class ComponentManagerBuilder {
 	}
 
 	void registerLayerComponent (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginComponentSpec componentSpec) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"registerLayerComponent");
 
 		taskLogger.debugFormat (
 			"Loading %s from %s",

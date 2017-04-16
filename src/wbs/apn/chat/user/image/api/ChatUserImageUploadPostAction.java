@@ -80,6 +80,7 @@ class ChatUserImageUploadPostAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserImageUploadPostAction.goApi ()",
 					this);
 
@@ -242,6 +243,7 @@ class ChatUserImageUploadPostAction
 
 					Transaction errorTransaction =
 						database.beginReadWrite (
+							taskLogger,
 							"ChatUserImageUploadPostAction.goApi ()",
 							this);
 

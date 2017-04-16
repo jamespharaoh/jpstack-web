@@ -129,12 +129,6 @@ class SimulatorSessionCreateEventAction
 
 	@Override
 	protected
-	Responder backupResponder () {
-		return null;
-	}
-
-	@Override
-	protected
 	Responder goReal (
 			@NonNull TaskLogger parentTaskLogger) {
 
@@ -239,6 +233,7 @@ class SimulatorSessionCreateEventAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"SimulatorSessionCreateEventAction.sendMessage ()",
 					this);
 
@@ -420,6 +415,7 @@ class SimulatorSessionCreateEventAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"SimulatorSessionCreateEventAction.deliveryReport ()",
 					this);
 

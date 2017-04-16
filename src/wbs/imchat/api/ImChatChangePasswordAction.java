@@ -9,12 +9,14 @@ import lombok.NonNull;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.data.tools.DataFromJson;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.imchat.model.ImChatCustomerObjectHelper;
@@ -45,6 +47,9 @@ class ImChatChangePasswordAction
 	@SingletonDependency
 	ImChatSessionObjectHelper imChatSessionHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RequestContext requestContext;
 
@@ -59,6 +64,11 @@ class ImChatChangePasswordAction
 	public
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
 
 		DataFromJson dataFromJson =
 			new DataFromJson ();
@@ -81,6 +91,7 @@ class ImChatChangePasswordAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ImChatChangePasswordAction.handle ()",
 					this);
 

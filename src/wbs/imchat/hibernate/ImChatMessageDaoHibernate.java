@@ -17,7 +17,10 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.imchat.model.ImChatMessageDao;
 import wbs.imchat.model.ImChatMessageRec;
@@ -28,6 +31,13 @@ public
 class ImChatMessageDaoHibernate
 	extends HibernateDao
 	implements ImChatMessageDao {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
 
 	@Override
 	public
@@ -196,8 +206,14 @@ class ImChatMessageDaoHibernate
 	@Override
 	public
 	List <Optional <ImChatOperatorReport>> findOperatorReports (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ImChatMessageSearch search,
 			@NonNull List <Long> ids) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOperatorReports");
 
 		Criteria criteria =
 			searchOperatorReportCriteria (
@@ -209,6 +225,7 @@ class ImChatMessageDaoHibernate
 				ids));
 
 		return findOrdered (
+			taskLogger,
 			ImChatOperatorReport.class,
 			ids,
 			criteria.list ());

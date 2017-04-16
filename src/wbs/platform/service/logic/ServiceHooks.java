@@ -61,13 +61,20 @@ class ServiceHooks
 
 	@NormalLifecycleSetup
 	public
-	void init () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
 
 		try (
 
 			Transaction transaction =
 				database.beginReadOnly (
-					"serviceHooks.init ()",
+					taskLogger,
+					"serviceHooks.setup ()",
 					this);
 
 		) {

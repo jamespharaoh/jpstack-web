@@ -217,7 +217,12 @@ class ClockworkSmsRouteInAction
 	@Override
 	protected
 	void updateDatabase (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"updateDatabase");
 
 		// begin transaction
 
@@ -225,6 +230,7 @@ class ClockworkSmsRouteInAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ClockworkSmsRouteInAction.handle ()",
 					this);
 
@@ -330,7 +336,7 @@ class ClockworkSmsRouteInAction
 	@Override
 	protected
 	Responder createResponse (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		return textResponderProvider.get ()
@@ -355,6 +361,7 @@ class ClockworkSmsRouteInAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ClockworkSmsRouteInAction.storeLog ()",
 					this);
 

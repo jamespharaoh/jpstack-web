@@ -100,8 +100,10 @@ class PlatformExceptionLogger
 				typeCode,
 				source,
 				exceptionLogic.throwableSummary (
+					taskLogger,
 					throwable),
 				exceptionLogic.throwableDump (
+					taskLogger,
 					throwable),
 				userId,
 				resolution));
@@ -137,8 +139,10 @@ class PlatformExceptionLogger
 					"%s\n%s",
 					summary,
 					exceptionLogic.throwableSummary (
+						taskLogger,
 						throwable)),
 				exceptionLogic.throwableDump (
+					taskLogger,
 					throwable),
 				userId,
 				resolution));
@@ -184,8 +188,10 @@ class PlatformExceptionLogger
 						"%s\n%s",
 						furtherSummary,
 						exceptionLogic.throwableSummary (
+							taskLogger,
 							furtherException)),
 					exceptionLogic.throwableDump (
+						taskLogger,
 						furtherException),
 					optionalAbsent (),
 					GenericExceptionResolution.fatalError);
@@ -223,6 +229,7 @@ class PlatformExceptionLogger
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"PlatformExceptionLogger.realLogException (...)",
 					this);
 

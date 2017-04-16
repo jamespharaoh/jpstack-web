@@ -9,18 +9,26 @@ import javax.inject.Provider;
 
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
+
 import org.hibernate.SessionFactory;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("hibernateComponents")
 public
 class HibernateComponents {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	WbsConfig wbsConfig;
@@ -35,7 +43,13 @@ class HibernateComponents {
 
 	@SingletonComponent ("hibernateSessionFactory")
 	public
-	SessionFactory hibernateSessionFactory () {
+	SessionFactory hibernateSessionFactory (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"hibernateSessionFactory");
 
 		Properties configProperties =
 			mapToProperties (
@@ -68,7 +82,8 @@ class HibernateComponents {
 			.configProperties (
 				configProperties)
 
-			.build ();
+			.build (
+				taskLogger);
 
 	}
 

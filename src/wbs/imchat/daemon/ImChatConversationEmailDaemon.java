@@ -68,6 +68,7 @@ class ImChatConversationEmailDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ImChatConversationEmailDaemon.runOnce ()",
 					this);
 
@@ -85,6 +86,7 @@ class ImChatConversationEmailDaemon
 			) {
 
 				doConversation (
+					taskLogger,
 					conversation.getId ());
 
 			}
@@ -94,12 +96,19 @@ class ImChatConversationEmailDaemon
 	}
 
 	void doConversation (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long conversationId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doConversation");
 
 		try (
 
 			Transaction updateTransaction =
 				database.beginReadWrite (
+					taskLogger,
 					stringFormat (
 						"%s.%s (%s) begin",
 						"ImChatConcersationEmailDaemon",
@@ -134,6 +143,7 @@ class ImChatConversationEmailDaemon
 
 				Transaction emailTransaction =
 					database.beginReadOnly (
+						taskLogger,
 						stringFormat (
 							"%s.%s (%s) end",
 							"ImChatConversationEmailDaemon",

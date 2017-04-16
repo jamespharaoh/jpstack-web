@@ -8,6 +8,7 @@
 		<component class="HibernateInterceptor"/>
 		<component class="HibernateObjectDatabaseHelper"/>
 		<component class="HibernateSessionFactoryBuilder"/>
+		<component class="HibernateTransaction"/>
 	</layer>
 
 </plugin>

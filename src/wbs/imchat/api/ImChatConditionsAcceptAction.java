@@ -100,6 +100,7 @@ class ImChatConditionsAcceptAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ImChatConditionsAcceptAction.handle ()",
 					this);
 

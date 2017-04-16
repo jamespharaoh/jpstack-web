@@ -8,10 +8,12 @@ import lombok.NonNull;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.logic.QueueLogic;
@@ -39,13 +41,16 @@ class ChatHelpLogPendingFormAction
 	ChatHelpLogic chatHelpLogic;
 
 	@SingletonDependency
+	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	QueueLogic queueLogic;
-
-	@SingletonDependency
-	Database database;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -57,8 +62,12 @@ class ChatHelpLogPendingFormAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("chatHelpLogPendingFormResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"chatHelpLogPendingFormResponder");
+
 	}
 
 	// implementation
@@ -66,7 +75,12 @@ class ChatHelpLogPendingFormAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// get params
 
@@ -114,6 +128,7 @@ class ChatHelpLogPendingFormAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatHelpLogPendingFormAction.goReal ()",
 					this);
 

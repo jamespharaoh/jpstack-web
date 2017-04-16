@@ -267,7 +267,7 @@ class WbsServlet
 
 	protected
 	WebFile processPath (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws ServletException {
 
 		return null;
@@ -276,11 +276,16 @@ class WbsServlet
 
 	protected
 	void handleException (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Throwable exception)
 		throws
 			ServletException,
 			IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleException");
 
 		if (exception instanceof ServletException) {
 
@@ -328,10 +333,15 @@ class WbsServlet
 
 	protected
 	void handleNotFound (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws
 			ServletException,
 			IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleNotFound");
 
 		taskLogger.warningFormat (
 			"RCX not found %s",
@@ -346,10 +356,15 @@ class WbsServlet
 
 	protected
 	void handleMethodNotAllowed (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws
 			ServletException,
 			IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleMethodNotAllowed");
 
 		taskLogger.warningFormat (
 			"method not allowed %s",
@@ -363,11 +378,16 @@ class WbsServlet
 
 	protected
 	void handleForbidden (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RequestContext requestContext)
 		throws
 			ServletException,
 			IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleForbidden");
 
 		taskLogger.warningFormat (
 			"RCX forbidden %s",

@@ -420,6 +420,7 @@ class ManualResponderRequestPendingSummaryPart
 
 		oldRequests =
 			manualResponderRequestHelper.findRecentLimit (
+				taskLogger,
 				manualResponder,
 				manualResponderRequest.getNumber (),
 				maxResults + 1);

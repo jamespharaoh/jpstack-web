@@ -84,6 +84,7 @@ class ChatUserAlarmDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ChatUserAlarmDaemon.runOnce ()",
 					this);
 
@@ -142,6 +143,7 @@ class ChatUserAlarmDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserAlarmDaemon.doOneAlarm (alarmId)",
 					this);
 		) {

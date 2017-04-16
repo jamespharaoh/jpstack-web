@@ -34,6 +34,7 @@ import wbs.framework.codegen.JavaAnnotationWriter;
 import wbs.framework.codegen.JavaClassUnitWriter;
 import wbs.framework.codegen.JavaClassWriter;
 import wbs.framework.codegen.JavaImportRegistry;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -65,6 +66,9 @@ class ObjectHelperGenerator {
 
 	@SingletonDependency
 	EntityHelper entityHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// prototype dependencies
 
@@ -113,7 +117,12 @@ class ObjectHelperGenerator {
 
 	public
 	void generateHelper (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"generateHelper");
 
 		init (
 			taskLogger);
@@ -125,7 +134,7 @@ class ObjectHelperGenerator {
 
 	private
 	void init (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		if (model.parentTypeIsFixed ()) {
 
@@ -298,7 +307,12 @@ class ObjectHelperGenerator {
 
 	private
 	void writeClass (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"writeClass");
 
 		AtomicFileWriter formatWriter =
 			new AtomicFileWriter (

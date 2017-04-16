@@ -190,6 +190,7 @@ class UnwiredPlazaApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"UnwiredPlazaApiServletModule.reportFile.doGet ()",
 						this);
 

@@ -156,7 +156,12 @@ class ContextTabFormActionPageBuilder
 	}
 
 	void initFormActionHelper (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initFormActionHelper");
 
 		formActionHelperProvider =
 			componentManager.getComponentProviderRequired (

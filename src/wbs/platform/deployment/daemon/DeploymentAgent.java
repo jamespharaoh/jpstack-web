@@ -86,6 +86,7 @@ class DeploymentAgent
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"runOnce ()",
 					this);
 

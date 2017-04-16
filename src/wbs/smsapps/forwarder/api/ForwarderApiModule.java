@@ -462,6 +462,7 @@ class ForwarderApiModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"ForwarderApiModule.SendRpcHandler.handle (source)",
 						this);
 
@@ -866,6 +867,7 @@ class ForwarderApiModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"ForwarderApiModule.SendExRpcHandler.handle (source)",
 						this);
 
@@ -1810,10 +1812,16 @@ class ForwarderApiModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
+
 			try (
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"ForwarderApiModule.QueryExRpcHandler.handle (source)",
 						this);
 
@@ -2181,6 +2189,7 @@ class ForwarderApiModule
 
 				Transaction transaction =
 					database.beginReadOnly (
+						taskLogger,
 						"ForwarderApiModule.PeekExRpcHandler.handle (source)",
 						this);
 
@@ -2253,7 +2262,12 @@ class ForwarderApiModule
 
 		private
 		RpcResult makeSuccess (
-				@NonNull TaskLogger taskLogger) {
+				@NonNull TaskLogger parentTaskLogger) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"makeSuccess");
 
 			RpcList messagesPart =
 				Rpc.rpcList (

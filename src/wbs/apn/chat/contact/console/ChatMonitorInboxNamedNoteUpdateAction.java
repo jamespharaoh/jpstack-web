@@ -13,11 +13,13 @@ import lombok.NonNull;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.service.console.ServiceConsoleHelper;
@@ -59,6 +61,9 @@ class ChatMonitorInboxNamedNoteUpdateAction
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
@@ -88,16 +93,13 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 	@Override
 	protected
-	Responder backupResponder () {
-
-		return null;
-
-	}
-
-	@Override
-	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// get params
 
@@ -133,6 +135,7 @@ class ChatMonitorInboxNamedNoteUpdateAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatMonitorInboxNamedNoteUpdateAction.goReal ()",
 					this);
 

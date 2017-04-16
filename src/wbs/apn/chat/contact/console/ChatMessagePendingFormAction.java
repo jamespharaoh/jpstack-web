@@ -7,7 +7,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -93,8 +92,12 @@ class ChatMessagePendingFormAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("chatMessagePendingFormResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"chatMessagePendingFormResponder");
+
 	}
 
 	@Override
@@ -170,6 +173,7 @@ class ChatMessagePendingFormAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatMessagePendingFormAction.goSend ()",
 					this);
 
@@ -403,6 +407,7 @@ class ChatMessagePendingFormAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatMessagePendingFormAction.goReject ()",
 					this);
 

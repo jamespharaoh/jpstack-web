@@ -137,14 +137,6 @@ class ObjectSearchPostAction <
 	@Getter @Setter
 	String fileName;
 
-	// details
-
-	@Override
-	protected
-	Responder backupResponder () {
-		return null;
-	}
-
 	// implementation
 
 	@Override
@@ -163,6 +155,7 @@ class ObjectSearchPostAction <
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ObjectSearchPostAction.goReal ()",
 					this);
 

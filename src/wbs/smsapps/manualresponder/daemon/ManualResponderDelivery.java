@@ -86,6 +86,7 @@ class ManualResponderDelivery
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ManualResopnderDelivery.handle (deliveryId, ref)",
 					this);
 

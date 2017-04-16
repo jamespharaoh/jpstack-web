@@ -92,6 +92,7 @@ class ChatUserOnlineDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ChatUserOnlineDaemon.runOnce ()",
 					this);
 
@@ -131,6 +132,7 @@ class ChatUserOnlineDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserOnlineDaemon.doUser (chatUserId)",
 					this);
 

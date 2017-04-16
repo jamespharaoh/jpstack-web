@@ -12,7 +12,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.jdom2.Document;
@@ -22,11 +21,14 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.integrations.dialogue.model.DialogueLocatorRec;
@@ -50,6 +52,9 @@ class DialogueLocator
 	@SingletonDependency
 	LocatorObjectHelper locatorHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ObjectManager objectManager;
 
@@ -70,8 +75,14 @@ class DialogueLocator
 	@Override
 	public
 	LongLat lookup (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long locatorId,
 			@NonNull String number) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"lookup");
 
 		LocatorInfo locatorInfo =
 			new LocatorInfo ();
@@ -80,6 +91,7 @@ class DialogueLocator
 			number;
 
 		lookupDialogueLocator (
+			taskLogger,
 			locatorInfo,
 			locatorId);
 
@@ -97,13 +109,20 @@ class DialogueLocator
 	}
 
 	void lookupDialogueLocator (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull LocatorInfo locatorInfo,
 			@NonNull Long locatorId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"lookupDialogueLocator");
 
 		try (
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"DialogueLocator.lookupDialogueLocator (...)",
 					this);
 

@@ -18,11 +18,13 @@ import org.json.simple.JSONValue;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
@@ -42,6 +44,9 @@ class SimulatorSessionPollAction
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
@@ -56,20 +61,17 @@ class SimulatorSessionPollAction
 	@PrototypeDependency
 	Provider <JsonResponder> jsonResponderProvider;
 
-	// details
-
-	@Override
-	protected
-	Responder backupResponder () {
-		return null;
-	}
-
 	// implementation
 
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		Long lastId =
 			parseIntegerRequired (
@@ -85,6 +87,7 @@ class SimulatorSessionPollAction
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"SimulatorSessionPollAction.goReal ()",
 					this);
 

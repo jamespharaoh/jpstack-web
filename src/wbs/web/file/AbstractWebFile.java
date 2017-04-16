@@ -28,7 +28,7 @@ class AbstractWebFile
 	@Override
 	public
 	void doGet (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws
 			ServletException,
 			IOException {
@@ -43,7 +43,7 @@ class AbstractWebFile
 	@Override
 	public
 	void doPost (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws
 			ServletException,
 			IOException {
@@ -58,7 +58,7 @@ class AbstractWebFile
 	@Override
 	public
 	void doOptions (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws
 			ServletException,
 			IOException {

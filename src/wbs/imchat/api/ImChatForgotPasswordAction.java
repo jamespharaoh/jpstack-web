@@ -100,6 +100,7 @@ class ImChatForgotPasswordAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ImChatForgotPasswordAction.handle ()",
 					this);
 

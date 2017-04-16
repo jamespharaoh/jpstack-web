@@ -1088,6 +1088,7 @@ class ChatMessageLogicImplementation
 				"Chat message id: " + chatMessage.getId () + "\n" +
 				"\n" +
 				exceptionLogic.throwableDump (
+					taskLogger,
 					exception),
 
 				optionalAbsent (),
@@ -1155,6 +1156,7 @@ class ChatMessageLogicImplementation
 				"Chat message id: " + chatMessage.getId () + "\n" +
 				"\n" +
 				exceptionLogic.throwableDump (
+					taskLogger,
 					exception),
 
 				optionalAbsent (),
@@ -1194,6 +1196,7 @@ class ChatMessageLogicImplementation
 				"Chat message id: " + chatMessage.getId () + "\n" +
 				"\n" +
 				exceptionLogic.throwableDump (
+					taskLogger,
 					exception),
 
 				optionalAbsent (),
@@ -1405,6 +1408,7 @@ class ChatMessageLogicImplementation
 
 					"%s",
 					exceptionLogic.throwableDump (
+						taskLogger,
 						exception)),
 
 				Optional.absent (),

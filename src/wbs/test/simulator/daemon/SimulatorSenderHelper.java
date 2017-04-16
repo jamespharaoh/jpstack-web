@@ -107,6 +107,7 @@ class SimulatorSenderHelper
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"SimulatorSender.sendMessage (messageId)",
 					this);
 

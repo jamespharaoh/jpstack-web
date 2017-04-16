@@ -90,7 +90,8 @@ class AbstractDaemonService {
 	 * which calls runService ().
 	 */
 	protected
-	void createThreads () {
+	void createThreads (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		createThread (
 			getThreadName (),
@@ -170,7 +171,8 @@ class AbstractDaemonService {
 		threads =
 			new ArrayList<> ();
 
-		createThreads ();
+		createThreads (
+			taskLogger);
 
 		// done
 

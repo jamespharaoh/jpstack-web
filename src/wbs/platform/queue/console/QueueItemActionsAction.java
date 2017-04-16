@@ -59,7 +59,8 @@ class QueueItemActionsAction
 
 	@Override
 	protected
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"queueItemActionsResponder");
@@ -71,8 +72,13 @@ class QueueItemActionsAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws ServletException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// begin transaction
 
@@ -80,6 +86,7 @@ class QueueItemActionsAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"QueueItemActionsAction.goReal ()",
 					this);
 

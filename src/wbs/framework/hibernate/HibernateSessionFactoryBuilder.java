@@ -34,7 +34,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.apache.commons.io.FileUtils;
 
@@ -52,6 +51,7 @@ import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.Seconds;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
@@ -62,11 +62,12 @@ import wbs.framework.component.scaffold.PluginSpec;
 import wbs.framework.entity.helper.EntityHelper;
 import wbs.framework.entity.model.Model;
 import wbs.framework.entity.model.ModelField;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 import wbs.framework.schema.helper.SchemaNamesHelperImplementation;
 import wbs.framework.sql.SqlLogicImplementation;
 
 @Accessors (fluent = true)
-@Log4j
 @PrototypeComponent ("hibernateSessionFactoryBuilder")
 public
 class HibernateSessionFactoryBuilder {
@@ -78,6 +79,9 @@ class HibernateSessionFactoryBuilder {
 
 	@SingletonDependency
 	EntityHelper entityHelper;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	PluginManager pluginManager;
@@ -110,7 +114,13 @@ class HibernateSessionFactoryBuilder {
 
 	// implementation
 
-	void initCustomTypes () {
+	void initCustomTypes (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initCustomTypes");
 
 		customTypes.put (
 			LocalDate.class,
@@ -134,6 +144,7 @@ class HibernateSessionFactoryBuilder {
 			) {
 
 				initCustomType (
+					taskLogger,
 					customType);
 
 			}
@@ -144,6 +155,7 @@ class HibernateSessionFactoryBuilder {
 			) {
 
 				initEnumType (
+					taskLogger,
 					enumType);
 
 			}
@@ -174,7 +186,13 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void initCustomType (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginCustomTypeSpec type) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initCustomType");
 
 		String objectClassName =
 			stringFormat (
@@ -192,10 +210,9 @@ class HibernateSessionFactoryBuilder {
 				objectClassOptional)
 		) {
 
-			log.error (
-				stringFormat (
-					"No such class %s",
-					objectClassName));
+			taskLogger.errorFormat (
+				"No such class %s",
+				objectClassName);
 
 		}
 
@@ -215,10 +232,9 @@ class HibernateSessionFactoryBuilder {
 				helperClassOptional)
 		) {
 
-			log.error (
-				stringFormat (
-					"No such class %s",
-					helperClassName));
+			taskLogger.errorFormat (
+				"No such class %s",
+				helperClassName);
 
 		}
 
@@ -245,7 +261,13 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void initEnumType (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull PluginEnumTypeSpec enumType) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initEnumType");
 
 		String enumClassName =
 			stringFormat (
@@ -263,10 +285,9 @@ class HibernateSessionFactoryBuilder {
 				enumClassOptional)
 		) {
 
-			log.error (
-				stringFormat (
-					"Enum class not found: %s",
-					enumClassName));
+			taskLogger.errorFormat (
+				"Enum class not found: %s",
+				enumClassName);
 
 			errorTypes ++;
 
@@ -296,9 +317,16 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	public
-	SessionFactory build () {
+	SessionFactory build (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		initCustomTypes ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"build");
+
+		initCustomTypes (
+			taskLogger);
 
 		Configuration config =
 			new Configuration ();
@@ -308,6 +336,7 @@ class HibernateSessionFactoryBuilder {
 
 		SessionFactory sessionFactory =
 			buildSessionFactory (
+				taskLogger,
 				config);
 
 		return sessionFactory;
@@ -315,7 +344,13 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	SessionFactory buildSessionFactory (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Configuration config) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"buildSessionFactory");
 
 		WbsConnectionProvider.setDataSource (
 			dataSource);
@@ -324,11 +359,12 @@ class HibernateSessionFactoryBuilder {
 			"hibernate.connection.provider_class",
 			WbsConnectionProvider.class.getName ());
 
-		loadConfiguration (config);
+		loadConfiguration (
+			taskLogger,
+			config);
 
-		log.info (
-			stringFormat (
-				"Building session factory"));
+		taskLogger.noticeFormat (
+			"Building session factory");
 
 		Instant startTime =
 			Instant.now ();
@@ -350,22 +386,26 @@ class HibernateSessionFactoryBuilder {
 				startTime,
 				endTime);
 
-		log.info (
-			stringFormat (
-				"Session factory built in %s seconds",
-				integerToDecimalString (
-					buildSeconds.getSeconds ())));
+		taskLogger.noticeFormat (
+			"Session factory built in %s seconds",
+			integerToDecimalString (
+				buildSeconds.getSeconds ()));
 
 		return sessionFactory;
 
 	}
 
 	void loadConfiguration (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Configuration config) {
 
-		log.info (
-			stringFormat (
-				"Loading configuration"));
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"loadConfiguration");
+
+		taskLogger.noticeFormat (
+			"Loading configuration");
 
 		Instant startTime =
 			Instant.now ();
@@ -382,13 +422,14 @@ class HibernateSessionFactoryBuilder {
 
 		} catch (IOException exception) {
 
-			log.error (
-				"Error deleting contents of work/hibernate",
-				exception);
+			taskLogger.errorFormatException (
+				exception,
+				"Error deleting contents of work/hibernate");
 
 		}
 
 		loadXmlConfigurationReal (
+			taskLogger,
 			config);
 
 		Instant endTime =
@@ -399,11 +440,10 @@ class HibernateSessionFactoryBuilder {
 				startTime,
 				endTime);
 
-		log.info (
-			stringFormat (
-				"Configuration loaded in %s seconds",
-				integerToDecimalString (
-					buildSeconds.getSeconds ())));
+		taskLogger.noticeFormat (
+			"Configuration loaded in %s seconds",
+			integerToDecimalString (
+				buildSeconds.getSeconds ()));
 
 		if (errorClasses > 0) {
 
@@ -418,7 +458,13 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void loadXmlConfigurationReal (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Configuration config) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"loadXmlConfigurationReal");
 
 		for (
 			Model <?> model
@@ -426,6 +472,7 @@ class HibernateSessionFactoryBuilder {
 		) {
 
 			configureModel (
+				taskLogger,
 				config,
 				model);
 
@@ -435,13 +482,18 @@ class HibernateSessionFactoryBuilder {
 
 	public
 	void configureModel (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Configuration config,
 			@NonNull Model <?> model) {
 
-		log.debug (
-			stringFormat (
-				"Loading %s",
-				model.objectName ()));
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"configureModel");
+
+		taskLogger.debugFormat (
+			"Loading %s",
+			model.objectName ());
 
 		String tableNameSql =
 			sqlLogic.quoteIdentifier (
@@ -557,6 +609,7 @@ class HibernateSessionFactoryBuilder {
 			} else if (modelField.collection ()) {
 
 				configureCollection (
+					taskLogger,
 					model,
 					modelField,
 					classElement);
@@ -564,6 +617,7 @@ class HibernateSessionFactoryBuilder {
 			} else if (modelField.link ()) {
 
 				configureLink (
+					taskLogger,
 					model,
 					modelField,
 					classElement);
@@ -584,11 +638,10 @@ class HibernateSessionFactoryBuilder {
 
 			} else {
 
-				log.error (
-					stringFormat (
-						"Don't know how to map %s for %s",
-						modelField.type ().name (),
-						modelField.fullName ()));
+				taskLogger.errorFormat (
+					"Don't know how to map %s for %s",
+					modelField.type ().name (),
+					modelField.fullName ());
 
 				classErrors ++;
 
@@ -623,10 +676,9 @@ class HibernateSessionFactoryBuilder {
 
 		} catch (IOException exception) {
 
-			log.warn (
-				stringFormat (
-					"Error writing %s",
-					outputFile.getAbsolutePath ()));
+			taskLogger.warningFormat (
+				"Error writing %s",
+				outputFile.getAbsolutePath ());
 
 		}
 
@@ -634,12 +686,11 @@ class HibernateSessionFactoryBuilder {
 
 		if (classErrors > 0) {
 
-			log.error (
-				stringFormat (
-					"Skipping %s due to %s errors",
-					model.objectName (),
-					integerToDecimalString (
-						classErrors)));
+			taskLogger.errorFormat (
+				"Skipping %s due to %s errors",
+				model.objectName (),
+				integerToDecimalString (
+					classErrors));
 
 			errorClasses ++;
 
@@ -963,9 +1014,15 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureCollection (
-			Model <?> model,
-			ModelField modelField,
-			Element classElement) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Model <?> model,
+			@NonNull ModelField modelField,
+			@NonNull Element classElement) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"configureCollection");
 
 		if (modelField.valueType () == Set.class) {
 
@@ -977,6 +1034,7 @@ class HibernateSessionFactoryBuilder {
 		} else if (modelField.valueType () == List.class) {
 
 			configureCollectionList (
+				taskLogger,
 				model,
 				modelField,
 				classElement);
@@ -984,17 +1042,17 @@ class HibernateSessionFactoryBuilder {
 		} else if (modelField.valueType () == Map.class) {
 
 			configureCollectionMap (
+				taskLogger,
 				model,
 				modelField,
 				classElement);
 
 		} else {
 
-			log.error (
-				stringFormat (
-					"Don't know how to map a collection with type %s for %s",
-					modelField.valueType ().getSimpleName (),
-					modelField.fullName ()));
+			taskLogger.errorFormat (
+				"Don't know how to map a collection with type %s for %s",
+				modelField.valueType ().getSimpleName (),
+				modelField.fullName ());
 
 			classErrors ++;
 
@@ -1120,9 +1178,15 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureCollectionList (
-			Model <?> model,
-			ModelField modelField,
-			Element classElement) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Model <?> model,
+			@NonNull ModelField modelField,
+			@NonNull Element classElement) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"configureCollectionList");
 
 		// list
 
@@ -1189,10 +1253,9 @@ class HibernateSessionFactoryBuilder {
 
 		if (modelField.listIndexColumnName () == null) {
 
-			log.error (
-				stringFormat (
-					"No index specified for list %s",
-					modelField.fullName ()));
+			taskLogger.errorFormat (
+				"No index specified for list %s",
+				modelField.fullName ());
 
 			classErrors ++;
 
@@ -1273,9 +1336,15 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureCollectionMap (
-			Model <?> model,
-			ModelField modelField,
-			Element classElement) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Model <?> model,
+			@NonNull ModelField modelField,
+			@NonNull Element classElement) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"configureCollectionMap");
 
 		// map
 
@@ -1327,11 +1396,10 @@ class HibernateSessionFactoryBuilder {
 
 		if (indexType == null) {
 
-			log.error (
-				stringFormat (
-					"Don't know index type %s for %s",
-					modelField.collectionKeyType ().getName (),
-					modelField.fullName ()));
+			taskLogger.errorFormat (
+				"Don't know index type %s for %s",
+				modelField.collectionKeyType ().getName (),
+				modelField.fullName ());
 
 			classErrors ++;
 
@@ -1374,9 +1442,15 @@ class HibernateSessionFactoryBuilder {
 	}
 
 	void configureLink (
-			Model <?> model,
-			ModelField modelField,
-			Element classElement) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Model <?> model,
+			@NonNull ModelField modelField,
+			@NonNull Element classElement) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"configureLink");
 
 		if (modelField.valueType () == Set.class) {
 
@@ -1463,11 +1537,10 @@ class HibernateSessionFactoryBuilder {
 						referencedClass)
 				) {
 
-					log.error (
-						stringFormat (
-							"Invalid element type %s for %s",
-							modelField.valueType ().getName (),
-							modelField.fullName ()));
+					taskLogger.errorFormat (
+						"Invalid element type %s for %s",
+						modelField.valueType ().getName (),
+						modelField.fullName ());
 
 					return;
 
@@ -1636,11 +1709,10 @@ class HibernateSessionFactoryBuilder {
 
 		} else {
 
-			log.error (
-				stringFormat (
-					"Don't know how to map link type %s for %s",
-					modelField.valueType ().getSimpleName (),
-					modelField.fullName ()));
+			taskLogger.errorFormat (
+				"Don't know how to map link type %s for %s",
+				modelField.valueType ().getSimpleName (),
+				modelField.fullName ());
 
 			classErrors ++;
 

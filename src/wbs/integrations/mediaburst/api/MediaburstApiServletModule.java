@@ -212,6 +212,7 @@ class MediaburstApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"MediaburstApiServletModule.inFile.doPost ()",
 						this);
 
@@ -425,6 +426,7 @@ class MediaburstApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"MediaburstApiServletModule.reportFile.doGet ()",
 						this);
 

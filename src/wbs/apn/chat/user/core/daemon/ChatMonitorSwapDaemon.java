@@ -92,6 +92,7 @@ class ChatMonitorSwapDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ChatMonitorSwapDaemon.runOnce ()",
 					this);
 
@@ -202,6 +203,7 @@ class ChatMonitorSwapDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					stringFormat (
 						"%s.%s (%s)",
 						"ChatMonitorSwapDaemon",

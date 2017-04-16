@@ -102,7 +102,7 @@ class FonixRouteInAction
 	@Override
 	protected
 	void processRequest (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		// decode request
@@ -119,7 +119,12 @@ class FonixRouteInAction
 	@Override
 	protected
 	void updateDatabase (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"updateDatabase");
 
 		// begin transaction
 
@@ -127,6 +132,7 @@ class FonixRouteInAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					stringFormat (
 						"%s.%s ()",
 						getClass ().getSimpleName (),
@@ -249,7 +255,7 @@ class FonixRouteInAction
 	@Override
 	protected
 	Responder createResponse (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		return textResponderProvider.get ()
@@ -274,6 +280,7 @@ class FonixRouteInAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ClockworkSmsRouteInAction.storeLog ()",
 					this);
 

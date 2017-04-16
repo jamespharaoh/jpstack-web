@@ -268,6 +268,7 @@ class ChatInfoLogicImplementation
 					"\n",
 					"%s",
 					exceptionLogic.throwableDump (
+						taskLogger,
 						exception)),
 
 				Optional.absent (),

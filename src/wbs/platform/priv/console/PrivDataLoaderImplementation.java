@@ -250,6 +250,7 @@ class PrivDataLoaderImplementation
 
 				Transaction transaction =
 					database.beginReadOnlyJoin (
+						taskLogger,
 						"PrivDataLoaderImplementation.PrivDataReloader.get ()",
 						this);
 
@@ -677,6 +678,7 @@ class PrivDataLoaderImplementation
 
 				Transaction transaction =
 					database.beginReadOnly (
+						taskLogger,
 						"PrivDataLoaderImplementation.UserDataReloader.get ()",
 						this);
 

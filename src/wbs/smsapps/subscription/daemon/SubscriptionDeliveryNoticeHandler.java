@@ -94,6 +94,7 @@ class SubscriptionDeliveryNoticeHandler
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"SubscriptionDeliveryNoticeHandler.handle (deliveryId, ref)",
 					this);
 

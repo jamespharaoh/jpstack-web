@@ -154,9 +154,14 @@ class ContextTabActionPageBuilder <
 	}
 
 	void buildFile (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint
 				resolvedExtensionPoint) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"buildFile");
 
 		consoleModule.addContextFile (
 			localFile,

@@ -55,8 +55,13 @@ class ComponentRunner {
 
 	public
 	void run (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws Exception {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"run");
 
 		runnerClass =
 			Class.forName (
@@ -93,8 +98,13 @@ class ComponentRunner {
 	}
 
 	ComponentManager initComponentManager (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws Exception {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initComponentManager");
 
 		return new ComponentManagerBuilder ()
 
@@ -133,9 +143,14 @@ class ComponentRunner {
 
 	public
 	void invokeTarget (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentManager componentManager)
 		throws Exception {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"invokeTarget");
 
 		// find runnable and run it
 

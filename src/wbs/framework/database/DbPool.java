@@ -24,13 +24,15 @@ import javax.sql.DataSource;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 /**
  * TODO a maximum connection life would be nice
@@ -44,7 +46,6 @@ import wbs.framework.component.annotations.SingletonDependency;
  * @author James Pharaoh
  */
 @Accessors (fluent = true)
-@Log4j
 @PrototypeComponent ("dbPool")
 public
 class DbPool
@@ -54,6 +55,9 @@ class DbPool
 
 	@SingletonDependency
 	ActivityManager activityManager;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// state
 
@@ -212,6 +216,10 @@ class DbPool
 
 	void closeIdle () {
 
+		TaskLogger taskLogger =
+			logContext.createTaskLogger (
+				"closeIdle ()");
+
 		long now =
 			System.currentTimeMillis ();
 
@@ -293,9 +301,9 @@ class DbPool
 
 			} catch (SQLException exception) {
 
-				log.fatal (
-					"Unable to close idle connection",
-					exception);
+				taskLogger.fatalFormatException (
+					exception,
+					"Unable to close idle connection");
 
 			}
 

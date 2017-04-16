@@ -113,7 +113,12 @@ class ContextResponderPageBuilder <
 	}
 
 	void buildResponder (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"buildResponder");
 
 		consoleModule.addResponder (
 			responderName,

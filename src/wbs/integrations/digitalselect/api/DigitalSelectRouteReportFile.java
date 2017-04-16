@@ -110,6 +110,7 @@ class DigitalSelectRouteReportFile
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"DigitalSelectRouteReportFile.doPost ()",
 					this);
 

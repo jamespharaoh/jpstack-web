@@ -56,10 +56,15 @@ class BroadcastSystemsReportFile
 	@Override
 	public
 	void doGet (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws
 			ServletException,
 			IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doGet");
 
 		Data data =
 			new Data ();
@@ -76,7 +81,7 @@ class BroadcastSystemsReportFile
 
 	public
 	void processRequest (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Data data) {
 
 		data.routeId =
@@ -131,6 +136,7 @@ class BroadcastSystemsReportFile
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"BroadcastSystemsReportFile.updateDatabase (data)",
 					this);
 

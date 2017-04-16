@@ -135,6 +135,7 @@ class AlertsDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"AlertsDaemon.runOnce ()",
 					this);
 
@@ -243,6 +244,7 @@ class AlertsDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"AlertsDaemon.runOnce ()",
 					this);
 

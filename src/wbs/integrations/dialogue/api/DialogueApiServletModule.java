@@ -322,6 +322,7 @@ class DialogueApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"DialogueApiServletModule.inFile.doPost ()",
 						this);
 
@@ -540,6 +541,7 @@ class DialogueApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"DialogueApiServletModule.reportAction.handle ()",
 						this);
 

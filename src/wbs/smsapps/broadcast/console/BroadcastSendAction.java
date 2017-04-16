@@ -12,10 +12,12 @@ import org.joda.time.Instant;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -47,6 +49,9 @@ class BroadcastSendAction
 	@SingletonDependency
 	EventLogic eventLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
@@ -63,19 +68,29 @@ class BroadcastSendAction
 
 	@Override
 	protected
-	Responder backupResponder () {
-		return responder ("broadcastSendResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"broadcastSendResponder");
+
 	}
 
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		try (
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"BroadcastSendAction.goReal ()",
 					this);
 

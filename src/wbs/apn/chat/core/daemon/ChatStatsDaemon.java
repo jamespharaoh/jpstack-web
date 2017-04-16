@@ -144,6 +144,7 @@ class ChatStatsDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ChatStatsDaemon.doStats (timestamp)",
 					this);
 
@@ -186,6 +187,7 @@ class ChatStatsDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatStatsDaemon.doStats (timestamp, chatId)",
 					this);
 

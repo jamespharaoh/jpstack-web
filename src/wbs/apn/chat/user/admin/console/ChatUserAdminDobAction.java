@@ -9,10 +9,12 @@ import org.joda.time.LocalDate;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -42,6 +44,9 @@ class ChatUserAdminDobAction
 	@SingletonDependency
 	EventLogic eventLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
@@ -52,8 +57,12 @@ class ChatUserAdminDobAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("chatUserAdminDobResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"chatUserAdminDobResponder");
+
 	}
 
 	// implementation
@@ -61,7 +70,12 @@ class ChatUserAdminDobAction
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// get params
 
@@ -99,6 +113,7 @@ class ChatUserAdminDobAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserAdminDobAction.goReal ()",
 					this);
 

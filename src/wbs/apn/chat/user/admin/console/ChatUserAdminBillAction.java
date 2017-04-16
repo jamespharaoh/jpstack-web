@@ -11,10 +11,12 @@ import org.joda.time.LocalDate;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
@@ -48,10 +50,13 @@ class ChatUserAdminBillAction
 	ChatUserDao chatUserDao;
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
+	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
-	Database database;
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -63,8 +68,12 @@ class ChatUserAdminBillAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("chatUserAdminBillResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"chatUserAdminBillResponder");
+
 	}
 
 	// implementation
@@ -72,7 +81,12 @@ class ChatUserAdminBillAction
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		if (
 			! requestContext.canContext (
@@ -90,6 +104,7 @@ class ChatUserAdminBillAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserAdminBillAction.goReal ()",
 					this);
 

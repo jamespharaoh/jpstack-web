@@ -7,10 +7,12 @@ import lombok.NonNull;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
@@ -40,6 +42,9 @@ class ChatUserHelpFormAction
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
@@ -47,8 +52,12 @@ class ChatUserHelpFormAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("chatUserHelpFormResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"chatUserHelpFormResponder");
+
 	}
 
 	// implementation
@@ -56,7 +65,12 @@ class ChatUserHelpFormAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// get parameters
 
@@ -85,6 +99,7 @@ class ChatUserHelpFormAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserHelpFormAction.goReal ()",
 					this);
 

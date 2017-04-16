@@ -88,7 +88,7 @@ class OxygenateRouteReportAction
 	@Override
 	protected
 	void processRequest (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		smsRouteId =
@@ -109,12 +109,18 @@ class OxygenateRouteReportAction
 	@Override
 	protected
 	void updateDatabase (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"updateDatabase");
 
 		try (
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					stringFormat (
 						"%s.%s ()",
 						getClass ().getSimpleName (),
@@ -169,7 +175,7 @@ class OxygenateRouteReportAction
 	@Override
 	protected
 	Responder createResponse (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		// encode response
@@ -214,6 +220,7 @@ class OxygenateRouteReportAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					stringFormat (
 						"%s.%s ()",
 						getClass ().getSimpleName (),

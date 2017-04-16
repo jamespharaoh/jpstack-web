@@ -8,11 +8,13 @@ import javax.inject.Provider;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.media.model.ContentRec;
@@ -43,6 +45,9 @@ class ImChatMediaOriginalJpegAction
 	@SingletonDependency
 	ImChatProfileObjectHelper imChatProfileHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MediaObjectHelper mediaHelper;
 
@@ -64,12 +69,18 @@ class ImChatMediaOriginalJpegAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
+
 		// begin transaction
 
 		try (
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ImChatMediaOriginalJpecAction.handle ()",
 					this);
 

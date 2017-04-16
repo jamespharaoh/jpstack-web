@@ -178,6 +178,7 @@ class ChatBillDeliveryHandler
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatBillDeliveryHandler.handle (deliveryId, ref)",
 					this);
 

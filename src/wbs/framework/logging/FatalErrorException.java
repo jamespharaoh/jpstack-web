@@ -14,7 +14,7 @@ class FatalErrorException
 
 	public
 	FatalErrorException (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String message) {
 
 		super (
@@ -27,7 +27,7 @@ class FatalErrorException
 
 	public
 	FatalErrorException (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String message,
 			@NonNull Throwable cause) {
 

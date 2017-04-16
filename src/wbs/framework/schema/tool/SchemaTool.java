@@ -86,7 +86,12 @@ class SchemaTool {
 	}
 
 	void defineTables (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"defineTables");
 
 		schema =
 			schemaFromModel.get ()

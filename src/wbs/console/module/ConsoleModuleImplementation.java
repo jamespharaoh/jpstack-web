@@ -131,8 +131,13 @@ class ConsoleModuleImplementation
 
 	public
 	Provider <Responder> beanResponder (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String name) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"beanResponder");
 
 		return componentManager.getComponentProviderRequired (
 			taskLogger,

@@ -129,7 +129,8 @@ class ManualResponderRequestPendingFormAction
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"manualResponderRequestPendingFormResponder");
@@ -164,6 +165,7 @@ class ManualResponderRequestPendingFormAction
 		if (ignore) {
 
 			return goIgnore (
+				taskLogger,
 				manualResponderRequestId);
 
 		} else {
@@ -178,7 +180,13 @@ class ManualResponderRequestPendingFormAction
 	}
 
 	Responder goIgnore (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long manualResponderRequestId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goIgnore");
 
 		// start transaction
 
@@ -186,6 +194,7 @@ class ManualResponderRequestPendingFormAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					stringFormat (
 						"%s.%s (%s)",
 						"ManualResponderRequestPendingFormAction",
@@ -261,6 +270,7 @@ class ManualResponderRequestPendingFormAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ManualResponderRequestPendingFormAction.goSend (...)",
 					this);
 

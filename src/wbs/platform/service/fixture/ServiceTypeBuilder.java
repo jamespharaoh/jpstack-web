@@ -128,6 +128,7 @@ class ServiceTypeBuilder
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ServiceTypeBuilder.createServiceType ()",
 					this);
 

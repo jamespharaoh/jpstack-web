@@ -18,10 +18,12 @@ import lombok.NonNull;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
@@ -37,13 +39,16 @@ class ChatNoteNamesAction
 	// singleton dependencies
 
 	@SingletonDependency
-	Database database;
-
-	@SingletonDependency
 	ChatConsoleHelper chatHelper;
 
 	@SingletonDependency
 	ChatNoteNameConsoleHelper chatNoteNameHelper;
+
+	@SingletonDependency
+	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -52,8 +57,12 @@ class ChatNoteNamesAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("chatNoteNamesResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"chatNoteNamesResponder");
+
 	}
 
 	// implementation
@@ -61,7 +70,12 @@ class ChatNoteNamesAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		List <String> notices =
 			new ArrayList<> ();
@@ -72,6 +86,7 @@ class ChatNoteNamesAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatNoteNamesAction.goReal ()",
 					this);
 

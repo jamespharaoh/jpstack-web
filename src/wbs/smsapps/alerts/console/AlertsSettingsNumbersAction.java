@@ -26,10 +26,12 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -63,6 +65,9 @@ class AlertsSettingsNumbersAction
 	@SingletonDependency
 	EventLogic eventLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	NumberConsoleHelper numberHelper;
 
@@ -82,7 +87,8 @@ class AlertsSettingsNumbersAction
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"alertsSettingsNumbersResponder");
@@ -94,8 +100,13 @@ class AlertsSettingsNumbersAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws ServletException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		if (! requestContext.canContext ("alertsSettings.manage")) {
 
@@ -113,6 +124,7 @@ class AlertsSettingsNumbersAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"AlertsSettingsNumbersAction.goReal ()",
 					this);
 

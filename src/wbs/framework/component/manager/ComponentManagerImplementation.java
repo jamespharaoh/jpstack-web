@@ -54,7 +54,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -137,9 +136,14 @@ class ComponentManagerImplementation
 	@Override
 	public <ComponentType>
 	Optional <ComponentType> getComponent (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getComponent");
 
 		try (
 
@@ -179,9 +183,14 @@ class ComponentManagerImplementation
 	@Override
 	public <ComponentType>
 	ComponentType getComponentRequired (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getComponentRequired");
 
 		try (
 
@@ -223,10 +232,15 @@ class ComponentManagerImplementation
 	@Override
 	public <ComponentType>
 	ComponentType getComponentOrElse (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass,
 			@NonNull Supplier <ComponentType> orElse) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getComponentOrElse");
 
 		try (
 
@@ -263,9 +277,14 @@ class ComponentManagerImplementation
 	@Override
 	public <ComponentType>
 	Provider <ComponentType> getComponentProviderRequired (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String componentName,
 			@NonNull Class <ComponentType> componentClass) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getComponentProviderRequired");
 
 		try (
 
@@ -326,7 +345,12 @@ class ComponentManagerImplementation
 
 	public
 	Map <String, Object> getAllSingletonComponents (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getAllSingletonComponents");
 
 		try (
 
@@ -358,9 +382,14 @@ class ComponentManagerImplementation
 
 	private
 	Object getComponent (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialize) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getComponent");
 
 		try (
 
@@ -609,10 +638,15 @@ class ComponentManagerImplementation
 
 	private
 	void initializeComponent (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component,
 			@NonNull ComponentMetaDataImplementation componentMetaData) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"initializeComponent");
 
 		synchronized (componentMetaData) {
 
@@ -818,9 +852,14 @@ class ComponentManagerImplementation
 
 	private
 	void setComponentInjectedProperties (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Object component) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setComponentInjectedProperties");
 
 		try (
 
@@ -1085,8 +1124,13 @@ class ComponentManagerImplementation
 
 	private
 	void performInjection (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Injection injection) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"performInjection");
 
 		List <Pair <ComponentDefinition, Object>> unaggregatedValues =
 			iterableMapToList (
@@ -1117,7 +1161,12 @@ class ComponentManagerImplementation
 
 	public
 	ComponentManager init (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"init");
 
 		try (
 
@@ -1405,11 +1454,11 @@ class ComponentManagerImplementation
 
 	public
 	Provider <?> getComponentProvider (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition) {
 
 		return getComponentProvider (
-			taskLogger,
+			parentTaskLogger,
 			componentDefinition,
 			true);
 
@@ -1417,7 +1466,7 @@ class ComponentManagerImplementation
 
 	public
 	Provider <?> getComponentProvider (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition,
 			@NonNull Boolean initialized) {
 
@@ -1433,6 +1482,10 @@ class ComponentManagerImplementation
 				@Override
 				public
 				Object get () {
+
+					TaskLogger taskLogger =
+						logContext.createTaskLogger (
+							"getComponentProvider.Provider.get");
 
 					return getComponent (
 						taskLogger,

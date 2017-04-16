@@ -64,15 +64,18 @@ class ConsoleAction
 	int maxTries = 3;
 
 	protected
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
 		return null;
+
 	}
 
 	// implementation
 
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws ServletException {
 
 		return null;
@@ -99,7 +102,8 @@ class ConsoleAction
 				return responder;
 
 			Responder backupResponder =
-				backupResponder ();
+				backupResponder (
+					taskLogger);
 
 			if (backupResponder == null) {
 
@@ -124,8 +128,13 @@ class ConsoleAction
 
 	private
 	Responder goWithRetry (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws ServletException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goWithRetry");
 
 		int triesRemaining =
 			maxTries;
@@ -176,8 +185,13 @@ class ConsoleAction
 	}
 
 	Responder handleException (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Throwable throwable) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handleException");
 
 		// if we have no backup page just die
 
@@ -186,7 +200,8 @@ class ConsoleAction
 		try {
 
 			backupResponder =
-				backupResponder ();
+				backupResponder (
+					taskLogger);
 
 		} catch (Exception exceptionFromBackupResponder) {
 

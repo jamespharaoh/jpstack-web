@@ -73,7 +73,8 @@ class ObjectSearchGetAction
 
 	@Override
 	protected
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			searchResponderName);
@@ -96,6 +97,7 @@ class ObjectSearchGetAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ObjectSearchGetAction.goReal",
 					this);
 

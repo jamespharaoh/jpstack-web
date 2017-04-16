@@ -5,6 +5,7 @@ import lombok.NonNull;
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.module.ConsoleModuleImplementation;
 import wbs.console.module.SimpleConsoleBuilderContainer;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
@@ -17,6 +18,7 @@ import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.manager.ComponentManager;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.web.pathhandler.PathHandler;
 
 @PrototypeComponent ("simplePathBuilder")
@@ -71,7 +73,12 @@ class SimplePathBuilder
 	}
 
 	void buildPath (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"buildPath");
 
 		PathHandler pathHandler =
 			componentManager.getComponentRequired (

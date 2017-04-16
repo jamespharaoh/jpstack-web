@@ -151,7 +151,7 @@ class MessageTemplateEntryValueFieldsProvider
 	@Override
 	public
 	FormFieldSet <MessageTemplateEntryValueRec> getFieldsForParent (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull MessageTemplateSetRec parent) {
 
 		throw new UnsupportedOperationException ();

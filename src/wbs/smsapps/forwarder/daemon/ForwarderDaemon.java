@@ -78,7 +78,13 @@ class ForwarderDaemon
 		implements Runnable {
 
 		public
-		boolean doQuery () {
+		boolean doQuery (
+				@NonNull TaskLogger parentTaskLogger) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doQuery");
 
 			Set<Long> activeIds =
 				buffer.getKeys ();
@@ -89,6 +95,7 @@ class ForwarderDaemon
 
 				Transaction transaction =
 					database.beginReadOnly (
+						taskLogger,
 						"ForwarderDaemon.MainThread.doQuery ()",
 						this);
 
@@ -155,15 +162,30 @@ class ForwarderDaemon
 
 			while (true) {
 
-				boolean moreMessages = doQuery();
+				TaskLogger taskLogger =
+					logContext.createTaskLogger (
+						"MainThread.run");
+
+				boolean moreMessages =
+					doQuery (
+						taskLogger);
 
 				try {
-					if (moreMessages)
-						buffer.waitNotFull();
-					else
-						Thread.sleep(1000);
+
+					if (moreMessages) {
+
+						buffer.waitNotFull ();
+
+					} else {
+
+						Thread.sleep (
+							1000);
+					}
+
 				} catch (InterruptedException e) {
+
 					return;
+
 				}
 
 			}
@@ -447,6 +469,7 @@ class ForwarderDaemon
 
 				Transaction checkTransaction =
 					database.beginReadWrite (
+						taskLogger,
 						stringFormat (
 							"%s.%s.%s (%s)",
 							"ForwarderDaemon",
@@ -512,6 +535,7 @@ class ForwarderDaemon
 
 					Transaction resultTransaction =
 						database.beginReadWrite (
+							taskLogger,
 							"ForwarderDaemon.WorkerThread.doMessage",
 							this);
 
@@ -635,7 +659,8 @@ class ForwarderDaemon
 
 	@Override
 	protected
-	void createThreads () {
+	void createThreads (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		// main thread
 

@@ -82,6 +82,7 @@ class ChatSpendWarningDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ChatSpendWarningDaemon.runOnce ()",
 					this);
 
@@ -137,6 +138,7 @@ class ChatSpendWarningDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatSpendWarningDaemon.doUser (chatUserId)",
 					this);
 

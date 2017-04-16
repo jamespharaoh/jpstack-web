@@ -88,6 +88,7 @@ class ChatUserQuietDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ChatUserQuietDaemon.runOnce ()",
 					this);
 
@@ -146,6 +147,7 @@ class ChatUserQuietDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserQuietDaemon.doUser (chatUserId)",
 					this);
 

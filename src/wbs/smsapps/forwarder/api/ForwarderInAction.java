@@ -61,10 +61,16 @@ class ForwarderInAction
 	Responder goApi (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goApi");
+
 		try (
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ForwarderInAction.goApi ()",
 					this);
 

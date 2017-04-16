@@ -85,6 +85,7 @@ class ErrorResponder
 				stringFormat (
 					"<pre>%h</pre>",
 					exceptionLogic.throwableDump (
+						taskLogger,
 						exception)));
 
 		}

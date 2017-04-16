@@ -22,7 +22,7 @@ class ProfileLogger {
 
 	public
 	ProfileLogger (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull LogSeverity severity,
 			@NonNull String name) {
 

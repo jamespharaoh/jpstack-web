@@ -172,11 +172,16 @@ class DigitalSelectSender
 
 	}
 
-	private static
+	private
 	void openConnection (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull State state)
 		throws IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"openConnection");
 
 		state.httpClient (
 			HttpClientBuilder.create ()

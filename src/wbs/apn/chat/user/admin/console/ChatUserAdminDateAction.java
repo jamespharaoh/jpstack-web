@@ -10,10 +10,12 @@ import lombok.NonNull;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
@@ -39,10 +41,13 @@ class ChatUserAdminDateAction
 	ChatUserConsoleHelper chatUserHelper;
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
+	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
-	Database database;
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
@@ -54,7 +59,8 @@ class ChatUserAdminDateAction
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"chatUserAdminDateResponder");
@@ -66,7 +72,12 @@ class ChatUserAdminDateAction
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		ChatUserDateMode dateMode =
 			toEnum (
@@ -128,6 +139,7 @@ class ChatUserAdminDateAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserAdminDateAction.goReal ()",
 					this);
 

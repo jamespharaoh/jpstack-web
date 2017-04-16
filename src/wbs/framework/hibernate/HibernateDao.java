@@ -21,7 +21,6 @@ import java.util.List;
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.hibernate.Criteria;
 import org.hibernate.LockOptions;
@@ -30,10 +29,12 @@ import org.hibernate.Session;
 
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.IdObject;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
 public abstract
 class HibernateDao {
 
@@ -44,6 +45,9 @@ class HibernateDao {
 
 	@SingletonDependency
 	HibernateDatabase database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	// implementation
 
@@ -422,12 +426,18 @@ class HibernateDao {
 
 	protected <RowType extends IdObject>
 	List <Optional <RowType>> findOrdered (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Class <RowType> rowTypeClass,
 			@NonNull List <Long> objectIds,
 			@NonNull List <?> unorderedList) {
 
-		HashMap<Long,RowType> indexedList =
-			new HashMap<Long,RowType> ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findOrdered");
+
+		HashMap <Long, RowType> indexedList =
+			new HashMap<> ();
 
 		for (
 			int index = 0;
@@ -475,12 +485,11 @@ class HibernateDao {
 					object)
 			) {
 
-				log.warn (
-					stringFormat (
-						"%s with id %s not found",
-						rowTypeClass.getSimpleName (),
-						integerToDecimalString (
-							objectId)));
+				taskLogger.warningFormat (
+					"%s with id %s not found",
+					rowTypeClass.getSimpleName (),
+					integerToDecimalString (
+						objectId));
 
 			}
 

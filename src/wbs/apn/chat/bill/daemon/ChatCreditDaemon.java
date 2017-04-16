@@ -84,6 +84,7 @@ class ChatCreditDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ChatCreditDaemon.runOnce ()",
 					this);
 
@@ -122,6 +123,7 @@ class ChatCreditDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					stringFormat (
 						"%s.%s (%s)",
 						"ChatCreditDaemon",
@@ -188,6 +190,7 @@ class ChatCreditDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					stringFormat (
 						"%s.%s (%s)",
 						"ChatCreditDaemon",

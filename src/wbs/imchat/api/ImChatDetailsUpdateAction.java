@@ -109,6 +109,7 @@ class ImChatDetailsUpdateAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ImChatDetailsUpdateAction.handler ()",
 					this);
 

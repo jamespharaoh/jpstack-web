@@ -85,7 +85,12 @@ class SimpleActionPageBuilder
 	}
 
 	void buildFile (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"buildFile");
 
 		consoleModule.addFile (
 			path,
@@ -103,7 +108,12 @@ class SimpleActionPageBuilder
 	}
 
 	void buildResponder (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"buildResponder");
 
 		consoleModule.addResponder (
 			responderName,

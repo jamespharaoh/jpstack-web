@@ -25,7 +25,6 @@ import java.util.List;
 
 import com.google.common.base.Optional;
 
-import lombok.Cleanup;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -181,7 +180,12 @@ class ChatDateDaemon
 	}
 
 	void doRun (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doRun");
 
 		taskLogger.noticeFormat (
 			"Dating batch started");
@@ -193,6 +197,7 @@ class ChatDateDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ChatDateDaemon.doRun ()",
 					this);
 
@@ -333,6 +338,7 @@ class ChatDateDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					stringFormat (
 						"%s.%s (%s)",
 						classNameSimple (
@@ -676,9 +682,14 @@ class ChatDateDaemon
 	}
 
 	boolean doUser (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Collection <DatingUserInfo> otherUserInfos,
 			@NonNull Long thisUserId) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doUser");
 
 		taskLogger.noticeFormat (
 			"Doing user %s",
@@ -691,6 +702,7 @@ class ChatDateDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatDateDaemon.doUser (otherUserInfos, thisUserId)",
 					this);
 
@@ -898,13 +910,18 @@ class ChatDateDaemon
 	}
 
 	boolean sendSingleLot (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			ChatUserRec thisUser,
 			Collection<DatingUserInfo> otherUserInfos,
 			boolean sendPhoto,
 			boolean usersWithPhoto,
 			boolean usersWithoutPhoto,
 			int num) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"sendSingleLot");
 
 		// check each prospective user
 

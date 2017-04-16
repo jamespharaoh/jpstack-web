@@ -5,10 +5,12 @@ import lombok.NonNull;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleHelper;
@@ -35,6 +37,9 @@ class ChatMonitorInboxAddNoteAction
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
@@ -48,7 +53,8 @@ class ChatMonitorInboxAddNoteAction
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"chatMonitorInboxSummaryResponder");
@@ -58,7 +64,12 @@ class ChatMonitorInboxAddNoteAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		String newNote =
 			requestContext.parameterRequired (
@@ -68,6 +79,7 @@ class ChatMonitorInboxAddNoteAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatMonitorInboxAddNoteAction.goReal ()",
 					this);
 

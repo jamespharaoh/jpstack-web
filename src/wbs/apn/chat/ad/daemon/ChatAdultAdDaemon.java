@@ -114,6 +114,7 @@ class ChatAdultAdDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ChatAdultAdDaemon.runOnce ()",
 					this);
 
@@ -175,6 +176,7 @@ class ChatAdultAdDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatAdultAdDaemon.doAdultAd (chatUserId)",
 					this);
 

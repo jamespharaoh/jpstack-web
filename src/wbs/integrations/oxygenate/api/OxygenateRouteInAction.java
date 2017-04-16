@@ -70,7 +70,8 @@ class OxygenateRouteInAction
 				"goApi");
 
 		Action action =
-			chooseAction ();
+			chooseAction (
+				taskLogger);
 
 		return action.handle (
 			taskLogger);
@@ -80,12 +81,19 @@ class OxygenateRouteInAction
 	// private implementation
 
 	private
-	Action chooseAction () {
+	Action chooseAction (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chooseAction");
 
 		try (
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"OxygenateRouteInAction.chooseAction (...)",
 					this);
 

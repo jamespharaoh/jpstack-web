@@ -56,11 +56,17 @@ class SimpleExceptionLogger
 			@NonNull Optional<Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"logThrowable");
+
 		parentTaskLogger.errorFormatException (
 			throwable,
 			"%s: %s",
 			source,
 			exceptionLogic.throwableSummary (
+				taskLogger,
 				throwable));
 
 		return null;
@@ -78,11 +84,17 @@ class SimpleExceptionLogger
 			@NonNull Optional<Long> userId,
 			@NonNull GenericExceptionResolution resolution) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"logThrowableWithSummary");
+
 		parentTaskLogger.errorFormatException (
 			throwable,
 			"%s: %s",
 			source,
 			exceptionLogic.throwableSummary (
+				taskLogger,
 				throwable));
 
 		return null;

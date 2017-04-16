@@ -113,6 +113,7 @@ class ImChatCustomerCreateAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ImChatCustomerCreateAction.handle ()",
 					this);
 

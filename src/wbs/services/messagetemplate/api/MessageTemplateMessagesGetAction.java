@@ -13,12 +13,14 @@ import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.scaffold.model.SliceObjectHelper;
@@ -46,6 +48,9 @@ class MessageTemplateMessagesGetAction
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MessageTemplateDatabaseObjectHelper messageTemplateDatabaseHelper;
 
@@ -70,12 +75,18 @@ class MessageTemplateMessagesGetAction
 	Responder handle (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
+
 		// begin transaction
 
 		try (
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"MessageTemplateMessagesGetAction.handle ()",
 					this);
 

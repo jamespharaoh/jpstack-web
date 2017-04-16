@@ -15,10 +15,12 @@ import wbs.console.param.ParamCheckerSet;
 import wbs.console.param.RegexpParamChecker;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
@@ -49,6 +51,9 @@ class ChatUserAdminCreditAction
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserConsoleLogic userConsoleLogic;
 
@@ -59,7 +64,8 @@ class ChatUserAdminCreditAction
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"chatUserAdminCreditResponder");
@@ -71,7 +77,12 @@ class ChatUserAdminCreditAction
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// check privs
 
@@ -113,6 +124,7 @@ class ChatUserAdminCreditAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserAdminCreditAction.goReal ()",
 					this);
 

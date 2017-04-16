@@ -180,6 +180,7 @@ class ClockworkSmsRouteReportAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ClockworkSmsRouteOutAction.handle ()",
 					this);
 
@@ -429,7 +430,7 @@ class ClockworkSmsRouteReportAction
 	@Override
 	protected
 	Responder createResponse (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		// encode response
@@ -479,6 +480,7 @@ class ClockworkSmsRouteReportAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ClockworkSmsRouteReportAction.storeLog ()",
 					this);
 

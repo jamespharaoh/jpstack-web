@@ -246,7 +246,12 @@ class ChatApiServletModule
 	@NormalLifecycleSetup
 	public
 	void setup (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
 
 		registerRpcHandlerClasses (
 			taskLogger,
@@ -294,6 +299,7 @@ class ChatApiServletModule
 
 				Transaction transaction =
 					database.beginReadOnly (
+						taskLogger,
 						"ChatApiServletModule.MediaFile.doGet ()",
 						this);
 
@@ -836,6 +842,7 @@ class ChatApiServletModule
 
 				Transaction transaction =
 					database.beginReadOnly (
+						taskLogger,
 						"ChatApiServletModule.ProfilesRpcHandler.handle (source)",
 						this);
 
@@ -1449,10 +1456,16 @@ class ChatApiServletModule
 				@NonNull TaskLogger parentTaskLogger,
 				@NonNull RpcSource source) {
 
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"handle");
+
 			try (
 
 				Transaction transaction =
 					database.beginReadOnly (
+						taskLogger,
 						"ChatApiServletModule.MediaRpcHandler.handle (source)",
 						this);
 
@@ -1765,6 +1778,7 @@ class ChatApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"ChatApiServletModule.ProfileRpcHandler.handle (source)",
 						this);
 
@@ -2465,6 +2479,7 @@ class ChatApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						stringFormat (
 							"%s.%s.%s (%s)",
 							"ChatApiServletModule",
@@ -2537,8 +2552,13 @@ class ChatApiServletModule
 
 		private
 		void doUpdates (
-				@NonNull TaskLogger taskLogger,
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull Transaction transaction) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"doUpdates");
 
 			ChatRec chat =
 				chatHelper.findRequired (
@@ -2679,6 +2699,7 @@ class ChatApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						stringFormat (
 							"%s.%s.%s (%s)",
 							"ChatApiServletModule",
@@ -2991,6 +3012,7 @@ class ChatApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						stringFormat (
 							"%s.%s.%s (%s)",
 							"ChatApiServletModule",
@@ -3465,6 +3487,7 @@ class ChatApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						stringFormat (
 							"%s.%s.%s (%s)",
 							"ChatApiServletModule",
@@ -4132,6 +4155,7 @@ class ChatApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"ChatApiServletModule.CreditRpcHandler.handle (source)",
 						this);
 

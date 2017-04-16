@@ -225,6 +225,7 @@ class OxygenateRouteInMmsNewAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					stringFormat (
 						"%s.%s ()",
 						getClass ().getSimpleName (),
@@ -338,7 +339,7 @@ class OxygenateRouteInMmsNewAction
 	@Override
 	protected
 	Responder createResponse (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		debugWriter.writeLineFormat (
@@ -373,6 +374,7 @@ class OxygenateRouteInMmsNewAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ClockworkSmsRouteInAction.storeLog ()",
 					this);
 

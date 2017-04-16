@@ -106,12 +106,13 @@ class TicketStateTimeDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"TicketStateTimeDaemon.runOnce ()",
 					this);
 
 		) {
 
-			List<TicketRec> tickets =
+			List <TicketRec> tickets =
 				ticketHelper.findUnqueuedTickets ();
 
 			transaction.close ();
@@ -166,6 +167,7 @@ class TicketStateTimeDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"TicketStateTimeDaemon.doTicketTImeCheck (ticketId)",
 					this);
 

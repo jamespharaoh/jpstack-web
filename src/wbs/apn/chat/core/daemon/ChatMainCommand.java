@@ -768,9 +768,14 @@ class ChatMainCommand
 	}
 
 	Optional <InboxAttemptRec> tryKeyword (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String keyword,
 			@NonNull String rest) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"tryKeyword");
 
 		Optional <InboxAttemptRec> schemeKeywordInboxAttempt =
 			trySchemeKeyword (
@@ -795,7 +800,12 @@ class ChatMainCommand
 	}
 
 	Optional <InboxAttemptRec> tryDob (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"tryDob");
 
 		if (fromChatUser.getFirstJoin () != null) {
 			return optionalAbsent ();

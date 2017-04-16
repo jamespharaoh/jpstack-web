@@ -22,7 +22,10 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 import org.joda.time.Interval;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.model.QueueItemDao;
 import wbs.platform.queue.model.QueueItemRec;
@@ -36,6 +39,13 @@ public
 class QueueItemDaoHibernate
 	extends HibernateDao
 	implements QueueItemDao {
+
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
 
 	@Override
 	public
@@ -489,8 +499,14 @@ class QueueItemDaoHibernate
 	@Override
 	public
 	List <Optional <UserQueueReport>> searchUserQueueReports (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueItemSearch search,
 			@NonNull List<Long> objectIds) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchUserQueueReports");
 
 		Criteria criteria =
 			searchUserQueueReportCriteria (
@@ -502,6 +518,7 @@ class QueueItemDaoHibernate
 				objectIds));
 
 		return findOrdered (
+			taskLogger,
 			UserQueueReport.class,
 			objectIds,
 			criteria.list ());

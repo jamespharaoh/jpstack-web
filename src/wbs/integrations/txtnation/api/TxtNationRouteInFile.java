@@ -124,6 +124,7 @@ class TxtNationRouteInFile
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"TxtNationRouteInFile.doPost ()",
 					this);
 

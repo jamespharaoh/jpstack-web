@@ -94,7 +94,8 @@ class ChatAffiliateCreateOldAction
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"chatAffiliateCreateResponder");
@@ -171,6 +172,7 @@ class ChatAffiliateCreateOldAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatAffiliateCreateOldAction.goReal ()",
 					this);
 

@@ -84,6 +84,7 @@ class ChatUserJoinOutboundDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ChatUserJoinOutboundDaemon.runOnce ()",
 					this);
 
@@ -142,6 +143,7 @@ class ChatUserJoinOutboundDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					stringFormat (
 						"%s.%s (%s)",
 						"ChatUserJoinOutboundDaemon",

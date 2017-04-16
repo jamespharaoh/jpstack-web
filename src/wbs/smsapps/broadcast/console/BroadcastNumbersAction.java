@@ -7,8 +7,6 @@ import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
 import java.util.List;
 
-import javax.servlet.ServletException;
-
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
@@ -16,10 +14,12 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.event.logic.EventLogic;
@@ -64,6 +64,9 @@ class BroadcastNumbersAction
 	@SingletonDependency
 	EventLogic eventLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	NumberFormatLogic numberFormatLogic;
 
@@ -89,8 +92,12 @@ class BroadcastNumbersAction
 
 	@Override
 	protected
-	Responder backupResponder () {
-		return responder ("broadcastNumbersResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"broadcastNumbersResponder");
+
 	}
 
 	// implementation
@@ -98,8 +105,12 @@ class BroadcastNumbersAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger)
-		throws ServletException {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// begin transaction
 
@@ -107,6 +118,7 @@ class BroadcastNumbersAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"BroadcastNumbersAction.goReal ()",
 					this);
 

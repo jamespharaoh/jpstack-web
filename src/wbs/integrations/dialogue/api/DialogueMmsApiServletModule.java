@@ -25,7 +25,6 @@ import javax.servlet.ServletException;
 
 import com.google.common.collect.ImmutableMap;
 
-import lombok.Cleanup;
 import lombok.NonNull;
 
 import org.apache.commons.fileupload.FileItem;
@@ -153,6 +152,7 @@ class DialogueMmsApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"DialogueMmsApiServletModule.inFile.doPost ()",
 						this);
 
@@ -318,6 +318,7 @@ class DialogueMmsApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"DialogueMmsApiServletModule.reportFile.doPost ()",
 						this);
 

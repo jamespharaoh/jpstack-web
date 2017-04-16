@@ -104,7 +104,7 @@ class NullUserPrivChecker
 	@Override
 	public
 	void refresh (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		doNothing ();
 

@@ -17,12 +17,15 @@ import org.hibernate.SessionFactory;
 
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.database.TransactionView;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @SingletonComponent ("database")
 public
@@ -34,6 +37,9 @@ class HibernateDatabase
 	@SingletonDependency
 	ActivityManager activityManager;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	SessionFactory sessionFactory;
 
@@ -41,6 +47,9 @@ class HibernateDatabase
 
 	@PrototypeDependency
 	Provider <HibernateInterceptor> hibernateInterceptorProvider;
+
+	@PrototypeDependency
+	Provider <HibernateTransaction> hibernateTransactionProvider;
 
 	// properties
 
@@ -68,12 +77,18 @@ class HibernateDatabase
 	@Override
 	public
 	Transaction beginTransaction (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String summary,
 			@NonNull Object owner,
 			boolean readWrite,
 			boolean canJoin,
 			boolean canCreateNew,
 			boolean makeCurrent) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"beginTransaction");
 
 		ActiveTask activeTask =
 			activityManager.start (
@@ -86,6 +101,7 @@ class HibernateDatabase
 
 			HibernateTransaction transaction =
 				beginTransactionReal (
+					taskLogger,
 					activeTask,
 					readWrite,
 					canJoin,
@@ -120,11 +136,17 @@ class HibernateDatabase
 	}
 
 	HibernateTransaction beginTransactionReal (
-			ActiveTask transactionTask,
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ActiveTask transactionTask,
 			boolean readWrite,
 			boolean canJoin,
 			boolean canCreateNew,
 			boolean makeCurrent) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"beginTransactionReal");
 
 		// check args
 
@@ -169,11 +191,24 @@ class HibernateDatabase
 			) {
 
 				HibernateTransaction newTransaction =
-					new HibernateTransaction (
-						this,
-						readWrite,
-						currentTransaction,
-						currentTransactionStack,
+					hibernateTransactionProvider.get ()
+
+					.parentTaskLogger (
+						taskLogger)
+
+					.hibernateDatabase (
+						this)
+
+					.isReadWrite (
+						readWrite)
+
+					.realTransaction (
+						currentTransaction)
+
+					.stack (
+						currentTransactionStack)
+
+					.activeTask (
 						transactionTask);
 
 				newTransaction.begin ();
@@ -194,11 +229,24 @@ class HibernateDatabase
 			if (canCreateNew) {
 
 				HibernateTransaction newTransaction =
-					new HibernateTransaction (
-						this,
-						readWrite,
-						null,
-						currentTransactionStack,
+					hibernateTransactionProvider.get ()
+
+					.parentTaskLogger (
+						taskLogger)
+
+					.hibernateDatabase (
+						this)
+
+					.id (
+						Transaction.IdGenerator.nextId ())
+
+					.isReadWrite (
+						readWrite)
+
+					.stack (
+						currentTransactionStack)
+
+					.activeTask (
 						transactionTask);
 
 				newTransaction.begin ();
@@ -220,54 +268,6 @@ class HibernateDatabase
 
 		throw new RuntimeException (
 			"Unable to begin transaction");
-
-	}
-
-	@Override
-	public
-	Transaction beginReadWrite (
-			@NonNull String summary,
-			@NonNull Object owner) {
-
-		return beginTransaction (
-			summary,
-			owner,
-			true,
-			false,
-			true,
-			true);
-
-	}
-
-	@Override
-	public
-	Transaction beginReadOnly (
-			@NonNull String summary,
-			@NonNull Object owner) {
-
-		return beginTransaction (
-			summary,
-			owner,
-			false,
-			true,
-			true,
-			true);
-
-	}
-
-	@Override
-	public
-	Transaction beginReadOnlyJoin (
-			@NonNull String summary,
-			@NonNull Object owner) {
-
-		return beginTransaction (
-			summary,
-			owner,
-			false,
-			false,
-			true,
-			true);
 
 	}
 

@@ -120,6 +120,7 @@ class SmsArenaDlrDispatchAction
 				stringFormat (
 					"%s\n",
 					exceptionLogic.throwableDump (
+						taskLogger,
 						exception)));
 
 			throw exception;
@@ -219,6 +220,7 @@ class SmsArenaDlrDispatchAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"SmsArenaDlrDispatchAction.handleDispatch ()",
 					this);
 
@@ -277,6 +279,7 @@ class SmsArenaDlrDispatchAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"SmsArenaDlrDispatchAction.writeLog ()",
 					this);
 

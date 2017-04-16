@@ -23,7 +23,7 @@ class EnumConsoleHelperFactory <EnumType extends Enum <EnumType>>
 	@Override
 	public
 	Object makeComponent (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return new EnumConsoleHelper <EnumType> ()
 

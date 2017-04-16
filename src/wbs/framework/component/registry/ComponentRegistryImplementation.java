@@ -1080,7 +1080,7 @@ class ComponentRegistryImplementation
 
 	private
 	void registerScopedSingletons (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ComponentDefinition componentDefinition) {
 
 		try (

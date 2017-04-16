@@ -53,7 +53,7 @@ class G8waveApiServlet
 	@Override
 	protected
 	WebFile processPath (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		String path =
 			optionalOrEmptyString (

@@ -110,7 +110,7 @@ class FonixRouteReportAction
 	@Override
 	protected
 	void processRequest (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		// read and log request
@@ -142,7 +142,12 @@ class FonixRouteReportAction
 	@Override
 	protected
 	void updateDatabase (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"updateDatabase");
 
 		// begin transaction
 
@@ -150,6 +155,7 @@ class FonixRouteReportAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					stringFormat (
 						"%s.%s ()",
 						getClass ().getSimpleName (),
@@ -314,7 +320,7 @@ class FonixRouteReportAction
 	@Override
 	protected
 	Responder createResponse (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter debugWriter) {
 
 		// encode response
@@ -359,6 +365,7 @@ class FonixRouteReportAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					stringFormat (
 						"%s.%s ()",
 						getClass ().getSimpleName (),

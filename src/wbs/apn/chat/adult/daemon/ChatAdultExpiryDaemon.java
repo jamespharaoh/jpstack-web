@@ -75,6 +75,7 @@ class ChatAdultExpiryDaemon
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ChatAdultExpiryDaemon.runOnce ()",
 					this);
 
@@ -117,6 +118,7 @@ class ChatAdultExpiryDaemon
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatAdultExpiryDaemon.runOnce ()",
 					this);
 

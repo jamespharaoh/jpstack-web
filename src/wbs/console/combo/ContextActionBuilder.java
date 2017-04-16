@@ -98,8 +98,13 @@ class ContextActionBuilder <
 	}
 
 	void buildContextFile (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ResolvedConsoleContextExtensionPoint resolvedExtensionPoint) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"buildContextFile");
 
 		consoleModule.addContextFile (
 			fileName,

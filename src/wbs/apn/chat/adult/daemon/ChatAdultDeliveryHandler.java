@@ -83,6 +83,7 @@ class ChatAdultDeliveryHandler
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatAdultDeliveryHandler.handle (deliveryId, ref)",
 					this);
 

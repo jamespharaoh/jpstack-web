@@ -69,6 +69,7 @@ class GenericSendDaemon <
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"GenericSendDaemon.runOnce ()",
 					this);
 
@@ -121,6 +122,7 @@ class GenericSendDaemon <
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"GenericSendDaemon.runJob (jobId)",
 					this);
 

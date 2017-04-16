@@ -466,6 +466,7 @@ class TabbedResponder
 					stringFormat (
 						"<pre>%h</pre>",
 						exceptionLogic.throwableDump (
+							taskLogger,
 							pagePartThrew)));
 
 			}

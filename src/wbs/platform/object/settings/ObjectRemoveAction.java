@@ -86,8 +86,11 @@ class ObjectRemoveAction
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
 		return settingsResponder.get ();
+
 	}
 
 	// implementation
@@ -106,6 +109,7 @@ class ObjectRemoveAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ObjectRemoveAction.goReal ()",
 					this);
 

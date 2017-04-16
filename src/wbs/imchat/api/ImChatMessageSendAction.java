@@ -110,6 +110,7 @@ class ImChatMessageSendAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ImChatMessageSendAction.handle ()",
 					this);
 

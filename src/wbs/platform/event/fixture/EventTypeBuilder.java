@@ -112,6 +112,7 @@ class EventTypeBuilder {
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"EventTypeBuilder.createEventType ()",
 					this);
 

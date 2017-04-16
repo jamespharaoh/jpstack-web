@@ -283,7 +283,10 @@ interface RequestContextParameterMethods
 
 	default
 	void debugParameters (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			parentTaskLogger;
 
 		for (
 			Map.Entry <String, List <String>> entry

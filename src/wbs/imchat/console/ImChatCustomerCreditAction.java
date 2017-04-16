@@ -70,7 +70,8 @@ class ImChatCustomerCreditAction
 
 	@Override
 	protected
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"imChatCustomerCreditResponder");
@@ -96,6 +97,7 @@ class ImChatCustomerCreditAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ImChatCustomerCreditAction.goReal ()",
 					this);
 

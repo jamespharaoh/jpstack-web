@@ -101,6 +101,7 @@ class ImChatMediaJpegAction
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ImChatMediaJpegAction.handle ()",
 					this);
 

@@ -108,6 +108,7 @@ class ImChatEventPostAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ImChatEventPostAction.handle ()",
 					this);
 

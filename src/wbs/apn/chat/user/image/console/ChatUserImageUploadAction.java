@@ -99,8 +99,12 @@ class ChatUserImageUploadAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("chatUserImageUploadResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"chatUserImageUploadResponder");
+
 	}
 
 	// implementation
@@ -227,6 +231,7 @@ class ChatUserImageUploadAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserImageUploadAction.goReal ()",
 					this);
 

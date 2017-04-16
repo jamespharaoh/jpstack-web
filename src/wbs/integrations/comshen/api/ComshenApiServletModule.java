@@ -97,6 +97,7 @@ class ComshenApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"ComshenApiServletModule.reportFile.doGet ()",
 						this);
 

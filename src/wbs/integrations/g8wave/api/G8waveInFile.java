@@ -11,10 +11,12 @@ import javax.servlet.ServletException;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.text.model.TextObjectHelper;
@@ -41,6 +43,9 @@ class G8waveInFile
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	NetworkObjectHelper networkHelper;
 
@@ -64,10 +69,15 @@ class G8waveInFile
 	@Override
 	public
 	void doGet (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws
 			ServletException,
 			IOException {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doGet");
 
 		doPost (
 			taskLogger);
@@ -77,15 +87,18 @@ class G8waveInFile
 	@Override
 	public
 	void doPost (
-			@NonNull TaskLogger taskLogger)
-		throws
-			ServletException,
-			IOException {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"doPost");
 
 		try (
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"G8waveInFile.doPost ()",
 					this);
 
@@ -132,12 +145,17 @@ class G8waveInFile
 				else if (networkParam.equals("O2"))
 					networkId = 4l;
 
-				else if (networkParam.equals("THREE"))
+				else if (networkParam.equals("THREE")) {
+
 					networkId = 6l;
 
-				else
-					throw new ServletException (
+				} else {
+
+					throw new RuntimeException (
 						"Unknown network: " + networkParam);
+
+				}
+
 			}
 
 			// load the stuff
@@ -187,7 +205,7 @@ class G8waveInFile
 	@Override
 	public
 	void doOptions (
-			@NonNull TaskLogger taskLogger)
+			@NonNull TaskLogger parentTaskLogger)
 		throws
 			ServletException,
 			IOException {

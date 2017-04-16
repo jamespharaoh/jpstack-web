@@ -5,10 +5,12 @@ import lombok.NonNull;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
@@ -34,6 +36,9 @@ class ChatSettingsMonitorsAction
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
@@ -41,14 +46,23 @@ class ChatSettingsMonitorsAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("chatSettingsMonitorsResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"chatSettingsMonitorsResponder");
+
 	}
 
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		if (! requestContext.canContext ("chat.manage")) {
 
@@ -104,6 +118,7 @@ class ChatSettingsMonitorsAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatSettingsMonitorsAction.goReal ()",
 					this);
 

@@ -58,7 +58,8 @@ class ImChatCustomerSettingsPasswordAction
 
 	@Override
 	protected
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"imChatCustomerSettingsPasswordResponder");
@@ -84,6 +85,7 @@ class ImChatCustomerSettingsPasswordAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ImChaCustomerSettingsPasswordAction.goReal ()",
 					this);
 

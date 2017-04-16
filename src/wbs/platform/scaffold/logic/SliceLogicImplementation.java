@@ -149,6 +149,7 @@ class SliceLogicImplementation
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"SliceLogicImplementation.runNow ()",
 					this);
 

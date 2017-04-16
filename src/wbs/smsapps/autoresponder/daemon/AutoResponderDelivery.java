@@ -87,6 +87,7 @@ class AutoResponderDelivery
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"AutoResponderDelivery.handle (deliveryId, ref)",
 					this);
 

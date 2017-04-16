@@ -43,8 +43,12 @@ class QueueItemAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("queueHomeResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"queueHomeResponder");
+
 	}
 
 	@Override
@@ -66,6 +70,7 @@ class QueueItemAction
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"QueueItemAction.goReal ()",
 					this);
 

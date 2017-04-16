@@ -88,6 +88,7 @@ class ForwarderOutAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ForwarderOutAction.goApi ()",
 					this);
 

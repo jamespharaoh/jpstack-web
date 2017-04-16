@@ -81,6 +81,7 @@ class ConsoleResponder
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ConsoleResponder.execute ()",
 					this)
 

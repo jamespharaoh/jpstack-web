@@ -78,7 +78,12 @@ class TabContextResponder
 			@Override
 			public
 			PagePart buildPagePart (
-					@NonNull TaskLogger taskLogger) {
+					@NonNull TaskLogger parentTaskLogger) {
+
+				TaskLogger taskLogger =
+					logContext.nestTaskLogger (
+						parentTaskLogger,
+						"buildPagePart");
 
 				Object bean =
 					componentManager.getComponentRequired (

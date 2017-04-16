@@ -64,7 +64,8 @@ class ConsoleFormActionAction <FormState>
 
 	@Override
 	protected
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			responderName);
@@ -89,6 +90,7 @@ class ConsoleFormActionAction <FormState>
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ContextFormActionAction.goReal ()",
 					this);
 

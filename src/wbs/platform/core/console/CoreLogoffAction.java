@@ -5,10 +5,12 @@ import lombok.NonNull;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleLogic;
@@ -31,6 +33,9 @@ class CoreLogoffAction
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
@@ -44,7 +49,8 @@ class CoreLogoffAction
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"coreRedirectResponder");
@@ -56,7 +62,12 @@ class CoreLogoffAction
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		if (! userConsoleLogic.loggedIn ()) {
 			return null;
@@ -69,6 +80,7 @@ class CoreLogoffAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"CoreLogoffAction.goReal ()",
 					this);
 

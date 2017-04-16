@@ -158,6 +158,7 @@ class FixturesTool {
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"FixturesTool.runFixtureProviders (arguments)",
 					this);
 

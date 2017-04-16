@@ -71,7 +71,12 @@ class ConsoleExceptionHandler
 	@NormalLifecycleSetup
 	public
 	void init (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"init");
 
 		taskLogger.noticeFormat (
 			"Initialised console exception handler");
@@ -211,6 +216,7 @@ class ConsoleExceptionHandler
 					List <String> exceptionDumpLines =
 						stringSplitNewline (
 							exceptionLogic.throwableDump (
+								taskLogger,
 								throwable));
 
 					exceptionDumpLines.forEach (

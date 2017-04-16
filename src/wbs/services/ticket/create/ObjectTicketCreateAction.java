@@ -162,7 +162,8 @@ class ObjectTicketCreateAction <
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			responderName ());
@@ -185,6 +186,7 @@ class ObjectTicketCreateAction <
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ObjectTicketCreateAction.goReal ()",
 					this);
 

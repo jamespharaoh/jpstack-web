@@ -13,10 +13,12 @@ import org.joda.time.Seconds;
 import wbs.console.action.ConsoleAction;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.console.UserConsoleHelper;
@@ -54,6 +56,9 @@ class ChatMonitorInboxAlarmAction
 	@SingletonDependency
 	Database database;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
 
@@ -74,7 +79,8 @@ class ChatMonitorInboxAlarmAction
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"chatMonitorInboxSummaryResponder");
@@ -86,7 +92,12 @@ class ChatMonitorInboxAlarmAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// start transaction
 
@@ -94,6 +105,7 @@ class ChatMonitorInboxAlarmAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatMonitorInboxAlarmAction.goReal ()",
 					this);
 

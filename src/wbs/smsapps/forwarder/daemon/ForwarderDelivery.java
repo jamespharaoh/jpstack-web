@@ -77,6 +77,7 @@ class ForwarderDelivery
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ForwarderDelivery.handle (deliveryId, ref)",
 					this);
 

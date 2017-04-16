@@ -34,11 +34,13 @@ import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.module.ConsoleModule;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.LogSeverity;
 import wbs.framework.logging.TaskLogger;
 
@@ -131,6 +133,9 @@ class ChatBroadcastSendAction
 	@SingletonDependency
 	FormFieldLogic formFieldLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MagicNumberLogic magicNumberLogic;
 
@@ -165,7 +170,8 @@ class ChatBroadcastSendAction
 
 	@Override
 	protected
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		if (
 			optionalIsPresent (
@@ -188,7 +194,12 @@ class ChatBroadcastSendAction
 	@Override
 	public
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		boolean verify =
 			requestContext.formIsPresent (
@@ -208,6 +219,7 @@ class ChatBroadcastSendAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatBroadcastSendAction.goReal ()",
 					this);
 

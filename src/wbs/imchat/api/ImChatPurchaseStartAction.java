@@ -156,7 +156,8 @@ class ImChatPurchaseStartAction
 
 		makeApiCall ();
 
-		updatePurchase ();
+		updatePurchase (
+			taskLogger);
 
 		return createResponse ();
 
@@ -193,6 +194,7 @@ class ImChatPurchaseStartAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ImChatPurchaseStartAction.createPurchase ()",
 					this);
 
@@ -460,7 +462,13 @@ class ImChatPurchaseStartAction
 
 	}
 
-	void updatePurchase () {
+	void updatePurchase (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"updatePurchase");
 
 		// begin transaction
 
@@ -468,6 +476,7 @@ class ImChatPurchaseStartAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ImChatPurchaseStartAction.updatePurchase",
 					this);
 

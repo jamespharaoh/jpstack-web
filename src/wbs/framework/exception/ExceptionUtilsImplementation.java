@@ -15,24 +15,38 @@ import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import org.hibernate.JDBCException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.json.simple.JSONObject;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @SingletonComponent ("exceptionUtils")
 public
 class ExceptionUtilsImplementation
 	implements ExceptionUtils {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	String throwableSummary (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Throwable originalThrowable) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"throwableSummary");
 
 		Throwable currentThrowable =
 			originalThrowable;
@@ -63,9 +77,9 @@ class ExceptionUtilsImplementation
 
 		} catch (Exception exception) {
 
-			log.error (
-				"Threw error in throwableSummary",
-				exception);
+			taskLogger.errorFormatException (
+				exception,
+				"Threw error in throwableSummary");
 
 			return "(error)";
 
@@ -76,7 +90,13 @@ class ExceptionUtilsImplementation
 	@Override
 	public
 	String throwableDump (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Throwable throwable) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"throwableDump");
 
 		try {
 
@@ -96,9 +116,9 @@ class ExceptionUtilsImplementation
 
 		} catch (Exception exception) {
 
-			log.error (
-				"Threw error in throwableDump",
-				exception);
+			taskLogger.errorFormatException (
+				exception,
+				"Threw error in throwableDump");
 
 			return "(error)";
 
@@ -246,7 +266,13 @@ class ExceptionUtilsImplementation
 	@Override
 	public
 	JSONObject throwableDumpJson (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Throwable throwable) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"throwableDumpJson");
 
 		ImmutableMap.Builder<String,Object> dumpBuilder =
 			ImmutableMap.<String,Object>builder ();
@@ -298,6 +324,7 @@ class ExceptionUtilsImplementation
 			dumpBuilder.put (
 				"cause",
 				throwableDumpJson (
+					taskLogger,
 					throwable.getCause ()));
 
 		}

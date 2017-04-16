@@ -69,8 +69,12 @@ class UserPrivsEditorAction
 
 	@Override
 	public
-	Responder backupResponder () {
-		return responder ("userPrivsEditorResponder");
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		return responder (
+			"userPrivsEditorResponder");
+
 	}
 
 	@Override
@@ -87,6 +91,7 @@ class UserPrivsEditorAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"UserPrivsEditorAction.goReal ()",
 					this);
 

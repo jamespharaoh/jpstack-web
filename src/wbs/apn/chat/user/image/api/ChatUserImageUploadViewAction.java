@@ -52,6 +52,7 @@ class ChatUserImageUploadViewAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserImageUploadViewAction.goApi ()",
 					this);
 

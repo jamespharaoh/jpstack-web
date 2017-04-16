@@ -242,13 +242,18 @@ class HtmlResponder
 
 	protected
 	void renderHtmlBodyContents (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
 	}
 
 	protected
 	void renderHtmlBody (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"renderHtmlBody");
 
 		formatWriter.writeLineFormat (
 			"<body>");

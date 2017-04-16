@@ -520,6 +520,7 @@ class ChatMiscLogicImplementation
 
 						Transaction transaction =
 							database.beginReadWrite (
+								taskLogger,
 								stringFormat (
 									"%s.%s.%s.%s (...)",
 									"ChatMiscLogicImplementation",

@@ -109,6 +109,7 @@ class ImChatSessionStartAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ImChatSessionStartAction.handle ()",
 					this);
 

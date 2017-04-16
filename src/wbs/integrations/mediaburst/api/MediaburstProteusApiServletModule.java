@@ -139,6 +139,7 @@ class MediaburstProteusApiServletModule
 
 				Transaction transaction =
 					database.beginReadWrite (
+						taskLogger,
 						"MediaburstProteusApiServletModule.reportFile.doPost ()",
 						this);
 

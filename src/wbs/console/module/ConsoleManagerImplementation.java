@@ -248,12 +248,17 @@ class ConsoleManagerImplementation
 	}
 
 	int collectContextTypes (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"collectContextTypes");
 
 		int errors = 0;
 
-		Map<String,String> beanNamesByContextTypeName =
-			new HashMap<String,String> ();
+		Map <String, String> beanNamesByContextTypeName =
+			new HashMap<> ();
 
 		for (
 			Map.Entry <String, ConsoleModule> ent
@@ -1163,6 +1168,7 @@ class ConsoleManagerImplementation
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ConsoleManager.chatContext (...)",
 					this);
 
@@ -1236,8 +1242,13 @@ class ConsoleManagerImplementation
 		@Override
 		public
 		WebFile processPath (
-				@NonNull TaskLogger taskLogger,
+				@NonNull TaskLogger parentTaskLogger,
 				@NonNull String remainingPath) {
+
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processPath");
 
 			String fullPath =
 				joinWithoutSeparator (
@@ -1253,8 +1264,13 @@ class ConsoleManagerImplementation
 	}
 
 	WebFile fileForPath (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String path) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"fileForPath");
 
 		taskLogger.debugFormat (
 			"processing path %s",
@@ -1264,6 +1280,7 @@ class ConsoleManagerImplementation
 
 			Transaction transaction =
 				database.beginReadOnly (
+					taskLogger,
 					"ConsoleManagerImplementation.fileForPath (path)",
 					this);
 

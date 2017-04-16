@@ -13,10 +13,12 @@ import wbs.console.action.ConsoleAction;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.queue.logic.QueueLogic;
@@ -75,16 +77,19 @@ class ChatMonitorInboxFormAction
 	ChatUserLogic chatUserLogic;
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
 	Database database;
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	UserPrivChecker privChecker;
 
 	@SingletonDependency
 	QueueLogic queueLogic;
+
+	@SingletonDependency
+	ConsoleRequestContext requestContext;
 
 	@SingletonDependency
 	ServiceObjectHelper serviceHelper;
@@ -102,7 +107,8 @@ class ChatMonitorInboxFormAction
 
 	@Override
 	public
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"chatMonitorInboxFormResponder");
@@ -114,7 +120,12 @@ class ChatMonitorInboxFormAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// get stuff
 
@@ -181,6 +192,7 @@ class ChatMonitorInboxFormAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatMonitorInboxFormAction.goReal ()",
 					this);
 

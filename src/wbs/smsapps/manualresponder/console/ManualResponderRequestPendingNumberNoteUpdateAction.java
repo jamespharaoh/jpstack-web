@@ -91,14 +91,6 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 		Pattern.compile (
 			"manualResponderNumberNote([0-9]+)");
 
-	// details
-
-	@Override
-	protected
-	Responder backupResponder () {
-		return null;
-	}
-
 	// state
 
 	String valueParam;
@@ -113,7 +105,12 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 	@Override
 	protected
 	Responder goReal (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goReal");
 
 		// get params
 
@@ -145,6 +142,7 @@ class ManualResponderRequestPendingNumberNoteUpdateAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ManualResponderRequestPendingNumberNoteUpdateAction.goReal ()",
 					this);
 

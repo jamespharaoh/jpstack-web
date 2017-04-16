@@ -3,7 +3,6 @@ package wbs.framework.hibernate;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -13,8 +12,8 @@ import java.util.Map;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.experimental.Accessors;
-import lombok.extern.log4j.Log4j;
 
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
@@ -22,43 +21,60 @@ import org.hibernate.jdbc.ReturningWork;
 import org.joda.time.Instant;
 
 import wbs.framework.activitymanager.ActiveTask;
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.database.Transaction;
 import wbs.framework.database.WbsConnection;
 import wbs.framework.entity.record.UnsavedRecordDetector;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
+@PrototypeComponent ("hibernateTransaction")
 @Accessors (fluent = true)
-@Log4j
+public
 class HibernateTransaction
 	implements Transaction {
 
+	// singleton components
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// properties
+
+	@Getter @Setter
+	TaskLogger parentTaskLogger;
+
+	@Getter @Setter
+	HibernateDatabase hibernateDatabase;
+
+	@Getter @Setter
+	long id;
+
+	@Getter @Setter
+	boolean isReadWrite;
+
+	@Getter @Setter
+	HibernateTransaction realTransaction;
+
+	@Getter @Setter
+	List<HibernateTransaction> stack;
+
+	@Getter @Setter
+	ActiveTask activeTask;
+
+	// state
 
 	@Getter
 	long serverProcessId;
 
-	// state
-
-	private final
-	HibernateDatabase hibernateDatabase;
-
-	private final
-	long id;
-
-	final
-	boolean isReadWrite;
-
-	private final
-	HibernateTransaction realTransaction;
-
-	private final
-	List<HibernateTransaction> stack;
-
-	private final
-	ActiveTask activeTask;
-
 	private final
 	Instant now =
 		Instant.now ();
+
+	private
+	Map <String, Object> meta =
+		new HashMap<> ();
 
 	private
 	boolean begun;
@@ -78,30 +94,14 @@ class HibernateTransaction
 	private
 	org.hibernate.Transaction hibernateTransaction;
 
-	Map <String, Object> meta =
-		new HashMap<> ();
-
-	// constructors
-
-	HibernateTransaction (
-			HibernateDatabase hibernateDatabase,
-			boolean isReadWrite,
-			HibernateTransaction realTransaction,
-			List<HibernateTransaction> stack,
-			ActiveTask activeTask) {
-
-		this.hibernateDatabase = hibernateDatabase;
-		this.id = Transaction.IdGenerator.nextId ();
-		this.isReadWrite = isReadWrite;
-		this.realTransaction = realTransaction;
-		this.stack = stack;
-		this.activeTask = activeTask;
-
-	}
-
 	// implementation
 
 	void begin () {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"begin");
 
 		if (
 			isNotNull (
@@ -110,14 +110,13 @@ class HibernateTransaction
 			return;
 		}
 
-		log.debug (
-			stringFormat (
-				"BEGIN %s %s",
-				integerToDecimalString (
-					id),
-				isReadWrite
-					? "rw"
-					: "ro"));
+		taskLogger.debugFormat (
+			"BEGIN %s %s",
+			integerToDecimalString (
+				id),
+			isReadWrite
+				? "rw"
+				: "ro");
 
 		// create session
 
@@ -208,6 +207,11 @@ class HibernateTransaction
 	public
 	void commit () {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"commit");
+
 		// check there is nothing stupid going on
 
 		if (! isReadWrite) {
@@ -238,14 +242,13 @@ class HibernateTransaction
 
 		}
 
-		log.debug (
-			stringFormat (
-				"COMMIT %s %s",
-				integerToDecimalString (
-					id),
-				isReadWrite
-					? "rw"
-					: "ro"));
+		taskLogger.debugFormat (
+			"COMMIT %s %s",
+			integerToDecimalString (
+				id),
+			isReadWrite
+				? "rw"
+				: "ro");
 
 		// remove us from the transaction stack
 
@@ -284,6 +287,11 @@ class HibernateTransaction
 	public
 	void close () {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"close");
+
 		// handle repeated close
 
 		if (closed) {
@@ -318,14 +326,13 @@ class HibernateTransaction
 
 			if (hibernateTransaction != null && ! committed) {
 
-				log.debug (
-					stringFormat (
-						"ROLLBACK %s %s",
-						integerToDecimalString (
-							id),
-						isReadWrite
-							? "rw"
-							: "ro"));
+				taskLogger.debugFormat (
+					"ROLLBACK %s %s",
+					integerToDecimalString (
+						id),
+					isReadWrite
+						? "rw"
+						: "ro");
 
 				hibernateTransaction.rollback ();
 
@@ -343,9 +350,9 @@ class HibernateTransaction
 
 			} catch (Exception exception) {
 
-				log.fatal (
-					"Error teardown session",
-					exception);
+				taskLogger.fatalFormatException (
+					exception,
+					"Error teardown session");
 
 			}
 
@@ -362,9 +369,9 @@ class HibernateTransaction
 
 			} catch (Exception exception) {
 
-				log.fatal (
-					"Error teardown active task",
-					exception);
+				taskLogger.fatalFormatException (
+					exception,
+					"Error teardown active task");
 
 			}
 
@@ -379,9 +386,9 @@ class HibernateTransaction
 
 				} catch (Exception exception) {
 
-					log.fatal (
-						"Error destroying unsaved record detector frame",
-						exception);
+					taskLogger.fatalFormatException (
+						exception,
+						"Error destroying unsaved record detector frame");
 
 				}
 
@@ -414,9 +421,14 @@ class HibernateTransaction
 	void finalize ()
 		throws Throwable {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"finalize");
+
 		if (! closed) {
 
-			log.warn (
+			taskLogger.warningFormat (
 				"Finalising un-closed transaction");
 
 			close ();

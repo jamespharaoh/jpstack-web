@@ -19,8 +19,13 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.sms.number.core.model.NumberRec;
+
 import wbs.smsapps.manualresponder.model.ManualResponderOperatorReport;
 import wbs.smsapps.manualresponder.model.ManualResponderRec;
 import wbs.smsapps.manualresponder.model.ManualResponderRequestDao;
@@ -33,9 +38,17 @@ class ManualResponderRequestDaoHibernate
 	extends HibernateDao
 	implements ManualResponderRequestDao {
 
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// implementation
+
 	@Override
 	public
 	List <ManualResponderRequestRec> findRecentLimit (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRec manualResponder,
 			@NonNull NumberRec number,
 			@NonNull Long maxResults) {
@@ -81,6 +94,7 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	Criteria searchCriteria (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
 
 		Criteria criteria =
@@ -250,10 +264,17 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	List <Long> searchIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchIds");
 
 		Criteria criteria =
 			searchCriteria (
+				taskLogger,
 				search);
 
 		// set order
@@ -295,10 +316,17 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	Criteria searchServiceReportCriteria (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchServiceReportCriteria");
 
 		Criteria criteria =
 			searchCriteria (
+				taskLogger,
 				search);
 
 		criteria.setProjection (
@@ -336,10 +364,17 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	List <Long> searchServiceReportIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchServiceReportIds");
 
 		Criteria criteria =
 			searchCriteria (
+				taskLogger,
 				search);
 
 		criteria.setProjection (
@@ -379,11 +414,18 @@ class ManualResponderRequestDaoHibernate
 
 	@Override
 	public
-	List<ManualResponderServiceReport> searchServiceReports (
+	List <ManualResponderServiceReport> searchServiceReports (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchServiceReports");
 
 		Criteria criteria =
 			searchServiceReportCriteria (
+				taskLogger,
 				search);
 
 		return findMany (
@@ -396,11 +438,18 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	List <Optional <ManualResponderServiceReport>> searchServiceReports (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search,
 			@NonNull List <Long> objectIds) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchServiceReports");
+
 		Criteria criteria =
 			searchServiceReportCriteria (
+				taskLogger,
 				search);
 
 		criteria.add (
@@ -409,6 +458,7 @@ class ManualResponderRequestDaoHibernate
 				objectIds));
 
 		return findOrdered (
+			taskLogger,
 			ManualResponderServiceReport.class,
 			objectIds,
 			criteria.list ());
@@ -418,10 +468,17 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	Criteria searchOperatorReportCriteria (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchOperatorReportCriteria");
 
 		Criteria criteria =
 			searchCriteria (
+				taskLogger,
 				search);
 
 		criteria.setProjection (
@@ -458,11 +515,18 @@ class ManualResponderRequestDaoHibernate
 
 	@Override
 	public
-	List<Long> searchOperatorReportIds (
+	List <Long> searchOperatorReportIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchOperatorReportIds");
 
 		Criteria criteria =
 			searchCriteria (
+				taskLogger,
 				search);
 
 		criteria.setProjection (
@@ -502,11 +566,18 @@ class ManualResponderRequestDaoHibernate
 
 	@Override
 	public
-	List<ManualResponderOperatorReport> searchOperatorReports (
+	List <ManualResponderOperatorReport> searchOperatorReports (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchOperatorReports");
 
 		Criteria criteria =
 			searchOperatorReportCriteria (
+				taskLogger,
 				search);
 
 		return findMany (
@@ -519,11 +590,18 @@ class ManualResponderRequestDaoHibernate
 	@Override
 	public
 	List <Optional <ManualResponderOperatorReport>> searchOperatorReports (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ManualResponderRequestSearch search,
 			@NonNull List <Long> objectIds) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchOperatorReports");
+
 		Criteria criteria =
 			searchOperatorReportCriteria (
+				taskLogger,
 				search);
 
 		criteria.add (
@@ -532,6 +610,7 @@ class ManualResponderRequestDaoHibernate
 				objectIds));
 
 		return findOrdered (
+			taskLogger,
 			ManualResponderOperatorReport.class,
 			objectIds,
 			criteria.list ());

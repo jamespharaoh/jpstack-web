@@ -92,7 +92,8 @@ class ChatUserSearchOldAction
 
 	@Override
 	protected
-	Responder backupResponder () {
+	Responder backupResponder (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return responder (
 			"chatUserSearchOldResponder");
@@ -115,6 +116,7 @@ class ChatUserSearchOldAction
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ChatUserSearchOldAction.goReal ()",
 					this);
 

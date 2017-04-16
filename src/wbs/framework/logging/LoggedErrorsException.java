@@ -14,7 +14,7 @@ class LoggedErrorsException
 
 	public
 	LoggedErrorsException (
-			@NonNull TaskLogger taskLogger,
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull String message) {
 
 		super (

@@ -13,10 +13,12 @@ import javax.inject.Named;
 
 import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.rpc.core.Rpc;
@@ -57,6 +59,9 @@ class ForwarderUnqueueExRpcHandler
 	@Named
 	RpcDefinition forwarderUnqueueExRequestDef;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// state
 
 	ForwarderRec forwarder;
@@ -80,10 +85,16 @@ class ForwarderUnqueueExRpcHandler
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull RpcSource source) {
 
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"handle");
+
 		try (
 
 			Transaction transaction =
 				database.beginReadWrite (
+					taskLogger,
 					"ForwarderUnqueueExRpcHandler.handle (source)",
 					this);
 

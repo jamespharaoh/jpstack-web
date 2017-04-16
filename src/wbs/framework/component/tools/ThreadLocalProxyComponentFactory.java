@@ -33,7 +33,7 @@ class ThreadLocalProxyComponentFactory
 	@Override
 	public
 	Object makeComponent (
-			@NonNull TaskLogger taskLogger) {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		return Proxy.newProxyInstance (
 			componentClass.getClassLoader (),
