@@ -137,6 +137,15 @@ interface FormField <Container, Generic, Native, Interface>
 	}
 
 	default
+	void setDefault (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Container container) {
+
+		doNothing ();
+
+	}
+
+	default
 	UpdateResult <Generic, Native> update (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,

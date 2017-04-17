@@ -1,11 +1,14 @@
 package wbs.console.forms;
 
+import com.google.common.base.Optional;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleModuleData;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAttribute;
 import wbs.framework.data.annotations.DataClass;
@@ -35,6 +38,10 @@ class YesNoFormFieldSpec {
 
 	@DataAttribute
 	Boolean hidden;
+
+	@DataAttribute (
+		name = "default")
+	Optional <Boolean> defaultValue;
 
 	@DataAttribute
 	String yesLabel;

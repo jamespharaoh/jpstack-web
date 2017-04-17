@@ -94,8 +94,11 @@ class ObjectSearchPart <
 
 	// state
 
-	SearchType search;
+	SearchType cleanSearch;
+	SearchType currentSearch;
+
 	Optional <UpdateResultSet> updateResultSet;
+
 	Map <String, Object> formHints;
 
 	// details
@@ -128,7 +131,11 @@ class ObjectSearchPart <
 				parentTaskLogger,
 				"prepare");
 
-		search =
+		cleanSearch =
+			instantiateSearch (
+				taskLogger);
+
+		currentSearch =
 			optionalOrElse (
 				genericCastUnchecked (
 					userSessionLogic.userDataObject (
@@ -137,8 +144,8 @@ class ObjectSearchPart <
 						stringFormat (
 							"object_search_%s_fields",
 							sessionKey))),
-				() -> classInstantiate (
-					searchClass));
+				() -> instantiateSearch (
+					taskLogger));
 
 		updateResultSet =
 			optionalCast (
@@ -182,6 +189,28 @@ class ObjectSearchPart <
 
 	}
 
+	private
+	SearchType instantiateSearch (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"instantiateSearch");
+
+		SearchType search =
+			classInstantiate (
+				searchClass);
+
+		formFieldLogic.setDefaults (
+			taskLogger,
+			fields,
+			search);
+
+		return search;
+
+	}
+
 	@Override
 	public
 	void renderHtmlBodyContent (
@@ -208,7 +237,7 @@ class ObjectSearchPart <
 			formatWriter,
 			fields,
 			updateResultSet,
-			search,
+			currentSearch,
 			formHints,
 			FormType.search,
 			"search");
@@ -250,7 +279,7 @@ class ObjectSearchPart <
 			formatWriter,
 			fields,
 			FormType.search,
-			search,
+			cleanSearch,
 			formHints,
 			"search");
 

@@ -2,6 +2,7 @@ package wbs.console.forms;
 
 import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionHasTwoElements;
+import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.Misc.eitherGetLeft;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.Misc.isNull;
@@ -11,6 +12,7 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalEqualOrNotPresentWithClass;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
 import static wbs.utils.etc.OptionalUtils.optionalOr;
 import static wbs.utils.etc.ResultUtils.getError;
 import static wbs.utils.etc.ResultUtils.isError;
@@ -28,6 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import com.google.common.base.Optional;
 
@@ -95,6 +98,10 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	@DataAttribute
 	@Getter @Setter
 	String label;
+
+	@DataAttribute
+	@Getter @Setter
+	Supplier <Optional <Generic>> defaultValueSupplier;
 
 	@DataAttribute
 	@Getter @Setter
@@ -213,7 +220,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				privParts.get (1);
 
 			Record <?> delegate =
-				(Record<?>)
+				(Record <?>)
 				objectManager.dereferenceObsolete (
 					container,
 					delegatePath,
@@ -236,6 +243,37 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 	public
 	void init (
 			String fieldSetName) {
+
+	}
+
+	@Override
+	public
+	void setDefault (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Container container) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setDefault");
+
+		if (
+			isNotNull (
+				defaultValueSupplier)
+		) {
+
+			Optional <Native> nativeValue =
+				nativeMapping.genericToNative (
+					taskLogger,
+					container,
+					defaultValueSupplier.get ());
+
+			accessor.write (
+				taskLogger,
+				container,
+				nativeValue);
+
+		}
 
 	}
 
@@ -292,7 +330,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormatWriter htmlWriter,
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map <String, Object> hints) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -478,33 +516,65 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				parentTaskLogger,
 				"renderFormReset");
 
-		Optional <Native> nativeValue =
-			requiredValue (
-				accessor.read (
-					taskLogger,
-					container));
+		if (
 
-		Optional <Generic> genericValue =
-			requiredValue (
-				nativeMapping.nativeToGeneric (
-					container,
-					nativeValue));
+			enumInSafe (
+				formType,
+				FormType.create,
+				FormType.perform,
+				FormType.search)
 
-		Optional <Interface> interfaceValue =
-			requiredValue (
-				eitherGetLeft (
-					interfaceMapping.genericToInterface (
+			&& isNotNull (
+				defaultValueSupplier)
+
+		) {
+
+			Optional <Interface> interfaceValue =
+				requiredValue (
+					eitherGetLeft (
+						interfaceMapping.genericToInterface (
+							taskLogger,
+							container,
+							hints,
+							defaultValueSupplier.get ())));
+
+			renderer.renderFormReset (
+				javascriptWriter,
+				container,
+				interfaceValue,
+				formName);
+
+		} else {
+
+			Optional <Native> nativeValue =
+				requiredValue (
+					accessor.read (
 						taskLogger,
-						container,
-						hints,
-						genericValue)));
+						container));
 
-		renderer.renderFormReset (
-			javascriptWriter,
-			container,
-			interfaceValue,
-			formType,
-			formName);
+			Optional <Generic> genericValue =
+				requiredValue (
+					nativeMapping.nativeToGeneric (
+						container,
+						nativeValue));
+
+			Optional <Interface> interfaceValue =
+				requiredValue (
+					eitherGetLeft (
+						interfaceMapping.genericToInterface (
+							taskLogger,
+							container,
+							hints,
+							genericValue)));
+
+
+			renderer.renderFormReset (
+				javascriptWriter,
+				container,
+				interfaceValue,
+				formName);
+
+		}
 
 	}
 
@@ -555,7 +625,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FormFieldSubmission submission,
 			@NonNull Container container,
-			@NonNull Map <String,Object> hints,
+			@NonNull Map <String, Object> hints,
 			@NonNull String formName) {
 
 		TaskLogger taskLogger =
@@ -595,7 +665,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				newInterfaceValue)
 		) {
 
-			return new UpdateResult<Generic,Native> ()
+			return new UpdateResult <Generic, Native> ()
 
 				.updated (
 					false)
@@ -621,28 +691,28 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				interfaceToGenericResult)
 		) {
 
-			return new UpdateResult<Generic,Native> ()
+			return new UpdateResult <Generic, Native> ()
 
 				.updated (
 					false)
 
 				.error (
-					Optional.of (
+					optionalOfFormat (
 						interfaceToGenericResult.right ().value ()));
 
 		}
 
-		Optional<Generic> newGenericValue =
+		Optional <Generic> newGenericValue =
 			interfaceToGenericResult.left ().value ();
 
 		// perform value validation
 
 		for (
-			FormFieldValueValidator<Generic> valueValidator
+			FormFieldValueValidator <Generic> valueValidator
 				: valueValidators
 		) {
 
-			Optional<String> valueError =
+			Optional <String> valueError =
 				valueValidator.validate (
 					newGenericValue);
 
@@ -651,13 +721,13 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 					valueError)
 			) {
 
-				return new UpdateResult<Generic,Native> ()
+				return new UpdateResult <Generic, Native> ()
 
 					.updated (
 						false)
 
 					.error (
-						Optional.of (
+						optionalOf (
 							valueError.get ()));
 
 			}
@@ -686,7 +756,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				constraintError)
 		) {
 
-			return new UpdateResult<Generic,Native> ()
+			return new UpdateResult <Generic, Native> ()
 
 				.updated (
 					false)
@@ -723,7 +793,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 					false)
 
 				.error (
-					Optional.absent ());
+					optionalAbsent ());
 
 		}
 
@@ -752,7 +822,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 				newNativeValue)
 
 			.error (
-				Optional.<String>absent ());
+				optionalAbsent ());
 
 	}
 

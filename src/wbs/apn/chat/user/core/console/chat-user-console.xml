@@ -109,7 +109,10 @@
 			label="Number"
 			nullable="yes"/>
 
-		<!-- TODO include deleted -->
+		<yes-no-field
+			name="deleted"
+			default="no"
+			nullable="yes"/>
 
 		<enum-field
 			name="gender"

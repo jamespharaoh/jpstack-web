@@ -100,6 +100,30 @@ class FormFieldLogic {
 
 	}
 
+	public <Container>
+	void setDefaults (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull FormFieldSet <Container> formFieldSet,
+			@NonNull Container container) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"implicit");
+
+		for (
+			FormField <Container, ?, ?, ?> formField
+				: formFieldSet.formFields ()
+		) {
+
+			formField.setDefault (
+				taskLogger,
+				container);
+
+		}
+
+	}
+
 	public
 	UpdateResultSet update (
 			@NonNull TaskLogger parentTaskLogger,

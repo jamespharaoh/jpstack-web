@@ -34,11 +34,11 @@ class TimestampFromParamChecker
 	@Override
 	public
 	Date get (
-			String param) {
+			String originalParam) {
 
-		param =
-			param != null
-				? param.trim ()
+		String param =
+			originalParam != null
+				? originalParam.trim ()
 				: "";
 
 		if (

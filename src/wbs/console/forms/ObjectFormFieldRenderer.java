@@ -338,47 +338,19 @@ class ObjectFormFieldRenderer <Container, Interface extends Record <Interface>>
 	void renderFormReset (
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
-			@NonNull Optional<Interface> interfaceValue,
-			@NonNull FormType formType,
+			@NonNull Optional <Interface> interfaceValue,
 			@NonNull String formName) {
 
-		if (
-			enumInSafe (
-				formType,
-				FormType.create,
-				FormType.perform,
-				FormType.search)
-		) {
-
-			javascriptWriter.writeLineFormat (
-				"$(\"%j\").val (\"none\");",
-				stringFormat (
-					"#%s\\.%s",
-					formName,
-					name));
-
-		} else if (
-			enumInSafe (
-				formType,
-				FormType.update)
-		) {
-
-			javascriptWriter.writeLineFormat (
-				"$(\"%j\").val (\"%h\");",
-				stringFormat (
-					"#%s\\.%s",
-					formName,
-					name),
-				interfaceValue.isPresent ()
-					? integerToDecimalString (
-						interfaceValue.get ().getId ())
-					: "none");
-
-		} else {
-
-			throw new RuntimeException ();
-
-		}
+		javascriptWriter.writeLineFormat (
+			"$(\"%j\").val (\"%h\");",
+			stringFormat (
+				"#%s\\.%s",
+				formName,
+				name),
+			interfaceValue.isPresent ()
+				? integerToDecimalString (
+					interfaceValue.get ().getId ())
+				: "none");
 
 	}
 

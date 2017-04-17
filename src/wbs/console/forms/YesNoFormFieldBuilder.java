@@ -1,5 +1,6 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -11,8 +12,12 @@ import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+
 import wbs.framework.builder.Builder;
+import wbs.framework.builder.BuilderComponent;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
 import wbs.framework.builder.annotations.BuilderSource;
@@ -20,12 +25,14 @@ import wbs.framework.builder.annotations.BuilderTarget;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 @SuppressWarnings ({ "rawtypes", "unchecked" })
 @PrototypeComponent ("yesNoFormFieldBuilder")
 @ConsoleModuleBuilderHandler
 public
-class YesNoFormFieldBuilder {
+class YesNoFormFieldBuilder
+	implements BuilderComponent {
 
 	// singleton dependencies
 
@@ -87,9 +94,11 @@ class YesNoFormFieldBuilder {
 	// build
 
 	@BuildMethod
+	@Override
 	public
 	void build (
-			Builder builder) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Builder builder) {
 
 		String name =
 			spec.name ();
@@ -153,7 +162,7 @@ class YesNoFormFieldBuilder {
 
 		// value validators
 
-		List<FormFieldValueValidator> valueValidators =
+		List <FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
 
 		if (! nullable) {
@@ -243,6 +252,12 @@ class YesNoFormFieldBuilder {
 
 				.label (
 					label)
+
+				.defaultValueSupplier (
+					ifNotNullThenElse (
+						spec.defaultValue (),
+						() -> spec::defaultValue,
+						() -> null))
 
 				.viewPriv (
 					spec.viewPriv ())

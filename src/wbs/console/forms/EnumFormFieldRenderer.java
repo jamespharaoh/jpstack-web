@@ -184,46 +184,18 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <Interface> interfaceValue,
-			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		if (
-			enumInSafe (
-				formType,
-				FormType.create,
-				FormType.perform,
-				FormType.search)
-		) {
-
-			javascriptWriter.writeLineFormat (
-				"$(\"%j\").val (\"none\");",
-				stringFormat (
-					"#%s\\.%s",
-					formName,
-					name));
-
-		} else if (
-			enumInSafe (
-				formType,
-				FormType.update)
-		) {
-
-			javascriptWriter.writeLineFormat (
-				"$(\"%j\").val (\"%h\");",
-				stringFormat (
-					"#%s\\.%s",
-					formName,
-					name),
-				interfaceValue.isPresent ()
-					? camelToHyphen (
-						interfaceValue.get ().name ())
-					: "none");
-
-		} else {
-
-			throw new RuntimeException ();
-
-		}
+		javascriptWriter.writeLineFormat (
+			"$(\"%j\").val (\"%h\");",
+			stringFormat (
+				"#%s\\.%s",
+				formName,
+				name),
+			interfaceValue.isPresent ()
+				? camelToHyphen (
+					interfaceValue.get ().name ())
+				: "none");
 
 	}
 

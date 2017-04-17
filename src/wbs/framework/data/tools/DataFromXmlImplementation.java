@@ -10,6 +10,7 @@ import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.moreThanZero;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
+import static wbs.utils.etc.ReflectionUtils.fieldParameterizedType;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.hyphenToCamel;
@@ -41,6 +42,7 @@ import java.util.regex.Pattern;
 
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -716,6 +718,32 @@ class DataFromXmlImplementation
 							stringValue)));
 
 				return true;
+
+			} else if (field.getType () == Optional.class) {
+
+				ParameterizedType parameterizedType =
+					fieldParameterizedType (
+						field);
+
+				Class <?> optionalClassParam =
+					genericCastUnchecked (
+						parameterizedType.getActualTypeArguments () [0]);
+
+				if (optionalClassParam == Boolean.class) {
+
+					PropertyUtils.propertySetSimple (
+						object,
+						field.getName (),
+						parseBooleanYesNoEmpty (
+							stringValue));
+
+					return true;
+
+				} else {
+
+					return false;
+
+				}
 
 			} else if (field.getType ().isEnum ()) {
 

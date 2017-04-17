@@ -1,11 +1,14 @@
 package wbs.platform.php;
 
+import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.string.StringUtils.stringToBytes;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Map;
+
+import lombok.NonNull;
 
 import org.joda.time.LocalDate;
 
@@ -197,16 +200,15 @@ class PhpSerializer {
 
 	public
 	void serialize (
-			OutputStream out,
-			Object object)
+			@NonNull OutputStream out,
+			Object originalObject)
 		throws IOException {
 
-		if (object instanceof PhpEntity) {
-
-			object =
-				((PhpEntity) object).asObject();
-
-		}
+		Object object =
+			ifThenElse (
+				originalObject instanceof PhpEntity,
+				() -> ((PhpEntity) originalObject).asObject (),
+				() -> originalObject);
 
 		if (object == null) {
 

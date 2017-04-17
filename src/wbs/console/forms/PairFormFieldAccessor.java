@@ -1,7 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOr;
 
 import com.google.common.base.Optional;
 
@@ -90,7 +90,7 @@ class PairFormFieldAccessor <Container, Left, Right>
 	void write (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Container container,
-			@NonNull Optional <Pair <Left, Right>> nativeValue) {
+			@NonNull Optional <Pair <Left, Right>> nativeValueOptional) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -99,15 +99,10 @@ class PairFormFieldAccessor <Container, Left, Right>
 
 		// special case for null
 
-		if (! nativeValue.isPresent ()) {
-
-			nativeValue =
-				optionalOf (
-					Pair.<Left, Right> of (
-						null,
-						null));
-
-		}
+		Pair <Left, Right> nativeValue =
+			optionalOr (
+				nativeValueOptional,
+				Pair.of (null, null));
 
 		// write values
 
@@ -115,13 +110,13 @@ class PairFormFieldAccessor <Container, Left, Right>
 			taskLogger,
 			container,
 			optionalFromNullable (
-				nativeValue.get ().getLeft ()));
+				nativeValue.getLeft ()));
 
 		rightAccessor.write (
 			taskLogger,
 			container,
 			optionalFromNullable (
-				nativeValue.get ().getRight ()));
+				nativeValue.getRight ()));
 
 	}
 

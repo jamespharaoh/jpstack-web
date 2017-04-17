@@ -3,14 +3,15 @@ package wbs.apn.chat.user.core.model;
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.apache.commons.lang3.Range;
-
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import org.apache.commons.lang3.Range;
+
+import wbs.utils.time.TextualInterval;
+
 import wbs.apn.chat.bill.model.ChatUserCreditMode;
 import wbs.apn.chat.contact.model.ChatMessageMethod;
-import wbs.utils.time.TextualInterval;
 
 @Accessors (fluent = true)
 @Data
@@ -21,10 +22,10 @@ class ChatUserSearch
 	Long chatId;
 
 	ChatUserType type;
-	Collection<ChatUserType> typeIn;
+	Collection <ChatUserType> typeIn;
 
 	String code;
-	Collection<String> codeIn;
+	Collection <String> codeIn;
 
 	Long numberId;
 	String numberLike;

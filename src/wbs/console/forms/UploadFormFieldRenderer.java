@@ -90,7 +90,6 @@ class UploadFormFieldRenderer <Container>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <FileUpload> interfaceValue,
-			@NonNull FormType formType,
 			@NonNull String formName) {
 
 		javascriptWriter.writeLineFormat (

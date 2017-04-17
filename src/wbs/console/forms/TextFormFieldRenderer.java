@@ -1,7 +1,6 @@
 package wbs.console.forms;
 
 import static wbs.utils.collection.MapUtils.mapIsNotEmpty;
-import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.LogicUtils.ifThenElse;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -199,43 +198,15 @@ class TextFormFieldRenderer <Container>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional<String> interfaceValue,
-			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		if (
-			enumInSafe (
-				formType,
-				FormType.create,
-				FormType.perform,
-				FormType.search)
-		) {
-
-			javascriptWriter.writeLineFormat (
-				"$(\"%j\").val (\"\");",
-				stringFormat (
-					"#%s\\.%s",
-					formName,
-					name));
-
-		} else if (
-			enumInSafe (
-				formType,
-				FormType.update)
-		) {
-
-			javascriptWriter.writeLineFormat (
-				"$(\"%j\").val (\"%j\");",
-				stringFormat (
-					"#%s\\.%s",
-					formName,
-					name),
-				interfaceValue.or (""));
-
-		} else {
-
-			throw new RuntimeException ();
-
-		}
+		javascriptWriter.writeLineFormat (
+			"$(\"%j\").val (\"%j\");",
+			stringFormat (
+				"#%s\\.%s",
+				formName,
+				name),
+			interfaceValue.or (""));
 
 	}
 

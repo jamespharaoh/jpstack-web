@@ -3,6 +3,8 @@ package wbs.console.param;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringIsEmpty;
 
+import lombok.NonNull;
+
 @Deprecated
 public
 class YesNoParamChecker
@@ -27,10 +29,10 @@ class YesNoParamChecker
 	@Override
 	public
 	Boolean get (
-			String param) {
+			@NonNull String originalParam) {
 
-		param =
-			param.trim ();
+		String param =
+			originalParam.trim ();
 
 		if (
 

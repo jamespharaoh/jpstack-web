@@ -71,7 +71,6 @@ class HtmlFormFieldRenderer <Container>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <String> interfaceValue,
-			@NonNull FormType formType,
 			@NonNull String formName) {
 
 		doNothing ();

@@ -1,5 +1,6 @@
 package wbs.console.forms;
 
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
 import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
@@ -39,8 +40,8 @@ interface FormFieldRenderer <Container, Interface> {
 			FormFieldSubmission submission,
 			FormatWriter htmlWriter,
 			Container container,
-			Map<String,Object> hints,
-			Optional<Interface> interfaceValue,
+			Map <String, Object> hints,
+			Optional <Interface> interfaceValue,
 			FormType formType,
 			String formName);
 
@@ -58,7 +59,6 @@ interface FormFieldRenderer <Container, Interface> {
 			FormatWriter htmlWriter,
 			Container container,
 			Optional <Interface> interfaceValue,
-			FormType formType,
 			String formName);
 
 	default
@@ -163,7 +163,7 @@ interface FormFieldRenderer <Container, Interface> {
 	Optional <String> htmlClass (
 			@NonNull Optional <Interface> interfaceValue) {
 
-		return Optional.absent ();
+		return optionalAbsent ();
 
 	}
 

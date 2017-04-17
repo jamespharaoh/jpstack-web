@@ -2,7 +2,6 @@ package wbs.console.forms;
 
 import static wbs.utils.etc.EnumUtils.enumInSafe;
 import static wbs.utils.etc.LogicUtils.booleanToString;
-import static wbs.utils.etc.LogicUtils.booleanToTrueFalseNone;
 import static wbs.utils.etc.LogicUtils.booleanToYesNoNone;
 import static wbs.utils.etc.LogicUtils.parseBooleanYesNoNone;
 import static wbs.utils.etc.Misc.doNothing;
@@ -167,44 +166,16 @@ class YesNoFormFieldRenderer <Container>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional <Boolean> interfaceValue,
-			@NonNull FormType formType,
 			@NonNull String formName) {
 
-		if (
-			enumInSafe (
-				formType,
-				FormType.create,
-				FormType.perform,
-				FormType.search)
-		) {
-
-			javascriptWriter.writeLineFormat (
-				"$(\"%j\").val (\"none\");",
-				stringFormat (
-					"#%s\\.%s",
-					formName,
-					name));
-
-		} else if (
-			enumInSafe (
-				formType,
-				FormType.update)
-		) {
-
-			javascriptWriter.writeLineFormat (
-				"$(\"%j\").val (%s);",
-				stringFormat (
-					"#%s\\.%s",
-					formName,
-					name),
-				booleanToTrueFalseNone (
-					interfaceValue));
-
-		} else {
-
-			throw new RuntimeException ();
-
-		}
+		javascriptWriter.writeLineFormat (
+			"$(\"%j\").val (\"%j\");",
+			stringFormat (
+				"#%s\\.%s",
+				formName,
+				name),
+			booleanToYesNoNone (
+				interfaceValue));
 
 	}
 
