@@ -1,39 +1,55 @@
 package wbs.web.responder;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import static wbs.utils.string.FormatWriterUtils.setCurrentFormatWriter;
 
 import lombok.NonNull;
 
-import wbs.utils.string.StringFormatter;
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Deprecated
+import wbs.utils.string.FormatWriter;
+import wbs.utils.string.WriterFormatWriter;
+
 public abstract
 class PrintResponder
 	extends AbstractResponder {
 
-	protected
-	PrintWriter writer;
+	// singleton components
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
+	// state
+
+	protected
+	FormatWriter formatWriter;
+
+	// implementation
+
+	@SuppressWarnings ("resource")
 	@Override
 	protected
-	void setup ()
-		throws IOException {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		writer =
-			requestContext.printWriter ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
 
-		super.setup ();
+		formatWriter =
+			new WriterFormatWriter (
+				requestContext.printWriter ())
 
-	}
+			.indentString (
+				"  ");
 
-	protected
-	void printFormat (
-			@NonNull Object ... args) {
+		setCurrentFormatWriter (
+			formatWriter);
 
-		writer.print (
-			StringFormatter.standard (
-				args));
+		super.setup (
+			taskLogger);
 
 	}
 
