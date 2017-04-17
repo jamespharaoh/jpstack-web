@@ -58,6 +58,7 @@ class TextualInterval
 
 	String sourceText;
 	String genericText;
+
 	Interval value;
 
 	public static
@@ -639,11 +640,11 @@ class TextualInterval
 
 			} else {
 
-				return Optional.absent ();
+				return optionalAbsent ();
 
 			}
 
-			return Optional.of (
+			return optionalOf (
 				Pair.of (
 					new Interval (
 						fromDateTime,
@@ -652,7 +653,7 @@ class TextualInterval
 
 		}
 
-		return Optional.absent ();
+		return optionalAbsent ();
 
 	}
 
@@ -688,7 +689,7 @@ class TextualInterval
 			return numericResult;
 		}
 
-		return Optional.absent ();
+		return optionalAbsent ();
 
 	}
 
@@ -743,7 +744,7 @@ class TextualInterval
 				optionalIsNotPresent (
 					optionalSecondInterval)
 			) {
-				return Optional.absent ();
+				return optionalAbsent ();
 			}
 
 			Interval interval =
@@ -751,7 +752,7 @@ class TextualInterval
 					optionalFirstInterval.get ().getLeft ().getStart (),
 					optionalSecondInterval.get ().getLeft ().getEnd ());
 
-			return Optional.of (
+			return optionalOf (
 				new TextualInterval (
 					source.trim (),
 					stringFormat (
