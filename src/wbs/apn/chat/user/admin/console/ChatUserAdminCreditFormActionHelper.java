@@ -175,12 +175,20 @@ class ChatUserAdminCreditFormActionHelper
 
 			htmlParagraphWriteFormat (
 				formatWriter,
-				"Please note: The credit amount is the actual credit to give ",
-				"the user. The bill amount is the amount they have paid. To ",
-				"give someone some free credit enter it in credit amount and ",
-				"enter 0.00 in bill amount. To process a credit card payment ",
-				"enter the amount of credit in credit amount and the amount ",
-				"they have paid in bill amount.");
+				"The credit amount is the actual credit to give the user. The ",
+				"bill amount is the amount they have paid.");
+
+			htmlParagraphWriteFormat (
+				formatWriter,
+				"To give someone some free credit enter it in credit amount ",
+				"and enter 0.00 in bill amount. To process a credit card ",
+				"payment enter the amount of credit in credit amount and the ",
+				"amount they have paid in bill amount.");
+
+			htmlParagraphWriteFormat (
+				formatWriter,
+				"You may also use negative amounts to adjust a previous error ",
+				"as appropriate.");
 
 		}
 
