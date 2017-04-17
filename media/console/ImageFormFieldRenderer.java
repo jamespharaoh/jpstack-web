@@ -153,7 +153,6 @@ class ImageFormFieldRenderer <Container>
 			@NonNull FormatWriter javascriptWriter,
 			@NonNull Container container,
 			@NonNull Optional<MediaRec> interfaceValue,
-			@NonNull FormType formType,
 			@NonNull String formName) {
 
 		javascriptWriter.writeLineFormat (
