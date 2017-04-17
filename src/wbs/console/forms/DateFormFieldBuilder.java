@@ -1,6 +1,9 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.NullUtils.ifNull;
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
 
@@ -9,9 +12,12 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
+import wbs.console.helper.manager.ConsoleObjectManager;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -31,6 +37,9 @@ class DateFormFieldBuilder {
 
 	@SingletonDependency
 	FormFieldPluginManagerImplementation formFieldPluginManager;
+
+	@SingletonDependency
+	ConsoleObjectManager objectManager;
 
 	// prototype dependencies
 
@@ -61,6 +70,10 @@ class DateFormFieldBuilder {
 	@PrototypeDependency
 	Provider <TextFormFieldRenderer>
 	textFormFieldRendererProvider;
+
+	@PrototypeDependency
+	Provider <TimestampAsDateFormFieldNativeMapping>
+	timestampAsDateFormFieldNativeMappingProvider;
 
 	@PrototypeDependency
 	Provider <DateFormFieldInterfaceMapping>
@@ -113,6 +126,16 @@ class DateFormFieldBuilder {
 				spec.nullable (),
 				false);
 
+		// field type
+
+		Class <?> propertyClass =
+			optionalGetRequired (
+				objectManager.dereferenceType (
+					optionalOf (
+						context.containerClass ()),
+					optionalOf (
+						nativeFieldName)));
+
 		// accessor
 
 		FormFieldAccessor accessor;
@@ -134,18 +157,41 @@ class DateFormFieldBuilder {
 					nativeFieldName)
 
 				.nativeClass (
-					LocalDate.class);
+					propertyClass);
 
 		}
 
 		// native mapping
 
-		FormFieldNativeMapping nativeMapping =
-			identityFormFieldNativeMappingProvider.get ();
+		FormFieldNativeMapping nativeMapping;
+
+		if (
+			classEqualSafe (
+				propertyClass,
+				LocalDate.class)
+		) {
+
+			nativeMapping =
+				identityFormFieldNativeMappingProvider.get ();
+
+		} else if (
+			classEqualSafe (
+				propertyClass,
+				Instant.class)
+		) {
+
+			nativeMapping =
+				timestampAsDateFormFieldNativeMappingProvider.get ();
+
+		} else {
+
+			throw new RuntimeException ();
+
+		}
 
 		// value validator
 
-		List<FormFieldValueValidator> valueValidators =
+		List <FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
 
 		if (! nullable) {
