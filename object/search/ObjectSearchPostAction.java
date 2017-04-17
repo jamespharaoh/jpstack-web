@@ -19,6 +19,7 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Provider;
 import javax.servlet.ServletException;
@@ -129,7 +130,7 @@ class ObjectSearchPostAction <
 	FormFieldSet <SearchType> searchFormFieldSet;
 
 	@Getter @Setter
-	List <FormFieldSet <ResultType>> resultsFormFieldSets;
+	Map <String, ObjectSearchResultsMode <ResultType>> resultsModes;
 
 	@Getter @Setter
 	String searchResponderName;
@@ -228,8 +229,8 @@ class ObjectSearchPostAction <
 					.consoleHelper (
 						consoleHelper)
 
-					.formFieldSets (
-						resultsFormFieldSets)
+					.resultsModes (
+						resultsModes)
 
 					.resultsDaoMethodName (
 						resultsDaoMethodName)

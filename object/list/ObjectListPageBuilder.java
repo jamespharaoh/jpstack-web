@@ -293,7 +293,7 @@ class ObjectListPageBuilder <
 				new StaticFieldsProvider <ObjectType, ParentType> ()
 
 				.fields (
-					consoleModule.formFieldSet (
+					consoleModule.formFieldSetRequired (
 						spec.fieldsName (),
 						consoleHelper.objectClass ()));
 

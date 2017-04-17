@@ -323,7 +323,7 @@ class ObjectLinksPageBuilder <
 			spec.successNotice ();
 
 		targetFields =
-			consoleModule.formFieldSet (
+			consoleModule.formFieldSetRequired (
 				spec.fieldsName (),
 				targetConsoleHelper.objectClass ());
 
