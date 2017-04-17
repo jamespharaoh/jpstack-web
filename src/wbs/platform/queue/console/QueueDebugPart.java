@@ -120,7 +120,7 @@ class QueueDebugPart
 				"prepare");
 
 		formFields =
-			queueConsoleModule.formFieldSet (
+			queueConsoleModule.formFieldSetRequired (
 				"queue-debug-form",
 				QueueDebugForm.class);
 

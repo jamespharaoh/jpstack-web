@@ -1,6 +1,7 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.EnumUtils.enumInSafe;
+import static wbs.utils.etc.EnumUtils.enumNameSpaces;
 import static wbs.utils.etc.Misc.toEnum;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -266,7 +267,8 @@ class EnumFormFieldRenderer <Container, Interface extends Enum <Interface>>
 		htmlWriter.writeFormat (
 			"%h",
 			interfaceValue.isPresent ()
-				? interfaceValue.get ().toString ()
+				? enumNameSpaces (
+					interfaceValue.get ())
 				: "");
 
 	}

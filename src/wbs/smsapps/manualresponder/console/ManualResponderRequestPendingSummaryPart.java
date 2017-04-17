@@ -221,7 +221,7 @@ class ManualResponderRequestPendingSummaryPart
 				"prepare");
 
 		customerDetailsFields =
-			manualResponderRequestPendingConsoleModule.formFieldSet (
+			manualResponderRequestPendingConsoleModule.formFieldSetRequired (
 				"customer-details",
 				SmsCustomerRec.class);
 

@@ -107,7 +107,7 @@ class AutoResponderVotesPart
 		// get fields
 
 		formFields =
-			autoResponderVotesConsoleModule.formFieldSet (
+			autoResponderVotesConsoleModule.formFieldSetRequired (
 				"auto-responder-votes",
 				AutoResponderVotesForm.class);
 

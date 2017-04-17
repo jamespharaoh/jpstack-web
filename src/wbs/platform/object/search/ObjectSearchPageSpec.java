@@ -1,13 +1,17 @@
 package wbs.platform.object.search;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import wbs.console.module.ConsoleModuleData;
 import wbs.console.module.ConsoleModuleSpec;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.data.annotations.DataAncestor;
 import wbs.framework.data.annotations.DataAttribute;
+import wbs.framework.data.annotations.DataChildren;
 import wbs.framework.data.annotations.DataClass;
 
 @Accessors (fluent = true)
@@ -88,5 +92,10 @@ class ObjectSearchPageSpec {
 	@DataAttribute (
 		name = "results-responder")
 	String searchResultsResponderName;
+
+	@DataChildren (
+		direct = true,
+		childElement = "results-mode")
+	List <ObjectSearchResultsModeSpec> resultsModes;
 
 }

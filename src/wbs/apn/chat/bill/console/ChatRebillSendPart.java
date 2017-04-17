@@ -96,17 +96,17 @@ class ChatRebillSendPart
 		// get form fields
 
 		searchFormFields =
-			chatRebillConsoleModule.formFieldSet (
+			chatRebillConsoleModule.formFieldSetRequired (
 				"search",
 				ChatRebillSearch.class);
 
 		billResultsFormFields =
-			chatRebillConsoleModule.formFieldSet (
+			chatRebillConsoleModule.formFieldSetRequired (
 				"bill-results",
 				ChatUserRec.class);
 
 		nonBillResultsFormFields =
-			chatRebillConsoleModule.formFieldSet (
+			chatRebillConsoleModule.formFieldSetRequired (
 				"non-bill-results",
 				ChatRebillNonBillResult.class);
 

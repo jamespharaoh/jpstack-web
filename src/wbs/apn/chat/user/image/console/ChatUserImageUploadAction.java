@@ -120,7 +120,7 @@ class ChatUserImageUploadAction
 				"goReal");
 
 		fields =
-			chatUserImageConsoleModule.formFieldSet (
+			chatUserImageConsoleModule.formFieldSetRequired (
 				"uploadForm",
 				ChatUserImageUploadForm.class);
 

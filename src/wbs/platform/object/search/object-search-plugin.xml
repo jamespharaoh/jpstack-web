@@ -9,6 +9,7 @@
 		<component class="ObjectSearchPageSpec"/>
 		<component class="ObjectSearchPart"/>
 		<component class="ObjectSearchPostAction"/>
+		<component class="ObjectSearchResultsModeSpec"/>
 		<component class="ObjectSearchResultsPart"/>
 	</layer>
 

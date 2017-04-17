@@ -163,17 +163,17 @@ class ImChatPendingSummaryPart
 		// get field sets
 
 		customerFields =
-			imChatPendingConsoleModule.formFieldSet (
+			imChatPendingConsoleModule.formFieldSetRequired (
 				"customerFields",
 				ImChatCustomerRec.class);
 
 		profileFields =
-			imChatPendingConsoleModule.formFieldSet (
+			imChatPendingConsoleModule.formFieldSetRequired (
 				"profileFields",
 				ImChatProfileRec.class);
 
 		messageFields =
-			imChatPendingConsoleModule.formFieldSet (
+			imChatPendingConsoleModule.formFieldSetRequired (
 				"messageFields",
 				ImChatMessageRec.class);
 

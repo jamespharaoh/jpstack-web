@@ -106,7 +106,7 @@ class ImChatCustomerCreditAction
 			// process form fields
 
 			FormFieldSet <ImChatCustomerCreditRequest> formFields =
-				imChatCustomerConsoleModule.formFieldSet (
+				imChatCustomerConsoleModule.formFieldSetRequired (
 					"credit-request",
 					ImChatCustomerCreditRequest.class);
 

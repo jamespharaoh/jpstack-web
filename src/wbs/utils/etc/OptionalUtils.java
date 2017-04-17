@@ -8,6 +8,7 @@ import static wbs.utils.string.StringUtils.stringFormatArray;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -686,6 +687,81 @@ class OptionalUtils {
 		return Optional.presentInstances (
 			Arrays.asList (
 				arguments));
+
+	}
+
+	public static <Type>
+	List <Type> presentInstancesList () {
+
+		return ImmutableList.of ();
+
+	}
+
+	public static <Type>
+	List <Type> presentInstancesList (
+			@NonNull Optional <Type> argument) {
+
+		return ImmutableList.copyOf (
+			presentInstances (
+				ImmutableList.of (
+					argument)));
+
+	}
+
+	public static <Type>
+	List <Type> presentInstancesList (
+			@NonNull Optional <Type> argument0,
+			@NonNull Optional <Type> argument1) {
+
+		return ImmutableList.copyOf (
+			presentInstances (
+				ImmutableList.of (
+					argument0,
+					argument1)));
+
+	}
+
+	public static <Type>
+	List <Type> presentInstancesList (
+			@NonNull Optional <Type> argument0,
+			@NonNull Optional <Type> argument1,
+			@NonNull Optional <Type> argument2) {
+
+		return ImmutableList.copyOf (
+			presentInstances (
+				ImmutableList.of (
+					argument0,
+					argument1,
+					argument2)));
+
+	}
+
+	public static <Type>
+	List <Type> presentInstancesList (
+			@NonNull Optional <Type> argument0,
+			@NonNull Optional <Type> argument1,
+			@NonNull Optional <Type> argument2,
+			@NonNull Optional <Type> argument3) {
+
+		return ImmutableList.copyOf (
+			presentInstances (
+				ImmutableList.of (
+					argument0,
+					argument1,
+					argument2,
+					argument3)));
+
+	}
+
+	@SafeVarargs
+	public static <Type>
+	List <Type> presentInstancesList (
+			@NonNull Optional <Type>... arguments) {
+
+		return ImmutableList.copyOf (
+			Optional.presentInstances (
+				Arrays.asList (
+					arguments)));
 
 	}
 

@@ -2,8 +2,10 @@ package wbs.platform.object.search;
 
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.etc.OptionalUtils.presentInstancesList;
 import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
@@ -12,7 +14,9 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitComma;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -46,7 +50,7 @@ import wbs.utils.string.FormatWriter;
 @Accessors (fluent = true)
 @PrototypeComponent ("objectSearchCsvResponder")
 public
-class ObjectSearchCsvResponder <RecordType>
+class ObjectSearchCsvResponder <ResultType>
 	extends ConsoleResponder {
 
 	// singleton dependencies
@@ -75,7 +79,7 @@ class ObjectSearchCsvResponder <RecordType>
 	ConsoleHelper <?> consoleHelper;
 
 	@Getter @Setter
-	List <FormFieldSet <RecordType>> formFieldSets;
+	Map <String, ObjectSearchResultsMode <ResultType>> resultsModes;
 
 	@Getter @Setter
 	String resultsDaoMethodName;
@@ -86,6 +90,9 @@ class ObjectSearchCsvResponder <RecordType>
 	// state
 
 	FormatWriter formatWriter;
+
+	List <FormFieldSet <ResultType>> formFieldSets =
+		new ArrayList<> ();
 
 	Object searchObject;
 	List <Long> objectIds;
@@ -172,6 +179,23 @@ class ObjectSearchCsvResponder <RecordType>
 		Transaction transaction =
 			database.currentTransaction ();
 
+		// form fields
+
+		String resultsModeName =
+			requestContext.parameterOrDefault (
+				"mode",
+				resultsModes.keySet ().iterator ().next ());
+
+		ObjectSearchResultsMode <ResultType> resultsMode =
+			mapItemForKeyRequired (
+				resultsModes,
+				resultsModeName);
+
+		formFieldSets =
+			presentInstancesList (
+				resultsMode.columns,
+				resultsMode.rows);
+
 		// write headers
 
 		formFieldLogic.outputCsvHeadings (
@@ -189,7 +213,7 @@ class ObjectSearchCsvResponder <RecordType>
 					64)
 		) {
 
-			List <Optional <RecordType>> objects;
+			List <Optional <ResultType>> objects;
 
 			if (
 				isNotNull (
@@ -222,7 +246,7 @@ class ObjectSearchCsvResponder <RecordType>
 			}
 
 			for (
-				RecordType object
+				ResultType object
 					: presentInstances (
 						objects)
 			) {

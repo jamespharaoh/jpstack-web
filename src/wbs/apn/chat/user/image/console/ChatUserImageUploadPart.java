@@ -69,7 +69,7 @@ class ChatUserImageUploadPart
 				"prepare");
 
 		formFieldSet =
-			chatUserImageConsoleModule.formFieldSet (
+			chatUserImageConsoleModule.formFieldSetRequired (
 				"uploadForm",
 				ChatUserImageUploadForm.class);
 

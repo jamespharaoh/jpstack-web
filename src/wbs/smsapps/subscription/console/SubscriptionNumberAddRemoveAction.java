@@ -125,10 +125,11 @@ class SubscriptionNumberAddRemoveAction
 
 			// process form
 
-			FormFieldSet <SubscriptionNumberAddRemoveForm> addRemoveFormFieldSet =
-				subscriptionNumberConsoleModule.formFieldSet (
-					"addRemoveForm",
-					SubscriptionNumberAddRemoveForm.class);
+			FormFieldSet <SubscriptionNumberAddRemoveForm>
+				addRemoveFormFieldSet =
+					subscriptionNumberConsoleModule.formFieldSetRequired (
+						"addRemoveForm",
+						SubscriptionNumberAddRemoveForm.class);
 
 			SubscriptionNumberAddRemoveForm addRemoveForm =
 				new SubscriptionNumberAddRemoveForm ();

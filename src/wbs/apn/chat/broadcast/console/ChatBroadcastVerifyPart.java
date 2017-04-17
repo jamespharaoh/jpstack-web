@@ -138,32 +138,32 @@ class ChatBroadcastVerifyPart
 			chatHelper.findFromContextRequired ();
 
 		searchFields =
-			chatBroadcastConsoleModule.formFieldSet (
+			chatBroadcastConsoleModule.formFieldSetRequired (
 				"send-search",
 				ChatBroadcastSendForm.class);
 
 		numbersFields =
-			chatBroadcastConsoleModule.formFieldSet (
+			chatBroadcastConsoleModule.formFieldSetRequired (
 				"send-numbers",
 				ChatBroadcastSendForm.class);
 
 		commonFields =
-			chatBroadcastConsoleModule.formFieldSet (
+			chatBroadcastConsoleModule.formFieldSetRequired (
 				"send-common",
 				ChatBroadcastSendForm.class);
 
 		messageUserFields =
-			chatBroadcastConsoleModule.formFieldSet (
+			chatBroadcastConsoleModule.formFieldSetRequired (
 				"send-message-user",
 				ChatBroadcastSendForm.class);
 
 		messageMessageFields =
-			chatBroadcastConsoleModule.formFieldSet (
+			chatBroadcastConsoleModule.formFieldSetRequired (
 				"send-message-message",
 				ChatBroadcastSendForm.class);
 
 		verifyUserFields =
-			chatBroadcastConsoleModule.formFieldSet (
+			chatBroadcastConsoleModule.formFieldSetRequired (
 				"verify-user",
 				ChatUserRec.class);
 

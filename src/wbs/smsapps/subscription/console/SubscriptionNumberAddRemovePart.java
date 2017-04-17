@@ -60,7 +60,7 @@ class SubscriptionNumberAddRemovePart
 				"prepare");
 
 		addRemoveFormFieldSet =
-			subscriptionNumberConsoleModule.formFieldSet (
+			subscriptionNumberConsoleModule.formFieldSetRequired (
 				"addRemoveForm",
 				SubscriptionNumberAddRemoveForm.class);
 

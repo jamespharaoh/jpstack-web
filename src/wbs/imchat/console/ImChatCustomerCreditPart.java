@@ -74,17 +74,17 @@ class ImChatCustomerCreditPart
 			@NonNull TaskLogger parentTaskLogger) {
 
 		customerFormFields =
-			imChatCustomerConsoleModule.formFieldSet (
+			imChatCustomerConsoleModule.formFieldSetRequired (
 				"credit-summary",
 				ImChatCustomerRec.class);
 
 		creditFormFields =
-			imChatCustomerConsoleModule.formFieldSet (
+			imChatCustomerConsoleModule.formFieldSetRequired (
 				"credit-request",
 				ImChatCustomerCreditRequest.class);
 
 		creditHistoryFormFields =
-			imChatCustomerConsoleModule.formFieldSet (
+			imChatCustomerConsoleModule.formFieldSetRequired (
 				"credit-history",
 				ImChatCustomerCreditRec.class);
 

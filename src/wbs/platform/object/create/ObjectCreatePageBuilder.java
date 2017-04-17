@@ -362,7 +362,7 @@ class ObjectCreatePageBuilder <
 		formFieldSet =
 			ifNotNullThenElse (
 				spec.fieldsName (),
-				() -> consoleModule.formFieldSet (
+				() -> consoleModule.formFieldSetRequired (
 					spec.fieldsName (),
 					consoleHelper.objectClass ()),
 				() -> defaultFields (

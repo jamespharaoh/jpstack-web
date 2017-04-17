@@ -2,6 +2,7 @@ package wbs.console.module;
 
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.collection.MapUtils.mapItemForKeyOrThrow;
+import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.List;
@@ -78,13 +79,37 @@ interface ConsoleModule
 	}
 
 	default <Type>
-	FormFieldSet <Type> formFieldSet (
+	Optional <FormFieldSet <Type>> formFieldSet (
 			@NonNull String name,
 			@NonNull Class <?> containerClass) {
 
-		FormFieldSet <?> fieldsUncast =
-			formFieldSetRequired (
+		Optional <FormFieldSet <?>> fieldsUncastOptional =
+			formFieldSet (
 				name);
+
+		return optionalMapRequired (
+			fieldsUncastOptional,
+			fieldsUncast ->
+				fieldsUncast.cast (
+					containerClass));
+
+	}
+
+	default <Type>
+	FormFieldSet <Type> formFieldSetRequired (
+			@NonNull String name,
+			@NonNull Class <Type> containerClass) {
+
+		FormFieldSet <?> fieldsUncast =
+			mapItemForKeyOrThrow (
+				formFieldSets (),
+				name,
+				() -> new NoSuchElementException (
+					stringFormat (
+						"Console module '%s' ",
+						name (),
+						"has no field set: %s",
+						name)));
 
 		return fieldsUncast.cast (
 			containerClass);

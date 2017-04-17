@@ -1,9 +1,11 @@
 package wbs.platform.object.search;
 
+import static wbs.utils.collection.CollectionUtils.collectionHasOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionSize;
 import static wbs.utils.collection.CollectionUtils.listSlice;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.emptyMap;
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
@@ -12,12 +14,15 @@ import static wbs.utils.etc.OptionalUtils.optionalIf;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.OptionalUtils.presentInstances;
 import static wbs.utils.etc.ReflectionUtils.methodGetRequired;
 import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classEqualSafe;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.etc.TypeUtils.isNotInstanceOf;
+import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.hyphenToSpaces;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringSplitComma;
@@ -43,7 +48,10 @@ import static wbs.web.utils.HtmlUtils.htmlLinkWrite;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import javax.inject.Provider;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -69,9 +77,11 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.module.ConsoleManager;
 import wbs.console.part.AbstractPagePart;
+import wbs.console.tab.TabList;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.entity.record.IdObject;
 import wbs.framework.entity.record.Record;
@@ -113,16 +123,18 @@ class ObjectSearchResultsPart <
 	@SingletonDependency
 	UserSessionLogic userSessionLogic;
 
+	// prototype dependencies
+
+	@PrototypeDependency
+	Provider <TabList> tabListProvider;
+
 	// properties
 
 	@Getter @Setter
 	ConsoleHelper <ObjectType> consoleHelper;
 
 	@Getter @Setter
-	FormFieldSet <ResultType> formFieldSet;
-
-	@Getter @Setter
-	FormFieldSet <ResultType> rowsFormFieldSet;
+	Map <String, ObjectSearchResultsMode <ResultType>> resultsModes;
 
 	@Getter @Setter
 	Class <ResultType> resultsClass;
@@ -140,6 +152,9 @@ class ObjectSearchResultsPart <
 	String targetContextTypeName;
 
 	// state
+
+	FormFieldSet <ResultType> columnsFormFieldSet;
+	FormFieldSet <ResultType> rowsFormFieldSet;
 
 	IdObject currentObject;
 	List <Optional <ResultType>> objects;
@@ -183,6 +198,26 @@ class ObjectSearchResultsPart <
 			logContext.nestTaskLogger (
 				parentTaskLogger,
 				"prepare");
+
+		// form fields
+
+		String resultsModeName =
+			requestContext.parameterOrDefault (
+				"mode",
+				resultsModes.keySet ().iterator ().next ());
+
+		ObjectSearchResultsMode <ResultType> resultsMode =
+			mapItemForKeyRequired (
+				resultsModes,
+				resultsModeName);
+
+		columnsFormFieldSet =
+			optionalOrNull (
+				resultsMode.columns);
+
+		rowsFormFieldSet =
+			optionalOrNull (
+				resultsMode.rows);
 
 		// current object
 
@@ -343,18 +378,28 @@ class ObjectSearchResultsPart <
 				parentTaskLogger,
 				"renderHtmlBodyContent");
 
-		goNewSearch ();
-		goTotalObjects ();
-		goPageNumbers ();
-
-		goSearchResults (
+		renderNewSearch (
 			taskLogger);
 
-		goPageNumbers ();
+		renderTotalObjects (
+			taskLogger);
+
+		renderPageNumbers (
+			taskLogger);
+
+		renderModeTabs (
+			taskLogger);
+
+		renderSearchResults (
+			taskLogger);
+
+		renderPageNumbers (
+			taskLogger);
 
 	}
 
-	void goNewSearch () {
+	void renderNewSearch (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlFormOpenPost ();
 
@@ -387,7 +432,8 @@ class ObjectSearchResultsPart <
 
 	}
 
-	void goTotalObjects () {
+	void renderTotalObjects (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlParagraphWriteFormat (
 			"Search returned %h items",
@@ -396,7 +442,8 @@ class ObjectSearchResultsPart <
 
 	}
 
-	void goPageNumbers () {
+	void renderPageNumbers (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		if (pageCount == 1)
 			return;
@@ -409,7 +456,11 @@ class ObjectSearchResultsPart <
 			"Select page");
 
 		htmlLinkWrite (
-			"?page=all",
+			stringFormat (
+				"?page=all&mode=%u",
+				requestContext.parameterOrDefault (
+					"mode",
+					resultsModes.keySet ().iterator ().next ())),
 			"All",
 			presentInstances (
 				optionalIf (
@@ -425,9 +476,12 @@ class ObjectSearchResultsPart <
 
 			htmlLinkWrite (
 				stringFormat (
-					"?page=%h",
+					"?page=%h&mode=%u",
 					integerToDecimalString (
-						page)),
+						page),
+					requestContext.parameterOrDefault (
+						"mode",
+						resultsModes.keySet ().iterator ().next ())),
 				integerToDecimalString (
 					page + 1),
 				presentInstances (
@@ -442,7 +496,53 @@ class ObjectSearchResultsPart <
 
 	}
 
-	void goSearchResults (
+	void renderModeTabs (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		if (
+			collectionHasOneElement (
+				resultsModes.entrySet ())
+		) {
+			return;
+		}
+
+		htmlParagraphOpen (
+			htmlClassAttribute (
+				"links"));
+
+		for (
+			ObjectSearchResultsMode <ResultType> resultsMode
+				: resultsModes.values ()
+		) {
+
+			htmlLinkWrite (
+				formatWriter,
+				stringFormat (
+					"?page=%u&mode=%u",
+					requestContext.parameterOrDefault (
+						"page",
+						"0"),
+					resultsMode.name ()),
+				capitalise (
+					hyphenToSpaces (
+						resultsMode.name ())),
+				presentInstances (
+					optionalIf (
+						stringEqualSafe (
+							resultsMode.name (),
+							requestContext.parameterOrDefault (
+								"mode",
+								resultsModes.keySet ().iterator ().next ())),
+						() -> htmlClassAttribute (
+							"selected"))));
+
+		}
+
+		htmlParagraphClose ();
+
+	}
+
+	void renderSearchResults (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		TaskLogger taskLogger =
@@ -456,7 +556,7 @@ class ObjectSearchResultsPart <
 
 		formFieldLogic.outputTableHeadings (
 			formatWriter,
-			formFieldSet);
+			columnsFormFieldSet);
 
 		htmlTableRowClose ();
 
@@ -479,7 +579,7 @@ class ObjectSearchResultsPart <
 					"(deleted)",
 					htmlColumnSpanAttribute (
 						collectionSize (
-							formFieldSet.formItems ())));
+							columnsFormFieldSet.formItems ())));
 
 				htmlTableRowClose ();
 
@@ -507,7 +607,7 @@ class ObjectSearchResultsPart <
 					"(restricted)",
 					htmlColumnSpanAttribute (
 						collectionSize (
-							formFieldSet.formItems ())));
+							columnsFormFieldSet.formItems ())));
 
 				htmlTableRowClose ();
 
@@ -556,7 +656,7 @@ class ObjectSearchResultsPart <
 							rowTimestamp),
 						htmlColumnSpanAttribute (
 							collectionSize (
-								formFieldSet.formItems ())));
+								columnsFormFieldSet.formItems ())));
 
 					htmlTableRowClose ();
 
@@ -623,7 +723,7 @@ class ObjectSearchResultsPart <
 			formFieldLogic.outputTableCellsList (
 				taskLogger,
 				formatWriter,
-				formFieldSet,
+				columnsFormFieldSet,
 				result,
 				emptyMap (),
 				false);
@@ -684,7 +784,7 @@ class ObjectSearchResultsPart <
 					rowsFormFieldSet,
 					result,
 					false,
-					formFieldSet.columns ());
+					columnsFormFieldSet.columns ());
 
 			}
 

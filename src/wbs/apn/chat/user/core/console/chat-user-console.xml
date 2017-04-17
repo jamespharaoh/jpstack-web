@@ -40,8 +40,12 @@
 					name="new"
 					tab-label="New"
 					search-fields="search"
-					results-fields="results"
-					priv-key="chat.supervisor"/>
+					priv-key="chat.supervisor">
+
+					<results-mode name="normal"/>
+					<results-mode name="credit"/>
+
+				</object-search-page>
 
 				<context-tab-action-page
 					name="old"/>
@@ -187,7 +191,7 @@
 	</field-set>
 
 	<field-set
-		name="results"
+		name="results-normal-columns"
 		object-name="chatUser">
 
 		<code-field/>
@@ -212,6 +216,54 @@
 		<text-field
 			name="infoText"
 			label="Info"/>
+
+	</field-set>
+
+	<field-set
+		name="results-credit-columns"
+		object-name="chatUser">
+
+		<code-field/>
+
+		<enum-field
+			name="type"/>
+
+		<enum-field
+			name="gender"/>
+
+		<enum-field
+			name="orient"/>
+
+		<currency-field
+			name="valueSinceEver"
+			label="Spent"
+			currency="chat.currency"/>
+
+		<currency-field
+			name="credit"
+			currency="chat.currency"/>
+
+		<enum-field
+			name="creditMode"
+			label="Mode"/>
+
+		<currency-field
+			name="creditPending"
+			label="Pending"
+			currency="chat.currency"/>
+
+		<currency-field
+			name="creditSuccess"
+			label="Success"
+			currency="chat.currency"/>
+
+		<object-field
+			name="chatScheme"
+			label="Scheme"
+			root-field="chat"/>
+
+		<date-field
+			name="lastAction"/>
 
 	</field-set>
 
