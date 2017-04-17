@@ -27,4 +27,23 @@ class IoUtils {
 
 	}
 
+	public static
+	void writeByte (
+			@NonNull OutputStream target,
+			int value) {
+
+		try {
+
+			target.write (
+				value);
+
+		} catch (IOException ioException) {
+
+			throw new RuntimeException (
+				ioException);
+
+		}
+
+	}
+
 }

@@ -9,6 +9,7 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalOf;
 import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.TypeUtils.classNameFull;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
 
@@ -17,6 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -334,6 +336,15 @@ class ReflectionUtils {
 				invocationTargetException);
 
 		}
+
+	}
+
+	public static
+	ParameterizedType fieldParameterizedType (
+			@NonNull Field field) {
+
+		return genericCastUnchecked (
+			field.getGenericType ());
 
 	}
 
