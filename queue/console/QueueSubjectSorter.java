@@ -738,7 +738,7 @@ class QueueSubjectSorter {
 			- subject.getActiveItems ();
 
 		QueueItemRec item =
-			queueCache.findQueueItemByIndex (
+			queueCache.findQueueItemByIndexRequired (
 				subject,
 				nextItemIndex);
 

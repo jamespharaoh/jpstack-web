@@ -7,8 +7,6 @@ import com.google.common.base.Optional;
 
 import lombok.NonNull;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import wbs.console.formaction.ConsoleFormActionHelper;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
@@ -31,7 +29,7 @@ import wbs.web.responder.Responder;
 @PrototypeComponent ("daemonDeploymentRestartFormActionHelper")
 public
 class DaemonDeploymentRestartFormActionHelper
-	implements ConsoleFormActionHelper <Object> {
+	implements ConsoleFormActionHelper <Object, Object> {
 
 	// singleton dependencies
 
@@ -57,7 +55,7 @@ class DaemonDeploymentRestartFormActionHelper
 
 	@Override
 	public
-	Pair <Boolean, Boolean> canBePerformed (
+	Permissions canBePerformed (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		TaskLogger taskLogger =
@@ -77,9 +75,9 @@ class DaemonDeploymentRestartFormActionHelper
 		boolean enable =
 			! daemonDeployment.getRestart ();
 
-		return Pair.of (
-			show,
-			enable);
+		return new Permissions ()
+			.canView (show)
+			.canPerform (enable);
 
 	}
 

@@ -1,5 +1,6 @@
 package wbs.platform.queue.logic;
 
+import static wbs.utils.collection.MapUtils.mapItemForKeyRequired;
 import static wbs.utils.etc.Misc.isNotNull;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueItemState;
@@ -107,11 +109,12 @@ class MasterQueueCache
 
 	@Override
 	public
-	QueueItemRec findQueueItemByIndex (
+	QueueItemRec findQueueItemByIndexRequired (
 			@NonNull QueueSubjectRec subject,
 			@NonNull Long index) {
 
-		return queueItemsBySubjectAndIndex.get (
+		return mapItemForKeyRequired (
+			queueItemsBySubjectAndIndex,
 			Pair.of (
 				subject.getId (),
 				index));

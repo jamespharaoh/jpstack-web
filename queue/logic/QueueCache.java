@@ -9,7 +9,7 @@ import wbs.platform.queue.model.QueueSubjectRec;
 public
 interface QueueCache {
 
-	QueueItemRec findQueueItemByIndex (
+	QueueItemRec findQueueItemByIndexRequired (
 			QueueSubjectRec subject,
 			Long index);
 

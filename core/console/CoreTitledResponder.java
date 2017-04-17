@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.PagePart;
 import wbs.console.priv.UserPrivChecker;
-import wbs.console.responder.HtmlResponder;
+import wbs.console.responder.ConsoleHtmlResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -35,7 +35,7 @@ import wbs.platform.user.console.UserConsoleLogic;
 @PrototypeComponent ("coreTitledResponder")
 public
 class CoreTitledResponder
-	extends HtmlResponder {
+	extends ConsoleHtmlResponder {
 
 	// singleton dependencies
 

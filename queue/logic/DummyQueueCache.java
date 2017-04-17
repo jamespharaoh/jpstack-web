@@ -6,6 +6,7 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.platform.queue.model.QueueItemObjectHelper;
 import wbs.platform.queue.model.QueueItemRec;
 import wbs.platform.queue.model.QueueRec;
@@ -31,11 +32,11 @@ class DummyQueueCache
 
 	@Override
 	public
-	QueueItemRec findQueueItemByIndex (
+	QueueItemRec findQueueItemByIndexRequired (
 			@NonNull QueueSubjectRec subject,
 			@NonNull Long index) {
 
-		return queueItemHelper.findByIndexOrNull (
+		return queueItemHelper.findByIndexRequired (
 			subject,
 			index);
 

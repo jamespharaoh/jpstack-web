@@ -66,7 +66,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.console.responder.HtmlResponder;
+import wbs.console.responder.ConsoleHtmlResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -91,7 +91,7 @@ import wbs.platform.user.model.UserObjectHelper;
 @PrototypeComponent ("queueHomeResponder")
 public
 class QueueHomeResponder
-	extends HtmlResponder {
+	extends ConsoleHtmlResponder {
 
 	// singleton dependencies
 

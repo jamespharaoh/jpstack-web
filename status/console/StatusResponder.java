@@ -30,7 +30,7 @@ import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.part.PagePart;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.console.responder.HtmlResponder;
+import wbs.console.responder.ConsoleHtmlResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -41,7 +41,7 @@ import wbs.framework.logging.TaskLogger;
 @PrototypeComponent ("statusResponder")
 public
 class StatusResponder
-	extends HtmlResponder {
+	extends ConsoleHtmlResponder {
 
 	// singleton dependencies
 
