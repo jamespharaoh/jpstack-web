@@ -1,7 +1,12 @@
 package wbs.console.helper.enums;
 
+import static wbs.utils.etc.EnumUtils.enumNameHyphens;
+import static wbs.utils.etc.OptionalUtils.optionalOfFormat;
+import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.string.FormatWriterUtils.currentFormatWriter;
+import static wbs.utils.string.StringUtils.camelToHyphen;
 import static wbs.utils.string.StringUtils.camelToSpaces;
+import static wbs.utils.string.StringUtils.uncapitalise;
 import static wbs.web.utils.HtmlInputUtils.htmlSelect;
 
 import java.util.LinkedHashMap;
@@ -168,7 +173,14 @@ class EnumConsoleHelper <E extends Enum <E>> {
 	Optional <String> htmlClass (
 			@NonNull E value) {
 
-		return Optional.<String>absent ();
+		return optionalOfFormat (
+			"enum--%s--%s",
+			camelToHyphen (
+				uncapitalise (
+					classNameSimple (
+						enumClass))),
+			enumNameHyphens (
+				value));
 
 	}
 

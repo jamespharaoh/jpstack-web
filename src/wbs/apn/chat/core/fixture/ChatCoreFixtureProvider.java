@@ -1,9 +1,21 @@
 package wbs.apn.chat.core.fixture;
 
+import static wbs.utils.collection.IterableUtils.iterableMap;
+import static wbs.utils.etc.Misc.contains;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import lombok.NonNull;
 
@@ -20,6 +32,10 @@ import wbs.framework.logging.TaskLogger;
 import wbs.framework.object.ObjectManager;
 
 import wbs.platform.currency.model.CurrencyObjectHelper;
+import wbs.platform.media.fixture.MediaTestImagesFixtureProvider;
+import wbs.platform.media.logic.MediaLogic;
+import wbs.platform.media.model.MediaObjectHelper;
+import wbs.platform.media.model.MediaRec;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
@@ -51,6 +67,12 @@ import wbs.apn.chat.scheme.model.ChatSchemeRec;
 import wbs.apn.chat.user.core.model.ChatUserObjectHelper;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.core.model.ChatUserType;
+import wbs.apn.chat.user.core.model.Gender;
+import wbs.apn.chat.user.core.model.Orient;
+import wbs.apn.chat.user.image.model.ChatUserImageObjectHelper;
+import wbs.apn.chat.user.image.model.ChatUserImageRec;
+import wbs.apn.chat.user.image.model.ChatUserImageType;
+import wbs.apn.chat.user.info.model.ChatUserInfoStatus;
 
 @PrototypeComponent ("chatCoreFixtureProvider")
 public
@@ -75,6 +97,9 @@ class ChatCoreFixtureProvider
 	ChatUserObjectHelper chatUserHelper;
 
 	@SingletonDependency
+	ChatUserImageObjectHelper chatUserImageHelper;
+
+	@SingletonDependency
 	CommandObjectHelper commandHelper;
 
 	@SingletonDependency
@@ -85,6 +110,12 @@ class ChatCoreFixtureProvider
 
 	@ClassSingletonDependency
 	LogContext logContext;
+
+	@SingletonDependency
+	MediaObjectHelper mediaHelper;
+
+	@SingletonDependency
+	MediaLogic mediaLogic;
 
 	@SingletonDependency
 	MenuGroupObjectHelper menuGroupHelper;
@@ -134,6 +165,9 @@ class ChatCoreFixtureProvider
 
 	List <ChatUserRec> chatMonitors =
 		new ArrayList<> ();
+
+	Set <String> chatUserCodes =
+		new HashSet<> ();
 
 	// implementation
 
@@ -582,6 +616,25 @@ class ChatCoreFixtureProvider
 				parentTaskLogger,
 				"createChatUsers");
 
+		List <Optional <MediaRec>> imageMedias =
+			ImmutableList.<Optional <MediaRec>> builder ()
+
+			.addAll (
+				iterableMap (
+					mediaId ->
+						optionalOf (
+							mediaHelper.findRequired (
+								mediaId)),
+					MediaTestImagesFixtureProvider.testMediaIdsByName.values ()))
+
+			.addAll (
+				iterableMap (
+					mediaId ->
+						optionalAbsent (),
+					MediaTestImagesFixtureProvider.testMediaIdsByName.values ()))
+
+			.build ();
+
 		for (
 			int index = 0;
 			index < 260;
@@ -589,9 +642,7 @@ class ChatCoreFixtureProvider
 		) {
 
 			String code =
-				String.format (
-					"%06d",
-					index + 100000);
+				chatUserCode ();
 
 			String numberString =
 				String.format (
@@ -611,6 +662,15 @@ class ChatCoreFixtureProvider
 						networks))
 
 			);
+
+			Gender gender =
+				randomLogic.sample (
+					Gender.values ());
+
+			String name =
+				randomLogic.sample (
+					namesByGender.get (
+						gender));
 
 			ChatUserRec chatUser =
 				chatUserHelper.insert (
@@ -642,10 +702,32 @@ class ChatCoreFixtureProvider
 				.setOldNumber (
 					number)
 
+				.setGender (
+					gender)
+
+				.setOrient (
+					randomLogic.sample (
+						Orient.values ()))
+
+				.setName (
+					name)
+
+				.setInfoText (
+					textHelper.findOrCreateFormat (
+						taskLogger,
+						"Info for %s",
+						name))
+
 				.setCreditMode (
 					ChatUserCreditMode.billedMessages)
 
 			);
+
+			chatUserAddImage (
+				taskLogger,
+				transaction,
+				chatUser,
+				imageMedias);
 
 			chatUsers.add (
 				chatUser);
@@ -659,9 +741,16 @@ class ChatCoreFixtureProvider
 		) {
 
 			String code =
-				String.format (
-					"%06d",
-					index + 200000);
+				chatUserCode ();
+
+			Gender gender =
+				randomLogic.sample (
+					Gender.values ());
+
+			String name =
+				randomLogic.sample (
+					namesByGender.get (
+						gender));
 
 			ChatUserRec chatUser =
 				chatUserHelper.insert (
@@ -683,10 +772,32 @@ class ChatCoreFixtureProvider
 				.setType (
 					ChatUserType.monitor)
 
+				.setGender (
+					gender)
+
+				.setOrient (
+					randomLogic.sample (
+						Orient.values ()))
+
+				.setName (
+					name)
+
+				.setInfoText (
+					textHelper.findOrCreateFormat (
+						taskLogger,
+						"Info for %s",
+						name))
+
 				.setCreditMode (
 					ChatUserCreditMode.free)
 
 			);
+
+			chatUserAddImage (
+				taskLogger,
+				transaction,
+				chatUser,
+				imageMedias);
 
 			chatMonitors.add (
 				chatUser);
@@ -694,6 +805,93 @@ class ChatCoreFixtureProvider
 		}
 
 		transaction.flush ();
+
+	}
+
+	private
+	String chatUserCode () {
+
+		for (;;) {
+
+			String code =
+				randomLogic.generateNumericNoZero (6);
+
+			if (
+				contains (
+					chatUserCodes,
+					code)
+			) {
+				continue;
+			}
+
+			chatUserCodes.add (
+				code);
+
+			return code;
+
+		}
+
+	}
+
+	private
+	void chatUserAddImage (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction,
+			@NonNull ChatUserRec chatUser,
+			@NonNull List <Optional <MediaRec>> imageMedias) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatUserAddImage");
+
+		Optional <MediaRec> mediaOptional =
+			randomLogic.sample (
+				imageMedias);
+
+		if (
+			optionalIsNotPresent (
+				mediaOptional)
+		) {
+			return;
+		}
+
+		ChatUserImageRec chatUserImage =
+			chatUserImageHelper.insert (
+				taskLogger,
+				chatUserImageHelper.createInstance ()
+
+			.setChatUser (
+				chatUser)
+
+			.setType (
+				ChatUserImageType.image)
+
+			.setIndex (
+				0l)
+
+			.setStatus (
+				ChatUserInfoStatus.console)
+
+			.setTimestamp (
+				transaction.now ())
+
+			.setFullMedia (
+				mediaOptional.get ())
+
+			.setMedia (
+				mediaOptional.get ())
+
+		);
+
+		chatUser.setMainChatUserImage (
+			chatUserImage);
+
+		chatUser.getChatUserImages ().add (
+			chatUserImage);
+
+		chatUser.getChatUserImageList ().add (
+			chatUserImage);
 
 	}
 
@@ -904,5 +1102,45 @@ class ChatCoreFixtureProvider
 			choice * choice);
 
 	}
+
+	// constants
+
+	private final static
+	List <String> maleNames =
+		ImmutableList.of (
+			"Alfonso", "Arnoldo", "Arthur", "Bobbie", "Britt", "Cristobal",
+			"Cruz", "Damon", "Deshawn", "Dominick", "Donn", "Emil", "Erwin",
+			"Floyd", "Fredric", "Garfield", "Gayle", "Gerard", "Grover",
+			"Harland", "Harold", "Homer", "Hunter", "Ike", "Jarred",
+			"Kristofer", "Lane", "Leif", "Lindsay", "Lupe", "Luther", "Lynn",
+			"Milford", "Myles", "Normand", "Oliver", "Reinaldo", "Rex", "Ron",
+			"Roy", "Sandy", "Sanford", "Stan", "Stanton", "Thaddeus", "Timmy",
+			"Victor", "Ward", "Wilbur", "Zachariah");
+
+	private final static
+	List <String> femaleNames =
+		ImmutableList.of (
+			"Adah", "Alesia", "Alissa", "Aiko", "Aracely", "Blondell",
+			"Brianna", "Carmela", "Chelsey", "Concetta", "Consuelo", "Darla",
+			"Deena", "Dianna", "Evonne", "Exie", "Felipa", "Gloria", "Hallie",
+			"Herlinda", "Inocencia", "Keely", "Latoyia", "Lavonda", "Lecia",
+			"Lenita", "Lina", "Louann", "Maranda", "Marguerite", "Marian",
+			"May", "Maybell", "Melaine", "Nila", "Nola", "Olga", "Ona",
+			"Ressie", "Rheba", "Sally", "Sasha", "Sharonda", "Suzette", "Talia",
+			"Tamesha", "Telma", "Violeta", "Vonnie", "Yuko");
+
+	private final static
+	Map <Gender, List <String>> namesByGender =
+		ImmutableMap.<Gender, List <String>> builder ()
+
+		.put (
+			Gender.male,
+			maleNames)
+
+		.put (
+			Gender.female,
+			femaleNames)
+
+		.build ();
 
 }

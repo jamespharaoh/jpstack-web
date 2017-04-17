@@ -36,11 +36,11 @@ class ChatUserSearch
 
 	Boolean hasGender;
 	Gender gender;
-	Collection<Gender> genderIn;
+	Collection <Gender> genderIn;
 
 	Boolean hasOrient;
 	Orient orient;
-	Collection<Orient> orientIn;
+	Collection <Orient> orientIn;
 
 	Long chatAffiliateId;
 
@@ -61,9 +61,9 @@ class ChatUserSearch
 
 	ChatUserCreditMode creditMode;
 
-	Range<Long> creditFailed;
-	Range<Long> creditNoReports;
-	Range<Long> valueSinceEver;
+	Range <Long> creditFailed;
+	Range <Long> creditNoReports;
+	Range <Long> valueSinceEver;
 
 	TextualInterval firstJoin;
 	TextualInterval lastAction;
@@ -72,6 +72,14 @@ class ChatUserSearch
 	ChatUserDateMode datingMode;
 	Boolean hasDatingMode;
 
-	Collection<ChatMessageMethod> deliveryMethodIn;
+	Collection <ChatMessageMethod> deliveryMethodIn;
+
+	Order order =
+		Order.code;
+
+	public static
+	enum Order {
+		code;
+	}
 
 }

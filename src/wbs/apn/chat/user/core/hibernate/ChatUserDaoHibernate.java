@@ -1,6 +1,7 @@
 package wbs.apn.chat.user.core.hibernate;
 
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.Misc.shouldNeverHappen;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -1070,6 +1071,10 @@ class ChatUserDaoHibernate
 				"_chat")
 
 			.createAlias (
+				"_chat.slice",
+				"_slice")
+
+			.createAlias (
 				"_chatUser.number",
 				"_number",
 				JoinType.LEFT_OUTER_JOIN);
@@ -1609,6 +1614,23 @@ class ChatUserDaoHibernate
 				Restrictions.in (
 					"_chatUser.deliveryMethod",
 					search.deliveryMethodIn ()));
+
+		}
+
+		switch (search.order ()) {
+
+		case code:
+
+			criteria
+				.addOrder (Order.asc ("_slice.code"))
+				.addOrder (Order.asc ("_chat.code"))
+				.addOrder (Order.asc ("_chatUser.code"));
+
+			break;
+
+		default:
+
+			shouldNeverHappen ();
 
 		}
 

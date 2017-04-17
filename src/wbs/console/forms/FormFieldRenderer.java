@@ -1,6 +1,8 @@
 package wbs.console.forms;
 
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.web.utils.HtmlAttributeUtils.htmlClassAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlColumnSpanAttribute;
 import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
@@ -76,7 +78,11 @@ interface FormFieldRenderer <Container, Interface> {
 				"text-align",
 				listAlign ().name ()),
 			htmlColumnSpanAttribute (
-				colspan));
+				colspan),
+			htmlClassAttribute (
+				presentInstances (
+					htmlClass (
+						interfaceValue))));
 
 		renderHtmlSimple (
 			parentTaskLogger,

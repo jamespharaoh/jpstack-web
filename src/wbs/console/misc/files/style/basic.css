@@ -365,3 +365,35 @@ h1 {
 .magic-table-row {
 	cursor: pointer;
 }
+
+/* ---------- chat */
+
+table.list tr td.enum--gender--male {
+	background-color: #ccccff;
+}
+
+table.list tr td.enum--gender--female {
+	background-color: #ffcccc;
+}
+
+table.list tr td.enum--orient--gay {
+	background-color: #ffccff;
+}
+
+table.list tr td.enum--orient--straight {
+	background-color: #ccffff;
+}
+
+table.list tr td.enum--orient--bi {
+	background-color: #ffffcc;
+}
+
+table.list tr td.enum--chat-user-type--user {
+	background-color: #cccccc;
+}
+
+table.list tr td.enum--chat-user-type--monitor {
+	background-color: #999999;
+}
+
+/* ex: noet ts=4 filetype=css */

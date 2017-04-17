@@ -2,6 +2,10 @@
 	name="chat-user-core"
 	package="wbs.apn.chat.user.core">
 
+	<plugin-dependencies>
+		<plugin-dependency name="media"/>
+	</plugin-dependencies>
+
 	<sql-scripts>
 		<sql-schema name="chat-user"/>
 		<sql-schema name="chat-user-session"/>

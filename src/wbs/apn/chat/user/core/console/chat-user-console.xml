@@ -204,7 +204,10 @@
 		<text-field
 			name="name"/>
 
-		<!-- TODO picture -->
+		<image-field
+			name="pic"
+			field="mainChatUserImage.media"
+			show-filename="no"/>
 
 		<text-field
 			name="infoText"

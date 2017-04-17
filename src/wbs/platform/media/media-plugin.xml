@@ -37,6 +37,7 @@
 
 	<fixtures>
 		<fixture name="media"/>
+		<fixture name="mediaTestImages"/>
 	</fixtures>
 
 	<console-modules>
