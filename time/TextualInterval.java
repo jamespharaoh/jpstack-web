@@ -310,7 +310,7 @@ class TextualInterval
 									hourOffset),
 								0),
 							timezone)),
-					nextMonth.toString (
+					thisMonth.toString (
 						monthFormat)));
 
 		case "last month":
