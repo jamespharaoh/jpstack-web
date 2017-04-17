@@ -76,17 +76,17 @@ class TicketPendingHistoryPart
 		// get field sets
 
 		ticketFields =
-			ticketPendingConsoleModule.formFieldSet (
+			ticketPendingConsoleModule.formFieldSetRequired (
 				"ticketFields",
 				TicketRec.class);
 
 		ticketNoteFields =
-			ticketPendingConsoleModule.formFieldSet (
+			ticketPendingConsoleModule.formFieldSetRequired (
 				"ticketNoteFields",
 				TicketNoteRec.class);
 
 		ticketStateFields =
-			ticketPendingConsoleModule.formFieldSet (
+			ticketPendingConsoleModule.formFieldSetRequired (
 				"ticketStateFields",
 				TicketStateRec.class);
 
