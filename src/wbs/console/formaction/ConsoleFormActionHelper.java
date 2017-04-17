@@ -1,5 +1,6 @@
 package wbs.console.formaction;
 
+import static wbs.utils.collection.CollectionUtils.emptyList;
 import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
@@ -8,13 +9,14 @@ import static wbs.utils.etc.TypeUtils.isSubclassOf;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.base.Optional;
 
+import lombok.Data;
 import lombok.NonNull;
-
-import org.apache.commons.lang3.tuple.Pair;
+import lombok.experimental.Accessors;
 
 import wbs.framework.database.Transaction;
 import wbs.framework.logging.TaskLogger;
@@ -24,15 +26,15 @@ import wbs.utils.string.FormatWriter;
 import wbs.web.responder.Responder;
 
 public
-interface ConsoleFormActionHelper <FormState> {
+interface ConsoleFormActionHelper <FormState, History> {
 
 	default
-	Pair <Boolean, Boolean> canBePerformed (
+	Permissions canBePerformed (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		return Pair.of (
-			true,
-			true);
+		return new Permissions ()
+			.canView (true)
+			.canPerform (true);
 
 	}
 
@@ -90,6 +92,13 @@ interface ConsoleFormActionHelper <FormState> {
 	}
 
 	default
+	Map <String, Object> formHints () {
+
+		return emptyMap ();
+
+	}
+
+	default
 	void updatePassiveFormState (
 			@NonNull FormState formState) {
 
@@ -101,5 +110,22 @@ interface ConsoleFormActionHelper <FormState> {
 			TaskLogger parentTaskLogger,
 			Transaction transaction,
 			FormState formState);
+
+	default
+	List <History> history () {
+
+		return emptyList ();
+
+	}
+
+	@Accessors (fluent = true)
+	@Data
+	public static
+	class Permissions {
+
+		Boolean canView;
+		Boolean canPerform;
+
+	}
 
 }

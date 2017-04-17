@@ -3,12 +3,14 @@ package wbs.console.formaction;
 import javax.inject.Provider;
 
 import wbs.console.module.ConsoleManager;
+
 import wbs.framework.component.annotations.SingletonDependency;
+
 import wbs.web.responder.Responder;
 
 public abstract
-class AbstractConsoleFormActionHelper <FormState>
-	implements ConsoleFormActionHelper <FormState> {
+class AbstractConsoleFormActionHelper <FormState, History>
+	implements ConsoleFormActionHelper <FormState, History> {
 
 	// singleton dependencies
 

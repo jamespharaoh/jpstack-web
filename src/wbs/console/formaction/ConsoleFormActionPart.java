@@ -1,10 +1,14 @@
 package wbs.console.formaction;
 
-import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.OptionalUtils.optionalAbsent;
+import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.web.utils.HtmlBlockUtils.htmlHeadingTwoWrite;
 import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
+
+import java.util.List;
+import java.util.Map;
+
+import com.google.common.base.Optional;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -12,6 +16,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.console.forms.FormFieldLogic;
+import wbs.console.forms.FormFieldLogic.UpdateResultSet;
 import wbs.console.forms.FormFieldSet;
 import wbs.console.forms.FormType;
 import wbs.console.part.AbstractPagePart;
@@ -25,7 +30,7 @@ import wbs.framework.logging.TaskLogger;
 @Accessors (fluent = true)
 @PrototypeComponent ("consoleFormActionPart")
 public
-class ConsoleFormActionPart <FormState>
+class ConsoleFormActionPart <FormState, History>
 	extends AbstractPagePart {
 
 	// singleton dependencies
@@ -42,7 +47,7 @@ class ConsoleFormActionPart <FormState>
 	FormFieldSet <FormState> formFields;
 
 	@Getter @Setter
-	ConsoleFormActionHelper <FormState> formActionHelper;
+	ConsoleFormActionHelper <FormState, History> formActionHelper;
 
 	@Getter @Setter
 	String name;
@@ -59,9 +64,21 @@ class ConsoleFormActionPart <FormState>
 	@Getter @Setter
 	String localFile;
 
+	@Getter @Setter
+	String historyHeading;
+
+	@Getter @Setter
+	FormFieldSet <History> historyFields;
+
 	// state
 
 	FormState formState;
+
+	Map <String, Object> formHints;
+
+	Optional <UpdateResultSet> updateResultSet;
+
+	List <History> history;
 
 	// implementation
 
@@ -75,6 +92,17 @@ class ConsoleFormActionPart <FormState>
 
 		formActionHelper.updatePassiveFormState (
 			formState);
+
+		formHints =
+			formActionHelper.formHints ();
+
+		updateResultSet =
+			genericCastUnchecked (
+				requestContext.request (
+					"console-form-action-update-result-set"));
+
+		history =
+			formActionHelper.history ();
 
 	}
 
@@ -90,15 +118,8 @@ class ConsoleFormActionPart <FormState>
 
 		// write heading
 
-		if (
-			isNotNull (
-				heading)
-		) {
-
-			htmlHeadingTwoWrite (
-				heading);
-
-		}
+		htmlHeadingTwoWrite (
+			heading);
 
 		// write help
 
@@ -132,15 +153,35 @@ class ConsoleFormActionPart <FormState>
 				requestContext,
 				formatWriter,
 				formFields,
-				optionalAbsent (),
+				updateResultSet,
 				formState,
-				emptyMap (),
+				formHints,
 				"post",
 				requestContext.resolveLocalUrl (
 					localFile),
 				submitLabel,
 				FormType.perform,
 				name);
+
+		}
+
+		// write history
+
+		if (
+			isNotNull (
+				historyFields)
+		) {
+
+			htmlHeadingTwoWrite (
+				historyHeading);
+
+			formFieldLogic.outputListTable (
+				taskLogger,
+				formatWriter,
+				historyFields,
+				history,
+				formHints,
+				true);
 
 		}
 

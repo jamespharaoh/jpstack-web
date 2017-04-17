@@ -1,9 +1,11 @@
 package wbs.console.formaction;
 
-import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
+import static wbs.utils.collection.MapUtils.mapItemForKeyOrElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
+import static wbs.utils.string.StringUtils.hyphenToSpaces;
+import static wbs.utils.string.StringUtils.joinWithSpace;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import javax.inject.Provider;
@@ -95,8 +97,10 @@ class ContextTabFormActionPageBuilder
 	String title;
 	String pagePartName;
 
-	FormFieldSet formFields;
 	Provider <ConsoleFormActionHelper> formActionHelperProvider;
+
+	FormFieldSet formFields;
+	FormFieldSet historyFields;
 
 	PagePartFactory pagePartFactory;
 	Provider <Action> actionProvider;
@@ -147,11 +151,24 @@ class ContextTabFormActionPageBuilder
 	void initFormFields () {
 
 		formFields =
-			ifNotNullThenElse (
-				spec.fieldsName (),
-				() -> consoleModule.formFieldSets ().get (
-					spec.fieldsName ()),
+			mapItemForKeyOrElse (
+				consoleModule.formFieldSets (),
+				ifNull (
+					spec.fieldsName (),
+					stringFormat (
+						"%s-form",
+						spec.name ())),
 				() -> new FormFieldSet ());
+
+		historyFields =
+			mapItemForKeyOrElse (
+				consoleModule.formFieldSets (),
+				ifNull (
+					spec.historyFieldsName (),
+					stringFormat (
+						"%s-history",
+						spec.name ())),
+				() -> (FormFieldSet) null);
 
 	}
 
@@ -194,6 +211,13 @@ class ContextTabFormActionPageBuilder
 			.name (
 				"action")
 
+			.heading (
+				capitalise (
+					joinWithSpace (
+						hyphenToSpaces (
+							consoleModule.name ()),
+						spec.name ())))
+
 			.formActionHelper (
 				formActionHelperProvider.get ())
 
@@ -207,7 +231,13 @@ class ContextTabFormActionPageBuilder
 				spec.submitLabel ())
 
 			.localFile (
-				"/" + localFile);
+				"/" + localFile)
+
+			.historyHeading (
+				spec.historyHeading ())
+
+			.historyFields (
+				historyFields);
 
 	}
 

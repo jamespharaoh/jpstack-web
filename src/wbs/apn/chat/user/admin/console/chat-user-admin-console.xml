@@ -26,8 +26,11 @@
 			<context-tab-action-page
 				name="barring"/>
 
-			<context-tab-action-page
-				name="credit"/>
+			<context-tab-form-action-page
+				name="credit"
+				help-text="Adjust credit for this chat user"
+				submit-label="adjust credit"
+				history-heading="Credit history"/>
 
 			<context-tab-action-page
 				name="creditMode"/>
@@ -43,7 +46,6 @@
 
 			<context-tab-form-action-page
 				name="location"
-				fields="location-form"
 				help-text="Set a new location for this chat user"
 				submit-label="set location"/>
 
@@ -114,6 +116,58 @@
 			name="category"
 			object-type="chatCategory"
 			nullable="yes"/>
+
+	</field-set>
+
+	<field-set
+		name="credit-form"
+		class="wbs.apn.chat.user.admin.console.ChatUserAdminCreditForm">
+
+		<currency-field
+			name="currentCredit"
+			currency="chat.currency"
+			read-only="yes"/>
+
+		<currency-field
+			name="creditAmount"
+			currency="chat.currency"/>
+
+		<currency-field
+			name="billAmount"
+			currency="chat.currency"/>
+
+		<text-field
+			name="details"
+			minimum-length="1"/>
+
+	</field-set>
+
+	<field-set
+		name="credit-history"
+		object-name="chatUserCredit">
+
+		<id-field
+			label="Ref"/>
+
+		<timestamp-field
+			name="timestamp"/>
+
+		<currency-field
+			name="creditAmount"
+			label="Credit"
+			currency="chat.currency"/>
+
+		<currency-field
+			name="billAmount"
+			label="Bill"
+			currency="chat.currency"/>
+
+		<text-field
+			name="details"/>
+
+		<object-field
+			name="user"
+			object-type="user"/>
 
 	</field-set>
 

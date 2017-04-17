@@ -1,11 +1,14 @@
 package wbs.apn.chat.user.image.api;
 
-import java.io.IOException;
-
 import com.google.common.collect.ImmutableMap;
 
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
@@ -31,6 +34,9 @@ class ChatUserImageUploadErrorPage
 	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RequestContext requestContext;
 
@@ -46,7 +52,8 @@ class ChatUserImageUploadErrorPage
 
 	@Override
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		imageUploadToken =
 			chatUserImageUploadTokenHelper.findByToken (
@@ -74,8 +81,8 @@ class ChatUserImageUploadErrorPage
 
 	@Override
 	protected
-	void goHeaders ()
-		throws IOException {
+	void goHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		requestContext.addHeader (
 			"Content-Type",
@@ -85,55 +92,64 @@ class ChatUserImageUploadErrorPage
 
 	@Override
 	protected
-	void goContent ()
-		throws IOException {
+	void goContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		printFormat (
-			"<!DOCTYPE html>\n");
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goContent");
 
-		printFormat (
-			"<html>\n");
+		formatWriter.writeLineFormat (
+			"<!DOCTYPE html>");
 
-		goHead ();
+		formatWriter.writeLineFormatIncreaseIndent (
+			"<html>");
 
-		goBody ();
+		goHead (
+			taskLogger);
 
-		printFormat (
-			"</html>\n");
+		goBody (
+			taskLogger);
 
-	}
-
-	protected
-	void goHead () {
-
-		printFormat (
-			"<head>\n");
-
-		printFormat (
-			"<title>%h</title>\n",
-			titleText);
-
-		printFormat (
-			"</head>\n");
+		formatWriter.writeLineFormatDecreaseIndent (
+			"</html>");
 
 	}
 
 	protected
-	void goBody () {
+	void goHead (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		printFormat (
-			"<body>\n");
+		formatWriter.writeLineFormatIncreaseIndent (
+			"<head>");
 
-		printFormat (
-			"<h1>%h</h1>\n",
+		formatWriter.writeLineFormat (
+			"<title>%h</title>",
 			titleText);
 
-		printFormat (
+		formatWriter.writeLineFormatDecreaseIndent (
+			"</head>");
+
+	}
+
+	protected
+	void goBody (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"<body>");
+
+		formatWriter.writeLineFormat (
+			"<h1>%h</h1>",
+			titleText);
+
+		formatWriter.writeFormat (
 			"%s\n",
 			bodyHtml);
 
-		printFormat (
-			"</body>\n");
+		formatWriter.writeLineFormatDecreaseIndent (
+			"</body>");
 
 	}
 

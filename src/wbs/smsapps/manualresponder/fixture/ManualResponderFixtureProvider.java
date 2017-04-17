@@ -5,7 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -40,9 +40,6 @@ class ManualResponderFixtureProvider
 
 	@SingletonDependency
 	CurrencyObjectHelper currencyHelper;
-
-	@SingletonDependency
-	Database database;
 
 	@SingletonDependency
 	KeywordObjectHelper keywordHelper;
@@ -85,7 +82,8 @@ class ManualResponderFixtureProvider
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -93,16 +91,19 @@ class ManualResponderFixtureProvider
 				"createFixtures");
 
 		createMenuItem (
-			taskLogger);
+			taskLogger,
+			transaction);
 
 		createManualResponder (
-			taskLogger);
+			taskLogger,
+			transaction);
 
 	}
 
 	private
 	void createMenuItem (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -139,11 +140,14 @@ class ManualResponderFixtureProvider
 
 		);
 
+		transaction.flush ();
+
 	}
 
 	private
 	void createManualResponder (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -192,7 +196,7 @@ class ManualResponderFixtureProvider
 
 		);
 
-		database.flush ();
+		transaction.flush ();
 
 		keywordHelper.insert (
 			taskLogger,
@@ -220,6 +224,8 @@ class ManualResponderFixtureProvider
 		createManualResponderTemplates (
 			taskLogger,
 			manualResponder);
+
+		transaction.flush ();
 
 	}
 

@@ -42,12 +42,12 @@ class ConsoleFormActionsPart
 	// prototype dependencies
 
 	@PrototypeDependency
-	Provider <ConsoleFormActionPart <?>> consoleFormActionPartProvider;
+	Provider <ConsoleFormActionPart <?, ?>> consoleFormActionPartProvider;
 
 	// properties
 
 	@Getter @Setter
-	List <ConsoleFormAction <?>> formActions;
+	List <ConsoleFormAction <?, ?>> formActions;
 
 	@Getter @Setter
 	String localFile;
@@ -85,7 +85,7 @@ class ConsoleFormActionsPart
 
 			.filter (
 				showSubmitFormAction ->
-					showSubmitFormAction.getLeft ().getLeft ())
+					showSubmitFormAction.getLeft ().canView ())
 
 			.map (
 				showSubmitFormAction ->
@@ -110,7 +110,7 @@ class ConsoleFormActionsPart
 
 				.submitLabel (
 					ifThenElse (
-						showSubmitFormAction.getLeft ().getRight (),
+						showSubmitFormAction.getLeft ().canPerform (),
 						() -> showSubmitFormAction.getRight ().submitLabel (),
 						() -> null))
 

@@ -4,6 +4,7 @@ import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElse;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalOrElse;
+import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
 import static wbs.utils.string.StringUtils.camelToSpaces;
 import static wbs.utils.string.StringUtils.capitalise;
@@ -177,7 +178,7 @@ class ContextTabFormActionsPageBuilder
 							actionSpec.name (),
 							actionSpec.helperName ()))));
 
-		ConsoleFormActionHelper <?> actionHelper =
+		ConsoleFormActionHelper <?, ?> actionHelper =
 			genericCastUnchecked (
 				componentManager.getComponentRequired (
 					parentTaskLogger,
@@ -193,6 +194,14 @@ class ContextTabFormActionsPageBuilder
 				genericCastUnchecked (
 					actionHelper))
 
+			.heading (
+				capitalise (
+					hyphenToSpaces (
+						actionSpec.name ())))
+
+			.helpText (
+				actionSpec.helpText ())
+
 			.formFields (
 				ifNotNullThenElse (
 					actionSpec.fieldsName (),
@@ -205,20 +214,28 @@ class ContextTabFormActionsPageBuilder
 								actionSpec.name ())),
 						() -> new FormFieldSet ())))
 
-			.heading (
-				capitalise (
-					hyphenToSpaces (
-						actionSpec.name ())))
-
-			.helpText (
-				actionSpec.helpText ())
-
 			.submitLabel (
 				ifNull (
 					actionSpec.submitLabel (),
 					hyphenToSpaces (
-						actionSpec.name ())));
+						actionSpec.name ())))
 
+			.historyHeading (
+				actionSpec.historyHeading ())
+
+			.historyFields (
+				ifNotNullThenElse (
+					actionSpec.historyHeading (),
+					() -> optionalOrNull (
+						consoleModule.formFieldSet (
+							ifNull (
+								actionSpec.historyFieldsName (),
+								stringFormat (
+									"%s-history",
+									actionSpec.name ())))),
+					() -> (FormFieldSet <?>) null))
+
+		;
 
 	}
 

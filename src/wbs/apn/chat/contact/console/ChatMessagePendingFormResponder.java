@@ -28,7 +28,7 @@ import java.util.List;
 import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
-import wbs.console.responder.HtmlResponder;
+import wbs.console.responder.ConsoleHtmlResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -43,7 +43,7 @@ import wbs.apn.chat.help.model.ChatHelpTemplateRec;
 @PrototypeComponent ("chatMessagePendingFormResponder")
 public
 class ChatMessagePendingFormResponder
-	extends HtmlResponder {
+	extends ConsoleHtmlResponder {
 
 	// singleton dependencies
 

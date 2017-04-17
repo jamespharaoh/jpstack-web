@@ -25,7 +25,7 @@ import wbs.console.html.MagicTableScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.request.ConsoleRequestContext;
-import wbs.console.responder.HtmlResponder;
+import wbs.console.responder.ConsoleHtmlResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -48,7 +48,7 @@ import wbs.web.utils.ABSwap;
 @PrototypeComponent ("coreSidebarMenuResponder")
 public
 class CoreSidebarMenuResponder
-	extends HtmlResponder {
+	extends ConsoleHtmlResponder {
 
 	// singleton dependencies
 

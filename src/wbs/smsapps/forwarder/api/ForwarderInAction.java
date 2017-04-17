@@ -6,7 +6,6 @@ import java.util.Map;
 import javax.inject.Provider;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.api.mvc.ApiAction;
 
@@ -29,7 +28,6 @@ import wbs.smsapps.forwarder.model.ForwarderRec;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.Responder;
 
-@Log4j
 @PrototypeComponent ("forwarderInAction")
 public
 class ForwarderInAction
@@ -77,27 +75,20 @@ class ForwarderInAction
 		) {
 
 			String slice =
-				requestContext.parameterOrNull ("slice");
+				requestContext.parameterRequired (
+					"slice");
 
 			String code =
-				requestContext.parameterOrNull ("code");
+				requestContext.parameterRequired (
+					"code");
 
 			String password =
-				requestContext.parameterOrNull ("password");
+				requestContext.parameterRequired (
+					"password");
 
 			String action =
-				requestContext.parameterOrNull ("action");
-
-			if (
-				code == null
-				|| password == null
-				|| action == null
-			) {
-
-				throw new ReportableException (
-					"Invalid parameters supplied");
-
-			}
+				requestContext.parameterRequired (
+					"action");
 
 			ForwarderRec forwarder;
 
@@ -151,19 +142,32 @@ class ForwarderInAction
 
 		} catch (ReportableException exception) {
 
-			log.error ("Error doing 'in': " + exception.getMessage ());
+			taskLogger.errorFormatException (
+				exception,
+				"Error doing 'in'");
 
-			for (Map.Entry<String,List<String>> entry
-					: requestContext.parameterMap ().entrySet ()) {
+			for (
+				Map.Entry <String, List <String>> entry
+					: requestContext.parameterMap ().entrySet ()
+			) {
 
 				String name =
 					entry.getKey ();
 
-				List<String> values =
+				List <String> values =
 					entry.getValue ();
 
-				for (String value : values)
-					log.error ("Param " + name + ": " + value);
+				for (
+					String value
+						: values
+				) {
+
+					taskLogger.errorFormat (
+						"Param %s: %s",
+						 name,
+						 value);
+
+				}
 
 			}
 

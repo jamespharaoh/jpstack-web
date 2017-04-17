@@ -31,7 +31,10 @@ import wbs.web.responder.Responder;
 @SingletonComponent ("chatUserAdminLocationFormActionHelper")
 public
 class ChatUserAdminLocationFormActionHelper
-	extends AbstractConsoleFormActionHelper <ChatUserAdminLocationForm> {
+	extends AbstractConsoleFormActionHelper <
+		ChatUserAdminLocationForm,
+		Object
+	> {
 
 	// singleton dependencies
 

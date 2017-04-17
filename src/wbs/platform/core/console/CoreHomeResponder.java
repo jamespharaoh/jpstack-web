@@ -5,14 +5,14 @@ import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
 
 import lombok.NonNull;
 
-import wbs.console.responder.HtmlResponder;
+import wbs.console.responder.ConsoleHtmlResponder;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.logging.TaskLogger;
 
 @PrototypeComponent ("coreHomeResponder")
 public
 class CoreHomeResponder
-	extends HtmlResponder {
+	extends ConsoleHtmlResponder {
 
 	@Override
 	protected

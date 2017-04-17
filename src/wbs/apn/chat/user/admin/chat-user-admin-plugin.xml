@@ -7,10 +7,9 @@
 		<component class="console.ChatUserAdminBarringPart"/>
 		<component class="console.ChatUserAdminBillAction"/>
 		<component class="console.ChatUserAdminBillPart"/>
-		<component class="console.ChatUserAdminCreditAction"/>
+		<component class="console.ChatUserAdminCreditFormActionHelper"/>
 		<component class="console.ChatUserAdminCreditModeAction"/>
 		<component class="console.ChatUserAdminCreditModePart"/>
-		<component class="console.ChatUserAdminCreditPart"/>
 		<component class="console.ChatUserAdminDateAction"/>
 		<component class="console.ChatUserAdminDatePart"/>
 		<component class="console.ChatUserAdminDeleteAction"/>

@@ -617,10 +617,6 @@
 			package="wbs.integrations.common"/>
 
 		<plugin
-			name="broadcast-systems"
-			package="wbs.integrations.broadcastsystems"/>
-
-		<plugin
 			name="clockwork-sms"
 			package="wbs.integrations.clockworksms"/>
 
@@ -651,10 +647,6 @@
 		<plugin
 			name="paypal"
 			package="wbs.integrations.paypal"/>
-
-		<plugin
-			name="sms-arena"
-			package="wbs.integrations.smsarena"/>
 
 		<plugin
 			name="txt-nation"

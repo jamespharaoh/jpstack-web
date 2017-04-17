@@ -1,5 +1,6 @@
 package wbs.apn.chat.broadcast.console;
 
+import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.etc.LogicUtils.ifNotNullThenElseEmDash;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
@@ -402,6 +403,7 @@ class ChatBroadcastVerifyPart
 			formatWriter,
 			verifyUserFields,
 			chatUsers,
+			emptyMap (),
 			false);
 
 	}

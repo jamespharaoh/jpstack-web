@@ -40,7 +40,7 @@ import lombok.NonNull;
 import wbs.console.context.ConsoleContextScriptRef;
 import wbs.console.html.ScriptRef;
 import wbs.console.priv.UserPrivChecker;
-import wbs.console.responder.HtmlResponder;
+import wbs.console.responder.ConsoleHtmlResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -57,7 +57,7 @@ import wbs.services.ticket.core.model.TicketTemplateRec;
 @PrototypeComponent ("ticketPendingFormResponder")
 public
 class TicketPendingFormResponder
-	extends HtmlResponder {
+	extends ConsoleHtmlResponder {
 
 	// singleton dependencies
 

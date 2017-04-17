@@ -5,6 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -64,7 +65,8 @@ class BroadcastFixtureProvider
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -72,16 +74,19 @@ class BroadcastFixtureProvider
 				"createFixtures");
 
 		createMenuItems (
-			taskLogger);
+			taskLogger,
+			transaction);
 
 		createBroadcastConfigs (
-			taskLogger);
+			taskLogger,
+			transaction);
 
 	}
 
 	private
 	void createMenuItems (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -118,11 +123,14 @@ class BroadcastFixtureProvider
 
 		);
 
+		transaction.flush ();
+
 	}
 
 	private
 	void createBroadcastConfigs (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -169,6 +177,8 @@ class BroadcastFixtureProvider
 					"uk"))
 
 		);
+
+		transaction.flush ();
 
 	}
 

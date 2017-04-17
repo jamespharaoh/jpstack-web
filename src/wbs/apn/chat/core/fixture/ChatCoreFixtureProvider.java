@@ -12,7 +12,6 @@ import org.joda.time.Instant;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
 import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
@@ -24,14 +23,12 @@ import wbs.platform.currency.model.CurrencyObjectHelper;
 import wbs.platform.menu.model.MenuGroupObjectHelper;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
-import wbs.platform.scaffold.model.SliceRec;
 import wbs.platform.text.model.TextObjectHelper;
 import wbs.platform.text.model.TextRec;
 import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
 import wbs.sms.command.model.CommandObjectHelper;
-import wbs.sms.command.model.CommandRec;
 import wbs.sms.gazetteer.model.GazetteerObjectHelper;
 import wbs.sms.network.model.NetworkObjectHelper;
 import wbs.sms.network.model.NetworkRec;
@@ -48,7 +45,6 @@ import wbs.apn.chat.contact.model.ChatMessageMethod;
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
 import wbs.apn.chat.contact.model.ChatMessageStatus;
 import wbs.apn.chat.core.model.ChatObjectHelper;
-import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.apn.chat.scheme.model.ChatSchemeObjectHelper;
 import wbs.apn.chat.scheme.model.ChatSchemeRec;
@@ -83,9 +79,6 @@ class ChatCoreFixtureProvider
 
 	@SingletonDependency
 	CurrencyObjectHelper currencyHelper;
-
-	@SingletonDependency
-	Database database;
 
 	@SingletonDependency
 	GazetteerObjectHelper gazetteerHelper;
@@ -129,32 +122,72 @@ class ChatCoreFixtureProvider
 	@SingletonDependency
 	UserObjectHelper userHelper;
 
+	// state
+
+	List <NetworkRec> networks;
+	List <UserRec> users;
+
+	List <ChatSchemeRec> chatSchemes;
+
+	List <ChatUserRec> chatUsers =
+		new ArrayList<> ();
+
+	List <ChatUserRec> chatMonitors =
+		new ArrayList<> ();
+
 	// implementation
 
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
 				"createFixtures");
 
+		networks =
+			networkHelper.findAll ();
+
+		users =
+			userHelper.findAll ();
+
 		createMenuItems (
-			taskLogger);
+			taskLogger,
+			transaction);
 
 		createRoutes (
-			taskLogger);
+			taskLogger,
+			transaction);
 
 		createChatServices (
-			taskLogger);
+			taskLogger,
+			transaction);
+
+		createChatTemplates (
+			taskLogger,
+			transaction);
+
+		createChatSchemes (
+			taskLogger,
+			transaction);
+
+		createChatUsers (
+			taskLogger,
+			transaction);
+
+		createChatMessages (
+			taskLogger,
+			transaction);
 
 	}
 
 	private
 	void createMenuItems (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -195,14 +228,13 @@ class ChatCoreFixtureProvider
 
 	private
 	void createRoutes (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
 				"createRoutes");
-
-		// routes
 
 		routeHelper.insert (
 			taskLogger,
@@ -275,44 +307,14 @@ class ChatCoreFixtureProvider
 
 		);
 
-		database.flush ();
-
-	}
-
-	private
-	void createChatServices (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createChatServices");
-
-		Transaction transaction =
-			database.currentTransaction ();
-
-		List<NetworkRec> allNetworks =
-			networkHelper.findAll ();
-
-		List<UserRec> allUsers =
-			userHelper.findAll ();
-
-		SliceRec testSlice =
-			sliceHelper.findByCodeRequired (
-				GlobalId.root,
-				"test");
-
-		CommandRec magicCommand =
-			commandHelper.findByCodeRequired (
-				GlobalId.root,
-				"magic_number");
-
 		routeHelper.insert (
 			taskLogger,
 			routeHelper.createInstance ()
 
 			.setSlice (
-				testSlice)
+				sliceHelper.findByCodeRequired (
+					GlobalId.root,
+					"test"))
 
 			.setCode (
 				"chat_magic")
@@ -327,16 +329,29 @@ class ChatCoreFixtureProvider
 				true)
 
 			.setCommand (
-				magicCommand)
+				commandHelper.findByCodeRequired (
+					GlobalId.root,
+					"magic_number"))
 
 		);
 
-		// chat
+		transaction.flush ();
 
-		ChatRec chat =
-			chatHelper.insert (
-				taskLogger,
-				chatHelper.createInstance ()
+	}
+
+	private
+	void createChatServices (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createChatServices");
+
+		chatHelper.insert (
+			taskLogger,
+			chatHelper.createInstance ()
 
 			.setSlice (
 				sliceHelper.findByCodeRequired (
@@ -372,14 +387,29 @@ class ChatCoreFixtureProvider
 
 		);
 
-		// templates
+		transaction.flush ();
+
+	}
+
+	private
+	void createChatTemplates (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createChatTemplates");
 
 		chatHelpTemplateHelper.insert (
 			taskLogger,
 			chatHelpTemplateHelper.createInstance ()
 
 			.setChat (
-				chat)
+				chatHelper.findByCodeRequired (
+					GlobalId.root,
+					"test",
+					"test"))
 
 			.setType (
 				"system")
@@ -400,7 +430,10 @@ class ChatCoreFixtureProvider
 			chatHelpTemplateHelper.createInstance ()
 
 			.setChat (
-				chat)
+				chatHelper.findByCodeRequired (
+					GlobalId.root,
+					"test",
+					"test"))
 
 			.setType (
 				"system")
@@ -416,15 +449,29 @@ class ChatCoreFixtureProvider
 
 		);
 
-		// chat schemes
+		transaction.flush ();
 
-		ChatSchemeRec leftChatScheme =
-			chatSchemeHelper.insert (
-				taskLogger,
-				chatSchemeHelper.createInstance ()
+	}
+
+	private
+	void createChatSchemes (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createChatSchemes");
+
+		chatSchemeHelper.insert (
+			taskLogger,
+			chatSchemeHelper.createInstance ()
 
 			.setChat (
-				chat)
+				chatHelper.findByCodeRequired (
+					GlobalId.root,
+					"test",
+					"test"))
 
 			.setCode (
 				"left")
@@ -472,7 +519,10 @@ class ChatCoreFixtureProvider
 			chatSchemeHelper.createInstance ()
 
 			.setChat (
-				chat)
+				chatHelper.findByCodeRequired (
+					GlobalId.root,
+					"test",
+					"test"))
 
 			.setCode (
 				"right")
@@ -515,10 +565,22 @@ class ChatCoreFixtureProvider
 
 		);
 
-		// chat users, regular
+		transaction.flush ();
 
-		List <ChatUserRec> chatUsers =
-			new ArrayList<> ();
+		chatSchemes =
+			chatSchemeHelper.findAll ();
+
+	}
+
+	private
+	void createChatUsers (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createChatUsers");
 
 		for (
 			int index = 0;
@@ -546,7 +608,7 @@ class ChatCoreFixtureProvider
 
 				.setNetwork (
 					randomLogic.sample (
-						allNetworks))
+						networks))
 
 			);
 
@@ -556,7 +618,10 @@ class ChatCoreFixtureProvider
 					chatUserHelper.createInstance ()
 
 				.setChat (
-					chat)
+					chatHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"test"))
 
 				.setCode (
 					code)
@@ -565,12 +630,16 @@ class ChatCoreFixtureProvider
 					transaction.now ())
 
 				.setChatScheme (
-					leftChatScheme)
+					randomLogic.sample (
+						chatSchemes))
 
 				.setType (
 					ChatUserType.user)
 
 				.setNumber (
+					number)
+
+				.setOldNumber (
 					number)
 
 				.setCreditMode (
@@ -582,11 +651,6 @@ class ChatCoreFixtureProvider
 				chatUser);
 
 		}
-
-		// chat users, monitors
-
-		List <ChatUserRec> chatMonitors =
-			new ArrayList<> ();
 
 		for (
 			int index = 0;
@@ -605,7 +669,10 @@ class ChatCoreFixtureProvider
 					chatUserHelper.createInstance ()
 
 				.setChat (
-					chat)
+					chatHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"test"))
 
 				.setCode (
 					code)
@@ -626,7 +693,19 @@ class ChatCoreFixtureProvider
 
 		}
 
-		database.flush ();
+		transaction.flush ();
+
+	}
+
+	private
+	void createChatMessages (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createChatMessages");
 
 		// chat messages, between users
 
@@ -648,7 +727,10 @@ class ChatCoreFixtureProvider
 				chatMessageHelper.createInstance ()
 
 				.setChat (
-					chat)
+					chatHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"test"))
 
 				.setFromUser (
 					randomLogic.sample (
@@ -679,12 +761,13 @@ class ChatCoreFixtureProvider
 
 			);
 
-			if (index % 100 == 0)
-				database.flush ();
+			if (index % 100 == 0) {
+				transaction.flush ();
+			}
 
 		}
 
-		database.flush ();
+		transaction.flush ();
 
 		// chat messages, to monitors
 
@@ -706,7 +789,10 @@ class ChatCoreFixtureProvider
 				chatMessageHelper.createInstance ()
 
 				.setChat (
-					chat)
+					chatHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"test"))
 
 				.setFromUser (
 					randomLogic.sample (
@@ -734,12 +820,13 @@ class ChatCoreFixtureProvider
 
 			);
 
-			if (index % 100 == 0)
-				database.flush ();
+			if (index % 100 == 0) {
+				transaction.flush ();
+			}
 
 		}
 
-		database.flush ();
+		transaction.flush ();
 
 		// chat messages, from monitors
 
@@ -761,7 +848,10 @@ class ChatCoreFixtureProvider
 				chatMessageHelper.createInstance ()
 
 				.setChat (
-					chat)
+					chatHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"test"))
 
 				.setFromUser (
 					randomLogic.sample (
@@ -777,7 +867,7 @@ class ChatCoreFixtureProvider
 
 				.setSender (
 					randomLogic.sample (
-						allUsers))
+						users))
 
 				.setMethod (
 					ChatMessageMethod.api)
@@ -794,10 +884,12 @@ class ChatCoreFixtureProvider
 			);
 
 			if (index % 100 == 0) {
-				database.flush ();
+				transaction.flush ();
 			}
 
 		}
+
+		transaction.flush ();
 
 	}
 

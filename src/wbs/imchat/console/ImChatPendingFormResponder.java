@@ -40,7 +40,7 @@ import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.misc.JqueryScriptRef;
 import wbs.console.priv.UserPrivChecker;
-import wbs.console.responder.HtmlResponder;
+import wbs.console.responder.ConsoleHtmlResponder;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
@@ -59,7 +59,7 @@ import wbs.imchat.model.ImChatTemplateRec;
 @PrototypeComponent ("imChatPendingFormResponder")
 public
 class ImChatPendingFormResponder
-	extends HtmlResponder {
+	extends ConsoleHtmlResponder {
 
 	// dependencies
 

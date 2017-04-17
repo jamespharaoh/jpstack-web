@@ -2,7 +2,6 @@ package wbs.console.forms;
 
 import static wbs.utils.collection.CollectionUtils.collectionIsEmpty;
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
-import static wbs.utils.collection.MapUtils.emptyMap;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.etc.Misc.doNothing;
 import static wbs.utils.etc.NumberUtils.equalToOne;
@@ -873,7 +872,7 @@ class FormFieldLogic {
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet formFieldSet,
 			@NonNull Object object,
-			@NonNull Map<String,Object> hints) {
+			@NonNull Map <String, Object> hints) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -900,6 +899,7 @@ class FormFieldLogic {
 			@NonNull FormatWriter htmlWriter,
 			@NonNull FormFieldSet <Container> formFieldSet,
 			@NonNull List <Container> objects,
+			@NonNull Map <String, Object> hints,
 			@NonNull Boolean links) {
 
 		TaskLogger taskLogger =
@@ -958,7 +958,7 @@ class FormFieldLogic {
 					htmlWriter,
 					formFieldSet,
 					object,
-					emptyMap (),
+					hints,
 					links);
 
 				htmlTableRowClose (

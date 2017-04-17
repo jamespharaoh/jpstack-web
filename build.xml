@@ -276,7 +276,6 @@
       <fileset dir="src/wbs/services/ticket/core/api/files"/>
       <fileset dir="src/wbs/services/messagetemplate/api/files"/>
       <fileset dir="src/wbs/integrations/common/api/files"/>
-      <fileset dir="src/wbs/integrations/broadcastsystems/api/files"/>
       <fileset dir="src/wbs/integrations/clockworksms/api/files"/>
       <fileset dir="src/wbs/integrations/comshen/api/files"/>
       <fileset dir="src/wbs/integrations/dialogue/api/files"/>
@@ -285,7 +284,6 @@
       <fileset dir="src/wbs/integrations/mediaburst/api/files"/>
       <fileset dir="src/wbs/integrations/oxygenate/api/files"/>
       <fileset dir="src/wbs/integrations/paypal/api/files"/>
-      <fileset dir="src/wbs/integrations/smsarena/api/files"/>
       <fileset dir="src/wbs/integrations/txtnation/api/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/api/files"/>
       <fileset dir="src/wbs/integrations/urbanairship/api/files"/>
@@ -456,7 +454,6 @@
       <fileset dir="src/wbs/services/ticket/core/console/files"/>
       <fileset dir="src/wbs/services/messagetemplate/console/files"/>
       <fileset dir="src/wbs/integrations/common/console/files"/>
-      <fileset dir="src/wbs/integrations/broadcastsystems/console/files"/>
       <fileset dir="src/wbs/integrations/clockworksms/console/files"/>
       <fileset dir="src/wbs/integrations/comshen/console/files"/>
       <fileset dir="src/wbs/integrations/dialogue/console/files"/>
@@ -465,7 +462,6 @@
       <fileset dir="src/wbs/integrations/mediaburst/console/files"/>
       <fileset dir="src/wbs/integrations/oxygenate/console/files"/>
       <fileset dir="src/wbs/integrations/paypal/console/files"/>
-      <fileset dir="src/wbs/integrations/smsarena/console/files"/>
       <fileset dir="src/wbs/integrations/txtnation/console/files"/>
       <fileset dir="src/wbs/integrations/unwiredplaza/console/files"/>
       <fileset dir="src/wbs/integrations/urbanairship/console/files"/>

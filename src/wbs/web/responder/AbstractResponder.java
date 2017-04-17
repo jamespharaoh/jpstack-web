@@ -1,6 +1,6 @@
 package wbs.web.responder;
 
-import java.io.IOException;
+import static wbs.utils.etc.Misc.doNothing;
 
 import lombok.NonNull;
 
@@ -31,34 +31,49 @@ class AbstractResponder
 	// implementation
 
 	protected
-	void setup ()
-		throws IOException {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		doNothing ();
+
 	}
 
 	protected
-	void tearDown ()
-		throws IOException {
+	void tearDown (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		doNothing ();
+
 	}
 
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		doNothing ();
+
 	}
 
 	protected
-	void goHeaders ()
-		throws IOException {
+	void goHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		doNothing ();
+
 	}
 
 	protected
-	void goContent ()
-		throws IOException {
+	void goContent (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		doNothing ();
+
 	}
 
 	@Override
 	public final
 	void execute (
-			@NonNull TaskLogger parentTaskLogger)
-		throws IOException {
+			@NonNull TaskLogger parentTaskLogger) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -75,19 +90,24 @@ class AbstractResponder
 
 		) {
 
-			setup ();
+			setup (
+				taskLogger);
 
 			try {
 
-				prepare ();
+				prepare (
+					taskLogger);
 
-				goHeaders ();
+				goHeaders (
+					taskLogger);
 
-				goContent ();
+				goContent (
+					taskLogger);
 
 			} finally {
 
-				tearDown ();
+				tearDown (
+					taskLogger);
 
 			}
 

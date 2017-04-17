@@ -16,6 +16,7 @@ import com.google.common.base.Optional;
 
 import wbs.console.annotations.ConsoleModuleBuilderHandler;
 import wbs.console.helper.manager.ConsoleObjectManager;
+
 import wbs.framework.builder.Builder;
 import wbs.framework.builder.annotations.BuildMethod;
 import wbs.framework.builder.annotations.BuilderParent;
@@ -71,6 +72,9 @@ class TextFormFieldBuilder {
 
 	@PrototypeDependency
 	Provider <TextFormFieldRenderer> textFormFieldRendererProvider;
+
+	@PrototypeDependency
+	Provider <TextFormFieldValueValidator> textFormFieldValueValidatorProvider;
 
 	@PrototypeDependency
 	Provider <UpdatableFormField> updatableFormFieldProvider;
@@ -202,7 +206,7 @@ class TextFormFieldBuilder {
 
 		// value validator
 
-		List<FormFieldValueValidator> valueValidators =
+		List <FormFieldValueValidator> valueValidators =
 			new ArrayList<> ();
 
 		if (! nullable) {
@@ -211,6 +215,20 @@ class TextFormFieldBuilder {
 				requiredFormFieldValueValidatorProvider.get ());
 
 		}
+
+		valueValidators.add (
+			textFormFieldValueValidatorProvider.get ()
+
+			.trim (
+				true)
+
+			.minimumLength (
+				spec.minimumLength ())
+
+			.maximumLength (
+				spec.maximumLength ())
+
+		);
 
 		// constraint validator
 

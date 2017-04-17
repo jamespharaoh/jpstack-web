@@ -17,7 +17,7 @@ import static wbs.web.utils.HtmlTableUtils.htmlTableOpenDetails;
 import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
-import wbs.console.responder.HtmlResponder;
+import wbs.console.responder.ConsoleHtmlResponder;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
@@ -28,7 +28,7 @@ import wbs.apn.chat.user.core.model.ChatUserRec;
 @PrototypeComponent ("chatUserHelpFormResponder")
 public
 class ChatUserHelpFormResponder
-	extends HtmlResponder {
+	extends ConsoleHtmlResponder {
 
 	// singleton dependencies
 

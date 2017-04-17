@@ -1,9 +1,13 @@
 package wbs.apn.chat.infosite.api;
 
-import java.io.IOException;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWrite;
+
+import lombok.NonNull;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.web.context.RequestContext;
 import wbs.web.responder.PrintResponder;
 
@@ -21,8 +25,8 @@ class ChatInfoSiteMessageSentResponder
 
 	@Override
 	protected
-	void goHeaders ()
-		throws IOException {
+	void goHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		requestContext.setHeader (
 			"Content-Type",
@@ -32,11 +36,11 @@ class ChatInfoSiteMessageSentResponder
 
 	@Override
 	protected
-	void goContent ()
-		throws IOException {
+	void goContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		printFormat (
-			"<p>Your message has been sent.</p>\n");
+		htmlParagraphWrite (
+			"Your message has been sent.");
 
 	}
 

@@ -1,18 +1,23 @@
 package wbs.apn.chat.infosite.api;
 
+import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
 
-import java.io.IOException;
 import java.io.OutputStream;
+
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.media.model.MediaRec;
 
 import wbs.apn.chat.infosite.model.ChatInfoSiteObjectHelper;
 import wbs.apn.chat.infosite.model.ChatInfoSiteRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
-import wbs.platform.media.model.MediaRec;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.AbstractResponder;
 
@@ -39,7 +44,8 @@ class ChatInfoSiteImageResponder
 
 	@Override
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		infoSite =
 			chatInfoSiteHelper.findRequired (
@@ -101,7 +107,8 @@ class ChatInfoSiteImageResponder
 
 	@Override
 	protected
-	void goHeaders () {
+	void goHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		requestContext.setHeader (
 			"Content-Type",
@@ -116,13 +123,14 @@ class ChatInfoSiteImageResponder
 
 	@Override
 	protected
-	void goContent ()
-		throws IOException {
+	void goContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		OutputStream out =
 			requestContext.outputStream ();
 
-		out.write (
+		writeBytes (
+			out,
 			data);
 
 	}

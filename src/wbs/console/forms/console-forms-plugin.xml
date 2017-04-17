@@ -93,6 +93,7 @@
 		<component class="TextFormFieldBuilder"/>
 		<component class="TextFormFieldRenderer"/>
 		<component class="TextFormFieldSpec"/>
+		<component class="TextFormFieldValueValidator"/>
 		<component class="TextualRangeFormFieldInterfaceMapping"/>
 		<component class="TimestampFormFieldBuilder"/>
 		<component class="TimestampFormFieldInterfaceMapping"/>

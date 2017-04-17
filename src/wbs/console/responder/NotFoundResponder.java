@@ -17,7 +17,7 @@ import wbs.framework.logging.TaskLogger;
 @PrototypeComponent ("notFoundResponder")
 public
 class NotFoundResponder
-	extends HtmlResponder {
+	extends ConsoleHtmlResponder {
 
 	// singleton dependencies
 

@@ -54,7 +54,7 @@ class ConsoleFormActionsAction
 	// properties
 
 	@Getter @Setter
-	List <ConsoleFormAction <?>> formActions;
+	List <ConsoleFormAction <?, ?>> formActions;
 
 	@Getter @Setter
 	String responderName;
@@ -86,7 +86,7 @@ class ConsoleFormActionsAction
 			requestContext.formRequired (
 				"form.name");
 
-		ConsoleFormAction <?> formAction =
+		ConsoleFormAction <?, ?> formAction =
 			iterableFindExactlyOneRequired (
 				candidateFormAction ->
 					stringEqualSafe (

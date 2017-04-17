@@ -30,7 +30,7 @@ import wbs.framework.logging.TaskLogger;
 import wbs.utils.time.TimeFormatter;
 
 public abstract
-class HtmlResponder
+class ConsoleHtmlResponder
 	extends ConsolePrintResponder {
 
 	// singleton dependencies

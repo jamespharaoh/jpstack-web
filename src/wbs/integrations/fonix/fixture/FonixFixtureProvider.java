@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Database;
+import wbs.framework.database.Transaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.fixtures.TestAccounts;
@@ -44,9 +44,6 @@ class FonixFixtureProvider
 	implements FixtureProvider {
 
 	// singleton dependencies
-
-	@SingletonDependency
-	Database database;
 
 	@SingletonDependency
 	FonixConfigObjectHelper fonixConfigHelper;
@@ -92,7 +89,8 @@ class FonixFixtureProvider
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -100,25 +98,31 @@ class FonixFixtureProvider
 				"createFixtures");
 
 		createMenus (
-			taskLogger);
+			taskLogger,
+			transaction);
 
 		createConfig (
-			taskLogger);
+			taskLogger,
+			transaction);
 
 		createDefaultDeliveryStatuses (
-			taskLogger);
+			taskLogger,
+			transaction);
 
 		createDefaultNetworks (
-			taskLogger);
+			taskLogger,
+			transaction);
 
 		createRoutes (
-			taskLogger);
+			taskLogger,
+			transaction);
 
 	}
 
 	private
 	void createMenus (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -155,13 +159,14 @@ class FonixFixtureProvider
 
 		);
 
-		database.flush ();
+		transaction.flush ();
 
 	}
 
 	private
 	void createConfig (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -183,13 +188,14 @@ class FonixFixtureProvider
 
 		);
 
-		database.flush ();
+		transaction.flush ();
 
 	}
 
 	private
 	void createDefaultDeliveryStatuses (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -221,13 +227,14 @@ class FonixFixtureProvider
 
 		));
 
-		database.flush ();
+		transaction.flush ();
 
 	}
 
 	private
 	void createDefaultNetworks (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -255,13 +262,14 @@ class FonixFixtureProvider
 
 		));
 
-		database.flush ();
+		transaction.flush ();
 
 	}
 
 	private
 	void createRoutes (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -273,15 +281,17 @@ class FonixFixtureProvider
 			testAccount ->
 				createRoute (
 					taskLogger,
+					transaction,
 					testAccount));
 
-		database.flush ();
+		transaction.flush ();
 
 	}
 
 	private
 	void createRoute (
 			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction,
 			@NonNull Map <String, String> params) {
 
 		TaskLogger taskLogger =

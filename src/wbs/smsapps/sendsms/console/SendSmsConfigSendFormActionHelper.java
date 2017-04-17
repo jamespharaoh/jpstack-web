@@ -35,7 +35,10 @@ import wbs.web.responder.Responder;
 @SingletonComponent ("sendSmsConfigSendFormActionHelper")
 public
 class SendSmsConfigSendFormActionHelper
-	extends AbstractConsoleFormActionHelper <SendSmsConfigSendForm> {
+	extends AbstractConsoleFormActionHelper <
+		SendSmsConfigSendForm,
+		Object
+	> {
 
 	// singleton dependencies
 

@@ -10,6 +10,7 @@ import java.util.Arrays;
 import lombok.NonNull;
 
 import wbs.utils.string.FormatWriter;
+
 import wbs.web.utils.HtmlAttributeUtils.HtmlAttribute;
 import wbs.web.utils.HtmlAttributeUtils.ToHtmlAttribute;
 
@@ -403,6 +404,35 @@ class HtmlBlockUtils {
 	public static
 	void htmlParagraphWriteHtml (
 			@NonNull String content,
+			@NonNull HtmlAttribute ... attributes) {
+
+		htmlParagraphWriteHtml (
+			currentFormatWriter (),
+			content,
+			attributes);
+
+	}
+
+	public static
+	void htmlParagraphWriteHtml (
+			@NonNull FormatWriter formatWriter,
+			@NonNull Runnable content,
+			@NonNull HtmlAttribute ... attributes) {
+
+		htmlParagraphOpen (
+			formatWriter,
+			attributes);
+
+		content.run ();
+
+		htmlParagraphClose (
+			formatWriter);
+
+	}
+
+	public static
+	void htmlParagraphWriteHtml (
+			@NonNull Runnable content,
 			@NonNull HtmlAttribute ... attributes) {
 
 		htmlParagraphWriteHtml (

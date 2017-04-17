@@ -70,8 +70,11 @@ class ChatHelpLogicImplementation
 			@NonNull UserRec user,
 			@NonNull ChatUserRec chatUser,
 			@NonNull String text,
-			@NonNull Optional <Long> threadId,
+			@NonNull Optional <Long> originalThreadId,
 			@NonNull Optional <ChatHelpLogRec> replyTo) {
+
+		Optional <Long> threadId =
+			originalThreadId;
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (

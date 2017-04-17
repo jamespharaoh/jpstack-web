@@ -8,15 +8,18 @@ import wbs.console.forms.FormFieldSet;
 @Accessors (fluent = true)
 @Data
 public
-class ConsoleFormAction <FormState> {
+class ConsoleFormAction <FormState, History> {
 
 	String name;
 
-	ConsoleFormActionHelper <FormState> helper;
-	FormFieldSet <FormState> formFields;
+	ConsoleFormActionHelper <FormState, History> helper;
 
 	String heading;
 	String helpText;
+	FormFieldSet <FormState> formFields;
 	String submitLabel;
+
+	String historyHeading;
+	FormFieldSet <History> historyFields;
 
 }

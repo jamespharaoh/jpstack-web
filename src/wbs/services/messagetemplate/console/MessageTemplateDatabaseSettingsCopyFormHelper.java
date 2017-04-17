@@ -24,7 +24,10 @@ import wbs.web.responder.Responder;
 @SingletonComponent ("messageTemplateDatabaseSettingsCopyFormActionHelper")
 public
 class MessageTemplateDatabaseSettingsCopyFormHelper
-	implements ConsoleFormActionHelper <MessageTemplateCopyForm> {
+	implements ConsoleFormActionHelper <
+		MessageTemplateCopyForm,
+		Object
+	> {
 
 	// singleton dependencies
 

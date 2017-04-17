@@ -24,7 +24,7 @@ import wbs.framework.logging.TaskLogger;
 @PrototypeComponent ("errorResponder")
 public
 class ErrorResponder
-	extends HtmlResponder {
+	extends ConsoleHtmlResponder {
 
 	// singleton dependencies
 

@@ -45,4 +45,12 @@ class ContextTabFormActionPageSpec {
 		name = "helper")
 	String helperName;
 
+	@DataAttribute (
+		name = "history-heading")
+	String historyHeading;
+
+	@DataAttribute (
+		name = "history-fields")
+	String historyFieldsName;
+
 }

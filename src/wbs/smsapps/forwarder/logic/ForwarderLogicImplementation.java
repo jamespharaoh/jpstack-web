@@ -22,7 +22,6 @@ import javax.inject.Provider;
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
-import lombok.extern.log4j.Log4j;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -59,7 +58,6 @@ import wbs.smsapps.forwarder.model.ForwarderRec;
 import wbs.smsapps.forwarder.model.ForwarderRouteObjectHelper;
 import wbs.smsapps.forwarder.model.ForwarderRouteRec;
 
-@Log4j
 @SingletonComponent ("forwarderLogic")
 public
 class ForwarderLogicImplementation
@@ -261,7 +259,9 @@ class ForwarderLogicImplementation
 		if (! work.template.forwarder.getAllowNewSends ()
 				&& template.fmIn == null) {
 
-			log.debug ("no reply-to on template : " + template.toString ());
+			taskLogger.debugFormat (
+				"no reply-to on template: %s",
+				template.toString ());
 
 			work.template.errors.add (
 				"Reply-to-message-id must be specified");

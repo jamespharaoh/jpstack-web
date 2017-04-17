@@ -64,6 +64,7 @@ class ChatContactObjectHelperMethodsImplementation
 	void setup (
 			@NonNull TaskLogger parentTaskLogger) {
 
+		@SuppressWarnings ("unused")
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,

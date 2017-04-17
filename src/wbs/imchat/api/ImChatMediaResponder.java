@@ -1,16 +1,18 @@
 package wbs.imchat.api;
 
 import static wbs.utils.collection.CollectionUtils.arrayLength;
+import static wbs.utils.etc.IoUtils.writeBytes;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 
-import java.io.IOException;
-
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.web.context.RequestContext;
 import wbs.web.responder.AbstractResponder;
 
@@ -37,7 +39,8 @@ class ImChatMediaResponder
 
 	@Override
 	protected
-	void goHeaders () {
+	void goHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		requestContext.setHeader (
 			"Content-Type",
@@ -53,10 +56,11 @@ class ImChatMediaResponder
 
 	@Override
 	protected
-	void goContent ()
-		throws IOException {
+	void goContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		requestContext.outputStream ().write (
+		writeBytes (
+			requestContext.outputStream (),
 			data);
 
 	}

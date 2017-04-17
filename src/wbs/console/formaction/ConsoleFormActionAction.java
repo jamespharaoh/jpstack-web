@@ -1,9 +1,10 @@
 package wbs.console.formaction;
 
+import java.util.Map;
+
 import javax.servlet.ServletException;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -29,7 +30,7 @@ import wbs.web.responder.Responder;
 @PrototypeComponent ("contextFormActionAction")
 @Accessors (fluent = true)
 public
-class ConsoleFormActionAction <FormState>
+class ConsoleFormActionAction <FormState, History>
 	extends ConsoleAction {
 
 	// singleton dependencies
@@ -55,7 +56,7 @@ class ConsoleFormActionAction <FormState>
 	FormFieldSet <FormState> fields;
 
 	@Getter @Setter
-	ConsoleFormActionHelper <FormState> formActionHelper;
+	ConsoleFormActionHelper <FormState, History> formActionHelper;
 
 	@Getter @Setter
 	String responderName;
@@ -83,9 +84,6 @@ class ConsoleFormActionAction <FormState>
 				parentTaskLogger,
 				"goReal");
 
-		FormState formState =
-			formActionHelper.constructFormState ();
-
 		try (
 
 			Transaction transaction =
@@ -96,6 +94,12 @@ class ConsoleFormActionAction <FormState>
 
 		) {
 
+			FormState formState =
+				formActionHelper.constructFormState ();
+
+			Map <String, Object> formHints =
+				formActionHelper.formHints ();
+
 			formActionHelper.updatePassiveFormState (
 				formState);
 
@@ -105,11 +109,22 @@ class ConsoleFormActionAction <FormState>
 					requestContext,
 					fields,
 					formState,
-					ImmutableMap.of (),
+					formHints,
 					name);
 
 			if (updateResultSet.errorCount () > 0) {
+
+				formFieldLogic.reportErrors (
+					requestContext,
+					updateResultSet,
+					name);
+
+				requestContext.request (
+					"console-form-action-update-result-set",
+					updateResultSet);
+
 				return null;
+
 			}
 
 			Optional <Responder> responder =

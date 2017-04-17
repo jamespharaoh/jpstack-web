@@ -133,15 +133,13 @@ class ImChatCoreFixtureProvider
 	@Override
 	public
 	void createFixtures (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
 				"createFixtures");
-
-		Transaction transaction =
-			database.currentTransaction ();
 
 		// menu
 

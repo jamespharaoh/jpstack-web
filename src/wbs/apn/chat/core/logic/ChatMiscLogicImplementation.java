@@ -324,6 +324,9 @@ class ChatMiscLogicImplementation
 			@NonNull MessageRec message,
 			boolean sendMessage) {
 
+		boolean currentSendMessage =
+			sendMessage;
+
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
@@ -346,7 +349,7 @@ class ChatMiscLogicImplementation
 				message.getThreadId (),
 				ChatMessageMethod.sms);
 
-			sendMessage = false;
+			currentSendMessage = true;
 
 		}
 
@@ -366,7 +369,7 @@ class ChatMiscLogicImplementation
 				chatUser.getMainChatUserImage () != null
 					? ChatUserDateMode.photo
 					: ChatUserDateMode.text,
-				sendMessage);
+				currentSendMessage);
 
 		}
 

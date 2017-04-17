@@ -3,11 +3,21 @@ package wbs.apn.chat.infosite.api;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphClose;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphOpen;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteFormat;
+import static wbs.web.utils.HtmlBlockUtils.htmlParagraphWriteHtml;
+import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
+import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPost;
+import static wbs.web.utils.HtmlUtils.htmlLinkWriteHtml;
 
-import java.io.IOException;
+import lombok.NonNull;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.help.model.ChatHelpTemplateObjectHelper;
 import wbs.apn.chat.help.model.ChatHelpTemplateRec;
@@ -30,6 +40,9 @@ class ChatInfoSiteViewResponder
 	@SingletonDependency
 	ChatInfoSiteObjectHelper chatInfoSiteHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RequestContext requestContext;
 
@@ -42,7 +55,8 @@ class ChatInfoSiteViewResponder
 
 	@Override
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		infoSite =
 			chatInfoSiteHelper.findRequired (
@@ -71,8 +85,8 @@ class ChatInfoSiteViewResponder
 
 	@Override
 	protected
-	void goHeaders ()
-		throws IOException {
+	void goHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		requestContext.addHeader (
 			"Content-Type",
@@ -82,50 +96,61 @@ class ChatInfoSiteViewResponder
 
 	@Override
 	protected
-	void goContent ()
-		throws IOException {
+	void goContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		printFormat (
-			"<!DOCTYPE html>\n");
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goContent");
 
-		printFormat (
-			"<html>\n");
+		formatWriter.writeLineFormat (
+			"<!DOCTYPE html>");
 
-		goHead ();
+		formatWriter.writeLineFormatIncreaseIndent (
+			"<html>");
 
-		goBody ();
+		goHead (
+			taskLogger);
 
-		printFormat (
-			"</html>\n");
+		goBody (
+			taskLogger);
+
+		formatWriter.writeLineFormatDecreaseIndent (
+			"</html>");
 
 	}
 
 	protected
-	void goHead () {
+	void goHead (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		printFormat (
-			"<head>\n");
+		formatWriter.writeLineFormatIncreaseIndent (
+			"<head>");
 
-		printFormat (
-			"<title>%h</title>\n",
+		formatWriter.writeLineFormat (
+			"<title>%h</title>",
 			"User profiles");
 
-		printFormat (
-			"</head>\n");
+		formatWriter.writeLineFormatDecreaseIndent (
+			"</head>");
 
 	}
 
 	protected
-	void goBody () {
+	void goBody (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		printFormat (
-			"<body>\n");
+		formatWriter.writeLineFormatIncreaseIndent (
+			"<body>");
 
 		for (
 			int index = 0;
 			index < infoSite.getOtherChatUsers ().size ();
-			index++
+			index ++
 		) {
+
+			int currentIndex = index;
 
 			ChatUserRec otherUser =
 				infoSite.getOtherChatUsers ().get (
@@ -133,85 +158,83 @@ class ChatInfoSiteViewResponder
 
 			if (index > 0) {
 
-				printFormat (
-					"<hr>\n");
+				formatWriter.writeLineFormat (
+					"<hr>");
 
 			}
 
-			printFormat (
-				"<p>",
+			htmlParagraphWriteHtml (
+				() -> htmlLinkWriteHtml (
+					stringFormat (
+						"%u/%u/full",
+						infoSite.getToken (),
+						integerToDecimalString (
+							currentIndex)),
+					() -> formatWriter.writeLineFormat (
+						"<img src=\"%h\">",
+						stringFormat (
+							"%u/%u/normal",
+							infoSite.getToken (),
+							integerToDecimalString (
+								currentIndex)))));
 
-				"<a href=\"%h\">",
-				stringFormat (
-					"%u/%u/full",
-					infoSite.getToken (),
-					integerToDecimalString (
-						index)),
-
-				"<img src=\"%h\">",
-				stringFormat (
-					"%u/%u/normal",
-					infoSite.getToken (),
-					integerToDecimalString (
-						index)),
-
-				"</a>",
-
-				"</p>\n");
-
-			printFormat (
-				"<p>User: %h</p>\n",
+			htmlParagraphWriteFormat (
+				"User: %h",
 				otherUser.getCode ());
 
 			if (otherUser.getName () != null) {
 
-				printFormat (
-					"<p>Name: %h</p>\n",
+				htmlParagraphWriteFormat (
+					"Name: %h",
 					otherUser.getName ());
 
 			}
 
 			if (otherUser.getInfoText () != null) {
 
-				printFormat (
-					"<p>Info: %h</p>\n",
+				htmlParagraphWriteFormat (
+					"Info: %h",
 					otherUser.getInfoText ().getText ());
 
 			}
 
-			printFormat (
-				"<form method=\"post\">\n");
+			htmlFormOpenPost ();
 
-			printFormat (
+			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"hidden\"",
 				" name=\"otherUserId\"",
 				" value=\"%h\"",
-				otherUser.getId (),
+				integerToDecimalString (
+					otherUser.getId ()),
 				">\n");
 
-			printFormat (
-				"<p><input",
-				" type=\"text\"",
-				" name=\"text\">\n");
+			htmlParagraphOpen ();
 
-			printFormat (
+			formatWriter.writeLineFormat (
+				"<input",
+				" type=\"text\"",
+				" name=\"text\"",
+				">");
+
+			formatWriter.writeLineFormat (
 				"<input",
 				" type=\"submit\"",
 				" value=\"send\"",
-				"></p>\n");
+				">");
 
-			printFormat (
-				"</form>\n");
+			htmlParagraphClose ();
+
+			htmlFormClose ();
 
 		}
 
-		printFormat (
-			"%s\n",
+		formatWriter.writeLineFormat (
+			"%s",
 			infoSiteHelpTemplate.getText ());
 
-		printFormat (
-			"</body>\n");
+		formatWriter.writeLineFormatDecreaseIndent (
+			"</body>");
 
 	}
 

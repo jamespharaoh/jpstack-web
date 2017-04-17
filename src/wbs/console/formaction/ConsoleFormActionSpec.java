@@ -35,4 +35,11 @@ class ConsoleFormActionSpec {
 		name = "helper")
 	String helperName;
 
+	@DataAttribute
+	String historyHeading;
+
+	@DataAttribute (
+		name = "history-fields")
+	String historyFieldsName;
+
 }

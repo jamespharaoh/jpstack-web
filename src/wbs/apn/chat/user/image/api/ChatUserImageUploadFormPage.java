@@ -1,16 +1,20 @@
 package wbs.apn.chat.user.image.api;
 
-import java.io.IOException;
-
 import com.google.common.collect.ImmutableMap;
+
+import lombok.NonNull;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
+import wbs.framework.component.annotations.PrototypeComponent;
+import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.contact.logic.ChatSendLogic;
 import wbs.apn.chat.user.core.logic.ChatUserLogic;
 import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenObjectHelper;
 import wbs.apn.chat.user.image.model.ChatUserImageUploadTokenRec;
-import wbs.framework.component.annotations.PrototypeComponent;
-import wbs.framework.component.annotations.SingletonDependency;
 import wbs.web.context.RequestContext;
 import wbs.web.responder.PrintResponder;
 
@@ -30,6 +34,9 @@ class ChatUserImageUploadFormPage
 	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	RequestContext requestContext;
 
@@ -46,7 +53,8 @@ class ChatUserImageUploadFormPage
 
 	@Override
 	protected
-	void prepare () {
+	void prepare (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		imageUploadToken =
 			chatUserImageUploadTokenHelper.findByToken (
@@ -81,8 +89,8 @@ class ChatUserImageUploadFormPage
 
 	@Override
 	protected
-	void goHeaders ()
-		throws IOException {
+	void goHeaders (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		requestContext.addHeader (
 			"Content-Type",
@@ -92,77 +100,86 @@ class ChatUserImageUploadFormPage
 
 	@Override
 	protected
-	void goContent ()
-		throws IOException {
+	void goContent (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		printFormat (
-			"<!DOCTYPE html>\n");
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"goContent");
 
-		printFormat (
-			"<html>\n");
+		formatWriter.writeLineFormat (
+			"<!DOCTYPE html>");
 
-		goHead ();
+		formatWriter.writeLineFormatIncreaseIndent (
+			"<html>");
 
-		goBody ();
+		goHead (
+			taskLogger);
 
-		printFormat (
-			"</html>\n");
+		goBody (
+			taskLogger);
 
-	}
-
-	protected
-	void goHead () {
-
-		printFormat (
-			"<head>\n");
-
-		printFormat (
-			"<title>%h</title>\n",
-			titleText);
-
-		printFormat (
-			"</head>\n");
+		formatWriter.writeLineFormatDecreaseIndent (
+			"</html>");
 
 	}
 
 	protected
-	void goBody () {
+	void goHead (
+			@NonNull TaskLogger parentTaskLogger) {
 
-		printFormat (
-			"<body>\n");
+		formatWriter.writeLineFormatIncreaseIndent (
+			"<head>");
 
-		printFormat (
-			"<h1>%h</h1>\n",
+		formatWriter.writeLineFormat (
+			"<title>%h</title>",
 			titleText);
 
-		printFormat (
+		formatWriter.writeLineFormatDecreaseIndent (
+			"</head>");
+
+	}
+
+	protected
+	void goBody (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		formatWriter.writeLineFormatIncreaseIndent (
+			"<body>");
+
+		formatWriter.writeLineFormat (
+			"<h1>%h</h1>",
+			titleText);
+
+		formatWriter.writeFormat (
 			"%s\n",
 			introHtml);
 
-		printFormat (
+		formatWriter.writeLineFormatIncreaseIndent (
 			"<form",
 			" method=\"post\"",
 			" enctype=\"multipart/form-data\"",
-			">\n");
+			">");
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<p><input",
 			" type=\"file\"",
 			" name=\"file\"",
-			"></p>\n");
+			"></p>");
 
-		printFormat (
+		formatWriter.writeLineFormat (
 			"<p><input",
 			" type=\"submit\"",
 			" value=\"%h\"",
 			submitLabel,
-			"></p>\n");
+			"></p>");
 
-		printFormat (
-			"</form>\n");
+		formatWriter.writeLineFormatDecreaseIndent (
+			"</form>");
 
-		printFormat (
-			"</body>\n");
+		formatWriter.writeLineFormatDecreaseIndent (
+			"</body>");
 
 	}
 

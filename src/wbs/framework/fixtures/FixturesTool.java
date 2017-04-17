@@ -165,7 +165,8 @@ class FixturesTool {
 		) {
 
 			fixtureProvider.createFixtures (
-				taskLogger);
+				taskLogger,
+				transaction);
 
 			transaction.commit ();
 

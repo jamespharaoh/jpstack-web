@@ -167,6 +167,7 @@ class ImChatCustomerCreditPart
 			creditHistoryFormFields,
 			Lists.reverse (
 				creditHistory),
+			emptyMap (),
 			true);
 
 	}
