@@ -3,6 +3,8 @@ package wbs.services.messagetemplate.logic;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
 
+import java.util.function.Consumer;
+
 import com.google.common.base.Optional;
 
 import lombok.NonNull;
@@ -37,8 +39,7 @@ class MessageTemplateEntryTypeObjectHelperMethodsImplementation
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull MessageTemplateDatabaseRec messageTemplateDatabase,
 			@NonNull String code,
-			@NonNull String name,
-			@NonNull String description) {
+			@NonNull Consumer <MessageTemplateEntryTypeRec> consumer) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
@@ -62,25 +63,20 @@ class MessageTemplateEntryTypeObjectHelperMethodsImplementation
 		}
 
 		MessageTemplateEntryTypeRec newMessageTemplateEntry =
-			messageTemplateEntryTypeHelper.insert (
-				taskLogger,
-				messageTemplateEntryTypeHelper.createInstance ()
+			messageTemplateEntryTypeHelper.createInstance ()
 
 			.setMessageTemplateDatabase (
 				messageTemplateDatabase)
 
 			.setCode (
-				code)
+				code);
 
-			.setName (
-				name)
+		consumer.accept (
+			newMessageTemplateEntry);
 
-			.setDescription (
-				description)
-
-		);
-
-		return newMessageTemplateEntry;
+		return messageTemplateEntryTypeHelper.insert (
+			taskLogger,
+			newMessageTemplateEntry);
 
 	}
 

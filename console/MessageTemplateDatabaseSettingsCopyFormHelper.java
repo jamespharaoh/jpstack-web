@@ -77,8 +77,16 @@ class MessageTemplateDatabaseSettingsCopyFormHelper
 					taskLogger,
 					targetDatabase,
 					sourceEntryType.getCode (),
-					sourceEntryType.getName (),
-					sourceEntryType.getDescription ());
+					newEntryType ->
+						newEntryType
+
+				.setName (
+					sourceEntryType.getName ())
+
+				.setDescription (
+					sourceEntryType.getDescription ())
+
+			);
 
 			for (
 				MessageTemplateFieldTypeRec sourceFieldType
