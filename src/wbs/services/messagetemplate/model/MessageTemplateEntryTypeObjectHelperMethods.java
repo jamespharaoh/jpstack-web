@@ -1,5 +1,7 @@
 package wbs.services.messagetemplate.model;
 
+import java.util.function.Consumer;
+
 import wbs.framework.logging.TaskLogger;
 
 public
@@ -9,7 +11,6 @@ interface MessageTemplateEntryTypeObjectHelperMethods {
 			TaskLogger parentTaskLogger,
 			MessageTemplateDatabaseRec messageTemplateDatabase,
 			String code,
-			String name,
-			String description);
+			Consumer <MessageTemplateEntryTypeRec> consumer); 
 
 }

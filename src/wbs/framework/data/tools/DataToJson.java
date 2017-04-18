@@ -3,6 +3,7 @@ package wbs.framework.data.tools;
 import static wbs.utils.etc.EnumUtils.enumNameHyphens;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.ReflectionUtils.fieldGet;
+import static wbs.utils.string.StringUtils.nullIfEmptyString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.reflect.Field;
@@ -125,7 +126,8 @@ class DataToJson {
 
 				jsonValueBuilder.put (
 					ifNull (
-						dataAttribute.name (),
+						nullIfEmptyString (
+							dataAttribute.name ()),
 						field.getName ()),
 					toJson (fieldValue));
 
