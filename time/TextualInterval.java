@@ -20,6 +20,7 @@ import static wbs.utils.string.StringUtils.stringEndsWithSimple;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringInSafe;
 import static wbs.utils.string.StringUtils.stringNotEqualSafe;
+import static wbs.utils.string.StringUtils.stringNotInSafe;
 import static wbs.utils.string.StringUtils.stringSplitSimple;
 import static wbs.utils.string.StringUtils.stringSplitSpace;
 import static wbs.utils.string.StringUtils.stringStartsWithSimple;
@@ -762,9 +763,17 @@ class TextualInterval
 					interval));
 
 		} else if (
+
 			stringStartsWithSimple (
 				"last ",
 				source)
+
+			&& stringNotInSafe (
+				source,
+				"last day",
+				"last month",
+				"last year")
+
 		) {
 
 			return parseRecent (
