@@ -319,6 +319,7 @@ class ObjectSearchResultsPart <
 					consoleHelper.getClass (),
 					resultsDaoMethodName,
 					ImmutableList.<Class <?>> of (
+						TaskLogger.class,
 						searchObject.getClass (),
 						List.class));
 
@@ -327,6 +328,7 @@ class ObjectSearchResultsPart <
 					methodInvoke (
 						method,
 						consoleHelper,
+						taskLogger,
 						searchObject,
 						pageObjectIds));
 
