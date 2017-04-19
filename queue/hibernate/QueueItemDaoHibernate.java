@@ -50,6 +50,7 @@ class QueueItemDaoHibernate
 	@Override
 	public
 	Criteria searchCriteria (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueItemSearch search) {
 
 		Criteria criteria =
@@ -217,10 +218,17 @@ class QueueItemDaoHibernate
 	@Override
 	public
 	List <Long> searchIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueItemSearch search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchIds");
 
 		Criteria criteria =
 			searchCriteria (
+				taskLogger,
 				search);
 
 		criteria.addOrder (
@@ -386,10 +394,17 @@ class QueueItemDaoHibernate
 	@Override
 	public
 	Criteria searchUserQueueReportCriteria (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueItemSearch search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchUserQueueReportCriteria");
 
 		Criteria criteria =
 			searchCriteria (
+				taskLogger,
 				search);
 
 		criteria.add (
@@ -451,10 +466,17 @@ class QueueItemDaoHibernate
 	@Override
 	public
 	List <Long> searchUserQueueReportIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull QueueItemSearch search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchUserQueueReportIds");
 
 		Criteria criteria =
 			searchCriteria (
+				taskLogger,
 				search);
 
 		criteria.add (
@@ -510,6 +532,7 @@ class QueueItemDaoHibernate
 
 		Criteria criteria =
 			searchUserQueueReportCriteria (
+				taskLogger,
 				search);
 
 		criteria.add (

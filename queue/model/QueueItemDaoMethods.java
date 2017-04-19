@@ -15,15 +15,19 @@ public
 interface QueueItemDaoMethods {
 
 	Criteria searchCriteria (
+			TaskLogger parentTaskLogger,
 			QueueItemSearch search);
 
 	List <Long> searchIds (
+			TaskLogger parentTaskLogger,
 			QueueItemSearch search);
 
 	Criteria searchUserQueueReportCriteria (
+			TaskLogger parentTaskLogger,
 			QueueItemSearch search);
 
 	List <Long> searchUserQueueReportIds (
+			TaskLogger parentTaskLogger,
 			QueueItemSearch search);
 
 	List <Optional <UserQueueReport>> searchUserQueueReports (

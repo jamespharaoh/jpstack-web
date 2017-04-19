@@ -5,6 +5,8 @@ import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -12,8 +14,9 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.joda.time.Instant;
 
-import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.exception.model.ExceptionLogDao;
 import wbs.platform.exception.model.ExceptionLogRec;
 import wbs.platform.exception.model.ExceptionLogSearch;
@@ -79,7 +82,8 @@ class ExceptionLogDaoHibernate
 	@Override
 	public
 	List <Long> searchIds (
-			ExceptionLogSearch search) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ExceptionLogSearch search) {
 
 		Criteria criteria =
 			createCriteria (

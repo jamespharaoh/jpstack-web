@@ -153,7 +153,7 @@ class ObjectSearchPart <
 				requestContext.request (
 					"objectSearchUpdateResultSet"));
 
-		ImmutableMap.Builder<String,Object> formHintsBuilder =
+		ImmutableMap.Builder <String, Object> formHintsBuilder =
 			ImmutableMap.builder ();
 
 		if (consoleHelper.parentExists ()) {

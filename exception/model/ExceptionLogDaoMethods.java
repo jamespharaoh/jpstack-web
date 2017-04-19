@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.joda.time.Instant;
 
+import wbs.framework.logging.TaskLogger;
+
 public
 interface ExceptionLogDaoMethods {
 
@@ -12,6 +14,7 @@ interface ExceptionLogDaoMethods {
 	Long countWithAlertAndFatal ();
 
 	List <Long> searchIds (
+			TaskLogger parentTaskLogger,
 			ExceptionLogSearch search);
 
 	List <ExceptionLogRec> findOldLimit (
