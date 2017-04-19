@@ -2,6 +2,10 @@ package wbs.platform.status.console;
 
 import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.etc.Misc.isNotNull;
+import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
+import static wbs.utils.etc.OptionalUtils.optionalOf;
+import static wbs.utils.etc.OptionalUtils.presentInstances;
+import static wbs.utils.string.StringUtils.joinWithSeparator;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.thread.ConcurrentUtils.futureGet;
 
@@ -29,6 +33,8 @@ import wbs.framework.component.config.WbsConfig;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
+import wbs.platform.deployment.logic.DeploymentLogic;
+import wbs.platform.deployment.model.ConsoleDeploymentRec;
 import wbs.platform.scaffold.console.RootConsoleHelper;
 import wbs.platform.scaffold.model.RootRec;
 import wbs.platform.scaffold.model.SliceRec;
@@ -44,6 +50,9 @@ class StatusUpdateResponder
 	extends ConsoleResponder {
 
 	// singleton dependencies
+
+	@SingletonDependency
+	DeploymentLogic deploymentLogic;
 
 	@ClassSingletonDependency
 	LogContext logContext;
@@ -106,6 +115,9 @@ class StatusUpdateResponder
 			rootHelper.findRequired (
 				0l);
 
+		ConsoleDeploymentRec consoleDeployment =
+			deploymentLogic.thisConsoleDeployment ();
+
 		// get status lines
 
 		List <Future <String>> futures =
@@ -122,6 +134,19 @@ class StatusUpdateResponder
 
 		PrintWriter printWriter =
 			new PrintWriter (stringWriter);
+
+		printWriter.print (
+			stringFormat (
+				"updateHeader ('%j');\n",
+				joinWithSeparator (
+					" – ",
+					presentInstances (
+						optionalOf (
+							"Status"),
+						optionalFromNullable (
+							consoleDeployment.getStatusLabel ()),
+						optionalOf (
+							deploymentLogic.gitVersion ())))));
 
 		printWriter.print (
 			stringFormat (

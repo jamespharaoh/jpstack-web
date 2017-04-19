@@ -30,6 +30,10 @@
 			name="serviceName"
 			nullable="yes"/>
 
+		<string-field
+			name="statusLabel"
+			nullable="yes"/>
+
 		<!-- state -->
 
 		<enum-field

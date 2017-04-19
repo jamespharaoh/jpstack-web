@@ -1,5 +1,6 @@
 // status
 
+var headerText = "Status";
 var statusRequest;
 
 // sets up the request
@@ -25,21 +26,29 @@ function statusRequestChange () {
 	if (statusRequest.readyState != 4) return;
 
 	if (statusRequest.status != 200) {
+
 		document.getElementById ('headerCell').firstChild.data =
-		 'Status (' + statusRequest.status + '!)';
+			headerText + ' (' + statusRequest.status + '!)';
+
 		statusRequestSchedule ();
+
 		return;
+
 	}
 
 	try {
 
 		var statusDiv = document.getElementById ('statusDiv');
+
 		var response = statusRequest.responseXML.documentElement;
+
 		eval (response.getElementsByTagName ('javascript') [0].firstChild.data);
 
-		document.getElementById ('headerCell').firstChild.data = 'Status';
+		document.getElementById ('headerCell').firstChild.data =
+			headerText;
 
 		var loadingRow = document.getElementById ('loadingRow');
+
 		showTableRow (loadingRow, false);
 
 	} catch (e) { }
@@ -71,6 +80,10 @@ function showTableRow (row, show) {
 		row.style.display = 'none';
 	}
 
+}
+
+function updateHeader (newHeaderText) {
+	headerText = newHeaderText;
 }
 
 function updateTimestamp (timestamp) {
