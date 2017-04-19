@@ -29,6 +29,10 @@
 		<component class="console.ConsoleDeploymentRestartFormActionHelper"/>
 	</layer>
 
+	<layer name="logic">
+		<component class="logic.DeploymentLogicImplementation"/>
+	</layer>
+
 	<console-modules>
 		<console-module name="api-deployment"/>
 		<console-module name="console-deployment"/>

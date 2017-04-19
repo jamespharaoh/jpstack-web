@@ -116,13 +116,13 @@ class DeploymentFixtureProvider
 			consoleDeploymentHelper.createInstance ()
 
 			.setCode (
-				"console_dev")
+				"test")
 
 			.setName (
-				"Console dev")
+				"Test")
 
 			.setDescription (
-				"Console dev")
+				"Console test deployment")
 
 			.setHost (
 				runHostname ())

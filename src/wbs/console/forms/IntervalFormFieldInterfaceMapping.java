@@ -82,7 +82,7 @@ class IntervalFormFieldInterfaceMapping <Container>
 
 		// parse interval
 
-		Optional<TextualInterval> optionalInterval =
+		Optional <TextualInterval> optionalInterval =
 			TextualInterval.parse (
 				formFieldPreferences.timezone (),
 				interfaceValue.get (),
