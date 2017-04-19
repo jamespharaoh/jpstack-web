@@ -72,8 +72,7 @@ class ChatUserConsoleHooks
 						requestContext.stuffInteger (
 							"chatId")))
 
-				.deleted (
-					false);
+			;
 
 		} else {
 

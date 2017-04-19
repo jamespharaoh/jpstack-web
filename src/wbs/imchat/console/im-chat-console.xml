@@ -76,6 +76,8 @@
 					label="Customer detail types"
 					priv-key="imChat.manage"/>
 
+				<object-privs-page/>
+
 			</section>
 
 			<section

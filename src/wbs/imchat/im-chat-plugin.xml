@@ -38,14 +38,6 @@
 		<fixture name="imChatCore"/>
 	</fixtures>
 
-	<layer name="logic">
-		<component class="logic.ImChatLogicImplementation"/>
-	</layer>
-
-	<layer name="daemon">
-		<component class="daemon.ImChatConversationEmailDaemon"/>
-	</layer>
-
 	<layer name="api">
 		<component class="api.ImChatApiLogicImplementation"/>
 		<component class="api.ImChatChangePasswordAction"/>
@@ -80,11 +72,20 @@
 		<component class="console.ImChatCustomerSearchOrderConsoleHelper"/>
 		<component class="console.ImChatCustomerSettingsPasswordAction"/>
 		<component class="console.ImChatCustomerSettingsPasswordPart"/>
+		<component class="console.ImChatMessageConsoleHooks"/>
 		<component class="console.ImChatQueueConsole"/>
 		<component class="console.ImChatPendingCustomerNoteUpdateAction"/>
 		<component class="console.ImChatPendingFormAction"/>
 		<component class="console.ImChatPendingFormResponder"/>
 		<component class="console.ImChatPendingSummaryPart"/>
+	</layer>
+
+	<layer name="daemon">
+		<component class="daemon.ImChatConversationEmailDaemon"/>
+	</layer>
+
+	<layer name="logic">
+		<component class="logic.ImChatLogicImplementation"/>
 	</layer>
 
 	<api-modules>

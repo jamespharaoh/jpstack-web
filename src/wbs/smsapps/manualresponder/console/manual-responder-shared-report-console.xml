@@ -57,7 +57,7 @@
 		object-name="manualResponderRequest">
 
 		<object-field
-			name="Request"
+			name="request"
 			object-type="manualResponderRequest"
 			field="this"/>
 
