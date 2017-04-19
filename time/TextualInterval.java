@@ -866,7 +866,7 @@ class TextualInterval
 		return forInterval (
 			timezone,
 			new Interval (
-				startDate.toDateTimeAtStartOfDay(
+				startDate.toDateTimeAtStartOfDay (
 					timezone),
 				endDate.toDateTimeAtStartOfDay (
 					timezone)));
