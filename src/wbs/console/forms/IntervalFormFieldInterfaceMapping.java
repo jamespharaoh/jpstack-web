@@ -4,6 +4,7 @@ import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
 import static wbs.utils.etc.ResultUtils.errorResultFormat;
 import static wbs.utils.etc.ResultUtils.successResult;
+import static wbs.utils.etc.ResultUtils.successResultPresent;
 
 import java.util.Map;
 
@@ -55,18 +56,17 @@ class IntervalFormFieldInterfaceMapping <Container>
 
 		// return textual part
 
-		return successResult (
-			Optional.of (
-				genericValue.get ().genericText ()));
+		return successResultPresent (
+			genericValue.get ().genericText ());
 
 	}
 
 	@Override
 	public
-	Either<Optional<TextualInterval>,String> interfaceToGeneric (
+	Either <Optional <TextualInterval>, String> interfaceToGeneric (
 			@NonNull Container container,
-			@NonNull Map<String,Object> hints,
-			@NonNull Optional<String> interfaceValue) {
+			@NonNull Map <String, Object> hints,
+			@NonNull Optional <String> interfaceValue) {
 
 		// allow null
 

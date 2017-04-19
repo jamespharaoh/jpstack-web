@@ -12,6 +12,8 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.integrations.oxygenate.model.OxygenateInboundLogDao;
 import wbs.integrations.oxygenate.model.OxygenateInboundLogRec;
 import wbs.integrations.oxygenate.model.OxygenateInboundLogSearch;
@@ -26,6 +28,7 @@ class OxygenateInboundLogDaoHibernate
 	@Override
 	public
 	List <Long> searchIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull OxygenateInboundLogSearch search) {
 
 		Criteria criteria =

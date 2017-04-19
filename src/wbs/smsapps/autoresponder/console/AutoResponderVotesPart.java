@@ -161,6 +161,7 @@ class AutoResponderVotesPart
 
 		List <MessageRec> messages =
 			messageHelper.search (
+				taskLogger,
 				messageSearch);
 
 		// now aggregate them

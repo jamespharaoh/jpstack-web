@@ -21,10 +21,6 @@
 		<component class="api.MediaburstProteusApiServletModule"/>
 	</layer>
 
-	<layer name="daemon">
-		<component class="daemon.MediaburstProteusSender"/>
-	</layer>
-
 	<console-modules>
 		<console-module name="mediaburst"/>
 		<console-module name="mediaburst-network"/>

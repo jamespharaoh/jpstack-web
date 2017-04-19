@@ -11,6 +11,6 @@ interface MessageTemplateEntryTypeObjectHelperMethods {
 			TaskLogger parentTaskLogger,
 			MessageTemplateDatabaseRec messageTemplateDatabase,
 			String code,
-			Consumer <MessageTemplateEntryTypeRec> consumer); 
+			Consumer <MessageTemplateEntryTypeRec> consumer);
 
 }

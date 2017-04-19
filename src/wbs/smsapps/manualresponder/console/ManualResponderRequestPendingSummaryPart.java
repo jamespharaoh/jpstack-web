@@ -325,6 +325,7 @@ class ManualResponderRequestPendingSummaryPart
 
 			List <MessageRec> messages =
 				messageHelper.search (
+					taskLogger,
 					messageSearch);
 
 			for (

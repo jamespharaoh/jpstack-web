@@ -17,16 +17,24 @@ import lombok.NonNull;
 
 import wbs.console.request.ConsoleRequestContext;
 import wbs.console.responder.ConsoleResponder;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.graph.console.GraphScale;
+
 import wbs.utils.io.RuntimeIoException;
 
 public abstract
 class GraphImageResponder
 	extends ConsoleResponder {
 
-	// singelton dependencies
+	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@SingletonDependency
 	ConsoleRequestContext requestContext;
@@ -61,7 +69,8 @@ class GraphImageResponder
 	FontMetrics fontMetrics;
 
 	protected abstract
-	void prepareData ();
+	void prepareData (
+			TaskLogger parentTaskLogger);
 
 	protected abstract
 	void prepareVerticalScale ();
@@ -287,7 +296,14 @@ class GraphImageResponder
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
 
-		prepareData ();
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
+
+		prepareData (
+			taskLogger);
+
 		prepareVerticalScale ();
 		prepareImage ();
 

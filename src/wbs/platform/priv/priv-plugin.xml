@@ -7,6 +7,14 @@
 		<model name="privType"/>
 	</models>
 
+	<layer name="console">
+		<component class="console.ObjectPrivsPageBuilder"/>
+		<component class="console.ObjectPrivsPageSpec"/>
+		<component class="console.ObjectPrivsPart"/>
+		<component class="console.ObjectSummaryPrivPart"/>
+		<component class="console.PrivDataLoaderImplementation"/>
+	</layer>
+
 	<layer name="fixture">
 		<component class="fixture.PrivTypeBuilder"/>
 		<component class="fixture.PrivTypesBuilder"/>
@@ -15,11 +23,6 @@
 	<layer name="model-meta">
 		<component class="metamodel.PrivTypeSpec"/>
 		<component class="metamodel.PrivTypesSpec"/>
-	</layer>
-
-	<layer name="console">
-		<component class="console.ObjectSummaryPrivPart"/>
-		<component class="console.PrivDataLoaderImplementation"/>
 	</layer>
 
 	<console-modules>

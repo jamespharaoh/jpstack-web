@@ -12,12 +12,15 @@ public
 interface ImChatMessageDaoMethods {
 
 	Criteria searchCriteria (
+			TaskLogger parentTaskLogger,
 			ImChatMessageSearch search);
 
 	Criteria searchOperatorReportCriteria (
+			TaskLogger parentTaskLogger,
 			ImChatMessageSearch search);
 
 	List <Long> searchOperatorReportIds (
+			TaskLogger parentTaskLogger,
 			ImChatMessageSearch search);
 
 	List <Optional <ImChatOperatorReport>> findOperatorReports (

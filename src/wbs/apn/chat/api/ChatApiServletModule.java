@@ -1028,6 +1028,7 @@ class ChatApiServletModule
 
 				List <Long> userIds =
 					chatUserHelper.searchIds (
+						taskLogger,
 						search);
 
 				// build list
@@ -3211,8 +3212,9 @@ class ChatApiServletModule
 
 			if (gotDeliveryId != null) {
 
-				List<ChatMessageRec> chatMessages =
+				List <ChatMessageRec> chatMessages =
 					chatMessageHelper.search (
+						taskLogger,
 						new ChatMessageSearch ()
 
 					.toUserId (
@@ -3259,6 +3261,7 @@ class ChatApiServletModule
 
 			List<ChatMessageRec> messages =
 				chatMessageHelper.search (
+					taskLogger,
 					new ChatMessageSearch ()
 
 				.toUserId (

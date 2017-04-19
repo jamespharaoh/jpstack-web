@@ -487,6 +487,7 @@ class ChatBroadcastSendAction
 
 					allChatUserIds =
 						chatUserHelper.searchIds (
+							taskLogger,
 							search);
 
 					taskLogger.debugFormat (

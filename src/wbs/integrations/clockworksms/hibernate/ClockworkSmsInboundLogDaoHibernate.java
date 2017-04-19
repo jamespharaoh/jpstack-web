@@ -12,6 +12,8 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogDao;
 import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogRec;
 import wbs.integrations.clockworksms.model.ClockworkSmsInboundLogSearch;
@@ -26,6 +28,7 @@ class ClockworkSmsInboundLogDaoHibernate
 	@Override
 	public
 	List <Long> searchIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ClockworkSmsInboundLogSearch search) {
 
 		Criteria criteria =

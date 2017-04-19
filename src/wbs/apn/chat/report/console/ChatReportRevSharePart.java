@@ -229,8 +229,12 @@ class ChatReportRevSharePart
 
 		addSmsMessages ();
 		addCredits ();
-		addJoiners ();
-		addChatMessages ();
+
+		addJoiners (
+			taskLogger);
+
+		addChatMessages (
+			taskLogger);
 
 		// sort chat reports
 
@@ -415,10 +419,17 @@ class ChatReportRevSharePart
 
 	}
 
-	void addJoiners () {
+	void addJoiners (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"addJoiners");
 
 		List <ChatUserRec> joiners =
 			chatUserHelper.search (
+				taskLogger,
 				new ChatUserSearch ()
 
 			.chatId (
@@ -657,7 +668,13 @@ class ChatReportRevSharePart
 
 	}
 
-	void addChatMessages () {
+	void addChatMessages (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"addChatMessages");
 
 		Optional <ChatMonthCostRec> chatMonthCostOptional =
 			chatMonthCostHelper.findByCode (
@@ -676,6 +693,7 @@ class ChatReportRevSharePart
 
 		List <ChatMessageRec> chatMessages =
 			chatMessageHelper.search (
+				taskLogger,
 				new ChatMessageSearch ()
 
 			.hasSender (

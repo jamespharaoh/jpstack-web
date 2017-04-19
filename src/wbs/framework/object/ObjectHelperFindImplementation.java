@@ -16,10 +16,13 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.WeakSingletonDependency;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
 @Accessors (fluent = true)
 @PrototypeComponent ("objectHelperFindImplementation")
@@ -30,6 +33,9 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 		ObjectHelperFindMethods <RecordType> {
 
 	// singleton dependencies
+
+	@ClassSingletonDependency
+	LogContext logContext;
 
 	@WeakSingletonDependency
 	ObjectManager objectManager;
@@ -97,10 +103,17 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 	@Override
 	public
 	List <RecordType> search (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"search");
 
 		List <Long> objectIds =
 			searchIds (
+				taskLogger,
 				search);
 
 		ImmutableList.Builder <RecordType> objectsBuilder =
@@ -125,7 +138,13 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 	@Override
 	public
 	List <Long> searchIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Object search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchIds");
 
 		Class <?> searchClass;
 
@@ -146,6 +165,7 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 				objectModel.daoImplementation ().getClass (),
 				"searchIds",
 				ImmutableList.of (
+					TaskLogger.class,
 					searchClass));
 
 		try {
@@ -154,6 +174,7 @@ class ObjectHelperFindImplementation <RecordType extends Record <RecordType>>
 				genericCastUnchecked (
 					searchIdsMethod.invoke (
 						objectModel.daoImplementation (),
+						taskLogger,
 						search));
 
 			return objectIds;

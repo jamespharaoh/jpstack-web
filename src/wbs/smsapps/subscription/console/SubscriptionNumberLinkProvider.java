@@ -5,13 +5,19 @@ import java.util.List;
 
 import javax.inject.Provider;
 
+import lombok.NonNull;
+
 import wbs.console.priv.UserPrivChecker;
 import wbs.console.request.ConsoleRequestContext;
+
 import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.sms.number.core.console.NumberPlugin;
 import wbs.sms.number.core.model.NumberRec;
+
 import wbs.smsapps.subscription.model.SubscriptionSubObjectHelper;
 
 @SingletonComponent ("subscriptionNumberLinkProvider")
@@ -47,8 +53,9 @@ class SubscriptionNumberLinkProvider
 
 	@Override
 	public
-	List<Link> findLinks (
-			NumberRec number,
+	List <Link> findLinks (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull NumberRec number,
 			boolean active) {
 
 		/*

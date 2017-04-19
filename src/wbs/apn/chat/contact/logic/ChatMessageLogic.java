@@ -39,6 +39,7 @@ interface ChatMessageLogic {
 			ChatMessageRec chatMessage);
 
 	boolean chatMessageIsRecentDupe (
+			TaskLogger parentTaskLogger,
 			ChatUserRec fromUser,
 			ChatUserRec toUser,
 			TextRec originalText);

@@ -110,6 +110,7 @@ class ChatMessageUserStatsProvider
 
 			StatsDataSet singleStatsDataSet =
 				getStatsForChat (
+					taskLogger,
 					period,
 					chat);
 
@@ -130,8 +131,14 @@ class ChatMessageUserStatsProvider
 	}
 
 	StatsDataSet getStatsForChat (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull StatsPeriod period,
 			@NonNull ChatRec chat) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getStatsForChat");
 
 		// setup data structures
 
@@ -157,8 +164,9 @@ class ChatMessageUserStatsProvider
 			.timestampAfter (period.startTime ())
 			.timestampBefore (period.endTime ());
 
-		List<ChatMessageRec> chatMessages =
+		List <ChatMessageRec> chatMessages =
 			chatMessageHelper.search (
+				taskLogger,
 				chatMessageSearch);
 
 		// aggregate stats

@@ -23,14 +23,14 @@ class ResolvedConsoleContextExtensionPoint {
 	String name;
 
 	@DataAttribute
-	List<String> parentContextNames;
+	List <String> parentContextNames;
 
 	// children
 
 	@DataChildren
-	List<String> contextTypeNames;
+	List <String> contextTypeNames;
 
 	@DataChildren
-	List<String> contextLinkNames;
+	List <String> contextLinkNames;
 
 }

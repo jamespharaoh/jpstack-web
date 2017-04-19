@@ -43,9 +43,6 @@
 		<component class="console.ChatUserNotesPart"/>
 		<component class="console.ChatUserNumberLinkProvider"/>
 		<component class="console.ChatUserOnlinePart"/>
-		<component class="console.ChatUserSearchOldAction"/>
-		<component class="console.ChatUserSearchOldPart"/>
-		<component class="console.ChatUserSearchOldResultsPart"/>
 		<component class="console.ChatUserSummaryPart"/>
 	</layer>
 

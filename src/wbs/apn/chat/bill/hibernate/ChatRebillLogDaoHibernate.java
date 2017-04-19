@@ -11,10 +11,12 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.apn.chat.bill.model.ChatRebillLogDaoMethods;
 import wbs.apn.chat.bill.model.ChatRebillLogRec;
 import wbs.apn.chat.bill.model.ChatRebillLogSearch;
-import wbs.framework.hibernate.HibernateDao;
 
 public
 class ChatRebillLogDaoHibernate
@@ -24,6 +26,7 @@ class ChatRebillLogDaoHibernate
 	@Override
 	public
 	List <Long> searchIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatRebillLogSearch search) {
 
 		Criteria criteria =

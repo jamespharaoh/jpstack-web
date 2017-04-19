@@ -4,6 +4,7 @@ import java.util.List;
 
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.entity.record.Record;
+import wbs.framework.logging.TaskLogger;
 
 public
 interface ObjectHelperFindMethods <
@@ -29,9 +30,11 @@ interface ObjectHelperFindMethods <
 			String typeCode);
 
 	List <RecordType> search (
+			TaskLogger parentTaskLogger,
 			Object search);
 
 	List <Long> searchIds (
+			TaskLogger parentTaskLogger,
 			Object search);
 
 }

@@ -179,9 +179,15 @@ class ChatMessageLogicImplementation
 	@Override
 	public
 	boolean chatMessageIsRecentDupe (
-			ChatUserRec fromUser,
-			ChatUserRec toUser,
-			TextRec originalText) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ChatUserRec fromUser,
+			@NonNull ChatUserRec toUser,
+			@NonNull TextRec originalText) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"chatMessageIsRecentDupe");
 
 		Transaction transaction =
 			database.currentTransaction ();
@@ -192,6 +198,7 @@ class ChatMessageLogicImplementation
 
 		List<ChatMessageRec> dupes =
 			chatMessageHelper.search (
+				taskLogger,
 				new ChatMessageSearch ()
 
 			.fromUserId (
@@ -291,6 +298,7 @@ class ChatMessageLogicImplementation
 				ChatMessageMethod.iphone),
 
 			() -> chatMessageIsRecentDupe (
+				taskLogger,
 				fromUser,
 				toUser,
 				originalText)
@@ -1010,6 +1018,7 @@ class ChatMessageLogicImplementation
 
 		List <ChatMessageRec> messages =
 			chatMessageHelper.search (
+				taskLogger,
 				new ChatMessageSearch ()
 
 			.toUserId (

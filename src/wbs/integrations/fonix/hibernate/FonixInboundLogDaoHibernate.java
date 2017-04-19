@@ -12,6 +12,8 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.integrations.fonix.model.FonixInboundLogDaoMethods;
 import wbs.integrations.fonix.model.FonixInboundLogRec;
 import wbs.integrations.fonix.model.FonixInboundLogSearch;
@@ -26,6 +28,7 @@ class FonixInboundLogDaoHibernate
 	@Override
 	public
 	List <Long> searchIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull FonixInboundLogSearch search) {
 
 		Criteria criteria =

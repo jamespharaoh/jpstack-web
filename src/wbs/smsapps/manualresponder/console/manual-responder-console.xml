@@ -65,6 +65,8 @@
 					label="Affiliates"
 					priv-key="manualResponder.manage"/>
 
+				<object-privs-page/>
+
 			</section>
 
 			<section

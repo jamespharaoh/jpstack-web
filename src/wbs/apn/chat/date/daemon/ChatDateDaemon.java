@@ -494,6 +494,7 @@ class ChatDateDaemon
 
 				Collection <Long> monitorIds =
 					chatUserHelper.searchIds (
+						taskLogger,
 						new ChatUserSearch ()
 
 					.chatId (

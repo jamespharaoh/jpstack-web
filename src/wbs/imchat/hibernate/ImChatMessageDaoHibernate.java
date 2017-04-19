@@ -42,6 +42,7 @@ class ImChatMessageDaoHibernate
 	@Override
 	public
 	Criteria searchCriteria (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ImChatMessageSearch search) {
 
 		Criteria criteria =
@@ -105,10 +106,17 @@ class ImChatMessageDaoHibernate
 	@Override
 	public
 	Criteria searchOperatorReportCriteria (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ImChatMessageSearch search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchOperatorReportCriteria");
 
 		Criteria criteria =
 			searchCriteria (
+				taskLogger,
 				search);
 
 		criteria.setProjection (
@@ -162,10 +170,17 @@ class ImChatMessageDaoHibernate
 	@Override
 	public
 	List <Long> searchOperatorReportIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ImChatMessageSearch search) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"searchOperatorReportIds");
 
 		Criteria criteria =
 			searchCriteria (
+				taskLogger,
 				search);
 
 		criteria.setProjection (
@@ -217,6 +232,7 @@ class ImChatMessageDaoHibernate
 
 		Criteria criteria =
 			searchOperatorReportCriteria (
+				taskLogger,
 				search);
 
 		criteria.add (

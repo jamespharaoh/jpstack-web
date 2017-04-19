@@ -4,13 +4,16 @@ import static wbs.utils.etc.Misc.isNotNull;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import lombok.NonNull;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.event.model.EventDao;
 import wbs.platform.event.model.EventRec;
 import wbs.platform.event.model.EventSearch;
@@ -23,6 +26,7 @@ class EventDaoHibernate
 	@Override
 	public
 	List <Long> searchIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull EventSearch eventSearch) {
 
 		Criteria criteria =

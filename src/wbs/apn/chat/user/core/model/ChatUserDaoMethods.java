@@ -1,14 +1,16 @@
 package wbs.apn.chat.user.core.model;
 
 import java.util.List;
-import java.util.Map;
 
 import org.joda.time.Instant;
+
+import wbs.framework.logging.TaskLogger;
+
+import wbs.sms.number.core.model.NumberRec;
 
 import wbs.apn.chat.affiliate.model.ChatAffiliateRec;
 import wbs.apn.chat.category.model.ChatCategoryRec;
 import wbs.apn.chat.core.model.ChatRec;
-import wbs.sms.number.core.model.NumberRec;
 
 public
 interface ChatUserDaoMethods {
@@ -66,11 +68,8 @@ interface ChatUserDaoMethods {
 	List <ChatUserRec> findWantingAdultAd (
 			Instant now);
 
-	@Deprecated
 	List <Long> searchIds (
-			Map <String, Object> searchMap);
-
-	List <Long> searchIds (
+			TaskLogger parentTaskLogger,
 			ChatUserSearch search);
 
 	List <ChatUserRec> find (

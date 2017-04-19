@@ -1,10 +1,13 @@
 package wbs.platform.user.hibernate;
 
+import java.util.List;
+
 import lombok.NonNull;
 
 import org.hibernate.criterion.Restrictions;
 
 import wbs.framework.hibernate.HibernateDao;
+
 import wbs.platform.priv.model.PrivRec;
 import wbs.platform.user.model.UserPrivDao;
 import wbs.platform.user.model.UserPrivRec;
@@ -33,6 +36,28 @@ class UserPrivDaoHibernate
 				Restrictions.eq (
 					"_userPriv.user",
 					user))
+
+			.add (
+				Restrictions.eq (
+					"_userPriv.priv",
+					priv))
+
+		);
+
+	}
+
+	@Override
+	public
+	List <UserPrivRec> find (
+			@NonNull PrivRec priv) {
+
+		return findMany (
+			"find (priv)",
+			UserPrivRec.class,
+
+			createCriteria (
+				UserPrivRec.class,
+				"_userPriv")
 
 			.add (
 				Restrictions.eq (

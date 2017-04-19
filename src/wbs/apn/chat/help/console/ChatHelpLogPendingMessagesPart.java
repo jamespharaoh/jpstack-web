@@ -17,8 +17,10 @@ import lombok.NonNull;
 
 import wbs.console.part.AbstractPagePart;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.service.console.ServiceConsoleHelper;
@@ -52,6 +54,9 @@ class ChatHelpLogPendingMessagesPart
 	@SingletonDependency
 	ChatUserLogic chatUserLogic;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
 	MessageObjectHelper messageHelper;
 
@@ -67,7 +72,7 @@ class ChatHelpLogPendingMessagesPart
 	ChatUserRec chatUser;
 	ChatRec chat;
 
-	List<MessageRec> messages;
+	List <MessageRec> messages;
 
 	// implementation
 
@@ -75,6 +80,11 @@ class ChatHelpLogPendingMessagesPart
 	public
 	void prepare (
 			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepare");
 
 		chatHelpLog =
 			chatHelpLogHelper.findFromContextRequired ();
@@ -106,7 +116,8 @@ class ChatHelpLogPendingMessagesPart
 				MessageSearchOrder.createdTime);
 
 		messages =
-			messageHelper.search(
+			messageHelper.search (
+				taskLogger,
 				messageSearch);
 
 	}

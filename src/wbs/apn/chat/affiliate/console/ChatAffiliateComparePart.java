@@ -139,6 +139,7 @@ class ChatAffiliateComparePart
 
 		List <Long> newUserIds =
 			chatUserHelper.searchIds (
+				taskLogger,
 				new ChatUserSearch ()
 
 			.chatId (

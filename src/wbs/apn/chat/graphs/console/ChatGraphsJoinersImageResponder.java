@@ -4,6 +4,8 @@ import static wbs.utils.etc.OptionalUtils.optionalOrNull;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
@@ -13,6 +15,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.database.Database;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.time.TextualInterval;
 
@@ -70,14 +73,21 @@ class ChatGraphsJoinersImageResponder
 	@Override
 	protected
 	void prepareData (
-			Instant minTime,
-			Instant maxTime) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Instant minTime,
+			@NonNull Instant maxTime) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepareData");
 
 		ChatRec chat =
 			chatHelper.findFromContextRequired ();
 
 		List <Long> chatUserIds =
 			chatUserHelper.searchIds (
+				taskLogger,
 				new ChatUserSearch ()
 
 			.chatId (

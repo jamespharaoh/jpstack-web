@@ -15,8 +15,10 @@ import wbs.console.reporting.StatsGranularity;
 import wbs.console.reporting.StatsPeriod;
 import wbs.console.reporting.StatsProvider;
 
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.contact.model.ChatMessageObjectHelper;
@@ -34,6 +36,9 @@ class ChatMessageStatsProvider
 	@SingletonDependency
 	ChatMessageObjectHelper chatMessageHelper;
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	// implementation
 
 	@Override
@@ -42,6 +47,11 @@ class ChatMessageStatsProvider
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull StatsPeriod period,
 			@NonNull Map <String, Object> conditions) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"getStats");
 
 		if (period.granularity () != StatsGranularity.hour)
 			throw new IllegalArgumentException ();
@@ -73,8 +83,9 @@ class ChatMessageStatsProvider
 
 		// retrieve messages
 
-		List<ChatMessageRec> chatMessages =
+		List <ChatMessageRec> chatMessages =
 			chatMessageHelper.search (
+				taskLogger,
 				new ChatMessageSearch ()
 
 			.chatId (

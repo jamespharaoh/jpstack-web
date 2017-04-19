@@ -6,6 +6,8 @@ import static wbs.utils.etc.Misc.isNotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -13,13 +15,13 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Interval;
 
-import lombok.NonNull;
+import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.TaskLogger;
 
-import wbs.apn.chat.contact.model.ChatUserInitiationLogSearch;
 import wbs.apn.chat.contact.model.ChatUserInitiationLogDao;
 import wbs.apn.chat.contact.model.ChatUserInitiationLogRec;
+import wbs.apn.chat.contact.model.ChatUserInitiationLogSearch;
 import wbs.apn.chat.core.model.ChatRec;
-import wbs.framework.hibernate.HibernateDao;
 
 public
 class ChatUserInitiationLogDaoHibernate
@@ -66,6 +68,7 @@ class ChatUserInitiationLogDaoHibernate
 	@Override
 	public
 	List <Long> searchIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserInitiationLogSearch search) {
 
 		Criteria criteria =

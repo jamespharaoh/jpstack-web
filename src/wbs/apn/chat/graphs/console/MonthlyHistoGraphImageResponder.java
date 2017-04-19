@@ -9,15 +9,20 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.LocalDate;
 import org.joda.time.YearMonth;
 
-import wbs.apn.chat.core.logic.ChatMiscLogic;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.graph.console.GraphScale;
+
+import wbs.apn.chat.core.logic.ChatMiscLogic;
 
 public abstract
 class MonthlyHistoGraphImageResponder
@@ -63,6 +68,7 @@ class MonthlyHistoGraphImageResponder
 
 	protected abstract
 	void prepareData (
+			TaskLogger parentTaskLogger,
 			Instant minTime,
 			Instant maxTime);
 
@@ -71,7 +77,13 @@ class MonthlyHistoGraphImageResponder
 
 	@Override
 	protected
-	void prepareData () {
+	void prepareData (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepareData");
 
 		timezone =
 			timezone ();
@@ -95,6 +107,7 @@ class MonthlyHistoGraphImageResponder
 				.toInstant ();
 
 		prepareData (
+			taskLogger,
 			minTime,
 			maxTime);
 

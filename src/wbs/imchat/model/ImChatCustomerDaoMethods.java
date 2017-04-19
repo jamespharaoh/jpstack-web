@@ -2,8 +2,7 @@ package wbs.imchat.model;
 
 import java.util.List;
 
-import wbs.imchat.model.ImChatCustomerRec;
-import wbs.imchat.model.ImChatRec;
+import wbs.framework.logging.TaskLogger;
 
 public
 interface ImChatCustomerDaoMethods {
@@ -13,6 +12,7 @@ interface ImChatCustomerDaoMethods {
 			String email);
 
 	List <Long> searchIds (
+			TaskLogger parentTaskLogger,
 			ImChatCustomerSearch imChatCustomerSearch);
 
 }

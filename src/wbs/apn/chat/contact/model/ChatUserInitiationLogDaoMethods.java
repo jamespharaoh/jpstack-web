@@ -4,7 +4,8 @@ import java.util.List;
 
 import org.joda.time.Interval;
 
-import wbs.apn.chat.contact.model.ChatUserInitiationLogRec;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.apn.chat.core.model.ChatRec;
 
 public
@@ -15,6 +16,7 @@ interface ChatUserInitiationLogDaoMethods {
 			Interval timestampInterval);
 
 	List <Long> searchIds (
+			TaskLogger parentTaskLogger,
 			ChatUserInitiationLogSearch search);
 
 }

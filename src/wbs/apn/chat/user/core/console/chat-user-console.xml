@@ -32,29 +32,14 @@
 
 		<list>
 
-			<section
-				name="search"
-				label="Search">
+			<object-search-page
+				search-fields="search"
+				priv-key="chat.supervisor">
 
-				<object-search-page
-					name="new"
-					tab-label="New"
-					search-fields="search"
-					priv-key="chat.supervisor">
+				<results-mode name="normal"/>
+				<results-mode name="credit"/>
 
-					<results-mode name="normal"/>
-					<results-mode name="credit"/>
-
-				</object-search-page>
-
-				<context-tab-action-page
-					name="old"/>
-
-				<context-tab-responder
-					name="oldResults"
-					tab="chatUser.search.old"/>
-
-			</section>
+			</object-search-page>
 
 			<context-tab-responder-page
 				name="online"/>

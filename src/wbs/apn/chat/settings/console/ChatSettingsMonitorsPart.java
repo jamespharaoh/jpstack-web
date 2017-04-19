@@ -87,6 +87,7 @@ class ChatSettingsMonitorsPart
 
 		List <Long> onlineMonitorIds =
 			chatUserHelper.searchIds (
+				taskLogger,
 				new ChatUserSearch ()
 
 			.chatId (

@@ -6,6 +6,8 @@ import java.awt.Color;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
@@ -16,6 +18,7 @@ import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.graph.console.GraphScale;
 
@@ -74,7 +77,8 @@ class ChatGraphsUsersImageResponder
 
 	@Override
 	protected
-	void prepareData () {
+	void prepareData (
+			@NonNull TaskLogger parentTaskLogger) {
 
 		chat =
 			chatHelper.findFromContextRequired ();

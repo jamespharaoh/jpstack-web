@@ -59,14 +59,21 @@ class ChatUserNumberLinkProvider
 
 	@Override
 	public
-	List<Link> findLinks (
-			NumberRec number,
+	List <Link> findLinks (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull NumberRec number,
 			boolean active) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"findLinks");
 
 		// find relevant subs
 
-		List<Long> chatUserIds =
+		List <Long> chatUserIds =
 			chatUserHelper.searchIds (
+				taskLogger,
 				new ChatUserSearch ()
 
 			.numberId (

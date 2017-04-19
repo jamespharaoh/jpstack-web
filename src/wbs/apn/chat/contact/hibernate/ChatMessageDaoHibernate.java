@@ -4,6 +4,8 @@ import static wbs.utils.etc.NumberUtils.toJavaIntegerRequired;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -11,17 +13,18 @@ import org.hibernate.criterion.Restrictions;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
-import lombok.NonNull;
-
-import wbs.apn.chat.contact.model.ChatMessageSearch;
-import wbs.apn.chat.contact.model.ChatMessageStatus;
-import wbs.apn.chat.contact.model.ChatMessageDao;
-import wbs.apn.chat.contact.model.ChatMessageRec;
-import wbs.apn.chat.core.model.ChatRec;
-import wbs.apn.chat.user.core.model.ChatUserRec;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.platform.user.model.UserRec;
+
+import wbs.apn.chat.contact.model.ChatMessageDao;
+import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.apn.chat.contact.model.ChatMessageSearch;
+import wbs.apn.chat.contact.model.ChatMessageStatus;
+import wbs.apn.chat.core.model.ChatRec;
+import wbs.apn.chat.user.core.model.ChatUserRec;
 
 @SingletonComponent ("chatMessageDao")
 public
@@ -233,7 +236,8 @@ class ChatMessageDaoHibernate
 
 	@Override
 	public
-	List<ChatMessageRec> search (
+	List <ChatMessageRec> search (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatMessageSearch search) {
 
 		Criteria criteria =

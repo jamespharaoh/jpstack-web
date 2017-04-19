@@ -12,6 +12,8 @@ import java.util.Set;
 
 import com.google.common.base.Optional;
 
+import lombok.NonNull;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.Instant;
 
@@ -19,6 +21,7 @@ import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.TaskLogger;
 
 import wbs.apn.chat.core.console.ChatConsoleHelper;
 import wbs.apn.chat.core.logic.ChatMiscLogic;
@@ -71,8 +74,14 @@ class ChatGraphsDailyUsersImageResponder
 	@Override
 	protected
 	void prepareData (
-			Instant minTime,
-			Instant maxTime) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Instant minTime,
+			@NonNull Instant maxTime) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"prepareData");
 
 		Map <String, Object> searchMap =
 			new LinkedHashMap<> ();
@@ -109,15 +118,16 @@ class ChatGraphsDailyUsersImageResponder
 
 		Collection <ChatUserSessionRec> chatUserSessions =
 			chatUserSessionHelper.search (
+				taskLogger,
 				searchMap);
 
-		List<Set<ChatUserRec>> chatUserSets =
-			new ArrayList<Set<ChatUserRec>> ();
+		List <Set <ChatUserRec>> chatUserSets =
+			new ArrayList<> ();
 
 		for (int i = 0; i < values.size (); i ++) {
 
 			chatUserSets.add (
-				new HashSet<ChatUserRec> ());
+				new HashSet<> ());
 
 		}
 

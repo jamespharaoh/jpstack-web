@@ -352,6 +352,7 @@ class ObjectSearchPostAction <
 						consoleHelper.getClass (),
 						searchDaoMethodName,
 						ImmutableList.<Class <?>> of (
+							TaskLogger.class,
 							searchClass));
 
 				objectIds =
@@ -359,12 +360,14 @@ class ObjectSearchPostAction <
 						methodInvoke (
 							method,
 							consoleHelper,
+							taskLogger,
 							search));
 
 			} else {
 
 				objectIds =
 					consoleHelper.searchIds (
+						taskLogger,
 						search);
 
 			}

@@ -5,17 +5,20 @@ import static wbs.utils.time.TimeUtils.toInstant;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import lombok.NonNull;
+import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.TaskLogger;
+
 import wbs.imchat.model.ImChatCustomerDao;
 import wbs.imchat.model.ImChatCustomerRec;
-import wbs.imchat.model.ImChatRec;
-import wbs.framework.hibernate.HibernateDao;
 import wbs.imchat.model.ImChatCustomerSearch;
+import wbs.imchat.model.ImChatRec;
 
 public
 class ImChatCustomerDaoHibernate
@@ -53,7 +56,8 @@ class ImChatCustomerDaoHibernate
 	@Override
 	public
 	List <Long> searchIds (
-			ImChatCustomerSearch imChatCustomerSearch) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ImChatCustomerSearch imChatCustomerSearch) {
 
 		Criteria criteria =
 

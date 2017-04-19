@@ -5,10 +5,12 @@ import java.util.List;
 import org.joda.time.Instant;
 import org.joda.time.Interval;
 
-import wbs.apn.chat.contact.model.ChatMessageRec;
+import wbs.framework.logging.TaskLogger;
+
+import wbs.platform.user.model.UserRec;
+
 import wbs.apn.chat.core.model.ChatRec;
 import wbs.apn.chat.user.core.model.ChatUserRec;
-import wbs.platform.user.model.UserRec;
 
 public
 interface ChatMessageDaoMethods {
@@ -55,6 +57,7 @@ interface ChatMessageDaoMethods {
 	// search
 
 	List <ChatMessageRec> search (
+			TaskLogger parentTaskLogger,
 			ChatMessageSearch search);
 
 }

@@ -4,19 +4,21 @@ import static wbs.utils.etc.Misc.isNotNull;
 
 import java.util.List;
 
+import lombok.NonNull;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.Interval;
 
-import lombok.NonNull;
+import wbs.framework.hibernate.HibernateDao;
+import wbs.framework.logging.TaskLogger;
 
-import wbs.apn.chat.bill.model.ChatUserCreditSearch;
 import wbs.apn.chat.bill.model.ChatUserCreditDao;
 import wbs.apn.chat.bill.model.ChatUserCreditRec;
+import wbs.apn.chat.bill.model.ChatUserCreditSearch;
 import wbs.apn.chat.core.model.ChatRec;
-import wbs.framework.hibernate.HibernateDao;
 
 public
 class ChatUserCreditDaoHibernate
@@ -63,6 +65,7 @@ class ChatUserCreditDaoHibernate
 	@Override
 	public
 	List <Long> searchIds (
+			@NonNull TaskLogger parentTaskLogger,
 			@NonNull ChatUserCreditSearch search) {
 
 		Criteria criteria =

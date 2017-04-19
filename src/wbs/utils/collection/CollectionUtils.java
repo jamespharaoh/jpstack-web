@@ -512,7 +512,7 @@ class CollectionUtils {
 
 	}
 
-	public static <Type extends Comparable <Type>>
+	public static <Type extends Comparable <? super Type>>
 	List <Type> listSorted (
 			@NonNull Iterable <Type> iterable) {
 
