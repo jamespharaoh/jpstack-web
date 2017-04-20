@@ -3,6 +3,7 @@ package wbs.platform.deployment.logic;
 import static wbs.utils.collection.CollectionUtils.collectionDoesNotHaveOneElement;
 import static wbs.utils.collection.CollectionUtils.collectionIsNotEmpty;
 import static wbs.utils.collection.CollectionUtils.listFirstElementRequired;
+import static wbs.utils.string.StringUtils.hyphenToUnderscore;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringStartsWithSimple;
 import static wbs.utils.string.StringUtils.substringFrom;
@@ -180,8 +181,9 @@ class DeploymentLogicImplementation
 
 		return apiDeploymentHelper.findByCodeRequired (
 			GlobalId.root,
-			System.getenv (
-				"WBS_DEPLOYMENT_NAME"));
+			hyphenToUnderscore (
+				System.getenv (
+					"WBS_DEPLOYMENT_NAME")));
 
 	}
 
@@ -191,8 +193,9 @@ class DeploymentLogicImplementation
 
 		return consoleDeploymentHelper.findByCodeRequired (
 			GlobalId.root,
-			System.getenv (
-				"WBS_DEPLOYMENT_NAME"));
+			hyphenToUnderscore (
+				System.getenv (
+					"WBS_DEPLOYMENT_NAME")));
 
 	}
 
@@ -202,8 +205,9 @@ class DeploymentLogicImplementation
 
 		return daemonDeploymentHelper.findByCodeRequired (
 			GlobalId.root,
-			System.getenv (
-				"WBS_DEPLOYMENT_NAME"));
+			hyphenToUnderscore (
+				System.getenv (
+					"WBS_DEPLOYMENT_NAME")));
 
 	}
 
