@@ -10,8 +10,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.thread.ConcurrentUtils.futureGet;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -43,6 +41,7 @@ import wbs.platform.user.model.UserObjectHelper;
 import wbs.platform.user.model.UserRec;
 
 import wbs.utils.io.RuntimeIoException;
+import wbs.utils.string.StringFormatWriter;
 
 @PrototypeComponent ("statusUpdateResponder")
 public
@@ -129,14 +128,14 @@ class StatusUpdateResponder
 
 		// create the html
 
-		StringWriter stringWriter =
-			new StringWriter ();
+		try (
 
-		PrintWriter printWriter =
-			new PrintWriter (stringWriter);
+			StringFormatWriter formatWriter =
+				new StringFormatWriter ();
 
-		printWriter.print (
-			stringFormat (
+		) {
+
+			formatWriter.writeFormat (
 				"updateHeader ('%j');\n",
 				joinWithSeparator (
 					" – ",
@@ -146,48 +145,47 @@ class StatusUpdateResponder
 						optionalFromNullable (
 							consoleDeployment.getStatusLabel ()),
 						optionalOf (
-							deploymentLogic.gitVersion ())))));
-
-		printWriter.print (
-			stringFormat (
+							deploymentLogic.gitVersion ()))));
+	
+			formatWriter.writeFormat (
 				"updateTimestamp ('%j');\n",
 				userConsoleLogic.timestampWithTimezoneString (
-					transaction.now ())));
-
-		if (
-			isNotNull (
-				root.getNotice ())
-		) {
-
-			printWriter.print (
-				stringFormat (
+					transaction.now ()));
+	
+			if (
+				isNotNull (
+					root.getNotice ())
+			) {
+	
+				formatWriter.writeFormat (
 					"updateNotice ('%j');\n",
-					root.getNotice ()));
-
-		} else {
-
-			printWriter.print (
-				stringFormat (
-					"updateNotice (undefined);\n"));
-
-		}
-
-		// close transaction
-
-		transaction.close ();
-
-		// wait for status lines
-
-		futures.forEach (
-			future ->
-				printWriter.print (
+					root.getNotice ());
+	
+			} else {
+	
+				formatWriter.writeFormat (
+					"updateNotice (undefined);\n");
+	
+			}
+	
+			// close transaction
+	
+			transaction.close ();
+	
+			// wait for status lines
+	
+			futures.forEach (
+				future ->
+					formatWriter.writeString (
 					futureGet (
 						future)));
+	
+			// convert to string
+	
+			javascript =
+				formatWriter.toString ();
 
-		// convert to string
-
-		javascript =
-			stringWriter.toString ();
+		}
 
 	}
 
