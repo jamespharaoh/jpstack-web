@@ -4,30 +4,38 @@ import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.inject.Provider;
+
 import com.google.common.collect.ImmutableList;
 
 import lombok.Getter;
-import lombok.extern.log4j.Log4j;
+import lombok.NonNull;
 
+import wbs.console.priv.UserPrivCheckerBuilder;
+
+import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
+import wbs.framework.component.annotations.PrototypeDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
+import wbs.framework.logging.LogContext;
+import wbs.framework.logging.TaskLogger;
 
-@Log4j
 @SingletonComponent ("statusLineManager")
 public
 class StatusLineManager {
 
 	// singleton dependencies
 
+	@ClassSingletonDependency
+	LogContext logContext;
+
 	@SingletonDependency
-	Map<String,StatusLine> statusLinesByBeanName =
-		Collections.emptyMap ();
+	Map <String, StatusLine> statusLinesByBeanName;
 
 	// properties
 
@@ -38,8 +46,13 @@ class StatusLineManager {
 
 	@NormalLifecycleSetup
 	public
-	void afterPropertiesSet ()
-		throws Exception {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
 
 		Set <String> statusLineNames =
 			new HashSet<> ();
@@ -47,7 +60,7 @@ class StatusLineManager {
 		ImmutableList.Builder <StatusLine> statusLinesBuilder =
 			ImmutableList.builder ();
 
-		log.debug (
+		taskLogger.debugFormat (
 			"About to initialise status lines");
 
 		for (
@@ -62,13 +75,12 @@ class StatusLineManager {
 				entry.getValue ();
 
 			String statusLineName =
-				statusLine.getName ();
+				statusLine.typeName ();
 
-			log.debug (
-				stringFormat (
-					"Adding status line %s from %s",
-					statusLineName,
-					beanName));
+			taskLogger.debugFormat (
+				"Adding status line %s from %s",
+				statusLineName,
+				beanName);
 
 			if (
 				statusLineNames
@@ -89,22 +101,20 @@ class StatusLineManager {
 			statusLinesBuilder.add (
 				statusLine);
 
-			log.debug (
-				stringFormat (
-					"Adding status line %s from %s",
-					statusLineName,
-					beanName));
+			taskLogger.debugFormat (
+				"Adding status line %s from %s",
+				statusLineName,
+				beanName);
 
 		}
 
 		statusLines =
 			statusLinesBuilder.build ();
 
-		log.info (
-			stringFormat (
-				"Initialised %s status lines",
-				integerToDecimalString (
-					statusLines.size ())));
+		taskLogger.noticeFormat (
+			"Initialised %s status lines",
+			integerToDecimalString (
+				statusLines.size ()));
 
 	}
 

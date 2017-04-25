@@ -53,7 +53,14 @@ class TextObjectHelperMethodsImplementation
 
 	@LateLifecycleSetup
 	public
-	void setup () {
+	void setup (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		@SuppressWarnings ("unused")
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"setup");
 
 		// from and to user id
 

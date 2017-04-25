@@ -2,19 +2,23 @@ package wbs.platform.status.console;
 
 import java.util.concurrent.Future;
 
+import com.google.gson.JsonObject;
+
 import wbs.console.part.PagePart;
+import wbs.console.priv.UserPrivChecker;
 
 import wbs.framework.logging.TaskLogger;
 
 public
 interface StatusLine {
 
-	String getName ();
+	String typeName ();
 
-	PagePart get (
+	PagePart createPagePart (
 			TaskLogger parentTaskLogger);
 
-	Future <String> getUpdateScript (
-			TaskLogger parentTaskLogger);
+	Future <JsonObject> getUpdateData (
+			TaskLogger parentTaskLogger,
+			UserPrivChecker privChecker);
 
 }

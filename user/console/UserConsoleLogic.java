@@ -23,7 +23,4 @@ interface UserConsoleLogic
 	Optional <Long> sliceId ();
 	Long sliceIdRequired ();
 
-	boolean loggedIn ();
-	boolean notLoggedIn ();
-
 }

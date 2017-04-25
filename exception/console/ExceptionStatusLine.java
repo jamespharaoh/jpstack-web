@@ -1,12 +1,12 @@
 package wbs.platform.exception.console;
 
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.thread.ConcurrentUtils.futureValue;
 
 import java.util.concurrent.Future;
 
 import javax.inject.Provider;
+
+import com.google.gson.JsonObject;
 
 import lombok.NonNull;
 
@@ -31,9 +31,6 @@ class ExceptionStatusLine
 
 	// singleton dependencies
 
-	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
 	@ClassSingletonDependency
 	LogContext logContext;
 
@@ -44,7 +41,7 @@ class ExceptionStatusLine
 	NumFatalExceptionsCache numFatalExceptionsCache;
 
 	@SingletonDependency
-	UserPrivChecker privChecker;
+	ConsoleRequestContext requestContext;
 
 	// prototype dependencies
 
@@ -55,7 +52,7 @@ class ExceptionStatusLine
 
 	@Override
 	public
-	String getName () {
+	String typeName () {
 		return "exceptions";
 	}
 
@@ -63,7 +60,7 @@ class ExceptionStatusLine
 
 	@Override
 	public
-	PagePart get (
+	PagePart createPagePart (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		return exceptionStatusLinePart.get ();
@@ -72,16 +69,17 @@ class ExceptionStatusLine
 
 	@Override
 	public
-	Future <String> getUpdateScript (
-			@NonNull TaskLogger parentTaskLogger) {
+	Future <JsonObject> getUpdateData (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull UserPrivChecker privChecker) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
 				"getUpdateScript");
 
-		Long numExceptions = 0l;
-		Long numExceptionsFatal = 0l;
+		JsonObject updateData =
+			new JsonObject ();
 
 		// count exceptions (if visible)
 
@@ -92,31 +90,26 @@ class ExceptionStatusLine
 				"alert")
 		) {
 
-			numExceptions =
+			updateData.addProperty (
+				"exceptions",
 				numExceptionsCache.get (
-					taskLogger);
-
-			numExceptionsFatal =
-				numFatalExceptionsCache.get (
-					taskLogger);
+					taskLogger));
 
 		} else {
 
-			numExceptionsFatal =
-				numFatalExceptionsCache.get (
-					taskLogger);
+			updateData.addProperty (
+				"exceptions",
+				0);
 
 		}
 
-		// return
+		updateData.addProperty (
+			"fatalExceptions",
+			numFatalExceptionsCache.get (
+				taskLogger));
 
 		return futureValue (
-			stringFormat (
-				"updateExceptions (%s, %s);\n",
-				integerToDecimalString (
-					numExceptions),
-				integerToDecimalString (
-					numExceptionsFatal)));
+			updateData);
 
 	}
 

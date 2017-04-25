@@ -3,9 +3,10 @@
 	package="wbs.platform.status">
 
 	<layer name="console">
+		<component class="console.StatusKeepaliveAsyncEndpoint"/>
 		<component class="console.StatusLineManager"/>
 		<component class="console.StatusResponder"/>
-		<component class="console.StatusUpdateResponder"/>
+		<component class="console.StatusUpdateAsyncEndpoint"/>
 	</layer>
 
 	<console-modules>

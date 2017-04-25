@@ -12,6 +12,9 @@ import lombok.NonNull;
 
 import org.apache.commons.lang3.SerializationUtils;
 
+import wbs.console.request.ConsoleRequestContext;
+import wbs.console.session.UserSessionVerifyLogic;
+
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.user.model.UserRec;
@@ -20,16 +23,19 @@ import wbs.platform.user.model.UserSessionRec;
 import wbs.utils.string.StringUtils;
 
 public
-interface UserSessionLogic {
+interface UserSessionLogic
+	extends UserSessionVerifyLogic {
 
 	UserSessionRec userLogon (
 			TaskLogger parentTaskLogger,
+			ConsoleRequestContext requestContext,
 			UserRec user,
 			Optional <String> userAgent,
 			Optional <String> consoleDeploymentCode);
 
 	Optional <UserSessionRec> userLogonTry (
 			TaskLogger parentTaskLogger,
+			ConsoleRequestContext requestContext,
 			String sliceCode,
 			String username,
 			String password,
@@ -41,7 +47,8 @@ interface UserSessionLogic {
 			UserRec user);
 
 	boolean userSessionVerify (
-			TaskLogger parentTaskLogger);
+			TaskLogger parentTaskLogger,
+			ConsoleRequestContext requestContext);
 
 	Optional <byte[]> userData (
 			UserRec user,

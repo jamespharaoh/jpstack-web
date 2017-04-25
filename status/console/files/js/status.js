@@ -1,117 +1,19 @@
-// status
+var wbsStatus = {
 
-var headerText = "Status";
-var statusRequest;
+	_handlers: {},
 
-// sets up the request
+};
 
-function statusRequestGo () {
+wbsStatus._init =
+function wbsStatusInit () {
 
-	if (window.XMLHttpRequest) {
-		statusRequest = new XMLHttpRequest ();
-	} else if (window.ActiveXObject) {
-		statusRequest = new ActiveXObject ("Microsoft.XMLHTTP");
-	} else return;
+	async.onConnect (
+		wbsStatus._handleConnect);
 
-	statusRequest.onreadystatechange = statusRequestChange;
-	statusRequest.open ("GET", statusRequestUrl, true);
-	statusRequest.send (null);
+	async.onDisconnect (
+		wbsStatus._handleError);
 
-}
-
-// handles the request status change events
-
-function statusRequestChange () {
-
-	if (statusRequest.readyState != 4) return;
-
-	if (statusRequest.status != 200) {
-
-		document.getElementById ('headerCell').firstChild.data =
-			headerText + ' (' + statusRequest.status + '!)';
-
-		statusRequestSchedule ();
-
-		return;
-
-	}
-
-	try {
-
-		var statusDiv = document.getElementById ('statusDiv');
-
-		var response = statusRequest.responseXML.documentElement;
-
-		eval (response.getElementsByTagName ('javascript') [0].firstChild.data);
-
-		document.getElementById ('headerCell').firstChild.data =
-			headerText;
-
-		var loadingRow = document.getElementById ('loadingRow');
-
-		showTableRow (loadingRow, false);
-
-	} catch (e) { }
-
-	statusRequestSchedule ();
-
-}
-
-// sets a timer for the request
-
-function statusRequestSchedule () {
-
-	setTimeout (
-		statusRequestGo,
-		statusRequestTime);
-
-}
-
-// shows or hides the given table row
-
-function showTableRow (row, show) {
-
-	if (show && row.style.display != 'table-row' && row.style.display != 'block') {
-		try { row.style.display = 'table-row'; }
-		catch (e) { row.style.display = 'block'; }
-	}
-
-	if (! show && row.style.display != 'none') {
-		row.style.display = 'none';
-	}
-
-}
-
-function updateHeader (newHeaderText) {
-	headerText = newHeaderText;
-}
-
-function updateTimestamp (timestamp) {
-
-	var timeCell = document.getElementById ('timeCell');
-	var timeRow = document.getElementById ('timeRow');
-
-	timeCell.firstChild.data = timestamp;
-	showTableRow (timeRow, true);
-
-}
-
-function updateNotice (notice) {
-
-	if (notice) {
-
-		$("#noticeCell").html (notice);
-		$("#noticeRow").show ();
-
-	} else {
-
-		$("#noticeRow").hide ();
-
-	}
-
-}
-
-$(function () {
+	wbsStatus._keepaliveLoop ();
 
 	$("#timeRow").hover (
 		function () { $(this).addClass ("hover") },
@@ -119,6 +21,124 @@ $(function () {
 
 	$("#timeRow").click (function () {
 		window.parent.frames.main.location = "/coreSystem";
+	});
+
+};
+
+wbsStatus.handlerRegister =
+function wbsStatusHandlerRegister (type, callback) {
+
+	if (type in wbsStatus._handlers) {
+
+		throw new Error (
+			"Duplicated status handler: " + type);
+
+	}
+
+	wbsStatus._handlers [type] = callback;
+
+	console.debug (
+		"Registered status handler: " + type);
+
+};
+
+wbsStatus._handleConnect =
+function wbsStatusHandleConnect () {
+
+	console.debug (
+		"Status update subscribe");
+
+	async.subscribe (
+		"/status/update",
+		wbsStatus._handleUpdate);
+
+};
+
+wbsStatus._handleUpdate =
+function wbsStatusHandleUpdate (payload) {
+
+	payload.updates.forEach (function (update) {
+
+		if (update.type in wbsStatus._handlers) {
+
+			var handler =
+				wbsStatus._handlers [update.type];
+
+			handler (
+				update.data);
+
+		} else {
+
+			console.warn (
+				"Status update of unknown type: " + update.type);
+
+		}
+
+	});
+
+	$("#loadingRow").hide ();
+
+};
+
+wbsStatus._handleError =
+function wbsStatusHandleError () {
+
+	$("#headerCell").text ("Status");
+	$("#loadingRow").show ();
+	$("#timeRow").hide ();
+
+};
+
+wbsStatus._sendKeepalive =
+function wbsStatusSendKeepalive () {
+
+	async.send (
+		"/status/keepalive",
+		{});
+
+};
+
+wbsStatus._keepaliveLoop =
+function wbsStatusKeepaliveLoop () {
+
+	wbsStatus._sendKeepalive ();
+
+	setTimeout (
+		wbsStatus._keepaliveLoop,
+		1000);
+
+};
+
+$(wbsStatus._init);
+
+$(function () {
+
+	wbsStatus.handlerRegister ("core",
+	function (data) {
+
+		// update header
+
+		$("#headerCell").text (
+			data.header);
+
+		// update timestamp
+
+		$("#timeCell").text (
+			data.timestamp);
+
+		$("#timeRow").show ();
+
+		// update notice
+
+		$("#noticeCell").text (
+			data.notice);
+
+		if (data.notice) {
+			$("#noticeRow").show ();
+		} else {
+			$("#noticeRow").hide ();
+		}
+
 	});
 
 });

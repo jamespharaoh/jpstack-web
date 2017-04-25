@@ -2,8 +2,7 @@ package wbs.platform.user.console;
 
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
-import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
-import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+import static wbs.utils.etc.OptionalUtils.optionalMapOptional;
 import static wbs.utils.etc.OptionalUtils.optionalMapRequired;
 
 import com.google.common.base.Optional;
@@ -66,10 +65,9 @@ class UserConsoleLogicImplementation
 	public
 	Optional <UserRec> user () {
 
-		return loggedIn ()
-			? Optional.of (
-				userRequired ())
-			: Optional.absent ();
+		return optionalMapOptional (
+			userId (),
+			userHelper::find);
 
 	}
 
@@ -84,12 +82,11 @@ class UserConsoleLogicImplementation
 
 	@Override
 	public
-	Optional<SliceRec> slice () {
+	Optional <SliceRec> slice () {
 
-		return loggedIn ()
-			? Optional.of (
-				userRequired ().getSlice ())
-			: Optional.absent ();
+		return optionalMapRequired (
+			user (),
+			UserRec::getSlice);
 
 	}
 
@@ -105,10 +102,10 @@ class UserConsoleLogicImplementation
 	public
 	Optional <Long> userId () {
 
-		return optionalMapRequired (
+		return optionalMapOptional (
 			requestContext.cookie (
 				"wbs-user-id"),
-			NumberUtils::parseIntegerRequired);
+			NumberUtils::parseInteger);
 
 	}
 
@@ -123,12 +120,11 @@ class UserConsoleLogicImplementation
 
 	@Override
 	public
-	Optional<Long> sliceId () {
+	Optional <Long> sliceId () {
 
-		return loggedIn ()
-			? Optional.of (
-				userRequired ().getSlice ().getId ())
-			: Optional.absent ();
+		return optionalMapRequired (
+			slice (),
+			SliceRec::getId);
 
 	}
 
@@ -137,26 +133,6 @@ class UserConsoleLogicImplementation
 	Long sliceIdRequired () {
 
 		return userRequired ().getSlice ().getId ();
-
-	}
-
-	@Override
-	public
-	boolean loggedIn () {
-
-		return optionalIsPresent (
-			requestContext.cookie (
-				"wbs-session-id"));
-
-	}
-
-	@Override
-	public
-	boolean notLoggedIn () {
-
-		return optionalIsNotPresent (
-			requestContext.cookie (
-				"wbs-session-id"));
 
 	}
 

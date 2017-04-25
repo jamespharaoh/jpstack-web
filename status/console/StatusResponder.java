@@ -4,8 +4,6 @@ import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlIdAttribute;
 import static wbs.web.utils.HtmlFormUtils.htmlFormClose;
 import static wbs.web.utils.HtmlFormUtils.htmlFormOpenPostAction;
-import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
-import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellOpen;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
@@ -72,6 +70,14 @@ class StatusResponder
 
 			.add (
 				ConsoleApplicationScriptRef.javascript (
+					"/js/js-cookie-2.0.4.js"))
+
+			.add (
+				ConsoleApplicationScriptRef.javascript (
+					"/js/async.js"))
+
+			.add (
+				ConsoleApplicationScriptRef.javascript (
 					"/js/status.js"))
 
 			.addAll (
@@ -123,7 +129,7 @@ class StatusResponder
 		) {
 
 			PagePart pagePart =
-				statusLine.get (
+				statusLine.createPagePart (
 					taskLogger);
 
 			pagePart.setup (
@@ -165,35 +171,10 @@ class StatusResponder
 		super.renderHtmlHeadContents (
 			parentTaskLogger);
 
-		renderScriptBlock ();
-
 		pageParts.forEach (
 			pagePart ->
 				pagePart.renderHtmlHeadContent (
 					parentTaskLogger));
-
-	}
-
-	private
-	void renderScriptBlock () {
-
-		// script open
-
-		htmlScriptBlockOpen ();
-
-		// variables
-
-		formatWriter.writeLineFormat (
-			"var statusRequestUrl = '%j';",
-			requestContext.resolveApplicationUrl (
-				"/status.update"));
-
-		formatWriter.writeLineFormat (
-			"var statusRequestTime = 800;");
-
-		// script close
-
-		htmlScriptBlockClose ();
 
 	}
 
@@ -203,7 +184,7 @@ class StatusResponder
 			@NonNull TaskLogger parentTaskLogger) {
 
 		formatWriter.writeLineFormat (
-			"<body onload=\"statusRequestSchedule ();\">");
+			"<body>");
 
 		formatWriter.increaseIndent ();
 
