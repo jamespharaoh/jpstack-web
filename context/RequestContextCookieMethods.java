@@ -99,9 +99,26 @@ interface RequestContextCookieMethods
 	void cookieUnset (
 			@NonNull String name) {
 
-		cookieSet (
+		State state =
+			requestContextCookieMethodsState ();
+
+		Cookie cookie =
+			new Cookie (
+				name,
+				"");
+
+		cookie.setPath (
+			"/");
+
+		cookie.setMaxAge (
+			0);
+
+		state.cookiesByName.put (
 			name,
-			"");
+			cookie);
+
+		response ().addCookie (
+			cookie);
 
 	}
 
