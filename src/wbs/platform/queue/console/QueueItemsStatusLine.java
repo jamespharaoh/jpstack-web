@@ -1,7 +1,6 @@
 package wbs.platform.queue.console;
 
 import static wbs.utils.etc.Misc.isNotNull;
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
 import static wbs.utils.etc.ThreadUtils.threadInterruptAndJoinIgnoreInterrupt;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.thread.ConcurrentUtils.futureValue;
@@ -13,6 +12,8 @@ import java.util.concurrent.Future;
 
 import javax.inject.Provider;
 
+import com.google.gson.JsonObject;
+
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -21,7 +22,7 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import wbs.console.part.PagePart;
-import wbs.console.request.ConsoleRequestContext;
+import wbs.console.priv.UserPrivChecker;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
@@ -41,32 +42,14 @@ import wbs.platform.queue.logic.MasterQueueCache;
 import wbs.platform.queue.logic.QueueCache;
 import wbs.platform.status.console.StatusLine;
 import wbs.platform.user.console.UserConsoleHelper;
-import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserRec;
 
 import wbs.utils.thread.ThreadManager;
 
 @SingletonComponent ("queueItemStatusLine")
 public
-class QueueItemStatusLine
+class QueueItemsStatusLine
 	implements StatusLine {
-
-	// constants
-
-	public final static
-	Duration sleepDuration =
-		Duration.standardSeconds (
-			1);
-
-	public final static
-	Duration updateDuration =
-		Duration.standardSeconds (
-			5);
-
-	public final static
-	Duration idleDuration =
-		Duration.standardMinutes (
-			5);
 
 	// dependencies
 
@@ -80,13 +63,7 @@ class QueueItemStatusLine
 	LogContext logContext;
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
 	ThreadManager threadManager;
-
-	@SingletonDependency
-	UserConsoleLogic userConsoleLogic;
 
 	@SingletonDependency
 	UserConsoleHelper userHelper;
@@ -122,13 +99,13 @@ class QueueItemStatusLine
 
 	@Override
 	public
-	String getName () {
-		return "queueItems";
+	String typeName () {
+		return "queue-items";
 	}
 
 	@Override
 	public
-	PagePart get (
+	PagePart createPagePart (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		return queueItemsStatusLinePart.get ();
@@ -178,8 +155,9 @@ class QueueItemStatusLine
 
 	@Override
 	public
-	Future <String> getUpdateScript (
-			@NonNull TaskLogger parentTaskLogger) {
+	Future <JsonObject> getUpdateData (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull UserPrivChecker privChecker) {
 
 		try (
 
@@ -189,7 +167,7 @@ class QueueItemStatusLine
 		) {
 
 			Long userId =
-				userConsoleLogic.userIdRequired ();
+				privChecker.userIdRequired ();
 
 			UserData userData =
 				userDatas.computeIfAbsent (
@@ -219,13 +197,19 @@ class QueueItemStatusLine
 					.lastContact (
 						Instant.now ());
 
+				JsonObject updateData =
+					new JsonObject ();
+
+				updateData.addProperty (
+					"total",
+					userData.totalAvailableItems ());
+
+				updateData.addProperty (
+					"claimed",
+					userData.userClaimedItems ());
+
 				return futureValue (
-					stringFormat (
-						"updateQueueItems (%s, %s);\n",
-						integerToDecimalString (
-							userData.totalAvailableItems ()),
-						integerToDecimalString (
-							userData.userClaimedItems ())));
+					updateData);
 
 			}
 
@@ -389,5 +373,22 @@ class QueueItemStatusLine
 		Long userClaimedItems;
 
 	}
+
+	// constants
+
+	public final static
+	Duration sleepDuration =
+		Duration.standardSeconds (
+			1);
+
+	public final static
+	Duration updateDuration =
+		Duration.standardSeconds (
+			5);
+
+	public final static
+	Duration idleDuration =
+		Duration.standardMinutes (
+			5);
 
 }

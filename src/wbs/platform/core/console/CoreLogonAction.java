@@ -170,6 +170,7 @@ class CoreLogonAction
 			Optional <UserSessionRec> userSessionOptional =
 				userSessionLogic.userLogonTry (
 					taskLogger,
+					requestContext,
 					slice.toLowerCase (),
 					username.toLowerCase (),
 					password,

@@ -17,6 +17,12 @@ class NullUserPrivChecker
 
 	@Override
 	public
+	Long userIdRequired () {
+		throw new RuntimeException ();
+	}
+
+	@Override
+	public
 	boolean canRecursive (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Long privId) {

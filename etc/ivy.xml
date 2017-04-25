@@ -63,12 +63,17 @@
 			name="grizzly-http-server"
 			rev="2.3.30"/>
 
+		<dependency
+			org="org.glassfish.grizzly"
+			name="grizzly-websockets"
+			rev="2.3.30"/>
+
 		<!-- guava -->
 
 		<dependency
 			org="com.google.guava"
 			name="guava"
-			rev="19.0"/>
+			rev="21.0"/>
 
 		<!-- hibernate -->
 

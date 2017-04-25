@@ -1,6 +1,5 @@
 package wbs.platform.priv.console;
 
-import static wbs.utils.etc.DebugUtils.debugFormat;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.string.StringUtils.capitalise;
 import static wbs.utils.string.StringUtils.stringFormat;
@@ -94,9 +93,6 @@ class ObjectPrivsPageBuilder <
 	void build (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Builder builder) {
-
-debugFormat (
-	"Object privs page builder . build");
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (

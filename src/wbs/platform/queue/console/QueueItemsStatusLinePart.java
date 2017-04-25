@@ -3,11 +3,6 @@ package wbs.platform.queue.console;
 import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlIdAttribute;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockClose;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockOpen;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleClose;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntryWrite;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleOpen;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
@@ -19,6 +14,7 @@ import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 
@@ -37,7 +33,7 @@ class QueueItemsStatusLinePart
 		return ImmutableSet.<ScriptRef> of (
 
 			ConsoleApplicationScriptRef.javascript (
-				"/js/queue-status.js")
+				"/js/queue-items-status.js")
 
 		);
 
@@ -45,25 +41,14 @@ class QueueItemsStatusLinePart
 
 	@Override
 	public
-	void renderHtmlHeadContent (
-			@NonNull TaskLogger parentTaskLogger) {
+	Set <HtmlLink> links () {
 
-		htmlStyleBlockOpen ();
+		return ImmutableSet.<HtmlLink> of (
 
-		htmlStyleRuleOpen (
-			"#queueRow");
+			HtmlLink.applicationCssStyle (
+				"/style/queue-items-status.css")
 
-		htmlStyleRuleEntryWrite (
-			"display",
-			"none");
-
-		htmlStyleRuleEntryWrite (
-			"cursor",
-			"pointer");
-
-		htmlStyleRuleClose ();
-
-		htmlStyleBlockClose ();
+		);
 
 	}
 

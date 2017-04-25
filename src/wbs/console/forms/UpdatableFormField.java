@@ -176,6 +176,7 @@ class UpdatableFormField <Container, Generic, Native, Interface>
 
 			&& ! featureChecker.checkFeatureAccess (
 				taskLogger,
+				privChecker,
 				featureCode)
 
 		) {

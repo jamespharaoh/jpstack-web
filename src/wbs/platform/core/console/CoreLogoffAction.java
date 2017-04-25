@@ -1,5 +1,10 @@
 package wbs.platform.core.console;
 
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
+
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 
 import wbs.console.action.ConsoleAction;
@@ -69,12 +74,19 @@ class CoreLogoffAction
 				parentTaskLogger,
 				"goReal");
 
-		if (! userConsoleLogic.loggedIn ()) {
+		Optional <Long> userIdOptional =
+			userConsoleLogic.userId ();
+
+		if (
+			optionalIsNotPresent (
+				userIdOptional)
+		) {
 			return null;
 		}
 
 		Long userId =
-			userConsoleLogic.userIdRequired ();
+			optionalGetRequired (
+				userIdOptional);
 
 		try (
 

@@ -1,15 +1,19 @@
 package wbs.console.priv;
 
+import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
+import static wbs.utils.etc.OptionalUtils.optionalIsPresent;
+
 import java.util.Collection;
 import java.util.Map;
 
 import javax.inject.Provider;
 
+import com.google.common.base.Optional;
+
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import wbs.console.misc.ConsoleUserHelper;
-import wbs.console.request.ConsoleRequestContext;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
@@ -40,9 +44,6 @@ class UserPrivCheckerImplementation
 	@SingletonDependency
 	UserPrivDataLoader privDataLoader;
 
-	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
 	// prototype dependencies
 
 	@PrototypeDependency
@@ -64,27 +65,45 @@ class UserPrivCheckerImplementation
 				parentTaskLogger,
 				"init");
 
-		if (! consoleUserHelper.loggedIn ()) {
+		Optional <Long> userIdOptional =
+			consoleUserHelper.loggedInUserId ();
 
-			target =
-				new NullUserPrivChecker ();
+		if (
+			optionalIsPresent (
+				userIdOptional)
+		) {
 
-		} else {
+			Long userId =
+				optionalGetRequired (
+					userIdOptional);
 
 			target =
 				privCheckerBuilderProvider.get ()
 
 				.userId (
-					consoleUserHelper.loggedInUserIdRequired ())
+					userId)
 
 				.build (
 					taskLogger);
+
+		} else {
+
+			target =
+				new NullUserPrivChecker ();
 
 		}
 
 	}
 
 	// implementation
+
+	@Override
+	public
+	Long userIdRequired () {
+
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public

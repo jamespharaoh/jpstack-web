@@ -194,9 +194,9 @@ class ReflectionUtils {
 
 	public static
 	Method methodGetStaticRequired (
-			@NonNull Class<?> containingClass,
+			@NonNull Class <?> containingClass,
 			@NonNull String methodName,
-			@NonNull List<Class<?>> parameterTypes) {
+			@NonNull List <Class <?>> parameterTypes) {
 
 		Method method =
 			methodGetDeclaredRequired (

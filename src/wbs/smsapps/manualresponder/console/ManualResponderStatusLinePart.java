@@ -1,20 +1,21 @@
 package wbs.smsapps.manualresponder.console;
 
 import static wbs.web.utils.HtmlAttributeUtils.htmlIdAttribute;
-import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockClose;
-import static wbs.web.utils.HtmlScriptUtils.htmlScriptBlockOpen;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockClose;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleBlockOpen;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleClose;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntryWrite;
-import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleOpen;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
 
+import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
+
 import lombok.NonNull;
 
+import wbs.console.context.ConsoleApplicationScriptRef;
+import wbs.console.html.HtmlLink;
+import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
+
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.logging.TaskLogger;
 
@@ -25,65 +26,27 @@ class ManualResponderStatusLinePart
 
 	@Override
 	public
-	void renderHtmlHeadContent (
-			@NonNull TaskLogger parentTaskLogger) {
+	Set <ScriptRef> scriptRefs () {
 
-		renderStyleBlock ();
-		renderScriptBlock ();
+		return ImmutableSet.<ScriptRef> of (
 
-	}
+			ConsoleApplicationScriptRef.javascript (
+				"/js/manual-responder-status.js")
 
-	private
-	void renderStyleBlock () {
-
-		htmlStyleBlockOpen ();
-
-		htmlStyleRuleOpen (
-			"#manualResponderRow");
-
-		htmlStyleRuleEntryWrite (
-			"display",
-			"none");
-
-		htmlStyleRuleClose ();
-
-		htmlStyleBlockClose ();
+		);
 
 	}
 
-	private
-	void renderScriptBlock () {
+	@Override
+	public
+	Set <HtmlLink> links () {
 
-		htmlScriptBlockOpen ();
+		return ImmutableSet.<HtmlLink> of (
 
-		formatWriter.writeLineFormatIncreaseIndent (
-			"function updateManualResponder (numToday, numThisHour) {");
+			HtmlLink.applicationCssStyle (
+				"/style/manual-responder-status.css")
 
-		formatWriter.writeLineFormat (
-			"var cell = $('#manualResponderCell');");
-
-		formatWriter.writeLineFormat (
-			"var row = $('#manualResponderRow');");
-
-		formatWriter.writeLineFormatIncreaseIndent (
-			"cell.text ('Messages answered: ' + [");
-
-		formatWriter.writeLineFormat (
-			"String (numToday) + ' today',");
-
-		formatWriter.writeLineFormat (
-			"String (numThisHour) + ' this hour',");
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"].join (', '));");
-
-		formatWriter.writeLineFormat (
-			"showTableRow (row [0], numToday > 0 || numThisHour > 0);");
-
-		formatWriter.writeLineFormatDecreaseIndent (
-			"}");
-
-		htmlScriptBlockClose ();
+		);
 
 	}
 

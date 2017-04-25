@@ -110,41 +110,30 @@ class ImChatPendingSummaryPart
 
 	@Override
 	public
-	Set<ScriptRef> scriptRefs () {
+	Set <ScriptRef> scriptRefs () {
 
-		return ImmutableSet.<ScriptRef>builder ()
+		return ImmutableSet.<ScriptRef> of (
 
-			.addAll (
-				super.scriptRefs ())
+			JqueryScriptRef.instance,
+			JqueryEditableScriptRef.instance,
 
-			.add (
-				JqueryScriptRef.instance)
+			ConsoleApplicationScriptRef.javascript (
+				"/js/im-chat.js")
 
-			.add (
-				JqueryEditableScriptRef.instance)
-
-			.add (
-				ConsoleApplicationScriptRef.javascript (
-					"/js/im-chat.js"))
-
-			.build ();
+		);
 
 	}
 
 	@Override
 	public
-	Set<HtmlLink> links () {
+	Set <HtmlLink> links () {
 
-		return ImmutableSet.<HtmlLink>builder ()
+		return ImmutableSet.<HtmlLink> of (
 
-			.addAll (
-				super.links ())
+			HtmlLink.applicationCssStyle (
+				"/style/im-chat.css")
 
-			.add (
-				HtmlLink.applicationCssStyle (
-					"/styles/im-chat.css"))
-
-			.build ();
+		);
 
 	}
 

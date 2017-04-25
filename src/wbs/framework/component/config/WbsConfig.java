@@ -75,6 +75,9 @@ class WbsConfig {
 	@DataChild
 	WbsConfigProcessApi processApi;
 
+	@DataChild
+	WbsConfigConsoleServer consoleServer;
+
 	// security
 
 	@DataAttribute (
@@ -124,6 +127,7 @@ class WbsConfig {
 			.registerBuilderClasses (
 				ImmutableList.of (
 					WbsConfig.class,
+					WbsConfigConsoleServer.class,
 					WbsConfigDatabase.class,
 					WbsConfigEmail.class,
 					WbsConfigProcessApi.class))

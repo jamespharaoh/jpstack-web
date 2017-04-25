@@ -22,15 +22,17 @@
 	<library name="dbus-java" type="jar" version="2.7.2" source="yes"/>
 	<library name="disruptor" type="jar" version="3.3.2"/>
 	<library name="dom4j" type="jar" version="1.6.1"/>
-	<library name="error_prone_annotations" type="jar" version="2.0.2"/>
+	<library name="error_prone_annotations" type="jar" version="2.0.15"/>
 	<library name="functionaljava" type="jar" version="3.0" source="yes"/>
 	<library name="gmbal-api-only" type="jar" version="3.2.0-b003"/>
 	<library name="gmbal" type="jar" version="3.2.0-b003"/>
 	<library name="grizzly-framework" type="bundle" version="2.3.30" source="yes"/>
 	<library name="grizzly-http" type="bundle" version="2.3.30"/>
 	<library name="grizzly-http-server" type="bundle" version="2.3.30" source="yes"/>
+	<library name="grizzly-http-servlet" type="bundle" version="2.3.30"/>
+	<library name="grizzly-websockets" type="bundle" version="2.3.30" source="yes"/>
 	<library name="gson" type="jar" version="2.2.2"/>
-	<library name="guava" type="bundle" version="19.0" source="yes"/>
+	<library name="guava" type="bundle" version="21.0" source="yes"/>
 	<library name="hamcrest-core" type="jar" version="1.1"/>
 	<library name="hibernate-commons-annotations" type="jar" version="5.0.1.Final"/>
 	<library name="hibernate-core" type="jar" version="5.0.6.Final" source="yes"/>
@@ -40,7 +42,7 @@
 	<library name="httpcore" type="jar" version="4.4.3"/>
 	<library name="httpmime" type="jar" version="4.5.1" source="yes"/>
 	<library name="istack-commons-runtime" type="jar" version="2.21"/>
-	<library name="j2objc-annotations" type="jar" version="0.1"/>
+	<library name="j2objc-annotations" type="jar" version="1.1"/>
 	<library name="jackson-annotations" type="bundle" version="2.6.0"/>
 	<library name="jackson-core" type="bundle" version="2.6.3"/>
 	<library name="jackson-databind" type="bundle" version="2.6.3"/>
@@ -56,6 +58,7 @@
 	<library name="javax.inject" type="jar" version="1" source="yes"/>
 	<library name="javax.mail-api" type="jar" version="1.5.5" source="yes"/>
 	<library name="javax.mail" type="jar" version="1.5.4"/>
+	<library name="javax.servlet-api" type="jar" version="3.1.0"/>
 	<library name="jaxb-api" type="jar" version="2.2.12-b140109.1041"/>
 	<library name="jaxb-core" type="jar" version="2.2.11"/>
 	<library name="jaxb-impl" type="jar" version="2.2.11" source="yes"/>

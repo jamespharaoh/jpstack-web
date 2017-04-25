@@ -122,7 +122,7 @@ class ManualResponderRequestPendingFormResponder
 		return ImmutableSet.<HtmlLink>of (
 
 			HtmlLink.applicationCssStyle (
-				"/styles/manual-responder.css")
+				"/style/manual-responder.css")
 
 		);
 

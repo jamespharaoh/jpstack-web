@@ -11,9 +11,6 @@ interface ConsoleUserHelper
 	Optional <Long> loggedInUserId ();
 	Long loggedInUserIdRequired ();
 
-	boolean loggedIn ();
-	boolean notLoggedIn ();
-
 	Long hourOffset ();
 
 }

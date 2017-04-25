@@ -1,21 +1,27 @@
 package wbs.smsapps.manualresponder.console;
 
-import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.string.StringUtils.stringFormat;
+import static wbs.utils.collection.CacheUtils.cacheGet;
 import static wbs.utils.thread.ConcurrentUtils.futureValue;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Provider;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.gson.JsonObject;
+
+import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 
+import org.joda.time.Duration;
+
 import wbs.console.feature.FeatureChecker;
 import wbs.console.part.PagePart;
-import wbs.console.request.ConsoleRequestContext;
+import wbs.console.priv.UserPrivChecker;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeDependency;
@@ -26,7 +32,6 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.status.console.StatusLine;
-import wbs.platform.user.console.UserConsoleLogic;
 import wbs.platform.user.model.UserObjectHelper;
 
 import wbs.smsapps.manualresponder.model.ManualResponderRequestObjectHelper;
@@ -51,12 +56,6 @@ class ManualResponderStatusLine
 	ManualResponderRequestObjectHelper manualResponderRequestHelper;
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
-	UserConsoleLogic userConsoleLogic;
-
-	@SingletonDependency
 	UserObjectHelper userHelper;
 
 	// prototype dependencies
@@ -75,22 +74,53 @@ class ManualResponderStatusLine
 
 	// state
 
-	Map <Long, PerOperatorCaches> cachesByUserId =
-		new HashMap<> ();
+	LoadingCache <Long, PerOperatorCaches> cachesByUserId =
+		CacheBuilder.newBuilder ()
+
+		.maximumSize (
+			maxCacheSize)
+
+		.expireAfterAccess (
+			cacheExpiryTime.getMillis (),
+			TimeUnit.MILLISECONDS)
+
+		.build (
+			new CacheLoader <Long, PerOperatorCaches> () {
+
+			@Override
+			public
+			PerOperatorCaches load (
+					@NonNull Long userId) {
+
+				return new PerOperatorCaches ()
+
+					.numThisHourCache (
+						manualResponderNumThisHourCacheProvider.get ()
+							.userId (userId))
+
+					.numTodayCache (
+						manualResponderNumTodayCacheProvider.get ()
+							.userId (userId))
+
+				;
+
+			}
+
+		});
 
 	// details
 
 	@Override
 	public
-	String getName () {
-		return "manualResponder";
+	String typeName () {
+		return "manual-responder";
 	}
 
 	// implementation
 
 	@Override
 	public
-	PagePart get (
+	PagePart createPagePart (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		return manualResponderStatusLinePartProvider.get ();
@@ -99,30 +129,44 @@ class ManualResponderStatusLine
 
 	@Override
 	public
-	Future <String> getUpdateScript (
-			@NonNull TaskLogger parentTaskLogger) {
+	Future <JsonObject> getUpdateData (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull UserPrivChecker privChecker) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
 				"getUpdateScript");
 
+		JsonObject updateData =
+			new JsonObject ();
+
 		if (
 			! featureChecker.checkFeatureAccess (
 				taskLogger,
+				privChecker,
 				"queue_items_status_line")
 		) {
 
+			updateData.addProperty (
+				"numToday",
+				0);
+
+			updateData.addProperty (
+				"numThisHour",
+				0);
+
 			return futureValue (
-				"updateManualResponder (0, 0);\n");
+				updateData);
 
 		}
 
 		// find or create per-operator caches
 
 		PerOperatorCaches caches =
-			cachesByUserId.get (
-				userConsoleLogic.userIdRequired ());
+			cacheGet (
+				cachesByUserId,
+				privChecker.userIdRequired ());
 
 		if (caches == null) {
 
@@ -130,36 +174,44 @@ class ManualResponderStatusLine
 				new PerOperatorCaches ();
 
 			cachesByUserId.put (
-				userConsoleLogic.userIdRequired (),
+				privChecker.userIdRequired (),
 				caches);
 
 		}
 
 		// return update script
 
+		updateData.addProperty (
+			"numToday",
+			caches.numTodayCache.get (
+				taskLogger));
+
+		updateData.addProperty (
+			"numThisHour",
+			caches.numThisHourCache.get (
+				taskLogger));
+
 		return futureValue (
-			stringFormat (
-				"updateManualResponder (%s, %s);\n",
-				integerToDecimalString (
-					caches.numTodayCache.get (
-						taskLogger)),
-				integerToDecimalString (
-					caches.numThisHourCache.get (
-						taskLogger))));
+			updateData);
 
 	}
 
 	// helpers
 
 	@Accessors (fluent = true)
+	@Data
 	class PerOperatorCaches {
-
-		ManualResponderNumThisHourCache numThisHourCache =
-			manualResponderNumThisHourCacheProvider.get ();
-
-		ManualResponderNumTodayCache numTodayCache =
-			manualResponderNumTodayCacheProvider.get ();
-
+		ManualResponderNumThisHourCache numThisHourCache;
+		ManualResponderNumTodayCache numTodayCache;
 	}
+
+	// constants
+
+	public final static
+	Long maxCacheSize = 1024l;
+
+	public final static
+	Duration cacheExpiryTime =
+		Duration.standardHours (1l);
 
 }

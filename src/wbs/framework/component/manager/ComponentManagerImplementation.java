@@ -14,6 +14,7 @@ import static wbs.utils.etc.Misc.isNull;
 import static wbs.utils.etc.Misc.requiredValue;
 import static wbs.utils.etc.NullUtils.ifNull;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
+import static wbs.utils.etc.NumberUtils.notEqualToOne;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
@@ -25,7 +26,6 @@ import static wbs.utils.etc.ReflectionUtils.methodInvoke;
 import static wbs.utils.etc.TypeUtils.classInstantiate;
 import static wbs.utils.etc.TypeUtils.classNameSimple;
 import static wbs.utils.etc.TypeUtils.genericCastUnchecked;
-import static wbs.utils.etc.TypeUtils.isInstanceOf;
 import static wbs.utils.etc.TypeUtils.isNotSubclassOf;
 import static wbs.utils.string.StringUtils.joinWithCommaAndSpace;
 import static wbs.utils.string.StringUtils.stringEqualSafe;
@@ -33,7 +33,6 @@ import static wbs.utils.string.StringUtils.stringFormat;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,6 +64,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import wbs.framework.activitymanager.ActiveTask;
 import wbs.framework.activitymanager.ActivityManager;
 import wbs.framework.activitymanager.RuntimeExceptionWithTask;
+import wbs.framework.component.annotations.ComponentManagerShutdownBegun;
+import wbs.framework.component.annotations.ComponentManagerStartupComplete;
 import wbs.framework.component.annotations.LateLifecycleSetup;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.registry.ComponentDefinition;
@@ -80,6 +81,7 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.utils.etc.PropertyUtils;
+import wbs.utils.exception.RuntimeInvocationTargetException;
 
 @Accessors (fluent = true)
 public
@@ -1297,53 +1299,78 @@ class ComponentManagerImplementation
 						continue;
 					}
 
-					try {
+					if (
+						notEqualToOne (
+							method.getParameterCount ())
+					) {
 
-						if (method.getParameterCount () == 0) {
-
-							method.invoke (
-								component);
-
-						} else if (method.getParameterCount () == 1) {
-
-							method.invoke (
-								component,
-								taskLogger);
-
-						} else {
-
-							throw new RuntimeException ();
-
-						}
-
-					} catch (InvocationTargetException invocationTargetException) {
-
-						if (
-							isInstanceOf (
-								RuntimeException.class,
-								invocationTargetException.getTargetException ())
-						) {
-
-							throw (RuntimeException)
-								invocationTargetException.getTargetException ();
-
-						} else {
-
-							throw new RuntimeException (
-								invocationTargetException.getTargetException ());
-
-						}
-
-					} catch (IllegalAccessException illegalAccessException) {
-
-						throw new RuntimeException (
-							illegalAccessException);
+						taskLogger.errorFormat (
+							"Late lifecycle setup method %s.%s ",
+							classNameSimple (
+								component.getClass ()),
+							method.getName (),
+							"must have exactly one parameter");
 
 					}
+
+					methodInvoke (
+						method,
+						component,
+						taskLogger);
 
 				}
 
 			}
+
+			taskLogger.makeException ();
+
+			// run startup complete
+
+			for (
+				Object component
+					: singletonComponents.values ()
+			) {
+
+				for (
+					Method method
+						: component.getClass ().getMethods ()
+				) {
+
+					ComponentManagerStartupComplete startupCompleteAnnotation =
+						method.getDeclaredAnnotation (
+							ComponentManagerStartupComplete.class);
+
+					if (
+						isNull (
+							startupCompleteAnnotation)
+					) {
+						continue;
+					}
+
+					if (
+						notEqualToOne (
+							method.getParameterCount ())
+					) {
+
+						taskLogger.errorFormat (
+							"Startup complete method %s.%s ",
+							classNameSimple (
+								component.getClass ()),
+							method.getName (),
+							"must have exactly one parameter");
+
+					}
+
+					methodInvoke (
+						method,
+						component,
+						taskLogger);
+
+				}
+
+			}
+
+			taskLogger.makeException ();
 
 			// return
 
@@ -1391,6 +1418,66 @@ class ComponentManagerImplementation
 
 			Lists.reverse (
 				singletonDefinitions);
+
+			// run shutdown begun
+
+			for (
+				Object component
+					: singletonComponents.values ()
+			) {
+
+				for (
+					Method method
+						: component.getClass ().getMethods ()
+				) {
+
+					ComponentManagerShutdownBegun shutdownBegunAnnotation =
+						method.getDeclaredAnnotation (
+							ComponentManagerShutdownBegun.class);
+
+					if (
+						isNull (
+							shutdownBegunAnnotation)
+					) {
+						continue;
+					}
+
+					if (
+						notEqualToOne (
+							method.getParameterCount ())
+					) {
+						throw new RuntimeException (
+							stringFormat (
+								"Shutdown begun method %s.%s ",
+								classNameSimple (
+									component.getClass ()),
+								method.getName (),
+								"must have exactly one parameter"));
+					}
+
+					try {
+
+						methodInvoke (
+							method,
+							component,
+							taskLogger);
+
+					} catch (RuntimeInvocationTargetException exception) {
+
+						taskLogger.errorFormatException (
+							exception,
+							"Error invoking %s.%s",
+							classNameSimple (
+								component.getClass ()),
+							method.getName ());
+
+					}
+
+				}
+
+			}
+
+			// run tear down
 
 			for (
 				ComponentDefinition singletonDefinition

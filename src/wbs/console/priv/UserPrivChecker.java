@@ -10,6 +10,8 @@ import wbs.framework.logging.TaskLogger;
 public
 interface UserPrivChecker {
 
+	Long userIdRequired ();
+
 	boolean canRecursive (
 			TaskLogger parentTaskLogger,
 			Long privId);

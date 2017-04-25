@@ -5,8 +5,4 @@
 		path="/status"
 			name=""/>
 
-	<simple-responder-file
-		path="/status.update"
-		name="update"/>
-
 </console-module>

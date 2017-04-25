@@ -1,8 +1,16 @@
 package wbs.web.utils;
 
+import static wbs.utils.etc.Misc.isNull;
+import static wbs.utils.string.StringUtils.stringFormat;
 import static wbs.utils.string.StringUtils.stringToUtf8;
 
 import java.io.StringWriter;
+import java.util.NoSuchElementException;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
 import lombok.Builder;
 import lombok.NonNull;
@@ -131,6 +139,157 @@ class JsonUtils {
 		});
 
 	}
+
+	public static
+	String jsonObjectGetString (
+			@NonNull JsonObject jsonObject,
+			@NonNull String key) {
+
+		JsonElement valueElement =
+			jsonObject.get (
+				key);
+
+		if (
+			isNull (
+				valueElement)
+		) {
+
+			throw new NoSuchElementException (
+				stringFormat (
+					"No such element: %s",
+					key));
+
+		}
+
+		if (! valueElement.isJsonPrimitive ()) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Element is not a primitive: %s",
+					key));
+
+		}
+
+		JsonPrimitive valuePrimitive =
+			valueElement.getAsJsonPrimitive ();
+
+		if (! valuePrimitive.isString ()) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Element is not a string: %s",
+					key));
+
+		}
+
+		return valuePrimitive.getAsString ();
+
+	}
+
+	public static
+	Long jsonObjectGetInteger (
+			@NonNull JsonObject jsonObject,
+			@NonNull String key) {
+
+		JsonElement valueElement =
+			jsonObject.get (
+				key);
+
+		if (
+			isNull (
+				valueElement)
+		) {
+
+			throw new NoSuchElementException (
+				stringFormat (
+					"No such element: %s",
+					key));
+
+		}
+
+		if (! valueElement.isJsonPrimitive ()) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Element is not a primitive: %s",
+					key));
+
+		}
+
+		JsonPrimitive valuePrimitive =
+			valueElement.getAsJsonPrimitive ();
+
+		if (! valuePrimitive.isNumber ()) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Element is not a number: %s",
+					key));
+
+		}
+
+		return valuePrimitive.getAsLong ();
+
+	}
+
+	public static
+	JsonObject jsonObjectGetObject (
+			@NonNull JsonObject jsonObject,
+			@NonNull String key) {
+
+		JsonElement valueElement =
+			jsonObject.get (
+				key);
+
+		if (
+			isNull (
+				valueElement)
+		) {
+
+			throw new NoSuchElementException (
+				stringFormat (
+					"No such element: %s",
+					key));
+
+		}
+
+		if (! valueElement.isJsonObject ()) {
+
+			throw new ClassCastException (
+				stringFormat (
+					"Element is not an object: %s",
+					key));
+
+		}
+
+		return valueElement.getAsJsonObject ();
+
+	}
+
+	public static
+	JsonObject jsonObjectParse (
+			@NonNull String string) {
+
+		JsonParser jsonParser =
+			new JsonParser ();
+
+		JsonElement jsonElement =
+			jsonParser.parse (
+				string);
+
+		return jsonElement.getAsJsonObject ();
+
+	}
+
+	public static
+	String jsonEncode (
+			@NonNull JsonElement jsonElement) {
+
+		return jsonElement.toString ();
+
+	}
+
+	// options class
 
 	@Accessors (fluent = true)
 	@Builder

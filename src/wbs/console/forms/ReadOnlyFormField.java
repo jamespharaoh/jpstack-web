@@ -144,6 +144,7 @@ class ReadOnlyFormField <Container, Generic, Native, Interface>
 
 			&& ! featureChecker.checkFeatureAccess (
 				taskLogger,
+				privChecker,
 				featureCode)
 
 		) {

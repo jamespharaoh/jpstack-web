@@ -27,15 +27,13 @@ class FeatureCheckerImplementation
 	@ClassSingletonDependency
 	LogContext logContext;
 
-	@SingletonDependency
-	UserPrivChecker privChecker;
-
 	// public implementation
 
 	@Override
 	public
 	boolean checkFeatureAccess (
 			@NonNull TaskLogger parentTaskLogger,
+			@NonNull UserPrivChecker privChecker,
 			@NonNull String featureCode) {
 
 		TaskLogger taskLogger =

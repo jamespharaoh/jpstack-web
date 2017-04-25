@@ -3,7 +3,7 @@ package wbs.platform.user.console;
 import static wbs.utils.collection.MapUtils.mapItemForKey;
 import static wbs.utils.etc.Misc.hashSha1Base64;
 import static wbs.utils.etc.NumberUtils.integerToDecimalString;
-import static wbs.utils.etc.NumberUtils.parseIntegerRequired;
+import static wbs.utils.etc.NumberUtils.parseInteger;
 import static wbs.utils.etc.OptionalUtils.optionalAbsent;
 import static wbs.utils.etc.OptionalUtils.optionalGetRequired;
 import static wbs.utils.etc.OptionalUtils.optionalIsNotPresent;
@@ -68,9 +68,6 @@ class UserSessionLogicImplementation
 	RandomLogic randomLogic;
 
 	@SingletonDependency
-	ConsoleRequestContext requestContext;
-
-	@SingletonDependency
 	TextConsoleHelper textHelper;
 
 	@SingletonDependency
@@ -105,6 +102,7 @@ class UserSessionLogicImplementation
 	public
 	UserSessionRec userLogon (
 			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConsoleRequestContext requestContext,
 			@NonNull UserRec user,
 			@NonNull Optional <String> userAgent,
 			@NonNull Optional <String> consoleDeploymentCode) {
@@ -225,6 +223,7 @@ class UserSessionLogicImplementation
 	public
 	Optional <UserSessionRec> userLogonTry (
 			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConsoleRequestContext requestContext,
 			@NonNull String sliceCode,
 			@NonNull String username,
 			@NonNull String password,
@@ -271,6 +270,7 @@ class UserSessionLogicImplementation
 		UserSessionRec userSession =
 			userLogon (
 				taskLogger,
+				requestContext,
 				user,
 				userAgent,
 				consoleDeploymentCode);
@@ -335,45 +335,18 @@ class UserSessionLogicImplementation
 	@Override
 	public synchronized
 	boolean userSessionVerify (
-			@NonNull TaskLogger parentTaskLogger) {
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull String sessionId,
+			@NonNull Long userId,
+			@NonNull Boolean forceReload) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
-				"checkUser");
+				"userSessionVerify (sessionId, userId, forceReload)");
 
 		Instant now =
 			Instant.now ();
-
-		// check the cookies are present
-
-		if (
-
-			optionalIsNotPresent (
-				requestContext.cookie (
-					sessionIdCookieName))
-
-			|| optionalIsNotPresent (
-				requestContext.cookie (
-					userIdCookieName))
-
-		) {
-
-			taskLogger.debugFormat (
-				"Cookies not found");
-
-			return false;
-
-		}
-
-		String sessionId =
-			requestContext.cookieRequired (
-				sessionIdCookieName);
-
-		Long userId =
-			parseIntegerRequired (
-				requestContext.cookieRequired (
-					userIdCookieName));
 
 		// reload if overdue or not done yet, always for root path
 
@@ -381,13 +354,11 @@ class UserSessionLogicImplementation
 
 		if (
 
-			earlierThan (
+			forceReload
+
+			|| earlierThan (
 				nextReload,
 				now)
-
-			|| stringEqualSafe (
-				requestContext.servletPath (),
-				"/")
 
 		) {
 
@@ -453,6 +424,89 @@ class UserSessionLogicImplementation
 			now);
 
 		return true;
+
+	}
+
+	@Override
+	public
+	boolean userSessionVerify (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull ConsoleRequestContext requestContext) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"userSessionVerify (requestContext)");
+
+		// check the cookies are present
+
+		if (
+
+			optionalIsNotPresent (
+				requestContext.cookie (
+					sessionIdCookieName))
+
+			|| optionalIsNotPresent (
+				requestContext.cookie (
+					userIdCookieName))
+
+		) {
+
+			taskLogger.debugFormat (
+				"Cookies not found");
+
+			return false;
+
+		}
+
+		String sessionId =
+			requestContext.cookieRequired (
+				sessionIdCookieName);
+
+		Optional <Long> userIdOptional =
+			parseInteger (
+				requestContext.cookieRequired (
+					userIdCookieName));
+
+		if (
+			optionalIsNotPresent (
+				userIdOptional)
+		) {
+
+			taskLogger.debugFormat (
+				"User id is not valid");
+
+			return false;
+
+		}
+
+		Long userId =
+			optionalGetRequired (
+				userIdOptional);
+
+		Boolean forceReload =
+			stringEqualSafe (
+				requestContext.servletPath (),
+				"/");
+
+		Boolean result =
+			userSessionVerify (
+				taskLogger,
+				sessionId,
+				userId,
+				forceReload);
+
+		if (! result) {
+
+			requestContext.cookieUnset (
+				sessionIdCookieName);
+
+			requestContext.cookieUnset (
+				userIdCookieName);
+
+		}
+
+		return result;
 
 	}
 

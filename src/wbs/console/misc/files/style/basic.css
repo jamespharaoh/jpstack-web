@@ -92,11 +92,27 @@ table.menu tr td {
 
 table.menu tr.a td { background: #eeeeee; color: black; }
 table.menu tr.b td { background: #eeeeee; color: black; }
-table.menu tr.hover td, table.list tr.selected td, table.list td.selected, table.list td.hover { background: #bbbbbb; }
 table.menu tr.sep { height: 2px; }
 
-table.menu tr.alert td { background: red; color: white; font-weight: bold; }
-table.menu tr.alert_hover td { cursor: pointer; background: darkred; color: white; font-weight: bold; }
+table.menu tr.hover td,
+table.list tr.selected td,
+table.list td.selected,
+table.list td.hover {
+	background: #bbbbbb;
+}
+
+table.menu tr.alert td {
+	background: red;
+	color: white;
+	font-weight: bold;
+}
+
+table.menu tr.alert.hover td {
+	cursor: pointer;
+	background: darkred;
+	color: white;
+	font-weight: bold;
+}
 
 /* ---------- list table */
 

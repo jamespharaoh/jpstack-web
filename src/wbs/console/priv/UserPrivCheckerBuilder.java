@@ -47,6 +47,9 @@ class UserPrivCheckerBuilder {
 
 		return new Implementation ()
 
+			.userId (
+				userId)
+
 			.userPrivData (
 				privDataLoader.getUserPrivData (
 					parentTaskLogger,
@@ -62,7 +65,16 @@ class UserPrivCheckerBuilder {
 		implements UserPrivChecker {
 
 		@Getter @Setter
+		Long userId;
+
+		@Getter @Setter
 		UserPrivData userPrivData;
+
+		@Override
+		public
+		Long userIdRequired () {
+			return userId;
+		}
 
 		@Override
 		public

@@ -16,16 +16,6 @@
 		<model name="queueType"/>
 	</models>
 
-	<layer name="fixture">
-		<component class="fixture.QueueTypeBuilder"/>
-		<component class="fixture.QueueTypesBuilder"/>
-	</layer>
-
-	<layer name="model-meta">
-		<component class="metamodel.QueueTypeSpec"/>
-		<component class="metamodel.QueueTypesSpec"/>
-	</layer>
-
 	<layer name="console">
 		<component class="console.QueueClaimAction"/>
 		<component class="console.QueueConsoleLogic"/>
@@ -37,9 +27,9 @@
 		<component class="console.QueueItemActionsPart"/>
 		<component class="console.QueueItemConsoleHooks"/>
 		<component class="console.QueueItemQueueStatsProvider"/>
-		<component class="console.QueueItemsStatusLinePart"/>
-		<component class="console.QueueItemStatusLine"/>
 		<component class="console.QueueItemUserStatsProvider"/>
+		<component class="console.QueueItemsStatusLinePart"/>
+		<component class="console.QueueItemsStatusLine"/>
 		<component class="console.QueueListActivePart"/>
 		<component class="console.QueueManager"/>
 		<component class="console.QueueStatsFilter"/>
@@ -55,10 +45,20 @@
 		<component class="console.QueueUsersPart"/>
 	</layer>
 
+	<layer name="fixture">
+		<component class="fixture.QueueTypeBuilder"/>
+		<component class="fixture.QueueTypesBuilder"/>
+	</layer>
+
 	<layer name="logic">
 		<component class="logic.DummyQueueCache"/>
 		<component class="logic.MasterQueueCache"/>
 		<component class="logic.QueueLogicImplementation"/>
+	</layer>
+
+	<layer name="model-meta">
+		<component class="metamodel.QueueTypeSpec"/>
+		<component class="metamodel.QueueTypesSpec"/>
 	</layer>
 
 	<fixtures>

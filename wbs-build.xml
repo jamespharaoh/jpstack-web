@@ -84,6 +84,10 @@
 		<!-- console -->
 
 		<plugin
+			name="console-async"
+			package="wbs.console.async"/>
+
+		<plugin
 			name="console-combo"
 			package="wbs.console.combo"/>
 
@@ -130,6 +134,10 @@
 		<plugin
 			name="console-responder"
 			package="wbs.console.responder"/>
+
+		<plugin
+			name="console-server"
+			package="wbs.console.server"/>
 
 		<plugin
 			name="console-supervisor"

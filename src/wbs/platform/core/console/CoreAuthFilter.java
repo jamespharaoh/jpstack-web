@@ -88,7 +88,8 @@ class CoreAuthFilter
 
 		boolean userOk =
 			userSessionLogic.userSessionVerify (
-				taskLogger);
+				taskLogger,
+				requestContext);
 
 		if (userOk) {
 

@@ -96,7 +96,7 @@ class ImChatPendingFormResponder
 		return ImmutableSet.<HtmlLink>of (
 
 			HtmlLink.applicationCssStyle (
-				"/styles/im-chat.css")
+				"/style/im-chat.css")
 
 		);
 
