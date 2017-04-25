@@ -66,9 +66,9 @@ class CoreAuthFilter
 	@Override
 	public
 	void doFilter (
-			ServletRequest request,
-			ServletResponse response,
-			FilterChain chain)
+			@NonNull ServletRequest request,
+			@NonNull ServletResponse response,
+			@NonNull FilterChain chain)
 		throws
 			ServletException,
 			IOException {

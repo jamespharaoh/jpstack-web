@@ -282,56 +282,6 @@ class UserSessionLogicImplementation
 
 	}
 
-	boolean checkPassword (
-			@NonNull UserRec user,
-			@NonNull String password) {
-
-		// bypass for dev auto-login
-
-		if (
-
-			stringEqualSafe (
-				password,
-				"**********")
-
-			&& wbsConfig.testUsers ().contains (
-				joinWithFullStop (
-					user.getSlice ().getCode (),
-					user.getUsername ()))
-
-		) {
-
-			return true;
-
-		}
-
-		// always fail if user has no password
-
-		if (user.getPassword () == null) {
-
-			return false;
-
-		}
-
-		// fail if password hash doesn't match
-
-		if (
-			stringNotEqualSafe (
-				user.getPassword (),
-				hashSha1Base64 (
-					password))
-		) {
-
-			return false;
-
-		}
-
-		// all correct
-
-		return true;
-
-	}
-
 	@Override
 	public synchronized
 	boolean userSessionVerify (
@@ -498,6 +448,11 @@ class UserSessionLogicImplementation
 
 		if (! result) {
 
+			taskLogger.noticeFormat (
+				"Removing session cookies for user %s",
+				integerToDecimalString (
+					userId));
+
 			requestContext.cookieUnset (
 				sessionIdCookieName);
 
@@ -556,94 +511,6 @@ class UserSessionLogicImplementation
 
 		reloadReal (
 			taskLogger);
-
-	}
-
-	private synchronized
-	void reloadReal (
-			@NonNull TaskLogger parentTaskLogger) {
-
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"reload");
-
-		try (
-
-			Transaction transaction =
-				database.beginReadWrite (
-					taskLogger,
-					"UserSessionLogicImplementation.reload ()",
-					this);
-
-		) {
-
-			onlineSessionIdsByUserId =
-				new HashMap <> ();
-
-			for (
-				UserOnlineRec online
-					: userOnlineHelper.findAll ()
-			) {
-
-				UserRec user =
-					online.getUser ();
-
-				// update his timestamp if appropriate
-
-				if (
-					activeSessions.containsKey (
-						online.getSessionId ())
-				)
-
-					online
-
-						.setTimestamp (
-							activeSessions.get (
-								online.getSessionId ()));
-
-				// check if he has been disabled or timed out
-
-				if (
-
-					! user.getActive ()
-
-					|| earlierThan (
-						online.getTimestamp ().plus (
-							logoffTime),
-						transaction.now ())
-
-				) {
-
-					userLogoff (
-						taskLogger,
-						user);
-
-					continue;
-
-				}
-
-				// ok put him in the ok list
-
-				onlineSessionIdsByUserId.put (
-					user.getId (),
-					online.getSessionId ());
-
-			}
-
-			transaction.commit ();
-
-			activeSessions =
-				new HashMap<> ();
-
-		}
-
-		nextReload =
-			Instant.now ().plus (
-				reloadFrequency.getMillis ()
-				- reloadFrequencyDeviation.getMillis ()
-				+ randomLogic.randomInteger (
-					reloadFrequencyDeviation.getMillis () * 2));
 
 	}
 
@@ -837,6 +704,149 @@ class UserSessionLogicImplementation
 			code,
 			SerializationUtils.serialize (
 				value));
+
+	}
+
+	// private implementation
+
+	private synchronized
+	void reloadReal (
+			@NonNull TaskLogger parentTaskLogger) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"reload");
+
+		try (
+
+			Transaction transaction =
+				database.beginReadWrite (
+					taskLogger,
+					"UserSessionLogicImplementation.reload ()",
+					this);
+
+		) {
+
+			onlineSessionIdsByUserId =
+				new HashMap <> ();
+
+			for (
+				UserOnlineRec online
+					: userOnlineHelper.findAll ()
+			) {
+
+				UserRec user =
+					online.getUser ();
+
+				// update his timestamp if appropriate
+
+				if (
+					activeSessions.containsKey (
+						online.getSessionId ())
+				) {
+
+					online
+
+						.setTimestamp (
+							activeSessions.get (
+								online.getSessionId ()));
+
+				}
+
+				// check if he has been disabled or timed out
+
+				if (
+
+					! user.getActive ()
+
+					|| earlierThan (
+						online.getTimestamp ().plus (
+							logoffTime),
+						transaction.now ())
+
+				) {
+
+					userLogoff (
+						taskLogger,
+						user);
+
+					continue;
+
+				}
+
+				// ok put him in the ok list
+
+				onlineSessionIdsByUserId.put (
+					user.getId (),
+					online.getSessionId ());
+
+			}
+
+			transaction.commit ();
+
+			activeSessions =
+				new HashMap<> ();
+
+		}
+
+		nextReload =
+			Instant.now ().plus (
+				reloadFrequency.getMillis ()
+				- reloadFrequencyDeviation.getMillis ()
+				+ randomLogic.randomInteger (
+					reloadFrequencyDeviation.getMillis () * 2));
+
+	}
+
+	private
+	boolean checkPassword (
+			@NonNull UserRec user,
+			@NonNull String password) {
+
+		// bypass for dev auto-login
+
+		if (
+
+			stringEqualSafe (
+				password,
+				"**********")
+
+			&& wbsConfig.testUsers ().contains (
+				joinWithFullStop (
+					user.getSlice ().getCode (),
+					user.getUsername ()))
+
+		) {
+
+			return true;
+
+		}
+
+		// always fail if user has no password
+
+		if (user.getPassword () == null) {
+
+			return false;
+
+		}
+
+		// fail if password hash doesn't match
+
+		if (
+			stringNotEqualSafe (
+				user.getPassword (),
+				hashSha1Base64 (
+					password))
+		) {
+
+			return false;
+
+		}
+
+		// all correct
+
+		return true;
 
 	}
 

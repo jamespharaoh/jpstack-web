@@ -4,9 +4,11 @@ $(function () {
 		function () { $(this).addClass ("hover") },
 		function () { $(this).removeClass ("hover") });
 
-	$("#exceptionsRow").click (function () {
-		top.frames.main.location = "/exceptionLogs";
-	});
+	$("#exceptionsRow")
+		.css ("cursor", "pointer")
+		.click (function () {
+			top.frames.main.location = "/exceptionLogs";
+		});
 
 	wbsStatus.handlerRegister ("exceptions",
 	function (data) {

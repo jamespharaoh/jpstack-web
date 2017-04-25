@@ -1,8 +1,7 @@
 package wbs.platform.queue.console;
 
-import static wbs.utils.string.StringUtils.stringFormat;
-import static wbs.web.utils.HtmlAttributeUtils.htmlAttribute;
 import static wbs.web.utils.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
@@ -14,7 +13,6 @@ import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 
@@ -41,42 +39,15 @@ class QueueItemsStatusLinePart
 
 	@Override
 	public
-	Set <HtmlLink> links () {
-
-		return ImmutableSet.<HtmlLink> of (
-
-			HtmlLink.applicationCssStyle (
-				"/style/queue-items-status.css")
-
-		);
-
-	}
-
-	@Override
-	public
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlTableRowOpen (
-
 			htmlIdAttribute (
 				"queue-row"),
-
-			htmlAttribute (
-				"onmouseover",
-				"this.className='hover';"),
-
-			htmlAttribute (
-				"onmouseout",
-				"this.className='';"),
-
-			htmlAttribute (
-				"onclick",
-				stringFormat (
-					"top.frames ['inbox'].location = '%j';",
-					requestContext.resolveApplicationUrl (
-						"/queues/queue.home")))
-		);
+			htmlStyleRuleEntry (
+				"display",
+				"none"));
 
 		htmlTableCellWrite (
 			"—",
