@@ -12,7 +12,6 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.menu.model.MenuGroupObjectHelper;
-import wbs.platform.menu.model.MenuGroupRec;
 import wbs.platform.menu.model.MenuItemObjectHelper;
 import wbs.platform.scaffold.model.SliceObjectHelper;
 
@@ -48,6 +47,78 @@ class PlatformCommonFixtureProvider
 				parentTaskLogger,
 				"createFixtures");
 
+		createMenuGroups (
+			taskLogger,
+			transaction);
+
+		createMenuItems (
+			taskLogger,
+			transaction);
+
+	}
+
+	private
+	void createMenuGroups (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
+
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMenuGroups");
+
+		menuGroupHelper.insert (
+			taskLogger,
+			menuGroupHelper.createInstance ()
+
+			.setSlice (
+				sliceHelper.findByCodeRequired (
+					GlobalId.root,
+					"test"))
+
+			.setCode (
+				"panel")
+
+			.setName (
+				"Panel")
+
+			.setDescription (
+				"")
+
+			.setLabel (
+				"Panels")
+
+			.setOrder (
+				20l)
+
+		);
+
+		menuGroupHelper.insert (
+			taskLogger,
+			menuGroupHelper.createInstance ()
+
+			.setSlice (
+				sliceHelper.findByCodeRequired (
+					GlobalId.root,
+					"test"))
+
+			.setCode (
+				"system")
+
+			.setName (
+				"System")
+
+			.setDescription (
+				"")
+
+			.setLabel (
+				"System")
+
+			.setOrder (
+				50l)
+
+		);
+
 		menuGroupHelper.insert (
 			taskLogger,
 			menuGroupHelper.createInstance ()
@@ -74,39 +145,29 @@ class PlatformCommonFixtureProvider
 
 		);
 
-		MenuGroupRec systemMenuGroup =
-			menuGroupHelper.insert (
-				taskLogger,
-				menuGroupHelper.createInstance ()
+		transaction.flush ();
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+	}
 
-			.setCode (
-				"system")
+	private
+	void createMenuItems (
+			@NonNull TaskLogger parentTaskLogger,
+			@NonNull Transaction transaction) {
 
-			.setName (
-				"System")
-
-			.setDescription (
-				"")
-
-			.setLabel (
-				"System")
-
-			.setOrder (
-				50l)
-
-		);
+		TaskLogger taskLogger =
+			logContext.nestTaskLogger (
+				parentTaskLogger,
+				"createMenuItems");
 
 		menuItemHelper.insert (
 			taskLogger,
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				systemMenuGroup)
+				menuGroupHelper.findByCodeRequired (
+					GlobalId.root,
+					"test",
+					"system"))
 
 			.setCode (
 				"slice")
@@ -133,7 +194,10 @@ class PlatformCommonFixtureProvider
 			menuItemHelper.createInstance ()
 
 			.setMenuGroup (
-				systemMenuGroup)
+				menuGroupHelper.findByCodeRequired (
+					GlobalId.root,
+					"test",
+					"system"))
 
 			.setCode (
 				"menu")
@@ -154,6 +218,8 @@ class PlatformCommonFixtureProvider
 				"main")
 
 		);
+
+		transaction.flush ();
 
 	}
 
