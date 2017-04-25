@@ -134,7 +134,7 @@ class Misc {
 
 	public static
 	long min (
-			long... params) {
+			long ... params) {
 
 		long ret =
 			params [0];
@@ -155,7 +155,7 @@ class Misc {
 
 	public static
 	long max (
-			long... params) {
+			long ... params) {
 
 		long ret =
 			params [0];
