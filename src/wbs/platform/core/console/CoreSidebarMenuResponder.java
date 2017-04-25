@@ -17,8 +17,11 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Ordering;
 
 import lombok.NonNull;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.console.helper.manager.ConsoleObjectManager;
 import wbs.console.html.MagicTableScriptRef;
@@ -139,7 +142,12 @@ class CoreSidebarMenuResponder
 		}
 
 		Collections.sort (
-			menuGroups);
+			menuGroups,
+			Ordering.natural ().onResultOf (
+				menuGroup ->
+					Pair.of (
+						menuGroup.getOrder (),
+						menuGroup.getCode ())));
 
 	}
 

@@ -13,8 +13,6 @@ function wbsStatusInit () {
 	async.onDisconnect (
 		wbsStatus._handleError);
 
-	wbsStatus._keepaliveLoop ();
-
 	$("#timeRow").hover (
 		function () { $(this).addClass ("hover") },
 		function () { $(this).removeClass ("hover") });
@@ -86,26 +84,6 @@ function wbsStatusHandleError () {
 	$("#headerCell").text ("Status");
 	$("#loadingRow").show ();
 	$("#timeRow").hide ();
-
-};
-
-wbsStatus._sendKeepalive =
-function wbsStatusSendKeepalive () {
-
-	async.send (
-		"/status/keepalive",
-		{});
-
-};
-
-wbsStatus._keepaliveLoop =
-function wbsStatusKeepaliveLoop () {
-
-	wbsStatus._sendKeepalive ();
-
-	setTimeout (
-		wbsStatus._keepaliveLoop,
-		1000);
 
 };
 

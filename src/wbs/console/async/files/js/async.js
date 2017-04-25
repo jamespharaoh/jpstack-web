@@ -1,8 +1,8 @@
 var async = {
 
-	state: "none",
+	_state: "none",
 
-	webSocketUrl: [
+	_webSocketUrl: [
 		{
 			"http:": "ws:",
 			"https:": "wss:",
@@ -11,6 +11,9 @@ var async = {
 		location.hostname,
 		"/_async",
 	].join (''),
+
+	_keepaliveTime: 1000,
+	_errorWaitTime: 5000,
 
 	_webSocket: undefined,
 
@@ -21,23 +24,33 @@ var async = {
 
 };
 
-async._connect = function asyncConnect () {
+async._init =
+function asyncInit () {
 
-	if (async.state != "none") {
+	setTimeout (async._connect);
+
+	setTimeout (async._keepaliveLoop);
+
+};
+
+async._connect =
+function asyncConnect () {
+
+	if (async._state != "none") {
 
 		throw new Error (
-			"Unable to connect in state: " + async.state);
+			"Unable to connect in state: " + async._state);
 
 	}
 
-	async.state = "connecting";
+	async._state = "connecting";
 
 	console.log (
-		"Connection to " + async.webSocketUrl);
+		"Connection to " + async._webSocketUrl);
 
 	async._webSocket =
 		new WebSocket (
-			async.webSocketUrl);
+			async._webSocketUrl);
 
 	async._webSocket.onerror = function () {
 
@@ -48,12 +61,12 @@ async._connect = function asyncConnect () {
 
 	async._webSocket.onopen = function () {
 
-		if (async.state != "connecting") {
+		if (async._state != "connecting") {
 			throw new Error (
-				"Invalid state: " + async.state);
+				"Invalid state: " + async._state);
 		}
 
-		async.state = "connected";
+		async._state = "connected";
 
 		console.log (
 			"Web socket connected");
@@ -70,14 +83,14 @@ async._connect = function asyncConnect () {
 
 	async._webSocket.onclose = function () {
 
-		if (async.state == "none") {
+		if (async._state == "none") {
 
 			throw new Error (
-				"Invalid state: " + async.state);
+				"Invalid state: " + async._state);
 
 		}
 
-		async.state = "none";
+		async._state = "none";
 
 		console.warn (
 			"Web socket closed");
@@ -90,7 +103,9 @@ async._connect = function asyncConnect () {
 			}
 		);
 
-		setTimeout (async._connect, 5000);
+		setTimeout (
+			async._connect,
+			async._errorWaitTime);
 
 	};
 
@@ -123,7 +138,7 @@ async.onConnect = function asyncOnConnect (callback) {
 	async._onConnectCallbacks.push (
 		callback);
 
-	if (async.state == "connected") {
+	if (async._state == "connected") {
 		callback ();
 	}
 
@@ -138,7 +153,7 @@ async.onDisconnect = function asyncOnDisconnect (callback) {
 
 async.send = function asyncSend (endpoint, payload) {
 
-	if (async.state != "connected") {
+	if (async._state != "connected") {
 		return;
 	}
 
@@ -168,6 +183,26 @@ async.subscribe = function asyncSubscribe (endpoint, handler) {
 
 }
 
-$(async._connect);
+async._keepaliveLoop =
+function asyncKeepaliveLoop () {
+
+	async._keepaliveSend ();
+
+	setTimeout (
+		async._keepaliveLoop,
+		async._keepaliveTime);
+
+};
+
+async._keepaliveSend =
+function asyncSendKeepalive () {
+
+	async.send (
+		"/status/keepalive",
+		{});
+
+};
+
+$(async._init);
 
 // ex: noet ts=4 filetype=javascript

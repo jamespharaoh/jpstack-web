@@ -83,6 +83,9 @@ interface RequestContextCookieMethods
 				name,
 				value);
 
+		cookie.setPath (
+			"/");
+
 		state.cookiesByName.put (
 			name,
 			cookie);
