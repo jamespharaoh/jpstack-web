@@ -46,6 +46,15 @@ $(function () {
 
 	});
 
+	$("#queue-row")
+		.css ("cursor", "pointer")
+		.hover (
+			function () { $(this).addClass ("hover") },
+			function () { $(this).removeClass ("hover") })
+		.click (function () {
+			top.frames.inbox.location = "/queues/queue.home";
+		});
+
 });
 
 // ex: noet ts=4 filetype=javascript

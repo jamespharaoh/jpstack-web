@@ -5,7 +5,7 @@ $(function () {
 
 		if (data.numToday || data.numThisHour) {
 
-			$("#manualResponderCell").text ([
+			$("#manual-responder-cell").text ([
 				"Messages answered: ",
 				String (numToday),
 				" today, ",
@@ -13,11 +13,11 @@ $(function () {
 				" this hour",
 			].join (""));
 
-			$("#manualResponderRow").show ();
+			$("#manual-responder-row").show ();
 
 		} else {
 
-			$("#manualResponderRow").hide ();
+			$("#manual-responder-row").hide ();
 
 		}
 

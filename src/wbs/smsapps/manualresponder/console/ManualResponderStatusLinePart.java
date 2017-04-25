@@ -1,6 +1,7 @@
 package wbs.smsapps.manualresponder.console;
 
 import static wbs.web.utils.HtmlAttributeUtils.htmlIdAttribute;
+import static wbs.web.utils.HtmlStyleUtils.htmlStyleRuleEntry;
 import static wbs.web.utils.HtmlTableUtils.htmlTableCellWrite;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowClose;
 import static wbs.web.utils.HtmlTableUtils.htmlTableRowOpen;
@@ -12,7 +13,6 @@ import com.google.common.collect.ImmutableSet;
 import lombok.NonNull;
 
 import wbs.console.context.ConsoleApplicationScriptRef;
-import wbs.console.html.HtmlLink;
 import wbs.console.html.ScriptRef;
 import wbs.console.part.AbstractPagePart;
 
@@ -39,30 +39,20 @@ class ManualResponderStatusLinePart
 
 	@Override
 	public
-	Set <HtmlLink> links () {
-
-		return ImmutableSet.<HtmlLink> of (
-
-			HtmlLink.applicationCssStyle (
-				"/style/manual-responder-status.css")
-
-		);
-
-	}
-
-	@Override
-	public
 	void renderHtmlBodyContent (
 			@NonNull TaskLogger parentTaskLogger) {
 
 		htmlTableRowOpen (
 			htmlIdAttribute (
-				"manualResponderRow"));
+				"manual-responder-row"),
+			htmlStyleRuleEntry (
+				"display",
+				"none"));
 
 		htmlTableCellWrite (
 			"—",
 			htmlIdAttribute (
-				"manualResponderCell"));
+				"manual-responder-cell"));
 
 		htmlTableRowClose ();
 
