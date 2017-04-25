@@ -1,32 +1,22 @@
-package wbs.platform.status.console;
+package wbs.platform.core.console;
 
-import static wbs.utils.collection.IterableUtils.iterableMapToList;
 import static wbs.utils.collection.MapUtils.mapContainsKey;
 import static wbs.utils.etc.Misc.isNull;
-import static wbs.utils.etc.NullUtils.ifNull;
-import static wbs.utils.etc.OptionalUtils.optionalFromNullable;
-import static wbs.utils.etc.OptionalUtils.optionalOf;
-import static wbs.utils.etc.OptionalUtils.presentInstances;
-import static wbs.utils.string.StringUtils.emptyStringIfNull;
-import static wbs.utils.string.StringUtils.joinWithSeparator;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Future;
 
 import javax.inject.Provider;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.experimental.Accessors;
-
-import org.apache.commons.lang3.tuple.Pair;
 
 import wbs.console.async.ConsoleAsyncConnectionHandle;
 import wbs.console.async.ConsoleAsyncEndpoint;
@@ -36,8 +26,8 @@ import wbs.console.priv.UserPrivCheckerBuilder;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.NormalLifecycleSetup;
 import wbs.framework.component.annotations.NormalLifecycleTeardown;
+import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.PrototypeDependency;
-import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
 import wbs.framework.component.config.WbsConfig;
 import wbs.framework.database.Database;
@@ -46,17 +36,17 @@ import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
 import wbs.platform.deployment.logic.DeploymentLogic;
-import wbs.platform.deployment.model.ConsoleDeploymentRec;
 import wbs.platform.scaffold.console.RootConsoleHelper;
-import wbs.platform.scaffold.model.RootRec;
+import wbs.platform.status.console.StatusLineManager;
 import wbs.platform.user.console.UserConsoleHelper;
 import wbs.platform.user.model.UserRec;
 
 import wbs.utils.time.TimeFormatter;
 
-@SingletonComponent ("statusUpdateAsyncEndpoint")
+@PrototypeComponent ("consoleAsyncSubscription")
+@Accessors (fluent = true)
 public
-class StatusUpdateAsyncEndpoint
+class ConsoleAsyncSubscription <SubscriberState>
 	implements ConsoleAsyncEndpoint {
 
 	// singleton dependencies
@@ -90,11 +80,16 @@ class StatusUpdateAsyncEndpoint
 	@PrototypeDependency
 	Provider <UserPrivCheckerBuilder> userPrivCheckerBuilderProvider;
 
+	// properties
+
+	@Getter @Setter
+	Helper <SubscriberState> helper;
+
 	// state
 
 	Thread backgroundThread;
 
-	Map <String, Subscriber> subscribersByConnectionId =
+	Map <String, Subscriber <SubscriberState>> subscribersByConnectionId =
 		new HashMap<> ();
 
 	// details
@@ -102,7 +97,7 @@ class StatusUpdateAsyncEndpoint
 	@Override
 	public
 	String endpointPath () {
-		return "/status/update";
+		return helper.endpointPath ();
 	}
 
 	// life cycle
@@ -118,7 +113,8 @@ class StatusUpdateAsyncEndpoint
 				"setup");
 
 		taskLogger.noticeFormat (
-			"Status update async endpoint starting");
+			"%s async endpoint starting",
+			helper.endpointName ());
 
 		backgroundThread =
 			new Thread (
@@ -146,7 +142,8 @@ class StatusUpdateAsyncEndpoint
 		}
 
 		taskLogger.noticeFormat (
-			"Status update async endpoint shutting down");
+			"%s async endpoint shutting down",
+			helper.endpointName ());
 
 		backgroundThread.interrupt ();
 
@@ -196,13 +193,17 @@ class StatusUpdateAsyncEndpoint
 
 			subscribersByConnectionId.put (
 				connectionHandle.connectionId (),
-				new Subscriber ()
+				new Subscriber <SubscriberState> ()
 
 				.connectionHandle (
 					connectionHandle)
 
 				.userId (
 					userId)
+
+				.state (
+					helper.newSubscription (
+						taskLogger))
 
 			);
 
@@ -254,15 +255,21 @@ class StatusUpdateAsyncEndpoint
 
 			) {
 
+				helper.prepareUpdate (
+					taskLogger);
+
 				for (
-					Map.Entry <String, Subscriber> subscriberEntry
+					Map.Entry <
+						String,
+						Subscriber <SubscriberState>
+					> subscriberEntry
 						: subscribersByConnectionId.entrySet ()
 				) {
 
 					String connectionId =
 						subscriberEntry.getKey ();
 
-					Subscriber subscriber =
+					Subscriber <SubscriberState> subscriber =
 						subscriberEntry.getValue ();
 
 					if (! subscriber.connectionHandle ().isConnected ()) {
@@ -300,12 +307,16 @@ class StatusUpdateAsyncEndpoint
 	void updateSubscriber (
 			@NonNull TaskLogger parentTaskLogger,
 			@NonNull Transaction transaction,
-			@NonNull Subscriber subscriber) {
+			@NonNull Subscriber <SubscriberState> subscriber) {
 
 		TaskLogger taskLogger =
 			logContext.nestTaskLogger (
 				parentTaskLogger,
 				"updateSubscriber");
+
+		UserRec user =
+			userHelper.findRequired (
+				subscriber.userId ());
 
 		UserPrivChecker privChecker =
 			userPrivCheckerBuilderProvider.get ()
@@ -316,132 +327,48 @@ class StatusUpdateAsyncEndpoint
 			.build (
 				taskLogger);
 
-		List <Pair <String, Future <JsonObject>>> futures =
-			iterableMapToList (
-				statusLine ->
-					Pair.of (
-						statusLine.typeName (),
-						statusLine.getUpdateData (
-							taskLogger,
-							privChecker)),
-				statusLineManager.getStatusLines ());
+		try {
 
-		JsonObject payload =
-			new JsonObject ();
-
-		JsonArray updates =
-			new JsonArray ();
-
-		addUpdate (
-			updates,
-			"core",
-			buildUpdateCore (
+			helper.updateSubscriber (
 				taskLogger,
+				subscriber.state (),
+				subscriber.connectionHandle (),
 				transaction,
-				subscriber));
+				user,
+				privChecker);
 
-		for (
-			Pair <String, Future <JsonObject>> future
-				: futures
-		) {
+		} catch (Exception exception) {
 
-			try {
-
-				addUpdate (
-					updates,
-					future.getKey (),
-					future.getValue ().get ());
-
-			} catch (Exception exception) {
-
-				taskLogger.errorFormatException (
-					exception,
-					"Error getting status update for %s",
-					future.getKey ());
-
-			}
+			taskLogger.errorFormatException (
+				exception,
+				"%s async endpoint error updating subscriber",
+				helper.endpointName ());
 
 		}
 
-		payload.add (
-			"updates",
-			updates);
-
-		subscriber.connectionHandle ().send (
-			taskLogger,
-			payload);
-
 	}
 
-	private
-	void addUpdate (
-			@NonNull JsonArray updates,
-			@NonNull String updateType,
-			@NonNull JsonObject updateData) {
+	// helper interface
 
-		JsonObject update =
-			new JsonObject ();
+	public static
+	interface Helper <SubscriberStateType> {
 
-		update.addProperty (
-			"type",
-			updateType);
+		String endpointPath ();
+		String endpointName ();
 
-		update.add (
-			"data",
-			updateData);
+		SubscriberStateType newSubscription (
+				TaskLogger parentTaskLogger);
 
-		updates.add (
-			update);
+		void prepareUpdate (
+				TaskLogger parentTaskLogger);
 
-	}
-
-	private
-	JsonObject buildUpdateCore (
-			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
-			@NonNull Subscriber subscriber) {
-
-		RootRec root =
-			rootHelper.findRequired (0l);
-
-		UserRec user =
-			userHelper.findRequired (
-				subscriber.userId ());
-
-		ConsoleDeploymentRec consoleDeployment =
-			deploymentLogic.thisConsoleDeployment ();
-
-		JsonObject update =
-			new JsonObject ();
-
-		update.addProperty (
-			"header",
-			joinWithSeparator (
-				" – ",
-				presentInstances (
-					optionalOf (
-						"Status"),
-					optionalFromNullable (
-						consoleDeployment.getStatusLabel ()),
-						optionalOf (
-						deploymentLogic.gitVersion ()))));
-
-		update.addProperty (
-			"timestamp",
-			timeFormatter.timestampString (
-				timeFormatter.timezone (
-					ifNull (
-						user.getDefaultTimezone (),
-						user.getSlice ().getDefaultTimezone (),
-						wbsConfig.defaultTimezone ())),
-				transaction.now ()));
-
-		update.addProperty (
-			"notice",
-			emptyStringIfNull (
-				root.getNotice ()));
-
-		return update;
+		void updateSubscriber (
+				TaskLogger parentTaskLogger,
+				SubscriberStateType subscriberState,
+				ConsoleAsyncConnectionHandle connectionHandle,
+				Transaction transaction,
+				UserRec user,
+				UserPrivChecker privChecker);
 
 	}
 
@@ -449,10 +376,11 @@ class StatusUpdateAsyncEndpoint
 
 	@Accessors (fluent = true)
 	@Data
-	static
-	class Subscriber {
+	public static
+	class Subscriber <SubscriberState> {
 		ConsoleAsyncConnectionHandle connectionHandle;
 		Long userId;
+		SubscriberState state;
 	}
 
 }

@@ -3,6 +3,7 @@
 	package="wbs.platform.core">
 
 	<layer name="console">
+		<component class="console.ConsoleAsyncSubscription"/>
 		<component class="console.CoreAuthAction"/>
 		<component class="console.CoreAuthFilter"/>
 		<component class="console.CoreFrameSetResponder"/>
