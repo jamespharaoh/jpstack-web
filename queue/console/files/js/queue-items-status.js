@@ -45,6 +45,7 @@ $(function () {
 		}
 
 	});
+
 });
 
 // ex: noet ts=4 filetype=javascript
