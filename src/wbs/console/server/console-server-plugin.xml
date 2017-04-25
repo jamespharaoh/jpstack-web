@@ -5,7 +5,6 @@
 	<layer name="console">
 		<component class="ConsoleServer"/>
 		<component class="ConsoleWebSocketApplication"/>
-		<component class="ConsoleWebSocketFactory"/>
 	</layer>
 
 </plugin>
