@@ -12,7 +12,7 @@ import wbs.console.request.ConsoleRequestContext;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.logging.LogContext;
 import wbs.framework.logging.TaskLogger;
 
@@ -52,89 +52,95 @@ class MessageTemplateDatabaseSettingsCopyFormHelper
 	public
 	Optional <Responder> processFormSubmission (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction,
+			@NonNull OwnedTransaction transaction,
 			@NonNull MessageTemplateCopyForm state) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"processFormSubmission");
+		try (
 
-		MessageTemplateDatabaseRec targetDatabase =
-			messageTemplateDatabaseHelper.findFromContextRequired ();
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"processFormSubmission");
 
-		MessageTemplateDatabaseRec sourceDatabase =
-			messageTemplateDatabaseHelper.findRequired (
-				state.sourceMessageTemplateDatabaseId ());
-
-		for (
-			MessageTemplateEntryTypeRec sourceEntryType
-				: sourceDatabase.getMessageTemplateEntryTypes ()
 		) {
 
-			MessageTemplateEntryTypeRec targetEntryType =
-				messageTemplateEntryTypeHelper.findOrCreate (
-					taskLogger,
-					targetDatabase,
-					sourceEntryType.getCode (),
-					newEntryType ->
-						newEntryType
+			MessageTemplateDatabaseRec targetDatabase =
+				messageTemplateDatabaseHelper.findFromContextRequired ();
 
-				.setName (
-					sourceEntryType.getName ())
-
-				.setDescription (
-					sourceEntryType.getDescription ())
-
-			);
+			MessageTemplateDatabaseRec sourceDatabase =
+				messageTemplateDatabaseHelper.findRequired (
+					state.sourceMessageTemplateDatabaseId ());
 
 			for (
-				MessageTemplateFieldTypeRec sourceFieldType
-					: sourceEntryType.getMessageTemplateFieldTypes ()
+				MessageTemplateEntryTypeRec sourceEntryType
+					: sourceDatabase.getMessageTemplateEntryTypes ()
 			) {
 
-				messageTemplateFieldTypeHelper.findOrCreate (
-					taskLogger,
-					targetEntryType,
-					sourceFieldType.getCode (),
-					targetFieldType ->
-						targetFieldType
+				MessageTemplateEntryTypeRec targetEntryType =
+					messageTemplateEntryTypeHelper.findOrCreate (
+						taskLogger,
+						targetDatabase,
+						sourceEntryType.getCode (),
+						newEntryType ->
+							newEntryType
 
 					.setName (
-						sourceFieldType.getName ())
+						sourceEntryType.getName ())
 
 					.setDescription (
-						sourceFieldType.getDescription ())
-
-					.setDefaultValue (
-						sourceFieldType.getDefaultValue ())
-
-					.setHelpText (
-						sourceFieldType.getHelpText ())
-
-					.setMinLength (
-						sourceFieldType.getMinLength ())
-
-					.setMaxLength (
-						sourceFieldType.getMaxLength ())
-
-					.setCharset (
-						sourceFieldType.getCharset ())
+						sourceEntryType.getDescription ())
 
 				);
 
+				for (
+					MessageTemplateFieldTypeRec sourceFieldType
+						: sourceEntryType.getMessageTemplateFieldTypes ()
+				) {
+
+					messageTemplateFieldTypeHelper.findOrCreate (
+						taskLogger,
+						targetEntryType,
+						sourceFieldType.getCode (),
+						targetFieldType ->
+							targetFieldType
+
+						.setName (
+							sourceFieldType.getName ())
+
+						.setDescription (
+							sourceFieldType.getDescription ())
+
+						.setDefaultValue (
+							sourceFieldType.getDefaultValue ())
+
+						.setHelpText (
+							sourceFieldType.getHelpText ())
+
+						.setMinLength (
+							sourceFieldType.getMinLength ())
+
+						.setMaxLength (
+							sourceFieldType.getMaxLength ())
+
+						.setCharset (
+							sourceFieldType.getCharset ())
+
+					);
+
+				}
+
 			}
 
+			transaction.commit ();
+
+			requestContext.addNoticeFormat (
+				"Message database types copied from %s.%s",
+				sourceDatabase.getSlice ().getCode (),
+				sourceDatabase.getCode ());
+
+			return optionalAbsent ();
+
 		}
-
-		transaction.commit ();
-
-		requestContext.addNoticeFormat (
-			"Message database types copied from %s.%s",
-			sourceDatabase.getSlice ().getCode (),
-			sourceDatabase.getCode ());
-
-		return optionalAbsent ();
 
 	}
 

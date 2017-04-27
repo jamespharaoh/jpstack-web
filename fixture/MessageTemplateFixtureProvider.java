@@ -4,7 +4,7 @@ import lombok.NonNull;
 
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -86,284 +86,290 @@ class MessageTemplateFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"facility"))
+		) {
 
-			.setCode (
-				"message_template")
-
-			.setName (
-				"Message templates")
-
-			.setDescription (
-				"Message templates")
-
-			.setLabel (
-				"Message templates")
-
-			.setTargetPath (
-				"/messageTemplateDatabases")
-
-			.setTargetFrame (
-				"main")
-
-		);
-
-		MessageTemplateDatabaseRec messageTemplateDatabase =
-			messageTemplateDatabaseHelper.insert (
+			menuItemHelper.insert (
 				taskLogger,
-				messageTemplateDatabaseHelper.createInstance ()
+				menuItemHelper.createInstance ()
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"facility"))
 
-			.setCode (
-				"message_template_database")
+				.setCode (
+					"message_template")
 
-			.setName (
-				"My message template database")
+				.setName (
+					"Message templates")
 
-			.setDescription (
-				"Message template database description")
+				.setDescription (
+					"Message templates")
 
-		);
+				.setLabel (
+					"Message templates")
 
-		MessageTemplateEntryTypeRec entryType1 =
-			messageTemplateEntryTypeHelper.insert (
+				.setTargetPath (
+					"/messageTemplateDatabases")
+
+				.setTargetFrame (
+					"main")
+
+			);
+
+			MessageTemplateDatabaseRec messageTemplateDatabase =
+				messageTemplateDatabaseHelper.insert (
+					taskLogger,
+					messageTemplateDatabaseHelper.createInstance ()
+
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
+
+				.setCode (
+					"message_template_database")
+
+				.setName (
+					"My message template database")
+
+				.setDescription (
+					"Message template database description")
+
+			);
+
+			MessageTemplateEntryTypeRec entryType1 =
+				messageTemplateEntryTypeHelper.insert (
+					taskLogger,
+					messageTemplateEntryTypeHelper.createInstance ()
+
+				.setMessageTemplateDatabase (
+					messageTemplateDatabase)
+
+				.setCode (
+					"entry_type_1")
+
+				.setName (
+					"Entry type 1")
+
+				.setDescription (
+					"")
+
+			);
+
+			MessageTemplateFieldTypeRec fieldType1a =
+				messageTemplateFieldTypeHelper.insert (
+					taskLogger,
+					messageTemplateFieldTypeHelper.createInstance ()
+
+				.setMessageTemplateEntryType (
+					entryType1)
+
+				.setCode (
+					"field_type_a")
+
+				.setName (
+					"Field type A")
+
+				.setDescription (
+					"")
+
+				.setDefaultValue (
+					"Template 1 Default Value")
+
+				.setHelpText (
+					"<p>Help text 1</p>")
+
+				.setMinLength (
+					1l)
+
+				.setMaxLength (
+					50l)
+
+				.setCharset (
+					MessageTemplateTypeCharset.unicode)
+
+			);
+
+			messageTemplateParameterHelper.insert (
 				taskLogger,
-				messageTemplateEntryTypeHelper.createInstance ()
+				messageTemplateParameterHelper.createInstance ()
 
-			.setMessageTemplateDatabase (
-				messageTemplateDatabase)
+				.setCode (
+					"test")
 
-			.setCode (
-				"entry_type_1")
+				.setName (
+					"Test")
 
-			.setName (
-				"Entry type 1")
+				.setDescription (
+					"")
 
-			.setDescription (
-				"")
+				.setMessageTemplateEntryType (
+					entryType1)
 
-		);
+				.setRequired (
+					false)
 
-		MessageTemplateFieldTypeRec fieldType1a =
+			);
+
+			MessageTemplateEntryTypeRec entryType2 =
+				messageTemplateEntryTypeHelper.insert (
+					taskLogger,
+					messageTemplateEntryTypeHelper.createInstance ()
+
+				.setMessageTemplateDatabase (
+					messageTemplateDatabase)
+
+				.setCode (
+					"entry_type_2")
+
+				.setName (
+					"Entry type 2")
+
+				.setDescription (
+					"")
+
+			);
+
 			messageTemplateFieldTypeHelper.insert (
 				taskLogger,
 				messageTemplateFieldTypeHelper.createInstance ()
 
-			.setMessageTemplateEntryType (
-				entryType1)
+				.setMessageTemplateEntryType (
+					entryType2)
 
-			.setCode (
-				"field_type_a")
+				.setCode (
+					"field_type_a")
 
-			.setName (
-				"Field type A")
+				.setName (
+					"Field type A")
 
-			.setDescription (
-				"")
+				.setDescription (
+					"")
 
-			.setDefaultValue (
-				"Template 1 Default Value")
+				.setDefaultValue (
+					"My name is {name}")
 
-			.setHelpText (
-				"<p>Help text 1</p>")
+				.setHelpText (
+					"<p>Help text 2</p>")
 
-			.setMinLength (
-				1l)
+				.setMinLength (
+					5l)
 
-			.setMaxLength (
-				50l)
+				.setMaxLength (
+					20l)
 
-			.setCharset (
-				MessageTemplateTypeCharset.unicode)
+				.setCharset (
+					MessageTemplateTypeCharset.unicode)
 
-		);
+			);
 
-		messageTemplateParameterHelper.insert (
-			taskLogger,
-			messageTemplateParameterHelper.createInstance ()
-
-			.setCode (
-				"test")
-
-			.setName (
-				"Test")
-
-			.setDescription (
-				"")
-
-			.setMessageTemplateEntryType (
-				entryType1)
-
-			.setRequired (
-				false)
-
-		);
-
-		MessageTemplateEntryTypeRec entryType2 =
-			messageTemplateEntryTypeHelper.insert (
+			messageTemplateParameterHelper.insert (
 				taskLogger,
-				messageTemplateEntryTypeHelper.createInstance ()
+				messageTemplateParameterHelper.createInstance ()
 
-			.setMessageTemplateDatabase (
-				messageTemplateDatabase)
+				.setMessageTemplateEntryType (
+					entryType2)
 
-			.setCode (
-				"entry_type_2")
+				.setCode (
+					"parameter_type_a")
 
-			.setName (
-				"Entry type 2")
+				.setName (
+					"Parameter type A")
 
-			.setDescription (
-				"")
+				.setDescription (
+					"")
 
-		);
+				.setRequired (
+					true)
 
-		messageTemplateFieldTypeHelper.insert (
-			taskLogger,
-			messageTemplateFieldTypeHelper.createInstance ()
+				.setMaximumLength (
+					4l)
 
-			.setMessageTemplateEntryType (
-				entryType2)
+			);
 
-			.setCode (
-				"field_type_a")
-
-			.setName (
-				"Field type A")
-
-			.setDescription (
-				"")
-
-			.setDefaultValue (
-				"My name is {name}")
-
-			.setHelpText (
-				"<p>Help text 2</p>")
-
-			.setMinLength (
-				5l)
-
-			.setMaxLength (
-				20l)
-
-			.setCharset (
-				MessageTemplateTypeCharset.unicode)
-
-		);
-
-		messageTemplateParameterHelper.insert (
-			taskLogger,
-			messageTemplateParameterHelper.createInstance ()
-
-			.setMessageTemplateEntryType (
-				entryType2)
-
-			.setCode (
-				"parameter_type_a")
-
-			.setName (
-				"Parameter type A")
-
-			.setDescription (
-				"")
-
-			.setRequired (
-				true)
-
-			.setMaximumLength (
-				4l)
-
-		);
-
-		messageTemplateParameterHelper.insert (
-			taskLogger,
-			messageTemplateParameterHelper.createInstance ()
-
-			.setMessageTemplateEntryType (
-				entryType2)
-
-			.setCode (
-				"parameter_type_b")
-
-			.setName (
-				"Parameter type B")
-
-			.setDescription (
-				"")
-
-			.setRequired (
-				false)
-
-			.setMaximumLength (
-				3l)
-
-		);
-
-		MessageTemplateSetRec messageTemplateSet =
-			messageTemplateSetHelper.insert (
+			messageTemplateParameterHelper.insert (
 				taskLogger,
-				messageTemplateSetHelper.createInstance ()
+				messageTemplateParameterHelper.createInstance ()
 
-			.setMessageTemplateDatabase (
-				messageTemplateDatabase)
+				.setMessageTemplateEntryType (
+					entryType2)
 
-			.setCode (
-				"test")
+				.setCode (
+					"parameter_type_b")
 
-			.setName (
-				"Test")
+				.setName (
+					"Parameter type B")
 
-			.setDescription (
-				"")
+				.setDescription (
+					"")
 
-		);
+				.setRequired (
+					false)
 
-		MessageTemplateEntryValueRec entryValue1 =
-			messageTemplateEntryValueHelper.insert (
+				.setMaximumLength (
+					3l)
+
+			);
+
+			MessageTemplateSetRec messageTemplateSet =
+				messageTemplateSetHelper.insert (
+					taskLogger,
+					messageTemplateSetHelper.createInstance ()
+
+				.setMessageTemplateDatabase (
+					messageTemplateDatabase)
+
+				.setCode (
+					"test")
+
+				.setName (
+					"Test")
+
+				.setDescription (
+					"")
+
+			);
+
+			MessageTemplateEntryValueRec entryValue1 =
+				messageTemplateEntryValueHelper.insert (
+					taskLogger,
+					messageTemplateEntryValueHelper.createInstance ()
+
+				.setMessageTemplateSet (
+					messageTemplateSet)
+
+				.setMessageTemplateEntryType (
+					entryType1)
+
+			);
+
+			messageTemplateFieldValueHelper.insert (
 				taskLogger,
-				messageTemplateEntryValueHelper.createInstance ()
+				messageTemplateFieldValueHelper.createInstance ()
 
-			.setMessageTemplateSet (
-				messageTemplateSet)
+				.setMessageTemplateEntryValue (
+					entryValue1)
 
-			.setMessageTemplateEntryType (
-				entryType1)
+				.setMessageTemplateFieldType (
+					fieldType1a)
 
-		);
+				.setStringValue (
+					"hello world")
 
-		messageTemplateFieldValueHelper.insert (
-			taskLogger,
-			messageTemplateFieldValueHelper.createInstance ()
+			);
 
-			.setMessageTemplateEntryValue (
-				entryValue1)
-
-			.setMessageTemplateFieldType (
-				fieldType1a)
-
-			.setStringValue (
-				"hello world")
-
-		);
+		}
 
 	}
 

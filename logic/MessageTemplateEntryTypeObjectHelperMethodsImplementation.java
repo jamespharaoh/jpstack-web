@@ -41,42 +41,48 @@ class MessageTemplateEntryTypeObjectHelperMethodsImplementation
 			@NonNull String code,
 			@NonNull Consumer <MessageTemplateEntryTypeRec> consumer) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"findOrCreate");
+		try (
 
-		Optional <MessageTemplateEntryTypeRec>
-			existingMessageTemplateEntryType =
-				messageTemplateEntryTypeHelper.findByCode (
-					messageTemplateDatabase,
-					code);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"findOrCreate");
 
-		if (
-			optionalIsPresent (
-				existingMessageTemplateEntryType)
 		) {
 
-			return optionalGetRequired (
-				existingMessageTemplateEntryType);
+			Optional <MessageTemplateEntryTypeRec>
+				existingMessageTemplateEntryType =
+					messageTemplateEntryTypeHelper.findByCode (
+						messageTemplateDatabase,
+						code);
+
+			if (
+				optionalIsPresent (
+					existingMessageTemplateEntryType)
+			) {
+
+				return optionalGetRequired (
+					existingMessageTemplateEntryType);
+
+			}
+
+			MessageTemplateEntryTypeRec newMessageTemplateEntry =
+				messageTemplateEntryTypeHelper.createInstance ()
+
+				.setMessageTemplateDatabase (
+					messageTemplateDatabase)
+
+				.setCode (
+					code);
+
+			consumer.accept (
+				newMessageTemplateEntry);
+
+			return messageTemplateEntryTypeHelper.insert (
+				taskLogger,
+				newMessageTemplateEntry);
 
 		}
-
-		MessageTemplateEntryTypeRec newMessageTemplateEntry =
-			messageTemplateEntryTypeHelper.createInstance ()
-
-			.setMessageTemplateDatabase (
-				messageTemplateDatabase)
-
-			.setCode (
-				code);
-
-		consumer.accept (
-			newMessageTemplateEntry);
-
-		return messageTemplateEntryTypeHelper.insert (
-			taskLogger,
-			newMessageTemplateEntry);
 
 	}
 
