@@ -5,7 +5,7 @@ import lombok.NonNull;
 import wbs.framework.component.annotations.ClassSingletonDependency;
 import wbs.framework.component.annotations.PrototypeComponent;
 import wbs.framework.component.annotations.SingletonDependency;
-import wbs.framework.database.Transaction;
+import wbs.framework.database.OwnedTransaction;
 import wbs.framework.entity.record.GlobalId;
 import wbs.framework.fixtures.FixtureProvider;
 import wbs.framework.logging.LogContext;
@@ -40,186 +40,204 @@ class PlatformCommonFixtureProvider
 	public
 	void createFixtures (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createFixtures");
+		try (
 
-		createMenuGroups (
-			taskLogger,
-			transaction);
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createFixtures");
 
-		createMenuItems (
-			taskLogger,
-			transaction);
+		) {
+
+			createMenuGroups (
+				taskLogger,
+				transaction);
+
+			createMenuItems (
+				taskLogger,
+				transaction);
+
+		}
 
 	}
 
 	private
 	void createMenuGroups (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMenuGroups");
+		try (
 
-		menuGroupHelper.insert (
-			taskLogger,
-			menuGroupHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMenuGroups");
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+		) {
 
-			.setCode (
-				"panel")
+			menuGroupHelper.insert (
+				taskLogger,
+				menuGroupHelper.createInstance ()
 
-			.setName (
-				"Panel")
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"panel")
 
-			.setLabel (
-				"Panels")
+				.setName (
+					"Panel")
 
-			.setOrder (
-				20l)
+				.setDescription (
+					"")
 
-		);
+				.setLabel (
+					"Panels")
 
-		menuGroupHelper.insert (
-			taskLogger,
-			menuGroupHelper.createInstance ()
+				.setOrder (
+					20l)
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+			);
 
-			.setCode (
-				"system")
+			menuGroupHelper.insert (
+				taskLogger,
+				menuGroupHelper.createInstance ()
 
-			.setName (
-				"System")
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"system")
 
-			.setLabel (
-				"System")
+				.setName (
+					"System")
 
-			.setOrder (
-				50l)
+				.setDescription (
+					"")
 
-		);
+				.setLabel (
+					"System")
 
-		menuGroupHelper.insert (
-			taskLogger,
-			menuGroupHelper.createInstance ()
+				.setOrder (
+					50l)
 
-			.setSlice (
-				sliceHelper.findByCodeRequired (
-					GlobalId.root,
-					"test"))
+			);
 
-			.setCode (
-				"internal")
+			menuGroupHelper.insert (
+				taskLogger,
+				menuGroupHelper.createInstance ()
 
-			.setName (
-				"Internal")
+				.setSlice (
+					sliceHelper.findByCodeRequired (
+						GlobalId.root,
+						"test"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"internal")
 
-			.setLabel (
-				"Internals")
+				.setName (
+					"Internal")
 
-			.setOrder (
-				70l)
+				.setDescription (
+					"")
 
-		);
+				.setLabel (
+					"Internals")
 
-		transaction.flush ();
+				.setOrder (
+					70l)
+
+			);
+
+			transaction.flush ();
+
+		}
 
 	}
 
 	private
 	void createMenuItems (
 			@NonNull TaskLogger parentTaskLogger,
-			@NonNull Transaction transaction) {
+			@NonNull OwnedTransaction transaction) {
 
-		TaskLogger taskLogger =
-			logContext.nestTaskLogger (
-				parentTaskLogger,
-				"createMenuItems");
+		try (
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+			TaskLogger taskLogger =
+				logContext.nestTaskLogger (
+					parentTaskLogger,
+					"createMenuItems");
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"system"))
+		) {
 
-			.setCode (
-				"slice")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"Slice")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"system"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"slice")
 
-			.setLabel (
-				"Slice")
+				.setName (
+					"Slice")
 
-			.setTargetPath (
-				"/slices")
+				.setDescription (
+					"")
 
-			.setTargetFrame (
-				"main")
+				.setLabel (
+					"Slice")
 
-		);
+				.setTargetPath (
+					"/slices")
 
-		menuItemHelper.insert (
-			taskLogger,
-			menuItemHelper.createInstance ()
+				.setTargetFrame (
+					"main")
 
-			.setMenuGroup (
-				menuGroupHelper.findByCodeRequired (
-					GlobalId.root,
-					"test",
-					"system"))
+			);
 
-			.setCode (
-				"menu")
+			menuItemHelper.insert (
+				taskLogger,
+				menuItemHelper.createInstance ()
 
-			.setName (
-				"Menu")
+				.setMenuGroup (
+					menuGroupHelper.findByCodeRequired (
+						GlobalId.root,
+						"test",
+						"system"))
 
-			.setDescription (
-				"")
+				.setCode (
+					"menu")
 
-			.setLabel (
-				"Menu")
+				.setName (
+					"Menu")
 
-			.setTargetPath (
-				"/menuGroups")
+				.setDescription (
+					"")
 
-			.setTargetFrame (
-				"main")
+				.setLabel (
+					"Menu")
 
-		);
+				.setTargetPath (
+					"/menuGroups")
 
-		transaction.flush ();
+				.setTargetFrame (
+					"main")
+
+			);
+
+			transaction.flush ();
+
+		}
 
 	}
 
